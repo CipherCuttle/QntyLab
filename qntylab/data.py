@@ -158,6 +158,11 @@ def load_funding(path: Path) -> list[dict[str, str]]:
 
 def fetch_perp_daily_archive(symbol: str, start: str, end: str, root: Path) -> dict:
     """Resumably normalize completed monthly 1d archives, preserving absence as data."""
+    target = root / "data/raw" / f"{symbol}-perp-1d.csv"
+    if target.exists():
+        existing = load_perp_daily(target)
+        if existing and existing[-1]["timestamp"][:10] >= end:
+            return {"symbol": symbol, "status": "REUSED", "sha256": sha256(target), "rows": len(existing), "start": existing[0]["timestamp"], "end": existing[-1]["timestamp"], "gaps": validate(existing, interval_hours=24)}
     session = requests.Session(); rows: dict[int, list[str]] = {}; sources = []; now = datetime.now(UTC).isoformat().replace("+00:00", "Z")
     for year, month in _months(start, datetime.fromisoformat(end).replace(tzinfo=UTC) + timedelta(days=1)):
         stem = f"{symbol}-1d-{year}-{month:02d}"; url = ARCHIVE_URL.format(kind="klines", symbol=symbol, interval="1d", filename=stem)
@@ -185,11 +190,16 @@ def fetch_perp_daily_archive(symbol: str, start: str, end: str, root: Path) -> d
     gaps = validate(normalized, interval_hours=24)
     for row in normalized:
         if float(row["quote_volume"]) < 0 or float(row["taker_buy_quote_volume"]) < 0: raise ValueError("negative daily quote volume")
-    target = root / "data/raw" / f"{symbol}-perp-1d.csv"; target.parent.mkdir(parents=True, exist_ok=True)
+    target.parent.mkdir(parents=True, exist_ok=True)
     fields = tuple(normalized[0])
     with target.open("w", newline="", encoding="utf-8") as out:
         writer = csv.DictWriter(out, fieldnames=fields); writer.writeheader(); writer.writerows(normalized)
     return {"symbol": symbol, "status": "OK", "source_files": sources, "sha256": sha256(target), "rows": len(normalized), "start": normalized[0]["timestamp"], "end": normalized[-1]["timestamp"], "gaps": gaps, "retrieved_at": now}
+
+def load_perp_daily(path: Path) -> list[dict[str, str]]:
+    with path.open(newline="", encoding="utf-8") as src: rows = list(csv.DictReader(src))
+    validate(rows, interval_hours=24)
+    return rows
 
 def fetch_funding(symbol: str, start: str, root: Path, end: datetime | None = None) -> dict:
     session = requests.Session(); events = []

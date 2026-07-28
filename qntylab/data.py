@@ -156,6 +156,41 @@ def load_funding(path: Path) -> list[dict[str, str]]:
     if not rows or len({row["timestamp"] for row in rows}) != len(rows): raise ValueError("funding rows missing or duplicate")
     return rows
 
+def fetch_perp_daily_archive(symbol: str, start: str, end: str, root: Path) -> dict:
+    """Resumably normalize completed monthly 1d archives, preserving absence as data."""
+    session = requests.Session(); rows: dict[int, list[str]] = {}; sources = []; now = datetime.now(UTC).isoformat().replace("+00:00", "Z")
+    for year, month in _months(start, datetime.fromisoformat(end).replace(tzinfo=UTC) + timedelta(days=1)):
+        stem = f"{symbol}-1d-{year}-{month:02d}"; url = ARCHIVE_URL.format(kind="klines", symbol=symbol, interval="1d", filename=stem)
+        response = session.get(url, timeout=60)
+        if response.status_code == 404: continue
+        response.raise_for_status(); official = session.get(url + ".CHECKSUM", timeout=30)
+        if official.status_code == 200:
+            expected = official.text.strip().split()[0]
+            actual = hashlib.sha256(response.content).hexdigest()
+            if expected != actual: raise ValueError(f"archive checksum mismatch: {url}")
+        with zipfile.ZipFile(BytesIO(response.content)) as archive:
+            names = archive.namelist()
+            if len(names) != 1: raise ValueError(f"unexpected archive members: {url}")
+            with archive.open(names[0]) as raw:
+                for row in csv.reader(TextIOWrapper(raw, encoding="utf-8")):
+                    if row and row[0].isdigit(): rows[int(row[0])] = row
+        sources.append({"url": url, "official_checksum": expected if official.status_code == 200 else None, "archive_sha256": hashlib.sha256(response.content).hexdigest()})
+    cutoff_ms = int(datetime.fromisoformat(end).replace(tzinfo=UTC).timestamp() * 1000) + 86_399_999
+    normalized = []
+    for stamp, row in sorted(rows.items()):
+        if stamp > cutoff_ms: continue
+        normalized.append({"timestamp": datetime.fromtimestamp(stamp / 1000, UTC).isoformat().replace("+00:00", "Z"), "open": row[1], "high": row[2], "low": row[3], "close": row[4], "volume": row[5], "quote_volume": row[7], "trade_count": row[8], "taker_buy_base_volume": row[9], "taker_buy_quote_volume": row[10]})
+    if not normalized: return {"symbol": symbol, "status": "ARCHIVE_ABSENT", "sources": sources}
+    # Existing OHLC validation plus daily-only economic fields.
+    gaps = validate(normalized, interval_hours=24)
+    for row in normalized:
+        if float(row["quote_volume"]) < 0 or float(row["taker_buy_quote_volume"]) < 0: raise ValueError("negative daily quote volume")
+    target = root / "data/raw" / f"{symbol}-perp-1d.csv"; target.parent.mkdir(parents=True, exist_ok=True)
+    fields = tuple(normalized[0])
+    with target.open("w", newline="", encoding="utf-8") as out:
+        writer = csv.DictWriter(out, fieldnames=fields); writer.writeheader(); writer.writerows(normalized)
+    return {"symbol": symbol, "status": "OK", "source_files": sources, "sha256": sha256(target), "rows": len(normalized), "start": normalized[0]["timestamp"], "end": normalized[-1]["timestamp"], "gaps": gaps, "retrieved_at": now}
+
 def fetch_funding(symbol: str, start: str, root: Path, end: datetime | None = None) -> dict:
     session = requests.Session(); events = []
     for year, month in _months(start, end or datetime.now(UTC)):

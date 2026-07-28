@@ -6,6 +6,7 @@ from qntylab.strategies import momentum
 from qntylab.perp import causal, funding_to_bars, evaluate_perp, positions
 from qntylab.experiment import _perp_splits
 from qntylab.cross_section import deterministic_order, evaluate as evaluate_cross_section, factor_scores, random_scores, receipt_sha256, turnover, weights
+from qntylab.universe import build_universe, write_dataset_manifest
 
 def test_signal_is_shifted_one_bar_no_lookahead():
     # The jump is visible at index 2; its long position begins at 3, after the jump.
@@ -113,3 +114,14 @@ def test_archive_symbol_discovery_uses_archive_directories_not_current_exchange_
 
 def test_cross_sectional_receipt_is_deterministic():
     assert receipt_sha256(b'{"v":2}', b'{"manifest":1}') == receipt_sha256(b'{"v":2}', b'{"manifest":1}')
+
+def test_dynamic_universe_is_causal_changes_and_preserves_historical_delistings(tmp_path):
+    symbols=["A","B","C"]; dates=["d0","d1","d2","d3"]
+    close=np.array([[1,1,np.nan],[1,1,np.nan],[1,1,1],[1,np.nan,1]],float)
+    volume=np.array([[10,5,np.nan],[10,6,np.nan],[10,100,100],[10,np.nan,100]],float)
+    selected, ledger=build_universe(symbols,dates,close,volume,history_days=2,liquidity_days=2,top_n=1,minimum_breadth=1)
+    assert selected[1].tolist()==[True,False,False] and selected[2].tolist()==[False,True,False]
+    assert not selected[0,2] and np.isfinite(close[0,0])  # future listing excluded; delisted history remains
+    a=write_dataset_manifest(tmp_path/'a.json',spec_sha256='x',cutoff='2026-06-30',candidates=symbols,panels=[],ledger=ledger,union_selected=['A','B'],exclusions=[])
+    b=write_dataset_manifest(tmp_path/'b.json',spec_sha256='x',cutoff='2026-06-30',candidates=symbols,panels=[],ledger=ledger,union_selected=['A','B'],exclusions=[])
+    assert a['root_sha256']==b['root_sha256']

@@ -1,0 +1,30 @@
+{
+  "complete_archive_months_only": true,
+  "data_type": [
+    "klines",
+    "premiumIndexKlines",
+    "fundingRate"
+  ],
+  "end": "2026-06-30T23:00:00Z",
+  "funding_events": 6096,
+  "funding_source": "Binance public-data fundingRate archive",
+  "gaps": [
+    "2021-06-30T23:00:00+00:00 -> 2021-07-02T00:00:00+00:00 (1 day, 1:00:00)",
+    "2021-07-23T23:00:00+00:00 -> 2021-07-28T00:00:00+00:00 (4 days, 1:00:00)",
+    "2022-02-25T23:00:00+00:00 -> 2022-03-01T00:00:00+00:00 (3 days, 1:00:00)",
+    "2022-03-31T23:00:00+00:00 -> 2022-04-03T00:00:00+00:00 (2 days, 1:00:00)",
+    "2023-04-08T23:00:00+00:00 -> 2023-04-10T00:00:00+00:00 (1 day, 1:00:00)",
+    "2026-06-28T23:00:00+00:00 -> 2026-06-30T00:00:00+00:00 (1 day, 1:00:00)"
+  ],
+  "market": "USD-M perpetual",
+  "retrieved_at": "2026-07-28T20:02:00.457773Z",
+  "rows": 47880,
+  "sha256": {
+    "funding": "138753bec9936f63ec128c9463ae003b02247d045d275167caf36532fd230c9d",
+    "perp": "b292842c2933c088cba5c2b0d508c8980d07a4ae8057c1314db452f5e200301d"
+  },
+  "source": "https://data.binance.vision/data/futures/um/monthly",
+  "start": "2021-01-01T00:00:00Z",
+  "symbol": "SOLUSDT",
+  "timeframe": "1h"
+}

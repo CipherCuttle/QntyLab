@@ -1,0 +1,15 @@
+{
+  "identity": "EXPLORATORY ONLY; NON_AUTHORITATIVE; NO SCIENTIFIC VALIDATION; NO HOLDOUT; NO PAPER/LIVE AUTHORITY; NO TRADING EXECUTION",
+  "sprint": "v1_perp_structure",
+  "symbols": ["BTCUSDT", "ETHUSDT", "SOLUSDT"],
+  "timeframe": "1h",
+  "costs_bps": [5, 10, 20],
+  "causality": "bar-t features activate for the t+1 return; settled funding is event-time information and activates no earlier than the next hour; no returns bridge source gaps",
+  "families": [
+    {"id":"H007_funding_extremes","hypothesis":"Extreme settled funding predicts a crowded-position reversal.","economic_story":"Funding transfers balance crowded perpetual demand; extremes can identify vulnerable positioning, not a free carry claim.","falsifier":"Nonpositive at 10bps, fewer than two positive thirds, fewer than two assets, or extra-bar delay is as good or better.","variants":[{"lookback":168,"threshold":1.5,"holding_hours":8},{"lookback":168,"threshold":2.0,"holding_hours":8},{"lookback":336,"threshold":1.5,"holding_hours":8},{"lookback":168,"threshold":2.0,"holding_hours":24}]},
+    {"id":"H008_funding_conditioned_momentum","hypothesis":"Fixed 168h momentum persists more when funding is not extreme.","economic_story":"Trend with modest leverage demand may be less crowded than trend accompanied by funding extremes.","falsifier":"The conditioned rule does not clear base costs/cross-asset tests or the condition adds no useful robustness.","variants":[{"funding_lookback":168,"max_abs_z":1.0},{"funding_lookback":168,"max_abs_z":1.5},{"funding_lookback":336,"max_abs_z":1.0}]},
+    {"id":"H009_premium_mean_reversion","hypothesis":"Extreme premium-index levels predict subsequent perpetual mean reversion.","economic_story":"Premium is a direct measure of perp-index dislocation and an input to anchoring pressure.","falsifier":"No lagged net relation after cost, or only contemporaneous premium convergence.","variants":[{"lookback":168,"threshold":1.5,"holding_hours":1},{"lookback":168,"threshold":2.0,"holding_hours":8},{"lookback":336,"threshold":1.5,"holding_hours":8},{"lookback":336,"threshold":2.0,"holding_hours":24}]},
+    {"id":"H010_taker_flow","hypothesis":"Taker-buy quote-volume imbalance forecasts continuation or reversal at the next bar.","economic_story":"Aggressive flow can reflect information or temporary pressure; both signs are predeclared.","falsifier":"The next-bar effect vanishes after costs, cross-asset checks, or an extra-bar delay.","variants":[{"lookback":1,"threshold":0.15,"direction":1},{"lookback":6,"threshold":0.15,"direction":1},{"lookback":24,"threshold":0.15,"direction":1},{"lookback":1,"threshold":0.15,"direction":-1},{"lookback":6,"threshold":0.15,"direction":-1},{"lookback":24,"threshold":0.15,"direction":-1}]}
+  ],
+  "classification": "INTERESTING requires positive 10bps net, at least two positive thirds, support on at least two assets, and real alignment beating the extra-bar-delay diagnostic. It remains exploratory; no formal inference is attempted."
+}

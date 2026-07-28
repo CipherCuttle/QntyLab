@@ -1,0 +1,29 @@
+{
+  "complete_archive_months_only": true,
+  "data_type": [
+    "klines",
+    "premiumIndexKlines",
+    "fundingRate"
+  ],
+  "end": "2026-06-30T23:00:00Z",
+  "funding_events": 6021,
+  "funding_source": "Binance public-data fundingRate archive",
+  "gaps": [
+    "2021-06-30T23:00:00+00:00 -> 2021-07-02T00:00:00+00:00 (1 day, 1:00:00)",
+    "2021-07-23T23:00:00+00:00 -> 2021-07-28T00:00:00+00:00 (4 days, 1:00:00)",
+    "2022-10-01T23:00:00+00:00 -> 2022-10-03T00:00:00+00:00 (1 day, 1:00:00)",
+    "2023-04-08T23:00:00+00:00 -> 2023-04-10T00:00:00+00:00 (1 day, 1:00:00)",
+    "2026-06-28T23:00:00+00:00 -> 2026-06-30T00:00:00+00:00 (1 day, 1:00:00)"
+  ],
+  "market": "USD-M perpetual",
+  "retrieved_at": "2026-07-28T19:59:15.967655Z",
+  "rows": 47976,
+  "sha256": {
+    "funding": "9cea3d4bb9424a15102d7e8a941d068a835e9c861e4752a044d4e76fb7fc9003",
+    "perp": "fe07af74a6e509eb3471aaf173f9de5ae9b1fa4e34b6596bc4229178a767f087"
+  },
+  "source": "https://data.binance.vision/data/futures/um/monthly",
+  "start": "2021-01-01T00:00:00Z",
+  "symbol": "ETHUSDT",
+  "timeframe": "1h"
+}

@@ -1,0 +1,52 @@
+family,symbol,params,net_10bps,price_pnl,funding_cashflow,fees,control_net,cross_asset_support,verdict
+H007_funding_extremes,BTCUSDT,"{""holding_hours"": 8, ""lookback"": 168, ""threshold"": 1.5}",-0.5926891914434963,0.4452032777921864,0.06835575,1.334,-0.5104823039001478,0,KILL
+H007_funding_extremes,BTCUSDT,"{""holding_hours"": 8, ""lookback"": 168, ""threshold"": 2.0}",-0.5288092917850126,-0.05826544342605933,0.048067639999999995,0.74,-0.41863061460913964,0,KILL
+H007_funding_extremes,BTCUSDT,"{""holding_hours"": 8, ""lookback"": 336, ""threshold"": 1.5}",-0.08217846263603235,1.6064333541823386,0.08472972,1.1280000000000001,0.11587965398210676,0,KILL
+H007_funding_extremes,BTCUSDT,"{""holding_hours"": 24, ""lookback"": 168, ""threshold"": 2.0}",0.21206582081894143,0.9993212643996039,0.08280327999999999,0.5830000000000001,0.47613074071660333,1,KILL
+H008_funding_conditioned_momentum,BTCUSDT,"{""funding_lookback"": 168, ""max_abs_z"": 1.0}",-0.9995150187729998,0.3209342640149946,0.0,7.906000000000001,-0.9997562911314156,0,KILL
+H008_funding_conditioned_momentum,BTCUSDT,"{""funding_lookback"": 168, ""max_abs_z"": 1.5}",-0.9999249409418817,0.4998879586900018,0.0,9.898000000000001,-0.9999694586388489,0,KILL
+H008_funding_conditioned_momentum,BTCUSDT,"{""funding_lookback"": 336, ""max_abs_z"": 1.0}",-0.9995987418341707,0.2323968161687162,0.0,8.026,-0.9997553749663053,0,KILL
+H009_premium_mean_reversion,BTCUSDT,"{""holding_hours"": 1, ""lookback"": 168, ""threshold"": 1.5}",-0.9998870771985711,0.07342222946963961,0.03815715,9.192,-0.9996185709522336,0,KILL
+H009_premium_mean_reversion,BTCUSDT,"{""holding_hours"": 8, ""lookback"": 168, ""threshold"": 2.0}",-0.9178709142769256,0.36483978827739794,0.10818802,2.9160000000000004,-0.8782207751783204,0,KILL
+H009_premium_mean_reversion,BTCUSDT,"{""holding_hours"": 8, ""lookback"": 336, ""threshold"": 1.5}",-0.9452529469051273,2.467703264529919,0.17190519999999998,4.316,-0.9282387111741566,0,KILL
+H009_premium_mean_reversion,BTCUSDT,"{""holding_hours"": 24, ""lookback"": 336, ""threshold"": 2.0}",-0.8542629096993566,-0.27189275440536387,0.18362653,1.79,-0.753344105353036,0,KILL
+H010_taker_flow,BTCUSDT,"{""direction"": 1, ""lookback"": 1, ""threshold"": 0.15}",-0.999442594584898,0.1610811890852082,0.00252011,7.640000000000001,-0.9994756480816317,0,KILL
+H010_taker_flow,BTCUSDT,"{""direction"": 1, ""lookback"": 6, ""threshold"": 0.15}",-0.054509181840480814,-0.006124914854580554,0.00012552999999999997,0.05,-0.06686293020049094,0,KILL
+H010_taker_flow,BTCUSDT,"{""direction"": 1, ""lookback"": 24, ""threshold"": 0.15}",0.0,0.0,0.0,0.0,0.0,0,KILL
+H010_taker_flow,BTCUSDT,"{""direction"": -1, ""lookback"": 1, ""threshold"": 0.15}",-0.9996144519134571,-0.19259398140579065,-0.00252011,7.640000000000001,-0.9995920570546076,0,KILL
+H010_taker_flow,BTCUSDT,"{""direction"": -1, ""lookback"": 6, ""threshold"": 0.15}",-0.043180858732862704,0.006019388593222708,-0.00012552999999999997,0.05,-0.030544805896353555,0,KILL
+H010_taker_flow,BTCUSDT,"{""direction"": -1, ""lookback"": 24, ""threshold"": 0.15}",0.0,0.0,0.0,0.0,0.0,0,KILL
+H007_funding_extremes,ETHUSDT,"{""holding_hours"": 8, ""lookback"": 168, ""threshold"": 1.5}",-0.8624391019918627,-0.5226289056454647,0.07430195,1.318,-0.7510241145446808,0,KILL
+H007_funding_extremes,ETHUSDT,"{""holding_hours"": 8, ""lookback"": 168, ""threshold"": 2.0}",-0.8096432288041505,-0.6028898341929144,0.06327334,0.798,-0.728594336707924,0,KILL
+H007_funding_extremes,ETHUSDT,"{""holding_hours"": 8, ""lookback"": 336, ""threshold"": 1.5}",-0.86326091559211,-0.6357408844000727,0.1005308,1.08,-0.7108260059438194,0,KILL
+H007_funding_extremes,ETHUSDT,"{""holding_hours"": 24, ""lookback"": 168, ""threshold"": 2.0}",-0.7389001900451478,-0.5681501048513823,0.11483383,0.6180000000000001,-0.5923780019235907,1,KILL
+H008_funding_conditioned_momentum,ETHUSDT,"{""funding_lookback"": 168, ""max_abs_z"": 1.0}",-0.9996136280599418,0.13798672919670807,0.0,7.984,-0.9997457913310237,0,KILL
+H008_funding_conditioned_momentum,ETHUSDT,"{""funding_lookback"": 168, ""max_abs_z"": 1.5}",-0.9999485907853997,0.19876368036659442,0.0,10.052000000000001,-0.9999633919093333,0,KILL
+H008_funding_conditioned_momentum,ETHUSDT,"{""funding_lookback"": 336, ""max_abs_z"": 1.0}",-0.9996187382549245,0.2941934273951965,0.0,8.126000000000001,-0.9997670678464393,0,KILL
+H009_premium_mean_reversion,ETHUSDT,"{""holding_hours"": 1, ""lookback"": 168, ""threshold"": 1.5}",-0.9999184224456267,-0.48600475674441357,0.04181245,8.784,-0.9996132868302698,0,KILL
+H009_premium_mean_reversion,ETHUSDT,"{""holding_hours"": 8, ""lookback"": 168, ""threshold"": 2.0}",-0.9604028169157116,-0.40604733067633725,0.14465765,2.8500000000000005,-0.9424474412022602,0,KILL
+H009_premium_mean_reversion,ETHUSDT,"{""holding_hours"": 8, ""lookback"": 336, ""threshold"": 1.5}",-0.9986585582742105,-0.9247435260439538,0.20423022999999998,4.227,-0.9990147594824823,0,KILL
+H009_premium_mean_reversion,ETHUSDT,"{""holding_hours"": 24, ""lookback"": 336, ""threshold"": 2.0}",-0.8365886653311525,-0.28541015308451956,0.21855618000000002,1.693,-0.7238196861980373,0,KILL
+H010_taker_flow,ETHUSDT,"{""direction"": 1, ""lookback"": 1, ""threshold"": 0.15}",-0.9974170769015084,0.0056965978700305175,0.0126902,5.974,-0.996297332449965,0,KILL
+H010_taker_flow,ETHUSDT,"{""direction"": 1, ""lookback"": 6, ""threshold"": 0.15}",-0.022302656764788598,-0.012336138713439526,-0.00013272000000000002,0.01,-0.010510839343631284,0,KILL
+H010_taker_flow,ETHUSDT,"{""direction"": 1, ""lookback"": 24, ""threshold"": 0.15}",0.0,0.0,0.0,0.0,0.0,0,KILL
+H010_taker_flow,ETHUSDT,"{""direction"": -1, ""lookback"": 1, ""threshold"": 0.15}",-0.9977745171241899,-0.11107301239891776,-0.0126902,5.974,-0.998474684865801,0,KILL
+H010_taker_flow,ETHUSDT,"{""direction"": -1, ""lookback"": 6, ""threshold"": 0.15}",0.0024980395369091912,0.012440308715549131,0.00013272000000000002,0.01,-0.00942372582057105,0,KILL
+H010_taker_flow,ETHUSDT,"{""direction"": -1, ""lookback"": 24, ""threshold"": 0.15}",0.0,0.0,0.0,0.0,0.0,0,KILL
+H007_funding_extremes,SOLUSDT,"{""holding_hours"": 8, ""lookback"": 168, ""threshold"": 1.5}",-0.9549746292372181,-0.8950901852052516,0.37897230000000004,1.226,-0.9487137298036785,0,KILL
+H007_funding_extremes,SOLUSDT,"{""holding_hours"": 8, ""lookback"": 168, ""threshold"": 2.0}",-0.9055351766151024,-0.8497682329864802,0.29762144000000007,0.764,-0.8258396195092733,0,KILL
+H007_funding_extremes,SOLUSDT,"{""holding_hours"": 8, ""lookback"": 336, ""threshold"": 1.5}",-0.8619205864695614,-0.7618971805591577,0.42333813,0.97,-0.8447218146701647,0,KILL
+H007_funding_extremes,SOLUSDT,"{""holding_hours"": 24, ""lookback"": 168, ""threshold"": 2.0}",-0.9604131816222358,-0.954449885153541,0.4492504399999999,0.5920000000000001,-0.9196850752820881,1,KILL
+H008_funding_conditioned_momentum,SOLUSDT,"{""funding_lookback"": 168, ""max_abs_z"": 1.0}",-0.9989856394676225,3.2820857929026586,-0.12112772,8.224000000000002,-0.9998622885335332,0,KILL
+H008_funding_conditioned_momentum,SOLUSDT,"{""funding_lookback"": 168, ""max_abs_z"": 1.5}",-0.9998391358778883,3.9299603474120914,-0.13928898,10.186,-0.9999851955425862,0,KILL
+H008_funding_conditioned_momentum,SOLUSDT,"{""funding_lookback"": 336, ""max_abs_z"": 1.0}",-0.9992668325637103,3.1228057400870206,-0.11967108000000001,8.512,-0.9997685824485126,0,KILL
+H009_premium_mean_reversion,SOLUSDT,"{""holding_hours"": 1, ""lookback"": 168, ""threshold"": 1.5}",-0.9998550907964793,-0.01603560222676792,0.20500568999999996,9.026,-0.9993593821125658,0,KILL
+H009_premium_mean_reversion,SOLUSDT,"{""holding_hours"": 8, ""lookback"": 168, ""threshold"": 2.0}",-0.9945327860369269,-0.9512204746668061,0.42279602000000005,2.615,-0.9970077480845494,0,KILL
+H009_premium_mean_reversion,SOLUSDT,"{""holding_hours"": 8, ""lookback"": 336, ""threshold"": 1.5}",-0.9980743568613747,-0.9479837987738022,0.58377422,3.881,-0.9991959434226811,0,KILL
+H009_premium_mean_reversion,SOLUSDT,"{""holding_hours"": 24, ""lookback"": 336, ""threshold"": 2.0}",-0.9732471872593781,-0.9347160326154709,0.5992436,1.493,-0.9794968421238421,0,KILL
+H010_taker_flow,SOLUSDT,"{""direction"": 1, ""lookback"": 1, ""threshold"": 0.15}",-0.9950776459189608,-0.038386061618844725,0.06365678999999999,5.336,-0.9956577496906786,0,KILL
+H010_taker_flow,SOLUSDT,"{""direction"": 1, ""lookback"": 6, ""threshold"": 0.15}",-0.20871308467573768,-0.17179259361994192,0.050253219999999994,0.096,-0.21348606263685643,0,KILL
+H010_taker_flow,SOLUSDT,"{""direction"": 1, ""lookback"": 24, ""threshold"": 0.15}",-0.15714561232139113,-0.1774276368464749,0.04806533,0.024,-0.1478378442609395,0,KILL
+H010_taker_flow,SOLUSDT,"{""direction"": -1, ""lookback"": 1, ""threshold"": 0.15}",-0.996728729400478,-0.2739265274100239,-0.06365678999999999,5.336,-0.9964193915860207,0,KILL
+H010_taker_flow,SOLUSDT,"{""direction"": -1, ""lookback"": 6, ""threshold"": 0.15}",-0.03710817102513919,0.114093055193494,-0.050253219999999994,0.096,-0.027102981454400044,0,KILL
+H010_taker_flow,SOLUSDT,"{""direction"": -1, ""lookback"": 24, ""threshold"": 0.15}",0.05187185469786715,0.1302190359314781,-0.04806533,0.024,0.042553923310939545,0,KILL

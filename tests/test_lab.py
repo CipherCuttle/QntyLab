@@ -8,6 +8,7 @@ from qntylab.experiment import _perp_splits
 from qntylab.cross_section import deterministic_order, evaluate as evaluate_cross_section, factor_scores, random_scores, receipt_sha256, turnover, weights
 from qntylab.universe import build_universe, write_dataset_manifest
 from qntylab.archive_index import eligible_symbols
+from qntylab.aux_v2 import load_union
 
 def test_signal_is_shifted_one_bar_no_lookahead():
     # The jump is visible at index 2; its long position begins at 3, after the jump.
@@ -138,3 +139,7 @@ def test_non_comparable_commodity_contract_cannot_enter_crypto_universe():
 def test_frozen_funding_factor_ids_are_accepted():
     funding=np.array([[.01],[.02]])
     assert factor_scores(np.ones((2,1)),funding,None,"H014_funding_24h",1)[0,0] == pytest.approx(.01)
+
+def test_auxiliary_union_fails_closed_on_wrong_contract(tmp_path):
+    path=tmp_path/'union.json'; path.write_text('{"symbols":[]}')
+    with pytest.raises(ValueError): load_union(path)

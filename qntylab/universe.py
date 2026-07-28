@@ -7,6 +7,9 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 import numpy as np
 
+# Archive names that unambiguously denote commodity, rather than crypto, perps.
+NON_COMPARABLE_SYMBOLS = frozenset({"XAGUSDT", "XAUUSDT"})
+
 
 def _sha(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -25,7 +28,7 @@ def build_universe(symbols: list[str], dates: list[str], close: np.ndarray, quot
             sample = quote_volume[max(0, t - liquidity_days + 1):t + 1, j]
             if np.isfinite(sample).sum() < liquidity_days: continue
             liquid[j] = np.median(sample)
-        order = sorted((j for j in range(len(symbols)) if np.isfinite(liquid[j])), key=lambda j: (-liquid[j], symbols[j]))
+        order = sorted((j for j in range(len(symbols)) if symbols[j] not in NON_COMPARABLE_SYMBOLS and np.isfinite(liquid[j])), key=lambda j: (-liquid[j], symbols[j]))
         picked = order[:top_n] if len(order) >= minimum_breadth else []
         selected[t, picked] = True
         ledger.append({"date": day, "eligible_count": len(order), "selected_count": len(picked), "selected_symbols": [symbols[j] for j in picked], "liquidity_rank": [{"symbol": symbols[j], "trailing_median_quote_volume": float(liquid[j]), "rank": i + 1} for i, j in enumerate(order)]})

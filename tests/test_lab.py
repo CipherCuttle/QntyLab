@@ -130,3 +130,7 @@ def test_dynamic_universe_is_causal_changes_and_preserves_historical_delistings(
 def test_archive_identity_filter_is_mechanical_and_keeps_retired_usdt_names():
     prefixes=["data/futures/um/monthly/klines/BTCUSDT/", "data/futures/um/monthly/klines/OLDUSDT/", "data/futures/um/monthly/klines/BTCUSDT_260626/", "data/futures/um/monthly/klines/USDCUSDT/", "data/futures/um/monthly/klines/ETHUSDC/"]
     assert eligible_symbols(prefixes)==["BTCUSDT", "OLDUSDT"]
+
+def test_non_comparable_commodity_contract_cannot_enter_crypto_universe():
+    selected,_=build_universe(["BTCUSDT","XAUUSDT"],["d0","d1"],np.ones((2,2)),np.array([[1,100],[1,100.]]),history_days=1,liquidity_days=1,top_n=1,minimum_breadth=1)
+    assert selected[1].tolist()==[True,False]

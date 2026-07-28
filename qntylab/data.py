@@ -4,6 +4,7 @@ import csv, hashlib, json, math, zipfile
 from io import BytesIO, TextIOWrapper
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from xml.etree import ElementTree
 
 import requests
 
@@ -12,6 +13,25 @@ FIELDS = ("timestamp", "open", "high", "low", "close", "volume")
 PERP_FIELDS = ("timestamp", "open", "high", "low", "close", "volume", "quote_volume", "trade_count", "taker_buy_base_volume", "taker_buy_quote_volume", "premium")
 FUNDING_FIELDS = ("timestamp", "funding_interval_hours", "funding_rate")
 ARCHIVE_URL = "https://data.binance.vision/data/futures/um/monthly/{kind}/{symbol}/{interval}/{filename}.zip"
+ARCHIVE_BUCKET_URL = "https://s3-ap-northeast-1.amazonaws.com/data.binance.vision"
+
+def archive_usdt_perp_symbols(session: requests.Session | None = None) -> list[str]:
+    """Discover archive directories, retaining retired USDT perpetual candidates.
+
+    This deliberately does not call Binance exchangeInfo: availability at a
+    rebalance is established later from each candidate's own archived bars.
+    """
+    client = session or requests.Session()
+    prefix = "data/futures/um/daily/klines/"
+    response = client.get(ARCHIVE_BUCKET_URL, params={"delimiter": "/", "prefix": prefix, "max-keys": 1000}, timeout=30)
+    response.raise_for_status(); root = ElementTree.fromstring(response.content)
+    ns = {"s3": "http://s3.amazonaws.com/doc/2006-03-01/"}
+    result = []
+    for item in root.findall("s3:CommonPrefixes", ns):
+        value = item.findtext("s3:Prefix", default="", namespaces=ns).removeprefix(prefix).removesuffix("/")
+        if value.endswith("USDT") and "_" not in value and value not in {"USDCUSDT", "BUSDUSDT", "TUSDUSDT", "FDUSDUSDT"}:
+            result.append(value)
+    return sorted(set(result))
 
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()

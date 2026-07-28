@@ -7,6 +7,7 @@ from qntylab.perp import causal, funding_to_bars, evaluate_perp, positions
 from qntylab.experiment import _perp_splits
 from qntylab.cross_section import deterministic_order, evaluate as evaluate_cross_section, factor_scores, random_scores, receipt_sha256, turnover, weights
 from qntylab.universe import build_universe, write_dataset_manifest
+from qntylab.archive_index import eligible_symbols
 
 def test_signal_is_shifted_one_bar_no_lookahead():
     # The jump is visible at index 2; its long position begins at 3, after the jump.
@@ -125,3 +126,7 @@ def test_dynamic_universe_is_causal_changes_and_preserves_historical_delistings(
     a=write_dataset_manifest(tmp_path/'a.json',spec_sha256='x',cutoff='2026-06-30',candidates=symbols,panels=[],ledger=ledger,union_selected=['A','B'],exclusions=[])
     b=write_dataset_manifest(tmp_path/'b.json',spec_sha256='x',cutoff='2026-06-30',candidates=symbols,panels=[],ledger=ledger,union_selected=['A','B'],exclusions=[])
     assert a['root_sha256']==b['root_sha256']
+
+def test_archive_identity_filter_is_mechanical_and_keeps_retired_usdt_names():
+    prefixes=["data/futures/um/monthly/klines/BTCUSDT/", "data/futures/um/monthly/klines/OLDUSDT/", "data/futures/um/monthly/klines/BTCUSDT_260626/", "data/futures/um/monthly/klines/USDCUSDT/", "data/futures/um/monthly/klines/ETHUSDC/"]
+    assert eligible_symbols(prefixes)==["BTCUSDT", "OLDUSDT"]

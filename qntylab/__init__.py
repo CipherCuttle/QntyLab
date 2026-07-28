@@ -1,0 +1,3 @@
+"""Standalone, non-authoritative public-data experiment harness."""
+
+IDENTITY = "EXPLORATORY ONLY | NON_AUTHORITATIVE | NO SCIENTIFIC VALIDATION | NO HOLDOUT | NO PAPER/LIVE AUTHORITY | NO TRADING EXECUTION"

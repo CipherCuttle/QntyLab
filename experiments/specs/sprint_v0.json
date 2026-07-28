@@ -1,0 +1,11 @@
+{
+  "symbols": ["BTCUSDT", "ETHUSDT", "SOLUSDT"],
+  "timeframe": "1h",
+  "costs_bps": [5, 10, 20],
+  "families": [
+    {"id":"H002_momentum","hypothesis":"Trailing returns predict continuation.","economic_story":"Information diffusion and trend persistence.","falsifier":"Non-positive after 10bps, fewer than two positive thirds, or only one asset.","expected_failure_mode":"Whipsaw and long-market beta.","variants":[{"lookback":24,"mode":"long_flat"},{"lookback":72,"mode":"long_flat"},{"lookback":168,"mode":"long_flat"},{"lookback":72,"mode":"long_short"}]},
+    {"id":"H003_moving_average","hypothesis":"Trend filtering captures persistent moves.","economic_story":"Slow-moving trend and behavioral underreaction.","falsifier":"Non-positive after 10bps, fewer than two positive thirds, or only one asset.","expected_failure_mode":"Lag and whipsaw.","variants":[{"fast":12,"slow":48,"mode":"long_flat"},{"fast":24,"slow":96,"mode":"long_flat"},{"fast":48,"slow":192,"mode":"long_flat"},{"fast":24,"slow":96,"mode":"long_short"}]},
+    {"id":"H004_mean_reversion","hypothesis":"Extreme hourly moves partially reverse.","economic_story":"Liquidity shocks and temporary price pressure.","falsifier":"Non-positive after 10bps, fewer than two positive thirds, or only one asset.","expected_failure_mode":"Continuation after news or liquidation cascades.","variants":[{"lookback":24,"threshold":1.5,"mode":"long_short"},{"lookback":48,"threshold":2.0,"mode":"long_short"},{"lookback":72,"threshold":2.0,"mode":"long_short"}]},
+    {"id":"H005_donchian","hypothesis":"Breakouts continue beyond recent ranges.","economic_story":"Trend following after price discovery.","falsifier":"Non-positive after 10bps, fewer than two positive thirds, or only one asset.","expected_failure_mode":"False breakouts and transaction costs.","variants":[{"lookback":24,"mode":"long_flat"},{"lookback":72,"mode":"long_flat"},{"lookback":168,"mode":"long_flat"},{"lookback":72,"mode":"long_short"}]}
+  ]
+}

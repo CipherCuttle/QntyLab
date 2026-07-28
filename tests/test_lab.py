@@ -134,3 +134,7 @@ def test_archive_identity_filter_is_mechanical_and_keeps_retired_usdt_names():
 def test_non_comparable_commodity_contract_cannot_enter_crypto_universe():
     selected,_=build_universe(["BTCUSDT","XAUUSDT"],["d0","d1"],np.ones((2,2)),np.array([[1,100],[1,100.]]),history_days=1,liquidity_days=1,top_n=1,minimum_breadth=1)
     assert selected[1].tolist()==[True,False]
+
+def test_frozen_funding_factor_ids_are_accepted():
+    funding=np.array([[.01],[.02]])
+    assert factor_scores(np.ones((2,1)),funding,None,"H014_funding_24h",1)[0,0] == pytest.approx(.01)

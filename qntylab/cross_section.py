@@ -43,7 +43,7 @@ def factor_scores(close: np.ndarray, funding: np.ndarray | None, premium: np.nda
     result = np.full_like(close, np.nan, dtype=float)
     if name in {"H012_momentum_7d", "H012_momentum_30d", "H012_momentum_90d", "H013_reversal_1d", "H013_reversal_3d"}:
         result[lookback:] = close[lookback:] / close[:-lookback] - 1
-    elif name == "H014_funding":
+    elif name in {"H014_funding_24h", "H014_funding_7d"}:
         if funding is None: raise ValueError("funding required")
         for t in range(lookback - 1, len(close)):
             result[t] = np.nansum(funding[t - lookback + 1:t + 1])

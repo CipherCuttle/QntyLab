@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 
 # Archive names that unambiguously denote commodity, rather than crypto, perps.
-NON_COMPARABLE_SYMBOLS = frozenset({"XAGUSDT", "XAUUSDT"})
+NON_COMPARABLE_SYMBOLS = frozenset({"TSLAUSDT", "XAGUSDT", "XAUUSDT"})
 
 
 def _sha(path: Path) -> str:

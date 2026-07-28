@@ -1,0 +1,18 @@
+{
+  "identity": "EXPLORATORY ONLY; NON_AUTHORITATIVE; NO SCIENTIFIC VALIDATION; NO HOLDOUT; NO PAPER/LIVE AUTHORITY; NO TRADING EXECUTION",
+  "sprint": "v2_cross_sectional",
+  "data": "Binance Vision USD-M USDT perpetual daily archives; manifest pins source checksums when published and local SHA-256. Archive directory discovery, not current exchangeInfo, supplies candidates.",
+  "universe": {"history_days": 90, "liquidity_days": 30, "top_n": 20, "minimum_breadth": 10, "quote_volume_measure": "trailing 30-day median daily quote volume through t", "exclusions": ["stablecoin-vs-stablecoin", "delivery futures", "leveraged tokens", "non-USDT perpetuals", "non-comparable products"]},
+  "execution": "factor through daily close t; weights trade at the next daily decision and earn close-to-close t to t+1 return; no same-day lookahead; no return across archive gaps; delisting is represented by archive availability and unresolved forced-close execution is flagged.",
+  "portfolio": {"rebalance": "daily", "weekly_robustness": "weekly", "bucket_fraction": 0.2, "weights": "equal weight, +1 total long and -1 total short", "costs_bps": [5, 10, 20]},
+  "factors": [
+    {"id":"H012_momentum_7d","lookback_days":7,"direction":1}, {"id":"H012_momentum_30d","lookback_days":30,"direction":1}, {"id":"H012_momentum_90d","lookback_days":90,"direction":1},
+    {"id":"H013_reversal_1d","lookback_days":1,"direction":-1}, {"id":"H013_reversal_3d","lookback_days":3,"direction":-1},
+    {"id":"H014_funding_24h","lookback_days":1,"direction":-1}, {"id":"H014_funding_7d","lookback_days":7,"direction":-1},
+    {"id":"H015_premium","lookback_days":1,"direction":-1}
+  ],
+  "funding": "actual settled events aggregated to daily rate; report price PnL, funding PnL, fees, and total.",
+  "null": {"count":100,"seed":20260728,"same_universe_and_bucket_counts":true,"report_zero_cost_and_costed":true},
+  "kill_criteria": ["net_10bps_nonpositive", "incoherent_or_zero_ic", "ordinary_random_rank_outcome", "only_2021_to_2023", "single_leg_market_beta", "20bps_catastrophic", "breadth_or_180d_instability", "uninterpretable_delisting"],
+  "interesting_requires": ["positive_10bps", "coherent_ic", "multiple_periods", "meaningfully_beats_random", "nearby_variant", "adequate_breadth", "not_one_asset_driven"]
+}

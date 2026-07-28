@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib, json, re
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlencode
@@ -36,9 +37,9 @@ def eligible_symbols(prefixes: list[str]) -> list[str]:
     values = [p.removeprefix(ROOT).removesuffix("/") for p in prefixes]
     return sorted(v for v in values if v.endswith("USDT") and "_" not in v and v not in excluded)
 
-def inventory(cutoff: str, opener=urlopen) -> dict:
+def inventory(cutoff: str, opener=urlopen, workers: int = 12) -> dict:
     prefixes, _ = list_objects(ROOT, delimiter="/", opener=opener); symbols = eligible_symbols(prefixes); records = []
-    for symbol in symbols:
+    def one(symbol: str) -> list[dict]:
         _, objects = list_objects(f"{ROOT}{symbol}/1d/", opener=opener)
         months: dict[str, dict] = {}
         for item in objects:
@@ -48,7 +49,9 @@ def inventory(cutoff: str, opener=urlopen) -> dict:
             month["checksum_key" if item["key"].endswith(".CHECKSUM") else "zip_key"] = item["key"]
             month["size" if not item["key"].endswith(".CHECKSUM") else "checksum_size"] = item["size"]
             month["last_modified" if not item["key"].endswith(".CHECKSUM") else "checksum_last_modified"] = item["last_modified"]
-        records.extend(value for value in months.values() if "zip_key" in value)
+        return [value for value in months.values() if "zip_key" in value]
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        for rows in pool.map(one, symbols): records.extend(rows)
     result = {"listing_method": "unsigned S3 ListObjectsV2", "bucket": BUCKET, "region": REGION, "root_prefix": ROOT, "cutoff": cutoff, "historical_prefix_count": len(prefixes), "structurally_eligible_symbols": symbols, "objects": sorted(records, key=lambda r: (r["symbol"], r["year_month"]))}
     result["root_sha256"] = hashlib.sha256(json.dumps(result, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
     return result

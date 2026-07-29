@@ -1,0 +1,3834 @@
+{
+  "auxiliary_coverage": [
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 5707,
+        "selected_interval_fully_covered": true,
+        "sha256": "b50ad14248496564578641d6dd5db7231846c78753ffe1cbe12e0e9dcaba0420",
+        "start": "2023-11-22T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 22810,
+        "selected_interval_fully_covered": true,
+        "sha256": "27eaa0852438dbd7493ffb449cc7d1dab51f5617aecb6199b3b2fe8d26ce4cab",
+        "start": "2023-11-22T14:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-08-29",
+      "selected_start": "2024-03-13",
+      "symbol": "1000BONKUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 3454,
+        "selected_interval_fully_covered": true,
+        "sha256": "af93274604544146ce3a8dd7ea7884c8f0c2d96235141f3c8cd4a010fe969b80",
+        "start": "2023-05-06T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 27608,
+        "selected_interval_fully_covered": true,
+        "sha256": "08939f48146fd9e5b17c91041a88bd4fe1b2685e5819f4d650d7c11e4f8ed501",
+        "start": "2023-05-06T16:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-07-31",
+      "selected_start": "2024-03-14",
+      "symbol": "1000FLOKIUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 4171,
+        "selected_interval_fully_covered": true,
+        "sha256": "82e899754eeb3f5e64fd4f5d4630ca423d5e175f4dcee4b836a7b6589b8eca22",
+        "start": "2022-09-09T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 33299,
+        "selected_interval_fully_covered": true,
+        "sha256": "e171127b04a58bb42c883194d272671d8bcfa6003e328c4664d9a83dc4b5cab3",
+        "start": "2022-09-09T13:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-12-27",
+      "selected_start": "2023-12-09",
+      "symbol": "1000LUNCUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 3457,
+        "selected_interval_fully_covered": true,
+        "sha256": "f45f848088041e35187cbc55a719d162ade2919a414adf8a410329a523bddc9c",
+        "start": "2023-05-05T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 27632,
+        "selected_interval_fully_covered": true,
+        "sha256": "a0f69e9c37552e5734273687b48233ff7b6c643991058bc3302276b91f8d8de4",
+        "start": "2023-05-05T16:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-30",
+      "selected_start": "2023-08-02",
+      "symbol": "1000PEPEUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 5569,
+        "selected_interval_fully_covered": true,
+        "sha256": "70ce19672c787e734792cc8269a933c493aabd1f21ec7b71ede62854952d1b69",
+        "start": "2023-12-15T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 22258,
+        "selected_interval_fully_covered": true,
+        "sha256": "1cbcf0378ad2e21146d7af343d82113dd5d4bbebfc08b66a0c96b3737717f86d",
+        "start": "2023-12-15T14:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-08-02",
+      "selected_start": "2024-07-08",
+      "symbol": "1000RATSUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 5587,
+        "selected_interval_fully_covered": true,
+        "sha256": "caa5866db175f711fe0a0d45767e9d54bc4ebf6a3a8e110861189797851d47fc",
+        "start": "2023-12-12T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 22330,
+        "selected_interval_fully_covered": true,
+        "sha256": "7ad168e966beac66009e335dc8cf682a2e3fbddc7c8e58117552e6619cac3f3a",
+        "start": "2023-12-12T14:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-10-14",
+      "selected_start": "2024-07-12",
+      "symbol": "1000SATSUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 5632,
+        "selected_interval_fully_covered": true,
+        "sha256": "02f29db63045effa6fbd2d6ca44736cf1fdd166d053b2bf421844ed023d5cfc2",
+        "start": "2021-05-10T16:00:00.013000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 44887,
+        "selected_interval_fully_covered": true,
+        "sha256": "0b58c065f09883e8b7b1f63bfce32b1cd44fd939b4cb3fe16ce750e62751bc87",
+        "start": "2021-05-10T17:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-01-27",
+      "selected_start": "2021-10-13",
+      "symbol": "1000SHIBUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6251,
+        "selected_interval_fully_covered": true,
+        "sha256": "c805b744bcfe9a87baa4c2de77675920afd73c414f68fe83752bd084028b6a21",
+        "start": "2020-10-16T08:00:00.003000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 49816,
+        "selected_interval_fully_covered": true,
+        "sha256": "d8d5866c2a563c4855ad5611da4fda6c304644e9e26835b657af3e43adc5e56c",
+        "start": "2020-10-16T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-05-19",
+      "selected_start": "2021-01-13",
+      "symbol": "AAVEUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 7063,
+        "selected_interval_fully_covered": true,
+        "sha256": "d19a48d1bdadecf0e3e4ca0c91faca47c7feb84f74f990dbba8c43535aefcf50",
+        "start": "2020-01-19T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 56031,
+        "selected_interval_fully_covered": true,
+        "sha256": "aba63af645fb0ba87fa1adf16cef0824aa6c7a89dc60811986b3701243bbf01d",
+        "start": "2020-01-31T08:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-30",
+      "selected_start": "2020-04-29",
+      "symbol": "ADAUSDT"
+    },
+    {
+      "funding": {
+        "end": "2025-06-19T08:00:00.003000Z",
+        "rows": 2565,
+        "selected_interval_fully_covered": true,
+        "sha256": "f6b523563963248c9d3f1bb9f79b2db21e62e082b8a270a3b3f9ed0ab612c3d4",
+        "start": "2023-02-15T16:00:00.005000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2025-07-10T11:00:00Z",
+        "rows": 20974,
+        "selected_interval_fully_covered": true,
+        "sha256": "dc6463a82c47bdfa0f289381c827758176e4753682ad90829db7efffa69a9544",
+        "start": "2023-02-16T14:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-03-07",
+      "selected_start": "2024-03-05",
+      "symbol": "AGIXUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 3205,
+        "selected_interval_fully_covered": true,
+        "sha256": "3d4aa30a3e91bf10c6472c033bcfb0c893492ca7e930db8303ebad02f71f914a",
+        "start": "2023-07-28T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 25606,
+        "selected_interval_fully_covered": true,
+        "sha256": "0500459e37a2e4b06dc2845a852e2771d04914dcf679bad4afb425f680c397fe",
+        "start": "2023-07-29T02:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-01-21",
+      "selected_start": "2025-01-12",
+      "symbol": "AGLDUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6663,
+        "selected_interval_fully_covered": true,
+        "sha256": "ac079264731c1dc97e439e6b7c60fb5f727ce87ee822a92799c1f58f7a473ba7",
+        "start": "2020-06-01T00:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 52742,
+        "selected_interval_fully_covered": true,
+        "sha256": "640fd8a18042a9dbb2866dadb56677e83d9ca10ae07486b90d7dd2456565a022",
+        "start": "2020-06-16T09:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2021-10-11",
+      "selected_start": "2020-09-13",
+      "symbol": "ALGOUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 6228,
+        "selected_interval_fully_covered": true,
+        "sha256": "1525e777c56695a1002b8e72664036ae0b022e345190221893057a75c9d9cf24",
+        "start": "2021-03-15T16:00:00.030000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 46197,
+        "selected_interval_fully_covered": true,
+        "sha256": "961fb6b488581bc491a7918988234ab2012e9ce834d8b87395161b3b8836f72f",
+        "start": "2021-03-16T03:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2022-04-26",
+      "selected_start": "2021-07-19",
+      "symbol": "ALICEUSDT"
+    },
+    {
+      "funding": {
+        "end": "2025-09-23T08:00:00.001000Z",
+        "rows": 5296,
+        "selected_interval_fully_covered": true,
+        "sha256": "158ac32dbc9fee6bc6d3a1b8d0438efc419bfc216935fa434e6073d8a803bbb8",
+        "start": "2020-11-23T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2025-10-22T10:00:00Z",
+        "rows": 42891,
+        "selected_interval_fully_covered": true,
+        "sha256": "10b8966c88e4331b877894e27c72061035170a7507e8b73ca91b35c8d07f5bea",
+        "start": "2020-11-23T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2021-02-20",
+      "selected_start": "2021-02-20",
+      "symbol": "ALPHAUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 4699,
+        "selected_interval_fully_covered": true,
+        "sha256": "a4f1b79dff56a75d78623e1359421da0eb662b58dc6cd4c7589327f2b3651338",
+        "start": "2022-03-17T16:00:00.004000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 37521,
+        "selected_interval_fully_covered": true,
+        "sha256": "0e6ba192cdc432faf54fc46faf6665a0627f22424b4c307366124c39b4533635",
+        "start": "2022-03-17T15:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-11-25",
+      "selected_start": "2022-06-14",
+      "symbol": "APEUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 8337,
+        "selected_interval_fully_covered": true,
+        "sha256": "61336b53517f429697519455886a1207b21123f5c650b73e946b4af6b946d13f",
+        "start": "2022-02-21T16:00:00.005000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 38085,
+        "selected_interval_fully_covered": true,
+        "sha256": "318a999780fb5cec0926ea1154d607f6c33e6dd44a8518fa20cdcd3937cbf5db",
+        "start": "2022-02-22T03:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-02-23",
+      "selected_start": "2024-02-12",
+      "symbol": "API3USDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 4054,
+        "selected_interval_fully_covered": true,
+        "sha256": "539991be5d38358b1bc0d8408f576628253962e10adf2f31ee2c3a05b3dea07d",
+        "start": "2022-10-18T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 32374,
+        "selected_interval_fully_covered": true,
+        "sha256": "1c4972681b374d5bfef00ac5397362ca203029a21162f88f70dde414a5c06ec0",
+        "start": "2022-10-19T02:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-12-04",
+      "selected_start": "2023-01-16",
+      "symbol": "APTUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 3587,
+        "selected_interval_fully_covered": true,
+        "sha256": "9c1e791fbb9094299ab1055e5c111a5ee714cb4cb7cfb4529d94bb3ff8374ecf",
+        "start": "2023-03-23T08:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 28665,
+        "selected_interval_fully_covered": true,
+        "sha256": "827db5fdf1e7642bf1fb5de3d7725181fd7834712ae3797e1335ad5bf8b1536e",
+        "start": "2023-03-23T15:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-09-16",
+      "selected_start": "2023-06-20",
+      "symbol": "ARBUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 1917,
+        "selected_interval_fully_covered": true,
+        "sha256": "91f5d8e88a183c1b0c571cba322bad173a69a59afaaa0ad0c4020c7cb8c59444",
+        "start": "2025-09-03T12:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 7189,
+        "selected_interval_fully_covered": true,
+        "sha256": "12fc954b124638ddb13be9983e81443d05ad785e46845b22edd134d0992c084f",
+        "start": "2025-09-03T11:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-04-22",
+      "selected_start": "2026-04-22",
+      "symbol": "ARIAUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 5147,
+        "selected_interval_fully_covered": true,
+        "sha256": "10df6298eb341e1267efcb8d82896eb0624ddace1a549bd2f8f982dbaefccc3b",
+        "start": "2021-10-19T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 41133,
+        "selected_interval_fully_covered": true,
+        "sha256": "8f1b8641a73e5b09fb5ca01c5287e1f457c1ef3dd4684f4029c27679736498bf",
+        "start": "2021-10-19T03:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-06-23",
+      "selected_start": "2023-05-27",
+      "symbol": "ARPAUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 1706,
+        "selected_interval_fully_covered": true,
+        "sha256": "d78e04450bcaee00c176a9308a291b8afcf47f967910b6010df12d1ffc0d476b",
+        "start": "2025-09-19T12:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 6804,
+        "selected_interval_fully_covered": true,
+        "sha256": "6aa0241fddcc5e9ffe545e0522e67fbf2276b918640007279c17bfe2d98010a3",
+        "start": "2025-09-19T12:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-03-09",
+      "selected_start": "2025-12-17",
+      "symbol": "ASTERUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 7009,
+        "selected_interval_fully_covered": true,
+        "sha256": "2ae78d8fe89d8d940874df8c732e60a31537a43afa8de5918a3c68fc97740b1d",
+        "start": "2020-02-06T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 55883,
+        "selected_interval_fully_covered": true,
+        "sha256": "8500915a2e3f80122655c66469a06ece6c486999ab0c84fc91adb417f877ffcc",
+        "start": "2020-02-07T12:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-01-08",
+      "selected_start": "2020-05-06",
+      "symbol": "ATOMUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 5631,
+        "selected_interval_fully_covered": true,
+        "sha256": "20519d8fe44c92bc50f51256fc7f7c935740f1d087a1410cc5482db89905f08b",
+        "start": "2023-12-15T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 22259,
+        "selected_interval_fully_covered": true,
+        "sha256": "99ec3ce022c26b8127bd334fbac9ef37cbbf59154e22bc32ba9cb5c7650be54d",
+        "start": "2023-12-15T13:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-04-17",
+      "selected_start": "2025-03-22",
+      "symbol": "AUCTIONUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6322,
+        "selected_interval_fully_covered": true,
+        "sha256": "a1439e44300cc3d35e9666d2e37905a07519dd3ce2e3a70ed0b3a9e13cdd801f",
+        "start": "2020-09-22T16:00:00.004000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 50368,
+        "selected_interval_fully_covered": true,
+        "sha256": "e30570387318b86358783168ff7f25ad86e2a307cafb67866b3268dfd1671c14",
+        "start": "2020-09-23T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-12",
+      "selected_start": "2021-01-24",
+      "symbol": "AVAXUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 6794,
+        "selected_interval_fully_covered": true,
+        "sha256": "59fbf9ff3860b45a9ad29dfca60a938800a236e3a2bcfbdd989713d361a3c412",
+        "start": "2020-11-20T08:00:00.005000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 48976,
+        "selected_interval_fully_covered": true,
+        "sha256": "93274b835408bcd54a87b88038c6641ac7b45fbf32147fcabf1e76c7b3289512",
+        "start": "2020-11-20T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-02-25",
+      "selected_start": "2021-07-15",
+      "symbol": "AXSUSDT"
+    },
+    {
+      "funding": {
+        "end": "2025-10-03T08:00:00.006000Z",
+        "rows": 4795,
+        "selected_interval_fully_covered": true,
+        "sha256": "02567111d4a929479143ea122def1dc0d19e9315148a659ced88915447da0d80",
+        "start": "2021-05-19T08:00:00.003000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2025-10-22T10:00:00Z",
+        "rows": 38644,
+        "selected_interval_fully_covered": true,
+        "sha256": "90e6de075a478421d3bb4a1c9cb6e78eb957fa89766a896e8fb2f75b3e6057cb",
+        "start": "2021-05-19T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-01-05",
+      "selected_start": "2024-01-01",
+      "symbol": "BAKEUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 2798,
+        "selected_interval_fully_covered": true,
+        "sha256": "eb210fcfbe4a6a698684e69f2836395fba9ffb3a60fda33c4b1a7f67b3f5f50d",
+        "start": "2025-03-20T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 11151,
+        "selected_interval_fully_covered": true,
+        "sha256": "d53cd128f991124e8ae7c22248249a961839d195ace691e5e13eec7b00036b03",
+        "start": "2025-03-22T09:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-07-14",
+      "selected_start": "2025-07-14",
+      "symbol": "BANANAS31USDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6488,
+        "selected_interval_fully_covered": true,
+        "sha256": "e2e9474ce4290e6ddcfe62fe5f1781affa1c68c8717ba2303bd1aeb21f574b97",
+        "start": "2020-07-29T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 51712,
+        "selected_interval_fully_covered": true,
+        "sha256": "98a09be5adeb4bb9a0c69cb5b315f3370a7fb30ad5f27134312899d1b81dcb1b",
+        "start": "2020-07-29T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2022-12-12",
+      "selected_start": "2020-10-26",
+      "symbol": "BANDUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6989,
+        "selected_interval_fully_covered": true,
+        "sha256": "f7a8328c6f122f5e768769bfd6c643c6df34b7a89c2158e543416fa6d81bb8e6",
+        "start": "2020-02-13T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 55719,
+        "selected_interval_fully_covered": true,
+        "sha256": "ed56b49a29f019d390795e6772fc7700b2fa9655907b3f764edcc221076d1492",
+        "start": "2020-02-13T08:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2020-07-27",
+      "selected_start": "2020-05-12",
+      "symbol": "BATUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 7119,
+        "selected_interval_fully_covered": true,
+        "sha256": "49615ee5297d0622763536ab9919acfe9874bf4801db70faf8d87ffe8284e4e0",
+        "start": "2020-01-01T00:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 56759,
+        "selected_interval_fully_covered": true,
+        "sha256": "f5f5326e0ebf5c6ef933fd286e1a95dd44789dabfd04b50dfe79efb786dbbf48",
+        "start": "2020-01-01T00:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-04-09",
+      "selected_start": "2020-04-18",
+      "symbol": "BCHUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 1718,
+        "selected_interval_fully_covered": true,
+        "sha256": "3a85824c32d1c6e360be131630d5ed743bdfb0eac1c13607f42209ce2905f388",
+        "start": "2025-11-12T12:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 5508,
+        "selected_interval_fully_covered": true,
+        "sha256": "5787f7a39fba46a2ef9a55dadaeb4d58360a3ab3a22dc9416ff97991a150bcb5",
+        "start": "2025-11-12T12:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-30",
+      "selected_start": "2026-06-13",
+      "symbol": "BEATUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6152,
+        "selected_interval_fully_covered": true,
+        "sha256": "c36d58e8058b5c7f2664eb64acf0c8bced0e6cb819df54b989278f025a869b6a",
+        "start": "2020-11-18T08:00:00.006000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 49024,
+        "selected_interval_fully_covered": true,
+        "sha256": "8be7fd4c426fe1497fd1293529c1ff3df396e25ca716f9dc5491a42800930052",
+        "start": "2020-11-18T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2022-06-29",
+      "selected_start": "2022-06-12",
+      "symbol": "BELUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 5953,
+        "selected_interval_fully_covered": true,
+        "sha256": "ee103127e8b9c846d6a97c3a2366ca9dfc959d6d312a5641cb456a0038470e6c",
+        "start": "2023-10-12T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 23794,
+        "selected_interval_fully_covered": true,
+        "sha256": "6b3f1f6c7f417fbfc2e5752f2d6eb04398210b70b088b6be7ed5c307bf211de0",
+        "start": "2023-10-12T14:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-11-16",
+      "selected_start": "2024-11-06",
+      "symbol": "BIGTIMEUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 4071,
+        "selected_interval_fully_covered": true,
+        "sha256": "4d83f2acdff07a440f8d9673a7cc9d168d8adcb128765bfb22421bedeec159cd",
+        "start": "2025-01-03T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 13020,
+        "selected_interval_fully_covered": true,
+        "sha256": "49e539dc84e10a41867d1f56e58f6f833a890105098f82b7830af69646e32954",
+        "start": "2025-01-03T12:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-09-20",
+      "selected_start": "2025-08-28",
+      "symbol": "BIOUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 3795,
+        "selected_interval_fully_covered": true,
+        "sha256": "e98609ab4b34fde7e4b2eaf7ecc4f1ecdef6db944ad55f3a9508e7007831bd84",
+        "start": "2023-04-27T16:00:00.005000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 27804,
+        "selected_interval_fully_covered": true,
+        "sha256": "928c46b2d9a752c6fefee54dd677391665e7dedf1c44fb333a519db116d86602",
+        "start": "2023-04-28T12:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-02-09",
+      "selected_start": "2023-11-29",
+      "symbol": "BLURUSDT"
+    },
+    {
+      "funding": {
+        "end": "2025-06-19T08:00:00.003000Z",
+        "rows": 7133,
+        "selected_interval_fully_covered": true,
+        "sha256": "3a48b54b13a4f5a1618e0e6adf4ec0b24dc0fba8563a2026233456f9f93c16e2",
+        "start": "2020-09-16T16:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2025-07-10T11:00:00Z",
+        "rows": 42004,
+        "selected_interval_fully_covered": true,
+        "sha256": "756492207a0418625312fcb2537da6b71d7524dee80f9f756f89b95b89800ecb",
+        "start": "2020-09-17T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-10-11",
+      "selected_start": "2023-08-27",
+      "symbol": "BLZUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6998,
+        "selected_interval_fully_covered": true,
+        "sha256": "3163391cf1f4ceb1c605e4a8d1f8c0c9d6d054d049d1bbc81f72066ad70cea96",
+        "start": "2020-02-10T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 55791,
+        "selected_interval_fully_covered": true,
+        "sha256": "3884ad34e73ed7d983fffb27f271e3041e2b1d46642e7d4a098449a98b4b1813",
+        "start": "2020-02-10T08:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-30",
+      "selected_start": "2020-05-09",
+      "symbol": "BNBUSDT"
+    },
+    {
+      "funding": {
+        "end": "2025-06-19T08:00:00.003000Z",
+        "rows": 2998,
+        "selected_interval_fully_covered": true,
+        "sha256": "329a88cf05accfdce8a7f9b046771f8bb9b7b319d405e03f76a9b8b0ac1f1f16",
+        "start": "2023-02-01T00:00:00.013000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2025-07-10T11:00:00Z",
+        "rows": 28003,
+        "selected_interval_fully_covered": true,
+        "sha256": "ea44efbc2c424036bfac714dc0f2cdf3e3435a155cab3dd298e809107aeda2a4",
+        "start": "2022-04-01T03:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-03-11",
+      "selected_start": "2025-03-06",
+      "symbol": "BNXUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 5019,
+        "selected_interval_fully_covered": true,
+        "sha256": "cb697abe580d952ff4e5f52bbad78039528a33eaa991a373ab9fb71b6406baa7",
+        "start": "2024-03-16T00:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 20052,
+        "selected_interval_fully_covered": true,
+        "sha256": "858cf0f83b88817bf03ac47723a3ce6e3f4c3c3e29596a6a5b2afbb9ddd5619b",
+        "start": "2024-03-16T12:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-11-22",
+      "selected_start": "2024-06-13",
+      "symbol": "BOMEUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 7119,
+        "selected_interval_fully_covered": true,
+        "sha256": "db8f5d1739a7b1271f915602854392875ef30384e943094b2f937ddffa672428",
+        "start": "2020-01-01T00:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 56759,
+        "selected_interval_fully_covered": true,
+        "sha256": "5a3a14822885c47067609c08170029fe42a314d082f7113983c3a644154e9ec9",
+        "start": "2020-01-01T00:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-30",
+      "selected_start": "2020-04-18",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.001000Z",
+        "rows": 549,
+        "selected_interval_fully_covered": true,
+        "sha256": "5290c759e218e40ebd67fe2789745e758c844f11070e726c2de53765977a1645",
+        "start": "2026-03-31T08:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 903,
+        "selected_interval_fully_covered": true,
+        "sha256": "30d816ef54701b56730cba891592c7d0aa9e78e9f68d4d7ee9fe749d52772c05",
+        "start": "2026-04-01T09:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-30",
+      "selected_start": "2026-06-29",
+      "symbol": "BZUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 3680,
+        "selected_interval_fully_covered": true,
+        "sha256": "8bfba2758cd13d4987f854cf5b8a7e562a6f62ae361a4c11d954a07bedc59f44",
+        "start": "2023-02-20T08:00:00.008000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 29386,
+        "selected_interval_fully_covered": true,
+        "sha256": "ba7793794a0365db7a0cba4c2f7ebc794f44f9529eade8c58ef1ad863d959518",
+        "start": "2023-02-20T14:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-09-21",
+      "selected_start": "2023-05-20",
+      "symbol": "CFXUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 5810,
+        "selected_interval_fully_covered": true,
+        "sha256": "fca880f7743772cb130a23d3112e92464fce5922cd6ee57f7ac9015c96cb4615",
+        "start": "2021-03-12T08:00:00.005000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 46289,
+        "selected_interval_fully_covered": true,
+        "sha256": "132e869025ba00cb17d715ada2699c68bb4755154fdac5359a02b895d3e2b35e",
+        "start": "2021-03-12T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2021-12-12",
+      "selected_start": "2021-07-29",
+      "symbol": "CHRUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6021,
+        "selected_interval_fully_covered": true,
+        "sha256": "f2652d225246ffe7a4ac89c94cd01312d7f42c32d972f8dd28282dd8ae3112e1",
+        "start": "2021-01-01T00:00:00.002000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 47489,
+        "selected_interval_fully_covered": true,
+        "sha256": "fbf22e353b50010aa5254f0fbda1651c0f68af8aa56e1dd3ffd808fe8eddc542",
+        "start": "2021-01-21T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-01-18",
+      "selected_start": "2021-04-20",
+      "symbol": "CHZUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.001000Z",
+        "rows": 549,
+        "selected_interval_fully_covered": true,
+        "sha256": "1ec9b48c2dea9702312ba71ec09cb0c98113478ada3a6012daae8653e39e7c43",
+        "start": "2026-03-31T08:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 879,
+        "selected_interval_fully_covered": true,
+        "sha256": "1e916b3fc3d25d11bbd0a4e4ad1513c207c81c6a061196b8d6dd5926a0cf6b4e",
+        "start": "2026-04-01T09:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-30",
+      "selected_start": "2026-06-29",
+      "symbol": "CLUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6575,
+        "selected_interval_fully_covered": true,
+        "sha256": "9bffc8c5834468bce59c2e34693763b9e7334984964484f291052917aaf44199",
+        "start": "2020-06-30T08:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 52406,
+        "selected_interval_fully_covered": true,
+        "sha256": "b4f2e1cd15103d74a3f31684cfd9feda0411058403aae7a0e81dc6bcea9919d6",
+        "start": "2020-06-30T09:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-08-26",
+      "selected_start": "2020-09-27",
+      "symbol": "COMPUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.001000Z",
+        "rows": 433,
+        "selected_interval_fully_covered": true,
+        "sha256": "96d625b929f86a501d9890e0a49ea50197726523a6b87341ed1712c82e455084",
+        "start": "2026-02-06T16:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 3322,
+        "selected_interval_fully_covered": true,
+        "sha256": "cb138a8b6ab53f773d65541f94754c03bb9b8ae97b68cfe4b26c20b53e09a210",
+        "start": "2026-02-09T14:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-28",
+      "selected_start": "2026-05-31",
+      "symbol": "CRCLUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6386,
+        "selected_interval_fully_covered": true,
+        "sha256": "00597273323632ad3ba05cc8f1f1e207b3c370af17672acb2ad62a49f24fe8d0",
+        "start": "2020-09-01T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 50896,
+        "selected_interval_fully_covered": true,
+        "sha256": "84a65e86976868aa460bdb69d229f6b492baa1f5563f30e009ec61faa7d88293",
+        "start": "2020-09-01T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-05-09",
+      "selected_start": "2020-11-29",
+      "symbol": "CRVUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 5126,
+        "selected_interval_fully_covered": true,
+        "sha256": "ac45bfc69c185386d5f78fdeac6ac6efc2067c3122dbc479d82ee6b5f8c427c9",
+        "start": "2021-10-26T08:00:00.016000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 40941,
+        "selected_interval_fully_covered": true,
+        "sha256": "3eec96e898e7b4be3123f10f93673067b81f7787f772d4c3b3ad62b00c95adbd",
+        "start": "2021-10-26T03:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-05-19",
+      "selected_start": "2023-05-02",
+      "symbol": "CTSIUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 7016,
+        "selected_interval_fully_covered": true,
+        "sha256": "a8d3763a3e630e96ee8a211f02209296011d7e44f44b647e051095ce74088966",
+        "start": "2020-02-04T08:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 55935,
+        "selected_interval_fully_covered": true,
+        "sha256": "261c4bfd046abdde6d0b96667b5c8f3dcb4077e7719bce44a5fb4b841fe88fac",
+        "start": "2020-02-04T08:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-11-30",
+      "selected_start": "2020-05-03",
+      "symbol": "DASHUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6545,
+        "selected_interval_fully_covered": true,
+        "sha256": "a125ecbaa2a3c159a13dfd28502cb8ef3db247bf882091774d3c8c63e9ee75ed",
+        "start": "2020-07-10T08:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 52166,
+        "selected_interval_fully_covered": true,
+        "sha256": "1017d17eaef1dc37d1ae40a16d099fb682442dd5c320ea36e2a73eae737e9d87",
+        "start": "2020-07-10T09:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-30",
+      "selected_start": "2021-02-11",
+      "symbol": "DOGEUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6422,
+        "selected_interval_fully_covered": true,
+        "sha256": "5f4c7b05505df439e273ea23b1fe9e5d74e9c30ac31b5e7e9efd09a62c406db1",
+        "start": "2020-08-20T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 51136,
+        "selected_interval_fully_covered": true,
+        "sha256": "bc7d92a952efd07a0db47f698fec5da7384f981eeec35be6fb5c6ccb9bb1f7e3",
+        "start": "2020-08-22T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-04-22",
+      "selected_start": "2020-11-19",
+      "symbol": "DOTUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 5266,
+        "selected_interval_fully_covered": true,
+        "sha256": "4648ac1dda4b4e65bd06ce35a5c92de5c44d47ff7810d725b823b42905735732",
+        "start": "2021-09-09T16:00:00.002000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 42045,
+        "selected_interval_fully_covered": true,
+        "sha256": "40ed699fef9b19a2ade287605158b19b63e3f6811efe7d6711d063ef47b87fb2",
+        "start": "2021-09-10T03:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-01-07",
+      "selected_start": "2022-02-26",
+      "symbol": "DYDXUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6349,
+        "selected_interval_fully_covered": true,
+        "sha256": "bcb86d72062229d94e754bbc29d7d9e6e953533896e378cccfc71639db4aa9ea",
+        "start": "2020-09-13T16:00:00.004000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 50584,
+        "selected_interval_fully_covered": true,
+        "sha256": "fd819bb965b7ddd45098d7fcc53b1cda06a4cd69411563f01561739085517041",
+        "start": "2020-09-14T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2022-04-03",
+      "selected_start": "2020-12-24",
+      "symbol": "EGLDUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 4915,
+        "selected_interval_fully_covered": true,
+        "sha256": "e3b50197dbdf8394b7982fa12d529d476d9105166435981c36908dda8be64367",
+        "start": "2024-04-02T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 19644,
+        "selected_interval_fully_covered": true,
+        "sha256": "9b53e4af7a5412d254283b1f21d75e7fcb0f3a7a26995632166da2dd6f1bae24",
+        "start": "2024-04-02T12:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-30",
+      "selected_start": "2024-08-19",
+      "symbol": "ENAUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 6885,
+        "selected_interval_fully_covered": true,
+        "sha256": "f48eb6bbee13da6a1c594e7962df9c5b7d004483eefec41fda64535b3009a44e",
+        "start": "2020-09-29T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 50224,
+        "selected_interval_fully_covered": true,
+        "sha256": "a01b8cbebd38f3fcdf31ba26aa6b51b1a48720713fee8614607582dabe3d83b6",
+        "start": "2020-09-29T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2021-04-18",
+      "selected_start": "2021-03-17",
+      "symbol": "ENJUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 5023,
+        "selected_interval_fully_covered": true,
+        "sha256": "d3aa3c6abdd8dbc5ab35b8a40469cbdb0072c6b28ff5236c09b28aff02cbd170",
+        "start": "2021-11-29T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 40101,
+        "selected_interval_fully_covered": true,
+        "sha256": "d3e377ff80e9e3dcdc030c791c3a3d944421b470be6edfe494d3bcac801addf0",
+        "start": "2021-11-30T03:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-07-27",
+      "selected_start": "2022-05-17",
+      "symbol": "ENSUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 7097,
+        "selected_interval_fully_covered": true,
+        "sha256": "3f5a751992d95b4c514751058b432d5fa7013b152855c5718c55176c39939f2d",
+        "start": "2020-01-08T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2025-05-21T09:00:00Z",
+        "rows": 46873,
+        "selected_interval_fully_covered": true,
+        "sha256": "748f64f00114dc3a7e568d3655812b2bb778e540cd753cf3fe7fa3d5800cec4b",
+        "start": "2020-01-08T08:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-05-02",
+      "selected_start": "2020-04-18",
+      "symbol": "EOSUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 2216,
+        "selected_interval_fully_covered": true,
+        "sha256": "e5ed4d27036381a4951b6836b3780932e4edcdccbb742e1a77deaf99b25b3c85",
+        "start": "2025-07-29T12:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 8054,
+        "selected_interval_fully_covered": true,
+        "sha256": "a88e284520e2b35018d74a1cf48e07dbdd60a3c69842c8efb47256a3bbde527f",
+        "start": "2025-07-29T10:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-21",
+      "selected_start": "2026-06-21",
+      "symbol": "ESPORTSUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 7073,
+        "selected_interval_fully_covered": true,
+        "sha256": "2248a9c0927b81c160ddfcc322fb9807e6790a0b7fae6b75574534e4f7076c54",
+        "start": "2020-01-16T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 56391,
+        "selected_interval_fully_covered": true,
+        "sha256": "180aac19484a0020d7208d5cd3b6f55a67feaa13e7370e78a71c066580ef8df2",
+        "start": "2020-01-16T08:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-12-15",
+      "selected_start": "2020-04-18",
+      "symbol": "ETCUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 5005,
+        "selected_interval_fully_covered": true,
+        "sha256": "e1ef6887b4c691846a9f0cb82cc63d87d2a3c4336659be206e273d273a7b653b",
+        "start": "2024-03-18T16:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 20001,
+        "selected_interval_fully_covered": true,
+        "sha256": "b865cbe732c07a40cca67c0970d31d9fc679d5bc8f32000d731b077840615c81",
+        "start": "2024-03-18T15:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-08-01",
+      "selected_start": "2024-07-24",
+      "symbol": "ETHFIUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 7119,
+        "selected_interval_fully_covered": true,
+        "sha256": "5fdae20506f21ddf7a302920cf048ef2c1aafed50b8f5c2c373080d36e8788a5",
+        "start": "2020-01-01T00:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 56759,
+        "selected_interval_fully_covered": true,
+        "sha256": "6ff1a163e1f0ba630e3d183531b7ad6d64f42803cce2a71d6918948544187fad",
+        "start": "2020-01-01T00:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-30",
+      "selected_start": "2020-04-18",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 3342,
+        "selected_interval_fully_covered": true,
+        "sha256": "adef983fd7cca302fd3e98123b2d2c0d78951e2eb827898d03fc2b89311bbaf6",
+        "start": "2024-12-20T20:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 13350,
+        "selected_interval_fully_covered": true,
+        "sha256": "1769ca364759cd743050f49b0a48a449de48ab7e7ee99b0da04088d135c398f4",
+        "start": "2024-12-20T18:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-01-28",
+      "selected_start": "2025-03-19",
+      "symbol": "FARTCOINUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 3785,
+        "selected_interval_fully_covered": true,
+        "sha256": "9753a011fb3d73b16af0be8d31d21d3eddefa40529c0e482af8dc4b92a54d890",
+        "start": "2023-01-16T08:00:00.007000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 30214,
+        "selected_interval_fully_covered": true,
+        "sha256": "32ebe530494fe86c2155c3a519110c41535b035254493df850d09d4effd4201b",
+        "start": "2023-01-17T02:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-10-17",
+      "selected_start": "2024-03-09",
+      "symbol": "FETUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6251,
+        "selected_interval_fully_covered": true,
+        "sha256": "f1aecc84ad8d30d5549ad40d7b3ac8a43623c0a9402feb4b477f1cd2a2cc09fa",
+        "start": "2020-10-16T08:00:00.003000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 49697,
+        "selected_interval_fully_covered": true,
+        "sha256": "2a9ca8d0bdb170a7d86ea55ab978798a3dcd04880588ef54e6321d6465b53e33",
+        "start": "2020-10-16T06:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-05",
+      "selected_start": "2021-03-26",
+      "symbol": "FILUSDT"
+    },
+    {
+      "funding": {
+        "end": "2025-06-19T08:00:00.003000Z",
+        "rows": 5190,
+        "selected_interval_fully_covered": true,
+        "sha256": "a695d53bad9f8bd4d6f8312a87dfdb27839268d4fda418047dc5181a526a8d2e",
+        "start": "2020-09-23T16:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2025-07-10T11:00:00Z",
+        "rows": 41740,
+        "selected_interval_fully_covered": true,
+        "sha256": "93ed50b1c883c2bfa1baa2b5bb73109f2236ecd73cadd3db0f6477963f938654",
+        "start": "2020-09-24T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-11-05",
+      "selected_start": "2021-09-13",
+      "symbol": "FTMUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-04-15T08:00:00Z",
+        "rows": 2823,
+        "selected_interval_fully_covered": true,
+        "sha256": "ff703d0ab5ce6414e0b41405242303841bf73aa1c938eb6a717380d6b7778670",
+        "start": "2025-03-31T12:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-12T07:00:00Z",
+        "rows": 10512,
+        "selected_interval_fully_covered": true,
+        "sha256": "060f4621429e32155336ab65987a0635f5fe0fd9298095e092b51a1f5920432f",
+        "start": "2025-03-31T08:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-07-17",
+      "selected_start": "2025-07-06",
+      "symbol": "FUNUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 5242,
+        "selected_interval_fully_covered": true,
+        "sha256": "5761f26359e9e40a7f75646af4e4710616ec1663499cf07ccbc11553cfcb5417",
+        "start": "2021-09-17T16:00:00.013000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 41853,
+        "selected_interval_fully_covered": true,
+        "sha256": "2712c23f70677004dc036aa7061739a7050b764a3a486f558f17465c22f1aa84",
+        "start": "2021-09-18T03:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-12-16",
+      "selected_start": "2021-12-16",
+      "symbol": "GALAUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 5314,
+        "selected_interval_fully_covered": true,
+        "sha256": "24d8da528b654c639dcbc6e920d4e64eabbf4741dbebdb477409d13e99151fb9",
+        "start": "2022-03-14T16:00:00.002000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 37556,
+        "selected_interval_fully_covered": true,
+        "sha256": "1558e4fe53e2663376cc134f9d69f64c544d8d33b46fdc0e7021651996404a8a",
+        "start": "2022-03-15T04:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-12-06",
+      "selected_start": "2022-06-14",
+      "symbol": "GMTUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6059,
+        "selected_interval_fully_covered": true,
+        "sha256": "9f0706b95ed065267d2b550e26e075b487b4554f02cb9fc3a37a348ef3599c48",
+        "start": "2020-12-19T08:00:00.018000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 48185,
+        "selected_interval_fully_covered": true,
+        "sha256": "867e73d8ef59d77432a20f0b662a11a0bfc11d9ace91e2525be3a526ac24800d",
+        "start": "2020-12-19T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-03-06",
+      "selected_start": "2023-03-04",
+      "symbol": "GRTUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 5795,
+        "selected_interval_fully_covered": true,
+        "sha256": "678050f2708c39d191c7f9aa9d204bfaf82b661f95da2f3097b54d672cab0749",
+        "start": "2021-03-17T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 46073,
+        "selected_interval_fully_covered": true,
+        "sha256": "29459c3d4dea16cfd6266bbf6bcba5b92ce92133bbd6da05a608b00dc95285cd",
+        "start": "2021-03-17T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-03-26",
+      "selected_start": "2024-12-06",
+      "symbol": "HBARUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 2638,
+        "selected_interval_fully_covered": true,
+        "sha256": "2744a6605c12b2524677a781086977cb937edef4d19222ffd7b3cbbb80e2fd35",
+        "start": "2025-06-25T12:00:00.003000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 8871,
+        "selected_interval_fully_covered": true,
+        "sha256": "504952bfa83cfa5b7dbae57504117096970d92316ed4201b563056037f0110c8",
+        "start": "2025-06-25T09:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-30",
+      "selected_start": "2026-06-14",
+      "symbol": "HUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 2378,
+        "selected_interval_fully_covered": true,
+        "sha256": "bbd7a9ae4bf44dfafdc6f128aefab0e37f2fa2ef762dccfc1951834e46a9bd6a",
+        "start": "2025-05-30T12:00:00.006000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 9494,
+        "selected_interval_fully_covered": true,
+        "sha256": "c72a5d4e5912b188adcef823633dcb0fe818e4c59c1e8b2ac72319564cc1b465",
+        "start": "2025-05-30T10:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-30",
+      "selected_start": "2025-08-27",
+      "symbol": "HYPEUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 4197,
+        "selected_interval_fully_covered": false,
+        "sha256": "fe90c386f68fb02e6911e68fd7f55ea50e73a153aeafb8295850feef0326e543",
+        "start": "2022-09-01T00:00:00.012000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 43034,
+        "selected_interval_fully_covered": true,
+        "sha256": "3a430682f751b1ab35c14aa28f617a90e879432bfb85c7c31130272f72391e83",
+        "start": "2021-05-11T03:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-12-01",
+      "selected_start": "2021-08-15",
+      "symbol": "ICPUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 4243,
+        "selected_interval_fully_covered": true,
+        "sha256": "3d01d6f631d62093027ea5d958efc9f8ce83922ecc3a096e94354381fad29f74",
+        "start": "2022-08-16T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 33862,
+        "selected_interval_fully_covered": true,
+        "sha256": "cddae06b707d882a4607a517126061ab6da9effb03de6be4453b9659ab111b1e",
+        "start": "2022-08-17T02:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-07-06",
+      "selected_start": "2023-04-18",
+      "symbol": "INJUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.001000Z",
+        "rows": 446,
+        "selected_interval_fully_covered": true,
+        "sha256": "5ae192bc0a7c20aa22878a003389d99c64e66bde136641da55c5b63b3a4fe207",
+        "start": "2026-02-02T08:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 3466,
+        "selected_interval_fully_covered": true,
+        "sha256": "3a430f57637eef554ec150127cc3921df1663a4de14b1b0ad115829495bf5bbb",
+        "start": "2026-02-02T14:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-30",
+      "selected_start": "2026-06-22",
+      "symbol": "INTCUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6965,
+        "selected_interval_fully_covered": true,
+        "sha256": "1e67f4ba219ffbf34f479fedb2ece17a34c93b8571a7c466eb6bb3bdb5f59515",
+        "start": "2020-02-21T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 55551,
+        "selected_interval_fully_covered": true,
+        "sha256": "612201a73a7cf5a61891fba9d7cafa56780906184a1e7b641739649bb0653288",
+        "start": "2020-02-21T08:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2020-09-26",
+      "selected_start": "2020-06-05",
+      "symbol": "IOSTUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6992,
+        "selected_interval_fully_covered": true,
+        "sha256": "ee8c53c7237a130de0cbf023739ea5f28757f86aaa65c854a646662fc7f39b1e",
+        "start": "2020-02-12T08:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 55647,
+        "selected_interval_fully_covered": true,
+        "sha256": "15041f21cf37b81430c5a36305f5d2c414cb865c851fb16670c68c868db9c0ca",
+        "start": "2020-02-12T08:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2020-05-15",
+      "selected_start": "2020-05-11",
+      "symbol": "IOTAUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 4601,
+        "selected_interval_fully_covered": true,
+        "sha256": "34c24bd5babcf57c3c978315b5e579cb1f75268568aa28eb370aa8b28334020e",
+        "start": "2022-04-19T08:00:00.031000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 36741,
+        "selected_interval_fully_covered": true,
+        "sha256": "6f0ce79b9b69051a112aac3ca69a0a518e4da16220951a6ba70efd43550fdfbe",
+        "start": "2022-04-20T03:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-07-04",
+      "selected_start": "2024-06-11",
+      "symbol": "JASMYUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 5612,
+        "selected_interval_fully_covered": true,
+        "sha256": "2a04be8996d12e2364595c9a2fc08811b9799d4d7263e7fbb8bdb081c3ed5ff3",
+        "start": "2023-12-08T12:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 22430,
+        "selected_interval_fully_covered": true,
+        "sha256": "668fb8398ac00a391b828c79193a158e5f2e8ddfac50c566ea15ea7ee1e68d85",
+        "start": "2023-12-08T10:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-05-22",
+      "selected_start": "2024-05-13",
+      "symbol": "JTOUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 5284,
+        "selected_interval_fully_covered": true,
+        "sha256": "24149a14c586f0f86aeb395eda415e4d8d665ce9f001921780b9dd7275b520d3",
+        "start": "2024-02-01T04:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 21117,
+        "selected_interval_fully_covered": true,
+        "sha256": "bbf9be1e55ab8803e1deab1219bfbb306a43a23dcd8f9477c0d97ea082799aa2",
+        "start": "2024-02-01T03:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-02-27",
+      "selected_start": "2025-02-06",
+      "symbol": "JUPUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 2971,
+        "selected_interval_fully_covered": true,
+        "sha256": "7acc56c87097ed75c9f1907215c4b410575cbe3d5b4bfa99753e4e3081726f21",
+        "start": "2025-02-20T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 11867,
+        "selected_interval_fully_covered": true,
+        "sha256": "b8e4f2d4bddc7f12fe4f4da4fd6491c85038ce544266e3b67155544e96e9b22c",
+        "start": "2025-02-20T13:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-05-30",
+      "selected_start": "2025-05-30",
+      "symbol": "KAITOUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 7937,
+        "selected_interval_fully_covered": true,
+        "sha256": "ac380201ada636009ed2a1b7a3d8020196bb45578e6e8172e91efcaff42f6cc3",
+        "start": "2020-07-28T08:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 51760,
+        "selected_interval_fully_covered": true,
+        "sha256": "3ffa55d542f2ece4cfa676d14d9bd746f0dd6aef58d4b40493a3cd1053ecc156",
+        "start": "2020-07-28T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-06-11",
+      "selected_start": "2020-11-22",
+      "symbol": "KAVAUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 1466,
+        "selected_interval_fully_covered": true,
+        "sha256": "678f6d2476ee0b8fac00fb656de90bc686ac764368efcbce256fdfcc06dd6d8e",
+        "start": "2025-10-29T12:00:00.011000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 5846,
+        "selected_interval_fully_covered": true,
+        "sha256": "eea3422bb2f0688aea9e24aaf0dd11a1553deeebe8bde420e4c16b398cb4e0e8",
+        "start": "2025-10-29T10:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-03-12",
+      "selected_start": "2026-03-10",
+      "symbol": "KITEUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6599,
+        "selected_interval_fully_covered": true,
+        "sha256": "9919ac9674dcb54eb762d7286bcc22154e96534fd0f942a2bb42525baf86d0e9",
+        "start": "2020-06-22T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 52503,
+        "selected_interval_fully_covered": true,
+        "sha256": "8c1067d91d2414b163becc52e0b4ef8c0f52baf579336e24fc87aa9f9bc19e9e",
+        "start": "2020-06-22T08:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2022-06-11",
+      "selected_start": "2022-05-02",
+      "symbol": "KNCUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6257,
+        "selected_interval_fully_covered": true,
+        "sha256": "4a729b16aac7f1f0a22d110776e35a05545e3b46ae5248c11d64cc7eaaea37ce",
+        "start": "2020-10-14T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 49768,
+        "selected_interval_fully_covered": true,
+        "sha256": "792b57cf0e9bd75d92c795e8eae5716bc482fa67ad0de4f6278510c0abffc034",
+        "start": "2020-10-14T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2021-07-15",
+      "selected_start": "2021-06-25",
+      "symbol": "KSMUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T23:00:00.002000Z",
+        "rows": 1768,
+        "selected_interval_fully_covered": true,
+        "sha256": "20adf36c54b649347a10499d7f35e696732d435601328970cbe6bb66efaa954a",
+        "start": "2025-10-17T16:00:00.003000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 6130,
+        "selected_interval_fully_covered": true,
+        "sha256": "6200fb5e047c6affc6e85c5caaca4e73eb920b27db3ce9adcd21ee77cde20466",
+        "start": "2025-10-17T14:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-30",
+      "selected_start": "2026-05-13",
+      "symbol": "LABUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 5142,
+        "selected_interval_fully_covered": true,
+        "sha256": "5bf23bf649102b8b1b864843b7c7239083cf5d3de104c8feb3c889df7d90cc3b",
+        "start": "2025-02-11T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 12081,
+        "selected_interval_fully_covered": true,
+        "sha256": "3d1646ca27ffdb590a6d0233495b689f11ed2f0d7dd32d7bf732788fa9cec82e",
+        "start": "2025-02-11T15:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-05-15",
+      "selected_start": "2025-05-11",
+      "symbol": "LAYERUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 4133,
+        "selected_interval_fully_covered": true,
+        "sha256": "569628dde8455c985e6088cf71d7623ba70ddd58e8af886c83b6dfacff05491b",
+        "start": "2022-09-22T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 33012,
+        "selected_interval_fully_covered": true,
+        "sha256": "f7b88d9e119cf753220e51b7353999ed73151cae93639de85877cce410dd8aa6",
+        "start": "2022-09-22T12:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-07-14",
+      "selected_start": "2023-01-16",
+      "symbol": "LDOUSDT"
+    },
+    {
+      "funding": {
+        "end": "2020-10-10T00:00:00.005000Z",
+        "rows": 243,
+        "selected_interval_fully_covered": false,
+        "sha256": "a5741d6e17d8bc0e5264f79eb5b6599f4f89f3c195534c9d49785c42cb68d6ab",
+        "start": "2020-07-21T08:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2020-11-10T08:00:00Z",
+        "rows": 2640,
+        "selected_interval_fully_covered": true,
+        "sha256": "a5efb914e9e5fc4ef1ca5cf034e6cfac840284709f793b29a42718164c5b9715",
+        "start": "2020-07-23T09:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2020-10-21",
+      "selected_start": "2020-10-20",
+      "symbol": "LENDUSDT"
+    },
+    {
+      "funding": {
+        "end": "2025-09-03T08:00:00.002000Z",
+        "rows": 2665,
+        "selected_interval_fully_covered": true,
+        "sha256": "97f948fe0d68de7249337f02db9c7dbb486a28e1a33109a6c165bf6afdd2d4a8",
+        "start": "2023-03-30T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2025-09-08T07:00:00Z",
+        "rows": 21404,
+        "selected_interval_fully_covered": true,
+        "sha256": "313b42766a25947c00a549d326bcad44467eb5baf43448abb960950f9a220110",
+        "start": "2023-03-30T12:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-10-21",
+      "selected_start": "2023-10-09",
+      "symbol": "LEVERUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 1729,
+        "selected_interval_fully_covered": true,
+        "sha256": "f11f6b88e9da78e6b8fed68125cb347d40a75cbacd027da6357b6bedcc3fe824",
+        "start": "2025-09-26T16:00:00.008000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 6613,
+        "selected_interval_fully_covered": true,
+        "sha256": "ebd7aa5a2684a0c7076cfb32496a7d41ce69ecc99713ee868529c19093d1b25a",
+        "start": "2025-09-27T11:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-01-10",
+      "selected_start": "2026-01-01",
+      "symbol": "LIGHTUSDT"
+    },
+    {
+      "funding": {
+        "end": "2025-06-19T08:00:00.003000Z",
+        "rows": 4660,
+        "selected_interval_fully_covered": true,
+        "sha256": "1b5573040669f6f981a656b8c99660f6b31032bcb1e779509530ff6ec04ae1c7",
+        "start": "2021-03-19T08:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2025-07-10T11:00:00Z",
+        "rows": 37517,
+        "selected_interval_fully_covered": true,
+        "sha256": "3a07e045e2b862ac4ade006633dbdf46291a10b2a4f1d245a3ad107723c52f8e",
+        "start": "2021-03-19T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-07-12",
+      "selected_start": "2023-04-12",
+      "symbol": "LINAUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 7070,
+        "selected_interval_fully_covered": true,
+        "sha256": "7c6272b1eb51079a2e60beae983d7f0a0c60de26e0b87245b57632a3d644d8ce",
+        "start": "2020-01-17T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 56367,
+        "selected_interval_fully_covered": true,
+        "sha256": "6725a739a0d5f9cfd212647776f3fbc172fcde21c9dc9a5d3551a9055102c04c",
+        "start": "2020-01-17T08:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-13",
+      "selected_start": "2020-04-18",
+      "symbol": "LINKUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 8967,
+        "selected_interval_fully_covered": true,
+        "sha256": "3a29b31435eb99ee123a58938a7d3d1f3b6883016eef94ece87ffe6f2a381a08",
+        "start": "2021-11-11T08:00:00.012000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 40557,
+        "selected_interval_fully_covered": true,
+        "sha256": "b3daddd35473c4eb7f0acbf292eb79e1bbcd107a62163b1c2907f31ea2e653de",
+        "start": "2021-11-11T03:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-09-16",
+      "selected_start": "2023-08-23",
+      "symbol": "LPTUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 3628,
+        "selected_interval_fully_covered": true,
+        "sha256": "1553e147ea4d0e90bd65c0f30d713e6ea0950c4dc67315471bf3274f356c8fa6",
+        "start": "2023-03-09T16:00:00.002000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 28956,
+        "selected_interval_fully_covered": true,
+        "sha256": "1b56c27285ab83318696e29ecfbc119dc207eac480aca43bc990bebb60dbfe24",
+        "start": "2023-03-10T12:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-11-02",
+      "selected_start": "2023-10-17",
+      "symbol": "LQTYUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-03-24T08:00:00Z",
+        "rows": 6662,
+        "selected_interval_fully_covered": true,
+        "sha256": "48520fe9f70dd9139b8c50d8d0993b83f69c63e3be30f9c34ad57c642dad7de7",
+        "start": "2020-10-19T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-12T07:00:00Z",
+        "rows": 49224,
+        "selected_interval_fully_covered": true,
+        "sha256": "a356e05df539aff24cce7ef0d6206e105b5651bdc5bd4b08d56cc83db1873dc9",
+        "start": "2020-10-19T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2021-12-22",
+      "selected_start": "2021-11-14",
+      "symbol": "LRCUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 7094,
+        "selected_interval_fully_covered": true,
+        "sha256": "2d5c7bec9f2b1a023f15477c4c688839b2b73da762d3588fcd93a928b33d7f52",
+        "start": "2020-01-09T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 56463,
+        "selected_interval_fully_covered": true,
+        "sha256": "008d8b79977a1d5cb4d8bc0bafe56a32278a58fd793eb0c353a82913db5c2d5c",
+        "start": "2020-01-09T08:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-02-14",
+      "selected_start": "2020-04-18",
+      "symbol": "LTCUSDT"
+    },
+    {
+      "funding": {
+        "end": "2022-05-13T00:00:00.014000Z",
+        "rows": 1410,
+        "selected_interval_fully_covered": true,
+        "sha256": "e4d0da4edafc93ba7e53f8084c18081582c3aab9f08387c606e572636bdce875",
+        "start": "2021-01-28T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2022-05-13T06:00:00Z",
+        "rows": 11040,
+        "selected_interval_fully_covered": true,
+        "sha256": "24e4c2544655cf10ec8d86f145acddf84519d96ff365daf3a9a5079896313245",
+        "start": "2021-01-28T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2022-05-13",
+      "selected_start": "2021-08-03",
+      "symbol": "LUNAUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 5801,
+        "selected_interval_fully_covered": true,
+        "sha256": "51767bc20290ee5cb84594071229223ef11636d01d59707299cd5d21b4d94d4e",
+        "start": "2021-03-15T08:00:00.016000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 46121,
+        "selected_interval_fully_covered": true,
+        "sha256": "7cc4875e8f3a97e76486351744b305f3c5c6e348b2820a713da4334573ed2d71",
+        "start": "2021-03-15T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-02-18",
+      "selected_start": "2021-11-12",
+      "symbol": "MANAUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 7225,
+        "selected_interval_fully_covered": true,
+        "sha256": "cfbea486e36f5c76b8030821d50bf52204375a5c84a3515ccc6bce36adf85e3e",
+        "start": "2021-08-26T08:00:00.016000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 42285,
+        "selected_interval_fully_covered": true,
+        "sha256": "79f5a030a3c13ad68840e60b8eaebe1f04fed3b8d671d7123ae0379c1469995b",
+        "start": "2021-08-27T03:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-06-26",
+      "selected_start": "2022-11-11",
+      "symbol": "MASKUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6233,
+        "selected_interval_fully_covered": true,
+        "sha256": "f4714984250a36ea2d7592a8de4297bf774723b0b1eab43f01c6469a92f0f343",
+        "start": "2020-10-22T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2024-09-11T09:00:00Z",
+        "rows": 33914,
+        "selected_interval_fully_covered": true,
+        "sha256": "75e980f9b6639db3cc6330502533a9cec1d05773e92a9dcd3d46e67df341ea74",
+        "start": "2020-10-22T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-05-16",
+      "selected_start": "2021-03-21",
+      "symbol": "MATICUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 4459,
+        "selected_interval_fully_covered": true,
+        "sha256": "ea531db36e70a88c0f885c57eaf6e5c824a786522de7517d79f52585d62dcece",
+        "start": "2024-06-17T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 17818,
+        "selected_interval_fully_covered": true,
+        "sha256": "768860b337b478596cc145eb24a2c099369b83af5fc4c6bb89e47285b771ec7f",
+        "start": "2024-06-17T14:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-11-19",
+      "selected_start": "2024-10-31",
+      "symbol": "MEWUSDT"
+    },
+    {
+      "funding": {
+        "end": "2025-09-08T08:00:00Z",
+        "rows": 5557,
+        "selected_interval_fully_covered": true,
+        "sha256": "2ba729a07bd8c10d707f4ca113a73cfb18859d167f49ce2548fb3ab9df46111c",
+        "start": "2020-08-13T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2025-10-22T10:00:00Z",
+        "rows": 45243,
+        "selected_interval_fully_covered": true,
+        "sha256": "d6eecde17e77b64ed4bc74fb01bcf67a5ee70d389cc7734a7e4a6af35584c7dc",
+        "start": "2020-08-13T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-10-27",
+      "selected_start": "2021-01-18",
+      "symbol": "MKRUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 3680,
+        "selected_interval_fully_covered": true,
+        "sha256": "cea2674739e2ef9e902b05b58b76efc5ad19cb9bb1da7774bfb1eab4ab05ca7d",
+        "start": "2024-10-25T12:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 14702,
+        "selected_interval_fully_covered": true,
+        "sha256": "17ca5e7498d763dd6e5fb9ed086e4dc929260c543a328ecfa89eb36d34e47f5d",
+        "start": "2024-10-25T10:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-06-30",
+      "selected_start": "2025-05-22",
+      "symbol": "MOODENGUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 5758,
+        "selected_interval_fully_covered": true,
+        "sha256": "6bd3eafaef2f50cc9ee40da96ff22c03e7a0de164d331b04f1f4604fb156af04",
+        "start": "2021-03-30T16:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 45833,
+        "selected_interval_fully_covered": true,
+        "sha256": "10f05f785814d18287b5387d44bd639cf0c42906bca15903fa8f4e1833e3714a",
+        "start": "2021-03-31T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-07-04",
+      "selected_start": "2022-04-28",
+      "symbol": "MTLUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 3731,
+        "selected_interval_fully_covered": true,
+        "sha256": "d345a579cf39ebe27f7e062fe842c14732b077399735a6fd398832295fb0115b",
+        "start": "2025-06-18T12:00:00.003000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 9036,
+        "selected_interval_fully_covered": true,
+        "sha256": "a53f162a8aab1b87743a1bf7bda0a7fd4ee9e614ddf0a747f29f67fc5a290a13",
+        "start": "2025-06-18T12:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-10-16",
+      "selected_start": "2025-09-25",
+      "symbol": "MYXUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6256,
+        "selected_interval_fully_covered": true,
+        "sha256": "1990f3a628d744c8fac0e338f68455bdabbd8ef0c577972f38e3f5ad996db81c",
+        "start": "2020-10-14T16:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 49743,
+        "selected_interval_fully_covered": true,
+        "sha256": "78765c89d0c62c79ae60cd2c3db6c1c07bfa3d633ab9199ff18e2ed1f992b316",
+        "start": "2020-10-15T08:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-30",
+      "selected_start": "2021-12-23",
+      "symbol": "NEARUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 3914,
+        "selected_interval_fully_covered": true,
+        "sha256": "bdb3c8ef877a43acb063f4aacb8f74221f6e4d88199def364f57d1535deae8b5",
+        "start": "2024-09-16T12:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 15637,
+        "selected_interval_fully_covered": true,
+        "sha256": "bc8f959622d853887dcf9314558d9d0f98a3e4edea2246d0a3fc404775601a81",
+        "start": "2024-09-16T11:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-06-13",
+      "selected_start": "2024-12-14",
+      "symbol": "NEIROUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6977,
+        "selected_interval_fully_covered": true,
+        "sha256": "d176cc443386487d185824895a1faf3dd93cbda5f2c8d4e397d934a4ec3e3892",
+        "start": "2020-02-17T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 55623,
+        "selected_interval_fully_covered": true,
+        "sha256": "0f280ee687e8776ab791aeefba916da258e9b39b8bb86d151e389d20a46fb274",
+        "start": "2020-02-17T08:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2020-11-10",
+      "selected_start": "2020-05-16",
+      "symbol": "NEOUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 4651,
+        "selected_interval_fully_covered": true,
+        "sha256": "2dfdb8ade2e12883207969e3bd8e22fd4a7493ded65226b071ccafb1618c199b",
+        "start": "2024-05-16T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 18586,
+        "selected_interval_fully_covered": true,
+        "sha256": "6761bf70e9da2251108e963d0cb91041494393ad080b7e00af34938d03cd5585",
+        "start": "2024-05-16T14:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-09-27",
+      "selected_start": "2024-08-13",
+      "symbol": "NOTUSDT"
+    },
+    {
+      "funding": {
+        "end": "2025-06-19T08:00:00.003000Z",
+        "rows": 5070,
+        "selected_interval_fully_covered": true,
+        "sha256": "919163ba87ce9a1390133088b7f73c7fa6a693056e50e48d94f4e2e559b70923",
+        "start": "2020-11-02T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2025-07-10T11:00:00Z",
+        "rows": 40780,
+        "selected_interval_fully_covered": true,
+        "sha256": "62809627c6b056ecd656355f97000f91f7679ad6f7c81c6d7ea520aa4e814d4d",
+        "start": "2020-11-03T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-01-20",
+      "selected_start": "2022-12-28",
+      "symbol": "OCEANUSDT"
+    },
+    {
+      "funding": {
+        "end": "2025-06-19T08:00:00.003000Z",
+        "rows": 5448,
+        "selected_interval_fully_covered": true,
+        "sha256": "2af9535f7652ab1e140cd54da65fad0222c2e5fb402cb9c458db9179113a2053",
+        "start": "2020-07-01T00:00:00.002000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2025-07-10T11:00:00Z",
+        "rows": 43754,
+        "selected_interval_fully_covered": true,
+        "sha256": "bb885771b925fbf389142d0ec3a08767e101db0f33a54fee82dc33dcf5db8086",
+        "start": "2020-07-02T09:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2021-10-19",
+      "selected_start": "2020-09-29",
+      "symbol": "OMGUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-02-23T08:00:00Z",
+        "rows": 4623,
+        "selected_interval_fully_covered": true,
+        "sha256": "f7423081a62c98413ff9017db13abddfe9bbaab57591dac70e5a698bef3450bf",
+        "start": "2024-02-13T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-03-02T07:00:00Z",
+        "rows": 17946,
+        "selected_interval_fully_covered": true,
+        "sha256": "20cb37b7e0bf78e60fb459deb9e1c6adb8ffbd2ec9c39e533b51837d3555b454",
+        "start": "2024-02-13T14:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-05-12",
+      "selected_start": "2025-05-06",
+      "symbol": "OMUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 5353,
+        "selected_interval_fully_covered": true,
+        "sha256": "75ae3e3fe8d995a9e0bc7c827d6ff15f766700066ec30ab3309058412f45184e",
+        "start": "2024-01-20T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 21395,
+        "selected_interval_fully_covered": true,
+        "sha256": "5bdefbbd619cd0b77a6da36049d4c8e984c1e364207feaf8598dcc956c0400a6",
+        "start": "2024-01-20T13:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-21",
+      "selected_start": "2024-04-18",
+      "symbol": "ONDOUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 5792,
+        "selected_interval_fully_covered": true,
+        "sha256": "49b7d8d0440b4840ed08bf6b6fef78e05909c8f9eeb288c67f41225c3a165ed3",
+        "start": "2021-03-18T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 46049,
+        "selected_interval_fully_covered": true,
+        "sha256": "5098eff8356a420f26580ef75eabadaa75e172a27b1e98f90a24dd9737e42e01",
+        "start": "2021-03-18T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2022-02-09",
+      "selected_start": "2022-01-16",
+      "symbol": "ONEUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 5677,
+        "selected_interval_fully_covered": true,
+        "sha256": "4a9b3b662c1fb644845121bbcb5af2fda86014905cc40014a08f4f7172a17f82",
+        "start": "2023-11-27T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 22691,
+        "selected_interval_fully_covered": true,
+        "sha256": "868fc7ee77580395b9f3b840cca50c89b80ae9b7945e674e9367ffaad6cdca2c",
+        "start": "2023-11-27T13:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-05-10",
+      "selected_start": "2024-05-02",
+      "symbol": "ONGUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 8022,
+        "selected_interval_fully_covered": true,
+        "sha256": "e93823eb7e3878e1c6901c21eda5191fd81b14f82ba4ea7fb2c94d53f15ec0ce",
+        "start": "2020-02-11T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 55767,
+        "selected_interval_fully_covered": true,
+        "sha256": "a88d9f53ea74c322d52c94208fd23c97ae5b86ecebfbfce43431ee11952bbecc",
+        "start": "2020-02-11T08:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2020-10-11",
+      "selected_start": "2020-05-10",
+      "symbol": "ONTUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 4472,
+        "selected_interval_fully_covered": true,
+        "sha256": "e6a4a9d021673f789640abdf63ad060d4eb3884575d5c7c3710d31e340e20b9f",
+        "start": "2022-06-01T08:00:00.011000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 35722,
+        "selected_interval_fully_covered": true,
+        "sha256": "df088524b9b91c16a8d5e184756b08591a71d4da83fcafb9751ae47270dc8817",
+        "start": "2022-06-01T14:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-05-29",
+      "selected_start": "2022-08-29",
+      "symbol": "OPUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 5797,
+        "selected_interval_fully_covered": true,
+        "sha256": "6aadc1d52d6b19838cdebb59ff9014b41a46a811fe946f9bfd661c2d1bfe7f99",
+        "start": "2023-11-07T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 23172,
+        "selected_interval_fully_covered": true,
+        "sha256": "3f8420307aa34b24091f219fbe755f27778861bbaff7aa65d1890c315e12b5f7",
+        "start": "2023-11-07T12:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-12-06",
+      "selected_start": "2024-02-04",
+      "symbol": "ORDIUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 2763,
+        "selected_interval_fully_covered": true,
+        "sha256": "69d1a435b5c9c6d10b87ca8e6add7fa3b64f53cc20b29a4dc7b4d4fc2e985d0c",
+        "start": "2025-03-27T08:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 11030,
+        "selected_interval_fully_covered": true,
+        "sha256": "3b233902597d704d6cc1720f2531282e773d133a392f2957b0ef2daa8e36a0ed",
+        "start": "2025-03-27T10:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-05-13",
+      "selected_start": "2025-10-28",
+      "symbol": "PAXGUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 3361,
+        "selected_interval_fully_covered": true,
+        "sha256": "13c96cc552cfc631127e82c471a792bead08e4018667b06891feb6bad8fef728",
+        "start": "2024-12-17T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 13424,
+        "selected_interval_fully_covered": true,
+        "sha256": "90909c719664c9773f36557929316f8ecc4529d97b7ba3e98c39c08747c3fd25",
+        "start": "2024-12-17T16:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-10-27",
+      "selected_start": "2025-07-16",
+      "symbol": "PENGUUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 4951,
+        "selected_interval_fully_covered": true,
+        "sha256": "2e2d6bfa260ac60a00080fc6ab4d7f8361d9fab25be07eef9c30c73818d888ea",
+        "start": "2021-12-23T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 39428,
+        "selected_interval_fully_covered": true,
+        "sha256": "cf12d8746c0757e8f0654e399a8bd9ff57422faf95b98bb9ffbe1876098ab10d",
+        "start": "2021-12-24T04:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-11-16",
+      "selected_start": "2022-05-31",
+      "symbol": "PEOPLEUSDT"
+    },
+    {
+      "funding": {
+        "end": "2025-11-21T08:00:00Z",
+        "rows": 5295,
+        "selected_interval_fully_covered": true,
+        "sha256": "01dd6bf24000c377f234ea923c93bf31f2e5c5b9ef0d1bcf1e3df175d060e1d5",
+        "start": "2023-03-03T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2025-12-23T08:00:00Z",
+        "rows": 24525,
+        "selected_interval_fully_covered": true,
+        "sha256": "7276685e25a196513701c2633e0d80ff25a153f6619a8ddc1780e8451c4e3943",
+        "start": "2023-03-06T12:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-10-04",
+      "selected_start": "2023-09-22",
+      "symbol": "PERPUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 4471,
+        "selected_interval_fully_covered": true,
+        "sha256": "313dcbabd268a76f0b3d1f0199daf4e082f54c699b45f65fc849fc11cd47bfa6",
+        "start": "2025-01-24T12:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 12518,
+        "selected_interval_fully_covered": true,
+        "sha256": "3ab8fc40e2eae57b1f9768e9a527fcbe950334fce47fd44ae68a5db019d97dd7",
+        "start": "2025-01-24T10:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-04-21",
+      "selected_start": "2025-12-08",
+      "symbol": "PIPPINUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 3577,
+        "selected_interval_fully_covered": true,
+        "sha256": "eac4fce78d21a20adb413902f35b2e16b667fcdb9864cea6daa4fbb199dc1482",
+        "start": "2024-11-11T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 14292,
+        "selected_interval_fully_covered": true,
+        "sha256": "348f321333c4b6a08ed533aedd1555970187e8208d76e4c3e528b0258bb1d4b6",
+        "start": "2024-11-11T12:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-05-25",
+      "selected_start": "2025-02-08",
+      "symbol": "PNUTUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 5979,
+        "selected_interval_fully_covered": true,
+        "sha256": "9e6d383c04bdd7276e83b77e46413bfa508047a1b8d1238ce37907ee668dac2b",
+        "start": "2023-10-24T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 23494,
+        "selected_interval_fully_covered": true,
+        "sha256": "58cca7f9bdfddfce68bddb90f8c65e3d2b5b71f7ded256a4de869bf573d8aba2",
+        "start": "2023-10-25T02:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-04-15",
+      "selected_start": "2024-04-15",
+      "symbol": "POLYXUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 4063,
+        "selected_interval_fully_covered": true,
+        "sha256": "60fa06293a89254a01a157b65d1b773fc58496acfbf02fc304aa6851b8b1140b",
+        "start": "2024-08-22T16:00:00.008000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 16235,
+        "selected_interval_fully_covered": true,
+        "sha256": "3d0d66537c6a93bd83fd40fa055d22444e56e8df148faa1e43120c3194db41ed",
+        "start": "2024-08-22T13:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-11-26",
+      "selected_start": "2024-11-19",
+      "symbol": "POPCATUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 1424,
+        "selected_interval_fully_covered": true,
+        "sha256": "bee95a1d9802b5ccdb8488cdb6a761fdeeebbc7d372e6f91450d88d952fbab49",
+        "start": "2025-12-06T12:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 4935,
+        "selected_interval_fully_covered": true,
+        "sha256": "48a842b8079a13985b48b44b2ae38dddc14ecdaadf24bb4ba80aa7249288665a",
+        "start": "2025-12-06T09:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-03-16",
+      "selected_start": "2026-03-05",
+      "symbol": "POWERUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 2540,
+        "selected_interval_fully_covered": true,
+        "sha256": "fb328bdf2774429736f5b517051a84fc5b251346482a50f2a5ffe1e744cddde2",
+        "start": "2025-04-12T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 10635,
+        "selected_interval_fully_covered": true,
+        "sha256": "001884e4fcc3ad745d47217ae157183ba1accfceb7a3c673c64950d30f5d6168",
+        "start": "2025-04-12T14:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-02-22",
+      "selected_start": "2025-07-26",
+      "symbol": "PUMPUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6939,
+        "selected_interval_fully_covered": true,
+        "sha256": "df4fce1cd41bedb4525c2360655fcdfcf65d3c2c81bb40cfd1d73b45948fb09b",
+        "start": "2020-03-01T00:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 55551,
+        "selected_interval_fully_covered": true,
+        "sha256": "61a0a91da2021342f770da3f2e7a2ee09ea28d09293f68d44f2da5b8193c7dcc",
+        "start": "2020-02-20T08:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2020-09-13",
+      "selected_start": "2020-07-28",
+      "symbol": "QTUMUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 1399,
+        "selected_interval_fully_covered": true,
+        "sha256": "a10d1dd53ef4a39b9d3a0836a96b26da810a9d896895e00cd94f27c1bc5cb0ee",
+        "start": "2025-12-14T16:00:00.005000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 4737,
+        "selected_interval_fully_covered": true,
+        "sha256": "2e2bec09a3897a11caa382aa66fc006a255435f342e47c694e2afd1ad9461d7b",
+        "start": "2025-12-14T15:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-05-16",
+      "selected_start": "2026-04-23",
+      "symbol": "RAVEUSDT"
+    },
+    {
+      "funding": {
+        "end": "2025-06-19T08:00:00.003000Z",
+        "rows": 5473,
+        "selected_interval_fully_covered": true,
+        "sha256": "fe44385d6eb6f57ed3ddbdb8b820d4965a2a8d285d935b423f5039bfad5d068b",
+        "start": "2021-02-22T08:00:00.002000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2025-07-10T11:00:00Z",
+        "rows": 38213,
+        "selected_interval_fully_covered": true,
+        "sha256": "20ce0fddca056e72dd1879b195090f3b799f8eef3719f1aff94bd3a72b38bd2a",
+        "start": "2021-02-22T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-10-27",
+      "selected_start": "2022-10-16",
+      "symbol": "REEFUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 2570,
+        "selected_interval_fully_covered": true,
+        "sha256": "ce7c64edbcb23c532ca0aace0840d80548b67e62bb4dc7fa1b42dd5dae44bc99",
+        "start": "2025-10-17T16:00:00.003000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 6130,
+        "selected_interval_fully_covered": true,
+        "sha256": "095ec427ce7640f4e0c031dbd885dfbb1297e177a57cd54e587ab7aa47ce11bf",
+        "start": "2025-10-17T14:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-05-05",
+      "selected_start": "2026-01-14",
+      "symbol": "RIVERUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6482,
+        "selected_interval_fully_covered": true,
+        "sha256": "211deca5e6ed2e85df428154e5b53aa542c77bcece4e5c4051593b03dcb4669d",
+        "start": "2020-07-31T08:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 51568,
+        "selected_interval_fully_covered": true,
+        "sha256": "e736a3790a86e05167b89d549ba4455f924683876cf65bba7149e24eea7cd004",
+        "start": "2020-07-31T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-01-15",
+      "selected_start": "2023-01-09",
+      "symbol": "RLCUSDT"
+    },
+    {
+      "funding": {
+        "end": "2024-08-15T08:00:00Z",
+        "rows": 1678,
+        "selected_interval_fully_covered": true,
+        "sha256": "0473209ea7b30d7d5a6d907af010c12f4f427e105b392ca2f6031a4c89f9da3e",
+        "start": "2023-02-03T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2024-07-30T06:00:00Z",
+        "rows": 13013,
+        "selected_interval_fully_covered": true,
+        "sha256": "d5ea50085874894f02daf707a860596984306822d257577358f22845cd72a936",
+        "start": "2023-02-03T02:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-06-05",
+      "selected_start": "2023-05-03",
+      "symbol": "RNDRUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6242,
+        "selected_interval_fully_covered": true,
+        "sha256": "2be13c83e8eb2dba04c3c3cfb8d8b7efea2c60179d9ee4ed5b593fb01d066402",
+        "start": "2020-10-19T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 49648,
+        "selected_interval_fully_covered": true,
+        "sha256": "0a4a67b87c13d4ff46867d7f10820d6c59f3abf8bee596e32a2536185477bb34",
+        "start": "2020-10-19T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2022-10-29",
+      "selected_start": "2022-10-07",
+      "symbol": "RSRUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6377,
+        "selected_interval_fully_covered": true,
+        "sha256": "68917f5a79c9149bea364c606734eb9952276e00e078e5d9e65cbba71805f68f",
+        "start": "2020-09-04T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 50824,
+        "selected_interval_fully_covered": true,
+        "sha256": "64ee9808780217187503d2dc0e9372f8f57aefd9259a41e29dc325141b6ad824",
+        "start": "2020-09-04T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-12-12",
+      "selected_start": "2021-07-07",
+      "symbol": "RUNEUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 7805,
+        "selected_interval_fully_covered": true,
+        "sha256": "87a37130a805a0810fd623ab11dead686762efc020de47691bd46d12aac6ec64",
+        "start": "2021-02-23T08:00:00.006000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 46601,
+        "selected_interval_fully_covered": true,
+        "sha256": "776a9c0db0dcdc6daf9bf3aa6ad6ba72b424fb4d10044a98c6792066a8326d6e",
+        "start": "2021-02-23T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2022-10-06",
+      "selected_start": "2022-09-21",
+      "symbol": "RVNUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 4876,
+        "selected_interval_fully_covered": true,
+        "sha256": "543e56817439b565663f3ec1efcc8467baaf7cb0d7b2eb3148806776d87dd3f3",
+        "start": "2024-04-09T00:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 19478,
+        "selected_interval_fully_covered": true,
+        "sha256": "f4c901f7e4282dfc0ee5746dc94b782f7a020a16f5a8d98693e01d7747295583",
+        "start": "2024-04-09T10:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-11-03",
+      "selected_start": "2024-10-02",
+      "symbol": "SAGAUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 5948,
+        "selected_interval_fully_covered": true,
+        "sha256": "508b4d0de3efaa6c44475d417b9dd5f906abb1d05784916a196d2af2f7d8d880",
+        "start": "2021-01-25T08:00:00.012000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 47297,
+        "selected_interval_fully_covered": true,
+        "sha256": "9c92f6b819140dae8587145e8d5684b6f01c797a7c709e3f0b3e06ac3ef151bf",
+        "start": "2021-01-25T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-02-28",
+      "selected_start": "2021-07-21",
+      "symbol": "SANDUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 3148,
+        "selected_interval_fully_covered": true,
+        "sha256": "8af94588c54229ed46b48d2865b14660438e4f7325914e27d14b3f8c65867574",
+        "start": "2023-08-16T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 25150,
+        "selected_interval_fully_covered": true,
+        "sha256": "6ae83dbbb9d3384f8853ef3f1accc720ac47aac84a3072f89f3b9ac499b3d17d",
+        "start": "2023-08-17T02:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-07-22",
+      "selected_start": "2023-12-02",
+      "symbol": "SEIUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 3267,
+        "selected_interval_fully_covered": true,
+        "sha256": "9bc7cad32131050f624c543692f3d9b429997c39e719dbb077db30ca81b37c53",
+        "start": "2025-03-20T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 11151,
+        "selected_interval_fully_covered": true,
+        "sha256": "ff8b7991290b035c4189ae81e3d821f4830e51153fe0f4ecdced9b4b335c3052",
+        "start": "2025-03-22T09:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-05-03",
+      "selected_start": "2026-03-03",
+      "symbol": "SIRENUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 2480,
+        "selected_interval_fully_covered": true,
+        "sha256": "d28c37a11d142c8741f29bfa5166a62637d2921e271ae1b0f15dbae191c62aed",
+        "start": "2025-05-13T12:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 9903,
+        "selected_interval_fully_covered": true,
+        "sha256": "f59ec6168c0e2755ee5d15625ad9c91a82613232b1a50bc81469d2a3fab6f3e6",
+        "start": "2025-05-13T09:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-05-30",
+      "selected_start": "2026-05-09",
+      "symbol": "SKYAIUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6440,
+        "selected_interval_fully_covered": true,
+        "sha256": "17fa4538fe8a865ae93c2abb9385db92f50c34979abf74f1ace52a3a2e41ef03",
+        "start": "2020-08-14T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 51328,
+        "selected_interval_fully_covered": true,
+        "sha256": "947cd02b9fa8bc91b9521956f5634dfe9784e9fca073458144b46980f6dba93f",
+        "start": "2020-08-14T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2021-01-16",
+      "selected_start": "2020-11-24",
+      "symbol": "SNXUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6424,
+        "selected_interval_fully_covered": true,
+        "sha256": "a9fac3e7cbc9136abcecd32dbda37e9e7dab836ca7f950259ce9fd75f11636fe",
+        "start": "2020-09-13T16:00:00.004000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 50488,
+        "selected_interval_fully_covered": true,
+        "sha256": "6da86dd82f965a3e9a8ac840ff45f4364705e94447ddc5c056927cc72d7e69f3",
+        "start": "2020-09-14T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-30",
+      "selected_start": "2021-04-12",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "funding": {
+        "end": "2025-06-19T08:00:00.003000Z",
+        "rows": 6519,
+        "selected_interval_fully_covered": true,
+        "sha256": "5781835bb8e2119490f9ea3d34ea2a2232087e82c00477592ef2f3a51312d3ec",
+        "start": "2021-03-22T08:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2025-07-10T11:00:00Z",
+        "rows": 37565,
+        "selected_interval_fully_covered": true,
+        "sha256": "5daa77c13f651f69e25793d6857be1e14820e7047368a4c802c96f0d30deb6ad",
+        "start": "2021-03-22T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-10-15",
+      "selected_start": "2023-08-04",
+      "symbol": "STMXUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 7029,
+        "selected_interval_fully_covered": true,
+        "sha256": "a3c3c9ae594d3d526a9a21fc794f29d00561cb994601f00c6b85fa59ab412a01",
+        "start": "2020-09-15T16:00:00.003000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 50440,
+        "selected_interval_fully_covered": true,
+        "sha256": "5de8a88fbe4d80f0f3f3cc5523e7854c5ee978c8e152c2619329f02d24c4b2ed",
+        "start": "2020-09-16T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-10-29",
+      "selected_start": "2023-09-26",
+      "symbol": "STORJUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 3677,
+        "selected_interval_fully_covered": true,
+        "sha256": "833f7c6199667546aa64c50090c75a91fc25352b73dd5ae3e0ec9a7b3c766d9e",
+        "start": "2023-02-21T08:00:00.004000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 29386,
+        "selected_interval_fully_covered": true,
+        "sha256": "6b5dfe76847f93eef4028dd801493cc693385ed73315a3b4a83a702d91421e39",
+        "start": "2023-02-21T14:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-02-29",
+      "selected_start": "2023-06-30",
+      "symbol": "STXUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 3463,
+        "selected_interval_fully_covered": true,
+        "sha256": "542ae81c075982450525d010edd9b4cdaea04f5ccbd4aabefe49478c2c46ccb1",
+        "start": "2023-05-03T16:00:00.011000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 27680,
+        "selected_interval_fully_covered": true,
+        "sha256": "252bde1acba6fd78342f3dffdf954f58dfc852a147ae089b4327176c8abf7a75",
+        "start": "2023-05-03T16:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-30",
+      "selected_start": "2023-07-31",
+      "symbol": "SUIUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6377,
+        "selected_interval_fully_covered": true,
+        "sha256": "e92930664ffbe1b9bfeeb28ccfadb68c258849fe90d5bc15c72ba05d9c9deb27",
+        "start": "2020-09-04T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 50728,
+        "selected_interval_fully_covered": true,
+        "sha256": "e8adc1d4297345aa8af5b1116fc7f63f054dd467ffa271747344c9cd36aec7b8",
+        "start": "2020-09-04T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2022-11-29",
+      "selected_start": "2020-12-02",
+      "symbol": "SUSHIUSDT"
+    },
+    {
+      "funding": {
+        "end": "2025-12-05T08:00:00Z",
+        "rows": 5890,
+        "selected_interval_fully_covered": true,
+        "sha256": "9277328e146f86c23ba67793d1fe3c46b54a44bde5fb53358791c175881b1260",
+        "start": "2020-07-21T08:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2025-12-23T08:00:00Z",
+        "rows": 47399,
+        "selected_interval_fully_covered": true,
+        "sha256": "48332a11fc363d67465949b359938d96acd5b221e67f134997f4f10f1ee209ea",
+        "start": "2020-07-21T09:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-05-03",
+      "selected_start": "2020-10-18",
+      "symbol": "SXPUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 4861,
+        "selected_interval_fully_covered": true,
+        "sha256": "c7b14c3068990478353df5aecb938d06ba51825b2b700c128d649be79dc2f7ef",
+        "start": "2024-04-11T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 19426,
+        "selected_interval_fully_covered": true,
+        "sha256": "22b4f28bb1edd6ce8e65d66811380e554125074bd7d47988cd89e817e7210ee1",
+        "start": "2024-04-11T14:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-27",
+      "selected_start": "2024-10-06",
+      "symbol": "TAOUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6679,
+        "selected_interval_fully_covered": true,
+        "sha256": "d8258e42dd564fdfca62cd3f862f4177624fa8e39c18d70afd46c74699739162",
+        "start": "2020-05-26T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 53247,
+        "selected_interval_fully_covered": true,
+        "sha256": "003f2b1f781380a6ac1c02d6132e5fc67a4613b0ffae8a299614a59c3f99b1b7",
+        "start": "2020-05-27T08:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2022-04-18",
+      "selected_start": "2020-08-25",
+      "symbol": "THETAUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 5838,
+        "selected_interval_fully_covered": true,
+        "sha256": "88299172088c1707813e2e83ccdf96748c9ce0f80cbc0ed225baa9b0068b8a13",
+        "start": "2023-10-31T20:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 23334,
+        "selected_interval_fully_covered": true,
+        "sha256": "3714a8e2f5c39da53c653dd8efb73aec65fa09e843e36deaba1b46d19200ff41",
+        "start": "2023-10-31T18:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-12-11",
+      "selected_start": "2024-01-28",
+      "symbol": "TIAUSDT"
+    },
+    {
+      "funding": {
+        "end": "2024-08-15T08:00:00Z",
+        "rows": 4210,
+        "selected_interval_fully_covered": true,
+        "sha256": "6616fa369b93fb46f8a2a0ef452aac7a8e38e91f7202cc7cd9d0891dd87ba799",
+        "start": "2020-10-12T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2023-11-30T06:00:00Z",
+        "rows": 27311,
+        "selected_interval_fully_covered": true,
+        "sha256": "550b415743c9cab99ddfae9211444a90537b59041b848536a5d896247fbb5888",
+        "start": "2020-10-12T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-09-20",
+      "selected_start": "2023-05-12",
+      "symbol": "TOMOUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-23T08:00:00.005000Z",
+        "rows": 5064,
+        "selected_interval_fully_covered": true,
+        "sha256": "f318ff0d00c0bafffd72f478b38b2379f113ab7e57265ffec23db7cf2f636941",
+        "start": "2024-03-01T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-28T23:00:00Z",
+        "rows": 20388,
+        "selected_interval_fully_covered": true,
+        "sha256": "5f1a9c3d2f18726889a48f21292e9f66cd78e52f7a245917538c66fad729551a",
+        "start": "2024-03-01T12:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-18",
+      "selected_start": "2024-08-27",
+      "symbol": "TONUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 9357,
+        "selected_interval_fully_covered": true,
+        "sha256": "eb8a53e260a5c32b44621345b60605bdd973adc9a8da2ae6959de5ae70ff5820",
+        "start": "2020-09-03T08:00:00.004000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 50752,
+        "selected_interval_fully_covered": true,
+        "sha256": "a2ca2fc8edd22fa79bd9348c762ae31181fa64b2dc526f592aa002d1474546d2",
+        "start": "2020-09-03T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-06-25",
+      "selected_start": "2022-08-15",
+      "symbol": "TRBUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 3169,
+        "selected_interval_fully_covered": true,
+        "sha256": "03ed8e1bf27f172999f545fa3bb14d06dd387a2689e594851be20b1dbbcc846a",
+        "start": "2025-01-18T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 12659,
+        "selected_interval_fully_covered": true,
+        "sha256": "3bc89cb0196ed221b31a681874ec138f5c5a06846bcd068c7a2dc1f0aff74a8b",
+        "start": "2025-01-18T13:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-11-25",
+      "selected_start": "2025-04-17",
+      "symbol": "TRUMPUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 7076,
+        "selected_interval_fully_covered": true,
+        "sha256": "32799f05e419c97fe2ee471724175a68ecae39c1107f36adc5b98caf9a30d16d",
+        "start": "2020-01-15T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 56319,
+        "selected_interval_fully_covered": true,
+        "sha256": "8d7bb87b6faab92516338a083f2d829e024994c7de46cb3ef64d245a0e62a6a3",
+        "start": "2020-01-15T08:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2022-07-05",
+      "selected_start": "2020-04-18",
+      "symbol": "TRXUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 4567,
+        "selected_interval_fully_covered": true,
+        "sha256": "eed7ffdd03d7ff9e4b70db4becd9f61db030c3f6c7bf0131625e65dde290a5d6",
+        "start": "2024-05-30T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 18249,
+        "selected_interval_fully_covered": true,
+        "sha256": "fe1b62c0c53a85d8a84c92189f1a41fe80fbc9958dedd77943347fd3a80f4cd3",
+        "start": "2024-05-30T15:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2024-11-18",
+      "selected_start": "2024-10-27",
+      "symbol": "TURBOUSDT"
+    },
+    {
+      "funding": {
+        "end": "2025-06-19T08:00:00.003000Z",
+        "rows": 6647,
+        "selected_interval_fully_covered": true,
+        "sha256": "7aa47b8e89868447cc0dfdefa5ef5541517ae31814c4b858c11f7d303263f8bd",
+        "start": "2021-02-01T00:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2025-07-10T11:00:00Z",
+        "rows": 38189,
+        "selected_interval_fully_covered": true,
+        "sha256": "0f0b369e226401f4523a25185d72c3faa32ca816eb70d896d4888d19fe38d4f7",
+        "start": "2021-02-19T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-09-29",
+      "selected_start": "2022-06-30",
+      "symbol": "UNFIUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6338,
+        "selected_interval_fully_covered": true,
+        "sha256": "92d5946cdec83807355fdf78b58ca1c7d0948ceb57f8ffcebec1f1cf40d141e6",
+        "start": "2020-09-17T08:00:00.012000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 50512,
+        "selected_interval_fully_covered": true,
+        "sha256": "525d82ea1f624a999a14e732fc3f099e3f3fe812ef5f2c2e646fa686b4df8f3f",
+        "start": "2020-09-18T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-08-27",
+      "selected_start": "2020-12-16",
+      "symbol": "UNIUSDT"
+    },
+    {
+      "funding": {
+        "end": "2025-09-26T08:00:00Z",
+        "rows": 2255,
+        "selected_interval_fully_covered": true,
+        "sha256": "241b22621b8425ecb5fe38a3b6e4e9a577fd2726a88675f8cb0b3495ce7c8ac5",
+        "start": "2024-09-15T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2025-10-22T10:00:00Z",
+        "rows": 9644,
+        "selected_interval_fully_covered": true,
+        "sha256": "dafa36de77d9dd89843d9c821934eb97b0378870a8c26cf7260fa0973655dc6a",
+        "start": "2024-09-15T15:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-01-19",
+      "selected_start": "2024-12-30",
+      "symbol": "UXLINKUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6986,
+        "selected_interval_fully_covered": true,
+        "sha256": "242ce2f118292792a184eb21a56efabcdce9f9194f5e272b161d1ebcc05a7878",
+        "start": "2020-02-14T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 55599,
+        "selected_interval_fully_covered": true,
+        "sha256": "9d7fe11621cbdff4ed787663bbec4f28515aa2f350fe85562bfbd9e155b4f54e",
+        "start": "2020-02-14T08:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2021-07-06",
+      "selected_start": "2020-05-13",
+      "symbol": "VETUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 3403,
+        "selected_interval_fully_covered": true,
+        "sha256": "7b925aab68f1170a1b2e4054241aee1af8792cb5701aeb2107550a72f8c01c8d",
+        "start": "2024-12-10T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 13596,
+        "selected_interval_fully_covered": true,
+        "sha256": "7f1bc98efbdf8de13d352e98a0326ab826a45b15ba2858f325e89c014b8e9075",
+        "start": "2024-12-10T12:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-11-23",
+      "selected_start": "2025-05-09",
+      "symbol": "VIRTUALUSDT"
+    },
+    {
+      "funding": {
+        "end": "2025-06-19T08:00:00.003000Z",
+        "rows": 5317,
+        "selected_interval_fully_covered": true,
+        "sha256": "788752d4d8655254313320324cbc6b2bd8be92f40287676dc3b79ea6dd92910b",
+        "start": "2020-08-12T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2025-07-10T11:00:00Z",
+        "rows": 42772,
+        "selected_interval_fully_covered": true,
+        "sha256": "879d8c16432e155af568706dd74dbdddbde67c57bf496c71b74f0395adf99b35",
+        "start": "2020-08-12T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2023-07-28",
+      "selected_start": "2020-11-09",
+      "symbol": "WAVESUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 5365,
+        "selected_interval_fully_covered": true,
+        "sha256": "f6d7f052c076013f2b2d7acdf4c1de2dd9965a8fc49f8eead831cc59b6597a57",
+        "start": "2024-01-18T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 21442,
+        "selected_interval_fully_covered": true,
+        "sha256": "63bbdfe7873b1a19b060f23afd6636228b73954085759154c746c84fbb7b1376",
+        "start": "2024-01-18T14:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-11-03",
+      "selected_start": "2024-04-16",
+      "symbol": "WIFUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 3217,
+        "selected_interval_fully_covered": true,
+        "sha256": "2c1a22959dd0be42a169eaba2cd72c907c4388ec27f0e4801f8f8885d2cc574c",
+        "start": "2023-07-24T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 25716,
+        "selected_interval_fully_covered": true,
+        "sha256": "f898b6c90e5da1e8efd9457253d7c2df0ab11cb289bd9ef5d1bec610d8b6da9e",
+        "start": "2023-07-24T12:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-30",
+      "selected_start": "2023-10-21",
+      "symbol": "WLDUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 1868,
+        "selected_interval_fully_covered": true,
+        "sha256": "674d5d3b69555d6618fbb6fdb40355442566fb2fb89455bb5bf703dae021e787",
+        "start": "2025-08-23T12:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 7456,
+        "selected_interval_fully_covered": true,
+        "sha256": "ea62dd58fb16bde4c12eca9b84a351fe3e65d65460ca298a992d47605c0bba36",
+        "start": "2025-08-23T08:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-03-02",
+      "selected_start": "2026-02-23",
+      "symbol": "WLFIUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 7063,
+        "selected_interval_fully_covered": true,
+        "sha256": "bb15a81f6a14846b67fe5022c7bd90c626b63f16f6cb9817a47dd78e98e7300b",
+        "start": "2020-01-19T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 56199,
+        "selected_interval_fully_covered": true,
+        "sha256": "5f3c75b80b39c451ab436b69a3c8d09d6a6a1fb28748453d2977f39ca6780973",
+        "start": "2020-01-20T08:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-28",
+      "selected_start": "2020-04-18",
+      "symbol": "XLMUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 7026,
+        "selected_interval_fully_covered": true,
+        "sha256": "f9095a64ab0915aaff5b6e35778e909c6ee85ec17106c2e9890dc2ebbccaa137",
+        "start": "2020-02-01T00:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 55983,
+        "selected_interval_fully_covered": true,
+        "sha256": "888ccad7671c9999172841f7e80333cd1b99cd0e2d31a29c3064d79ebdf4c3ee",
+        "start": "2020-02-03T08:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2022-05-01",
+      "selected_start": "2020-05-02",
+      "symbol": "XMRUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 1874,
+        "selected_interval_fully_covered": true,
+        "sha256": "e5233330c4bb934a722f121962ee4d09aee1c50f03221ec07c1913f9ff357af5",
+        "start": "2025-08-22T12:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 7479,
+        "selected_interval_fully_covered": true,
+        "sha256": "e20b2d6be96be677ef5e60169d4d70f18d19c46e1d9924293d0b6f7852470ac7",
+        "start": "2025-08-22T09:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-12-04",
+      "selected_start": "2025-11-19",
+      "symbol": "XPLUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 7103,
+        "selected_interval_fully_covered": true,
+        "sha256": "d91935b8f3c6f513e7aaa70f44f0d89f5cc97737da10287bd7d356a3b29b0b18",
+        "start": "2020-01-06T08:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 56535,
+        "selected_interval_fully_covered": true,
+        "sha256": "417e4cdb1bb6a6c8d898f594c3b48d708ca5e8c3d5f9704e101939fceffb3440",
+        "start": "2020-01-06T08:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-30",
+      "selected_start": "2020-04-18",
+      "symbol": "XRPUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 8091,
+        "selected_interval_fully_covered": true,
+        "sha256": "d7f679a727e0972c9d3653943ab92588cd91c45ad8deb73b975abb92ee47f9d6",
+        "start": "2020-02-04T08:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 55911,
+        "selected_interval_fully_covered": true,
+        "sha256": "23abd5194e4329375ddc6824529c46b586f38149355b0cf8f6a3c0203a342baa",
+        "start": "2020-02-06T08:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2022-03-03",
+      "selected_start": "2020-05-05",
+      "symbol": "XTZUSDT"
+    },
+    {
+      "funding": {
+        "end": "2022-04-14T08:00:00Z",
+        "rows": 1765,
+        "selected_interval_fully_covered": true,
+        "sha256": "b72db7d72f18394f1c279fbb5059893966c04137c2f2c8832f8df4bdc38d3236",
+        "start": "2020-09-03T08:00:00.004000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2022-04-12T09:00:00Z",
+        "rows": 13826,
+        "selected_interval_fully_covered": true,
+        "sha256": "865cd5612eee4a0727846cdc8d2cb3e040f1ed70039a8b91eed067d39f0fbd47",
+        "start": "2020-09-03T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2020-12-28",
+      "selected_start": "2020-12-01",
+      "symbol": "YFIIUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 6389,
+        "selected_interval_fully_covered": true,
+        "sha256": "b2ca6e73ab872200a2deece73fe449e6d48c0d0eda15171655afb59eb2fce4e4",
+        "start": "2020-08-31T08:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 50824,
+        "selected_interval_fully_covered": true,
+        "sha256": "e1485288c409a99b5d50526dba39c47f5e00cb7cdd595c64d6e56dff9328651d",
+        "start": "2020-08-31T07:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2021-02-19",
+      "selected_start": "2020-11-28",
+      "symbol": "YFIUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T16:00:00.005000Z",
+        "rows": 7016,
+        "selected_interval_fully_covered": true,
+        "sha256": "7af9b4bb5dab36ed5693f6a4b5f13e4900cd08a933b7717b1748176e9db348db",
+        "start": "2020-02-04T08:00:00.001000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 55815,
+        "selected_interval_fully_covered": true,
+        "sha256": "fdc9811a8bf95201f0aae6d793e7cd64c622e58ef868f590660ed8bc3b2a2ee9",
+        "start": "2020-02-05T08:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2026-06-30",
+      "selected_start": "2020-05-04",
+      "symbol": "ZECUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 7226,
+        "selected_interval_fully_covered": true,
+        "sha256": "4bda9dae756c2e2e2b214fea202d30face62ab4e0212774de91f47441c45fe2b",
+        "start": "2020-06-17T08:00:00.007000Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 52598,
+        "selected_interval_fully_covered": true,
+        "sha256": "9e2918ddf4a0748313746134dd5be21473557af76a31f70ddb7479e8b907da6d",
+        "start": "2020-06-18T09:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2022-06-13",
+      "selected_start": "2020-12-30",
+      "symbol": "ZILUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 4441,
+        "selected_interval_fully_covered": true,
+        "sha256": "cd3bcb71712ea7643175fa15d65e0bdaf51de6c54b45b632dfbc4a4c0f2db085",
+        "start": "2024-06-20T16:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "end": "2026-06-30T23:00:00Z",
+        "rows": 17746,
+        "selected_interval_fully_covered": true,
+        "sha256": "61f0ad61860e04590b831b04f8fd3ce6aab9d10745f413faffa8db238cb222e0",
+        "start": "2024-06-20T14:00:00Z",
+        "state": "VALID"
+      },
+      "selected_end": "2025-04-09",
+      "selected_start": "2025-04-07",
+      "symbol": "ZROUSDT"
+    },
+    {
+      "funding": {
+        "end": "2026-06-30T20:00:00.003000Z",
+        "rows": 545,
+        "selected_interval_fully_covered": true,
+        "sha256": "a99940ae0afa675eb94e0f6087bb16257d64dd1127727d5a215c4be33a99eb9c",
+        "start": "2026-04-01T00:00:00Z",
+        "state": "VALID"
+      },
+      "premium": {
+        "reason": "zero rows",
+        "state": "NO_SOURCE_DATA"
+      },
+      "selected_end": "2026-05-10",
+      "selected_start": "2026-04-23",
+      "symbol": "\u5e01\u5b89\u4eba\u751fUSDT"
+    }
+  ],
+  "broad_data": {
+    "panels_total": 789,
+    "panels_valid": 789,
+    "recorded_gaps": 103,
+    "rejected_panels": 0,
+    "rows": 586929
+  },
+  "canonicalization_domain": "UTF-8 JSON, keys sorted recursively, compact separators, SHA-256 over this object excluding dataset_root_sha256",
+  "dataset_root_sha256": "20baddd5ff1abe36e3d4ce02f352028c2a95afdb59904db077514912473c15a5",
+  "inventory": {
+    "canonical_root_sha256": "c087b76021e87916423a03faade252368640cb9037255fc3cd68d76b61e2a16e",
+    "raw_sha256": "d662ebdfcdc75d745927f3434c70722a5ba65007f65385b883c44e19c2fd53da"
+  },
+  "load_bearing_commits": {
+    "auxiliary_consumer": "7ab185f",
+    "implementation_repair": "66d3fb39b6ca26351b31559834890d1f2290842c",
+    "preregistration": "b5c4f16",
+    "universe": "310209e"
+  },
+  "manifest_version": 1,
+  "mechanical_exclusions": [
+    "XAGUSDT",
+    "XAUUSDT",
+    "TSLAUSDT"
+  ],
+  "preregistration_commit": "b5c4f16",
+  "sample_cutoff": "2026-06-30",
+  "sprint": "v2_cross_sectional",
+  "universe": {
+    "ledger_sha256": "d41cf6b15357d64b91709a9ccc9973da89a9fe9a93cc34388c58ba50fbec8e1d",
+    "union_count": 181,
+    "union_selected_sha256": "cb75d98621f72e12beaed1ce41cb15d6ffad01e8be66eaf3ae07517e12c60153"
+  }
+}

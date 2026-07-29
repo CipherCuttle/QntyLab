@@ -1,0 +1,1097 @@
+{
+  "mechanical_exclusions": [
+    "TSLAUSDT",
+    "XAGUSDT",
+    "XAUUSDT"
+  ],
+  "symbols": [
+    {
+      "first_selected": "2024-03-13",
+      "last_selected": "2025-08-29",
+      "selected_days": 174,
+      "symbol": "1000BONKUSDT"
+    },
+    {
+      "first_selected": "2024-03-14",
+      "last_selected": "2024-07-31",
+      "selected_days": 78,
+      "symbol": "1000FLOKIUSDT"
+    },
+    {
+      "first_selected": "2023-12-09",
+      "last_selected": "2023-12-27",
+      "selected_days": 19,
+      "symbol": "1000LUNCUSDT"
+    },
+    {
+      "first_selected": "2023-08-02",
+      "last_selected": "2026-06-30",
+      "selected_days": 976,
+      "symbol": "1000PEPEUSDT"
+    },
+    {
+      "first_selected": "2024-07-08",
+      "last_selected": "2024-08-02",
+      "selected_days": 24,
+      "symbol": "1000RATSUSDT"
+    },
+    {
+      "first_selected": "2024-07-12",
+      "last_selected": "2024-10-14",
+      "selected_days": 95,
+      "symbol": "1000SATSUSDT"
+    },
+    {
+      "first_selected": "2021-10-13",
+      "last_selected": "2025-01-27",
+      "selected_days": 751,
+      "symbol": "1000SHIBUSDT"
+    },
+    {
+      "first_selected": "2021-01-13",
+      "last_selected": "2026-05-19",
+      "selected_days": 490,
+      "symbol": "AAVEUSDT"
+    },
+    {
+      "first_selected": "2020-04-29",
+      "last_selected": "2026-06-30",
+      "selected_days": 2036,
+      "symbol": "ADAUSDT"
+    },
+    {
+      "first_selected": "2024-03-05",
+      "last_selected": "2024-03-07",
+      "selected_days": 3,
+      "symbol": "AGIXUSDT"
+    },
+    {
+      "first_selected": "2025-01-12",
+      "last_selected": "2025-01-21",
+      "selected_days": 10,
+      "symbol": "AGLDUSDT"
+    },
+    {
+      "first_selected": "2020-09-13",
+      "last_selected": "2021-10-11",
+      "selected_days": 50,
+      "symbol": "ALGOUSDT"
+    },
+    {
+      "first_selected": "2021-07-19",
+      "last_selected": "2022-04-26",
+      "selected_days": 141,
+      "symbol": "ALICEUSDT"
+    },
+    {
+      "first_selected": "2021-02-20",
+      "last_selected": "2021-02-20",
+      "selected_days": 1,
+      "symbol": "ALPHAUSDT"
+    },
+    {
+      "first_selected": "2022-06-14",
+      "last_selected": "2024-11-25",
+      "selected_days": 319,
+      "symbol": "APEUSDT"
+    },
+    {
+      "first_selected": "2024-02-12",
+      "last_selected": "2024-02-23",
+      "selected_days": 12,
+      "symbol": "API3USDT"
+    },
+    {
+      "first_selected": "2023-01-16",
+      "last_selected": "2024-12-04",
+      "selected_days": 265,
+      "symbol": "APTUSDT"
+    },
+    {
+      "first_selected": "2023-06-20",
+      "last_selected": "2025-09-16",
+      "selected_days": 309,
+      "symbol": "ARBUSDT"
+    },
+    {
+      "first_selected": "2026-04-22",
+      "last_selected": "2026-04-22",
+      "selected_days": 1,
+      "symbol": "ARIAUSDT"
+    },
+    {
+      "first_selected": "2023-05-27",
+      "last_selected": "2023-06-23",
+      "selected_days": 28,
+      "symbol": "ARPAUSDT"
+    },
+    {
+      "first_selected": "2025-12-17",
+      "last_selected": "2026-03-09",
+      "selected_days": 78,
+      "symbol": "ASTERUSDT"
+    },
+    {
+      "first_selected": "2020-05-06",
+      "last_selected": "2024-01-08",
+      "selected_days": 474,
+      "symbol": "ATOMUSDT"
+    },
+    {
+      "first_selected": "2025-03-22",
+      "last_selected": "2025-04-17",
+      "selected_days": 27,
+      "symbol": "AUCTIONUSDT"
+    },
+    {
+      "first_selected": "2021-01-24",
+      "last_selected": "2026-06-12",
+      "selected_days": 1534,
+      "symbol": "AVAXUSDT"
+    },
+    {
+      "first_selected": "2021-07-15",
+      "last_selected": "2026-02-25",
+      "selected_days": 328,
+      "symbol": "AXSUSDT"
+    },
+    {
+      "first_selected": "2024-01-01",
+      "last_selected": "2024-01-05",
+      "selected_days": 5,
+      "symbol": "BAKEUSDT"
+    },
+    {
+      "first_selected": "2025-07-14",
+      "last_selected": "2025-07-14",
+      "selected_days": 1,
+      "symbol": "BANANAS31USDT"
+    },
+    {
+      "first_selected": "2020-10-26",
+      "last_selected": "2022-12-12",
+      "selected_days": 52,
+      "symbol": "BANDUSDT"
+    },
+    {
+      "first_selected": "2020-05-12",
+      "last_selected": "2020-07-27",
+      "selected_days": 43,
+      "symbol": "BATUSDT"
+    },
+    {
+      "first_selected": "2020-04-18",
+      "last_selected": "2026-04-09",
+      "selected_days": 942,
+      "symbol": "BCHUSDT"
+    },
+    {
+      "first_selected": "2026-06-13",
+      "last_selected": "2026-06-30",
+      "selected_days": 18,
+      "symbol": "BEATUSDT"
+    },
+    {
+      "first_selected": "2022-06-12",
+      "last_selected": "2022-06-29",
+      "selected_days": 18,
+      "symbol": "BELUSDT"
+    },
+    {
+      "first_selected": "2024-11-06",
+      "last_selected": "2024-11-16",
+      "selected_days": 11,
+      "symbol": "BIGTIMEUSDT"
+    },
+    {
+      "first_selected": "2025-08-28",
+      "last_selected": "2025-09-20",
+      "selected_days": 24,
+      "symbol": "BIOUSDT"
+    },
+    {
+      "first_selected": "2023-11-29",
+      "last_selected": "2024-02-09",
+      "selected_days": 27,
+      "symbol": "BLURUSDT"
+    },
+    {
+      "first_selected": "2023-08-27",
+      "last_selected": "2023-10-11",
+      "selected_days": 46,
+      "symbol": "BLZUSDT"
+    },
+    {
+      "first_selected": "2020-05-09",
+      "last_selected": "2026-06-30",
+      "selected_days": 2242,
+      "symbol": "BNBUSDT"
+    },
+    {
+      "first_selected": "2025-03-06",
+      "last_selected": "2025-03-11",
+      "selected_days": 6,
+      "symbol": "BNXUSDT"
+    },
+    {
+      "first_selected": "2024-06-13",
+      "last_selected": "2024-11-22",
+      "selected_days": 99,
+      "symbol": "BOMEUSDT"
+    },
+    {
+      "first_selected": "2020-04-18",
+      "last_selected": "2026-06-30",
+      "selected_days": 2265,
+      "symbol": "BTCUSDT"
+    },
+    {
+      "first_selected": "2026-06-29",
+      "last_selected": "2026-06-30",
+      "selected_days": 2,
+      "symbol": "BZUSDT"
+    },
+    {
+      "first_selected": "2023-05-20",
+      "last_selected": "2023-09-21",
+      "selected_days": 72,
+      "symbol": "CFXUSDT"
+    },
+    {
+      "first_selected": "2021-07-29",
+      "last_selected": "2021-12-12",
+      "selected_days": 29,
+      "symbol": "CHRUSDT"
+    },
+    {
+      "first_selected": "2021-04-20",
+      "last_selected": "2023-01-18",
+      "selected_days": 211,
+      "symbol": "CHZUSDT"
+    },
+    {
+      "first_selected": "2026-06-29",
+      "last_selected": "2026-06-30",
+      "selected_days": 2,
+      "symbol": "CLUSDT"
+    },
+    {
+      "first_selected": "2020-09-27",
+      "last_selected": "2023-08-26",
+      "selected_days": 124,
+      "symbol": "COMPUSDT"
+    },
+    {
+      "first_selected": "2026-05-31",
+      "last_selected": "2026-06-28",
+      "selected_days": 21,
+      "symbol": "CRCLUSDT"
+    },
+    {
+      "first_selected": "2020-11-29",
+      "last_selected": "2025-05-09",
+      "selected_days": 248,
+      "symbol": "CRVUSDT"
+    },
+    {
+      "first_selected": "2023-05-02",
+      "last_selected": "2023-05-19",
+      "selected_days": 18,
+      "symbol": "CTSIUSDT"
+    },
+    {
+      "first_selected": "2020-05-03",
+      "last_selected": "2025-11-30",
+      "selected_days": 48,
+      "symbol": "DASHUSDT"
+    },
+    {
+      "first_selected": "2021-02-11",
+      "last_selected": "2026-06-30",
+      "selected_days": 1868,
+      "symbol": "DOGEUSDT"
+    },
+    {
+      "first_selected": "2020-11-19",
+      "last_selected": "2026-04-22",
+      "selected_days": 857,
+      "symbol": "DOTUSDT"
+    },
+    {
+      "first_selected": "2022-02-26",
+      "last_selected": "2024-01-07",
+      "selected_days": 249,
+      "symbol": "DYDXUSDT"
+    },
+    {
+      "first_selected": "2020-12-24",
+      "last_selected": "2022-04-03",
+      "selected_days": 24,
+      "symbol": "EGLDUSDT"
+    },
+    {
+      "first_selected": "2024-08-19",
+      "last_selected": "2026-06-30",
+      "selected_days": 522,
+      "symbol": "ENAUSDT"
+    },
+    {
+      "first_selected": "2021-03-17",
+      "last_selected": "2021-04-18",
+      "selected_days": 33,
+      "symbol": "ENJUSDT"
+    },
+    {
+      "first_selected": "2022-05-17",
+      "last_selected": "2024-07-27",
+      "selected_days": 53,
+      "symbol": "ENSUSDT"
+    },
+    {
+      "first_selected": "2020-04-18",
+      "last_selected": "2025-05-02",
+      "selected_days": 816,
+      "symbol": "EOSUSDT"
+    },
+    {
+      "first_selected": "2026-06-21",
+      "last_selected": "2026-06-21",
+      "selected_days": 1,
+      "symbol": "ESPORTSUSDT"
+    },
+    {
+      "first_selected": "2020-04-18",
+      "last_selected": "2024-12-15",
+      "selected_days": 851,
+      "symbol": "ETCUSDT"
+    },
+    {
+      "first_selected": "2024-07-24",
+      "last_selected": "2024-08-01",
+      "selected_days": 9,
+      "symbol": "ETHFIUSDT"
+    },
+    {
+      "first_selected": "2020-04-18",
+      "last_selected": "2026-06-30",
+      "selected_days": 2265,
+      "symbol": "ETHUSDT"
+    },
+    {
+      "first_selected": "2025-03-19",
+      "last_selected": "2026-01-28",
+      "selected_days": 281,
+      "symbol": "FARTCOINUSDT"
+    },
+    {
+      "first_selected": "2024-03-09",
+      "last_selected": "2024-10-17",
+      "selected_days": 55,
+      "symbol": "FETUSDT"
+    },
+    {
+      "first_selected": "2021-03-26",
+      "last_selected": "2026-06-05",
+      "selected_days": 573,
+      "symbol": "FILUSDT"
+    },
+    {
+      "first_selected": "2021-09-13",
+      "last_selected": "2024-11-05",
+      "selected_days": 555,
+      "symbol": "FTMUSDT"
+    },
+    {
+      "first_selected": "2025-07-06",
+      "last_selected": "2025-07-17",
+      "selected_days": 10,
+      "symbol": "FUNUSDT"
+    },
+    {
+      "first_selected": "2021-12-16",
+      "last_selected": "2023-12-16",
+      "selected_days": 330,
+      "symbol": "GALAUSDT"
+    },
+    {
+      "first_selected": "2022-06-14",
+      "last_selected": "2023-12-06",
+      "selected_days": 215,
+      "symbol": "GMTUSDT"
+    },
+    {
+      "first_selected": "2023-03-04",
+      "last_selected": "2023-03-06",
+      "selected_days": 3,
+      "symbol": "GRTUSDT"
+    },
+    {
+      "first_selected": "2024-12-06",
+      "last_selected": "2025-03-26",
+      "selected_days": 74,
+      "symbol": "HBARUSDT"
+    },
+    {
+      "first_selected": "2026-06-14",
+      "last_selected": "2026-06-30",
+      "selected_days": 17,
+      "symbol": "HUSDT"
+    },
+    {
+      "first_selected": "2025-08-27",
+      "last_selected": "2026-06-30",
+      "selected_days": 308,
+      "symbol": "HYPEUSDT"
+    },
+    {
+      "first_selected": "2021-08-15",
+      "last_selected": "2025-12-01",
+      "selected_days": 83,
+      "symbol": "ICPUSDT"
+    },
+    {
+      "first_selected": "2023-04-18",
+      "last_selected": "2024-07-06",
+      "selected_days": 204,
+      "symbol": "INJUSDT"
+    },
+    {
+      "first_selected": "2026-06-22",
+      "last_selected": "2026-06-30",
+      "selected_days": 9,
+      "symbol": "INTCUSDT"
+    },
+    {
+      "first_selected": "2020-06-05",
+      "last_selected": "2020-09-26",
+      "selected_days": 93,
+      "symbol": "IOSTUSDT"
+    },
+    {
+      "first_selected": "2020-05-11",
+      "last_selected": "2020-05-15",
+      "selected_days": 4,
+      "symbol": "IOTAUSDT"
+    },
+    {
+      "first_selected": "2024-06-11",
+      "last_selected": "2024-07-04",
+      "selected_days": 24,
+      "symbol": "JASMYUSDT"
+    },
+    {
+      "first_selected": "2024-05-13",
+      "last_selected": "2024-05-22",
+      "selected_days": 10,
+      "symbol": "JTOUSDT"
+    },
+    {
+      "first_selected": "2025-02-06",
+      "last_selected": "2025-02-27",
+      "selected_days": 22,
+      "symbol": "JUPUSDT"
+    },
+    {
+      "first_selected": "2025-05-30",
+      "last_selected": "2025-05-30",
+      "selected_days": 1,
+      "symbol": "KAITOUSDT"
+    },
+    {
+      "first_selected": "2020-11-22",
+      "last_selected": "2023-06-11",
+      "selected_days": 25,
+      "symbol": "KAVAUSDT"
+    },
+    {
+      "first_selected": "2026-03-10",
+      "last_selected": "2026-03-12",
+      "selected_days": 3,
+      "symbol": "KITEUSDT"
+    },
+    {
+      "first_selected": "2022-05-02",
+      "last_selected": "2022-06-11",
+      "selected_days": 41,
+      "symbol": "KNCUSDT"
+    },
+    {
+      "first_selected": "2021-06-25",
+      "last_selected": "2021-07-15",
+      "selected_days": 21,
+      "symbol": "KSMUSDT"
+    },
+    {
+      "first_selected": "2026-05-13",
+      "last_selected": "2026-06-30",
+      "selected_days": 49,
+      "symbol": "LABUSDT"
+    },
+    {
+      "first_selected": "2025-05-11",
+      "last_selected": "2025-05-15",
+      "selected_days": 5,
+      "symbol": "LAYERUSDT"
+    },
+    {
+      "first_selected": "2023-01-16",
+      "last_selected": "2024-07-14",
+      "selected_days": 104,
+      "symbol": "LDOUSDT"
+    },
+    {
+      "first_selected": "2020-10-20",
+      "last_selected": "2020-10-21",
+      "selected_days": 2,
+      "symbol": "LENDUSDT"
+    },
+    {
+      "first_selected": "2023-10-09",
+      "last_selected": "2023-10-21",
+      "selected_days": 13,
+      "symbol": "LEVERUSDT"
+    },
+    {
+      "first_selected": "2026-01-01",
+      "last_selected": "2026-01-10",
+      "selected_days": 10,
+      "symbol": "LIGHTUSDT"
+    },
+    {
+      "first_selected": "2023-04-12",
+      "last_selected": "2023-07-12",
+      "selected_days": 47,
+      "symbol": "LINAUSDT"
+    },
+    {
+      "first_selected": "2020-04-18",
+      "last_selected": "2026-06-13",
+      "selected_days": 1930,
+      "symbol": "LINKUSDT"
+    },
+    {
+      "first_selected": "2023-08-23",
+      "last_selected": "2023-09-16",
+      "selected_days": 25,
+      "symbol": "LPTUSDT"
+    },
+    {
+      "first_selected": "2023-10-17",
+      "last_selected": "2023-11-02",
+      "selected_days": 17,
+      "symbol": "LQTYUSDT"
+    },
+    {
+      "first_selected": "2021-11-14",
+      "last_selected": "2021-12-22",
+      "selected_days": 39,
+      "symbol": "LRCUSDT"
+    },
+    {
+      "first_selected": "2020-04-18",
+      "last_selected": "2026-02-14",
+      "selected_days": 1459,
+      "symbol": "LTCUSDT"
+    },
+    {
+      "first_selected": "2021-08-03",
+      "last_selected": "2022-05-13",
+      "selected_days": 197,
+      "symbol": "LUNAUSDT"
+    },
+    {
+      "first_selected": "2021-11-12",
+      "last_selected": "2023-02-18",
+      "selected_days": 140,
+      "symbol": "MANAUSDT"
+    },
+    {
+      "first_selected": "2022-11-11",
+      "last_selected": "2023-06-26",
+      "selected_days": 158,
+      "symbol": "MASKUSDT"
+    },
+    {
+      "first_selected": "2021-03-21",
+      "last_selected": "2024-05-16",
+      "selected_days": 1013,
+      "symbol": "MATICUSDT"
+    },
+    {
+      "first_selected": "2024-10-31",
+      "last_selected": "2024-11-19",
+      "selected_days": 20,
+      "symbol": "MEWUSDT"
+    },
+    {
+      "first_selected": "2021-01-18",
+      "last_selected": "2023-10-27",
+      "selected_days": 132,
+      "symbol": "MKRUSDT"
+    },
+    {
+      "first_selected": "2025-05-22",
+      "last_selected": "2025-06-30",
+      "selected_days": 33,
+      "symbol": "MOODENGUSDT"
+    },
+    {
+      "first_selected": "2022-04-28",
+      "last_selected": "2023-07-04",
+      "selected_days": 20,
+      "symbol": "MTLUSDT"
+    },
+    {
+      "first_selected": "2025-09-25",
+      "last_selected": "2025-10-16",
+      "selected_days": 22,
+      "symbol": "MYXUSDT"
+    },
+    {
+      "first_selected": "2021-12-23",
+      "last_selected": "2026-06-30",
+      "selected_days": 553,
+      "symbol": "NEARUSDT"
+    },
+    {
+      "first_selected": "2024-12-14",
+      "last_selected": "2025-06-13",
+      "selected_days": 114,
+      "symbol": "NEIROUSDT"
+    },
+    {
+      "first_selected": "2020-05-16",
+      "last_selected": "2020-11-10",
+      "selected_days": 179,
+      "symbol": "NEOUSDT"
+    },
+    {
+      "first_selected": "2024-08-13",
+      "last_selected": "2024-09-27",
+      "selected_days": 46,
+      "symbol": "NOTUSDT"
+    },
+    {
+      "first_selected": "2022-12-28",
+      "last_selected": "2023-01-20",
+      "selected_days": 24,
+      "symbol": "OCEANUSDT"
+    },
+    {
+      "first_selected": "2020-09-29",
+      "last_selected": "2021-10-19",
+      "selected_days": 52,
+      "symbol": "OMGUSDT"
+    },
+    {
+      "first_selected": "2025-05-06",
+      "last_selected": "2025-05-12",
+      "selected_days": 6,
+      "symbol": "OMUSDT"
+    },
+    {
+      "first_selected": "2024-04-18",
+      "last_selected": "2026-06-21",
+      "selected_days": 150,
+      "symbol": "ONDOUSDT"
+    },
+    {
+      "first_selected": "2022-01-16",
+      "last_selected": "2022-02-09",
+      "selected_days": 25,
+      "symbol": "ONEUSDT"
+    },
+    {
+      "first_selected": "2024-05-02",
+      "last_selected": "2024-05-10",
+      "selected_days": 9,
+      "symbol": "ONGUSDT"
+    },
+    {
+      "first_selected": "2020-05-10",
+      "last_selected": "2020-10-11",
+      "selected_days": 155,
+      "symbol": "ONTUSDT"
+    },
+    {
+      "first_selected": "2022-08-29",
+      "last_selected": "2024-05-29",
+      "selected_days": 434,
+      "symbol": "OPUSDT"
+    },
+    {
+      "first_selected": "2024-02-04",
+      "last_selected": "2024-12-06",
+      "selected_days": 303,
+      "symbol": "ORDIUSDT"
+    },
+    {
+      "first_selected": "2025-10-28",
+      "last_selected": "2026-05-13",
+      "selected_days": 128,
+      "symbol": "PAXGUSDT"
+    },
+    {
+      "first_selected": "2025-07-16",
+      "last_selected": "2025-10-27",
+      "selected_days": 96,
+      "symbol": "PENGUUSDT"
+    },
+    {
+      "first_selected": "2022-05-31",
+      "last_selected": "2024-11-16",
+      "selected_days": 145,
+      "symbol": "PEOPLEUSDT"
+    },
+    {
+      "first_selected": "2023-09-22",
+      "last_selected": "2023-10-04",
+      "selected_days": 13,
+      "symbol": "PERPUSDT"
+    },
+    {
+      "first_selected": "2025-12-08",
+      "last_selected": "2026-04-21",
+      "selected_days": 120,
+      "symbol": "PIPPINUSDT"
+    },
+    {
+      "first_selected": "2025-02-08",
+      "last_selected": "2025-05-25",
+      "selected_days": 76,
+      "symbol": "PNUTUSDT"
+    },
+    {
+      "first_selected": "2024-04-15",
+      "last_selected": "2024-04-15",
+      "selected_days": 1,
+      "symbol": "POLYXUSDT"
+    },
+    {
+      "first_selected": "2024-11-19",
+      "last_selected": "2024-11-26",
+      "selected_days": 8,
+      "symbol": "POPCATUSDT"
+    },
+    {
+      "first_selected": "2026-03-05",
+      "last_selected": "2026-03-16",
+      "selected_days": 12,
+      "symbol": "POWERUSDT"
+    },
+    {
+      "first_selected": "2025-07-26",
+      "last_selected": "2026-02-22",
+      "selected_days": 191,
+      "symbol": "PUMPUSDT"
+    },
+    {
+      "first_selected": "2020-07-28",
+      "last_selected": "2020-09-13",
+      "selected_days": 24,
+      "symbol": "QTUMUSDT"
+    },
+    {
+      "first_selected": "2026-04-23",
+      "last_selected": "2026-05-16",
+      "selected_days": 24,
+      "symbol": "RAVEUSDT"
+    },
+    {
+      "first_selected": "2022-10-16",
+      "last_selected": "2024-10-27",
+      "selected_days": 63,
+      "symbol": "REEFUSDT"
+    },
+    {
+      "first_selected": "2026-01-14",
+      "last_selected": "2026-05-05",
+      "selected_days": 112,
+      "symbol": "RIVERUSDT"
+    },
+    {
+      "first_selected": "2023-01-09",
+      "last_selected": "2023-01-15",
+      "selected_days": 7,
+      "symbol": "RLCUSDT"
+    },
+    {
+      "first_selected": "2023-05-03",
+      "last_selected": "2024-06-05",
+      "selected_days": 69,
+      "symbol": "RNDRUSDT"
+    },
+    {
+      "first_selected": "2022-10-07",
+      "last_selected": "2022-10-29",
+      "selected_days": 23,
+      "symbol": "RSRUSDT"
+    },
+    {
+      "first_selected": "2021-07-07",
+      "last_selected": "2023-12-12",
+      "selected_days": 170,
+      "symbol": "RUNEUSDT"
+    },
+    {
+      "first_selected": "2022-09-21",
+      "last_selected": "2022-10-06",
+      "selected_days": 16,
+      "symbol": "RVNUSDT"
+    },
+    {
+      "first_selected": "2024-10-02",
+      "last_selected": "2024-11-03",
+      "selected_days": 33,
+      "symbol": "SAGAUSDT"
+    },
+    {
+      "first_selected": "2021-07-21",
+      "last_selected": "2023-02-28",
+      "selected_days": 272,
+      "symbol": "SANDUSDT"
+    },
+    {
+      "first_selected": "2023-12-02",
+      "last_selected": "2025-07-22",
+      "selected_days": 130,
+      "symbol": "SEIUSDT"
+    },
+    {
+      "first_selected": "2026-03-03",
+      "last_selected": "2026-05-03",
+      "selected_days": 55,
+      "symbol": "SIRENUSDT"
+    },
+    {
+      "first_selected": "2026-05-09",
+      "last_selected": "2026-05-30",
+      "selected_days": 22,
+      "symbol": "SKYAIUSDT"
+    },
+    {
+      "first_selected": "2020-11-24",
+      "last_selected": "2021-01-16",
+      "selected_days": 8,
+      "symbol": "SNXUSDT"
+    },
+    {
+      "first_selected": "2021-04-12",
+      "last_selected": "2026-06-30",
+      "selected_days": 1836,
+      "symbol": "SOLUSDT"
+    },
+    {
+      "first_selected": "2023-08-04",
+      "last_selected": "2023-10-15",
+      "selected_days": 31,
+      "symbol": "STMXUSDT"
+    },
+    {
+      "first_selected": "2023-09-26",
+      "last_selected": "2023-10-29",
+      "selected_days": 34,
+      "symbol": "STORJUSDT"
+    },
+    {
+      "first_selected": "2023-06-30",
+      "last_selected": "2024-02-29",
+      "selected_days": 14,
+      "symbol": "STXUSDT"
+    },
+    {
+      "first_selected": "2023-07-31",
+      "last_selected": "2026-06-30",
+      "selected_days": 794,
+      "symbol": "SUIUSDT"
+    },
+    {
+      "first_selected": "2020-12-02",
+      "last_selected": "2022-11-29",
+      "selected_days": 199,
+      "symbol": "SUSHIUSDT"
+    },
+    {
+      "first_selected": "2020-10-18",
+      "last_selected": "2023-05-03",
+      "selected_days": 201,
+      "symbol": "SXPUSDT"
+    },
+    {
+      "first_selected": "2024-10-06",
+      "last_selected": "2026-06-27",
+      "selected_days": 213,
+      "symbol": "TAOUSDT"
+    },
+    {
+      "first_selected": "2020-08-25",
+      "last_selected": "2022-04-18",
+      "selected_days": 246,
+      "symbol": "THETAUSDT"
+    },
+    {
+      "first_selected": "2024-01-28",
+      "last_selected": "2024-12-11",
+      "selected_days": 153,
+      "symbol": "TIAUSDT"
+    },
+    {
+      "first_selected": "2023-05-12",
+      "last_selected": "2023-09-20",
+      "selected_days": 119,
+      "symbol": "TOMOUSDT"
+    },
+    {
+      "first_selected": "2024-08-27",
+      "last_selected": "2026-06-18",
+      "selected_days": 72,
+      "symbol": "TONUSDT"
+    },
+    {
+      "first_selected": "2022-08-15",
+      "last_selected": "2025-06-25",
+      "selected_days": 210,
+      "symbol": "TRBUSDT"
+    },
+    {
+      "first_selected": "2025-04-17",
+      "last_selected": "2025-11-25",
+      "selected_days": 146,
+      "symbol": "TRUMPUSDT"
+    },
+    {
+      "first_selected": "2020-04-18",
+      "last_selected": "2022-07-05",
+      "selected_days": 455,
+      "symbol": "TRXUSDT"
+    },
+    {
+      "first_selected": "2024-10-27",
+      "last_selected": "2024-11-18",
+      "selected_days": 23,
+      "symbol": "TURBOUSDT"
+    },
+    {
+      "first_selected": "2022-06-30",
+      "last_selected": "2023-09-29",
+      "selected_days": 80,
+      "symbol": "UNFIUSDT"
+    },
+    {
+      "first_selected": "2020-12-16",
+      "last_selected": "2025-08-27",
+      "selected_days": 293,
+      "symbol": "UNIUSDT"
+    },
+    {
+      "first_selected": "2024-12-30",
+      "last_selected": "2025-01-19",
+      "selected_days": 21,
+      "symbol": "UXLINKUSDT"
+    },
+    {
+      "first_selected": "2020-05-13",
+      "last_selected": "2021-07-06",
+      "selected_days": 291,
+      "symbol": "VETUSDT"
+    },
+    {
+      "first_selected": "2025-05-09",
+      "last_selected": "2025-11-23",
+      "selected_days": 80,
+      "symbol": "VIRTUALUSDT"
+    },
+    {
+      "first_selected": "2020-11-09",
+      "last_selected": "2023-07-28",
+      "selected_days": 178,
+      "symbol": "WAVESUSDT"
+    },
+    {
+      "first_selected": "2024-04-16",
+      "last_selected": "2025-11-03",
+      "selected_days": 547,
+      "symbol": "WIFUSDT"
+    },
+    {
+      "first_selected": "2023-10-21",
+      "last_selected": "2026-06-30",
+      "selected_days": 528,
+      "symbol": "WLDUSDT"
+    },
+    {
+      "first_selected": "2026-02-23",
+      "last_selected": "2026-03-02",
+      "selected_days": 8,
+      "symbol": "WLFIUSDT"
+    },
+    {
+      "first_selected": "2020-04-18",
+      "last_selected": "2026-06-28",
+      "selected_days": 449,
+      "symbol": "XLMUSDT"
+    },
+    {
+      "first_selected": "2020-05-02",
+      "last_selected": "2022-05-01",
+      "selected_days": 123,
+      "symbol": "XMRUSDT"
+    },
+    {
+      "first_selected": "2025-11-19",
+      "last_selected": "2025-12-04",
+      "selected_days": 13,
+      "symbol": "XPLUSDT"
+    },
+    {
+      "first_selected": "2020-04-18",
+      "last_selected": "2026-06-30",
+      "selected_days": 2202,
+      "symbol": "XRPUSDT"
+    },
+    {
+      "first_selected": "2020-05-05",
+      "last_selected": "2022-03-03",
+      "selected_days": 284,
+      "symbol": "XTZUSDT"
+    },
+    {
+      "first_selected": "2020-12-01",
+      "last_selected": "2020-12-28",
+      "selected_days": 27,
+      "symbol": "YFIIUSDT"
+    },
+    {
+      "first_selected": "2020-11-28",
+      "last_selected": "2021-02-19",
+      "selected_days": 84,
+      "symbol": "YFIUSDT"
+    },
+    {
+      "first_selected": "2020-05-04",
+      "last_selected": "2026-06-30",
+      "selected_days": 469,
+      "symbol": "ZECUSDT"
+    },
+    {
+      "first_selected": "2020-12-30",
+      "last_selected": "2022-06-13",
+      "selected_days": 66,
+      "symbol": "ZILUSDT"
+    },
+    {
+      "first_selected": "2025-04-07",
+      "last_selected": "2025-04-09",
+      "selected_days": 3,
+      "symbol": "ZROUSDT"
+    },
+    {
+      "first_selected": "2026-04-23",
+      "last_selected": "2026-05-10",
+      "selected_days": 18,
+      "symbol": "\u5e01\u5b89\u4eba\u751fUSDT"
+    }
+  ],
+  "union_selected_sha256": "cb75d98621f72e12beaed1ce41cb15d6ffad01e8be66eaf3ae07517e12c60153",
+  "universe_ledger_sha256": "d41cf6b15357d64b91709a9ccc9973da89a9fe9a93cc34388c58ba50fbec8e1d"
+}

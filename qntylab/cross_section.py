@@ -46,7 +46,12 @@ def factor_scores(close: np.ndarray, funding: np.ndarray | None, premium: np.nda
     elif name in {"H014_funding_24h", "H014_funding_7d"}:
         if funding is None: raise ValueError("funding required")
         for t in range(lookback - 1, len(close)):
-            result[t] = np.nansum(funding[t - lookback + 1:t + 1])
+            # A missing settled-funding day is unavailable information, not a
+            # zero rate.  Keeping it non-finite lets the frozen rank primitive
+            # exclude that observation without changing universe membership.
+            window = funding[t - lookback + 1:t + 1]
+            valid = np.isfinite(window).all(axis=0)
+            result[t, valid] = window[:, valid].sum(axis=0)
     elif name == "H015_premium":
         if premium is None: raise ValueError("premium required")
         result[:] = premium

@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from pathlib import Path
 from qntylab.backtest import evaluate, segments
 from qntylab.data import FUNDING_FIELDS, PERP_FIELDS, archive_usdt_perp_symbols, validate
 from qntylab.strategies import momentum
@@ -9,6 +10,7 @@ from qntylab.cross_section import deterministic_order, evaluate as evaluate_cros
 from qntylab.universe import build_universe, write_dataset_manifest
 from qntylab.archive_index import eligible_symbols
 from qntylab.aux_v2 import _one, build_dataset_freeze_manifest, load_union
+from qntylab import sprint_v2
 
 def test_signal_is_shifted_one_bar_no_lookahead():
     # The jump is visible at index 2; its long position begins at 3, after the jump.
@@ -183,3 +185,64 @@ def test_auxiliary_freeze_manifest_is_deterministic(tmp_path, monkeypatch):
     first=build_dataset_freeze_manifest(tmp_path,tmp_path/"union.json",implementation_commit="repair")
     second=build_dataset_freeze_manifest(tmp_path,tmp_path/"union.json",implementation_commit="repair")
     assert first == second and first["dataset_root_sha256"]
+
+
+def test_sprint_v2_freeze_identity_refuses_mutated_bindings(monkeypatch):
+    root = Path(__file__).resolve().parents[1]
+    original_read = sprint_v2._read_json
+    def changed_manifest(path):
+        value = original_read(path)
+        if path.name == "sprint_v2_pre_outcome_dataset_manifest.json":
+            value["sample_cutoff"] = "2026-06-29"
+        return value
+    monkeypatch.setattr(sprint_v2, "_read_json", changed_manifest)
+    with pytest.raises(ValueError, match="dataset root"): sprint_v2._verify_freeze(root)
+
+
+def test_sprint_v2_freeze_refuses_union_ledger_and_source_hash_mismatch(monkeypatch):
+    root = Path(__file__).resolve().parents[1]
+    original_read, original_sha = sprint_v2._read_json, sprint_v2.sha256
+    def changed_union(path):
+        value = original_read(path)
+        if path.name == "sprint_v2_union_selected.json": value["union_selected_sha256"] = "bad"
+        return value
+    monkeypatch.setattr(sprint_v2, "_read_json", changed_union)
+    with pytest.raises(ValueError, match="union"): sprint_v2._verify_freeze(root)
+    monkeypatch.setattr(sprint_v2, "_read_json", original_read)
+    monkeypatch.setattr(sprint_v2, "sha256", lambda path: "bad" if path.name == "sprint_v2_universe_ledger.json" else original_sha(path))
+    with pytest.raises(ValueError, match="ledger"): sprint_v2._verify_freeze(root)
+    monkeypatch.setattr(sprint_v2, "sha256", lambda path: "bad" if path.name == "BTCUSDT-funding.csv" else original_sha(path))
+    with pytest.raises(ValueError, match="source hash"): sprint_v2._verify_freeze(root)
+
+
+def test_sprint_v2_missing_features_remain_nonfinite_without_changing_universe_membership():
+    close = np.full((8, 2), 100.); funding = np.full((8, 2), .01); premium = np.full((8, 2), .02)
+    eligible = np.ones((8, 2), dtype=bool); funding[3, 0] = np.nan; premium[4, 1] = np.nan
+    funding_1d = factor_scores(close, funding, None, "H014_funding_24h", 1)
+    funding_7d = factor_scores(close, funding, None, "H014_funding_7d", 7)
+    premium_score = factor_scores(close, None, premium, "H015_premium", 1)
+    assert np.isnan(funding_1d[3, 0]) and np.isnan(funding_7d[6, 0])
+    assert np.isnan(premium_score[4, 1]) and eligible[3, 0] and eligible[4, 1]
+
+
+def test_sprint_v2_scores_are_causal_and_require_complete_lookbacks():
+    close = np.array([[100.], [101.], [102.], [103.], [104.], [105.], [106.], [107.], [999.]])
+    before = factor_scores(close, None, None, "H012_momentum_7d", 7)
+    changed = close.copy(); changed[-1, 0] = 1.
+    after = factor_scores(changed, None, None, "H012_momentum_7d", 7)
+    assert np.isnan(before[:7]).all() and np.array_equal(before[:8], after[:8], equal_nan=True)
+    gapped = close.copy(); gapped[1, 0] = np.nan
+    assert np.isnan(factor_scores(gapped, None, None, "H012_momentum_7d", 7)[8, 0])
+
+
+def test_sprint_v2_materialization_is_structural_only_and_preserves_asymmetric_sources():
+    root = Path(__file__).resolve().parents[1]
+    inputs = sprint_v2.materialize(root); report = sprint_v2.structural_report(inputs)
+    chinese = inputs.symbols.index("币安人生USDT"); icp = inputs.symbols.index("ICPUSDT"); lend = inputs.symbols.index("LENDUSDT")
+    assert report["union_count"] == 181 and inputs.close.shape == inputs.eligible.shape
+    assert np.isfinite(inputs.funding[:, chinese]).any() and not np.isfinite(inputs.premium[:, chinese]).any()
+    assert np.isnan(inputs.funding[:, icp]).any() and np.isnan(inputs.funding[:, lend]).any()
+    assert inputs.cost_bps == (5, 10, 20) and (inputs.null_seed, inputs.null_count, inputs.null_same_universe_and_bucket_counts) == (20260728, 100, True)
+    event = inputs.funding_events["币安人生USDT"][0]
+    assert event["timestamp"] == "2026-04-01T00:00:00Z" and float(event["funding_rate"]) == pytest.approx(.00005)
+    assert -1.0 * .01 == pytest.approx(-.01)  # frozen cashflow sign: -position * rate

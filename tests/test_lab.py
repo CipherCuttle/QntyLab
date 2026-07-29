@@ -1,14 +1,14 @@
 import numpy as np
 import pytest
 from qntylab.backtest import evaluate, segments
-from qntylab.data import archive_usdt_perp_symbols, validate
+from qntylab.data import FUNDING_FIELDS, PERP_FIELDS, archive_usdt_perp_symbols, validate
 from qntylab.strategies import momentum
 from qntylab.perp import causal, funding_to_bars, evaluate_perp, positions
 from qntylab.experiment import _perp_splits
 from qntylab.cross_section import deterministic_order, evaluate as evaluate_cross_section, factor_scores, random_scores, receipt_sha256, turnover, weights
 from qntylab.universe import build_universe, write_dataset_manifest
 from qntylab.archive_index import eligible_symbols
-from qntylab.aux_v2 import load_union
+from qntylab.aux_v2 import _one, build_dataset_freeze_manifest, load_union
 
 def test_signal_is_shifted_one_bar_no_lookahead():
     # The jump is visible at index 2; its long position begins at 3, after the jump.
@@ -143,3 +143,43 @@ def test_frozen_funding_factor_ids_are_accepted():
 def test_auxiliary_union_fails_closed_on_wrong_contract(tmp_path):
     path=tmp_path/'union.json'; path.write_text('{"symbols":[]}')
     with pytest.raises(ValueError): load_union(path)
+
+def test_auxiliary_receipts_use_independent_local_source_metadata(tmp_path, monkeypatch):
+    import qntylab.aux_v2 as aux
+    def absent(*args, **kwargs): raise ValueError("source absent")
+    monkeypatch.setattr(aux, "fetch_funding", absent)
+    monkeypatch.setattr(aux, "fetch_premium_perp", absent)
+    raw=tmp_path/"data/raw"; raw.mkdir(parents=True)
+    funding=raw/"CASE_A-funding.csv"; premium=raw/"CASE_A-perp-1h.csv"
+    funding.write_text("timestamp,funding_interval_hours,funding_rate\n2026-04-23T08:00:00Z,8,0.01\n")
+    item={"symbol":"CASE_A","first_selected":"2026-04-23","last_selected":"2026-05-10"}
+    result=_one(tmp_path,item)
+    assert result["funding"]["state"] == "VALID" and result["funding"]["rows"] == 1
+    assert result["premium"]["state"] == "NO_SOURCE_DATA"
+    premium.write_text(",".join(PERP_FIELDS)+"\n2026-04-23T00:00:00Z,1,1,1,1,1,1,1,1,1,0\n")
+    result=_one(tmp_path,item)
+    assert result["funding"]["state"] == result["premium"]["state"] == "VALID"
+    assert result["funding"]["start"] == "2026-04-23T08:00:00Z"
+    assert _one(tmp_path,item)["reused"] is True
+
+def test_auxiliary_receipt_keeps_available_premium_when_funding_is_absent(tmp_path, monkeypatch):
+    import qntylab.aux_v2 as aux
+    monkeypatch.setattr(aux, "fetch_funding", lambda *args, **kwargs: (_ for _ in ()).throw(ValueError("funding absent")))
+    raw=tmp_path/"data/raw"; raw.mkdir(parents=True)
+    (raw/"CASE_B-perp-1h.csv").write_text(",".join(PERP_FIELDS)+"\n2026-04-23T00:00:00Z,1,1,1,1,1,1,1,1,1,0\n")
+    result=_one(tmp_path,{"symbol":"CASE_B","first_selected":"2026-04-23","last_selected":"2026-05-10"})
+    assert result["funding"]["state"] == "NO_SOURCE_DATA"
+    assert result["premium"]["state"] == "VALID"
+
+def test_auxiliary_freeze_manifest_is_deterministic(tmp_path, monkeypatch):
+    import qntylab.aux_v2 as aux
+    item={"symbol":"CASE_C","first_selected":"2026-04-23","last_selected":"2026-05-10"}
+    monkeypatch.setattr(aux, "load_union", lambda path: [item])
+    monkeypatch.setattr(aux, "INVENTORY_RAW_SHA", "inventory-sha")
+    monkeypatch.setattr(aux, "sha256", lambda path: "inventory-sha" if path.name == "sprint_v2_1d_inventory.json" else "raw-sha")
+    (tmp_path/"data/archive/aux_v2").mkdir(parents=True)
+    (tmp_path/"data/archive/sprint_v2_1d_inventory.json").write_text("inventory")
+    (tmp_path/"data/archive/aux_v2/CASE_C.json").write_text('{"funding":{"end":"2026-05-10","rows":1,"sha256":"f","start":"2026-04-23","state":"VALID"},"premium":{"end":"2026-05-10","rows":1,"sha256":"p","start":"2026-04-23","state":"VALID"},"receipt_schema_version":2}')
+    first=build_dataset_freeze_manifest(tmp_path,tmp_path/"union.json",implementation_commit="repair")
+    second=build_dataset_freeze_manifest(tmp_path,tmp_path/"union.json",implementation_commit="repair")
+    assert first == second and first["dataset_root_sha256"]

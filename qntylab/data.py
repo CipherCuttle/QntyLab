@@ -115,36 +115,34 @@ def _validate_perp(rows: list[dict[str, str]]) -> list[str]:
             raise ValueError(f"taker volume exceeds total at row {i}")
     return gaps
 
-def fetch_perp(symbol: str, start: str, root: Path, end: datetime | None = None) -> dict:
-    """Fetch only completed archive months; archive rows are the durable raw source."""
+def fetch_premium_perp(symbol: str, start: str, root: Path, end: datetime | None = None) -> dict:
+    """Fetch the hourly kline/premium join without coupling it to funding."""
     now = end or datetime.now(UTC)
     months = _months(start, now)
-    session = requests.Session(); klines: dict[int, list[str]] = {}; premiums: dict[int, list[str]] = {}; funding: list[dict[str, str]] = []
+    session = requests.Session(); klines: dict[int, list[str]] = {}; premiums: dict[int, list[str]] = {}
     for year, month in months:
         for row in _archive_rows(session, "klines", symbol, "1h", year, month):
             if row and row[0].isdigit(): klines[int(row[0])] = row
         for row in _archive_rows(session, "premiumIndexKlines", symbol, "1h", year, month):
             if row and row[0].isdigit(): premiums[int(row[0])] = row
-        for row in _archive_rows(session, "fundingRate", symbol, "1h", year, month):
-            if row and row[0].isdigit(): funding.append({"timestamp": datetime.fromtimestamp(int(row[0]) / 1000, UTC).isoformat().replace("+00:00", "Z"), "funding_interval_hours": row[1], "funding_rate": row[2]})
     rows = []
     for stamp, bar in sorted(klines.items()):
         premium = premiums.get(stamp)
         if premium is None: continue
         rows.append({"timestamp": datetime.fromtimestamp(stamp / 1000, UTC).isoformat().replace("+00:00", "Z"), "open": bar[1], "high": bar[2], "low": bar[3], "close": bar[4], "volume": bar[5], "quote_volume": bar[7], "trade_count": bar[8], "taker_buy_base_volume": bar[9], "taker_buy_quote_volume": bar[10], "premium": premium[4]})
     gaps = _validate_perp(rows)
-    funding.sort(key=lambda row: row["timestamp"])
-    if len({row["timestamp"] for row in funding}) != len(funding): raise ValueError("duplicate funding events")
-    for row in funding:
-        if not math.isfinite(float(row["funding_rate"])) or abs(float(row["funding_rate"])) > 1: raise ValueError("funding rate out of range")
     raw = root / "data/raw" / f"{symbol}-perp-1h.csv"; raw.parent.mkdir(parents=True, exist_ok=True)
     with raw.open("w", newline="", encoding="utf-8") as out:
         writer = csv.DictWriter(out, fieldnames=PERP_FIELDS); writer.writeheader(); writer.writerows(rows)
-    funding_path = root / "data/raw" / f"{symbol}-funding.csv"
-    with funding_path.open("w", newline="", encoding="utf-8") as out:
-        writer = csv.DictWriter(out, fieldnames=FUNDING_FIELDS); writer.writeheader(); writer.writerows(funding)
-    manifest = {"source": "https://data.binance.vision/data/futures/um/monthly", "market": "USD-M perpetual", "symbol": symbol, "data_type": ["klines", "premiumIndexKlines", "fundingRate"], "timeframe": "1h", "start": rows[0]["timestamp"], "end": rows[-1]["timestamp"], "rows": len(rows), "sha256": {"perp": sha256(raw), "funding": sha256(funding_path)}, "retrieved_at": datetime.now(UTC).isoformat().replace("+00:00", "Z"), "gaps": gaps, "funding_events": len(funding), "complete_archive_months_only": True}
-    (root / "data/manifests" / f"{symbol}-perp-1h.json").write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
+    return {"symbol": symbol, "rows": len(rows), "sha256": sha256(raw), "start": rows[0]["timestamp"], "end": rows[-1]["timestamp"], "gaps": gaps, "source": "Binance public-data kline and premiumIndexKlines archives"}
+
+def fetch_perp(symbol: str, start: str, root: Path, end: datetime | None = None) -> dict:
+    """Fetch legacy combined perp data while preserving independent source acquisition."""
+    funding = fetch_funding(symbol, start, root, end=end)
+    premium = fetch_premium_perp(symbol, start, root, end=end)
+    manifest = {"source": "https://data.binance.vision/data/futures/um/monthly", "market": "USD-M perpetual", "symbol": symbol, "data_type": ["klines", "premiumIndexKlines", "fundingRate"], "timeframe": "1h", "start": premium["start"], "end": premium["end"], "rows": premium["rows"], "sha256": {"perp": premium["sha256"], "funding": funding["sha256"]}, "retrieved_at": datetime.now(UTC).isoformat().replace("+00:00", "Z"), "gaps": premium["gaps"], "funding_events": funding["rows"], "funding_start": funding["start"], "funding_end": funding["end"], "complete_archive_months_only": True}
+    target = root / "data/manifests" / f"{symbol}-perp-1h.json"; target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
     return manifest
 
 def load_perp(path: Path) -> list[dict[str, str]]:

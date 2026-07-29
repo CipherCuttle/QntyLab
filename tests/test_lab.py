@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+import json
 from pathlib import Path
 from qntylab.backtest import evaluate, segments
 from qntylab.data import FUNDING_FIELDS, PERP_FIELDS, archive_usdt_perp_symbols, validate
@@ -246,3 +247,18 @@ def test_sprint_v2_materialization_is_structural_only_and_preserves_asymmetric_s
     event = inputs.funding_events["币安人生USDT"][0]
     assert event["timestamp"] == "2026-04-01T00:00:00Z" and float(event["funding_rate"]) == pytest.approx(.00005)
     assert -1.0 * .01 == pytest.approx(-.01)  # frozen cashflow sign: -position * rate
+
+
+def test_sprint_v2_semantic_closure_binds_freezes_and_keeps_subjective_labels_unresolved():
+    root = Path(__file__).resolve().parents[1]
+    closure = json.loads((root / "experiments/specs/sprint_v2_pre_outcome_semantic_closure_001.json").read_text())
+    assert closure["outcomes_observed_before_amendment"] is False
+    assert closure["scientific_parameters_changed"] is False
+    assert closure["original_preregistration_commit"] == "b5c4f1622c19c442cfe5c30b84ebcd9d2a95b445"
+    assert closure["dataset_freeze_commit"] == "5ae7336f9b24369d2a7cb7f4ceb6474fb450e85b"
+    assert closure["input_harness_commit"] == "53fe4d31a30182d8b06ac2cf9e0c67ea636a6915"
+    assert closure["closure_gates"] == {"EXECUTION_SEMANTICS_COMPLETE": True, "CLASSIFICATION_SEMANTICS_COMPLETE": False, "outcome_embargo": closure["closure_gates"]["outcome_embargo"]}
+    weekly = next(row for row in closure["semantic_closure_matrix"] if row["field"] == "weekly robustness")
+    assert weekly["status"] == "BOUND"
+    assert "UNRESOLVED_CLASSIFICATION_SEMANTIC" == closure["classification_semantics"]["unresolved_status"]
+    assert "BLOCKED_BY_INCOMPLETE_PREREGISTRATION" in closure["one_shot_closure_rule"]

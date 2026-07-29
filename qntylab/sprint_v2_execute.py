@@ -7,8 +7,14 @@ synthetic :class:`~qntylab.sprint_v2.FrozenInputs` fixtures.
 from __future__ import annotations
 
 import argparse
+from bisect import bisect_left
+from dataclasses import dataclass
+from concurrent.futures import ProcessPoolExecutor
 import hashlib
 import json
+import os
+import tempfile
+import time
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
@@ -20,6 +26,8 @@ from .sprint_v2 import DATASET_ROOT_SHA256, INVENTORY_SHA256, LEDGER_SHA256, UNI
 IDENTITY = "EXPLORATORY ONLY; NON_AUTHORITATIVE; FROZEN PRE-OUTCOME EXECUTION; NO PAPER/LIVE AUTHORITY; NO TRADING EXECUTION"
 MINIMUM_BREADTH, FRACTION = 10, 0.2
 UNRESOLVED = "UNRESOLVED_CLASSIFICATION_SEMANTIC"
+_WORKER_BUNDLE: "FrozenTensorBundle | None" = None
+_WORKER_VARIANT: tuple[str, int, int] | None = None
 
 
 def _json(value: Any) -> Any:
@@ -117,7 +125,7 @@ def _segments(records: list[dict[str, Any]], cost: int) -> dict[str, Any]:
     return {"calendar": out, "rolling_180": windows}
 
 
-def execute_variant(inputs: FrozenInputs, variant: tuple[str, int, int], *, anchor: int | None = None, score: np.ndarray | None = None) -> dict[str, Any]:
+def _execute_variant_reference(inputs: FrozenInputs, variant: tuple[str, int, int], *, anchor: int | None = None, score: np.ndarray | None = None) -> dict[str, Any]:
     """Execute a single factor or synthetic null panel using only supplied arrays."""
     name, _, direction = variant; panel = inputs.scores[name] if score is None else score
     if panel.shape != inputs.close.shape: raise ValueError("score panel shape mismatch")
@@ -159,15 +167,150 @@ def execute_variant(inputs: FrozenInputs, variant: tuple[str, int, int], *, anch
     return {"variant_id": name, "anchor": anchor, "daily_portfolio_records": records, "cost_reports": cost_reports, "ic": {"daily": ics, "mean": float(np.mean(finite_ics)) if finite_ics else float("nan"), "median": float(np.median(finite_ics)) if finite_ics else float("nan"), "positive_hit_rate": float(np.mean(np.array(finite_ics) > 0)) if finite_ics else float("nan"), "count": len(finite_ics)}, "temporal": {str(cost): _segments(records, cost) for cost in inputs.cost_bps}, "concentration": {"asset": {"total": shares(contributions), "long": shares(long_contrib), "short": shares(short_contrib)}, "period": period_contributions}, "classification": classification}
 
 
-def execute(inputs: FrozenInputs) -> dict[str, Any]:
+@dataclass(frozen=True)
+class FrozenTensorBundle:
+    """Read-only interval tensors compiled once from frozen inputs.
+
+    Funding rows are consumed here, never in a portfolio evaluation loop.
+    ``funding_observed`` distinguishes an interval with no settlement from an
+    unavailable source, preserving the reference missingness semantics.
+    """
+    inputs: FrozenInputs
+    forward: np.ndarray
+    valid_return: np.ndarray
+    funding_interval_sum: np.ndarray
+    funding_observed: np.ndarray
+    funding_source_missing: np.ndarray
+
+
+def compile_tensor_bundle(inputs: FrozenInputs) -> FrozenTensorBundle:
+    intervals, symbols = len(inputs.dates) - 1, len(inputs.symbols)
+    forward = np.divide(inputs.close[1:], inputs.close[:-1], out=np.full((intervals, symbols), np.nan), where=np.isfinite(inputs.close[1:]) & np.isfinite(inputs.close[:-1])) - 1
+    adjacent = np.array([_adjacent(inputs.dates[t], inputs.dates[t + 1]) for t in range(intervals)], dtype=bool)
+    valid_return = np.isfinite(forward) & adjacent[:, None]
+    funding_sum = np.zeros((intervals, symbols), dtype=float)
+    funding_observed = np.zeros((intervals, symbols), dtype=bool)
+    source_missing = np.zeros(symbols, dtype=bool)
+    starts = [day + "T00:00:00Z" for day in inputs.dates[:-1]]
+    ends = [day + "T00:00:00Z" for day in inputs.dates[1:]]
+    for j, symbol in enumerate(inputs.symbols):
+        rows = inputs.funding_events.get(symbol)
+        if rows is None:
+            source_missing[j] = True
+            continue
+        # Each row is assigned once by timestamp lookup.  This is O(events),
+        # unlike the oracle's O(intervals * events) rescan.
+        for row in rows:
+            stamp = row["timestamp"]
+            t = bisect_left(ends, stamp)
+            if t < intervals and starts[t] < stamp <= ends[t]:
+                funding_sum[t, j] += float(row["funding_rate"])
+                funding_observed[t, j] = True
+    for array in (forward, valid_return, funding_sum, funding_observed, source_missing):
+        array.setflags(write=False)
+    return FrozenTensorBundle(inputs, forward, valid_return, funding_sum, funding_observed, source_missing)
+
+
+def _target_plan(bundle: FrozenTensorBundle, panel: np.ndarray, direction: int, anchor: int | None) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    inputs, intervals, width = bundle.inputs, len(bundle.inputs.dates) - 1, len(bundle.inputs.symbols)
+    weights = np.zeros((intervals, width), dtype=float); forced = np.zeros_like(weights, dtype=bool)
+    scheduled = np.zeros(intervals, dtype=bool); turnover = np.zeros(intervals, dtype=float)
+    prior = np.zeros(width, dtype=float)
+    for t in range(intervals):
+        scheduled[t] = anchor is None or date.fromisoformat(inputs.dates[t]).weekday() == anchor
+        target = _book(inputs.symbols, panel[t], inputs.eligible[t], direction) if scheduled[t] else prior.copy()
+        if anchor is not None and scheduled[t] and not np.any(target): target = prior.copy()
+        forced[t] = (target != 0) & ~bundle.valid_return[t]
+        turnover[t] = float(np.abs(target - prior).sum() + np.abs(target[forced[t]]).sum())
+        weights[t] = target
+        prior = target.copy(); prior[forced[t]] = 0.0
+    return weights, forced, scheduled, turnover
+
+
+def _cost_records(bundle: FrozenTensorBundle, weights: np.ndarray, forced: np.ndarray, scheduled: np.ndarray, turnover: np.ndarray, *, full: bool, panel: np.ndarray | None = None) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    inputs = bundle.inputs
+    price = np.where(bundle.valid_return, weights * bundle.forward, 0.0)
+    # Keep the oracle's positive zero for intervals with no settlement.
+    carry = np.where(bundle.funding_observed & (weights != 0) & (bundle.funding_interval_sum != 0), -weights * bundle.funding_interval_sum, 0.0)
+    missing = bundle.funding_source_missing[None, :] | ((weights != 0) & ~bundle.funding_observed)
+    records: list[dict[str, Any]] = []; ics: list[dict[str, Any]] = []
+    for t in range(len(weights)):
+        fees = {str(cost): float(turnover[t] * cost / 10_000) for cost in inputs.cost_bps}
+        row = {"date": inputs.dates[t], "scheduled": bool(scheduled[t]), "valid_portfolio": bool(np.any(weights[t])), "eligible_return_count": int(np.count_nonzero((weights[t] != 0) & bundle.valid_return[t])), "turnover": float(turnover[t]), "price_pnl": float(price[t].sum()), "funding_pnl": float(carry[t].sum()), "fees": fees}
+        if full:
+            row.update({"weights": weights[t].tolist(), "price_pnl_by_asset": price[t].tolist(), "funding_pnl_by_asset": carry[t].tolist(), "total_pnl_before_fees": float((price[t] + carry[t]).sum()), "forced_close_symbols": [inputs.symbols[i] for i in np.flatnonzero(forced[t])], "funding_source_missing_symbols": [inputs.symbols[i] for i in np.flatnonzero(missing[t])]})
+            assert panel is not None
+            ics.append({"date": inputs.dates[t], "value": _spearman(inputs.symbols, panel[t], bundle.forward[t] if bundle.valid_return[t, 0] or np.any(bundle.valid_return[t]) else np.full_like(bundle.forward[t], np.nan), inputs.eligible[t])})
+        records.append(row)
+    return records, ics
+
+
+def _execute_variant_optimized(bundle: FrozenTensorBundle, variant: tuple[str, int, int], *, anchor: int | None = None, score: np.ndarray | None = None, full: bool = True) -> dict[str, Any] | dict[str, dict[str, Any]]:
+    inputs = bundle.inputs; name, _, direction = variant; panel = inputs.scores[name] if score is None else score
+    if panel.shape != inputs.close.shape: raise ValueError("score panel shape mismatch")
+    weights, forced, scheduled, turnover = _target_plan(bundle, panel, direction, anchor)
+    records, ics = _cost_records(bundle, weights, forced, scheduled, turnover, full=full, panel=panel if full else None)
+    if not full: return {str(cost): _summary(records, cost) for cost in inputs.cost_bps}
+    finite_ics = [x["value"] for x in ics if np.isfinite(x["value"])]
+    cost_reports = {str(cost): _summary(records, cost) for cost in inputs.cost_bps}
+    contributions = np.zeros(len(inputs.symbols)); long_contrib = np.zeros(len(inputs.symbols)); short_contrib = np.zeros(len(inputs.symbols))
+    for row in records:
+        total = np.array(row["price_pnl_by_asset"]) + np.array(row["funding_pnl_by_asset"]); contributions += total; long_contrib += np.where(np.array(row["weights"]) > 0, total, 0); short_contrib += np.where(np.array(row["weights"]) < 0, total, 0)
+    def shares(values: np.ndarray) -> list[dict[str, Any]]:
+        signed = float(values.sum()); denom = signed if signed else float(np.abs(values).sum())
+        return [{"symbol": s, "contribution": values[i], "share": (values[i] / denom if denom else 0.0)} for i, s in enumerate(inputs.symbols) if values[i] != 0]
+    period_contributions = {}
+    for label, lo, hi in (("2020", "2020-01-01", "2020-12-31"), ("2021_2023", "2021-01-01", "2023-12-31"), ("2024_plus", "2024-01-01", "2026-06-30")):
+        rows = [r for r in records if lo <= r["date"] <= hi]
+        period_contributions[label] = {"total": float(sum(r["total_pnl_before_fees"] for r in rows)), "long": float(sum(sum(p + f for w, p, f in zip(r["weights"], r["price_pnl_by_asset"], r["funding_pnl_by_asset"]) if w > 0) for r in rows)), "short": float(sum(sum(p + f for w, p, f in zip(r["weights"], r["price_pnl_by_asset"], r["funding_pnl_by_asset"]) if w < 0) for r in rows))}
+    classification = {"objective_predicates": {"net_10bps_nonpositive": cost_reports["10"]["net_cumulative_return"] <= 0, "positive_10bps": cost_reports["10"]["net_cumulative_return"] > 0, "uninterpretable_delisting": any(r["forced_close_symbols"] for r in records)}, "status": "OBJECTIVE_KILL" if cost_reports["10"]["net_cumulative_return"] <= 0 else UNRESOLVED, "unresolved_semantics": ["incoherent_or_zero_ic", "ordinary_random_rank_outcome", "single_leg_market_beta", "20bps_catastrophic", "breadth_or_180d_instability", "coherent_ic", "multiple_periods", "meaningfully_beats_random", "nearby_variant", "adequate_breadth", "not_one_asset_driven"]}
+    return {"variant_id": name, "anchor": anchor, "daily_portfolio_records": records, "cost_reports": cost_reports, "ic": {"daily": ics, "mean": float(np.mean(finite_ics)) if finite_ics else float("nan"), "median": float(np.median(finite_ics)) if finite_ics else float("nan"), "positive_hit_rate": float(np.mean(np.array(finite_ics) > 0)) if finite_ics else float("nan"), "count": len(finite_ics)}, "temporal": {str(cost): _segments(records, cost) for cost in inputs.cost_bps}, "concentration": {"asset": {"total": shares(contributions), "long": shares(long_contrib), "short": shares(short_contrib)}, "period": period_contributions}, "classification": classification}
+
+
+def _init_null_worker(bundle: FrozenTensorBundle, variant: tuple[str, int, int]) -> None:
+    """Install one immutable, serialized bundle per spawned worker."""
+    global _WORKER_BUNDLE, _WORKER_VARIANT
+    _WORKER_BUNDLE, _WORKER_VARIANT = bundle, variant
+
+
+def _evaluate_null_worker(score: np.ndarray) -> dict[str, dict[str, Any]]:
+    if _WORKER_BUNDLE is None or _WORKER_VARIANT is None: raise RuntimeError("null worker was not initialized")
+    return _execute_variant_optimized(_WORKER_BUNDLE, _WORKER_VARIANT, score=score, full=False)  # type: ignore[return-value]
+
+
+def execute_variant(inputs: FrozenInputs, variant: tuple[str, int, int], *, anchor: int | None = None, score: np.ndarray | None = None) -> dict[str, Any]:
+    return _execute_variant_optimized(compile_tensor_bundle(inputs), variant, anchor=anchor, score=score)  # type: ignore[return-value]
+
+
+def execute(inputs: FrozenInputs, *, workers: int = 1, progress: bool = False) -> dict[str, Any]:
     """Run every frozen variant and required diagnostics deterministically."""
-    variants = []
+    if workers < 1: raise ValueError("workers must be positive")
+    # Prevent BLAS thread oversubscription in spawned process workers.  These
+    # settings do not alter the reference arithmetic or canonical collection.
+    for key in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS"): os.environ[key] = "1"
+    bundle, variants, started, completed = compile_tensor_bundle(inputs), [], time.monotonic(), 0
+    def report(variant_index: int, phase: str, draw: int | None = None) -> None:
+        if not progress: return
+        elapsed = time.monotonic() - started; rate = completed / elapsed if elapsed else 0.0
+        detail = f"draw {draw + 1} / {inputs.null_count}" if draw is not None else phase
+        eta = (864 - completed) / rate if rate else 0.0
+        print(f"Sprint v2 execution | variant {variant_index + 1} / 8 | phase {detail} | overall jobs {completed} / 864 | workers {workers} | elapsed {elapsed:.1f}s | rate {rate:.2f} jobs/s | ETA {eta:.1f}s", flush=True)
     rng = np.random.default_rng(inputs.null_seed)
-    for variant in EXPECTED_FACTORS:
-        main = execute_variant(inputs, variant)
-        weekly = {name: execute_variant(inputs, variant, anchor=weekday) for weekday, name in enumerate(("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))}
+    for variant_index, variant in enumerate(EXPECTED_FACTORS):
+        main = _execute_variant_optimized(bundle, variant)
+        completed += 1; report(variant_index, "primary")
+        weekly = {name: _execute_variant_optimized(bundle, variant, anchor=weekday) for weekday, name in enumerate(("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))}
+        completed += 7; report(variant_index, "weekly")
         values = [weekly[name]["cost_reports"]["10"]["net_cumulative_return"] for name in weekly]
-        null = [execute_variant(inputs, variant, score=rng.random(inputs.close.shape))["cost_reports"] for _ in range(inputs.null_count)]
+        # RNG generation remains in the parent and in reference order.  map()
+        # returns in draw-index order, so completion order cannot affect JSON.
+        scores = [rng.random(inputs.close.shape) for _ in range(inputs.null_count)]
+        if workers == 1:
+            null = [_execute_variant_optimized(bundle, variant, score=score, full=False) for score in scores]
+        else:
+            with ProcessPoolExecutor(max_workers=workers, initializer=_init_null_worker, initargs=(bundle, variant)) as pool:
+                null = list(pool.map(_evaluate_null_worker, scores))
+        completed += inputs.null_count; report(variant_index, "null", inputs.null_count - 1)
         main["weekly_robustness"] = {"anchors": weekly, "net_10bps": {"median": float(np.median(values)), "minimum": float(min(values)), "maximum": float(max(values)), "positive_anchor_count": int(sum(x > 0 for x in values)), "dispersion": float(max(values) - min(values))}}
         main["random_rank_null"] = {"seed": inputs.null_seed, "count": inputs.null_count, "draw_cost_reports": null}
         variants.append(main)
@@ -176,9 +319,12 @@ def execute(inputs: FrozenInputs) -> dict[str, Any]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="execute frozen Sprint-v2 outcomes from local frozen inputs")
-    parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1]); parser.add_argument("--output", type=Path, required=True)
-    args = parser.parse_args(); verify_semantic_closure(args.root); result = execute(materialize(args.root))
-    args.output.parent.mkdir(parents=True, exist_ok=True); args.output.write_bytes(canonical_bytes(result))
+    parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1]); parser.add_argument("--output", type=Path, required=True); parser.add_argument("--workers", type=int, default=1)
+    args = parser.parse_args(); verify_semantic_closure(args.root); result = execute(materialize(args.root), workers=args.workers)
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(dir=args.output.parent, prefix=args.output.name + ".", delete=False) as handle:
+        handle.write(canonical_bytes(result)); handle.flush(); os.fsync(handle.fileno()); temporary = Path(handle.name)
+    temporary.replace(args.output)
 
 
 if __name__ == "__main__": main()

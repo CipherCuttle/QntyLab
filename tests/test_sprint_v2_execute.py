@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from qntylab.sprint_v2 import FrozenInputs
-from qntylab.sprint_v2_execute import UNRESOLVED, _book, canonical_bytes, execute, execute_variant, verify_semantic_closure
+from qntylab.sprint_v2_execute import UNRESOLVED, _book, _execute_variant_reference, canonical_bytes, compile_tensor_bundle, execute, execute_variant, verify_semantic_closure
 
 
 VARIANT = ("H012_momentum_7d", 7, 1)
@@ -68,3 +68,31 @@ def test_all_variants_weekly_and_seeded_null_are_deterministic():
     for row in first["variants"]:
         assert set(row["weekly_robustness"]["anchors"]) == {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"}
         assert len(row["random_rank_null"]["draw_cost_reports"]) == 2
+
+
+def test_compiled_funding_and_optimized_execution_are_byte_equal_to_oracle():
+    inputs = fixture(days=12, names=13)
+    events = {
+        inputs.symbols[0]: (
+            {"timestamp": "2020-01-02T00:00:00Z", "funding_rate": "0.01"},
+            {"timestamp": "2020-01-02T12:00:00Z", "funding_rate": "-0.003"},
+            {"timestamp": "2020-01-07T00:00:00Z", "funding_rate": "0.004"},
+        )
+    }
+    enriched = FrozenInputs(inputs.dates, inputs.symbols, inputs.close, inputs.funding, inputs.premium, inputs.eligible, events, inputs.scores, inputs.cost_bps, inputs.null_seed, inputs.null_count, True)
+    bundle = compile_tensor_bundle(enriched)
+    # Each settlement is consumed once into its exact half-open daily interval;
+    # no evaluator accesses funding_events after this compile step.
+    assert bundle.funding_observed[0, 0] and bundle.funding_interval_sum[0, 0] == pytest.approx(.01)
+    assert bundle.funding_observed[1, 0] and bundle.funding_interval_sum[1, 0] == pytest.approx(-.003)
+    for anchor in (None, 0, 6):
+        assert canonical_bytes(_execute_variant_reference(enriched, VARIANT, anchor=anchor)) == canonical_bytes(execute_variant(enriched, VARIANT, anchor=anchor))
+
+
+def test_null_rng_and_worker_count_are_canonical_and_invariant():
+    inputs = fixture(days=9, names=11)
+    one = canonical_bytes(execute(inputs, workers=1))
+    two = canonical_bytes(execute(inputs, workers=2))
+    four = canonical_bytes(execute(inputs, workers=4))
+    eight = canonical_bytes(execute(inputs, workers=8))
+    assert one == two == four == eight

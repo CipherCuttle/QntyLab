@@ -1,0 +1,9 @@
+{
+  "artifact": "sprint_v2_outcome_analysis_receipt_v1",
+  "canonical_source": {"path":"experiments/results/sprint_v2_results.json","size_bytes":531151382,"sha256":"01868090cb77068e8524da67976121152a62034c7fa4ea4c9993366bcce4844d"},
+  "source_control": {"optimized_executor_commit":"eb9806c98a8069ab6d706b126e3a29307b9b8ead","execution_provenance_verdict":"COMPLETED_EXECUTION_PROVEN_BY_ATOMIC_ARTIFACT"},
+  "analysis_constraints": ["no rerun","no canonical artifact modification","no parameter or universe changes","no new variants","no threshold invention","no paper or live authority"],
+  "structural_verification": {"canonical_sha256_matches":true,"canonical_json_bytes_match":true,"primary_variant_count":8,"weekly_anchor_count_per_variant":7,"null_draw_count_per_variant":100,"null_seed":20260728},
+  "frozen_classification": {"objective_kills":4,"unresolved_survivor_candidates":4,"objective_kill_variants":["H012_momentum_7d","H013_reversal_1d","H013_reversal_3d","H015_premium"],"unresolved_survivor_candidates":["H012_momentum_30d","H012_momentum_90d","H014_funding_24h","H014_funding_7d"]},
+  "scientific_status": "EXPLORATORY ONLY; NONAUTHORITATIVE; NO SCIENTIFIC VALIDATION; NO HOLDOUT; NO PAPER/LIVE TRADING AUTHORITY"
+}

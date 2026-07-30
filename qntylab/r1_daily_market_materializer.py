@@ -50,6 +50,52 @@ owns on its own:
      an already-reachable Parser A gap, not a new exception class invented
      by this module and not a change to Parser A's own file.
 
+     Note on csv.Error specifically (independent hostile-review blocker #2
+     on commit 3081118): a gzip-valid, UTF-8-valid object whose CSV body is
+     structurally corrupt in a way stdlib csv cannot tokenize at all --
+     observed reproducer: a single field exceeding csv.field_size_limit()
+     (131072 bytes), reachable from e.g. a dropped newline or an
+     unterminated quote swallowing the remainder of the object -- raises a
+     bare csv.Error out of csv.DictReader/csv.reader iteration. Both
+     rp.parse_daily_object (Parser A, via its own unwrapped
+     `list(csv.DictReader(...))` body-row parse) and this module's own
+     _decode_container/materialize_parser_b body-row parse are affected.
+     This is whole-object-level CSV tokenization failure -- csv.Error aborts
+     the entire reader, not one row -- so it is classified with the other
+     structurally-corrupt-container cases (gzip corruption, invalid UTF-8,
+     truncated header) as CONTAINER_ANOMALY, not as a per-row rejection.
+     materialize_parser_a() catches csv.Error at its rp.parse_daily_object()
+     call site (no edit to r1_reference_parser.py); materialize_parser_b()
+     catches it across both its container-decode step and its own body-row
+     csv.DictReader parse.
+
+     Note on the Parser-B TypeError specifically (same hostile review, a
+     distinct failure class -- NOT conflated with csv.Error above): a
+     structurally malformed CSV row (observed reproducer: an unterminated
+     quote that swallows the remainder of one physical row, leaving
+     csv.DictReader's restval=None in every column after the swallowed
+     field) reaches qntylab.r1_retention_candidate.daily_primitive with
+     required numeric columns (timestamp/size/price/homeNotional/
+     foreignNotional/grossValue) set to None. daily_primitive already has
+     an existing, frozen, contract-authorized malformed-row disposition for
+     exactly this row shape -- reject the row, increment rejected_row_count,
+     append ANOMALY_PARSE_REJECTION, continue with the remaining rows
+     (mirroring Parser A's own REQUIRED_ROW_FIELDS row-rejection check) --
+     but daily_primitive's try/except at that step only catches
+     (KeyError, ValueError, InvalidOperation); Decimal(None)/float(None)
+     raise TypeError, which is not in that tuple, so the row crashes the
+     whole call instead of being rejected. This module does not catch
+     TypeError (that would risk hiding an unrelated programming bug inside
+     daily_primitive); instead materialize_parser_b() pre-filters rows
+     against the exact fixed set of columns daily_primitive's own
+     try-block numeric-converts unconditionally, before calling
+     daily_primitive, and folds the pre-filtered count into the same
+     rejected_row_count/ANOMALY_PARSE_REJECTION accounting daily_primitive
+     already produces for its other row-rejection causes -- so the
+     observable disposition is identical to what daily_primitive's own
+     mechanism already intends, not a new boundary-invented outcome, and no
+     Decimal/OHLC/aggregation logic is reimplemented here.
+
 Independence: this module calls both parsers but does not let either parser
 call the other, and performs no semantic parsing itself (only raw-hash
 binding, record assembly, contract-completeness checking, and typed error
@@ -105,6 +151,20 @@ ALL_CONTRACT_FIELDS = (
     "last_source_timestamp_utc", "first_source_trade_id", "last_source_trade_id",
     "duplicate_count", "rejected_row_count", "schema_id", "source_object_sha256",
 )
+
+# Exact set of columns qntylab.r1_retention_candidate.daily_primitive's own
+# row-parsing try-block (r1_retention_candidate.py, inside daily_primitive)
+# unconditionally numeric-converts via Decimal()/float() before its existing
+# (KeyError, ValueError, InvalidOperation) except-clause can apply -- see
+# module docstring's "Note on the Parser-B TypeError". A None value in any
+# of these (csv.DictReader's restval for a short/malformed row) makes that
+# conversion raise TypeError, which is not in daily_primitive's own except
+# tuple. This boundary pre-filters exactly these columns -- not side,
+# trdMatchID, or tickDirection, which daily_primitive stores without
+# numeric conversion and does not crash on -- so the row still reaches
+# daily_primitive's already-authorized PARSE_REJECTION disposition instead
+# of crashing the whole call.
+_PARSER_B_NUMERIC_ROW_FIELDS = ("timestamp", "size", "price", "homeNotional", "foreignNotional", "grossValue")
 
 _ISO_TS_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3,}Z$")
 _SHA256_HEX_PATTERN = re.compile(r"^[0-9a-f]{64}$")
@@ -216,18 +276,22 @@ def materialize_parser_a(raw_bytes: bytes, expected_utc_date: date, instrument_i
     """Parser A path. parse_daily_object already embeds source_object_sha256
     in its own record; this boundary independently recomputes sha256(raw_bytes)
     (never trusting the embedded value alone), requires exact equality, and
-    converts exactly the three explicitly-authorized, reachable
+    converts exactly the four explicitly-authorized, reachable
     container-corruption failure classes into a typed CONTAINER_ANOMALY
     quarantine result instead of letting them escape:
     rp.GzipCorruptionError, rp.TruncatedCSVError (both raised inside
-    rp.parse_daily_object itself), and UnicodeDecodeError (raised by
+    rp.parse_daily_object itself), UnicodeDecodeError (raised by
     rp.parse_daily_object's internal call to
     r1_reference_parser._decompress(), whose final .decode("utf-8",
     errors="strict") is not itself wrapped in that function's own
-    GzipCorruptionError try/except -- see module docstring). This is a
-    fixed, narrow tuple, not a bare `except Exception`: any other exception
-    (a genuine programming error, not an authorized object-corruption
-    class) still propagates uncaught, exactly as before."""
+    GzipCorruptionError try/except -- see module docstring), and csv.Error
+    (raised by rp.parse_daily_object's own unwrapped
+    `list(csv.DictReader(...))` body-row parse when the CSV body is not
+    tokenizable at all, e.g. a field exceeding csv.field_size_limit() --
+    see module docstring). This is a fixed, narrow tuple, not a bare
+    `except Exception`: any other exception (a genuine programming error,
+    not an authorized object-corruption class) still propagates uncaught,
+    exactly as before."""
     raw_sha = sha256(raw_bytes).hexdigest()
 
     if expected_raw_sha256 is not None and expected_raw_sha256 != raw_sha:
@@ -239,7 +303,7 @@ def materialize_parser_a(raw_bytes: bytes, expected_utc_date: date, instrument_i
 
     try:
         result = rp.parse_daily_object(raw_bytes, expected_utc_date, instrument_instance_id)
-    except (rp.GzipCorruptionError, rp.TruncatedCSVError, UnicodeDecodeError) as exc:
+    except (rp.GzipCorruptionError, rp.TruncatedCSVError, UnicodeDecodeError, csv.Error) as exc:
         return MaterializationResult(
             status=MATERIALIZATION_QUARANTINED, parser="A", raw_object_sha256=raw_sha,
             anomalies=[rc.ANOMALY_CONTAINER],
@@ -309,6 +373,24 @@ def _decode_container(raw_bytes: bytes) -> tuple[str, list[str]]:
     return text, header
 
 
+def _prefilter_parser_b_rows(rows: list) -> tuple[list, int]:
+    """Drops rows daily_primitive's own row-parsing try-block would crash on
+    with TypeError (see _PARSER_B_NUMERIC_ROW_FIELDS and the module
+    docstring's "Note on the Parser-B TypeError"), returning
+    (usable_rows, dropped_count). Checks nothing beyond that exact column
+    set -- no numeric parsing, no Decimal conversion, no OHLC/aggregation
+    logic; daily_primitive still does all of that, unmodified, on the
+    surviving rows."""
+    usable = []
+    dropped = 0
+    for row in rows:
+        if any(row.get(k) is None for k in _PARSER_B_NUMERIC_ROW_FIELDS):
+            dropped += 1
+            continue
+        usable.append(row)
+    return usable, dropped
+
+
 def materialize_parser_b(raw_bytes: bytes, utc_date: str, stream_id: str,
                           historical_cutoff_utc: str,
                           expected_raw_sha256: Optional[str] = None) -> MaterializationResult:
@@ -329,6 +411,7 @@ def materialize_parser_b(raw_bytes: bytes, utc_date: str, stream_id: str,
             reason=f"raw bytes do not match expected_raw_sha256 (expected {expected_raw_sha256}, got {raw_sha})",
         )
 
+    precheck_rejected = 0
     if len(raw_bytes) == 0:
         core, anomalies = rc.daily_primitive(
             stream_id=stream_id, utc_date=utc_date, header=rc.BASE_SCHEMA, rows=[],
@@ -337,7 +420,9 @@ def materialize_parser_b(raw_bytes: bytes, utc_date: str, stream_id: str,
     else:
         try:
             text, header = _decode_container(raw_bytes)
-        except (rp.GzipCorruptionError, rp.TruncatedCSVError) as exc:
+            if header:
+                rows, precheck_rejected = _prefilter_parser_b_rows(list(csv.DictReader(io.StringIO(text))))
+        except (rp.GzipCorruptionError, rp.TruncatedCSVError, csv.Error) as exc:
             return MaterializationResult(
                 status=MATERIALIZATION_QUARANTINED, parser="B", raw_object_sha256=raw_sha,
                 anomalies=[rc.ANOMALY_CONTAINER],
@@ -349,11 +434,19 @@ def materialize_parser_b(raw_bytes: bytes, utc_date: str, stream_id: str,
                 historical_cutoff_utc=historical_cutoff_utc,
             )
         else:
-            rows = list(csv.DictReader(io.StringIO(text)))
             core, anomalies = rc.daily_primitive(
                 stream_id=stream_id, utc_date=utc_date, header=tuple(header), rows=rows,
                 historical_cutoff_utc=historical_cutoff_utc,
             )
+            if precheck_rejected:
+                # Fold the pre-filtered count into daily_primitive's own
+                # rejected_row_count/anomaly accounting -- identical
+                # disposition to what daily_primitive's existing except
+                # tuple already produces for its other row-rejection
+                # causes (see _prefilter_parser_b_rows docstring), not a
+                # new boundary-invented outcome.
+                core["rejected_row_count"] = core.get("rejected_row_count", 0) + precheck_rejected
+                anomalies = sorted(set(anomalies) | {rc.ANOMALY_PARSE_REJECTION})
 
     record = dict(core)
     # daily_primitive's own dict key is "stream_id" (its internal candidate

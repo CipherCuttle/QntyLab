@@ -1,0 +1,135 @@
+{
+  "artifact": "r1_daily_market_materialization_boundary_v3",
+  "artifact_kind": "MATERIALIZATION_BOUNDARY_RECEIPT",
+  "status": "CANDIDATE_NOT_YET_FROZEN",
+  "self_freeze_authorized": false,
+  "outcome_embargo": true,
+  "raw_deletion_authorized": false,
+  "supersedes": "experiments/data/r1_daily_market_materialization_boundary_v2.json",
+
+  "parent_candidate": {
+    "commit": "3081118c441a2c4e0b444d8be19594792c92ca70",
+    "v1_receipt_path": "experiments/data/r1_daily_market_materialization_boundary_v1.json",
+    "v1_receipt_sha256_at_this_task_time": "4de2b5cfbacd34d719b6e72f43e94828982f01af38d5428cb27a3650954b4e71",
+    "v2_receipt_path": "experiments/data/r1_daily_market_materialization_boundary_v2.json",
+    "v2_receipt_sha256_at_this_task_time": "ed853ea0f8a1509f42ab313fb444f7e7d66855ea84251bebf159f1f326919870",
+    "note": "v1 and v2's own bytes/receipts/verdicts are NOT erased, edited, or reframed by this task. Both remain the historical record of the candidates that independent review blocked; this artifact is a new, additive superseding candidate on top of 3081118."
+  },
+
+  "task": "Repair ONLY the two malformed-object/batch-isolation defects that a second independent NEW CHAT hostile review of commit 3081118 established (BLOCK verdict). Does not touch OHLC, duplicate, timestamp, event-order, schema, or lifecycle logic in either parser; does not repair the separately-noted, still-open unknown-schema A/B divergence; does not resume other unfinished hostile-review sections.",
+
+  "independent_review_blocker": {
+    "review_verdict": "BLOCK",
+    "reviewed_commit": "3081118c441a2c4e0b444d8be19594792c92ca70",
+    "reproducer_class_A": "csv.Error (field larger than field limit)",
+    "reproducer_A": "gzip-valid, UTF-8-valid CSV body with a single field exceeding csv.field_size_limit() (131072 bytes) -- reproducer used: 200000-char field in a data row with an otherwise well-formed header/row shape -- raised bare csv.Error out of both materialize_parser_a (via rp.parse_daily_object's own unwrapped list(csv.DictReader(...)) body-row parse) and materialize_parser_b (via this module's own body-row csv.DictReader parse, previously outside any try/except)",
+    "reproducer_class_B": "TypeError: conversion from NoneType to Decimal is not supported",
+    "reproducer_B": "an unterminated quote in one physical CSV row swallows the remainder of that row (and would swallow further rows/newlines too, until EOF or a closing quote), leaving csv.DictReader's restval=None in every header column after the swallowed field for that row; qntylab.r1_retention_candidate.daily_primitive's own row-parsing try-block calls Decimal(row['size']) / Decimal(row['price']) / float(row['homeNotional']) / etc. unconditionally, and Decimal(None)/float(None) raise TypeError, which is not in daily_primitive's own (KeyError, ValueError, InvalidOperation) except tuple",
+    "batch_isolation_consequence_A": "in materialize_batch(items, materialize_fn), the csv.Error object at any position terminated the loop for BOTH parser paths; a subsequent valid object (C) was never attempted -- reproduced directly with valid/csv-corrupt/valid and corrupt/valid/corrupt/valid fixtures for both paths.",
+    "reproducer_B_did_not_terminate_the_batch": "unlike A, the TypeError case terminates only Parser B's single call for that object (it is not itself an object-level container-corruption exception escaping materialize_parser_b -- it was a crash INSIDE materialize_parser_b, still uncaught and still propagating out of that one call, and would still have terminated materialize_batch for that object exactly like A if left unrepaired); it is documented here as a structurally distinct, non-conflated failure class per the follow-up task's explicit instruction, not because its batch-termination effect on an unrepaired boundary would have differed.",
+    "parser_a_was_unaffected_by_B": "Parser A already has its own REQUIRED_ROW_FIELDS (timestamp, size, price, trdMatchID) row-rejection check (row.get(k) in (None, '') -> rejected_row_count += 1, continue) that correctly handles this exact malformed-row shape without crashing; only Parser B's daily_primitive lacked an equivalent guard for the None case specifically (TypeError, not KeyError/ValueError/InvalidOperation)."
+  },
+
+  "root_cause_classification": {
+    "csv_error": {
+      "frozen_vocabulary_match": "CONTAINER_ANOMALY (same bucket as gzip corruption, invalid UTF-8, and truncated-header cases already declared in commit 3081118's own module docstring under 'structurally truncated CSV')",
+      "reasoning": "csv.Error from field_size_limit overflow aborts csv.reader/csv.DictReader iteration entirely -- it is a whole-object CSV-tokenization failure, not a single-row-skippable condition -- so it is classified with the other structurally-corrupt-container cases, not as a per-row PARSE_REJECTION.",
+      "not_invented": "no new anomaly vocabulary was introduced; ANOMALY_CONTAINER (qntylab.r1_retention_candidate.ANOMALY_CONTAINER, aka CONTAINER_ANOMALY) already existed and was already the disposition used for GzipCorruptionError/TruncatedCSVError/UnicodeDecodeError."
+    },
+    "typeerror": {
+      "classification": "A -- malformed row that frozen parser semantics already require to become PARSE_REJECTION (ANOMALY_PARSE_REJECTION). qntylab.r1_retention_candidate.daily_primitive already implements exactly this disposition (reject the row, rejected_row_count += 1, append ANOMALY_PARSE_REJECTION, continue with remaining rows) for structurally-identical malformed-row causes (KeyError, ValueError, InvalidOperation); Parser A's own REQUIRED_ROW_FIELDS check independently corroborates that a row with a None-valued required field is contract-anticipated 'malformed row' territory, not container-level corruption and not scientific reinterpretation.",
+      "why_not_C_or_D": "not classified as (C) an implementation bug requiring a STOP, because the mechanism daily_primitive needs already exists in its own file (the try/except -> ANOMALY_PARSE_REJECTION path) -- only its except tuple is one exception class short of covering an already-anticipated row shape, and Parser A's own field-conversion guard in _redundant_field_check already treats TypeError as an ordinary, non-crashing outcome for the structurally analogous homeNotional/foreignNotional/grossValue fields. Not classified as (D) protocol-underspecified, because rejected_row_count / PARSE_REJECTION is an explicit, frozen, already-populated field/anomaly in both the contract and qntylab.r1_retention_candidate.ANOMALY_PARSE_REJECTION.",
+      "not_a_broad_typeerror_catch": "this module still never catches TypeError anywhere. The repair pre-filters row DATA (not exception classes) before calling daily_primitive, restricted to the exact fixed column set (timestamp, size, price, homeNotional, foreignNotional, grossValue) daily_primitive's own try-block numeric-converts unconditionally -- see _PARSER_B_NUMERIC_ROW_FIELDS in qntylab/r1_daily_market_materializer.py. A deliberately-injected, unrelated TypeError from inside daily_primitive (a genuine programming bug, not this row shape) still propagates uncaught -- verified directly (see no_generic_catch_safety_property)."
+    }
+  },
+
+  "repair_implementation": {
+    "csv_error_parser_a": {
+      "location": "qntylab/r1_daily_market_materializer.py:materialize_parser_a()",
+      "change": "extended the except tuple around the rp.parse_daily_object(...) call from (rp.GzipCorruptionError, rp.TruncatedCSVError, UnicodeDecodeError) to (..., csv.Error); maps to the same, already-frozen CONTAINER_ANOMALY / MATERIALIZATION_QUARANTINED_NO_RECORD outcome already used for the other three classes."
+    },
+    "csv_error_parser_b": {
+      "location": "qntylab/r1_daily_market_materializer.py:materialize_parser_b()",
+      "change": "restructured so the body-row list(csv.DictReader(io.StringIO(text))) parse -- previously OUTSIDE any try/except -- now runs inside the same try block as _decode_container(raw_bytes), and csv.Error was added to that block's except tuple alongside (rp.GzipCorruptionError, rp.TruncatedCSVError). This also covers a header-row csv.Error (_decode_container's own header-parse, which never caught csv.Error internally and simply propagates it up) -- a distinct call site from the body-row case, both now covered by the same widened try/except at the materialize_parser_b call site rather than inside _decode_container itself."
+    },
+    "typeerror_parser_b": {
+      "location": "qntylab/r1_daily_market_materializer.py: new _prefilter_parser_b_rows() helper + materialize_parser_b()",
+      "change": "before calling rc.daily_primitive(...), rows are pre-filtered: any row where row.get(k) is None for k in _PARSER_B_NUMERIC_ROW_FIELDS = (timestamp, size, price, homeNotional, foreignNotional, grossValue) is dropped and counted. daily_primitive is called only with the surviving rows (unmodified call, unmodified Decimal/OHLC/aggregation logic on those rows). After the call, the dropped count is folded into the returned rejected_row_count and ANOMALY_PARSE_REJECTION is added to anomalies (via sorted(set(...) | {...}), matching daily_primitive's own set-based anomaly convention) -- reproducing exactly the disposition daily_primitive's own except-block already produces for its other row-rejection causes, not a new boundary-invented outcome.",
+      "empirically_verified_agreement_with_parser_a": "for the identical unterminated-quote fixture (50 good rows + 1 malformed row), Parser A (unmodified) and the repaired Parser B produce IDENTICAL trade_count=50 and rejected_row_count=1 -- confirming the boundary compensation reproduces Parser A's own pre-existing, unmodified disposition for this row shape rather than inventing a different one."
+    },
+    "not_a_generic_catch_all": "no except Exception anywhere; both except tuples remain fixed, explicit, narrow lists of authorized object-corruption exception classes (csv.Error added to each, alongside the pre-existing gzip/UTF-8/truncated-CSV classes). TypeError is not caught anywhere in this module -- verified directly by two new regression tests that monkeypatch each parser call site to raise an unrelated TypeError and assert it still propagates uncaught (see no_generic_catch_safety_property).",
+    "parser_files_not_edited": "qntylab/r1_reference_parser.py and qntylab/r1_retention_candidate.py were NOT modified; their SHA-256 hashes are byte-identical to before this task and to the values independently reverified by the blocking hostile review (see parser_hashes below). Both root causes are compensated for entirely at the boundary/call-site level in r1_daily_market_materializer.py.",
+    "source_object_sha256_unchanged": "the source-object provenance implementation was not touched by this repair; re-verified directly that a malformed (csv.Error) object supplied together with its own correct expected_raw_sha256 still fails closed (MATERIALIZATION_QUARANTINED_NO_RECORD, record=None) rather than being accepted merely because its raw hash matched."
+  },
+
+  "parser_hashes": {
+    "parser_a_sha256": "76bfd763afbce1167ff931b912c7bb12e6c90e4b07d9ef862f6400e14a63823e",
+    "parser_b_sha256": "65aea38964fe18ad702376937aee9caa410125f0b8dd2efbd5833f5219d3f075",
+    "note": "byte-identical to the hashes recorded in v1/v2 and independently reverified by both blocking hostile reviews; this repair task made zero edits to qntylab/r1_reference_parser.py or qntylab/r1_retention_candidate.py"
+  },
+
+  "frozen_protocol_binding": {
+    "base_contract_sha256": "c199b9481285d80b34183b8a7681f75ef7e60e5aadad6e4e0ece3ef8f33d6c92",
+    "amendment_semantic_content_sha256": "aa732948b19957a2e3fb7cd2ae1905a3b94a902a0200e24e25874f036894adf9",
+    "effective_combined_contract_binding_sha256": "0d0dc12c16535f4ecb06ccfd9b87543862caf7d261cbe8a459d152dee4f493ab",
+    "note": "all three re-verified byte-identical/unchanged before and after this repair task; not recomputed differently from v1/v2's own bindings."
+  },
+
+  "materialization_boundary_implementation_sha256": "bb81486980771cca27d7f780c6b575b9e6dae7df8cf112ffbd631d1ed586152c",
+  "materialization_boundary_test_sha256": "3e027ed945105a1cb4df925a5a0c95b4f89c206a0ffd302951b914f0a2461656",
+
+  "csv_error_direct_result": {
+    "input": "gzip-compressed CSV with a data-row field exceeding csv.field_size_limit()",
+    "parser_a": "MATERIALIZATION_QUARANTINED_NO_RECORD, record=None, anomalies=['CONTAINER_ANOMALY']",
+    "parser_b": "MATERIALIZATION_QUARANTINED_NO_RECORD, record=None, anomalies=['CONTAINER_ANOMALY']",
+    "header_row_variant_also_verified": "an oversized field IN THE HEADER row itself (a distinct call site from the data-row case) produces the identical typed quarantine on both paths",
+    "verified": "directly re-executed against the repaired module in this task, not assumed from the test suite alone"
+  },
+
+  "csv_error_batch_isolation_result": {
+    "fixture": "valid A / csv-corrupt B / valid C, both parser paths",
+    "result": "len(results) == 3 for both paths; A and C both MATERIALIZED_VALID_RECORD, B MATERIALIZATION_QUARANTINED_NO_RECORD with CONTAINER_ANOMALY; C's record is demonstrably the correct one (first_source_trade_id == 'c-1'), proving C was actually attempted, not skipped",
+    "extended_fixture": "corrupt A / valid B / csv-corrupt C / valid D, both parser paths: len(results) == 4, D's record correct (first_source_trade_id == 'd-1')",
+    "attempted_accounting": "valid_count + typed_nonvalid_count == len(items) for every fixture above; no silent skip, no double accounting"
+  },
+
+  "typeerror_row_rejection_result": {
+    "fixture": "50 well-formed rows + 1 row with an unterminated quote (swallows the row, leaves restval=None in every subsequent column)",
+    "parser_a": "MATERIALIZED_VALID_RECORD, trade_count=50, rejected_row_count=1 (via its own pre-existing REQUIRED_ROW_FIELDS check, unmodified)",
+    "parser_b": "MATERIALIZED_VALID_RECORD, trade_count=50, rejected_row_count=1, anomalies contains 'PARSE_REJECTION' (via this repair's row pre-filter)",
+    "numeric_values_unperturbed": "separately verified with a 3-good-row variant that close/base_volume/quote_turnover for the surviving rows are exactly what daily_primitive computes unmodified (close='1', base_volume='3', quote_turnover='3')",
+    "batch_isolation": "the malformed-row object itself still materializes MATERIALIZED_VALID_RECORD (the row is rejected, not the object), and a subsequent object in the same batch is still attempted and correctly materialized"
+  },
+
+  "no_generic_catch_safety_property": {
+    "claim": "materialize_parser_a and materialize_parser_b each catch only their fixed, explicit, authorized container-corruption exception classes (now including csv.Error) -- never a bare Exception and never TypeError -- so a genuine unrelated programming error is never mislabeled as CONTAINER_ANOMALY or silently absorbed as a malformed-row rejection.",
+    "verification_method": "monkeypatched rp.parse_daily_object (A path) and rc.daily_primitive (B path) to each raise a deliberately unrelated, unambiguous TypeError (distinct from the Decimal(None)/float(None) shape this repair targets) and asserted it propagates uncaught through materialize_parser_a / materialize_parser_b respectively; separately re-confirmed the pre-existing RuntimeError narrow-catch tests from v2 still pass unmodified.",
+    "result": "confirmed for both paths, both exception classes (RuntimeError and TypeError)"
+  },
+
+  "test_collection_and_full_suite": {
+    "collect_only": "283 tests collected (273 baseline from v2 + 10 new tests added by this task)",
+    "full_suite": "283 passed, 0 failed",
+    "git_diff_check": "clean (exit 0)"
+  },
+
+  "known_out_of_scope_findings_still_open": {
+    "unknown_schema_ab_divergence": "unchanged from v1/v2: Parser A's parse_daily_object returns record=None (total quarantine) for an unregistered column set; Parser B's daily_primitive still computes and returns a populated core record with schema_id=None and a SCHEMA_MISMATCH anomaly for the same input. Not this task's scope -- deliberately not repaired here, per this task's explicit instruction not to broaden the repair.",
+    "receipt_precision_overclaim": "unchanged from v1/v2, out of scope.",
+    "unfinished_hostile_review_sections": "the second hostile review stopped at its exception-surface-audit blocker and did not reach source_object_sha256 counterfactuals, the complete contract-field audit, validator-overreach audit, parser-independence audit, the five-cached-real-objects re-validation, or the counterfactual byte test. This task does not resume or complete those sections; a fresh review pass covering the full surface against 3081118+this-repair remains outstanding before any freeze."
+  },
+
+  "firewalls_confirmed": {
+    "formal_qnty_untouched": true,
+    "unrelated_wip_untouched": true,
+    "raw_deletion_authorized": false,
+    "no_raw_deletion": true,
+    "no_pit": true,
+    "no_h012_h014_outcomes": true,
+    "no_forward_returns_pnl_ic_sharpe": true,
+    "no_2026_07_01_plus_reservoir_access": true,
+    "no_894_stream_population": true
+  },
+
+  "verdict": "R1_DAILYMARKET_MATERIALIZATION_BOUNDARY_REPAIRED_PENDING_REVIEW"
+}

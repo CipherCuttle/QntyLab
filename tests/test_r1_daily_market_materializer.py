@@ -20,11 +20,48 @@ verify batch isolation directly (not just the isolated per-object
 functions), while two narrow-catch safety tests confirm this fix did not
 widen into a generic `except Exception`.
 
+A second independent NEW CHAT hostile review of that repair (commit 3081118)
+established TWO further, distinct blockers, closed by the tests from
+"csv error oversized field" and "unterminated quote malformed row" onward:
+
+  A. csv.Error: a gzip-valid, UTF-8-valid object whose CSV body is not
+     tokenizable at all by the stdlib csv module (reproducer: a single field
+     exceeding csv.field_size_limit()) raised a bare csv.Error out of both
+     rp.parse_daily_object's own unwrapped body-row csv.DictReader parse
+     (Parser A) and this module's own body-row csv.DictReader parse (Parser
+     B), escaping materialize_batch exactly like the earlier
+     UnicodeDecodeError gap. Classified with the other structurally-corrupt
+     -container cases as CONTAINER_ANOMALY (whole-object tokenization
+     failure, not a per-row issue) and closed the same way: an extended,
+     still-narrow catch tuple at each boundary call site.
+
+  B. A DISTINCT failure class, not conflated with (A): a structurally
+     malformed CSV row (reproducer: an unterminated quote swallowing the
+     remainder of one physical row, leaving csv.DictReader's restval=None in
+     every column after the swallowed field) reaches
+     qntylab.r1_retention_candidate.daily_primitive with required numeric
+     columns set to None. daily_primitive already has an existing, frozen,
+     contract-authorized malformed-row disposition for exactly this shape
+     (reject the row, increment rejected_row_count, append
+     ANOMALY_PARSE_REJECTION -- mirroring Parser A's own REQUIRED_ROW_FIELDS
+     row-rejection check) but its own try/except only catches (KeyError,
+     ValueError, InvalidOperation), not the TypeError that Decimal(None)/
+     float(None) raise. This module does NOT catch TypeError (that would
+     risk hiding an unrelated programming bug inside daily_primitive);
+     instead it pre-filters rows against the exact column set daily_primitive
+     numeric-converts, before calling it, and folds the pre-filtered count
+     into daily_primitive's own rejected_row_count/anomaly accounting -- see
+     r1_daily_market_materializer.py's module docstring and
+     _prefilter_parser_b_rows. Additional narrow-catch safety tests confirm
+     an unrelated, deliberately-injected TypeError (not this specific
+     malformed-row shape) still propagates uncaught from both paths.
+
 This module makes no scientific decision: it does not touch OHLC, duplicate,
 timestamp, or event-order logic in either parser. Those remain covered by
 their own existing, unmodified test files, re-run here only as a regression
 gate (see the bottom of this file), not reimplemented.
 """
+import csv
 import gzip
 import hashlib
 import itertools
@@ -443,6 +480,220 @@ def test_materialize_parser_b_does_not_swallow_unrelated_exceptions(monkeypatch)
     raw = _raw_bytes([_row("1700000000.000", size="1", price="1", trdid="t-1")])
     with pytest.raises(RuntimeError, match="unrelated programming error"):
         materialize_parser_b(raw, "2023-11-14", "s", CUTOFF)
+
+
+# --- 20/21. csv.Error (field-size-limit) container corruption --------------
+# Independent hostile-review-#2 blocker on 3081118: a gzip-valid, UTF-8-valid
+# CSV body with a field exceeding csv.field_size_limit() is not tokenizable
+# by the stdlib csv module at all and raised bare csv.Error out of both
+# parser paths' body-row csv.DictReader parse, escaping materialize_batch.
+
+def _oversized_field_row_text(field_len=None):
+    huge = "X" * ((field_len or csv.field_size_limit()) + 1)
+    return f"1700000000.000,{huge},Buy,1,1,PlusTick,t-1,1,1,1\n"
+
+
+def test_csv_error_oversized_data_field_typed_quarantine_both_parsers():
+    raw = gzip.compress((",".join(HEADER) + "\n" + _oversized_field_row_text()).encode())
+    a = materialize_parser_a(raw, date(2023, 11, 14), "x")
+    b = materialize_parser_b(raw, "2023-11-14", "s", CUTOFF)
+    assert a.status == b.status == MATERIALIZATION_QUARANTINED
+    assert a.record is None and b.record is None
+    assert "CONTAINER_ANOMALY" in a.anomalies
+    assert "CONTAINER_ANOMALY" in b.anomalies
+
+
+def test_csv_error_oversized_header_field_typed_quarantine_both_parsers():
+    """The same csv.Error can also occur while parsing the header row itself
+    (this module's own _decode_container header-parse, and Parser A's
+    header-parse inside rp.parse_daily_object), not only the body -- a
+    distinct call site from the oversized-data-field case above."""
+    huge = "X" * (csv.field_size_limit() + 1)
+    text = f"timestamp,{huge},side,size,price,tickDirection,trdMatchID,grossValue,homeNotional,foreignNotional\n1700000000.000,SYM,Buy,1,1,PlusTick,t-1,1,1,1\n"
+    raw = gzip.compress(text.encode())
+    a = materialize_parser_a(raw, date(2023, 11, 14), "x")
+    b = materialize_parser_b(raw, "2023-11-14", "s", CUTOFF)
+    assert a.status == b.status == MATERIALIZATION_QUARANTINED
+    assert "CONTAINER_ANOMALY" in a.anomalies
+    assert "CONTAINER_ANOMALY" in b.anomalies
+
+
+def test_batch_isolation_csv_error_valid_corrupt_valid_parser_a():
+    """Direct regression for the reproduced review blocker: previously the
+    bare csv.Error from object B escaped materialize_parser_a and terminated
+    materialize_batch's loop before object C was ever attempted."""
+    valid_a = _raw_bytes([_row("1700000000.000", size="1", price="1", trdid="a-1")])
+    csv_corrupt = gzip.compress((",".join(HEADER) + "\n" + _oversized_field_row_text()).encode())
+    valid_c = _raw_bytes([_row("1700000000.000", size="2", price="2", trdid="c-1")])
+
+    items = [
+        (valid_a, date(2023, 11, 14), "x|A"),
+        (csv_corrupt, date(2023, 11, 14), "x|B"),
+        (valid_c, date(2023, 11, 14), "x|C"),
+    ]
+    results = materialize_batch(items, materialize_parser_a)
+
+    assert len(results) == 3, "object C was not attempted -- batch terminated early"
+    assert results[0].status == MATERIALIZED_VALID
+    assert results[1].status == MATERIALIZATION_QUARANTINED
+    assert "CONTAINER_ANOMALY" in results[1].anomalies
+    assert results[2].status == MATERIALIZED_VALID
+    assert results[2].record["first_source_trade_id"] == "c-1"
+
+    valid_count = sum(1 for r in results if r.status == MATERIALIZED_VALID)
+    typed_nonvalid_count = sum(1 for r in results if r.status == MATERIALIZATION_QUARANTINED)
+    assert valid_count + typed_nonvalid_count == len(items) == 3
+
+
+def test_batch_isolation_csv_error_valid_corrupt_valid_parser_b():
+    valid_a = _raw_bytes([_row("1700000000.000", size="1", price="1", trdid="a-1")])
+    csv_corrupt = gzip.compress((",".join(HEADER) + "\n" + _oversized_field_row_text()).encode())
+    valid_c = _raw_bytes([_row("1700000000.000", size="2", price="2", trdid="c-1")])
+
+    items = [
+        (valid_a, "2023-11-14", "A", CUTOFF),
+        (csv_corrupt, "2023-11-14", "B", CUTOFF),
+        (valid_c, "2023-11-14", "C", CUTOFF),
+    ]
+    results = materialize_batch(items, materialize_parser_b)
+    assert len(results) == 3, "object C was not attempted -- batch terminated early"
+    assert [r.status for r in results] == [MATERIALIZED_VALID, MATERIALIZATION_QUARANTINED, MATERIALIZED_VALID]
+    assert "CONTAINER_ANOMALY" in results[1].anomalies
+    assert results[2].record["first_source_trade_id"] == "c-1"
+
+    valid_count = sum(1 for r in results if r.status == MATERIALIZED_VALID)
+    typed_nonvalid_count = sum(1 for r in results if r.status == MATERIALIZATION_QUARANTINED)
+    assert valid_count + typed_nonvalid_count == len(items) == 3
+
+
+def test_batch_isolation_alternating_csv_error_corrupt_valid_four_objects_both_parsers():
+    """corrupt / valid / corrupt / valid using the csv.Error fixture: the
+    second corrupt object (C) must not prevent D from being attempted, for
+    either parser path."""
+    corrupt_a = b"not gzip data at all!!"
+    valid_b = _raw_bytes([_row("1700000000.000", size="1", price="1", trdid="b-1")])
+    corrupt_c = gzip.compress((",".join(HEADER) + "\n" + _oversized_field_row_text()).encode())
+    valid_d = _raw_bytes([_row("1700000000.000", size="2", price="2", trdid="d-1")])
+
+    a_items = [
+        (corrupt_a, date(2023, 11, 14), "x|A"),
+        (valid_b, date(2023, 11, 14), "x|B"),
+        (corrupt_c, date(2023, 11, 14), "x|C"),
+        (valid_d, date(2023, 11, 14), "x|D"),
+    ]
+    a_results = materialize_batch(a_items, materialize_parser_a)
+    assert len(a_results) == 4, "batch did not run to completion"
+    assert [r.status for r in a_results] == [
+        MATERIALIZATION_QUARANTINED, MATERIALIZED_VALID, MATERIALIZATION_QUARANTINED, MATERIALIZED_VALID,
+    ]
+    assert a_results[3].record["first_source_trade_id"] == "d-1"
+
+    b_items = [
+        (corrupt_a, "2023-11-14", "A", CUTOFF),
+        (valid_b, "2023-11-14", "B", CUTOFF),
+        (corrupt_c, "2023-11-14", "C", CUTOFF),
+        (valid_d, "2023-11-14", "D", CUTOFF),
+    ]
+    b_results = materialize_batch(b_items, materialize_parser_b)
+    assert len(b_results) == 4, "batch did not run to completion"
+    assert [r.status for r in b_results] == [
+        MATERIALIZATION_QUARANTINED, MATERIALIZED_VALID, MATERIALIZATION_QUARANTINED, MATERIALIZED_VALID,
+    ]
+    assert b_results[3].record["first_source_trade_id"] == "d-1"
+
+
+def test_materialize_parser_a_does_not_swallow_unrelated_typeerror(monkeypatch):
+    """Section-9 no-catch-all safety, specific to TypeError: an arbitrary,
+    unrelated TypeError raised inside rp.parse_daily_object (a genuine
+    programming error, NOT the csv.DictReader restval=None row shape this
+    repair targets) must still propagate uncaught. The repair never adds
+    TypeError to materialize_parser_a's catch tuple -- only csv.Error -- so
+    this should already hold, but is asserted directly rather than inferred."""
+    monkeypatch.setattr(rp, "parse_daily_object",
+                         lambda *a, **k: (_ for _ in ()).throw(TypeError("unrelated programming TypeError")))
+    raw = _raw_bytes([_row("1700000000.000", size="1", price="1", trdid="t-1")])
+    with pytest.raises(TypeError, match="unrelated programming TypeError"):
+        materialize_parser_a(raw, date(2023, 11, 14), "x")
+
+
+def test_materialize_parser_b_does_not_swallow_unrelated_typeerror(monkeypatch):
+    """Same property for Parser B: materialize_parser_b never catches
+    TypeError anywhere (it prevents the specific None-valued-required-field
+    TypeError by pre-filtering row *data* before calling daily_primitive, not
+    by catching the exception class) -- an unrelated TypeError raised inside
+    rc.daily_primitive itself must still propagate uncaught."""
+    import qntylab.r1_retention_candidate as rc_mod
+
+    def _boom(**kwargs):
+        raise TypeError("unrelated programming TypeError, not a malformed-row shape")
+
+    monkeypatch.setattr(rc_mod, "daily_primitive", _boom)
+    raw = _raw_bytes([_row("1700000000.000", size="1", price="1", trdid="t-1")])
+    with pytest.raises(TypeError, match="unrelated programming TypeError"):
+        materialize_parser_b(raw, "2023-11-14", "s", CUTOFF)
+
+
+# --- 22. Parser-B TypeError blocker: unterminated-quote malformed row ------
+# Independent hostile-review-#2 blocker on 3081118 (distinct from csv.Error
+# above): an unterminated quote swallows the remainder of one physical row,
+# leaving csv.DictReader's restval=None in every column after the swallowed
+# field. daily_primitive's own row-parsing try/except does not catch the
+# resulting TypeError from Decimal(None)/float(None). Both parsers must
+# reach the SAME already-authorized malformed-row disposition (reject just
+# that row, keep processing the rest) -- not merely "no exception".
+
+def _unterminated_quote_body(n_good_rows=50):
+    # canonical HEADER order, matching _raw_bytes' own serialization convention
+    rows = [",".join(str(_row("1700000000.000", "1", "1", f"t-{i}")[h]) for h in HEADER) for i in range(n_good_rows)]
+    rows.append('1700000000.000,"UNCLOSEDQUOTE,Buy,1,1,PlusTick,t-bad,1,1,1')
+    return ",".join(HEADER) + "\n" + "\n".join(rows) + "\n"
+
+
+def test_unterminated_quote_malformed_row_parser_a_and_b_agree_no_exception():
+    raw = gzip.compress(_unterminated_quote_body(n_good_rows=50).encode())
+    a = materialize_parser_a(raw, date(2023, 11, 14), "x")
+    b = materialize_parser_b(raw, "2023-11-14", "s", CUTOFF)
+
+    assert a.status == MATERIALIZED_VALID
+    assert b.status == MATERIALIZED_VALID
+    # Parser A already had its own REQUIRED_ROW_FIELDS row-rejection check
+    # for exactly this row shape; Parser B's boundary-level pre-filter must
+    # reach the identical disposition -- same trade_count, same
+    # rejected_row_count -- not a different, boundary-invented outcome.
+    assert a.record["trade_count"] == b.record["trade_count"] == 50
+    assert a.record["rejected_row_count"] == b.record["rejected_row_count"] == 1
+    assert "PARSE_REJECTION" in b.anomalies
+
+
+def test_unterminated_quote_malformed_row_does_not_corrupt_other_rows_numeric_values():
+    """The pre-filter must drop only the malformed row, not perturb any
+    Decimal/OHLC value daily_primitive computes for the surviving rows."""
+    raw = gzip.compress(_unterminated_quote_body(n_good_rows=3).encode())
+    b = materialize_parser_b(raw, "2023-11-14", "s", CUTOFF)
+    assert b.status == MATERIALIZED_VALID
+    assert b.record["trade_count"] == 3
+    assert b.record["close"] == "1"
+    assert b.record["base_volume"] == "3"
+    assert b.record["quote_turnover"] == "3"
+
+
+def test_batch_isolation_unterminated_quote_valid_before_and_after():
+    """The malformed-row object itself must still materialize as VALID (the
+    row is rejected, the object is not), and must not prevent a subsequent
+    object in the same batch from being attempted."""
+    malformed_but_valid = gzip.compress(_unterminated_quote_body(n_good_rows=5).encode())
+    valid_after = _raw_bytes([_row("1700000000.000", size="2", price="2", trdid="after-1")])
+
+    items = [
+        (malformed_but_valid, "2023-11-14", "A", CUTOFF),
+        (valid_after, "2023-11-14", "B", CUTOFF),
+    ]
+    results = materialize_batch(items, materialize_parser_b)
+    assert len(results) == 2
+    assert results[0].status == MATERIALIZED_VALID
+    assert results[0].record["rejected_row_count"] == 1
+    assert results[1].status == MATERIALIZED_VALID
+    assert results[1].record["first_source_trade_id"] == "after-1"
 
 
 # --- 17. contract validator used identically on both parsers' output -------

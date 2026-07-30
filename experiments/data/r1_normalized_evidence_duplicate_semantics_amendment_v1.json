@@ -1,0 +1,143 @@
+{
+  "amendment_semantic_content_sha256": "aa732948b19957a2e3fb7cd2ae1905a3b94a902a0200e24e25874f036894adf9",
+  "artifact": "r1_normalized_evidence_duplicate_semantics_amendment_v1",
+  "artifact_kind": "PROTOCOL_AMENDMENT_CANDIDATE",
+  "effective_combined_contract_binding": {
+    "amendment_semantic_content_sha256": "aa732948b19957a2e3fb7cd2ae1905a3b94a902a0200e24e25874f036894adf9",
+    "base_contract_artifact": "experiments/data/r1_normalized_evidence_contract_v1.json",
+    "base_contract_sha256": "c199b9481285d80b34183b8a7681f75ef7e60e5aadad6e4e0ece3ef8f33d6c92"
+  },
+  "effective_combined_contract_binding_sha256": "0d0dc12c16535f4ecb06ccfd9b87543862caf7d261cbe8a459d152dee4f493ab",
+  "freeze_authorized_by_this_task": false,
+  "next_step": "operator/protocol-owner review and explicit freeze decision; if frozen, Parser A remediation becomes a required subsequent implementation task per parser_status.parser_a.disposition",
+  "outcome_embargo": true,
+  "semantic_body": {
+    "adversarial_considerations": {
+      "genuine_numeric_conflict": "covered by conflict_semantics_unchanged: the rule is never invoked on a conflicting group; conflicts remain fail-closed.",
+      "mixed_price_and_size_spelling": "the (price_string, size_string) tuple ordering resolves ties on price first, then size, deterministically, for any combination of independently-varying price and size spellings.",
+      "ordinary_rows_mixed_with_duplicate_groups": "rows outside the duplicate group are unaffected; they are aggregated normally alongside the group's single representative.",
+      "permuted_raw_arrival_order_same_timestamp_same_trade_id": "this is exactly the row_order_non_interference property; the representative-selection rule's key is computed the same way regardless of which position a row occupies in the raw listing.",
+      "side_only_or_tickdirection_only_variation": "covered by residual_tie_proof: these fields never reach canonical output, so any remaining tie after price/size ordering is inconsequential.",
+      "target_confirmed": "for every scenario above, within the observed source grammar, one logical valid input yields one canonical output under the effective amended protocol.",
+      "three_plus_equivalent_spellings": "e.g. '1.1'/'1.10'/'1.100'/'1.1000' -- the rule selects the single lexicographically smallest member regardless of how many equivalent spellings are present or their arrival order."
+    },
+    "amends": {
+      "also_informed_by_unchanged": {
+        "r1_information_loss_ledger_v1.json_sha256": "7590ea9dd60b961dfc2fb64c5b099089662d6dead4c1cb3f91d3b87d67c5df02",
+        "r1_ingest_contract.json_sha256": "b82bbc464784faf220fcb694d60c26122d6098905ea09e95ef7484962cf0bca0",
+        "r1_source_precedence_freeze.json_sha256": "25b03b648774e49b04110f28637466494d35ace27ab6b210053af9224d29c51f",
+        "r1_source_schema_registry_v1.json_sha256": "02d2a75cdaa3d53a2708d2d20d5bf19f934fc68e6ee1b942404994d80ab94c4d"
+      },
+      "amendment_relationship": "ADDITIVE_CLARIFICATION_NOT_IN_PLACE_REWRITE",
+      "how_to_read": "effective_contract = original r1_normalized_evidence_contract_v1.json (unmodified) PLUS this amendment. The original text remains the historical record of what was (under-)specified before this amendment; this artifact does not retroactively imply the resolved rule existed at freeze time.",
+      "original_contract_bytes_unchanged_by_this_amendment": true,
+      "original_contract_preserved": true,
+      "target_artifact": "experiments/data/r1_normalized_evidence_contract_v1.json",
+      "target_artifact_sha256_at_amendment_time": "c199b9481285d80b34183b8a7681f75ef7e60e5aadad6e4e0ece3ef8f33d6c92",
+      "target_fields_amended": [
+        "DailyMarketEvidenceV1.open.duplicate_semantics",
+        "DailyMarketEvidenceV1.high.duplicate_semantics",
+        "DailyMarketEvidenceV1.low.duplicate_semantics",
+        "DailyMarketEvidenceV1.close.duplicate_semantics",
+        "DailyMarketEvidenceV1.base_volume.duplicate_semantics",
+        "DailyMarketEvidenceV1.quote_turnover.duplicate_semantics",
+        "DailyMarketEvidenceV1.duplicate_count.raw_derivation"
+      ]
+    },
+    "canonical_hash_semantics": {
+      "not_a_scientific_input": "this amendment does not add canonical_hash, or the duplicate-representative selection that feeds it, as an input to point_in_time_universe_selection, any H012/H013/H014/H015 factor construction, portfolio weighting, or any other strategy-relevant selection. No such usage is frozen elsewhere in the reviewed artifacts, and none is introduced here. (select_audit_reservoir's use of canonical_hash over a {dims, object_key} structure that excludes price/size entirely is a pre-existing, unaffected, non-scientific structural-sampling mechanism.)",
+      "role": "canonical_hash / normalized_primitive_sha256 remains solely a deterministic provenance and evidence-identity binding over the canonical DailyMarketEvidenceV1 record.",
+      "row_order_effect": "raw source-row arrival order alone must not alter it, per row_order_non_interference above."
+    },
+    "conflict_semantics_unchanged": {
+      "proof": "the duplicate_representative_selection_rule is defined to apply only to groups already classified as equivalent (non-conflicting) duplicates by the unchanged identity rule (preserved_unchanged.logical_duplicate_identity_clarification). A group containing members that are NOT all pairwise numerically equal in timestamp/price/size remains, exactly as before, a CONFLICT: excluded from aggregation, contributing zero canonical trades, per r1_source_precedence_freeze.json:conflict_rule. This amendment introduces no lexicographic or any other tie-break among numerically differing (conflicting) price or size values."
+    },
+    "counterfactuals": {
+      "note": "these counterfactuals describe the protocol expectation directly; no parser implementation is required to establish them, though Parser B (e466401) is independently confirmed to already produce exactly these results.",
+      "price_1.1_vs_1.10": "under the effective amended protocol, a duplicate group of {price='1.1', price='1.10'} (same trdMatchID/timestamp/size) now has exactly one protocol-determined canonical representative price string ('1.1', the lexicographically smaller of the two source-present spellings), regardless of which row the raw source lists first.",
+      "size_2_vs_2.00": "similarly, a duplicate group of {size='2', size='2.00'} now has exactly one protocol-determined canonical representative size string ('2'), regardless of raw row order."
+    },
+    "duplicate_representative_selection_rule": {
+      "adopted": true,
+      "applies_to": "a group of source rows already established as an equivalent (non-conflicting) duplicate group under the unchanged identity rule above",
+      "candidate_considered": "min(group, key=lambda row: (row.price_source_string, row.size_source_string))",
+      "grammar_scope": {
+        "claim": "this rule's well-definedness has been evaluated only against the empirically observed frozen source-archive token grammar for price/size: non-negative, non-leading-zero, plain fixed-point decimal strings matching the pattern ^[0-9]+(\\.[0-9]+)?$",
+        "empirical_basis": "verified directly against every price and size token in all 5 currently cached real pilot objects (BTCUSDT 2020-03-25, UNIUSDT 2021-11-30, ANCUSDT 2022-03-15, FTTUSDT 2022-11-13, 1000000CHEEMSUSDT 2026-05-28): zero tokens outside this pattern were observed",
+        "explicitly_out_of_scope": "scientific-notation tokens (e.g. '1E+2') and leading-zero-padded tokens (e.g. '01.10') are outside the observed source grammar. Should either ever be observed in a real object, its handling is UNRESOLVED pending its own review and is not silently resolved by this amendment merely because decimal.Decimal can parse such tokens."
+      },
+      "properties_verified": [
+        "content-derived: a pure function of the group's own member strings, not of arrival order",
+        "deterministic: identical input group always yields the identical representative",
+        "independent of arrival order: verified by construction (min over an unordered comparison key) and by permutation testing",
+        "chooses only an actually-observed source representation: the result is always one member of the group, never a synthesized string",
+        "does not round or change numeric value: all group members are numerically equal by the group's own equivalence definition, so no numeric value changes regardless of which member is chosen",
+        "does not use float: comparison is over the original source strings, not float(price)/float(size)",
+        "does not change duplicate/conflict classification: applied strictly after classification, never invoked on a conflicting group"
+      ],
+      "residual_tie_proof": "Group membership already requires identical trdMatchID (the literal grouping key, an opaque string preserved verbatim) and identical parsed event timestamp. Canonical DailyMarketEvidenceV1 fields derive only from trdMatchID (verbatim), parsed event timestamp (numeric), and the representative's price/size source string; side and tickDirection are INTENTIONALLY_DISCARDED and appear in no canonical field. Therefore, if two or more group members remain tied after ordering by (price_source_string, size_source_string) -- i.e. they share identical price and size strings and differ only in side/tickDirection -- every canonical field is already identical regardless of which tied member is chosen. No further tie-break dimension is defined; adding one would violate the requirement not to introduce meaningless ordering dimensions.",
+      "rule": "the canonical representative row is the group member whose (price_source_string, size_source_string) pair is lexicographically smallest, comparing each string as an ordinary Unicode code-point sequence (Python str '<' semantics), never as a parsed number"
+    },
+    "explicitly_not_addressed_by_this_amendment": [
+      "float timestamp parsing/semantics",
+      "Decimal working-context precision ceiling",
+      "quiet NaN / Infinity general handling policy",
+      "token grammars outside the empirically observed source grammar (scientific notation, leading-zero padding)",
+      "funding settlement semantics",
+      "market gap classification",
+      "lifecycle/identity ambiguity",
+      "any R1 hypothesis, factor, weight, return, PnL, IC, or Sharpe computation"
+    ],
+    "future_ab_acceptance_rule": {
+      "current_state": "tests/test_r1_parser_a_vs_b_cross_validation.py::test_real_objects_agree_on_core_aggregates currently requires exact A/B byte agreement scoped to the 5 currently cached real objects only; this remains valid and passing (zero duplicate groups of any kind occur in any of the 5 real objects today).",
+      "explicit_non_carve_out": "the mixed-scale-duplicate class must NOT be permanently excluded from the A/B acceptance gate merely because Parser A currently fails it. The present real-corpus-only scope is an interim, historically-explained state, not a permanent narrowing of the cross-validation architecture. Preserving Parser A's current gap as a permanent protocol carve-out would enshrine a known reference-implementation defect as protocol, which this amendment explicitly rejects.",
+      "target_state_after_parser_a_remediation": "once Parser A is remediated to conform to duplicate_representative_selection_rule and row_order_non_interference, the acceptance rule should be: for any valid raw logical input within the observed source grammar (grammar_scope above) -- not only the currently cached real objects, and explicitly including synthetic mixed-scale-duplicate constructions -- Parser A and Parser B MUST produce identical canonical DailyMarketEvidenceV1 bytes/hash."
+    },
+    "motivating_falsifier": {
+      "counterexample_id": "CX-1",
+      "note": "This amendment closes exactly the two gaps that verdict identified and no others. It does not retroactively assert the resolved rule was already implied by the original contract text.",
+      "origin": "independent NEW CHAT review of repair commit e466401 (parent 220d59b)",
+      "prior_review_verdict": "BLOCKED_BY_CANONICAL_TIEBREAK_UNDERSPECIFICATION",
+      "shape": "a duplicate group whose members share trdMatchID/timestamp and are numerically equal in price and size, but are spelled with different decimal scales in the raw source (e.g. price '1.1' vs '1.10', size '2' vs '2.00'), produced row-order-dependent canonical bytes/hash because the frozen contract specified neither (a) which textual spelling of an equivalent value survives collapse, nor (b) a general requirement that raw row order not affect canonical output at all"
+    },
+    "outcome_embargo_verified": "no H012/H014, PIT rank, weight, forward return, PnL, IC, Sharpe, or weekly/null/replication outcome was computed, inspected, or referenced in producing this amendment",
+    "parser_status": {
+      "parser_a": {
+        "conformance": "NONCONFORMING (expected, not remediated by this amendment)",
+        "current_sha256": "acad03e196d0f32724855817eed07c7efc1a40279355ed69b594de54eb81c640",
+        "disposition": "This amendment is a protocol document; it deliberately does not modify Parser A. Protocol defines conformance targets, not the reverse: Parser A's current behavior does not weaken or narrow this amendment. Parser A remediation is recorded here as a REQUIRED SUBSEQUENT IMPLEMENTATION STEP, to be performed and reviewed as its own task.",
+        "location": "qntylab/r1_reference_parser.py:299 (canonical.append(group[0]))",
+        "reason": "group[0] selects whichever row the raw source listed first -- a function of raw arrival order, not of group content -- so it satisfies neither duplicate_representative_selection_rule nor row_order_non_interference for an equivalent mixed-spelling duplicate group."
+      },
+      "parser_b_e466401": {
+        "action_required": "none; no Parser B code change is required by this amendment",
+        "conformance": "CONFORMS",
+        "current_sha256": "cfa829c7e28a658258cf31d768c7685c5a6e0cad0c04c75a1fb3faaba0e685c6",
+        "location": "qntylab/r1_retention_candidate.py (_canonical_duplicate_representative)",
+        "reason": "_canonical_duplicate_representative implements exactly min(group, key=lambda g: (str(price), str(size))), matching duplicate_representative_selection_rule verbatim; independently verified content-derived, deterministic, non-fabricating, row-order-invariant and canonical-hash-invariant under permutation testing (4!, 5!, and mixed duplicate+ordinary-trade fixtures) in the prior independent review of e466401."
+      }
+    },
+    "preserved_unchanged": {
+      "conflict_rule_unchanged": "Rows sharing trdMatchID whose parsed timestamp, price, or size are not all pairwise numerically equal remain a CONFLICT under r1_source_precedence_freeze.json:conflict_rule and fail closed (excluded from aggregation, zero canonical winner). The representative-selection rule defined below applies ONLY after a group has already been classified as an equivalent (non-conflicting) duplicate group by the unchanged identity rule above; it never operates on, and never picks a winner among, a conflicting group.",
+      "event_time_ordering_unchanged": "open/first_source_* and close/last_source_* remain determined by first/last qualifying trade by parsed UTC event timestamp, then immutable trade identity as tie-break, exactly as already frozen in r1_source_precedence_freeze.json:daily_close. This amendment's row-order-non-interference property (gap_b) concerns only the raw listing/arrival order of rows within a source object -- it does not make event-time ordering or the trade-identity tie-break order-independent in any new sense; those were already content-derived, not arrival-order-derived.",
+      "intentionally_discarded_fields_unchanged": "side and tickDirection remain INTENTIONALLY_DISCARDED per r1_information_loss_ledger_v1.json and continue to play no role in any canonical DailyMarketEvidenceV1 field, including the representative-selection rule below.",
+      "logical_duplicate_identity_clarification": "This amendment clarifies, without changing, the pre-existing frozen text 'identical trade id/timestamp/price/size' (r1_normalized_evidence_contract_v1.json:DailyMarketEvidenceV1.close.duplicate_semantics). 'Identical' trdMatchID is source-string equality (trdMatchID is an opaque string, preserved verbatim per its own field spec). 'Identical' timestamp/price/size means numeric equality of the parsed value (Decimal equality for price/size; equality of the parsed numeric event time for timestamp), not source-string equality. This is a clarification of already-implemented, already-shared behavior: both qntylab/r1_reference_parser.py and qntylab/r1_retention_candidate.py have grouped candidate duplicates by trdMatchID and classified them by parsed-value equality since commit 0edadf3, independent of and prior to e466401 and this amendment. This amendment does not change that classification in any way."
+    },
+    "raw_deletion_authorized": false,
+    "row_order_non_interference": {
+      "property": "for any two raw row sequences that are permutations of each other (the same multiset of raw source rows, in any arrival/listing order), the resulting canonical DailyMarketEvidenceV1 record, its canonical serialized bytes, and its canonical evidence hash MUST be identical",
+      "scope": "this invariant concerns only the raw arrival/listing order of rows within a single source object. It does NOT change: (a) event-time ordering, which remains a content-derived ordering over parsed timestamps used to determine open/first_source_* and close/last_source_*, not an ordering over raw arrival position; (b) the immutable-trade-identity tie-break already frozen for daily_close ('last qualifying trade by UTC event timestamp, then immutable trade identity'). Both (a) and (b) are properties of the parsed data's own content, not of how the raw file happens to list its rows, and are unaffected by this amendment."
+    },
+    "source_precision_interpretation": {
+      "equivalent_duplicate_group_with_multiple_representations": "when a canonical unique trade is derived from an equivalent duplicate group whose members carry different textual spellings of the same numeric value, there is no single unique 'the source spelling' to preserve -- there are multiple, mutually consistent, source-present spellings. In this case the protocol deterministically SELECTS one of the actually-observed source spellings via the duplicate_representative_selection_rule above. It never invents, normalizes, re-rounds, or averages a spelling that was not itself present in at least one source row.",
+      "single_source_observation": "when exactly one source row constitutes a canonical unique trade (no duplicate), its own source string precision for price/size is preserved verbatim, exactly as already frozen ('preserve source string precision; never round before storage')."
+    },
+    "underspecification_recorded": {
+      "explicit_statement": "As written prior to this amendment, the frozen contract did not resolve gap_a or gap_b. This amendment resolves exactly these two gaps.",
+      "gap_a_duplicate_representative_selection": "The original contract's duplicate_semantics fields state that equivalent rows 'collapse to one observation' but never state which textual representation of price/size is retained when equivalent rows are spelled differently.",
+      "gap_b_row_order_non_interference": "No frozen artifact states that permuting raw row arrival order must not change canonical DailyMarketEvidenceV1 bytes or the canonical evidence hash. The only place this property was previously asserted was an implementation repair receipt (r1_parser_b_numeric_conformance_repair_v1.json), which is provenance for an implementation, not frozen protocol text."
+    }
+  },
+  "status": "CANDIDATE_NOT_YET_FROZEN",
+  "verdict": "R1_DUPLICATE_SEMANTICS_AMENDMENT_CANDIDATE_READY"
+}

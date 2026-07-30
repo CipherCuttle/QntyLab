@@ -8,8 +8,15 @@
     "base_contract_sha256": "c199b9481285d80b34183b8a7681f75ef7e60e5aadad6e4e0ece3ef8f33d6c92"
   },
   "effective_combined_contract_binding_sha256": "0d0dc12c16535f4ecb06ccfd9b87543862caf7d261cbe8a459d152dee4f493ab",
-  "freeze_authorized_by_this_task": false,
-  "next_step": "operator/protocol-owner review and explicit freeze decision; if frozen, Parser A remediation becomes a required subsequent implementation task per parser_status.parser_a.disposition",
+  "freeze_authorized_by_this_task": true,
+  "freeze_provenance": {
+    "candidate_commit_reviewed_sha": "92c1759d7153d37d52edc57d37c4febb5cc3e067",
+    "frozen_amendment_semantic_content_sha256": "aa732948b19957a2e3fb7cd2ae1905a3b94a902a0200e24e25874f036894adf9",
+    "frozen_effective_combined_contract_binding_sha256": "0d0dc12c16535f4ecb06ccfd9b87543862caf7d261cbe8a459d152dee4f493ab",
+    "independent_review_result": "R1_DUPLICATE_SEMANTICS_AMENDMENT_FROZEN",
+    "operator_authorization": "explicit protocol-owner authorization received, scoped only to the exact semantic content independently reviewed in commit 92c1759d7153d37d52edc57d37c4febb5cc3e067 (amendment_semantic_content_sha256 aa732948b19957a2e3fb7cd2ae1905a3b94a902a0200e24e25874f036894adf9, effective_combined_contract_binding_sha256 0d0dc12c16535f4ecb06ccfd9b87543862caf7d261cbe8a459d152dee4f493ab); no semantic changes authorized"
+  },
+  "next_step": "Parser A remediation against the now-frozen effective protocol is a required subsequent implementation task, per parser_status.parser_a.disposition",
   "outcome_embargo": true,
   "semantic_body": {
     "adversarial_considerations": {
@@ -138,6 +145,6 @@
       "gap_b_row_order_non_interference": "No frozen artifact states that permuting raw row arrival order must not change canonical DailyMarketEvidenceV1 bytes or the canonical evidence hash. The only place this property was previously asserted was an implementation repair receipt (r1_parser_b_numeric_conformance_repair_v1.json), which is provenance for an implementation, not frozen protocol text."
     }
   },
-  "status": "CANDIDATE_NOT_YET_FROZEN",
-  "verdict": "R1_DUPLICATE_SEMANTICS_AMENDMENT_CANDIDATE_READY"
+  "status": "FROZEN",
+  "verdict": "R1_DUPLICATE_SEMANTICS_AMENDMENT_FROZEN"
 }

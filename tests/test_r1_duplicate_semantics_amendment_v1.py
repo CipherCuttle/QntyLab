@@ -73,10 +73,18 @@ def _load_amendment():
 
 # --- 1. amendment self-consistency and provenance binding -------------------
 
-def test_amendment_is_a_candidate_not_a_freeze():
+def test_amendment_is_frozen_with_recorded_operator_authorization():
+    """Governance-status expectation updated to reflect the explicit
+    protocol-owner freeze authorization recorded in freeze_provenance; the
+    reviewed semantic content itself (amendment_semantic_content_sha256) is
+    unchanged -- see test_amendment_semantic_content_digest_is_self_consistent
+    and test_amendment_base_contract_binding_matches_actual_current_file."""
     amendment = _load_amendment()
-    assert amendment["status"] == "CANDIDATE_NOT_YET_FROZEN"
-    assert amendment["freeze_authorized_by_this_task"] is False
+    assert amendment["status"] == "FROZEN"
+    assert amendment["freeze_authorized_by_this_task"] is True
+    assert amendment["freeze_provenance"]["candidate_commit_reviewed_sha"] == "92c1759d7153d37d52edc57d37c4febb5cc3e067"
+    assert amendment["freeze_provenance"]["frozen_amendment_semantic_content_sha256"] == amendment["amendment_semantic_content_sha256"]
+    assert amendment["freeze_provenance"]["frozen_effective_combined_contract_binding_sha256"] == amendment["effective_combined_contract_binding_sha256"]
 
 
 def test_amendment_semantic_content_digest_is_self_consistent():
@@ -107,10 +115,14 @@ def test_amendment_base_contract_binding_matches_actual_current_file():
     assert actual_sha256 == amendment["effective_combined_contract_binding"]["base_contract_sha256"]
 
 
-def test_amendment_does_not_authorize_raw_deletion_or_freeze_itself():
+def test_amendment_freeze_does_not_authorize_raw_deletion():
+    """raw_deletion_authorized is a permanent semantic-body invariant, unaffected
+    by the governance freeze; freeze_authorized_by_this_task now reflects the
+    explicit operator authorization recorded in freeze_provenance (see
+    test_amendment_is_frozen_with_recorded_operator_authorization)."""
     amendment = _load_amendment()
     assert amendment["semantic_body"]["raw_deletion_authorized"] is False
-    assert amendment["freeze_authorized_by_this_task"] is False
+    assert amendment["freeze_authorized_by_this_task"] is True
 
 
 # --- standalone reimplementation of the amendment's stated rule -------------

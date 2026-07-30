@@ -1,0 +1,47 @@
+{
+  "artifact": "r1_reference_parser_validation_v1",
+  "outcome_embargo": true,
+  "cutoff_utc": "2026-06-30T23:59:59Z",
+  "bound_to_input_contract_sha256": "3277f808dbc0a91f2e4573455349d01b281b70e617f441b81e11e6544fc62499",
+  "bound_to_corpus_artifact": "experiments/data/r1_reference_validation_corpus_v1.json",
+  "terminology": {
+    "parser_a": "independent contract-derived reference implementation (qntylab/r1_reference_parser.py)",
+    "parser_b": "pre-existing daily_primitive candidate (qntylab/r1_retention_candidate.py) -- NOT production: zero callers in the repository, module docstring self-describes as 'candidate, not frozen'"
+  },
+  "sequencing_record": {
+    "parser_a_core_frozen_before_unblinding_sha256": "5cc2c3080e331d366ece1dbeb4a5d18c4a631cc54552618c7bbdc0c6d487e6de",
+    "parser_a_test_suite_sha256_at_freeze": "4db826461be471fd0e32a519ff5d6d626a62853d832583015aef7ded0f055589",
+    "parser_a_final_sha256_after_adding_phase10_source_mutation_helper": "acad03e196d0f32724855817eed07c7efc1a40279355ed69b594de54eb81c640",
+    "note": "Parser A was designed, implemented, and test-passing (21/21) using only the frozen contract artifacts before qntylab/r1_retention_candidate.py was opened for this task. A small, independent Phase-10 helper (check_source_mutation) was appended after unblinding; it shares no logic with Parser B and does not touch trade parsing.",
+    "independence_caveat": "A preliminary read-only Phase-1 audit (an Explore subagent, dispatched before Parser A's design) surfaced high-level algorithmic facts about daily_primitive (trdMatchID+fingerprint dedup, (timestamp,id) sort key, close=last price, turnover=sum(price*size)) before Parser A was written. Full code-blindness was therefore not achieved. This is disclosed rather than hidden: the convergence on those specific rules is also independently required by the frozen contract text itself (duplicate/close/turnover derivation is fully specified there), so it does not by itself establish independent correctness -- only the absence of shared code and the divergences found below do that."
+  },
+  "real_object_cross_validation": {
+    "objects_compared": 5,
+    "objects_exact_match_core_aggregates": 5,
+    "objects_disagreement": 0,
+    "field_disagreements": [],
+    "error_state_disagreements": 0,
+    "detail": "trade_count identical on all 5; close/open/high/low/base_volume/quote_turnover agree to within 1e-9/1e-6 float tolerance on all 5 (Parser A's Decimal-string values vs Parser B's float64 values). Zero anomalies raised by Parser B on any of the 5 real objects (no duplicates, no conflicts, no schema mismatches present in this corpus's real objects)."
+  },
+  "synthetic_adversarial_cross_validation": {
+    "cases_run": 23,
+    "cases_agreement": 21,
+    "cases_confirmed_disagreement": 2,
+    "disagreements": [
+      {
+        "case": "exact-duplicate rows differing only in `side`",
+        "classification": "explained, non-blocking",
+        "finding": "Parser B's duplicate fingerprint includes `side`; the frozen contract's duplicate_semantics text ('identical trade id/timestamp/price/size') and the information-loss ledger (side: INTENTIONALLY_DISCARDED) do not. Parser B labels this DUPLICATE_CONFLICTING; Parser A treats it as an exact duplicate. Numeric aggregates still agreed in the tested case.",
+        "test": "tests/test_r1_parser_a_vs_b_cross_validation.py::test_disagreement_side_included_in_b_fingerprint_not_in_contract"
+      },
+      {
+        "case": "genuinely conflicting duplicate (same trade id, different price), row order reversed",
+        "classification": "explained, BLOCKING -- traced to r1_source_precedence_freeze.json:conflict_rule",
+        "finding": "conflict_rule requires fail-closed handling ('no lower-priority source silently replaces a higher-priority fact'). Parser A excludes both conflicting rows from aggregation, deterministically regardless of input row order (trade_count=0 either order). Parser B instead silently retains whichever row it iterates to first and discards the other as a 'duplicate' -- so its close value for logically identical data (100 vs 999 in the tested fixture) depends on raw row order. This also contradicts Parser B's own module docstring claim ('Deterministic under row-input reordering (sorts internally)'), since the retained value is selected before the internal sort runs.",
+        "test": "tests/test_r1_parser_a_vs_b_cross_validation.py::test_disagreement_conflicting_duplicate_row_order_dependence"
+      }
+    ],
+    "precision_semantic_note": "Parser B computes timestamp/size/price/close/quote_turnover as Python float (float()), storing close/open/high/low/quote_turnover as float64. The frozen contract requires 'preserve source string precision; never round before storage' for open/high/low/close and 'computed in source-native decimal precision, not float64' for quote_turnover. Parser A uses Decimal parsed directly from the original CSV string tokens throughout. No real or synthetic case in this bounded corpus produced a float64 rounding error large enough to change a reported value at the precision shown, but Parser B's design does not conform to the contract's precision_semantics as written -- the two implementations only avoid visible disagreement here because no tested object's decimal precision exceeded float64's representable precision."
+  },
+  "verdict_basis": "Not all cross-validation cases agree: the conflicting-duplicate-with-reversed-row-order case is a confirmed, contract-traceable disagreement, not an artifact of ambiguity. Per instruction, no winner is auto-selected; the frozen conflict_rule is decisive for that case and Parser B's output does not satisfy it."
+}

@@ -1,0 +1,69 @@
+{
+  "artifact": "r1_reference_validation_corpus_v1",
+  "outcome_embargo": true,
+  "cutoff_utc": "2026-06-30T23:59:59Z",
+  "bound_to_input_contract_sha256": "3277f808dbc0a91f2e4573455349d01b281b70e617f441b81e11e6544fc62499",
+  "selection_policy": "Strategy-blind: selection uses only structural coverage dimensions (era, schema variant, object size, stream volume, stream life-stage, disconnected/crisis-adjacent context). Selection never used return, momentum, funding signal, factor result, future performance, PnL, or replication result. Rationale below was recorded before any Parser A vs Parser B comparison was run.",
+  "network_acquisition_decision": {
+    "decision": "NO_NEW_NETWORK_ACQUISITION_THIS_PASS",
+    "why": "experiments/data/r1_ingest_contract.json:raw_store names a licensed Tardis vendor path ('/var/lib/qntylab/licensed/tardis/bybit-r1-v1', git_policy: never store vendor raw in git, retention: subject to vendor license); experiments/data/r1_data_source_qualification.json:decision is R1_DATA_SOURCE_QUALIFIED_PENDING_PROCUREMENT with metadata_endpoint_without_key=401. No Tardis API credential is present in this repository (verified: no TARDIS/API_KEY reference in qntylab/*.py). Rather than perform a new licensed-vendor download under ambiguous entitlement, this corpus reuses raw objects already legitimately present in .r1_input_cache/sha256/ (retrieved by an earlier, separate task) plus locally-authored synthetic fixtures.",
+    "consequence": "MONUSDT, FHEUSDT, and a SANDUSDT-2024-11-04-vicinity object requested by the task brief's wishlist are NOT represented by real data in this corpus. 2023/2024/2025 eras are not represented by real data either. This is recorded as an explicit, known gap, not silently glossed over."
+  },
+  "real_objects": [
+    {
+      "object_id": "BTCUSDT_2020-03-25",
+      "source_object_sha256": "cbca6933a8f0a11429661cfa93b04056055d776ee199209e8af9719ad2060a33",
+      "cache_path": ".r1_input_cache/sha256/cbca6933a8f0a11429661cfa93b04056055d776ee199209e8af9719ad2060a33",
+      "expected_utc_date": "2020-03-25",
+      "why_selected": "earliest available era (2020); major/high-liquidity instrument (BTCUSDT); establishes a baseline known_valid schema_variant=bybit_trade_v1 object with no observed anomalies",
+      "coverage_dimensions": ["era_2020", "known_schema_bybit_trade_v1", "major_stream", "object_size_small"]
+    },
+    {
+      "object_id": "UNIUSDT_2021-11-30",
+      "source_object_sha256": "8068ed2f06c280ad103b50525c4c8bc14a3a956a6ed40f4fba50ff738d59ebb4",
+      "cache_path": ".r1_input_cache/sha256/8068ed2f06c280ad103b50525c4c8bc14a3a956a6ed40f4fba50ff738d59ebb4",
+      "expected_utc_date": "2021-11-30",
+      "why_selected": "2021 era coverage; mid-size object; mid-volume stream",
+      "coverage_dimensions": ["era_2021", "known_schema_bybit_trade_v1", "object_size_medium", "mid_volume_stream"]
+    },
+    {
+      "object_id": "ANCUSDT_2022-03-15",
+      "source_object_sha256": "cabc599c8d0b2da8df4bb07de64700092701ac8bf4987ee8b4395bef8a6398d2",
+      "cache_path": ".r1_input_cache/sha256/cabc599c8d0b2da8df4bb07de64700092701ac8bf4987ee8b4395bef8a6398d2",
+      "expected_utc_date": "2022-03-15",
+      "why_selected": "2022 era coverage; instrument later delisted (Anchor Protocol depeg, May 2022) giving a lifecycle-adjacent but pre-crisis snapshot; higher-volume stream than the 2020/2021 objects",
+      "coverage_dimensions": ["era_2022", "known_schema_bybit_trade_v1", "object_size_large", "high_volume_stream", "later_delisted_instrument_precrisis"]
+    },
+    {
+      "object_id": "FTTUSDT_2022-11-13",
+      "source_object_sha256": "8c085036c9b65a99379941434f3531fa7365b24e31a752cd10a0d80ea8df77fc",
+      "cache_path": ".r1_input_cache/sha256/8c085036c9b65a99379941434f3531fa7365b24e31a752cd10a0d80ea8df77fc",
+      "expected_utc_date": "2022-11-13",
+      "why_selected": "disconnected/crisis-adjacent context: date falls within the FTX exchange collapse week (FTX halted withdrawals 2022-11-08); largest and highest-row-count object in the corpus, stress-testing parser throughput and dedup on a volatile, high-churn stream",
+      "coverage_dimensions": ["era_2022", "known_schema_bybit_trade_v1", "object_size_large", "high_volume_stream", "disconnected_source_crisis_context"]
+    },
+    {
+      "object_id": "1000000CHEEMSUSDT_2026-05-28",
+      "source_object_sha256": "d1b50f8316c1874d7ae7bde11314d077f3cf1b2baece4a6cdd7459e83cc2ce2a",
+      "cache_path": ".r1_input_cache/sha256/d1b50f8316c1874d7ae7bde11314d077f3cf1b2baece4a6cdd7459e83cc2ce2a",
+      "expected_utc_date": "2026-05-28",
+      "why_selected": "known RPI schema_variant=bybit_trade_v1_rpi real-world instance (previously undercounted -- the frozen schema registry cites only a single 2026-06-30 DOLOUSDT RPI observation; this is a second, independent real RPI object); newest/near-cutoff era; smallest object and lowest-volume stream in the corpus; early-life instrument (recently listed meme perpetual)",
+      "coverage_dimensions": ["era_2026", "known_schema_bybit_trade_v1_rpi", "object_size_smallest", "low_volume_stream", "early_life_instrument", "near_cutoff_era"]
+    }
+  ],
+  "synthetic_adversarial_objects": [
+    "out_of_order_rows", "duplicate_identical_trade", "conflicting_duplicate",
+    "identical_event_timestamps_tie_break", "utc_boundary_235959_999",
+    "utc_boundary_000000", "empty_object_zero_bytes", "one_trade_day",
+    "malformed_decimal", "malformed_timestamp", "unknown_extra_column_schema",
+    "missing_required_column_value", "future_timestamp_past_cutoff",
+    "gzip_corruption", "reordered_columns_known_schema"
+  ],
+  "synthetic_objects_location": "tests/test_r1_reference_parser.py (each fixture is generated inline, in-memory, not persisted as a separate data file -- fixtures are small enough that the test source is the canonical record of their bytes)",
+  "not_yet_covered_by_this_corpus": [
+    "truncated_csv (mid-row cutoff without trailing newline) -- exercised structurally via the truncated_tail_detected diagnostic path, but not asserted in a dedicated adversarial test in this pass",
+    "2023, 2024, 2025 real-object eras",
+    "MONUSDT / FHEUSDT / SANDUSDT-2024-11-04-vicinity real objects",
+    "a real symbol-reuse (identity ambiguity) case -- out of scope for the trade-level parser under test; belongs to the lifecycle compiler"
+  ]
+}

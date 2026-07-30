@@ -1,0 +1,38 @@
+{
+  "artifact": "r1_information_loss_ledger_v1",
+  "outcome_embargo": true,
+  "cutoff_utc": "2026-06-30T23:59:59Z",
+  "bound_to_checkpoint_sha256": "80ed752c7ea003ba354fe7f64c7f04eac300405ca4d60c6b5334cea95d1d50b0",
+  "scope_note": "Every raw field is classified against every KNOWN_VALID_SCHEMA_VARIANT in r1_source_schema_registry_v1.json; a rule proven for one variant is not assumed to hold for another without independent evidence.",
+  "trade_stream_fields": [
+    {"field": "timestamp", "schema_variants": ["bybit_trade_v1", "bybit_trade_v1_rpi"], "classification": "PRESERVED_DIRECTLY", "target": "DailyMarketEvidenceV1.first_source_timestamp_utc / last_source_timestamp_utc (per-trade timestamp retained in the min/max reduction, not the aggregate alone)", "reconstruction_rule": "n/a (direct)"},
+    {"field": "symbol", "schema_variants": ["bybit_trade_v1", "bybit_trade_v1_rpi"], "classification": "PRESERVED_DIRECTLY", "target": "instrument_instance_id component", "reconstruction_rule": "n/a"},
+    {"field": "side", "schema_variants": ["bybit_trade_v1", "bybit_trade_v1_rpi"], "classification": "INTENTIONALLY_DISCARDED", "target": "none", "reconstruction_rule": "not needed by any of open/high/low/close/base_volume/quote_turnover/trade_count under the frozen R1 operations; side is a taker-direction label, not a price/size/turnover input"},
+    {"field": "size", "schema_variants": ["bybit_trade_v1", "bybit_trade_v1_rpi"], "classification": "PRESERVED_DIRECTLY", "target": "DailyMarketEvidenceV1.base_volume (summed)", "reconstruction_rule": "n/a"},
+    {"field": "price", "schema_variants": ["bybit_trade_v1", "bybit_trade_v1_rpi"], "classification": "PRESERVED_DIRECTLY", "target": "DailyMarketEvidenceV1.open/high/low/close, and quote_turnover via price*size", "reconstruction_rule": "n/a"},
+    {"field": "tickDirection", "schema_variants": ["bybit_trade_v1", "bybit_trade_v1_rpi"], "classification": "INTENTIONALLY_DISCARDED", "target": "none", "reconstruction_rule": "uptick/downtick label; no frozen R1 operation reads microstructure tick direction"},
+    {"field": "trdMatchID", "schema_variants": ["bybit_trade_v1", "bybit_trade_v1_rpi"], "classification": "PRESERVED_DIRECTLY", "target": "DailyMarketEvidenceV1.first_source_trade_id / last_source_trade_id", "reconstruction_rule": "n/a"},
+    {"field": "grossValue", "schema_variants": ["bybit_trade_v1", "bybit_trade_v1_rpi"], "classification": "PRESERVED_AS_DIAGNOSTIC", "target": "redundant-field cross-check only (not a stored normalized field)", "reconstruction_rule": "grossValue == foreignNotional * 1e8 with zero reconstruction error, verified on every row of every r1_bounded_evidence_retention_candidate_v1.json pilot object (5 objects, 2021-2026). NOT globalized beyond the pilot sample: this equality is asserted only for objects that have actually been checked; a future object failing the check is REDUNDANT_FIELD_MISMATCH (an anomaly_trigger), not silently accepted."},
+    {"field": "homeNotional", "schema_variants": ["bybit_trade_v1", "bybit_trade_v1_rpi"], "classification": "PRESERVED_DERIVABLY", "target": "reconstructible from size", "reconstruction_rule": "homeNotional == size exactly, verified on every row of every pilot object (5 objects). Deterministic reconstruction rule: homeNotional := size. Same globalization caveat as grossValue -- verified on the pilot sample only, re-checked per object via the redundant-field cross-check anomaly trigger, not assumed globally true."},
+    {"field": "foreignNotional", "schema_variants": ["bybit_trade_v1", "bybit_trade_v1_rpi"], "classification": "PRESERVED_DERIVABLY", "target": "reconstructible from price*size", "reconstruction_rule": "foreignNotional == size*price exactly, verified on every row of every pilot object (5 objects). Deterministic reconstruction rule: foreignNotional := size*price. Same globalization caveat as above."},
+    {"field": "RPI", "schema_variants": ["bybit_trade_v1_rpi"], "classification": "UNRESOLVED", "target": "none yet", "reconstruction_rule": "observed only once (2026-06-30 DOLOUSDT pilot object); semantic meaning not yet documented from an authoritative Bybit source; must not be discarded until its meaning and any downstream relevance are established. Recorded verbatim as a diagnostic column pending resolution, never silently dropped."}
+  ],
+  "funding_stream_fields": [
+    {"field": "settlement timestamp", "classification": "PRESERVED_DIRECTLY", "target": "FundingSettlementEvidenceV1.settlement_timestamp_utc"},
+    {"field": "realized funding rate", "classification": "PRESERVED_DIRECTLY", "target": "FundingSettlementEvidenceV1.realized_funding_rate"},
+    {"field": "predicted_funding_rate (documented in the Tardis derivative_ticker free-sample schema)", "classification": "INTENTIONALLY_DISCARDED", "target": "none", "reconstruction_rule": "explicitly forbidden as a funding_settlement source by r1_source_precedence_freeze.json (predicted funding or funding-interval projection is a forbidden derivation)"},
+    {"field": "funding_timestamp (Tardis derivative_ticker free-sample field)", "classification": "PRESERVED_AS_DIAGNOSTIC", "target": "corroboration only, not the canonical settlement_timestamp_utc source", "reconstruction_rule": "primary source remains the official Bybit realized funding-history endpoint per r1_source_precedence_freeze.json"},
+    {"field": "open_interest, index_price, mark_price (Tardis derivative_ticker free-sample fields)", "classification": "INTENTIONALLY_DISCARDED", "target": "none", "reconstruction_rule": "not required by any locked R1 operation; these are corroboration-only fields for a source explicitly ranked below the official realized settlement"}
+  ],
+  "current_metadata_fields": [
+    {"field": "symbolId, status, contractType, launchTime, deliveryTime, fundingInterval (current Bybit instruments-info)", "classification": "PRESERVED_AS_DIAGNOSTIC", "target": "current-state corroboration only, per r1_semantic_issue_ledger.json:current_metadata_audit admission=EXCLUDED_FROM_HISTORICAL_INPUTS_CURRENT_METADATA_CORROBORATION_ONLY", "reconstruction_rule": "never used to establish historical eligibility, launch, or terminal events (r1_source_precedence_freeze.json forbidden clauses)"}
+  ],
+  "totals": {
+    "PRESERVED_DIRECTLY": 7,
+    "PRESERVED_DERIVABLY": 2,
+    "PRESERVED_AS_DIAGNOSTIC": 4,
+    "INTENTIONALLY_DISCARDED": 5,
+    "UNRESOLVED": 1
+  },
+  "unresolved_fields_block_raw_deletion": ["RPI"]
+}

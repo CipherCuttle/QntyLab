@@ -1,0 +1,40 @@
+{
+  "artifact": "r1_source_schema_registry_v1",
+  "outcome_embargo": true,
+  "cutoff_utc": "2026-06-30T23:59:59Z",
+  "bound_to_checkpoint_sha256": "80ed752c7ea003ba354fe7f64c7f04eac300405ca4d60c6b5334cea95d1d50b0",
+  "known_schema_variants": {
+    "bybit_trade_v1": {
+      "status": "KNOWN_VALID_SCHEMA_VARIANT",
+      "field_set": ["timestamp", "symbol", "side", "size", "price", "tickDirection", "trdMatchID", "grossValue", "homeNotional", "foreignNotional"],
+      "evidence": "r1_bounded_evidence_retention_candidate_v1.json:known_schema_variants; observed on pilot objects spanning 2021-2025",
+      "normalization_mapping": "see r1_information_loss_ledger_v1.json:trade_stream_fields",
+      "information_loss_treatment": "grossValue/homeNotional/foreignNotional are PRESERVED_AS_DIAGNOSTIC or PRESERVED_DERIVABLY, cross-checked per object, not assumed"
+    },
+    "bybit_trade_v1_rpi": {
+      "status": "KNOWN_VALID_SCHEMA_VARIANT",
+      "field_set": ["timestamp", "symbol", "side", "size", "price", "tickDirection", "trdMatchID", "grossValue", "homeNotional", "foreignNotional", "RPI"],
+      "evidence": "r1_bounded_evidence_retention_candidate_v1.json:known_schema_variants and schema_drift_observed; single observation, 2026-06-30 DOLOUSDT pilot object",
+      "normalization_mapping": "identical to bybit_trade_v1 for all shared fields; RPI is UNRESOLVED (see information-loss ledger)",
+      "information_loss_treatment": "RPI column recorded verbatim, not discarded, pending semantic resolution",
+      "note": "a KNOWN_VALID_SCHEMA_VARIANT is not automatically an anomaly; the anomaly channel (SCHEMA_MISMATCH trigger) exists for genuinely unknown column sets, not for this documented variant"
+    },
+    "tardis_derivative_ticker_v1": {
+      "status": "KNOWN_VALID_SCHEMA_VARIANT",
+      "field_set": ["exchange", "symbol", "timestamp", "local_timestamp", "funding_timestamp", "funding_rate", "predicted_funding_rate", "open_interest", "last_price", "index_price", "mark_price"],
+      "evidence": "experiments/data/r1_data_source_qualification.json:free_sample (single sample object, 2024-01-01 BTCUSDT, sha256 80e5658ea627e87bb372ca80bd0c9f424184b9582b6a551f35b0ce59ede4fffa)",
+      "normalization_mapping": "funding_rate/funding_timestamp are diagnostic-only corroboration for FundingSettlementEvidenceV1; this source is explicitly non-canonical for realized settlement per r1_source_precedence_freeze.json",
+      "information_loss_treatment": "see r1_information_loss_ledger_v1.json:funding_stream_fields"
+    },
+    "bybit_instruments_info_current_v1": {
+      "status": "KNOWN_VALID_SCHEMA_VARIANT",
+      "field_set": ["symbolId", "status", "contractType", "launchTime", "deliveryTime", "fundingInterval"],
+      "evidence": "experiments/data/r1_semantic_issue_ledger.json:current_metadata_audit (sha256 e3093f1ed6be586719f773df24ce6f2cd19146283f53beb5aa619fdf567daef3) and r1_data_source_qualification.json:sources.bybit",
+      "normalization_mapping": "CURRENT_STATE_ONLY per r1_identity_model_red_team_audit.json:source_semantics; never bound to a historical evidence record",
+      "information_loss_treatment": "see r1_information_loss_ledger_v1.json:current_metadata_fields"
+    }
+  },
+  "unknown_schema_variants": [],
+  "invalid_schema_variants": [],
+  "policy": "A variant absent from known_schema_variants at ingest time is UNKNOWN_SCHEMA and triggers SCHEMA_MISMATCH (fail-closed raw retention), never a best-effort parse against the nearest known variant."
+}

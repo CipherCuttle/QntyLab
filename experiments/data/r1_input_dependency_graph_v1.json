@@ -1,0 +1,91 @@
+{
+  "artifact": "r1_input_dependency_graph_v1",
+  "outcome_embargo": true,
+  "cutoff_utc": "2026-06-30T23:59:59Z",
+  "bound_to_checkpoint_sha256": "80ed752c7ea003ba354fe7f64c7f04eac300405ca4d60c6b5334cea95d1d50b0",
+  "hypotheses_covered_symmetrically": ["R1-H012-30d", "R1-H012-90d", "R1-H014-24h", "R1-H014-7d"],
+  "authoritative_locked_source": "experiments/specs/sprint_v2_pre_outcome_semantic_closure_001.json (git-tracked, pre-existing commit efdb8a4)",
+  "operations": [
+    {
+      "operation": "point_in_time_universe_selection",
+      "shared_by": ["R1-H012-30d", "R1-H012-90d", "R1-H014-24h", "R1-H014-7d"],
+      "required_information": ["90 trailing finite daily closes", "30 trailing finite daily quote-turnover days", "trailing 30-day median quote turnover", "descending liquidity rank", "lexicographic symbol tie-break", "top_n=20", "minimum_breadth=10"],
+      "normalized_primitive_fields": ["DailyMarketEvidenceV1.close", "DailyMarketEvidenceV1.quote_turnover", "DailyMarketEvidenceV1.utc_date", "LifecycleEvidenceV1.state"],
+      "raw_source_derivation": "close and quote_turnover are derived per r1_source_precedence_freeze.json daily_close/quote_turnover rules from canonical unique Bybit historical trades for the UTC day",
+      "timing_rule": "decision at UTC daily close t; only trailing (t-89..t) close days and (t-29..t) turnover days already materialized may be consulted",
+      "missingness_behavior": "a missing required trailing day makes the symbol ineligible at t (fails the 90/30 finite-day rule); it is never imputed or forward-filled",
+      "provenance_source": "experiments/specs/sprint_v2_pre_outcome_semantic_closure_001.json:preserved_parameters.universe; qntylab/r1_input_bom.py:input_requirements()",
+      "known_open_issue": "r1_semantic_issue_ledger.json:PIT-DAILY-BREADTH-UNMATERIALIZED (BLOCKING_AMBIGUITY) -- whether breadth>=10 actually holds on >=90% of candidate dates over the full acquired population is UNPROVEN; this is a population-materialization proof deferred to the acquisition/reservoir gaps, not a gap in this schema"
+    },
+    {
+      "operation": "H012_momentum_score",
+      "shared_by": ["R1-H012-30d", "R1-H012-90d"],
+      "required_information": ["close[t]", "close[t-lookback]"],
+      "normalized_primitive_fields": ["DailyMarketEvidenceV1.close"],
+      "raw_source_derivation": "last qualifying trade by UTC event timestamp, then immutable trade identity (r1_source_precedence_freeze.json:daily_close)",
+      "timing_rule": "score at t requires both close[t] and close[t-lookback] finite; lookback = 30d or 90d",
+      "missingness_behavior": "no score exists before its complete lookback; a missing endpoint close makes the score non-finite and the name is excluded from ranking that day only (does not change universe membership)",
+      "provenance_source": "experiments/specs/sprint_v2_pre_outcome_semantic_closure_001.json:semantic_closure_matrix[factor scores]"
+    },
+    {
+      "operation": "H014_funding_score",
+      "shared_by": ["R1-H014-24h", "R1-H014-7d"],
+      "required_information": ["every settled funding event dated in the inclusive UTC daily window ending t (1 day for 24h, 7 days for 7d)"],
+      "normalized_primitive_fields": ["FundingSettlementEvidenceV1.settlement_timestamp_utc", "FundingSettlementEvidenceV1.realized_funding_rate", "FundingSettlementEvidenceV1.assignment_state"],
+      "raw_source_derivation": "official realized Bybit funding-history observation only; never predicted_funding_rate, never a projection from current fundingInterval (r1_source_precedence_freeze.json:funding_settlement, funding_timestamp)",
+      "timing_rule": "score requires every daily cell in the window to be present; window is (t-lookback, t] inclusive of settlement timestamps",
+      "missingness_behavior": "any missing settled event in the required window makes the score unavailable that day; no imputed cashflow, reported as missing (matches downstream funding-economics rule in the same closure spec)",
+      "provenance_source": "experiments/specs/sprint_v2_pre_outcome_semantic_closure_001.json:semantic_closure_matrix[factor scores, funding economics]; r1_source_precedence_freeze.json"
+    },
+    {
+      "operation": "funding_alignment",
+      "shared_by": ["R1-H014-24h", "R1-H014-7d"],
+      "required_information": ["settlement_timestamp carried by the realized funding observation", "instrument_instance identity to prevent cross-lineage assignment"],
+      "normalized_primitive_fields": ["FundingSettlementEvidenceV1.settlement_timestamp_utc", "FundingSettlementEvidenceV1.assignment_state"],
+      "raw_source_derivation": "GET /v5/market/funding/history?category=linear&symbol=<symbol>, segmented in inclusive UTC ranges of at most 60 days, recursively bisected below the 200-row page cap (qntylab/r1_input_bom.py:funding_request_rule)",
+      "timing_rule": "conflict_rule (r1_source_precedence_freeze.json): non-identical duplicate funding settlements at the same timestamp are fail-closed, never silently merged",
+      "missingness_behavior": "assignment_state=UNASSIGNED_AMBIGUOUS when instrument identity is IDENTITY_AMBIGUOUS (r1_semantic_issue_ledger.json:identity_reuse_candidates); such events are not attributed to either candidate lineage",
+      "provenance_source": "r1_source_precedence_freeze.json; experiments/data/r1_semantic_issue_ledger.json"
+    },
+    {
+      "operation": "lifecycle_assignment",
+      "shared_by": ["R1-H012-30d", "R1-H012-90d", "R1-H014-24h", "R1-H014-7d"],
+      "required_information": ["state transitions among UNKNOWN/PRELAUNCH/OBSERVED_NOT_ELIGIBLE/TRADABLE/TEMPORARILY_UNOBSERVABLE/TERMINATED_VERIFIED/TERMINATED_AMBIGUOUS", "terminal evidence grade"],
+      "normalized_primitive_fields": ["LifecycleEvidenceV1.state", "LifecycleEvidenceV1.terminal_state", "LifecycleEvidenceV1.terminal_evidence_grade"],
+      "raw_source_derivation": "timestamped official lifecycle/delisting evidence (GRADE_A), qualified contemporaneous capture (GRADE_B), last observation/disappearance only (GRADE_C), or contradictory (GRADE_X) -- per r1_lifecycle_contract.json:evidence_grades",
+      "timing_rule": "cutoff_utc=2026-06-30T23:59:59Z; no event/observation timestamp after cutoff may be consulted",
+      "missingness_behavior": "GRADE_C/GRADE_X exposed terminal is BLOCKED_BY_DATA_INTEGRITY, not silently resolved; ambiguous-unexposed instances are removed after their last verified tradable state (r1_lifecycle_contract.json:terminal_policy)",
+      "provenance_source": "experiments/data/r1_lifecycle_contract.json; qntylab/lifecycle.py"
+    },
+    {
+      "operation": "gap_classification",
+      "shared_by": ["R1-H012-30d", "R1-H012-90d", "R1-H014-24h", "R1-H014-7d"],
+      "required_information": ["gap_class enum value", "evidence grade for the gap"],
+      "normalized_primitive_fields": ["GapEvidenceV1.gap_class", "GapEvidenceV1.evidence_grade"],
+      "raw_source_derivation": "timestamped exchange/vendor incident or preserved observation sequence; fallback UNKNOWN (r1_source_precedence_freeze.json:gap_classification)",
+      "timing_rule": "gaps are explicit and non-tradable (r1_ingest_contract.json:structural_gates)",
+      "missingness_behavior": "archive/API absence is never turned into a terminal event; a leg earns zero price return and reports a forced-close flag rather than bridging a gap (sprint_v2_pre_outcome_semantic_closure_001.json:daily execution and gaps)",
+      "provenance_source": "experiments/data/r1_lifecycle_contract.json; experiments/specs/sprint_v2_pre_outcome_semantic_closure_001.json"
+    },
+    {
+      "operation": "candidate_date_breadth_gate",
+      "shared_by": ["R1-H012-30d", "R1-H012-90d", "R1-H014-24h", "R1-H014-7d"],
+      "required_information": ["count of PIT-eligible symbols on date t", "minimum_breadth=10"],
+      "normalized_primitive_fields": ["DailyMarketEvidenceV1.close", "DailyMarketEvidenceV1.quote_turnover", "LifecycleEvidenceV1.state"],
+      "raw_source_derivation": "derived count, not a raw field; requires no field beyond the PIT universe selection inputs above",
+      "timing_rule": "same as point_in_time_universe_selection",
+      "missingness_behavior": "n<10 eligible names on date t means no book forms that day (n>=10 and n>=2k required per sprint_v2_pre_outcome_semantic_closure_001.json:ranking and buckets); this is a reporting outcome of the gate, not a missing-field condition",
+      "provenance_source": "experiments/specs/sprint_v2_pre_outcome_semantic_closure_001.json:preserved_parameters.universe"
+    },
+    {
+      "operation": "cost_execution_input_preparation",
+      "shared_by": ["R1-H012-30d", "R1-H012-90d", "R1-H014-24h", "R1-H014-7d"],
+      "required_information": ["close[t]", "close[t+1]", "adjacent UTC calendar date continuity"],
+      "normalized_primitive_fields": ["DailyMarketEvidenceV1.close", "DailyMarketEvidenceV1.utc_date"],
+      "raw_source_derivation": "same daily_close derivation as above; no additional raw market field is required for turnover-based cost application (cost_bps applied to abs(weight_new-weight_old), which needs no market field at all)",
+      "timing_rule": "a leg earns a price return only when both closes are finite and adjacent ledger dates are consecutive UTC calendar dates",
+      "missingness_behavior": "otherwise it earns zero price return and its forced-close flag is reported; no gap return is bridged",
+      "provenance_source": "experiments/specs/sprint_v2_pre_outcome_semantic_closure_001.json:semantic_closure_matrix[daily execution and gaps, costs]"
+    }
+  ]
+}

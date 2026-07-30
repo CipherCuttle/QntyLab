@@ -1,0 +1,101 @@
+{
+  "artifact": "r1_parser_b_canonical_serialization_repair_v1",
+  "outcome_embargo": true,
+  "task": "Repair of two attributable counterexamples (CX-1, CX-2) found by an independent NEW CHAT review of commit 220d59b, which falsified the R1_PARSER_B_NUMERIC_CONTRACT_REPAIRED verdict and returned BLOCKED_BY_CANONICAL_SERIALIZATION",
+  "repaired_commit_under_review_sha": "220d59b",
+  "independent_review_confirmed_sound": [
+    "all six canonical numeric fields (open, high, low, close, base_volume, quote_turnover) are Decimal end-to-end",
+    "the original float64 quote_turnover corruption is fixed",
+    "Parser A remains untouched",
+    "Parser A/B agree on all 5 real cached objects",
+    "exactness passed independent Decimal-oracle adversaries",
+    "raw-deletion firewall and outcome embargo remain intact"
+  ],
+  "not_reopened": [
+    "broader numeric design",
+    "float timestamp binding (pre-existing/shared)",
+    "NaN / Infinity general handling policy (pre-existing/shared; only the sNaN escape-to-uncaught-exception path is repaired here, quiet NaN/Infinity behavior is unchanged)",
+    "Decimal default precision context ceiling",
+    "exponent-form serialization ambiguity"
+  ],
+  "counterexamples": [
+    {
+      "id": "CX-1",
+      "name": "BLOCKING_CANONICAL_BYTE_NONDETERMINISM",
+      "reported_shape": "two rows, same trdMatchID/timestamp, numerically equal price/size spelled at different decimal scale (e.g. price '1.1' vs '1.10', size '2' vs '2.00')",
+      "reproduced_pre_repair": "confirmed: reversing raw row order changed close ('1.1' vs '1.10'), quote_turnover ('2.2' vs '2.2000'), and base_volume ('2' vs '2.00') for the identical logical dataset",
+      "root_cause": "qntylab/r1_retention_candidate.py:daily_primitive grouped duplicate rows by trdMatchID correctly, but retained `group[0]` -- whichever row happened to be first in `valid_rows`, which preserves raw input order -- as the surviving representative, before any canonical sort",
+      "frozen_duplicate_contract_consulted": {
+        "duplicate_identity": "r1_normalized_evidence_contract_v1.json:DailyMarketEvidenceV1.close.duplicate_semantics -- \"identical trade id/timestamp/price/size\"",
+        "numeric_equality": "Decimal value equality, not string-spelling equality (Decimal('1.1') == Decimal('1.10') is True in Python; verified empirically)",
+        "row_order_invariance": "implementation property claimed by the prior repair (r1_parser_b_numeric_conformance_repair_v1.json:row_order_invariance_preserved), not itself a written field in the frozen contract",
+        "canonical_serialization": "no frozen artifact specifies a tie-break rule among textually-different, numerically-equal spellings for the SAME duplicate group -- this is exactly the gap CX-1 identifies, not a case the frozen contract already resolved",
+        "conclusion": "no frozen semantic is contradicted by choosing a neutral, content-derived tie-break; none is contradicted by leaving Parser A unchanged either, since the frozen contract does not mandate a specific representative-selection rule"
+      },
+      "representative_selection_rule": "min(group, key=lambda row: (str(row.price), str(row.size))) -- the lexicographically smallest (price string, size string) pair among the group's members. All candidates are numerically equal by construction (that is the definition of a non-conflicting duplicate group), so this changes no numeric value; it is a pure function of the group's own content, not of arrival order, so it is invariant under any permutation of the raw input rows. side/tickDirection are never part of any canonical output field (both INTENTIONALLY_DISCARDED per r1_information_loss_ledger_v1.json), so no tie-break is needed for them.",
+      "repair_location": "qntylab/r1_retention_candidate.py: new function _canonical_duplicate_representative(group), used in place of `group[0]` at the non-conflicting-duplicate branch of daily_primitive's duplicate-classification loop",
+      "verification": "tests/test_r1_retention_candidate_canonical_repair_v1.py -- direct order-reversal fixtures for price-only and size-only mixed-scale duplicates, the exact reported two-field example, a mixed-scale-duplicate-plus-ordinary-trade fixture checked across all 3! row permutations, explicit canonical_hash equality (not just numeric/dict equality), and a dedicated exhaustive permutation property test (4 rows including one mixed-scale duplicate pair) requiring exactly one canonical byte result across all 24 permutations"
+    },
+    {
+      "id": "CX-2",
+      "name": "DIAGNOSTIC_FLOAT_CAST_ESCAPES_FAIL_CLOSED_PARSING",
+      "reported_shape": "price = sNaN (a signaling NaN token that decimal.Decimal() accepts without error but float() raises on)",
+      "reproduced_pre_repair": "confirmed: daily_primitive raised an uncaught ValueError ('cannot convert signaling NaN to float') from the redundant-field diagnostic's float(price) cast, which sits outside the row's protected try/except",
+      "root_cause": "the 220d59b numeric repair moved size/price parsing from float() (which raises ValueError on 'sNaN', so the row was rejected inside the protected try/except) to Decimal() (which constructs an sNaN Decimal without raising), but the diagnostic cross-check still called float(size)/float(price) on the resulting Decimal values, outside any protection",
+      "why_a_bare_try_except_around_only_the_diagnostic_is_insufficient": "verified empirically: an sNaN Decimal allowed to reach the row's canonical tuple would later crash sum()/max() over `parsed` (decimal.InvalidOperation, uncaught) during OHLC/turnover aggregation -- guarding only the diagnostic call would merely relocate the same class of crash to a different line, not fix it",
+      "repair": "the diagnostic float() conversion now executes inside the same try/except that already protects the rest of the row's parse (catching ValueError, among others already caught: KeyError, InvalidOperation); on failure the row is rejected via the existing ANOMALY_PARSE_REJECTION path -- the same controlled outcome (trade_count=0 for a single-row day, close=None, rejected_row_count incremented) as the pre-Decimal-migration behavior for this input, and the row is excluded from valid_rows entirely so it cannot reach later aggregation",
+      "scope_boundary": "quiet NaN and Infinity tokens are unaffected by this repair (Decimal(\"nan\")/Decimal(\"inf\") construct without error and float() of a quiet NaN/Infinity also succeeds without error, so they do not hit this code path at all); their general handling remains the pre-existing, explicitly out-of-scope, shared-with-Parser-A behavior",
+      "verification": "tests/test_r1_retention_candidate_canonical_repair_v1.py -- sNaN price and sNaN size each produce controlled rejection (no exception, trade_count=0, ANOMALY_PARSE_REJECTION present), a malformed row does not prevent an ordinary sibling row in the same object from parsing, and an ordinary valid row's canonical output is unaffected by the guard"
+    }
+  ],
+  "parser_a_finding_not_fixed_here": {
+    "observation": "qntylab/r1_reference_parser.py's parse_daily_object has the identical `group[0]`-before-canonical-sort representative selection for non-conflicting duplicate groups, and was empirically confirmed to exhibit the same order-dependent spelling behavior as CX-1 on the identical synthetic mixed-scale-duplicate fixture (close '1.1' vs '1.10', quote_turnover '2.2' vs '2.2000', base_volume '2' vs '2.00' depending on raw row order)",
+  "why_this_is_reported_not_fixed": "the task's hard scope requires Parser A to remain byte-identical, and explicitly anticipates this exact situation: 'if the new deterministic spelling rule produces a Parser A/B difference only in a synthetic scale-different duplicate case, do NOT automatically rewrite Parser A. First determine which behavior the frozen contract requires.' No frozen contract artifact mandates a specific duplicate-spelling tie-break rule (see CX-1's frozen_duplicate_contract_consulted above), so this is not a frozen-contract contradiction requiring a STOP -- it is a shared, pre-existing, real-corpus-unexercised latent property, now made visible only because this task added a permutation property test that specifically targets it",
+    "real_corpus_impact": "none observed: tests/test_r1_parser_a_vs_b_cross_validation.py::test_real_objects_agree_on_core_aggregates (all 5 real cached objects) still passes unchanged after this repair -- none of the 5 real cached objects contains a duplicate group with mixed-scale spellings",
+    "disposition": "left unmodified, per explicit instruction; flagged here for the next reviewer/task to decide whether Parser A itself should ever be updated"
+  },
+  "frozen_input_contract_sha256": {
+    "r1_normalized_evidence_contract_v1.json": "c199b9481285d80b34183b8a7681f75ef7e60e5aadad6e4e0ece3ef8f33d6c92",
+    "r1_source_precedence_freeze.json": "25b03b648774e49b04110f28637466494d35ace27ab6b210053af9224d29c51f",
+    "r1_information_loss_ledger_v1.json": "7590ea9dd60b961dfc2fb64c5b099089662d6dead4c1cb3f91d3b87d67c5df02",
+    "r1_source_schema_registry_v1.json": "02d2a75cdaa3d53a2708d2d20d5bf19f934fc68e6ee1b942404994d80ab94c4d",
+    "r1_ingest_contract.json": "b82bbc464784faf220fcb694d60c26122d6098905ea09e95ef7484962cf0bca0",
+    "verified": "recomputed independently against the working tree at repair time; git diff HEAD on all five files is empty"
+  },
+  "parser_b_module": "qntylab/r1_retention_candidate.py",
+  "parser_b_pre_repair_implementation_sha256_as_of_220d59b": "46b42c4f9118faf3f19920beb8e55e2499cee60198f798cc2f7529b30e1053fc",
+  "parser_b_post_repair_implementation_sha256": "cfa829c7e28a658258cf31d768c7685c5a6e0cad0c04c75a1fb3faaba0e685c6",
+  "parser_a_integrity": "qntylab/r1_reference_parser.py and tests/test_r1_reference_parser.py are byte-unmodified by this task (git diff HEAD is empty for both)",
+  "frozen_contract_integrity": "all five frozen input-contract artifacts listed above are byte-unmodified by this task (git diff HEAD is empty for all five)",
+  "raw_deletion_authorized": false,
+  "outcome_embargo_verified": "no H012/H014 value, factor rank, weight, forward return, PnL, IC, Sharpe, or weekly/null/replication outcome was computed, inspected, or referenced by this task",
+  "new_test_file": "tests/test_r1_retention_candidate_canonical_repair_v1.py",
+  "new_test_module_sha256": "61b3a7fe2904b189c1c220ebe167a2e2d3ce2ecee8f4e38ca2b19c0d752f3ad4",
+  "regression_ids": {
+    "new_tests": [
+      "test_cx1_mixed_scale_price_duplicate_is_order_invariant",
+      "test_cx1_mixed_scale_size_duplicate_is_order_invariant",
+      "test_cx1_reported_example_price_and_size_both_mixed_scale",
+      "test_cx1_mixed_scale_duplicate_plus_ordinary_trade_all_permutations",
+      "test_cx1_canonical_hash_invariant_not_only_numeric_value",
+      "test_exact_textual_duplicate_behavior_unchanged",
+      "test_conflicting_duplicate_still_fails_closed_and_order_invariant",
+      "test_side_only_and_tickdirection_only_duplicate_behavior_unaffected",
+      "test_cx2_snan_price_no_longer_raises_uncaught_exception",
+      "test_cx2_snan_price_produces_controlled_rejection",
+      "test_cx2_snan_size_also_produces_controlled_rejection",
+      "test_cx2_snan_row_does_not_prevent_other_rows_in_same_object_from_parsing",
+      "test_cx2_diagnostic_remains_noncanonical_and_nonbinding_on_ordinary_rows",
+      "test_property_permutation_invariance_with_mixed_scale_duplicates_and_ordinary_trades"
+    ],
+    "no_existing_test_files_modified": true
+  },
+  "row_order_invariance_preserved": "true, now proven by a mixed-scale-duplicate regression (previously the claim of the same name in r1_parser_b_numeric_conformance_repair_v1.json was not exercised by any test containing a duplicate group with differently-spelled numerically-equal members -- that is precisely the gap the independent review found)",
+  "verify": {
+    "collect_exit": 0,
+    "pytest_exit": 0,
+    "diff_check_exit": 0,
+    "total_tests_post_repair": 184
+  },
+  "verdict": "R1_PARSER_B_CANONICAL_SERIALIZATION_REPAIRED_PENDING_REVIEW"
+}

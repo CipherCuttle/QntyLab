@@ -100,6 +100,24 @@ def _size_stratum(byte_size: int) -> str:
     return "gte_100mb"
 
 
+def _canonical_duplicate_representative(group: list[tuple]) -> tuple:
+    """Deterministic, row-order-independent choice among rows the group has
+    already established are the same logical trade (identical trdMatchID,
+    numerically equal timestamp/size/price -- Decimal("1.1")==Decimal("1.10")
+    -- per the frozen duplicate definition). Different textual scales of an
+    equal value (e.g. "1.1" vs "1.10", "2" vs "2.00") are not distinguished
+    by the frozen contract, so the tie-break is a neutral, content-derived
+    rule rather than "whichever row the raw feed happened to list first":
+    the lexicographically smallest (price string, size string) pair. This
+    changes no numeric value (all candidates are equal by construction) and
+    is a pure function of the group's own content, so any permutation of the
+    input rows yields the identical representative and therefore identical
+    canonical bytes. `side`/`tickDirection` never reach a canonical output
+    field (both INTENTIONALLY_DISCARDED per r1_information_loss_ledger_v1.json),
+    so they need no tie-break of their own."""
+    return min(group, key=lambda g: (str(g[3]), str(g[2])))
+
+
 def daily_primitive(*, stream_id: str, utc_date: str, header: tuple[str, ...],
                      rows: list[dict[str, str]], historical_cutoff_utc: str) -> tuple[dict, list[str]]:
     """Build the strategy-independent daily forensic primitive for one
@@ -140,7 +158,23 @@ def daily_primitive(*, stream_id: str, utc_date: str, header: tuple[str, ...],
         # "preserve source string precision" for open/high/low/close). The
         # redundant-field cross-check is a diagnostic only, not a canonical
         # DailyMarketEvidenceV1 field, and stays float/tolerance-based.
-        if not redundant_fields_consistent(size=float(size), price=float(price), home=home, foreign=foreign, gross=gross):
+        #
+        # Decimal(row["size"])/Decimal(row["price"]) above accept tokens
+        # (e.g. "sNaN") that are not usable numbers even though they parse
+        # without error; float() of such a Decimal raises, and so would the
+        # later Decimal sum()/max() aggregation over `parsed` if such a value
+        # were allowed through. The diagnostic float() conversion is guarded
+        # here and, on failure, the row is rejected via the same controlled
+        # PARSE_REJECTION path as any other malformed row (matching the
+        # pre-Decimal-migration behavior for this input) rather than letting
+        # an unusable value reach canonical aggregation.
+        try:
+            diagnostic_ok = redundant_fields_consistent(size=float(size), price=float(price), home=home, foreign=foreign, gross=gross)
+        except (ValueError, OverflowError):
+            anomalies.append(ANOMALY_PARSE_REJECTION)
+            rejected += 1
+            continue
+        if not diagnostic_ok:
             anomalies.append(ANOMALY_REDUNDANT_FIELD_MISMATCH)
         valid_rows.append((ts, side, size, price, tickdir, trdid))
 
@@ -167,7 +201,7 @@ def daily_primitive(*, stream_id: str, utc_date: str, header: tuple[str, ...],
             continue
         distinct = {(g[0], g[2], g[3]) for g in group}  # (timestamp, size, price)
         if len(distinct) == 1:
-            parsed.append(group[0])
+            parsed.append(_canonical_duplicate_representative(group))
             duplicate_count += len(group) - 1
             anomalies.append(ANOMALY_DUPLICATE_UNEXPECTED)
         else:

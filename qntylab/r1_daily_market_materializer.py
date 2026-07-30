@@ -24,9 +24,9 @@ owns on its own:
      It asserts no scientific-consistency rule beyond what that contract text
      itself states.
 
-  3. converting container-level corruption (gzip corruption, structurally
-     truncated CSV) into the already-frozen CONTAINER_ANOMALY /
-     RAW_QUARANTINED_ANOMALY vocabulary
+  3. converting container-level corruption (gzip corruption, invalid-UTF-8
+     decompressed body, structurally truncated CSV) into the already-frozen
+     CONTAINER_ANOMALY / RAW_QUARANTINED_ANOMALY vocabulary
      (qntylab.r1_retention_candidate.ANOMALY_CONTAINER is already declared,
      and listed in experiments/data/r1_bounded_evidence_retention_candidate_v1.json
      :anomaly_triggers, but was never wired to any raising code path) instead
@@ -35,6 +35,20 @@ owns on its own:
      path, which does not decompress/parse CSV itself -- escape as an
      uncaught, batch-terminating exception. No new contract-visible status
      name is introduced by this module.
+
+     Note on UnicodeDecodeError specifically: qntylab.r1_reference_parser's
+     own _decompress() calls .decode("utf-8", errors="strict") outside its
+     GzipCorruptionError try/except, so a gzip-valid object whose
+     decompressed body is not valid UTF-8 raises a bare UnicodeDecodeError
+     out of rp.parse_daily_object(), not a GzipCorruptionError. This module
+     does not edit r1_reference_parser.py to fix that internally; instead
+     materialize_parser_a() additionally catches UnicodeDecodeError at its
+     own call site and maps it to the same CONTAINER_ANOMALY outcome, so
+     both parser paths reach the identical typed quarantine for the
+     identical raw-object corruption despite that difference in Parser A's
+     internal exception-wrapping. This is a boundary-level compensation for
+     an already-reachable Parser A gap, not a new exception class invented
+     by this module and not a change to Parser A's own file.
 
 Independence: this module calls both parsers but does not let either parser
 call the other, and performs no semantic parsing itself (only raw-hash
@@ -202,8 +216,18 @@ def materialize_parser_a(raw_bytes: bytes, expected_utc_date: date, instrument_i
     """Parser A path. parse_daily_object already embeds source_object_sha256
     in its own record; this boundary independently recomputes sha256(raw_bytes)
     (never trusting the embedded value alone), requires exact equality, and
-    converts any container-level exception into a typed quarantine result
-    instead of letting it escape."""
+    converts exactly the three explicitly-authorized, reachable
+    container-corruption failure classes into a typed CONTAINER_ANOMALY
+    quarantine result instead of letting them escape:
+    rp.GzipCorruptionError, rp.TruncatedCSVError (both raised inside
+    rp.parse_daily_object itself), and UnicodeDecodeError (raised by
+    rp.parse_daily_object's internal call to
+    r1_reference_parser._decompress(), whose final .decode("utf-8",
+    errors="strict") is not itself wrapped in that function's own
+    GzipCorruptionError try/except -- see module docstring). This is a
+    fixed, narrow tuple, not a bare `except Exception`: any other exception
+    (a genuine programming error, not an authorized object-corruption
+    class) still propagates uncaught, exactly as before."""
     raw_sha = sha256(raw_bytes).hexdigest()
 
     if expected_raw_sha256 is not None and expected_raw_sha256 != raw_sha:
@@ -215,7 +239,7 @@ def materialize_parser_a(raw_bytes: bytes, expected_utc_date: date, instrument_i
 
     try:
         result = rp.parse_daily_object(raw_bytes, expected_utc_date, instrument_instance_id)
-    except (rp.GzipCorruptionError, rp.TruncatedCSVError) as exc:
+    except (rp.GzipCorruptionError, rp.TruncatedCSVError, UnicodeDecodeError) as exc:
         return MaterializationResult(
             status=MATERIALIZATION_QUARANTINED, parser="A", raw_object_sha256=raw_sha,
             anomalies=[rc.ANOMALY_CONTAINER],
@@ -253,14 +277,21 @@ def materialize_parser_a(raw_bytes: bytes, expected_utc_date: date, instrument_i
 
 
 def _decode_container(raw_bytes: bytes) -> tuple[str, list[str]]:
-    """Mirrors qntylab.r1_reference_parser.parse_daily_object's own
-    container-decoding classification exactly (same exception classes, same
-    len/line/column thresholds), so the Parser B path is held to the
-    identical definition of 'structurally corrupt' as Parser A -- not a new,
-    separately-invented one. Raises rp.GzipCorruptionError / TruncatedCSVError
-    (Parser A's own already-defined exception types) on failure; callers of
-    this helper are expected to catch them, exactly as materialize_parser_a
-    does for Parser A itself."""
+    """Reaches the identical *outcome* classification as
+    qntylab.r1_reference_parser.parse_daily_object (same len/line/column
+    thresholds; the same three raw-object shapes end up quarantined:
+    invalid gzip, invalid-UTF-8 decompressed body, and a missing/too-short
+    CSV header) -- not the identical internal exception path. Parser A's
+    own _decompress() lets an invalid-UTF-8 body escape as a bare
+    UnicodeDecodeError instead of wrapping it in GzipCorruptionError (see
+    module docstring); this helper instead wraps that case as
+    GzipCorruptionError directly, at decode time. Raises
+    rp.GzipCorruptionError / TruncatedCSVError (Parser A's own
+    already-defined exception types) on failure; callers of this helper are
+    expected to catch them, exactly as materialize_parser_a does for Parser
+    A itself (materialize_parser_a additionally catches UnicodeDecodeError
+    directly, to compensate for Parser A's own un-wrapped case rather than
+    editing r1_reference_parser.py)."""
     try:
         text = gzip.decompress(raw_bytes).decode("utf-8", errors="strict")
     except (gzip.BadGzipFile, OSError, EOFError, zlib.error, UnicodeDecodeError) as exc:

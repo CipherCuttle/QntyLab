@@ -8,6 +8,18 @@ independent NEW CHAT review of commit 1d52ec1 established as open:
   2. GzipCorruptionError / TruncatedCSVError escaped as uncaught, per-object,
      batch-terminating exceptions instead of a typed fail-closed result.
 
+A subsequent independent NEW CHAT review of the first repair attempt
+(commit c90c54b) found that (2) was only partially closed: a gzip-valid
+object whose decompressed body is not valid UTF-8 raises a bare
+UnicodeDecodeError out of rp.parse_daily_object() (Parser A's own
+_decompress() does not wrap that specific case in GzipCorruptionError), and
+materialize_parser_a() did not catch it -- so it still escaped and still
+terminated materialize_batch() before later objects were attempted. The
+tests from "gzip-valid invalid utf8 body" onward close that specific gap and
+verify batch isolation directly (not just the isolated per-object
+functions), while two narrow-catch safety tests confirm this fix did not
+widen into a generic `except Exception`.
+
 This module makes no scientific decision: it does not touch OHLC, duplicate,
 timestamp, or event-order logic in either parser. Those remain covered by
 their own existing, unmodified test files, re-run here only as a regression
@@ -221,6 +233,24 @@ def test_gzip_valid_truncated_one_column_header_typed_quarantine_both_parsers():
     assert "CONTAINER_ANOMALY" in b.anomalies
 
 
+def test_gzip_valid_invalid_utf8_body_typed_quarantine_both_parsers():
+    """Regression for the independent-review blocker on c90c54b: gzip-valid
+    bytes whose decompressed body is not valid UTF-8 raise a bare
+    UnicodeDecodeError out of qntylab.r1_reference_parser.parse_daily_object
+    (its own _decompress() does not wrap this case in GzipCorruptionError --
+    see r1_daily_market_materializer module docstring). Both parser paths
+    must reach the same typed CONTAINER_ANOMALY quarantine as any other
+    container-level corruption, not let the exception escape."""
+    bad_utf8 = b"\xff\xfe\x00invalid utf8 csv content\n"
+    raw = gzip.compress(bad_utf8)
+    a = materialize_parser_a(raw, date(2023, 11, 14), "x")
+    b = materialize_parser_b(raw, "2023-11-14", "s", CUTOFF)
+    assert a.status == b.status == MATERIALIZATION_QUARANTINED
+    assert a.record is None and b.record is None
+    assert "CONTAINER_ANOMALY" in a.anomalies
+    assert "CONTAINER_ANOMALY" in b.anomalies
+
+
 def test_empty_raw_bytes_typed_valid_zero_trade_record_both_parsers():
     a = materialize_parser_a(b"", date(2023, 11, 14), "x")
     b = materialize_parser_b(b"", "2023-11-14", "s", CUTOFF)
@@ -297,6 +327,122 @@ def test_batch_isolation_parser_b():
     results = materialize_batch(items, materialize_parser_b)
     assert [r.status for r in results] == [MATERIALIZED_VALID, MATERIALIZATION_QUARANTINED, MATERIALIZED_VALID]
     assert results[2].record["first_source_trade_id"] == "c-1"
+
+
+def test_batch_isolation_invalid_utf8_valid_corrupt_valid_parser_a():
+    """Direct regression for the reproduced review blocker: previously the
+    bare UnicodeDecodeError from object B escaped materialize_parser_a and
+    terminated materialize_batch's loop before object C was ever attempted."""
+    valid_a = _raw_bytes([_row("1700000000.000", size="1", price="1", trdid="a-1")])
+    bad_utf8 = gzip.compress(b"\xff\xfe\x00invalid utf8 csv content\n")
+    valid_c = _raw_bytes([_row("1700000000.000", size="2", price="2", trdid="c-1")])
+
+    items = [
+        (valid_a, date(2023, 11, 14), "x|A"),
+        (bad_utf8, date(2023, 11, 14), "x|B"),
+        (valid_c, date(2023, 11, 14), "x|C"),
+    ]
+    results = materialize_batch(items, materialize_parser_a)
+
+    assert len(results) == 3, "object C was not attempted -- batch terminated early"
+    assert results[0].status == MATERIALIZED_VALID
+    assert results[1].status == MATERIALIZATION_QUARANTINED
+    assert "CONTAINER_ANOMALY" in results[1].anomalies
+    assert results[2].status == MATERIALIZED_VALID
+    assert results[2].record["first_source_trade_id"] == "c-1"
+
+    valid_count = sum(1 for r in results if r.status == MATERIALIZED_VALID)
+    typed_nonvalid_count = sum(1 for r in results if r.status == MATERIALIZATION_QUARANTINED)
+    assert valid_count + typed_nonvalid_count == len(items) == 3
+
+
+def test_batch_isolation_invalid_utf8_valid_corrupt_valid_parser_b():
+    valid_a = _raw_bytes([_row("1700000000.000", size="1", price="1", trdid="a-1")])
+    bad_utf8 = gzip.compress(b"\xff\xfe\x00invalid utf8 csv content\n")
+    valid_c = _raw_bytes([_row("1700000000.000", size="2", price="2", trdid="c-1")])
+
+    items = [
+        (valid_a, "2023-11-14", "A", CUTOFF),
+        (bad_utf8, "2023-11-14", "B", CUTOFF),
+        (valid_c, "2023-11-14", "C", CUTOFF),
+    ]
+    results = materialize_batch(items, materialize_parser_b)
+    assert len(results) == 3, "object C was not attempted -- batch terminated early"
+    assert [r.status for r in results] == [MATERIALIZED_VALID, MATERIALIZATION_QUARANTINED, MATERIALIZED_VALID]
+    assert "CONTAINER_ANOMALY" in results[1].anomalies
+    assert results[2].record["first_source_trade_id"] == "c-1"
+
+    valid_count = sum(1 for r in results if r.status == MATERIALIZED_VALID)
+    typed_nonvalid_count = sum(1 for r in results if r.status == MATERIALIZATION_QUARANTINED)
+    assert valid_count + typed_nonvalid_count == len(items) == 3
+
+
+def test_batch_isolation_alternating_corrupt_valid_four_objects_both_parsers():
+    """corrupt / valid / corrupt / valid: the second corrupt object (C) must
+    not prevent D from being attempted, for either parser path."""
+    corrupt_a = b"not gzip data at all!!"
+    valid_b = _raw_bytes([_row("1700000000.000", size="1", price="1", trdid="b-1")])
+    corrupt_c = gzip.compress(b"\xff\xfe\x00invalid utf8 csv content\n")
+    valid_d = _raw_bytes([_row("1700000000.000", size="2", price="2", trdid="d-1")])
+
+    a_items = [
+        (corrupt_a, date(2023, 11, 14), "x|A"),
+        (valid_b, date(2023, 11, 14), "x|B"),
+        (corrupt_c, date(2023, 11, 14), "x|C"),
+        (valid_d, date(2023, 11, 14), "x|D"),
+    ]
+    a_results = materialize_batch(a_items, materialize_parser_a)
+    assert len(a_results) == 4, "batch did not run to completion"
+    assert [r.status for r in a_results] == [
+        MATERIALIZATION_QUARANTINED, MATERIALIZED_VALID, MATERIALIZATION_QUARANTINED, MATERIALIZED_VALID,
+    ]
+    assert a_results[3].record["first_source_trade_id"] == "d-1"
+
+    b_items = [
+        (corrupt_a, "2023-11-14", "A", CUTOFF),
+        (valid_b, "2023-11-14", "B", CUTOFF),
+        (corrupt_c, "2023-11-14", "C", CUTOFF),
+        (valid_d, "2023-11-14", "D", CUTOFF),
+    ]
+    b_results = materialize_batch(b_items, materialize_parser_b)
+    assert len(b_results) == 4, "batch did not run to completion"
+    assert [r.status for r in b_results] == [
+        MATERIALIZATION_QUARANTINED, MATERIALIZED_VALID, MATERIALIZATION_QUARANTINED, MATERIALIZED_VALID,
+    ]
+    assert b_results[3].record["first_source_trade_id"] == "d-1"
+
+
+def test_materialize_parser_a_does_not_swallow_unrelated_exceptions(monkeypatch):
+    """Narrow-catch safety: materialize_parser_a must only convert the three
+    explicitly-authorized container-corruption classes (GzipCorruptionError,
+    TruncatedCSVError, UnicodeDecodeError) into CONTAINER_ANOMALY. Any other
+    exception -- e.g. a genuine programming error inside rp.parse_daily_object
+    -- must still propagate uncaught, not be mislabeled as corrupt evidence."""
+    import qntylab.r1_reference_parser as rp
+
+    def _boom(raw_bytes, expected_utc_date, instrument_instance_id):
+        raise RuntimeError("unrelated programming error, not container corruption")
+
+    monkeypatch.setattr(rp, "parse_daily_object", _boom)
+    raw = _raw_bytes([_row("1700000000.000", size="1", price="1", trdid="t-1")])
+    with pytest.raises(RuntimeError, match="unrelated programming error"):
+        materialize_parser_a(raw, date(2023, 11, 14), "x")
+
+
+def test_materialize_parser_b_does_not_swallow_unrelated_exceptions(monkeypatch):
+    """Same narrow-catch safety property for the Parser B path: only
+    rp.GzipCorruptionError / rp.TruncatedCSVError raised by this module's own
+    _decode_container are converted to CONTAINER_ANOMALY; an unrelated
+    exception from rc.daily_primitive itself must still propagate."""
+    import qntylab.r1_retention_candidate as rc_mod
+
+    def _boom(**kwargs):
+        raise RuntimeError("unrelated programming error, not container corruption")
+
+    monkeypatch.setattr(rc_mod, "daily_primitive", _boom)
+    raw = _raw_bytes([_row("1700000000.000", size="1", price="1", trdid="t-1")])
+    with pytest.raises(RuntimeError, match="unrelated programming error"):
+        materialize_parser_b(raw, "2023-11-14", "s", CUTOFF)
 
 
 # --- 17. contract validator used identically on both parsers' output -------

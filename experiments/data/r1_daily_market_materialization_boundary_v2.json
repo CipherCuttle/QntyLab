@@ -1,0 +1,82 @@
+{
+  "artifact": "r1_daily_market_materialization_boundary_v2",
+  "artifact_kind": "MATERIALIZATION_BOUNDARY_RECEIPT",
+  "status": "CANDIDATE_NOT_YET_FROZEN",
+  "self_freeze_authorized": false,
+  "outcome_embargo": true,
+  "raw_deletion_authorized": false,
+  "supersedes": "experiments/data/r1_daily_market_materialization_boundary_v1.json",
+
+  "parent_candidate": {
+    "commit": "c90c54b5dc267abc984c8e13c781c84dd4f5da1e",
+    "v1_receipt_path": "experiments/data/r1_daily_market_materialization_boundary_v1.json",
+    "v1_receipt_sha256_at_this_task_time": "4de2b5cfbacd34d719b6e72f43e94828982f01af38d5428cb27a3650954b4e71",
+    "note": "v1's own bytes/receipt/verdict are NOT erased, edited, or reframed as frozen/passed by this task. v1 remains the historical record of the candidate that independent review blocked; this artifact is a new, additive superseding candidate."
+  },
+
+  "task": "Repair ONLY the invalid-input/batch-isolation defect that an independent NEW CHAT hostile review of commit c90c54b established (BLOCK verdict): a gzip-valid raw object whose decompressed body is not valid UTF-8 raised an uncaught UnicodeDecodeError out of materialize_parser_a(), which terminated materialize_batch() before later objects in the same batch were attempted. Does not touch OHLC, duplicate, timestamp, event-order, schema, or lifecycle logic in either parser; does not repair the separately-noted, still-open unknown-schema A/B divergence.",
+
+  "independent_review_blocker": {
+    "review_verdict": "BLOCK",
+    "reviewed_commit": "c90c54b5dc267abc984c8e13c781c84dd4f5da1e",
+    "reproducer_class": "UnicodeDecodeError",
+    "reproducer": "bad_utf8 = b'\\xff\\xfe\\x00invalid utf8 csv content\\n'; raw = gzip.compress(bad_utf8); materialize_parser_a(raw, date(2023,11,14), 'x') raised UnicodeDecodeError uncaught instead of returning a MaterializationResult",
+    "root_cause": "qntylab/r1_reference_parser.py:_decompress() calls .decode('utf-8', errors='strict') OUTSIDE its own GzipCorruptionError try/except block, so an invalid-UTF-8 decompressed body escapes parse_daily_object() as a bare UnicodeDecodeError rather than being wrapped as GzipCorruptionError. materialize_parser_a() (as introduced by c90c54b) only caught (GzipCorruptionError, TruncatedCSVError), not UnicodeDecodeError.",
+    "batch_isolation_consequence": "in materialize_batch(items, materialize_parser_a), an invalid-UTF-8 object at any position terminated the loop; subsequent valid objects were never attempted -- reproduced directly with a valid/corrupt/valid fixture (object C, which would materialize MATERIALIZED_VALID_RECORD, was never reached).",
+    "parser_b_was_unaffected": "materialize_parser_b's own _decode_container() (introduced by c90c54b) already caught UnicodeDecodeError explicitly and converted it to CONTAINER_ANOMALY; only the Parser A path had the gap.",
+    "reason_c90c54b_was_not_population_ready": "a single corrupted raw object of this shape, encountered anywhere in a real batch materialized through the Parser A path, would silently drop every subsequent object in that batch from the attempted set with no typed record and no exception surfaced to the caller as a per-object failure -- an unacceptable evidence-loss failure mode for population-scale materialization.",
+    "docstring_accuracy_finding": "the review additionally found that _decode_container's docstring claimed to mirror parse_daily_object's own container-decoding classification 'exactly (same exception classes...)', which was not literally true given the root cause above. Corrected in this repair (see below); no semantic behavior claim was walked back, only the exception-class-identity claim."
+  },
+
+  "repair_implementation": {
+    "location": "qntylab/r1_daily_market_materializer.py:materialize_parser_a()",
+    "change": "extended the except tuple around the rp.parse_daily_object(...) call from (rp.GzipCorruptionError, rp.TruncatedCSVError) to (rp.GzipCorruptionError, rp.TruncatedCSVError, UnicodeDecodeError); all three map to the same, already-frozen CONTAINER_ANOMALY / MATERIALIZATION_QUARANTINED_NO_RECORD outcome already used for the other two classes. No new anomaly vocabulary introduced.",
+    "not_a_generic_catch_all": "the except tuple remains a fixed, explicit, three-member list of authorized object-corruption exception classes, not `except Exception`. Verified by two dedicated regression tests (test_materialize_parser_a_does_not_swallow_unrelated_exceptions, test_materialize_parser_b_does_not_swallow_unrelated_exceptions) that monkeypatch the underlying parser call to raise an unrelated RuntimeError and assert it still propagates uncaught through both materialize_parser_a and materialize_parser_b.",
+    "parser_files_not_edited": "qntylab/r1_reference_parser.py and qntylab/r1_retention_candidate.py were NOT modified; their SHA-256 hashes are byte-identical to before this task (see parser_hashes below). The root cause (the un-wrapped .decode() call in r1_reference_parser.py:_decompress) is compensated for at the boundary/call-site level in r1_daily_market_materializer.py, not fixed inside Parser A's own file, per this task's explicit constraint.",
+    "docstrings_corrected": "module docstring (concern #3), materialize_parser_a()'s docstring, and _decode_container()'s docstring were all updated to describe the actual architecture: _decode_container() reaches the identical outcome classification as parse_daily_object but not via an identical internal exception path, because Parser A's own _decompress() leaves the UnicodeDecodeError case un-wrapped; materialize_parser_a() compensates for that specific gap at its own call site rather than claiming exact mirroring.",
+    "source_object_sha256_unchanged": "the source-object provenance implementation (sha256(raw_bytes) computed once, independently re-verified against Parser A's embedded value, bound unconditionally for Parser B) was not touched; this repair did not mechanically require any change to it."
+  },
+
+  "parser_hashes": {
+    "parser_a_sha256": "76bfd763afbce1167ff931b912c7bb12e6c90e4b07d9ef862f6400e14a63823e",
+    "parser_b_sha256": "65aea38964fe18ad702376937aee9caa410125f0b8dd2efbd5833f5219d3f075",
+    "note": "byte-identical to the hashes recorded in v1 and independently reverified by the blocking review; this repair task made zero edits to qntylab/r1_reference_parser.py or qntylab/r1_retention_candidate.py"
+  },
+
+  "frozen_protocol_binding": {
+    "base_contract_sha256": "c199b9481285d80b34183b8a7681f75ef7e60e5aadad6e4e0ece3ef8f33d6c92",
+    "amendment_semantic_content_sha256": "aa732948b19957a2e3fb7cd2ae1905a3b94a902a0200e24e25874f036894adf9",
+    "effective_combined_contract_binding_sha256": "0d0dc12c16535f4ecb06ccfd9b87543862caf7d261cbe8a459d152dee4f493ab",
+    "note": "all three re-verified byte-identical/unchanged before and after this repair task; the amendment_semantic_content_sha256 is the amendment artifact's own self-declared hash over its semantic content, NOT sha256 of the whole r1_normalized_evidence_duplicate_semantics_amendment_v1.json file's raw bytes -- those are different quantities, and this task did not edit that file at all."
+  },
+
+  "materialization_boundary_implementation_sha256": "8230b7eabf1fac17a731dfeaf8331eec06098f441b728c498744edc36b2f610c",
+  "materialization_boundary_test_sha256": "0a380db813c58cd67be77d92bde96fbbdaf1433694f51321d2de9e1e54aa7ac7",
+
+  "invalid_utf8_direct_result": {
+    "input": "gzip.compress(b'\\xff\\xfe\\x00invalid utf8 csv content\\n')",
+    "parser_a": "MATERIALIZATION_QUARANTINED_NO_RECORD, record=None, anomalies=['CONTAINER_ANOMALY']",
+    "parser_b": "MATERIALIZATION_QUARANTINED_NO_RECORD, record=None, anomalies=['CONTAINER_ANOMALY']",
+    "verified": "directly re-executed against the repaired module in this task, not assumed from the test suite alone"
+  },
+
+  "invalid_utf8_batch_isolation_result": {
+    "fixture": "valid A / invalid-UTF-8 B / valid C, both parser paths",
+    "result": "len(results) == 3 for both paths; A and C both MATERIALIZED_VALID_RECORD, B MATERIALIZATION_QUARANTINED_NO_RECORD with CONTAINER_ANOMALY; C's record is demonstrably the correct one (first_source_trade_id == 'c-1'), proving C was actually attempted, not skipped",
+    "extended_fixture": "corrupt A / valid B / corrupt C / valid D, both parser paths: len(results) == 4, D's record correct (first_source_trade_id == 'd-1'), proving processing survives two separate corrupt objects in the same batch",
+    "attempted_accounting": "valid_count + typed_nonvalid_count == len(items) for every fixture above; no silent skip, no double accounting"
+  },
+
+  "no_generic_catch_safety_property": {
+    "claim": "materialize_parser_a and materialize_parser_b each catch only their fixed, explicit, authorized container-corruption exception classes -- never a bare Exception -- so a genuine unrelated programming error is never mislabeled as CONTAINER_ANOMALY quarantine.",
+    "verification_method": "monkeypatched rp.parse_daily_object (for the A path) and rc.daily_primitive (for the B path) to each raise an unrelated RuntimeError, and asserted the RuntimeError propagates uncaught through materialize_parser_a / materialize_parser_b respectively",
+    "result": "confirmed for both paths"
+  },
+
+  "known_out_of_scope_findings_still_open": {
+    "unknown_schema_ab_divergence": "unchanged from v1: Parser A's parse_daily_object returns record=None (total quarantine) for an unregistered column set; Parser B's daily_primitive still computes and returns a populated core record with schema_id=None and a SCHEMA_MISMATCH anomaly for the same input. Not exercised by any of the 5 real cached objects and not this task's scope -- deliberately not repaired here, per this task's explicit instruction not to broaden the repair.",
+    "receipt_precision_overclaim": "unchanged from v1, out of scope."
+  },
+
+  "verdict": "R1_DAILYMARKET_MATERIALIZATION_BOUNDARY_REPAIRED_PENDING_REVIEW"
+}

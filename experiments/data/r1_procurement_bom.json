@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "created_at_utc": "2026-07-29T00:00:00Z",
+  "outcome_embargo": true,
+  "source_cutoff_utc": "2026-06-30T23:59:59Z",
+  "acquisition_start_utc": "2020-05-28T00:00:00Z",
+  "first_possible_evaluation_date_utc": "2020-08-26T00:00:00Z",
+  "minimum_tardis_product": "Professional subscription, Perpetuals data plan, yearly billing or an equivalent one-off quote with CSV plus raw replay and metadata API",
+  "product_status": "CONDITIONAL_NOT_YET_PURCHASE_APPROVED",
+  "required": [
+    {"data_type":"trades","purpose":"derive daily causal close and quote volume from price and amount; retain gaps","access":"normalized CSV"},
+    {"data_type":"derivative_ticker","purpose":"funding rate, next funding timestamp, mark/index corroboration","access":"normalized CSV"},
+    {"data_type":"instrument_info","purpose":"point-in-time identity, status, launch/delivery and symbol-reuse evidence","access":"raw replay only"}
+  ],
+  "useful_corrobators": [
+    {"data_type":"official Bybit instruments/funding history","purpose":"current field semantics and spot checks; not a historical inventory"},
+    {"data_type":"Coin Metrics or Kaiko narrow lifecycle graveyard extract","purpose":"resolve only Grade C/X terminal or reuse conflicts"}
+  ],
+  "not_required": ["aggregated_trades", "OHLCV/candles", "order_book_snapshots", "order_book_deltas", "quotes", "liquidations", "open_interest", "index_price", "mark_price"],
+  "raw_replay_requirement": {"required":true,"scope":"Bybit instrument_info/status only","reason":"normalized CSV catalog has no instrument_info or disconnect events"},
+  "funding_contract": {"primary":"derivative_ticker.funding_rate immediately before derivative_ticker.funding_timestamp","settlement_time":"derivative_ticker.funding_timestamp","interval":"historical instrument_info funding interval; current Bybit instruments field is corroboration only","prohibited_substitute":"predicted_funding_rate"},
+  "lifecycle_purchase_gate": "Before payment, obtain written vendor confirmation and a representative historical Bybit-linear instrument_info sample proving timestamped status and launch/delivery fields for 2020-05-28 through 2026-06-30. If unavailable, do not buy.",
+  "pricing": {"public_verified_date":"2026-07-29","exact_configuration_price":"PRICE_NOT_PUBLIC","public_minimum_order_usd":300,"billing":"yearly needed for 4-year history on Professional; target range is over four years"},
+  "vendor_roles": {"coin_metrics":"OPTIONAL_CORROBORATOR","kaiko":"OPTIONAL_CORROBORATOR"}
+}

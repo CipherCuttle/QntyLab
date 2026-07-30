@@ -1,0 +1,974 @@
+{
+ "artifact": "r1_free_instrument_instances_v1",
+ "outcome_embargo": true,
+ "note": "Bounded, evidence-backed sample, not the full ~967-instance population. Full population counts are in r1_free_ambiguity_census.json.",
+ "instrument_instance_id_scheme": "venue|symbol|contract_type|first_observed_timestamp[|symbol-id=<id>]",
+ "sample_size": 39,
+ "instances": [
+  {
+   "instrument_instance_id": "bybit|ANCUSDT|linearperpetual|2022-03-15T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "ANCUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2022-03-15T00:00:00.000Z",
+   "last_positive_evidence_time": "2022-05-14T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive"
+   ],
+   "market_history_live_kline_api": false,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1648339200000,
+   "funding_last_ts_ms": 1654070400000,
+   "delisting_announcement_matches": [],
+   "terminal_state": "TERMINATED_AMBIGUOUS",
+   "terminal_evidence_grade": "GRADE_C",
+   "identity_confidence": "MEDIUM_GRADE_C_ONLY"
+  },
+  {
+   "instrument_instance_id": "bybit|BTTUSDT|linearperpetual|2021-12-08T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "BTTUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2021-12-08T00:00:00.000Z",
+   "last_positive_evidence_time": "2021-12-29T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive"
+   ],
+   "market_history_live_kline_api": false,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1641254400000,
+   "funding_last_ts_ms": 1644818400000,
+   "delisting_announcement_matches": [],
+   "terminal_state": "TERMINATED_AMBIGUOUS",
+   "terminal_evidence_grade": "GRADE_C",
+   "identity_confidence": "MEDIUM_GRADE_C_ONLY"
+  },
+  {
+   "instrument_instance_id": "bybit|FTTUSDT|linearperpetual|2021-10-12T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "FTTUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2021-10-12T00:00:00.000Z",
+   "last_positive_evidence_time": "2022-11-14T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive",
+    "bybit_delisting_announcement"
+   ],
+   "market_history_live_kline_api": false,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1663401600000,
+   "funding_last_ts_ms": 1668333600000,
+   "delisting_announcement_matches": [
+    {
+     "title": "Updated Delisting Time of FTTUSDT Contract",
+     "url": "https://announcements.bybit.com/en-US/article/updated-delisting-time-of-fttusdt-contract-blt17ad0384b62efb73"
+    },
+    {
+     "title": "Delisting of FTTUSDT Contract",
+     "url": "https://announcements.bybit.com/en-US/article/-fttusdt--blt5563164f37c4453d"
+    },
+    {
+     "title": "Margin Trading: Delisting of FTT",
+     "url": "https://announcements.bybit.com/en-US/article/margin-trading-delisting-of-ftt-blt6ed9a716be58fd03"
+    }
+   ],
+   "terminal_state": "TERMINATED_VERIFIED",
+   "terminal_evidence_grade": "GRADE_A",
+   "identity_confidence": "HIGH"
+  },
+  {
+   "instrument_instance_id": "bybit|GSTUSDT|linearperpetual|2022-05-05T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "GSTUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2022-05-05T00:00:00.000Z",
+   "last_positive_evidence_time": "2022-07-22T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive",
+    "bybit_delisting_announcement"
+   ],
+   "market_history_live_kline_api": false,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1657670400000,
+   "funding_last_ts_ms": 1658386800000,
+   "delisting_announcement_matches": [
+    {
+     "title": "Delisting of TGT, GST, NLK and FIRE",
+     "url": "https://announcements.bybit.com/en-US/article/delisting-of-tgt-gst-nlk-and-fire-blt5dd134cbb77aa21f/"
+    }
+   ],
+   "terminal_state": "TERMINATED_VERIFIED",
+   "terminal_evidence_grade": "GRADE_A",
+   "identity_confidence": "HIGH"
+  },
+  {
+   "instrument_instance_id": "bybit|KEEPUSDT|linearperpetual|2021-11-16T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "KEEPUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2021-11-16T00:00:00.000Z",
+   "last_positive_evidence_time": "2022-02-15T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive"
+   ],
+   "market_history_live_kline_api": false,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1639440000000,
+   "funding_last_ts_ms": 1645171200000,
+   "delisting_announcement_matches": [],
+   "terminal_state": "TERMINATED_AMBIGUOUS",
+   "terminal_evidence_grade": "GRADE_C",
+   "identity_confidence": "MEDIUM_GRADE_C_ONLY"
+  },
+  {
+   "instrument_instance_id": "bybit|LUNAUSDT|linearperpetual|2021-10-11T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "LUNAUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2021-10-11T00:00:00.000Z",
+   "last_positive_evidence_time": "2022-05-13T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive"
+   ],
+   "market_history_live_kline_api": false,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1648310400000,
+   "funding_last_ts_ms": 1654041600000,
+   "delisting_announcement_matches": [],
+   "terminal_state": "TERMINATED_AMBIGUOUS",
+   "terminal_evidence_grade": "GRADE_C",
+   "identity_confidence": "MEDIUM_GRADE_C_ONLY"
+  },
+  {
+   "instrument_instance_id": "bybit|RAYUSDT|linearperpetual|2022-02-15T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "RAYUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2022-02-15T00:00:00.000Z",
+   "last_positive_evidence_time": "2022-11-16T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive",
+    "bybit_delisting_announcement"
+   ],
+   "market_history_live_kline_api": false,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1662739200000,
+   "funding_last_ts_ms": 1668470400000,
+   "delisting_announcement_matches": [
+    {
+     "title": "Delisting of SRMUSDT and RAYUSDT Contracts",
+     "url": "https://announcements.bybit.com/en-US/article/delisting-of-srmusdt-and-rayusdt-contracts-blt865531370ab53688"
+    }
+   ],
+   "terminal_state": "TERMINATED_VERIFIED",
+   "terminal_evidence_grade": "GRADE_A",
+   "identity_confidence": "HIGH"
+  },
+  {
+   "instrument_instance_id": "bybit|SRMUSDT|linearperpetual|2021-10-11T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "SRMUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2021-10-11T00:00:00.000Z",
+   "last_positive_evidence_time": "2022-11-16T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive",
+    "bybit_delisting_announcement"
+   ],
+   "market_history_live_kline_api": false,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1662739200000,
+   "funding_last_ts_ms": 1668470400000,
+   "delisting_announcement_matches": [
+    {
+     "title": "Delisting of OMNICAT, DCR, SRM, CO and STRM",
+     "url": "https://announcements.bybit.com/en-US/article/delisting-of-omnicat-dcr-srm-co-and-strm-bltfe4d2accbf03e615/"
+    },
+    {
+     "title": "Margin Trading: Delisting of SRM",
+     "url": "https://announcements.bybit.com/en-US/article/margin-trading-delisting-of-srm-bltb9f089b8ca6248b8"
+    },
+    {
+     "title": "Delisting of SRMUSDT and RAYUSDT Contracts",
+     "url": "https://announcements.bybit.com/en-US/article/delisting-of-srmusdt-and-rayusdt-contracts-blt865531370ab53688"
+    }
+   ],
+   "terminal_state": "TERMINATED_VERIFIED",
+   "terminal_evidence_grade": "GRADE_A",
+   "identity_confidence": "HIGH"
+  },
+  {
+   "instrument_instance_id": "bybit|USTUSDT|linearperpetual|2022-05-10T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "USTUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2022-05-10T00:00:00.000Z",
+   "last_positive_evidence_time": "2022-05-14T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive"
+   ],
+   "market_history_live_kline_api": false,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1652169600000,
+   "funding_last_ts_ms": 1654041600000,
+   "delisting_announcement_matches": [],
+   "terminal_state": "TERMINATED_AMBIGUOUS",
+   "terminal_evidence_grade": "GRADE_C",
+   "identity_confidence": "MEDIUM_GRADE_C_ONLY"
+  },
+  {
+   "instrument_instance_id": "bybit|1000000VINUUSDT|linearperpetual|2023-11-28T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "1000000VINUUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2023-11-28T00:00:00.000Z",
+   "last_positive_evidence_time": "2024-02-07T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive",
+    "bybit_delisting_announcement"
+   ],
+   "market_history_live_kline_api": false,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1701475200000,
+   "funding_last_ts_ms": 1707206400000,
+   "delisting_announcement_matches": [
+    {
+     "title": "Delisting of WSMUSDT and 1000000VINUUSDT Perpetual Contracts",
+     "url": "https://announcements.bybit.com/en-US/article/bltf5f47a638b73d83a/"
+    }
+   ],
+   "terminal_state": "TERMINATED_VERIFIED",
+   "terminal_evidence_grade": "GRADE_A",
+   "identity_confidence": "HIGH"
+  },
+  {
+   "instrument_instance_id": "bybit|10000NFTUSDT|linearperpetual|2022-01-24T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "10000NFTUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2022-01-24T00:00:00.000Z",
+   "last_positive_evidence_time": "2024-09-19T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive",
+    "bybit_delisting_announcement"
+   ],
+   "market_history_live_kline_api": false,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1720915200000,
+   "funding_last_ts_ms": 1726646400000,
+   "delisting_announcement_matches": [
+    {
+     "title": "Delisting of  10000NFTUSDT Perpetual Contract",
+     "url": "https://announcements.bybit.com/en-US/article/delisting-of-10000nftusdt-perpetual-contract-blta98c927fd4e41c22/"
+    }
+   ],
+   "terminal_state": "TERMINATED_VERIFIED",
+   "terminal_evidence_grade": "GRADE_A",
+   "identity_confidence": "HIGH"
+  },
+  {
+   "instrument_instance_id": "bybit|10000STARLUSDT|linearperpetual|2023-10-20T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "10000STARLUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2023-10-20T00:00:00.000Z",
+   "last_positive_evidence_time": "2024-08-02T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive",
+    "bybit_delisting_announcement"
+   ],
+   "market_history_live_kline_api": false,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1716768000000,
+   "funding_last_ts_ms": 1722499200000,
+   "delisting_announcement_matches": [
+    {
+     "title": "Delisting of 10000STARLUSDT Perpetual Contract",
+     "url": "https://announcements.bybit.com/en-US/article/delisting-of-10000starlusdt-perpetual-contract-blt626e13f38794b072/"
+    }
+   ],
+   "terminal_state": "TERMINATED_VERIFIED",
+   "terminal_evidence_grade": "GRADE_A",
+   "identity_confidence": "HIGH"
+  },
+  {
+   "instrument_instance_id": "bybit|1000BEERUSDT|linearperpetual|2024-05-31T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "1000BEERUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2024-05-31T00:00:00.000Z",
+   "last_positive_evidence_time": "2024-10-23T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive",
+    "bybit_delisting_announcement"
+   ],
+   "market_history_live_kline_api": false,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1723852800000,
+   "funding_last_ts_ms": 1729584000000,
+   "delisting_announcement_matches": [
+    {
+     "title": "Delisting of  1000BEERUSDT Perpetual Contract",
+     "url": "https://announcements.bybit.com/en-US/article/delisting-of-1000beerusdt-perpetual-contract-blt38ec1ce8fe3dc93e/"
+    }
+   ],
+   "terminal_state": "TERMINATED_VERIFIED",
+   "terminal_evidence_grade": "GRADE_A",
+   "identity_confidence": "HIGH"
+  },
+  {
+   "instrument_instance_id": "bybit|1000IQ50USDT|linearperpetual|2024-03-19T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "1000IQ50USDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2024-03-19T00:00:00.000Z",
+   "last_positive_evidence_time": "2024-07-09T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive",
+    "bybit_delisting_announcement"
+   ],
+   "market_history_live_kline_api": false,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1714694400000,
+   "funding_last_ts_ms": 1720425600000,
+   "delisting_announcement_matches": [
+    {
+     "title": "Delisting of 1000IQ50USDT Perpetual  Contract",
+     "url": "https://announcements.bybit.com/en-US/article/delisting-of-1000iq50usdt-perpetual-contract-blt28d3999aae077e86/"
+    }
+   ],
+   "terminal_state": "TERMINATED_VERIFIED",
+   "terminal_evidence_grade": "GRADE_A",
+   "identity_confidence": "HIGH"
+  },
+  {
+   "instrument_instance_id": "bybit|AGIXUSDT|linearperpetual|2023-02-09T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "AGIXUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2023-02-09T00:00:00.000Z",
+   "last_positive_evidence_time": "2024-06-08T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive",
+    "bybit_delisting_announcement"
+   ],
+   "market_history_live_kline_api": false,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1712016000000,
+   "funding_last_ts_ms": 1717747200000,
+   "delisting_announcement_matches": [
+    {
+     "title": "Delisting of FETUSDT, OCEANUSDT, and AGIXUSDT Perpetual Contracts",
+     "url": "https://announcements.bybit.com/en-US/article/delisting-of-fetusdt-oceanusdt-and-agixusdt-perpetual-contracts-blt76ce31b7f7becb38/"
+    }
+   ],
+   "terminal_state": "TERMINATED_VERIFIED",
+   "terminal_evidence_grade": "GRADE_A",
+   "identity_confidence": "HIGH"
+  },
+  {
+   "instrument_instance_id": "bybit|AKROUSDT|linearperpetual|2022-05-25T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "AKROUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2022-05-25T00:00:00.000Z",
+   "last_positive_evidence_time": "2024-12-25T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive",
+    "bybit_delisting_announcement"
+   ],
+   "market_history_live_kline_api": false,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1729296000000,
+   "funding_last_ts_ms": 1735027200000,
+   "delisting_announcement_matches": [
+    {
+     "title": "Delisting  of AKROUSDT Perpetual Contract",
+     "url": "https://announcements.bybit.com/en-US/article/delisting-of-akrousdt-perpetual-contract-blt1c45d16b99a0bb80/"
+    }
+   ],
+   "terminal_state": "TERMINATED_VERIFIED",
+   "terminal_evidence_grade": "GRADE_A",
+   "identity_confidence": "HIGH"
+  },
+  {
+   "instrument_instance_id": "bybit|ANTUSDT|linearperpetual|2021-12-17T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "ANTUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2021-12-17T00:00:00.000Z",
+   "last_positive_evidence_time": "2024-07-26T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive",
+    "bybit_delisting_announcement"
+   ],
+   "market_history_live_kline_api": false,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1716163200000,
+   "funding_last_ts_ms": 1721894400000,
+   "delisting_announcement_matches": [
+    {
+     "title": "Delisting of ANTUSDT  Perpetual Contract",
+     "url": "https://announcements.bybit.com/en-US/article/delisting-of-antusdt-perpetual-contract-blt445ad8f3117a0788/"
+    }
+   ],
+   "terminal_state": "TERMINATED_VERIFIED",
+   "terminal_evidence_grade": "GRADE_A",
+   "identity_confidence": "HIGH"
+  },
+  {
+   "instrument_instance_id": "bybit|BITUSDT|linearperpetual|2021-10-11T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "BITUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2021-10-11T00:00:00.000Z",
+   "last_positive_evidence_time": "2023-07-05T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive",
+    "bybit_delisting_announcement"
+   ],
+   "market_history_live_kline_api": false,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1682697600000,
+   "funding_last_ts_ms": 1688428800000,
+   "delisting_announcement_matches": [
+    {
+     "title": "Termination of all BITUSDT Futures Grid Bots;  Auto-Redemption for BIT Liquidity Pools Complete",
+     "url": "https://announcements.bybit.com/en-US/article/termination-of-all-bitusdt-futures-grid-bots-auto-redemption-for-bit-liquidity-pools-complete-blt0c58bca305c6e61f/"
+    },
+    {
+     "title": "Delisting of BIT Derivatives Contracts",
+     "url": "https://announcements.bybit.com/en-US/article/delisting-of-bit-derivatives-contracts-bltdf9866413eb8bf10/"
+    }
+   ],
+   "terminal_state": "TERMINATED_VERIFIED",
+   "terminal_evidence_grade": "GRADE_A",
+   "identity_confidence": "HIGH"
+  },
+  {
+   "instrument_instance_id": "bybit|BLZUSDT|linearperpetual|2022-06-06T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "BLZUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2022-06-06T00:00:00.000Z",
+   "last_positive_evidence_time": "2024-12-25T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive",
+    "bybit_delisting_announcement"
+   ],
+   "market_history_live_kline_api": false,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1729296000000,
+   "funding_last_ts_ms": 1735027200000,
+   "delisting_announcement_matches": [
+    {
+     "title": "Delisting of  BLZUSDT Perpetual Contract",
+     "url": "https://announcements.bybit.com/en-US/article/delisting-of-blzusdt-perpetual-contract-blt4b9c26385241a446/"
+    }
+   ],
+   "terminal_state": "TERMINATED_VERIFIED",
+   "terminal_evidence_grade": "GRADE_A",
+   "identity_confidence": "HIGH"
+  },
+  {
+   "instrument_instance_id": "bybit|10000000AIDOGEUSDT|linearperpetual|2024-03-05T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "10000000AIDOGEUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2024-03-05T00:00:00.000Z",
+   "last_positive_evidence_time": "2025-04-29T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive",
+    "bybit_delisting_announcement"
+   ],
+   "market_history_live_kline_api": false,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1740067200000,
+   "funding_last_ts_ms": 1745798400000,
+   "delisting_announcement_matches": [
+    {
+     "title": "Delisting of 10000000AIDOGEUSDT Perpetual  Contract",
+     "url": "https://announcements.bybit.com/en-US/article/delisting-of-10000000aidogeusdt-perpetual-contract-blt411c241bf1cf6b3f/"
+    }
+   ],
+   "terminal_state": "TERMINATED_VERIFIED",
+   "terminal_evidence_grade": "GRADE_A",
+   "identity_confidence": "HIGH"
+  },
+  {
+   "instrument_instance_id": "bybit|1000000CHEEMSUSDT|linearperpetual|2024-11-25T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "1000000CHEEMSUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2024-11-25T00:00:00.000Z",
+   "last_positive_evidence_time": "2026-05-30T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive",
+    "bybit_delisting_announcement"
+   ],
+   "market_history_live_kline_api": true,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1777089600000,
+   "funding_last_ts_ms": 1779955200000,
+   "delisting_announcement_matches": [
+    {
+     "title": "Delisting of 1000000CHEEMSUSDT Perpetual Contract",
+     "url": "https://announcements.bybit.com/en-US/article/delisting-of-1000000cheemsusdt-perpetual-contract-blt5c2565fb80f7f651/"
+    }
+   ],
+   "terminal_state": "TERMINATED_VERIFIED",
+   "terminal_evidence_grade": "GRADE_A",
+   "identity_confidence": "HIGH"
+  },
+  {
+   "instrument_instance_id": "bybit|1000000PEIPEIUSDT|linearperpetual|2024-07-04T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "1000000PEIPEIUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2024-07-04T00:00:00.000Z",
+   "last_positive_evidence_time": "2025-10-18T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive",
+    "bybit_delisting_announcement"
+   ],
+   "market_history_live_kline_api": false,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1754956800000,
+   "funding_last_ts_ms": 1760688000000,
+   "delisting_announcement_matches": [
+    {
+     "title": "Delisting of 1000000PEIPEIUSDT Perpetual Contract",
+     "url": "https://announcements.bybit.com/en-US/article/delisting-of-1000000peipeiusdt-perpetual-contract-blt1af690e99d6f910e/"
+    }
+   ],
+   "terminal_state": "TERMINATED_VERIFIED",
+   "terminal_evidence_grade": "GRADE_A",
+   "identity_confidence": "HIGH"
+  },
+  {
+   "instrument_instance_id": "bybit|10000COQUSDT|linearperpetual|2024-03-12T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "10000COQUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2024-03-12T00:00:00.000Z",
+   "last_positive_evidence_time": "2025-10-07T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive",
+    "bybit_delisting_announcement"
+   ],
+   "market_history_live_kline_api": false,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1754006400000,
+   "funding_last_ts_ms": 1759737600000,
+   "delisting_announcement_matches": [
+    {
+     "title": "Delisting of 10000COQUSDT Perpetual Contract",
+     "url": "https://announcements.bybit.com/en-US/article/delisting-of-10000coqusdt-perpetual-contract-blt7db14a8144fecf05/"
+    }
+   ],
+   "terminal_state": "TERMINATED_VERIFIED",
+   "terminal_evidence_grade": "GRADE_A",
+   "identity_confidence": "HIGH"
+  },
+  {
+   "instrument_instance_id": "bybit|10000ELONUSDT|linearperpetual|2025-02-10T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "10000ELONUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2025-02-10T00:00:00.000Z",
+   "last_positive_evidence_time": "2026-02-07T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive",
+    "bybit_delisting_announcement"
+   ],
+   "market_history_live_kline_api": true,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1767499200000,
+   "funding_last_ts_ms": 1770364800000,
+   "delisting_announcement_matches": [
+    {
+     "title": "Delisting of 10000ELONUSDT Perpetual Contract",
+     "url": "https://announcements.bybit.com/en-US/article/delisting-of-10000elonusdt-perpetual-contract-bltae81044c65119142/"
+    }
+   ],
+   "terminal_state": "TERMINATED_VERIFIED",
+   "terminal_evidence_grade": "GRADE_A",
+   "identity_confidence": "HIGH"
+  },
+  {
+   "instrument_instance_id": "bybit|10000LADYSUSDT|linearperpetual|2023-05-11T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "10000LADYSUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2023-05-11T00:00:00.000Z",
+   "last_positive_evidence_time": "2025-10-07T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive",
+    "bybit_delisting_announcement"
+   ],
+   "market_history_live_kline_api": false,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1754006400000,
+   "funding_last_ts_ms": 1759737600000,
+   "delisting_announcement_matches": [
+    {
+     "title": "Delisting of 10000LADYSUSDT Perpetual Contract",
+     "url": "https://announcements.bybit.com/en-US/article/delisting-of-10000ladysusdt-perpetual-contract-bltad34766fa279a898/"
+    }
+   ],
+   "terminal_state": "TERMINATED_VERIFIED",
+   "terminal_evidence_grade": "GRADE_A",
+   "identity_confidence": "HIGH"
+  },
+  {
+   "instrument_instance_id": "bybit|10000QUBICUSDT|linearperpetual|2024-12-24T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "10000QUBICUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2024-12-24T00:00:00.000Z",
+   "last_positive_evidence_time": "2026-05-16T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive",
+    "bybit_delisting_announcement"
+   ],
+   "market_history_live_kline_api": true,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1773014400000,
+   "funding_last_ts_ms": 1778745600000,
+   "delisting_announcement_matches": [
+    {
+     "title": "Delisting of 10000QUBICUSDT Perpetual Contract",
+     "url": "https://announcements.bybit.com/en-US/article/delisting-of-10000qubicusdt-perpetual-contract-blt620a8c00748a1fc5/"
+    }
+   ],
+   "terminal_state": "TERMINATED_VERIFIED",
+   "terminal_evidence_grade": "GRADE_A",
+   "identity_confidence": "HIGH"
+  },
+  {
+   "instrument_instance_id": "bybit|10000WENUSDT|linearperpetual|2024-01-31T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "10000WENUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2024-01-31T00:00:00.000Z",
+   "last_positive_evidence_time": "2025-10-18T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive",
+    "bybit_delisting_announcement"
+   ],
+   "market_history_live_kline_api": false,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1754956800000,
+   "funding_last_ts_ms": 1760688000000,
+   "delisting_announcement_matches": [
+    {
+     "title": "Delisting of  10000WENUSDT Perpetual Contract",
+     "url": "https://announcements.bybit.com/en-US/article/delisting-of-10000wenusdt-perpetual-contract-blt0fc799458c8b52cb/"
+    }
+   ],
+   "terminal_state": "TERMINATED_VERIFIED",
+   "terminal_evidence_grade": "GRADE_A",
+   "identity_confidence": "HIGH"
+  },
+  {
+   "instrument_instance_id": "bybit|10000WHYUSDT|linearperpetual|2024-10-04T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "10000WHYUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2024-10-04T00:00:00.000Z",
+   "last_positive_evidence_time": "2025-09-04T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive",
+    "bybit_delisting_announcement"
+   ],
+   "market_history_live_kline_api": false,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1754020800000,
+   "funding_last_ts_ms": 1756886400000,
+   "delisting_announcement_matches": [
+    {
+     "title": "Delisting of 10000WHYUSDT Perpetual Contract",
+     "url": "https://announcements.bybit.com/en-US/article/delisting-of-10000whyusdt-perpetual-contract-bltef59f7d838950f41/"
+    }
+   ],
+   "terminal_state": "TERMINATED_VERIFIED",
+   "terminal_evidence_grade": "GRADE_A",
+   "identity_confidence": "HIGH"
+  },
+  {
+   "instrument_instance_id": "bybit|1000APUUSDT|linearperpetual|2024-06-20T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "1000APUUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2024-06-20T00:00:00.000Z",
+   "last_positive_evidence_time": "2025-07-13T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive",
+    "bybit_delisting_announcement"
+   ],
+   "market_history_live_kline_api": false,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1746489600000,
+   "funding_last_ts_ms": 1752220800000,
+   "delisting_announcement_matches": [
+    {
+     "title": "Delisting of 1000APUUSDT  Perpetual Contract",
+     "url": "https://announcements.bybit.com/en-US/article/delisting-of-1000apuusdt-perpetual-contract-blt6a583ef162d95f5e/"
+    }
+   ],
+   "terminal_state": "TERMINATED_VERIFIED",
+   "terminal_evidence_grade": "GRADE_A",
+   "identity_confidence": "HIGH"
+  },
+  {
+   "instrument_instance_id": "bybit|1000CATSUSDT|linearperpetual|2024-10-11T00:00:00.000Z",
+   "venue": "bybit",
+   "symbol": "1000CATSUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2024-10-11T00:00:00.000Z",
+   "last_positive_evidence_time": "2025-07-06T00:00:00.000Z",
+   "source_set": [
+    "tardis_catalog",
+    "bybit_funding_history_api",
+    "bybit_public_trade_archive",
+    "bybit_delisting_announcement"
+   ],
+   "market_history_live_kline_api": false,
+   "market_history_public_trade_archive": true,
+   "funding_history_found": true,
+   "funding_first_ts_ms": 1745971200000,
+   "funding_last_ts_ms": 1751702400000,
+   "delisting_announcement_matches": [
+    {
+     "title": "Delisting  of 1000CATSUSDT Perpetual Contract",
+     "url": "https://announcements.bybit.com/en-US/article/delisting-of-1000catsusdt-perpetual-contract-bltf5bf1b358e11e490/"
+    }
+   ],
+   "terminal_state": "TERMINATED_VERIFIED",
+   "terminal_evidence_grade": "GRADE_A",
+   "identity_confidence": "HIGH"
+  },
+  {
+   "instrument_instance_id": "bybit|LITUSDT|linearperpetual|2025-12-30T10:08:18+00:00",
+   "venue": "bybit",
+   "symbol": "LITUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2025-12-30T10:08:18+00:00",
+   "last_positive_evidence_time": "ACTIVE_AT_CUTOFF",
+   "source_set": [
+    "bybit_instruments_info_current",
+    "tardis_catalog"
+   ],
+   "identity_note": "current official launchTime is 1492d after Tardis first recorded this same ticker text -> possible earlier distinct instance under the same ticker; treat as a SEPARATE instrument_instance_id per the frozen non-continuity rule, not merged with any earlier ticker history",
+   "terminal_state": "ACTIVE_AT_CUTOFF",
+   "identity_confidence": "IDENTITY_AMBIGUOUS_RELIST_CANDIDATE"
+  },
+  {
+   "instrument_instance_id": "bybit|DATAUSDT|linearperpetual|2026-06-30T10:30:31+00:00",
+   "venue": "bybit",
+   "symbol": "DATAUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2026-06-30T10:30:31+00:00",
+   "last_positive_evidence_time": "ACTIVE_AT_CUTOFF",
+   "source_set": [
+    "bybit_instruments_info_current",
+    "tardis_catalog"
+   ],
+   "identity_note": "current official launchTime is 923d after Tardis first recorded this same ticker text -> possible earlier distinct instance under the same ticker; treat as a SEPARATE instrument_instance_id per the frozen non-continuity rule, not merged with any earlier ticker history",
+   "terminal_state": "ACTIVE_AT_CUTOFF",
+   "identity_confidence": "IDENTITY_AMBIGUOUS_RELIST_CANDIDATE"
+  },
+  {
+   "instrument_instance_id": "bybit|MONUSDT|linearperpetual|2025-11-24T13:58:06+00:00",
+   "venue": "bybit",
+   "symbol": "MONUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2025-11-24T13:58:06+00:00",
+   "last_positive_evidence_time": "ACTIVE_AT_CUTOFF",
+   "source_set": [
+    "bybit_instruments_info_current",
+    "tardis_catalog"
+   ],
+   "identity_note": "current official launchTime is 543d after Tardis first recorded this same ticker text -> possible earlier distinct instance under the same ticker; treat as a SEPARATE instrument_instance_id per the frozen non-continuity rule, not merged with any earlier ticker history",
+   "terminal_state": "ACTIVE_AT_CUTOFF",
+   "identity_confidence": "IDENTITY_AMBIGUOUS_RELIST_CANDIDATE"
+  },
+  {
+   "instrument_instance_id": "bybit|FHEUSDT|linearperpetual|2026-01-07T07:40:01+00:00",
+   "venue": "bybit",
+   "symbol": "FHEUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2026-01-07T07:40:01+00:00",
+   "last_positive_evidence_time": "ACTIVE_AT_CUTOFF",
+   "source_set": [
+    "bybit_instruments_info_current",
+    "tardis_catalog"
+   ],
+   "identity_note": "current official launchTime is 266d after Tardis first recorded this same ticker text -> possible earlier distinct instance under the same ticker; treat as a SEPARATE instrument_instance_id per the frozen non-continuity rule, not merged with any earlier ticker history",
+   "terminal_state": "ACTIVE_AT_CUTOFF",
+   "identity_confidence": "IDENTITY_AMBIGUOUS_RELIST_CANDIDATE"
+  },
+  {
+   "instrument_instance_id": "bybit|UNIUSDT|linearperpetual|2021-11-30T00:00:00+00:00",
+   "venue": "bybit",
+   "symbol": "UNIUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2021-11-30T00:00:00+00:00",
+   "last_positive_evidence_time": "ACTIVE_AT_CUTOFF",
+   "source_set": [
+    "bybit_instruments_info_current",
+    "tardis_catalog"
+   ],
+   "identity_note": "current official launchTime is 257d after Tardis first recorded this same ticker text -> possible earlier distinct instance under the same ticker; treat as a SEPARATE instrument_instance_id per the frozen non-continuity rule, not merged with any earlier ticker history",
+   "terminal_state": "ACTIVE_AT_CUTOFF",
+   "identity_confidence": "IDENTITY_AMBIGUOUS_RELIST_CANDIDATE"
+  },
+  {
+   "instrument_instance_id": "bybit|SUSHIUSDT|linearperpetual|2021-11-30T00:00:00+00:00",
+   "venue": "bybit",
+   "symbol": "SUSHIUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2021-11-30T00:00:00+00:00",
+   "last_positive_evidence_time": "ACTIVE_AT_CUTOFF",
+   "source_set": [
+    "bybit_instruments_info_current",
+    "tardis_catalog"
+   ],
+   "identity_note": "current official launchTime is 201d after Tardis first recorded this same ticker text -> possible earlier distinct instance under the same ticker; treat as a SEPARATE instrument_instance_id per the frozen non-continuity rule, not merged with any earlier ticker history",
+   "terminal_state": "ACTIVE_AT_CUTOFF",
+   "identity_confidence": "IDENTITY_AMBIGUOUS_RELIST_CANDIDATE"
+  },
+  {
+   "instrument_instance_id": "bybit|ETHUSDT|linearperpetual|2021-03-15T00:00:00+00:00",
+   "venue": "bybit",
+   "symbol": "ETHUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2021-03-15T00:00:00+00:00",
+   "last_positive_evidence_time": "ACTIVE_AT_CUTOFF",
+   "source_set": [
+    "bybit_instruments_info_current",
+    "tardis_catalog"
+   ],
+   "identity_note": "current official launchTime is 145d after Tardis first recorded this same ticker text -> possible earlier distinct instance under the same ticker; treat as a SEPARATE instrument_instance_id per the frozen non-continuity rule, not merged with any earlier ticker history",
+   "terminal_state": "ACTIVE_AT_CUTOFF",
+   "identity_confidence": "IDENTITY_AMBIGUOUS_RELIST_CANDIDATE"
+  },
+  {
+   "instrument_instance_id": "bybit|SOLUSDT|linearperpetual|2021-10-15T00:00:00+00:00",
+   "venue": "bybit",
+   "symbol": "SOLUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2021-10-15T00:00:00+00:00",
+   "last_positive_evidence_time": "ACTIVE_AT_CUTOFF",
+   "source_set": [
+    "bybit_instruments_info_current",
+    "tardis_catalog"
+   ],
+   "identity_note": "current official launchTime is 108d after Tardis first recorded this same ticker text -> possible earlier distinct instance under the same ticker; treat as a SEPARATE instrument_instance_id per the frozen non-continuity rule, not merged with any earlier ticker history",
+   "terminal_state": "ACTIVE_AT_CUTOFF",
+   "identity_confidence": "IDENTITY_AMBIGUOUS_RELIST_CANDIDATE"
+  },
+  {
+   "instrument_instance_id": "bybit|ZKUSDT|linearperpetual|2024-06-20T02:08:00+00:00",
+   "venue": "bybit",
+   "symbol": "ZKUSDT",
+   "contract_type": "LinearPerpetual",
+   "first_positive_evidence_time": "2024-06-20T02:08:00+00:00",
+   "last_positive_evidence_time": "ACTIVE_AT_CUTOFF",
+   "source_set": [
+    "bybit_instruments_info_current",
+    "tardis_catalog"
+   ],
+   "identity_note": "current official launchTime is 90d after Tardis first recorded this same ticker text -> possible earlier distinct instance under the same ticker; treat as a SEPARATE instrument_instance_id per the frozen non-continuity rule, not merged with any earlier ticker history",
+   "terminal_state": "ACTIVE_AT_CUTOFF",
+   "identity_confidence": "IDENTITY_AMBIGUOUS_RELIST_CANDIDATE"
+  }
+ ]
+}

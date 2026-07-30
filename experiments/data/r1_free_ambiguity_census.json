@@ -1,0 +1,171 @@
+{
+ "artifact": "r1_free_ambiguity_census_v1",
+ "outcome_embargo": true,
+ "cutoff_utc": "2026-06-30T23:59:59Z",
+ "population_counts": {
+  "total_candidate_instrument_population": 967,
+  "active_at_cutoff_current_live_usdt_linear_perp": 663,
+  "live_not_yet_in_tardis_catalog_recent_listings": 3,
+  "ended_candidate_population": 296,
+  "ended_terminal_on_or_after_delistfeed_floor_2022_08_11": 290,
+  "ended_terminal_before_delistfeed_floor_2022_08_11_structurally_uncoverable": 6,
+  "ended_with_grade_a_precise_matched_announcement": 266,
+  "ended_grade_a_match_rate_pct_within_covered_era": 91.7,
+  "ended_in_era_unmatched_needs_body_parse_or_grade_c": 24,
+  "identity_reuse_candidates_among_currently_live_symbols": 9,
+  "funding_graveyard_sample_tested": 30,
+  "funding_graveyard_sample_pass": 30,
+  "market_kline_live_api_sample_tested": 30,
+  "market_kline_live_api_sample_pass": 3,
+  "market_trade_archive_sample_tested": 30,
+  "market_trade_archive_sample_pass": 30,
+  "recorder_vs_official_terminal_timestamp_disagreement_sample": 4
+ },
+ "gap_classification_findings": {
+  "recorder_vs_official_terminal_disagreement_sample": [
+   {
+    "symbol": "ANCUSDT",
+    "tardis_availableTo": "2022-05-14T00:00:00.000Z",
+    "bybit_last_funding_settlement_utc": "2022-06-01T08:00:00Z",
+    "gap_days_tardis_minus_bybit": -19
+   },
+   {
+    "symbol": "BTTUSDT",
+    "tardis_availableTo": "2021-12-29T00:00:00.000Z",
+    "bybit_last_funding_settlement_utc": "2022-02-14T06:00:00Z",
+    "gap_days_tardis_minus_bybit": -48
+   },
+   {
+    "symbol": "LUNAUSDT",
+    "tardis_availableTo": "2022-05-13T00:00:00.000Z",
+    "bybit_last_funding_settlement_utc": "2022-06-01T00:00:00Z",
+    "gap_days_tardis_minus_bybit": -19
+   },
+   {
+    "symbol": "USTUSDT",
+    "tardis_availableTo": "2022-05-14T00:00:00.000Z",
+    "bybit_last_funding_settlement_utc": "2022-06-01T00:00:00Z",
+    "gap_days_tardis_minus_bybit": -18
+   }
+  ],
+  "archive_anomaly_examples": [
+   {
+    "symbol": "LUNAUSDT",
+    "finding": "continuous daily trade-archive files 2021-10-11..2022-05-12, then a single isolated file dated 2022-12-12 with no files between/after; classified gap_class=unknown (archive anomaly), terminal_state=TERMINATED_AMBIGUOUS; note the Terra 2.0 relaunch used a DIFFERENT ticker (LUNA2USDT, live, launchTime 2022-05-31) so this is not simple ticker reuse but an unexplained single stray archive file"
+   }
+  ],
+  "parser_false_positive_examples_fixed": [
+   {
+    "symbol": "LUNAUSDT",
+    "naive_match": "Delisting of QORPO, OBOL, LUNAI, TUNA and WEETH",
+    "cause": "substring 'LUNA' inside 'LUNAI'"
+   },
+   {
+    "symbol": "ANTUSDT",
+    "naive_match": "Token swap and rebranding of MANTRA (OM) to MANTRA (MANTRA)",
+    "cause": "substring 'ANT' inside 'MANTRA'"
+   },
+   {
+    "symbol": "BITUSDT",
+    "naive_match": "Bybit Alpha: Notice of removal of 2 tokens",
+    "cause": "substring 'BIT' inside 'Bybit'"
+   }
+  ]
+ },
+ "identity_reuse_candidates_detail": [
+  {
+   "symbol": "LITUSDT",
+   "current_launchTime": "2025-12-30T10:08:18+00:00",
+   "tardis_availableSince": "2021-11-29T00:00:00+00:00",
+   "gap_days": 1492
+  },
+  {
+   "symbol": "DATAUSDT",
+   "current_launchTime": "2026-06-30T10:30:31+00:00",
+   "tardis_availableSince": "2023-12-20T00:00:00+00:00",
+   "gap_days": 923
+  },
+  {
+   "symbol": "MONUSDT",
+   "current_launchTime": "2025-11-24T13:58:06+00:00",
+   "tardis_availableSince": "2024-05-30T00:00:00+00:00",
+   "gap_days": 543
+  },
+  {
+   "symbol": "FHEUSDT",
+   "current_launchTime": "2026-01-07T07:40:01+00:00",
+   "tardis_availableSince": "2025-04-16T00:00:00+00:00",
+   "gap_days": 266
+  },
+  {
+   "symbol": "UNIUSDT",
+   "current_launchTime": "2021-11-30T00:00:00+00:00",
+   "tardis_availableSince": "2021-03-18T00:00:00+00:00",
+   "gap_days": 257
+  },
+  {
+   "symbol": "SUSHIUSDT",
+   "current_launchTime": "2021-11-30T00:00:00+00:00",
+   "tardis_availableSince": "2021-05-13T00:00:00+00:00",
+   "gap_days": 201
+  },
+  {
+   "symbol": "ETHUSDT",
+   "current_launchTime": "2021-03-15T00:00:00+00:00",
+   "tardis_availableSince": "2020-10-21T00:00:00+00:00",
+   "gap_days": 145
+  },
+  {
+   "symbol": "SOLUSDT",
+   "current_launchTime": "2021-10-15T00:00:00+00:00",
+   "tardis_availableSince": "2021-06-29T00:00:00+00:00",
+   "gap_days": 108
+  },
+  {
+   "symbol": "ZKUSDT",
+   "current_launchTime": "2024-06-20T02:08:00+00:00",
+   "tardis_availableSince": "2024-03-22T00:00:00+00:00",
+   "gap_days": 90
+  }
+ ],
+ "pit_universe_breadth_by_sample_date": {
+  "2021-01-01": 6,
+  "2021-04-01": 9,
+  "2021-07-01": 20,
+  "2021-10-01": 29,
+  "2022-01-01": 104,
+  "2022-04-01": 144,
+  "2022-07-01": 175,
+  "2022-10-01": 181,
+  "2023-01-01": 183,
+  "2023-04-01": 208,
+  "2023-07-01": 223,
+  "2023-10-01": 251,
+  "2024-01-01": 295,
+  "2024-04-01": 332,
+  "2024-07-01": 384,
+  "2024-10-01": 413,
+  "2025-01-01": 472,
+  "2025-04-01": 505,
+  "2025-07-01": 533,
+  "2025-10-01": 590,
+  "2026-01-01": 556,
+  "2026-04-01": 549
+ },
+ "pit_universe_breadth_below_minimum_10": [
+  "2021-01-01",
+  "2021-04-01"
+ ],
+ "candidate_free_date_range": {
+  "earliest_archive_evidence": "2020-03-25 (BTCUSDT trade archive; corroborated by CM catalog min_time)",
+  "earliest_breadth_qualifying_quarter": "2021-07-01 (first sample date clearing breadth>=10; 2021-01-01 and 2021-04-01 fall below 10)",
+  "recommended_candidate_start_after_90d_signal_and_30d_universe_warmup": "2021-10-01",
+  "cutoff": "2026-06-30",
+  "implied_span_days_approx": 1734,
+  "meets_1095_day_minimum": true
+ },
+ "announcement_channel_depth_ceiling": {
+  "delistings_category_earliest_publish": "2022-08-11",
+  "consequence": "any ended instrument with a terminal date before 2022-08-11 cannot receive GRADE_A confirmation from this channel regardless of how it is queried; this is a structural ceiling of the free channel's retained depth, confirmed by the feed terminating naturally rather than by a client-side page limit"
+ }
+}

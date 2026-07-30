@@ -1,0 +1,162 @@
+[
+ {
+  "file": "LUNAUSDT_2022-05-12.csv.gz",
+  "bytes": 8671617,
+  "sha256": "45b47489869145ce0893ecf062c3319751d45883e37d64b8b3cb8834c669ec7c"
+ },
+ {
+  "file": "LUNAUSDT_idx.html",
+  "bytes": 16454,
+  "sha256": "bb3e51f9d7a2ba050a31a1508fef231b85c382026ac2271ed325543c77683f52"
+ },
+ {
+  "file": "agix_delist_page.html",
+  "bytes": 34515,
+  "sha256": "31af3c2e370bd85636a905b26b53e2da44a36d4e48da7b153d4896d748e3ee15"
+ },
+ {
+  "file": "bybit_announcements.json",
+  "bytes": 2855,
+  "sha256": "d7604f99066a53b94b6ad31598d96a5fc92afe5818fb1929812ae09526f6861f"
+ },
+ {
+  "file": "bybit_announcements_all.json",
+  "bytes": 141913,
+  "sha256": "f60b0bd07689c40f3f074a40017de24774025b15dc3b52cd73f3e901bd0792ab"
+ },
+ {
+  "file": "bybit_delistings_all.json",
+  "bytes": 238463,
+  "sha256": "708ae2a944c579657500cf26ce8e5df210df5f8850adc0ab33af0f6d0a134795"
+ },
+ {
+  "file": "bybit_funding.json",
+  "bytes": 539,
+  "sha256": "df3102afeb779b9f6865f5d3c85e8a8cade444708ae7eb835e83a9b3272c3207"
+ },
+ {
+  "file": "bybit_instruments.json",
+  "bytes": 4479,
+  "sha256": "f5086d359cb354dcf4957d08c50008df1367fa8eb8d72eab368dd23ca2957f47"
+ },
+ {
+  "file": "bybit_listings_all.json",
+  "bytes": 273769,
+  "sha256": "3325c6bc0e70550e7777d4c52a974428cf9acfd5307ba7b88378a0b7dd454ca3"
+ },
+ {
+  "file": "bybit_live_linear_instruments.json",
+  "bytes": 710115,
+  "sha256": "0bbe015949fe5f23de018d2b1a7bee51ddef53435ebe0cd48160811790549457"
+ },
+ {
+  "file": "bybit_mt4_btc.html",
+  "bytes": 532,
+  "sha256": "018e5732ddb959b1c446321e87325322549a3d4bccb926bb4dfd94f6e9c74a78"
+ },
+ {
+  "file": "bybit_public_archive_index.html",
+  "bytes": 169468,
+  "sha256": "c37a7c93475a7d43cafe371dae05b2fed8b422cc4f925d8b46b1c90b5e0be771"
+ },
+ {
+  "file": "bybit_public_root.html",
+  "bytes": 542,
+  "sha256": "f332be67965ba5069dc55cc469fb99262a9838b6bdf3dbc3052d9eb91497770a"
+ },
+ {
+  "file": "cdd_bybit_index.html",
+  "bytes": 77,
+  "sha256": "74188468490e859f321fa79343591c6c0a4880d3f77a5cab99298d5e2d6c2c42"
+ },
+ {
+  "file": "cdd_data_index.html",
+  "bytes": 145516,
+  "sha256": "e51535c4a06eef9887d3ff1afac207f051570292128add834db1fc64cbb2d582"
+ },
+ {
+  "file": "cdd_home.html",
+  "bytes": 197396,
+  "sha256": "c021b560fc88cda0b2fc853ae6911a3bc0e21876e3c6c067f968d37132baf18b"
+ },
+ {
+  "file": "cm_catalog.json",
+  "bytes": 89,
+  "sha256": "5cd84dbc6daf55deddcd9cea16e80d617fde751daa5a8c7fee98f55da919ea57"
+ },
+ {
+  "file": "cm_catalog2.json",
+  "bytes": 101,
+  "sha256": "f8ee97f75cada873550215011b7115e64deeb20e0e55ec012f7e09f350859450"
+ },
+ {
+  "file": "cm_catalog3.json",
+  "bytes": 1910349,
+  "sha256": "cdf13e4aee035c6bb3e8abdf91ac11148352d1e74f6ee4eaf2d152cf47f10059"
+ },
+ {
+  "file": "full_population_announcement_coverage.json",
+  "bytes": 693,
+  "sha256": "5d14979ee7fece68f4915ac351b8634e5640cfa8f4c3f840d30fcd224282d9ff"
+ },
+ {
+  "file": "funding_graveyard_results.json",
+  "bytes": 9170,
+  "sha256": "f6319e1090ce3869d566944ecb62497beb4044198461b1364d36d0679cdd0531"
+ },
+ {
+  "file": "graveyard_candidates.json",
+  "bytes": 4341,
+  "sha256": "1c63d7d0bb541ae284b82cba4a725861e76fb8fab66425fae94290d52d17cfe4"
+ },
+ {
+  "file": "graveyard_delisting_announcement_matches.json",
+  "bytes": 17913,
+  "sha256": "0d011dfcc990a68717b5b11ed0ab979b1c8c30069a2b5cb495b74e7a36f6160a"
+ },
+ {
+  "file": "graveyard_delisting_announcement_matches_precise.json",
+  "bytes": 7438,
+  "sha256": "3eaaca27a4a3fab48270533463c1179608a0894430e7662528d30008b077f6f6"
+ },
+ {
+  "file": "identity_reuse_candidates.json",
+  "bytes": 1417,
+  "sha256": "9281711d67cc562a29b51a268d35e70e96d48618339403a90beb48dc53ec729b"
+ },
+ {
+  "file": "market_graveyard_archive_results.json",
+  "bytes": 3381,
+  "sha256": "4574febdf8c3ce5098451ed1c483c27b2b4b97dd5fe1546455f7bcca4ba75bec"
+ },
+ {
+  "file": "market_graveyard_kline_results.json",
+  "bytes": 2768,
+  "sha256": "cf32717a75bc1e2ced88f8da7ea3c12cf1986b21cd8000bf68c46179baa9b28b"
+ },
+ {
+  "file": "one_delist_page_test.html",
+  "bytes": 474,
+  "sha256": "44d0f44d284e805872598e57d3bd6d4fcd08c8ac015819444eb1cbb7dae2ef24"
+ },
+ {
+  "file": "pit_breadth_sample.json",
+  "bytes": 436,
+  "sha256": "3ee3aa8ceffb0bb8436655e243227d4cca639523b5a26afc86d619d6aa97a314"
+ },
+ {
+  "file": "tardis_bybit_details.json",
+  "bytes": 655826,
+  "sha256": "b3bd5c5b17c4bf11b7f5d0cc8e93b234d1f6293008973a72710c59ea6fa739dc"
+ },
+ {
+  "file": "tardis_usdt_perp_symbols.json",
+  "bytes": 96901,
+  "sha256": "327e86b3ab3cc56b9166fc3e056834615385b67bf8a3733680f581bdf3748ca5"
+ },
+ {
+  "file": "wayback_check.json",
+  "bytes": 63,
+  "sha256": "bd887d747710b1f1c2d507b87b63ef0ead5c8229a6f04b9373e74875bce85388"
+ }
+]

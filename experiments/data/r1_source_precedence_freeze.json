@@ -1,0 +1,20 @@
+{
+  "artifact": "r1_source_precedence_freeze_v1",
+  "cutoff_utc": "2026-06-30T23:59:59Z",
+  "outcome_embargo": true,
+  "status": "POLICY_FROZEN_INPUT_FREEZE_BLOCKED_BY_MISSING_COMPLETE_EVIDENCE",
+  "temporal_rule": "A source retrieved after an event may reconstruct that event only when its event_time is at or before the cutoff. Current catalog membership never establishes historical membership.",
+  "fields": {
+    "instrument_discovery": {"primary": "timestamped historical catalog or qualified contemporaneous capture", "fallback": "current official catalog for candidate discovery only", "forbidden": "using current membership to prove historical eligibility"},
+    "launch_event": {"primary": "timestamped official announcement or qualified contemporaneous observation", "fallback": "none", "forbidden": "projecting current launchTime backward"},
+    "terminal_event": {"primary": "timestamped official lifecycle or delivery event", "fallback": "none", "forbidden": "creating a verified terminal from disappearance, recorder availableTo, or last trade"},
+    "ticker_identity": {"primary": "historical symbolId plus contract attributes when preserved", "fallback": "venue|symbol|contract_type|first_observed", "forbidden": "merging discontinuous ticker histories by ticker text"},
+    "market_trades": {"primary": "Bybit public historical trade archive with a retained object receipt", "fallback": "healthy official historical kline only as a corroboration diagnostic", "forbidden": "treating a missing HTTP/API result as zero trades"},
+    "daily_close": {"primary": "last qualifying trade by UTC event timestamp, then immutable trade identity", "fallback": "none", "forbidden": "forward-fill, synthetic close, or terminal-price invention"},
+    "quote_turnover": {"primary": "sum(price * size) for canonical unique trades in a UTC day", "fallback": "none", "forbidden": "zero-fill or merging incompatible archive fields"},
+    "funding_settlement": {"primary": "official realized Bybit funding-history observation", "fallback": "none", "forbidden": "predicted funding or funding-interval projection"},
+    "funding_timestamp": {"primary": "settlement timestamp carried by the realized funding observation", "fallback": "none", "forbidden": "inferring a timestamp from the current fundingInterval"},
+    "gap_classification": {"primary": "timestamped exchange/vendor incident or preserved observation sequence", "fallback": "UNKNOWN", "forbidden": "turning archive/API absence into a terminal event"}
+  },
+  "conflict_rule": "Conflicting canonical values, non-identical duplicate funding settlements, malformed records, or unresolved identity assignment are fail-closed; no lower-priority source silently replaces a higher-priority fact."
+}

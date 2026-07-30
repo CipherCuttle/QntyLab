@@ -1,0 +1,133 @@
+{
+ "artifact": "r1_free_source_census_v1",
+ "outcome_embargo": true,
+ "retrieved_at_utc": "2026-07-29T20:45:00Z",
+ "sources": [
+  {
+   "source": "Bybit announcements API",
+   "endpoint": "https://api.bybit.com/v5/announcements/index",
+   "currently_accessible": true,
+   "auth_required": false,
+   "relevant_data_types": [
+    "listing/delisting/rebrand/migration announcements, title+description+structured start/end timestamps"
+   ],
+   "historical_range": "delistings category paginates cleanly to 2022-08-11; new_crypto (listings) category retained only ~1yr in first 500 items due to high volume",
+   "limitations": "no full-text search; category taxonomy (type=) is undocumented and was reverse-probed; body content is a Contentstack rich-text JSON doc requiring a dedicated recursive parser for settlement mechanics",
+   "docs_cited": "https://bybit-exchange.github.io/docs/v5/announcement",
+   "sample_receipt": {
+    "file": "bybit_announcements.json",
+    "bytes": 2855,
+    "sha256": "d7604f99066a53b94b6ad31598d96a5fc92afe5818fb1929812ae09526f6861f"
+   }
+  },
+  {
+   "source": "Bybit current instruments API",
+   "endpoint": "https://api.bybit.com/v5/market/instruments-info",
+   "currently_accessible": true,
+   "auth_required": false,
+   "relevant_data_types": [
+    "symbol, contractType, status, launchTime, deliveryTime, fundingInterval"
+   ],
+   "historical_range": "current snapshot only; no historical/point-in-time query parameter",
+   "limitations": "current metadata cannot be projected backward; delisted symbols disappear from this endpoint entirely",
+   "docs_cited": "https://bybit-exchange.github.io/docs/v5/market/instrument",
+   "sample_receipt": {
+    "file": "bybit_live_linear_instruments.json",
+    "bytes": 710115,
+    "sha256": "0bbe015949fe5f23de018d2b1a7bee51ddef53435ebe0cd48160811790549457"
+   }
+  },
+  {
+   "source": "Bybit historical funding API",
+   "endpoint": "https://api.bybit.com/v5/market/funding/history",
+   "currently_accessible": true,
+   "auth_required": false,
+   "relevant_data_types": [
+    "symbol, fundingRate, fundingRateTimestamp (realized/settled)"
+   ],
+   "historical_range": "confirmed retrievable for delisted symbols across 2022-2026 span (30/30 graveyard sample); 200-record page cap per call, requires time-windowed pagination for full history",
+   "limitations": "no explicit statement in the payload distinguishing realized vs predicted; docs confirm this endpoint is settled history",
+   "docs_cited": "https://bybit-exchange.github.io/docs/v5/market/history-fund-rate",
+   "sample_receipt": {
+    "file": "bybit_funding.json",
+    "bytes": 539,
+    "sha256": "df3102afeb779b9f6865f5d3c85e8a8cade444708ae7eb835e83a9b3272c3207"
+   }
+  },
+  {
+   "source": "Bybit public historical market-data archive",
+   "endpoint": "https://public.bybit.com/trading/<SYMBOL>/  (daily trade CSV.gz)",
+   "currently_accessible": true,
+   "auth_required": false,
+   "relevant_data_types": [
+    "raw trades: timestamp, symbol, side, size, price, tickDirection, trdMatchID, grossValue, homeNotional, foreignNotional"
+   ],
+   "historical_range": "confirmed back to 2020-03-25 for BTCUSDT; per-symbol daily files persist for delisted symbols (30/30 graveyard sample directory-index HTTP 200)",
+   "limitations": "trade-level only for most symbols; kline_for_metatrader4 archive (pre-aggregated) exists but is sparsely populated for small-cap delisted symbols (1/30 in sample); daily close/quote-volume must be derived by causal aggregation, not read directly",
+   "docs_cited": "https://public.bybit.com/",
+   "sample_receipt": {
+    "file": "bybit_public_archive_index.html",
+    "bytes": 169468,
+    "sha256": "c37a7c93475a7d43cafe371dae05b2fed8b422cc4f925d8b46b1c90b5e0be771"
+   }
+  },
+  {
+   "source": "Tardis public Bybit exchange-details/catalog endpoint",
+   "endpoint": "https://api.tardis.dev/v1/exchanges/bybit",
+   "currently_accessible": true,
+   "auth_required": false,
+   "relevant_data_types": [
+    "availableSymbols[] with id, type, availableSince, availableTo; incidentReports; channelDetails"
+   ],
+   "historical_range": "linear derivative collection documented from 2020-05-28; 964 USDT-perpetual symbol records at retrieval",
+   "limitations": "availableTo is recorder-stop time, not an exchange delisting timestamp (frozen prior finding, reconfirmed here); raw instrument_info replay for lifecycle fields remains a paid capability, not used",
+   "docs_cited": "https://docs.tardis.dev/historical-data-details/bybit",
+   "sample_receipt": {
+    "file": "tardis_bybit_details.json",
+    "bytes": 655826,
+    "sha256": "b3bd5c5b17c4bf11b7f5d0cc8e93b234d1f6293008973a72710c59ea6fa739dc"
+   }
+  },
+  {
+   "source": "Coin Metrics Community/public market catalog",
+   "endpoint": "https://community-api.coinmetrics.io/v4/catalog-all/markets?exchange=bybit&type=future",
+   "currently_accessible": true,
+   "auth_required": false,
+   "relevant_data_types": [
+    "market min_time/max_time, trades/orderbooks/quotes/funding_rates sub-ranges per market"
+   ],
+   "historical_range": "966 USDT-quoted bybit future markets; earliest min_time 2020-03-25 (BTCUSDT); near-identical stale-set corroboration with Tardis (298 vs 296)",
+   "limitations": "type=future is not perpetual-specific in the schema; page_size/limit_per_market_type params are unsupported by this endpoint and must be omitted; catalog min/max is coverage metadata, not a listing/delisting event (same caveat as Tardis availableTo)",
+   "docs_cited": "https://docs.coinmetrics.io/market-data/market-data-overview/candles",
+   "sample_receipt": {
+    "file": "cm_catalog3.json",
+    "bytes": 1910349,
+    "sha256": "cdf13e4aee035c6bb3e8abdf91ac11148352d1e74f6ee4eaf2d152cf47f10059"
+   }
+  },
+  {
+   "source": "CryptoDataDownload Bybit datasets",
+   "endpoint": "https://www.cryptodatadownload.com/",
+   "currently_accessible": "PARTIAL",
+   "auth_required": false,
+   "relevant_data_types": [
+    "marketing copy confirms Bybit is a covered exchange; exact free-file URL pattern for Bybit USDT-linear perpetuals was not resolved by static crawl in this session"
+   ],
+   "historical_range": "UNCONFIRMED",
+   "limitations": "site navigation to the Bybit dataset page appears to require interactive/JS-driven browsing rather than a guessable static path; several plausible paths (/data/bybit/, /cdd/Bybit_*.csv, /exchanges/bybit/) all 404'd; not required for the verdict since Tier 1/2 sources already suffice and CDD is only a Tier 3 optional corroborator",
+   "docs_cited": "https://www.cryptodatadownload.com/",
+   "sample_receipt": {
+    "file": "cdd_home.html",
+    "bytes": 197396,
+    "sha256": "c021b560fc88cda0b2fc853ae6911a3bc0e21876e3c6c067f968d37132baf18b"
+   }
+  }
+ ],
+ "additional_probe_not_in_required_seven": {
+  "source": "Wayback Machine availability API",
+  "endpoint": "https://archive.org/wayback/available",
+  "currently_accessible": true,
+  "auth_required": false,
+  "note": "confirmed reachable; not exercised further because Tier 1-3 sources already supplied sufficient primary evidence for every finding in this census"
+ }
+}

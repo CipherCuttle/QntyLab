@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "verified_at_utc": "2026-07-29T00:00:00Z",
+  "tardis_access_matrix": {
+    "Academic": {"csv":true,"raw_replay":false,"metadata_api":false,"eligible":false},
+    "Solo": {"csv":true,"raw_replay":false,"metadata_api":false,"eligible":false},
+    "Professional": {"csv":true,"raw_replay":true,"metadata_api":true,"eligible":true},
+    "Business": {"csv":true,"raw_replay":true,"metadata_api":true,"eligible":true}
+  },
+  "cheapest_defensible": "Professional + Perpetuals, conditional on lifecycle pre-purchase gate",
+  "preferred": "Professional + Perpetuals; add a narrow corroborator only for unresolved Grade C/X terminal or reuse cases",
+  "must_have": ["Bybit perpetual/linear historical CSV", "raw replay for instrument_info", "yearly historical access sufficient to 2020-05-28", "written lifecycle-field confirmation"],
+  "nice_to_have": ["metadata API", "premium network", "narrow Coin Metrics or Kaiko graveyard extract"],
+  "not_needed": ["Business tier", "all-exchanges plan", "order-book feeds", "liquidations feed", "full raw replay of market channels"],
+  "coverage": {"bybit_linear_documented_start":"2020-05-28", "required_end":"2026-06-30", "future_reservoir_begins":"2026-07-01"},
+  "sources": [
+    "https://docs.tardis.dev/faq/billing-and-subscriptions",
+    "https://docs.tardis.dev/downloadable-csv-files",
+    "https://docs.tardis.dev/historical-data-details/bybit",
+    "https://bybit-exchange.github.io/docs/v5/market/history-fund-rate",
+    "https://bybit-exchange.github.io/docs/v5/market/instrument"
+  ]
+}

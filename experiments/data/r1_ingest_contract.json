@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "outcome_embargo": true,
+  "pipeline": ["signed download manifest", "partial object .part", "transport retry/range resume", "gzip validation plus SHA-256", "atomic rename into licensed raw store", "source-root canonical digest", "lifecycle compiler", "daily trades materializer", "funding materializer", "PIT universe ledger", "structural validation", "R1 dataset freeze"],
+  "raw_store": "/var/lib/qntylab/licensed/tardis/bybit-r1-v1",
+  "git_policy": "Never store vendor raw files in git. Commit only compact manifests, object hashes, canonical roots, coverage/gap receipts, and schema versions.",
+  "resumability": {"concurrency":"bounded and vendor-rate-limit aware", "failed_download":"no receipt and no atomic promotion", "partial_suffix":".part", "integrity":"SHA-256 each object plus canonical manifest root"},
+  "retention": {"backup":"two independently controlled encrypted copies subject to vendor license", "redownload":"manifest-based only while entitlement remains active", "derived_data":"daily/lifecycle products may be retained separately after source-root binding"},
+  "structural_gates": ["all event and observation timestamps at or before 2026-06-30T23:59:59Z", "no unresolved exposed Grade C/X terminal", "symbol reuse creates a new instance unless continuity is proven", "funding settlement has a funding timestamp and is not predicted_funding_rate", "gaps are explicit and non-tradable"]
+}

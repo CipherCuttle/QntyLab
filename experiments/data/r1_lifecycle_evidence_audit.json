@@ -1,0 +1,63 @@
+{
+  "audit_version": 1,
+  "retrieved_at_utc": "2026-07-29T18:00:00Z",
+  "scope": "Bybit USDT-linear perpetual lifecycle evidence only; no R1 execution or outcome calculation",
+  "outcome_embargo": true,
+  "frozen_cutoff_utc": "2026-06-30T23:59:59Z",
+  "sources": [
+    {"name": "Tardis Bybit derivatives details", "url": "https://docs.tardis.dev/historical-data-details/bybit", "kind": "vendor primary documentation"},
+    {"name": "Tardis exchange-details API", "url": "https://api.tardis.dev/v1/exchanges/bybit", "kind": "vendor public API"},
+    {"name": "Tardis HTTP API reference", "url": "https://docs.tardis.dev/api/http-api-reference", "kind": "vendor primary documentation"},
+    {"name": "Bybit V5 instruments", "url": "https://bybit-exchange.github.io/docs/v5/market/instrument", "kind": "exchange primary documentation"},
+    {"name": "Bybit V5 changelog", "url": "https://bybit-exchange.github.io/docs/changelog/v5", "kind": "exchange primary documentation"},
+    {"name": "Bybit legacy-to-V5 transition notice", "url": "https://t.me/s/Bybit_API_Announcements?before=170", "kind": "exchange primary announcement mirror"}
+  ],
+  "tardis_claims": {
+    "linear_coverage_start_2020_05_28": "CONFIRMED",
+    "instrument_info_listed_as_captured_bybit_channel": "CONFIRMED",
+    "historical_replay_uses_exchange_native_messages_with_local_capture_timestamp": "CONFIRMED",
+    "exchange_details_exposes_symbols_dates_channels_and_incidents": "CONFIRMED",
+    "historical_dead_symbol_raw_replay_without_vendor_confirmation": "PARTIALLY_CONFIRMED",
+    "disconnect_markers_in_returned_bybit_raw_stream": "UNCONFIRMED",
+    "continuous_instrument_info_subscription_for_every_linear_symbol": "UNCONFIRMED"
+  },
+  "public_catalog": {
+    "endpoint": "https://api.tardis.dev/v1/exchanges/bybit",
+    "selection": "type=perpetual and id endswith USDT",
+    "total_records": 964,
+    "current_looking_at_cutoff": 674,
+    "recording_ended_by_cutoff": 290,
+    "interpretation": "availableSince/availableTo are Tardis recording-availability boundaries, not exchange launch/delisting timestamps. Counts are a discovery index only."
+  },
+  "legacy_and_v5_channel_history": [
+    {"period": "2020-05-28 through 2022", "channel_or_topic": "legacy instrument_info.100ms.<symbol>", "publicly_observed_or_documented_fields": ["topic subscription name"], "lifecycle_information": "NOT_PROVEN: the retrieved official connector proves the legacy topic name, not a complete archived USDT-linear field schema or a terminal-state transition."},
+    {"period": "2023-01-01 through 2023-10-16", "channel_or_topic": "legacy instrument_info.100ms.<symbol>", "publicly_observed_or_documented_fields": ["topic subscription name"], "lifecycle_information": "PARTIALLY_CONFIRMED: official changelog documents ticker-field changes, but this audit found no primary archived field table proving status, launch, delivery, or delist fields for the legacy linear instrument_info payload."},
+    {"period": "2023-10-17 onward (V5)", "channel_or_topic": "V5 tickers.<symbol> plus REST /v5/market/instruments-info", "publicly_observed_or_documented_fields": ["REST symbol", "symbolId", "contractType", "status", "launchTime", "deliveryTime", "fundingInterval"], "lifecycle_information": "PARTIALLY_CONFIRMED: V5 REST metadata has lifecycle-relevant fields, but it is a current/post-hoc response. Public evidence does not prove Tardis's historical instrument_info label replays a V5 status transition or maps it to a stable historical schema."}
+  ],
+  "lifecycle_fact_assessment": {
+    "first_existence_or_launch": "DERIVABLE_WITH_RULE: first qualified contemporaneous capture gives first observed existence; official launchTime/announcement can upgrade it. It is not a proof of exchange creation absent such evidence.",
+    "tradable_period": "DERIVABLE_WITH_RULE: require contemporaneous instrument evidence plus a valid trade or ticker observation; gaps are not tradable.",
+    "suspension_or_interruption": "DERIVABLE_WITH_RULE: only an explicit status/event or a classified vendor/exchange incident qualifies. Silence alone is UNKNOWN.",
+    "confirmed_delisting_or_termination": "NOT_PROVEN publicly for the full population: requires explicit historical status/delivery field or timestamped official announcement.",
+    "termination_timestamp": "NOT_PROVEN from availableTo or last observation; use only an explicit timestamped lifecycle source.",
+    "terminal_price_or_settlement": "NOT_PROVEN for a delisted perpetual from trade/ticker disappearance. No synthetic last-price settlement is permitted.",
+    "symbol_reuse_or_relisting": "NOT_PROVEN as permanent ticker continuity; default to a new instance whenever observed lifetime or attributes are discontinuous.",
+    "contract_instance_identity": "DERIVABLE_WITH_RULE: venue|symbol|contract_type|first_observed, augmented with historical symbolId and attributes if observed; unresolved continuity is a new instance."
+  },
+  "graveyard_probes": [
+    {"symbol": "10000000AIDOGEUSDT", "availableFrom": "2024-03-05T00:00:00Z", "availableTo": "2025-04-29T00:00:00Z", "sample_date": "2024-04-01", "trades_csv_http": 200, "derivative_ticker_csv_http": 200},
+    {"symbol": "1000000CHEEMSUSDT", "availableFrom": "2024-11-25T00:00:00Z", "availableTo": "2026-05-30T00:00:00Z", "sample_date": "2025-01-01", "trades_csv_http": 200, "derivative_ticker_csv_http": 200},
+    {"symbol": "1000000PEIPEIUSDT", "availableFrom": "2024-07-04T00:00:00Z", "availableTo": "2025-10-18T00:00:00Z", "sample_date": "2024-08-01", "trades_csv_http": 200, "derivative_ticker_csv_http": 200},
+    {"symbol": "1000000VINUUSDT", "availableFrom": "2023-11-28T00:00:00Z", "availableTo": "2024-02-07T00:00:00Z", "sample_date": "2023-12-01", "trades_csv_http": 200, "derivative_ticker_csv_http": 200},
+    {"symbol": "10000COQUSDT", "availableFrom": "2024-03-12T00:00:00Z", "availableTo": "2025-10-07T00:00:00Z", "sample_date": "2024-04-01", "trades_csv_http": 200, "derivative_ticker_csv_http": 200},
+    {"symbol": "10000ELONUSDT", "availableFrom": "2025-02-10T00:00:00Z", "availableTo": "2026-02-07T00:00:00Z", "sample_date": "2025-03-01", "trades_csv_http": 200, "derivative_ticker_csv_http": 200},
+    {"symbol": "10000LADYSUSDT", "availableFrom": "2023-05-11T00:00:00Z", "availableTo": "2025-10-07T00:00:00Z", "sample_date": "2023-06-01", "trades_csv_http": 200, "derivative_ticker_csv_http": 200},
+    {"symbol": "10000NFTUSDT", "availableFrom": "2022-01-24T00:00:00Z", "availableTo": "2024-09-19T00:00:00Z", "sample_date": "2022-02-01", "trades_csv_http": 200, "derivative_ticker_csv_http": 200},
+    {"symbol": "10000STARLUSDT", "availableFrom": "2023-10-20T00:00:00Z", "availableTo": "2024-08-02T00:00:00Z", "sample_date": "2023-11-01", "trades_csv_http": 200, "derivative_ticker_csv_http": 200},
+    {"symbol": "1000BEERUSDT", "availableFrom": "2024-05-31T00:00:00Z", "availableTo": "2024-10-23T00:00:00Z", "sample_date": "2024-06-01", "trades_csv_http": 200, "derivative_ticker_csv_http": 200}
+  ],
+  "graveyard_interpretation": "All ten selected solely by catalog recording end had both sampled normalized data types publicly addressable. This positively demonstrates retained historical evidence for later-ended candidates. It does not establish that every availableTo is an exchange delisting, nor that raw instrument_info is retained and semantically sufficient.",
+  "source_precedence": ["timestamped official Bybit lifecycle/delivery event", "qualified contemporaneous raw capture with local timestamp", "independent historical market-data capture", "Tardis post-hoc metadata", "last-observation inference"],
+  "contradiction_policy": "Any high-grade contradiction, or an exposed instrument lacking an explicit terminal execution/settlement fact, is BLOCKED_BY_DATA_INTEGRITY.",
+  "decision": "LIFECYCLE_DATA_PENDING_VENDOR_CONFIRMATION"
+}

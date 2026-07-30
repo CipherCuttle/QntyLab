@@ -1,0 +1,7 @@
+{
+  "policy_version": 1,
+  "outcome_embargo": true,
+  "precedence": ["timestamped_official_bybit_event_or_delivery_field", "independent_contemporaneous_historical_capture", "post_hoc_vendor_metadata", "last_observation_inference"],
+  "rules": {"high_grade_disagreement": "BLOCKED_BY_DATA_INTEGRITY", "current_metadata": "may_not_be_projected_backward", "availableTo": "recording-stop evidence only; not a delisting timestamp", "symbol_reuse": "new instrument instance unless continuity is independently proven", "cross_vendor": "corroborate only; never silently merge"},
+  "sources": {"primary_candidate": "Tardis.dev", "corroborators": ["Coin Metrics", "Kaiko", "official Bybit"]}
+}

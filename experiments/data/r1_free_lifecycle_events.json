@@ -1,0 +1,403 @@
+{
+ "artifact": "r1_free_lifecycle_events_v1",
+ "outcome_embargo": true,
+ "announcement_feed_pagination": {
+  "delistings_category": {
+   "pages_fetched": 10,
+   "items_fetched": 456,
+   "earliest_publish_utc": "2022-08-11",
+   "latest_publish_utc": "2026-07-28",
+   "note": "feed terminated naturally (final page returned 6/50 items); this is the channel's full current historical depth, not a pagination-limit artifact"
+  },
+  "new_crypto_category": {
+   "pages_fetched": 10,
+   "items_fetched": 500,
+   "earliest_publish_utc": "2025-07-23",
+   "latest_publish_utc": "2026-07-29",
+   "note": "high-volume category (includes non-perpetual listings); 500 most-recent items span only ~1 year, far short of full 2020-2026 history; deeper listing-history census would require either many more pages or a narrower undocumented sub-tag"
+  }
+ },
+ "title_level_classification_counts_5_category_probe_n250": {
+  "PERP_LISTING": 46,
+  "OTHER": 158,
+  "PERP_DELISTING": 39,
+  "REBRAND": 2,
+  "PERP_RELIST": 1,
+  "CONTRACT_MIGRATION": 4
+ },
+ "delistings_by_publish_year": {
+  "2022": 8,
+  "2023": 20,
+  "2024": 70,
+  "2025": 204,
+  "2026": 154
+ },
+ "sample_delisting_events": [
+  {
+   "title": "Bybit Alpha: Notice of removal of 2 tokens \u2014 Jul 29, 2026, 8:00AM UTC",
+   "url": "https://announcements.bybit.com/en-US/article/bybit-alpha-notice-of-removal-of-2-tokens-jul-29-2026-8-00am-utc--artf31c79e03ee7/",
+   "publish_timestamp_ms": 1785242222000,
+   "start_timestamp_ms": 1785242222000,
+   "end_timestamp_ms": 1785242222000,
+   "queried_type": "delistings",
+   "classified_as": "OTHER"
+  },
+  {
+   "title": "Delisting of XTER,SCA,TOKEN,HPOS10I,PUMPBTC,AFC,INTER,XAVA,AO",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-of-xter-sca-token-hpos10i-pumpbtc-afc-inter-xava-ao--art406557a5a84a/",
+   "publish_timestamp_ms": 1785219102000,
+   "start_timestamp_ms": 1785219102000,
+   "end_timestamp_ms": 1785219102000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Delisting of AERGOUSDT Perpetual Contract",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-of-aergousdt-perpetual-contract--arte0c87ddb14d3/",
+   "publish_timestamp_ms": 1784883516000,
+   "start_timestamp_ms": 1784883516000,
+   "end_timestamp_ms": 1784883516000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Delisting of GIGAUSDT Perpetual Contract",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-of-gigausdt-perpetual-contract--art9ffe2404d99a/",
+   "publish_timestamp_ms": 1784883514000,
+   "start_timestamp_ms": 1784883514000,
+   "end_timestamp_ms": 1784883514000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Delisting of TSTBSCUSDT Perpetual Contract",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-of-tstbscusdt-perpetual-contract--artcdd412e9ea8d/",
+   "publish_timestamp_ms": 1784883512000,
+   "start_timestamp_ms": 1784883512000,
+   "end_timestamp_ms": 1784883512000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Delisting of ROAMUSDT Perpetual Contract",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-of-roamusdt-perpetual-contract--art87ba425d7d17/",
+   "publish_timestamp_ms": 1784883512000,
+   "start_timestamp_ms": 1784883512000,
+   "end_timestamp_ms": 1784883512000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Delisting of BOBBOBUSDT Perpetual Contract",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-of-bobbobusdt-perpetual-contract--artbc556a3c1f0a/",
+   "publish_timestamp_ms": 1784883509000,
+   "start_timestamp_ms": 1784883509000,
+   "end_timestamp_ms": 1784883509000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Delisting 11 Spot trading pairs on 2026-07-28 08:00:00 UTC",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-11-spot-trading-pairs-on-2026-07-28-08-00-00-utc--art6dad56c10a23/",
+   "publish_timestamp_ms": 1784534412000,
+   "start_timestamp_ms": 1784534412000,
+   "end_timestamp_ms": 1784534412000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Delisting 9 Spot trading pairs on 2026-07-24 08:00:00 UTC",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-9-spot-trading-pairs-on-2026-07-24-08-00-00-utc--arta680afe9cefb/",
+   "publish_timestamp_ms": 1784286152000,
+   "start_timestamp_ms": 1784286152000,
+   "end_timestamp_ms": 1784286152000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Delisting of HIGHUSDT Perpetual Contract",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-of-highusdt-perpetual-contract--artfcf38598faa8/",
+   "publish_timestamp_ms": 1784278711000,
+   "start_timestamp_ms": 1784278711000,
+   "end_timestamp_ms": 1784278711000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Delisting of PUMPBTCUSDT Perpetual Contract",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-of-pumpbtcusdt-perpetual-contract--artd26cfb3c63d2/",
+   "publish_timestamp_ms": 1784278707000,
+   "start_timestamp_ms": 1784278707000,
+   "end_timestamp_ms": 1784278707000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Delisting of WHITEWHALEUSDT Perpetual Contract",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-of-whitewhaleusdt-perpetual-contract--art994fe4b63f70/",
+   "publish_timestamp_ms": 1784278704000,
+   "start_timestamp_ms": 1784278704000,
+   "end_timestamp_ms": 1784278704000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Delisting of CBK,FLIP,FUEL,OL,PAAL,SAROS,STREAM",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-of-cbk-flip-fuel-ol-paal-saros-stream--artc357601e1303/",
+   "publish_timestamp_ms": 1784199502000,
+   "start_timestamp_ms": 1784199502000,
+   "end_timestamp_ms": 1784199502000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Bybit Alpha: Notice of removal of 1 tokens \u2014 Jul 16, 2026, 8:00AM UTC",
+   "url": "https://announcements.bybit.com/en-US/article/bybit-alpha-notice-of-removal-of-1-tokens-jul-16-2026-8-00am-utc--art4d47266fe38d/",
+   "publish_timestamp_ms": 1784185702000,
+   "start_timestamp_ms": 1784185702000,
+   "end_timestamp_ms": 1784185702000,
+   "queried_type": "delistings",
+   "classified_as": "OTHER"
+  },
+  {
+   "title": "Delisting of KORUUSDT Perpetual Contract",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-of-koruusdt-perpetual-contract--art650aac6794f7/",
+   "publish_timestamp_ms": 1783591176000,
+   "start_timestamp_ms": 1783591176000,
+   "end_timestamp_ms": 1783591176000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Delisting of ARTY,CTA,GTAI,LBTC,MBOX,NAKA,U",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-of-arty-cta-gtai-lbtc-mbox-naka-u--art81c9cb138ade/",
+   "publish_timestamp_ms": 1783579152000,
+   "start_timestamp_ms": 1783579152000,
+   "end_timestamp_ms": 1783579152000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Delisting of ESUSDT Perpetual Contract",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-of-esusdt-perpetual-contract--arta80e7b945dce/",
+   "publish_timestamp_ms": 1783501186000,
+   "start_timestamp_ms": 1783501186000,
+   "end_timestamp_ms": 1783501186000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Delisting of SWARMSUSDT Perpetual Contract",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-of-swarmsusdt-perpetual-contract--art2910d50438d3/",
+   "publish_timestamp_ms": 1783501184000,
+   "start_timestamp_ms": 1783501184000,
+   "end_timestamp_ms": 1783501184000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Delisting of SCRUSDT Perpetual Contract",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-of-scrusdt-perpetual-contract--art75b079e80cfb/",
+   "publish_timestamp_ms": 1783501178000,
+   "start_timestamp_ms": 1783501178000,
+   "end_timestamp_ms": 1783501178000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Discontinuation of ERA, HAEDAL, LA, MOG, TOSHI, BRETT, H, SAFE, TAIKO  as Collateral and Lending Asset ",
+   "url": "https://announcements.bybit.com/en-US/article/discontinuation-of-era-haedal-la-mog-toshi-brett-h-safe-taiko-as-collateral-and-lending-asset-blt171c9aac10df55ee/",
+   "publish_timestamp_ms": 1782801962000,
+   "start_timestamp_ms": 1782801962000,
+   "end_timestamp_ms": 1782801962000,
+   "queried_type": "delistings",
+   "classified_as": "OTHER"
+  },
+  {
+   "title": "Bybit Alpha: Notice of removal of 5 tokens \u2014 Jun 29, 2026, 8:00AM UTC",
+   "url": "https://announcements.bybit.com/en-US/article/bybit-alpha-notice-of-removal-of-5-tokens-jun-29-2026-8-00am-utc-bltdbbc53bb4db4007b/",
+   "publish_timestamp_ms": 1782713800000,
+   "start_timestamp_ms": 1782713800000,
+   "end_timestamp_ms": 1782713800000,
+   "queried_type": "delistings",
+   "classified_as": "OTHER"
+  },
+  {
+   "title": "Delisting of IPPERP USDC Perpetual Contract",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-of-ipperp-usdc-perpetual-contract-blt0c640bec7f483465/",
+   "publish_timestamp_ms": 1782386384000,
+   "start_timestamp_ms": 1782386386000,
+   "end_timestamp_ms": 1782777600000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Delisting 1  Spot trading pairs on 2026-06-29 08:00:00 UTC",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-1-spot-trading-pairs-on-2026-06-29-08-00-00-utc-bltfae333871ef962f6/",
+   "publish_timestamp_ms": 1782375420000,
+   "start_timestamp_ms": 1782375420000,
+   "end_timestamp_ms": 1782375420000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Delisting of MBOXUSDT Perpetual Contract",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-of-mboxusdt-perpetual-contract-blt20a0d0ac5d257063/",
+   "publish_timestamp_ms": 1782300720000,
+   "start_timestamp_ms": 1782300720000,
+   "end_timestamp_ms": 1782300720000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Delisting of SOLVUSDT Perpetual Contract",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-of-solvusdt-perpetual-contract-bltd1114a0644d4f077/",
+   "publish_timestamp_ms": 1782300680000,
+   "start_timestamp_ms": 1782300680000,
+   "end_timestamp_ms": 1782300680000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Delisting of MLNUSDT Perpetual Contract",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-of-mlnusdt-perpetual-contract-bltfa1a1c6961da67b6/",
+   "publish_timestamp_ms": 1782300640000,
+   "start_timestamp_ms": 1782300640000,
+   "end_timestamp_ms": 1782300640000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Delisting of IPUSDT Perpetual Contract",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-of-ipusdt-perpetual-contract-blt6ded6acc1447f3ec/",
+   "publish_timestamp_ms": 1782197970000,
+   "start_timestamp_ms": 1782197970000,
+   "end_timestamp_ms": 1782197970000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Delisting of IMU,PENGUIN,SPELL",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-of-imu-penguin-spell-bltae9bab723625bd08/",
+   "publish_timestamp_ms": 1782115240000,
+   "start_timestamp_ms": 1782115240000,
+   "end_timestamp_ms": 1782115240000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Discontinuation of  IP  as Collateral and Lending Asset",
+   "url": "https://announcements.bybit.com/en-US/article/discontinuation-of-ip-as-collateral-and-lending-asset-blt76d4ac187fae6a3d/",
+   "publish_timestamp_ms": 1782110190000,
+   "start_timestamp_ms": 1782110190000,
+   "end_timestamp_ms": 1782110190000,
+   "queried_type": "delistings",
+   "classified_as": "OTHER"
+  },
+  {
+   "title": "XION (XION) token swap and rebrand to VERONA (VERONA)",
+   "url": "https://announcements.bybit.com/en-US/article/xion-xion-token-swap-and-rebrand-to-verona-verona--blt93a96e2fa6e35b9e/",
+   "publish_timestamp_ms": 1781740800000,
+   "start_timestamp_ms": 1781776800000,
+   "end_timestamp_ms": 1785456000000,
+   "queried_type": "delistings",
+   "classified_as": "REBRAND"
+  },
+  {
+   "title": "Delisting of EAT, KILO, ZEX, MVL, SYND, ZRC, and PUFF",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-of-eat-kilo-zex-mvl-synd-zrc-and-puff-blt9bc0cc705259532f/",
+   "publish_timestamp_ms": 1781654400000,
+   "start_timestamp_ms": 1781654400000,
+   "end_timestamp_ms": 1785456000000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Delisting of XIONUSDT Perpetual Contract",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-of-xionusdt-perpetual-contract-bltfb9fa5fb0f7c5c3f/",
+   "publish_timestamp_ms": 1781600340000,
+   "start_timestamp_ms": 1781600340000,
+   "end_timestamp_ms": 1781600340000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Discontinuation of SAHARA  as Collateral and Lending Asset",
+   "url": "https://announcements.bybit.com/en-US/article/discontinuation-of-sahara-as-collateral-and-lending-asset-blt068e188c616d4a1b/",
+   "publish_timestamp_ms": 1781582730000,
+   "start_timestamp_ms": 1781582730000,
+   "end_timestamp_ms": 1781582730000,
+   "queried_type": "delistings",
+   "classified_as": "OTHER"
+  },
+  {
+   "title": "Delisting 2 Spot trading pairs on Jun 16, 2026",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-2-spot-trading-pairs-on-jun-16-2026-blt49d9295497380862/",
+   "publish_timestamp_ms": 1781568000000,
+   "start_timestamp_ms": 1781568000000,
+   "end_timestamp_ms": 1785456000000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Delisting of TONUSDT Perpetual Contract",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-of-tonusdt-perpetual-contract-bltd27f1f00e6b0f5ed/",
+   "publish_timestamp_ms": 1781171930000,
+   "start_timestamp_ms": 1781171930000,
+   "end_timestamp_ms": 1781171930000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Delisting of SEND and OAS",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-of-send-and-oas-blt1550b09172e79b89/",
+   "publish_timestamp_ms": 1781136000000,
+   "start_timestamp_ms": 1781166600000,
+   "end_timestamp_ms": 1782777600000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  },
+  {
+   "title": "Bybit to support Toncoin (TON) rebrand and ticker change to Gram (GRAM)",
+   "url": "https://announcements.bybit.com/en-US/article/bybit-to-support-toncoin-ton-rebrand-and-ticker-change-to-gram-gram--blt617f4bf48950ab77/",
+   "publish_timestamp_ms": 1781080200000,
+   "start_timestamp_ms": 1781080200000,
+   "end_timestamp_ms": 1785492000000,
+   "queried_type": "delistings",
+   "classified_as": "REBRAND"
+  },
+  {
+   "title": "Discontinuation of H  as Collateral and Lending Asset",
+   "url": "https://announcements.bybit.com/en-US/article/discontinuation-of-h-as-collateral-and-lending-asset-bltb119a6e5401e4934/",
+   "publish_timestamp_ms": 1781066840000,
+   "start_timestamp_ms": 1781066840000,
+   "end_timestamp_ms": 1781066840000,
+   "queried_type": "delistings",
+   "classified_as": "OTHER"
+  },
+  {
+   "title": "Notice of Delisting and Relisting of SPCXUSDT Pre-IPO Perpetual Contract",
+   "url": "https://announcements.bybit.com/en-US/article/notice-of-delisting-and-relisting-of-spcxusdt-pre-ipo-perpetual-contract-blte48557ba3cae4f5d/",
+   "publish_timestamp_ms": 1781025199000,
+   "start_timestamp_ms": 1781025202000,
+   "end_timestamp_ms": 1782777600000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_RELIST"
+  },
+  {
+   "title": "Delisting of SCUSDT Perpetual Contract",
+   "url": "https://announcements.bybit.com/en-US/article/delisting-of-scusdt-perpetual-contract-bltd06c5c9fb3700b3b/",
+   "publish_timestamp_ms": 1780995680000,
+   "start_timestamp_ms": 1780995680000,
+   "end_timestamp_ms": 1780995680000,
+   "queried_type": "delistings",
+   "classified_as": "PERP_DELISTING"
+  }
+ ],
+ "one_body_parse_case_study": {
+  "url": "https://announcements.bybit.com/en-US/article/delisting-of-fetusdt-oceanusdt-and-agixusdt-perpetual-contracts-blt76ce31b7f7becb38/",
+  "finding": "structured field end_time=2024-06-07T16:00:00.000Z disagrees with the article description prose ('at 10AM UTC on Jun 7, 2024'); this is an internal disagreement within a single official document, not a cross-vendor one",
+  "terminal_price_rule": "UNKNOWN",
+  "reason": "content_html was empty; the rich-text 'content' field is a nested Contentstack JSON doc whose leaf text nodes were not extractable with a generic walk in this session; a dedicated schema-aware parser is required before order-cancellation/position-closure/price-basis mechanics can be extracted body-wide"
+ }
+}

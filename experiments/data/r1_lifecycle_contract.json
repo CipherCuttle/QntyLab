@@ -1,0 +1,11 @@
+{
+  "contract_version": 1,
+  "outcome_embargo": true,
+  "instrument_instance_id": "venue|symbol|contract_type|first_observed_timestamp[|symbol-id=<id>]",
+  "required_fields": ["instrument_instance_id", "venue", "symbol", "contract_type", "tradable_intervals", "daily_close", "daily_quote_volume", "funding_settlements", "gap_state", "terminal_state", "terminal_evidence_grade"],
+  "states": ["UNKNOWN", "PRELAUNCH", "OBSERVED_NOT_ELIGIBLE", "TRADABLE", "TEMPORARILY_UNOBSERVABLE", "TERMINATED_VERIFIED", "TERMINATED_AMBIGUOUS"],
+  "evidence_grades": {"GRADE_A": "timestamped official lifecycle or delisting evidence", "GRADE_B": "qualified contemporaneous capture establishes an observed state", "GRADE_C": "last observation/disappearance only", "GRADE_X": "contradictory evidence"},
+  "terminal_policy": {"verified_with_settlement": "PROCESS_FROZEN_SETTLEMENT_RULE", "ambiguous_unexposed": "REMOVE_AFTER_LAST_VERIFIED_TRADABLE_STATE", "ambiguous_exposed": "BLOCKED_BY_DATA_INTEGRITY", "forbidden": ["implicit_last_price_exit", "interpolation", "favorable_exit_invention"]},
+  "gap_classes": ["vendor_recording_incident", "exchange_outage", "illiquidity_no_trades", "api_or_archive_absence", "suspension", "true_delisting", "unknown_disappearance"],
+  "cutoff_utc": "2026-06-30T23:59:59Z"
+}

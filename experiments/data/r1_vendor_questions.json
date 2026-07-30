@@ -1,0 +1,14 @@
+{
+  "question_set_version": 1,
+  "outcome_embargo": true,
+  "questions": [
+    {"id": "Q1", "question": "For exchange=bybit, does paid raw replay include historical instrument_info messages for USDT-linear perpetuals from 2020-05-28 through 2026-06-30? Answer YES/NO and name the required product and replay filter."},
+    {"id": "Q2", "question": "After a Bybit USDT-linear perpetual disappears from the current exchange catalog, do its historical instrument_info messages remain replayable? Answer YES/NO and provide one replay request and one redacted/raw response sample for a delisted symbol."},
+    {"id": "Q3", "question": "Were instrument_info subscriptions maintained for every newly discovered USDT-linear perpetual throughout this interval? If not, describe discovery/subscription gaps and how they appear in replay or incidents."},
+    {"id": "Q4", "question": "For legacy 2020-2023 instrument_info and post-V5 Bybit data, provide versioned sample payloads or schemas and identify which fields carry status, launch, delivery/delist, symbolId, and contract attributes."},
+    {"id": "Q5", "question": "Does raw replay preserve local capture timestamps and connection/disconnect or gap markers for Bybit? Answer YES/NO and provide a minimal example."},
+    {"id": "Q6", "question": "What exactly does availableTo in /v1/exchanges/bybit mean: last successfully recorded data, end of a subscription, exchange delisting, or another condition? Can it lag an exchange event?"},
+    {"id": "Q7", "question": "Does Tardis expose any lifecycle feed or metadata, beyond normalized CSV, that records Bybit status/delivery/delisting transitions? Answer YES/NO with endpoint and retention semantics."},
+    {"id": "Q8", "question": "How should a reused or relisted Bybit symbol be identified in historical raw data? Is there a stable historical exchange identifier, and is it present in the replay payload?"}
+  ]
+}

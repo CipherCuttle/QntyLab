@@ -294,11 +294,25 @@ def test_parser_a_sha_recorded_at_amendment_freeze_time_is_historically_accurate
     assert historical_sha == amendment["semantic_body"]["parser_status"]["parser_a"]["current_sha256"]
 
 
-def test_parser_b_unmodified_by_this_amendment_sha256():
-    import qntylab.r1_retention_candidate as rc
+def test_parser_b_sha_recorded_at_amendment_freeze_time_is_historically_accurate():
+    """No longer asserts Parser B is byte-identical *today* -- Parser B has
+    since been legitimately repaired by the subsequent, separately-reviewed
+    timestamp-canonicalization repair (first_source_timestamp_utc /
+    last_source_timestamp_utc; see
+    tests/test_r1_timestamp_canonicalization_repair_v1.py), which this
+    amendment's duplicate-semantics scope never addressed. Instead verifies
+    the amendment's recorded snapshot (parser_status.parser_b_e466401.
+    current_sha256) was accurate *at commit e466401* (unchanged through
+    e56b201, the duplicate-semantics repair this amendment specifically
+    governs), which remains true and immutable regardless of the later,
+    unrelated timestamp repair."""
     amendment = _load_amendment()
-    actual = hashlib.sha256(Path(rc.__file__).read_bytes()).hexdigest()
-    assert actual == amendment["semantic_body"]["parser_status"]["parser_b_e466401"]["current_sha256"]
+    result = subprocess.run(
+        ["git", "show", "e466401:qntylab/r1_retention_candidate.py"],
+        cwd=REPO_ROOT, capture_output=True, check=True,
+    )
+    historical_sha = hashlib.sha256(result.stdout).hexdigest()
+    assert historical_sha == amendment["semantic_body"]["parser_status"]["parser_b_e466401"]["current_sha256"]
 
 
 # --- 4. adversarial battery: one logical input -> one canonical output -----

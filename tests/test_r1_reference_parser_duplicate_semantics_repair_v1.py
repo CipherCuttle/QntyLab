@@ -31,6 +31,7 @@ import gzip
 import hashlib
 import itertools
 import json
+import subprocess
 from datetime import date
 from pathlib import Path
 
@@ -151,10 +152,22 @@ def test_frozen_protocol_hashes_unchanged():
     assert amendment["status"] == "FROZEN"
 
 
-def test_parser_b_byte_identical_not_modified_by_this_repair():
-    import qntylab.r1_retention_candidate as rc
-    actual = hashlib.sha256(Path(rc.__file__).read_bytes()).hexdigest()
-    assert actual == EXPECTED_PARSER_B_SHA256
+def test_parser_b_sha_recorded_at_this_repair_commit_is_historically_accurate():
+    """No longer asserts Parser B is byte-identical *today* -- Parser B has
+    since been legitimately repaired by the subsequent, separately-reviewed
+    timestamp-canonicalization repair (see
+    tests/test_r1_timestamp_canonicalization_repair_v1.py), which this
+    duplicate-semantics repair's own scope never touched. Instead verifies
+    Parser B's hash *at commit e56b201* (this repair's own commit, at which
+    Parser B was untouched) matches the historically recorded snapshot,
+    which remains true and immutable regardless of the later, unrelated
+    timestamp repair."""
+    result = subprocess.run(
+        ["git", "show", "e56b201:qntylab/r1_retention_candidate.py"],
+        cwd=REPO_ROOT, capture_output=True, check=True,
+    )
+    historical_sha = hashlib.sha256(result.stdout).hexdigest()
+    assert historical_sha == EXPECTED_PARSER_B_SHA256
 
 
 # --- 1. CX reproduction (documents the pre-repair defect, now fixed) --------

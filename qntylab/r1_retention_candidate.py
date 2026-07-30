@@ -17,7 +17,7 @@ unmutated) REHYDRATABILITY; it does not give PRESERVATION.
 """
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 from hashlib import sha256
 from pathlib import Path
@@ -118,6 +118,28 @@ def _canonical_duplicate_representative(group: list[tuple]) -> tuple:
     return min(group, key=lambda g: (str(g[3]), str(g[2])))
 
 
+def _canonical_utc_timestamp(ts_decimal: Decimal) -> str:
+    """UTC ISO-8601 string, millisecond-or-finer, per
+    r1_normalized_evidence_contract_v1.json:DailyMarketEvidenceV1
+    first_source_timestamp_utc/last_source_timestamp_utc (type: "timestamp
+    (ISO 8601, millisecond or finer)"). Derived independently from Parser A's
+    formatter (qntylab.r1_reference_parser._epoch_to_iso is not imported or
+    called here): the fractional-second component comes from the exact
+    Decimal remainder of the source token (never through binary float, so a
+    value such as Decimal("1585132572.9822") cannot be perturbed by float64
+    rounding), zero-padded up to a millisecond minimum; source precision
+    finer than milliseconds is preserved verbatim, never truncated.
+    """
+    whole_seconds = int(ts_decimal)
+    fractional = ts_decimal - whole_seconds
+    moment = datetime.fromtimestamp(whole_seconds, tz=timezone.utc)
+    fractional_str = str(fractional)
+    fractional_digits = fractional_str.split(".")[1] if "." in fractional_str else ""
+    if len(fractional_digits) < 3:
+        fractional_digits = fractional_digits.ljust(3, "0")
+    return moment.strftime("%Y-%m-%dT%H:%M:%S") + "." + fractional_digits + "Z"
+
+
 def daily_primitive(*, stream_id: str, utc_date: str, header: tuple[str, ...],
                      rows: list[dict[str, str]], historical_cutoff_utc: str) -> tuple[dict, list[str]]:
     """Build the strategy-independent daily forensic primitive for one
@@ -133,11 +155,12 @@ def daily_primitive(*, stream_id: str, utc_date: str, header: tuple[str, ...],
     day_start = datetime.fromisoformat(utc_date + "T00:00:00+00:00").timestamp()
     day_end = datetime.fromisoformat(utc_date + "T23:59:59.999999+00:00").timestamp()
 
-    valid_rows: list[tuple[float, str, Decimal, Decimal, str, str]] = []
+    valid_rows: list[tuple[float, str, Decimal, Decimal, str, str, Decimal]] = []
     rejected = 0
     for index, row in enumerate(rows):
         try:
             ts = float(row["timestamp"])
+            ts_decimal = Decimal(row["timestamp"])
             size, price = Decimal(row["size"]), Decimal(row["price"])
             side, trdid, tickdir = row["side"], row["trdMatchID"], row["tickDirection"]
             home, foreign, gross = float(row["homeNotional"]), float(row["foreignNotional"]), float(row["grossValue"])
@@ -176,7 +199,7 @@ def daily_primitive(*, stream_id: str, utc_date: str, header: tuple[str, ...],
             continue
         if not diagnostic_ok:
             anomalies.append(ANOMALY_REDUNDANT_FIELD_MISMATCH)
-        valid_rows.append((ts, side, size, price, tickdir, trdid))
+        valid_rows.append((ts, side, size, price, tickdir, trdid, ts_decimal))
 
     # Canonical trade identity is trdMatchID alone: `side` is
     # INTENTIONALLY_DISCARDED per r1_information_loss_ledger_v1.json and is
@@ -193,7 +216,7 @@ def daily_primitive(*, stream_id: str, utc_date: str, header: tuple[str, ...],
     for r in valid_rows:
         by_id.setdefault(r[5], []).append(r)
 
-    parsed: list[tuple[float, str, float, float, str, str]] = []
+    parsed: list[tuple[float, str, Decimal, Decimal, str, str, Decimal]] = []
     duplicate_count = 0
     for trdid, group in by_id.items():
         if len(group) == 1:
@@ -237,8 +260,8 @@ def daily_primitive(*, stream_id: str, utc_date: str, header: tuple[str, ...],
         "close": str(prices[-1]),
         "base_volume": str(sum(r[2] for r in parsed)),
         "quote_turnover": str(sum(r[2] * r[3] for r in parsed)),
-        "first_source_timestamp_utc": parsed[0][0],
-        "last_source_timestamp_utc": parsed[-1][0],
+        "first_source_timestamp_utc": _canonical_utc_timestamp(parsed[0][6]),
+        "last_source_timestamp_utc": _canonical_utc_timestamp(parsed[-1][6]),
         "first_source_trade_id": parsed[0][5],
         "last_source_trade_id": parsed[-1][5],
     }

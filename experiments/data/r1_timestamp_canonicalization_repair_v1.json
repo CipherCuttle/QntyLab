@@ -1,0 +1,107 @@
+{
+  "artifact": "r1_timestamp_canonicalization_repair_v1",
+  "artifact_kind": "PARSER_REPAIR_RECEIPT",
+  "status": "CANDIDATE_NOT_YET_FROZEN",
+  "task": "Repair the canonical string representation of first_source_timestamp_utc/last_source_timestamp_utc in both Parser A (qntylab/r1_reference_parser.py) and Parser B (qntylab/r1_retention_candidate.py) to conform to r1_normalized_evidence_contract_v1.json:DailyMarketEvidenceV1's own required field type (\"timestamp (ISO 8601, millisecond or finer)\"), per the independent NEW CHAT review of Parser A candidate commit e56b201 (verdict BLOCKED_BY_CANONICAL_FIELD_SCOPE).",
+  "self_freeze_authorized": false,
+  "outcome_embargo": true,
+  "raw_deletion_authorized": false,
+  "frozen_protocol_binding": {
+    "governance_freeze_commit_sha": "2da988c7cfa6defe90991f823e988d97fc0952d1",
+    "amendment_semantic_content_sha256": "aa732948b19957a2e3fb7cd2ae1905a3b94a902a0200e24e25874f036894adf9",
+    "effective_combined_contract_binding_sha256": "0d0dc12c16535f4ecb06ccfd9b87543862caf7d261cbe8a459d152dee4f493ab",
+    "base_contract_sha256": "c199b9481285d80b34183b8a7681f75ef7e60e5aadad6e4e0ece3ef8f33d6c92",
+    "note": "all three independently re-verified unchanged before and after this repair; this repair modifies no frozen protocol artifact, only parser implementation code"
+  },
+  "prior_review": {
+    "reviewed_commit": "e56b201",
+    "verdict": "BLOCKED_BY_CANONICAL_FIELD_SCOPE",
+    "finding": "first_source_timestamp_utc/last_source_timestamp_utc are required canonical DailyMarketEvidenceV1 fields typed 'timestamp (ISO 8601, millisecond or finer)'. Parser B returned a bare Python float (not ISO-8601 at all); Parser A returned ISO-8601 but under-padded whole-second tokens to a single fractional digit instead of millisecond-or-finer. Both were prior, already-logged, still-open findings (see known_out_of_scope_findings_still_open in r1_parser_b_numeric_conformance_repair_v1.json), not sanctioned permitted provenance differences."
+  },
+  "parser_a": {
+    "pre_repair_sha256": "0d019ec2ba7969bfe6f07d6e3da0ea302968ae4a0969a4661b852bb59baba07d",
+    "post_repair_sha256": "76bfd763afbce1167ff931b912c7bb12e6c90e4b07d9ef862f6400e14a63823e",
+    "location_of_fix": "qntylab/r1_reference_parser.py:_epoch_to_iso -- fractional-second digit string is now zero-padded to a minimum of 3 digits (millisecond) when the source token has fewer than 3 fractional digits (including zero, i.e. a bare whole-second token); source precision finer than milliseconds is preserved verbatim, never truncated",
+    "conformance_pre_repair": "NONCONFORMING (whole-second tokens rendered as a single fractional digit, e.g. '...:36.0Z' instead of '...:36.000Z')",
+    "conformance_post_repair": "CONFORMS (candidate; not self-frozen -- see self_freeze_authorized)"
+  },
+  "parser_b": {
+    "pre_repair_sha256": "cfa829c7e28a658258cf31d768c7685c5a6e0cad0c04c75a1fb3faaba0e685c6",
+    "post_repair_sha256": "65aea38964fe18ad702376937aee9caa410125f0b8dd2efbd5833f5219d3f075",
+    "location_of_fix": "qntylab/r1_retention_candidate.py: added a new standalone helper _canonical_utc_timestamp(ts_decimal); daily_primitive now additionally parses Decimal(row['timestamp']) alongside the existing float(row['timestamp']) (the float is retained, unmodified, for day-boundary/cutoff checks and event-time sort ordering -- out of this repair's scope), carries the exact Decimal timestamp as a 7th tuple element through grouping/duplicate-representative-selection/sort (all of which continue to index only the pre-existing 6 elements, so this repair changes no duplicate/ordering logic), and serializes first_source_timestamp_utc/last_source_timestamp_utc from that Decimal via _canonical_utc_timestamp instead of returning the bare float",
+    "conformance_pre_repair": "NONCONFORMING (bare Python float, not ISO-8601 at all)",
+    "conformance_post_repair": "CONFORMS (candidate; not self-frozen -- see self_freeze_authorized)"
+  },
+  "canonical_timestamp_rule": {
+    "rule": "UTC ISO-8601 string 'YYYY-MM-DDTHH:MM:SS.fffZ', derived from the exact Decimal parse of the source epoch-seconds token (never through binary float): whole_seconds = int(ts_decimal) (truncation toward zero, unchanged from pre-existing behavior); fractional = ts_decimal - whole_seconds (exact Decimal subtraction); the fractional digit string is zero-padded on the right to a minimum of 3 digits (millisecond floor) but never truncated if the source token already carries more than 3 fractional digits.",
+    "precision_policy": "millisecond-or-finer per the frozen contract's declared type; source precision beyond milliseconds (observed up to 4-6 digits on real cached objects) is preserved verbatim, never rounded or truncated",
+    "worked_examples": {
+      "whole_second": {"input": "1700000000", "output": "2023-11-14T22:13:20.000Z"},
+      "1_fractional_digit": {"input": "1700000000.1", "output": "2023-11-14T22:13:20.100Z"},
+      "2_fractional_digits": {"input": "1700000000.01", "output": "2023-11-14T22:13:20.010Z"},
+      "3_fractional_digits": {"input": "1700000000.001", "output": "2023-11-14T22:13:20.001Z"},
+      "4_fractional_digits_preserved": {"input": "1585132572.9822", "output": "2020-03-25T10:36:12.9822Z"}
+    }
+  },
+  "precision_firewall": {
+    "claim": "the canonical timestamp string is never derived by formatting a binary float; both parsers derive it from a Decimal parsed directly from the source token",
+    "parser_a_evidence": "_epoch_to_iso takes a Decimal parameter; parse_daily_object already parsed row['timestamp'] as Decimal (ts = _parse_decimal(row['timestamp'])) before this repair, so no new float conversion was introduced",
+    "parser_b_evidence": "daily_primitive now parses ts_decimal = Decimal(row['timestamp']) directly from the source string in the same try block as the pre-existing float(row['timestamp']) parse (retained, unused for canonical timestamp serialization); _canonical_utc_timestamp consumes only ts_decimal, never the float ts",
+    "counterexample_checked": "1585132572.9822 (real BTCUSDT first trade): float(Decimal('1585132572.9822')) == 1585132572.9822 in this specific case (no float64 rounding is visible at this magnitude), but the canonical serialization path does not depend on that float even being computed correctly -- it is never read for this field"
+  },
+  "independent_implementation_statement": {
+    "does_not_import_qntylab.r1_retention_candidate_from_parser_a": true,
+    "does_not_import_qntylab.r1_reference_parser_from_parser_b": true,
+    "verified_by": "AST-based import check (ast.walk over each module's own Import/ImportFrom nodes), not a substring search -- substring search on either module's source false-positives on its own docstring, which describes the independence property in prose",
+    "shared_utility_note": "Parser B imports qntylab.r1_input_bom.canonical_hash/canonical_bytes (a generic, repo-wide JSON-canonicalization helper with no market-timestamp semantics); Parser A defines its own separate canonical_bytes/canonical_hash. The two _canonical_utc_timestamp/_epoch_to_iso timestamp formatters are separately written, non-shared functions."
+  },
+  "counterexample_closure": {
+    "btc_float_vs_iso": {
+      "object": "BTCUSDT_2020-03-25",
+      "pre_repair": "A='2020-03-25T10:36:12.9822Z' (str) vs B=1585132572.9822 (float) -- type mismatch, B not ISO-8601",
+      "post_repair": "A == B == '2020-03-25T10:36:12.9822Z' (str, str)",
+      "status": "CLOSED"
+    },
+    "anc_whole_second": {
+      "object": "ANCUSDT_2022-03-15",
+      "pre_repair": "A='2022-03-15T07:19:36.0Z' (1 fractional digit, below millisecond floor)",
+      "post_repair": "A == B == '2022-03-15T07:19:36.000Z'",
+      "status": "CLOSED"
+    },
+    "ftt_whole_second": {
+      "object": "FTTUSDT_2022-11-13",
+      "pre_repair": "A='2022-11-13T00:00:00.0Z' (1 fractional digit, below millisecond floor)",
+      "post_repair": "A == B == '2022-11-13T00:00:00.000Z'",
+      "status": "CLOSED"
+    }
+  },
+  "real_corpus_cross_validation": {
+    "objects_checked": 5,
+    "result": "A/B first_source_timestamp_utc and last_source_timestamp_utc are byte-identical strings (both type str) on all 5 currently cached real objects, including the 3 named counterexamples above; all other previously-agreeing canonical fields (trade_count, open, high, low, close, base_volume, quote_turnover, duplicate_count, rejected_row_count, schema_id, first/last_source_trade_id) remain unchanged and in agreement",
+    "test": "tests/test_r1_timestamp_canonicalization_repair_v1.py::test_real_corpus_timestamp_agreement_and_counterexample_closure"
+  },
+  "adversarial_a_b_result": {
+    "classes_checked": [
+      "whole second, 1/2/3/4/6 fractional digits", "before/after midnight UTC",
+      "month boundary", "year boundary", "leap day",
+      "event order != raw arrival order (with and without a duplicate group present)",
+      "duplicate semantics regression (price-scale, 3+ spellings, genuine conflict)",
+      "numeric regression (4.35x100, 0.1+0.2+0.3, 20-significant-digit value)",
+      "row permutation invariance", "equivalent-duplicate-spelling permutation invariance"
+    ],
+    "result": "Parser A and Parser B produce byte-identical canonical timestamp strings on every case; no duplicate-semantics, event-ordering, or numeric-field regression detected",
+    "test": "tests/test_r1_timestamp_canonicalization_repair_v1.py"
+  },
+  "event_time_semantics": "unchanged; canonical timestamp formatting operates only on the already-selected first/last trade's own timestamp value -- it does not participate in trade selection, sorting, or duplicate-representative choice in either parser",
+  "duplicate_numeric_ordering_integrity": "no duplicate-representative-selection, numeric aggregation (open/high/low/close/base_volume/quote_turnover), or event-time sort-key logic was touched in either parser; pre-existing tests covering those (tests/test_r1_reference_parser.py, tests/test_r1_reference_parser_duplicate_semantics_repair_v1.py, tests/test_r1_duplicate_semantics_amendment_v1.py, tests/test_r1_retention_candidate*.py) pass unmodified except for two stale historical-snapshot assertions that pinned Parser B's file hash as permanently unchanged (updated to check the hash at commit e56b201, the last commit before this repair, per the same historical-snapshot pattern already used in this repo for Parser A's own analogous prior update)",
+  "changeset": [
+    "qntylab/r1_reference_parser.py",
+    "qntylab/r1_retention_candidate.py",
+    "tests/test_r1_timestamp_canonicalization_repair_v1.py (new)",
+    "tests/test_r1_duplicate_semantics_amendment_v1.py (1 test renamed/updated: test_parser_b_unmodified_by_this_amendment_sha256 -> test_parser_b_sha_recorded_at_amendment_freeze_time_is_historically_accurate, now checking Parser B's hash at commit e466401 instead of the live file, since this repair legitimately modifies Parser B)",
+    "tests/test_r1_reference_parser_duplicate_semantics_repair_v1.py (1 test renamed/updated: test_parser_b_byte_identical_not_modified_by_this_repair -> test_parser_b_sha_recorded_at_this_repair_commit_is_historically_accurate, now checking Parser B's hash at commit e56b201 instead of the live file)",
+    "experiments/data/r1_timestamp_canonicalization_repair_v1.json (this receipt)"
+  ],
+  "next_step": "operator/protocol-owner review of this repair candidate; a NEW CHAT reviewer decision on whether to freeze the timestamp-canonicalization conformance status is out of scope for this task",
+  "outcome_embargo_verified": "no H012/H014, PIT rank, weight, forward return, PnL, IC, Sharpe, or weekly/null/replication outcome was computed, inspected, or referenced in performing this repair"
+}

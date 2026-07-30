@@ -113,11 +113,21 @@ def identify_schema(header: list) -> Optional[str]:
 
 
 def _epoch_to_iso(ts: Decimal) -> str:
+    """UTC ISO-8601 string, millisecond-or-finer, per
+    r1_normalized_evidence_contract_v1.json:DailyMarketEvidenceV1
+    first_source_timestamp_utc/last_source_timestamp_utc (type: "timestamp
+    (ISO 8601, millisecond or finer)"). The fractional-second component is
+    taken from the exact Decimal remainder (never through float) and
+    zero-padded up to a millisecond minimum (3 digits); source precision
+    finer than milliseconds is preserved verbatim, never truncated.
+    """
     whole = int(ts)
     frac = ts - whole
     dt = datetime.fromtimestamp(whole, tz=timezone.utc)
     frac_str = str(frac)
-    frac_digits = frac_str.split(".")[1] if "." in frac_str else "0"
+    frac_digits = frac_str.split(".")[1] if "." in frac_str else ""
+    if len(frac_digits) < 3:
+        frac_digits = frac_digits.ljust(3, "0")
     return f"{dt.strftime('%Y-%m-%dT%H:%M:%S')}.{frac_digits}Z"
 
 

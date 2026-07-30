@@ -1,0 +1,70 @@
+{
+  "artifact": "r1_parser_a_duplicate_semantics_repair_v1",
+  "artifact_kind": "PARSER_REPAIR_RECEIPT",
+  "status": "CANDIDATE_NOT_YET_FROZEN",
+  "task": "Repair Parser A (qntylab/r1_reference_parser.py) to conform to the now-frozen r1_normalized_evidence_duplicate_semantics_amendment_v1.json, per parser_status.parser_a.disposition's own required-next-step.",
+  "self_freeze_authorized": false,
+  "outcome_embargo": true,
+  "raw_deletion_authorized": false,
+  "frozen_protocol_binding": {
+    "governance_freeze_commit_sha": "2da988c7cfa6defe90991f823e988d97fc0952d1",
+    "amendment_semantic_content_sha256": "aa732948b19957a2e3fb7cd2ae1905a3b94a902a0200e24e25874f036894adf9",
+    "effective_combined_contract_binding_sha256": "0d0dc12c16535f4ecb06ccfd9b87543862caf7d261cbe8a459d152dee4f493ab",
+    "base_contract_sha256": "c199b9481285d80b34183b8a7681f75ef7e60e5aadad6e4e0ece3ef8f33d6c92",
+    "note": "all three independently re-verified unchanged before and after this repair; this repair modifies none of them"
+  },
+  "parser_a": {
+    "pre_repair_sha256": "acad03e196d0f32724855817eed07c7efc1a40279355ed69b594de54eb81c640",
+    "post_repair_sha256": "0d019ec2ba7969bfe6f07d6e3da0ea302968ae4a0969a4661b852bb59baba07d",
+    "conformance_pre_repair": "NONCONFORMING",
+    "conformance_post_repair": "CONFORMS (candidate; not self-frozen -- see self_freeze_authorized)",
+    "location_of_fix": "qntylab/r1_reference_parser.py: canonical.append(group[0]) replaced with canonical.append(_canonical_duplicate_representative(group)) inside parse_daily_object's duplicate-group loop; new standalone helper _canonical_duplicate_representative added"
+  },
+  "parser_b": {
+    "sha256": "cfa829c7e28a658258cf31d768c7685c5a6e0cad0c04c75a1fb3faaba0e685c6",
+    "modified_by_this_task": false
+  },
+  "known_counterexample": {
+    "counterexample_id": "CX-1 (reused, now closed for Parser A)",
+    "shape": "duplicate group sharing trdMatchID/timestamp, numerically equal price and/or size, spelled at different decimal scales (e.g. price '1.1' vs '1.10', size '2' vs '2.00')",
+    "pre_repair_symptom": "canonical.append(group[0]) selected whichever row the raw source listed first; forward vs. reversed raw order produced different close/base_volume and different canonical hash",
+    "post_repair_result": "forward and reversed raw order agree, both equal to the frozen rule's lexicographically-smallest (price_source_string, size_source_string) representative"
+  },
+  "representative_rule_implemented": {
+    "rule": "min(group, key=lambda g: (str(g[2]), str(g[3])))  # g = (ts, trade_id, price, size); price then size",
+    "matches_frozen_rule": "duplicate_representative_selection_rule.rule: lexicographically smallest (price_source_string, size_source_string), comparing as ordinary Unicode code-point sequences, never as parsed numbers",
+    "applies_only_to": "groups already classified as equivalent (non-conflicting) duplicates via the unchanged Decimal-equality classification (distinct set collapses to one element) -- never invoked on a conflicting group"
+  },
+  "independent_implementation_statement": {
+    "does_not_import_qntylab.r1_retention_candidate": true,
+    "does_not_call_parser_b_helper": true,
+    "verified_by": "tests/test_r1_reference_parser.py::test_reference_parser_does_not_import_production_semantic_parser (pre-existing, unmodified, still passing) plus an explicit AST-free import check in this repair's own test module",
+    "tuple_layout_differs_from_parser_b": "Parser A's group tuple is (ts, trade_id, price, size); Parser B's is (ts, side, size, price, tickdir, trdid) -- the two representative-selection helpers are independently indexed against each parser's own internal representation, not shared code"
+  },
+  "real_corpus_cross_validation": {
+    "objects_checked": 5,
+    "objects_with_duplicate_groups": 0,
+    "result": "A/B agreement on all shared canonical fields (schema_id, trade_count, duplicate_count, rejected_row_count, open, high, low, close, base_volume, quote_turnover, first_source_trade_id, last_source_trade_id) unchanged and preserved after this repair -- behaviorally invisible on the real corpus as expected, since no real object contains a duplicate group of any kind",
+    "test": "tests/test_r1_reference_parser_duplicate_semantics_repair_v1.py::test_real_corpus_five_objects_a_b_agreement_preserved"
+  },
+  "adversarial_a_b_result": {
+    "classes_checked": [
+      "price-scale duplicate", "size-scale duplicate", "combined price+size scale duplicate",
+      "3+ equivalent spellings", "discarded-field-only (side/tickDirection) variation",
+      "duplicate group plus ordinary rows", "genuine price conflict (fail-closed)",
+      "genuine size conflict (fail-closed)", "bounded property test over all permutations"
+    ],
+    "result": "Parser A and Parser B agree (identical canonical hash over shared fields) on every class; conflicts remain fail-closed and unresolved by any representative selection in both parsers",
+    "oracle": "cross-checked against an independent standalone reimplementation of duplicate_representative_selection_rule.rule (frozen_rule_representative in the same test module), not against either parser's own helper"
+  },
+  "event_time_semantics": "unchanged; verified with rows whose raw listing order differs from event-timestamp order, with and without a duplicate group present -- open/close and first/last_source_trade_id continue to follow parsed event time, never raw position",
+  "numeric_core_integrity": "no Decimal/precision/parsing logic touched outside the duplicate-representative-selection branch; pre-existing numeric tests in tests/test_r1_reference_parser.py (test_decimal_precision_preserved, test_event_ordering_out_of_order_rows, etc.) pass unmodified",
+  "changeset": [
+    "qntylab/r1_reference_parser.py",
+    "tests/test_r1_reference_parser_duplicate_semantics_repair_v1.py (new)",
+    "tests/test_r1_duplicate_semantics_amendment_v1.py (2 tests updated: they asserted Parser A's pre-repair nonconformance/unmodified-SHA as a permanent fact; updated to reflect the now-authorized repair while preserving their original verification intent -- see in-file docstrings)",
+    "experiments/data/r1_parser_a_duplicate_semantics_repair_v1.json (this receipt)"
+  ],
+  "next_step": "operator/protocol-owner review of this repair candidate; a NEW CHAT reviewer decision on whether to freeze Parser A's conformance status is out of scope for this task",
+  "outcome_embargo_verified": "no H012/H014, PIT rank, weight, forward return, PnL, IC, Sharpe, or weekly/null/replication outcome was computed, inspected, or referenced in performing this repair"
+}

@@ -173,6 +173,26 @@ def _redundant_field_check(price: Decimal, size: Decimal, row: dict) -> dict:
     return result
 
 
+def _canonical_duplicate_representative(group: list) -> tuple:
+    """Deterministic, arrival-order-independent representative for a group
+    already classified as an equivalent (non-conflicting) duplicate -- see
+    experiments/data/r1_normalized_evidence_duplicate_semantics_amendment_v1.json:
+    duplicate_representative_selection_rule. `group` entries are
+    `(ts, trade_id, price, size)` with `price`/`size` already `Decimal`;
+    every member is numerically equal in price and size by construction (the
+    caller only reaches this branch once the group's `distinct` set has
+    already collapsed to one element), so choosing among them changes no
+    numeric value. `str(Decimal(token))` reproduces the original plain
+    fixed-point source token for the grammar this rule is scoped to (no
+    normalization occurs), so comparing the stringified price/size is
+    equivalent to comparing the original source spellings without this
+    parser separately retaining the raw tokens. The tie-break key orders on
+    price first, then size, matching the frozen rule's
+    (price_source_string, size_source_string) pair.
+    """
+    return min(group, key=lambda g: (str(g[2]), str(g[3])))
+
+
 def parse_daily_object(
     raw_bytes: bytes,
     expected_utc_date: date,
@@ -296,7 +316,7 @@ def parse_daily_object(
             continue
         distinct = {(g[0], g[2], g[3]) for g in group}
         if len(distinct) == 1:
-            canonical.append(group[0])
+            canonical.append(_canonical_duplicate_representative(group))
             duplicate_count += len(group) - 1
         else:
             conflicting_ids.append(trade_id)

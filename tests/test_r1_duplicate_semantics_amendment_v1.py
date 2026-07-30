@@ -31,6 +31,7 @@ import io
 import itertools
 import json
 import re
+import subprocess
 from datetime import date
 from pathlib import Path
 
@@ -241,14 +242,23 @@ def test_parser_b_conforms_amendment_rule_row_order_non_interference_hash():
     assert canonical_hash(core_ab) == canonical_hash(core_ba)
 
 
-# --- 3. Parser A nonconformance, proven against the standalone rule -------
+# --- 3. Parser A: formerly nonconforming, since repaired -------------------
+# Parser A's group[0]-before-sort nonconformance, documented here at
+# amendment-freeze time (parser_status.parser_a.conformance = NONCONFORMING),
+# was repaired in a separate, subsequent, authorized task per
+# parser_status.parser_a.disposition's own required-next-step -- see
+# tests/test_r1_reference_parser_duplicate_semantics_repair_v1.py for the
+# full repair regression/conformance suite. These two tests are updated to
+# reflect that repair (governance/status expectations only; the frozen
+# amendment's semantic_body, recording the pre-repair historical state, is
+# untouched -- see test_amendment_semantic_content_digest_is_self_consistent).
 
-def test_parser_a_is_nonconforming_order_dependent_for_mixed_scale_duplicate():
-    """Empirically substantiates parser_status.parser_a.conformance =
-    NONCONFORMING: Parser A's group[0]-before-sort selection is a function of
-    raw arrival order, so forward and reversed raw order disagree, unlike
-    the amendment rule (which always yields the same answer regardless of
-    order) and unlike Parser B (which conforms)."""
+def test_parser_a_formerly_nonconforming_now_order_independent_for_mixed_scale_duplicate():
+    """Previously (at freeze time) proved rec_fwd != rec_rev, documenting
+    NONCONFORMING. Parser A has since been repaired to implement
+    duplicate_representative_selection_rule independently, so this now
+    proves the opposite: order-independence and agreement with the
+    standalone amendment-rule oracle, in both raw orders."""
     header = ("timestamp", "symbol", "side", "size", "price", "tickDirection",
               "trdMatchID", "grossValue", "homeNotional", "foreignNotional")
     a = _row("1751328000.0", size="2", price="1.1", trdid="l" * 32)
@@ -257,18 +267,31 @@ def test_parser_a_is_nonconforming_order_dependent_for_mixed_scale_duplicate():
     rec_rev = _a_record([b, a], header)
     expected_price, expected_size = amendment_rule_representative([("1.1", "2"), ("1.10", "2.00")])
 
-    assert rec_fwd != rec_rev, "expected Parser A to still be order-dependent (documented nonconformance)"
-    both_match_amendment_rule = (
-        rec_fwd["close"] == rec_rev["close"] == expected_price
-        and rec_fwd["base_volume"] == rec_rev["base_volume"] == expected_size
-    )
-    assert not both_match_amendment_rule, "Parser A must not accidentally already conform to the amendment rule"
+    # source_object_sha256 is a fingerprint of the literal raw archive bytes
+    # (different forward vs. reversed CSV text by construction) and is
+    # excluded from the row-order-invariance comparison for the same reason
+    # test_r1_reference_parser.py::test_deterministic_regardless_of_row_order
+    # excludes it -- it is not a row-content derivation.
+    rec_fwd_content = {k: v for k, v in rec_fwd.items() if k != "source_object_sha256"}
+    rec_rev_content = {k: v for k, v in rec_rev.items() if k != "source_object_sha256"}
+    assert rec_fwd_content == rec_rev_content, "Parser A must now be order-independent (repaired)"
+    assert rec_fwd["close"] == rec_rev["close"] == expected_price
+    assert rec_fwd["base_volume"] == rec_rev["base_volume"] == expected_size
 
 
-def test_parser_a_unmodified_by_this_amendment_sha256():
+def test_parser_a_sha_recorded_at_amendment_freeze_time_is_historically_accurate():
+    """No longer asserts Parser A is byte-identical *today* -- Parser A has
+    since been legitimately repaired. Instead verifies the amendment's
+    recorded snapshot (parser_status.parser_a.current_sha256) was accurate
+    *at governance-freeze commit 2da988c7cfa6defe90991f823e988d97fc0952d1*,
+    which remains true and immutable regardless of later repair."""
     amendment = _load_amendment()
-    actual = hashlib.sha256(Path(rp.__file__).read_bytes()).hexdigest()
-    assert actual == amendment["semantic_body"]["parser_status"]["parser_a"]["current_sha256"]
+    result = subprocess.run(
+        ["git", "show", "2da988c7cfa6defe90991f823e988d97fc0952d1:qntylab/r1_reference_parser.py"],
+        cwd=REPO_ROOT, capture_output=True, check=True,
+    )
+    historical_sha = hashlib.sha256(result.stdout).hexdigest()
+    assert historical_sha == amendment["semantic_body"]["parser_status"]["parser_a"]["current_sha256"]
 
 
 def test_parser_b_unmodified_by_this_amendment_sha256():

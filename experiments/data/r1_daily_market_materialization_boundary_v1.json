@@ -1,0 +1,105 @@
+{
+  "artifact": "r1_daily_market_materialization_boundary_v1",
+  "artifact_kind": "MATERIALIZATION_BOUNDARY_RECEIPT",
+  "status": "CANDIDATE_NOT_YET_FROZEN",
+  "self_freeze_authorized": false,
+  "outcome_embargo": true,
+  "raw_deletion_authorized": false,
+  "task": "Close the two blockers an independent NEW CHAT review of commit 1d52ec1 established (BLOCKED_BY_SOURCE_OBJECT_PROVENANCE, BLOCKED_BY_INVALID_INPUT_HANDLING) by adding a narrow, strategy-independent DailyMarketEvidenceV1 record-assembly boundary. Does not touch OHLC, duplicate, timestamp, or event-order logic in either parser.",
+  "frozen_protocol_binding": {
+    "base_contract_sha256": "c199b9481285d80b34183b8a7681f75ef7e60e5aadad6e4e0ece3ef8f33d6c92",
+    "amendment_semantic_content_sha256": "aa732948b19957a2e3fb7cd2ae1905a3b94a902a0200e24e25874f036894adf9",
+    "effective_combined_contract_binding_sha256": "0d0dc12c16535f4ecb06ccfd9b87543862caf7d261cbe8a459d152dee4f493ab",
+    "timestamp_repair_commit": "1d52ec1",
+    "note": "all three re-verified byte-identical before and after this task; this task modifies no frozen protocol artifact, only adds new implementation/test/receipt files"
+  },
+  "parser_hashes": {
+    "parser_a_sha256": "76bfd763afbce1167ff931b912c7bb12e6c90e4b07d9ef862f6400e14a63823e",
+    "parser_b_sha256": "65aea38964fe18ad702376937aee9caa410125f0b8dd2efbd5833f5219d3f075",
+    "note": "identical to the post-1d52ec1 hashes verified in the prior independent review; this task made zero edits to qntylab/r1_reference_parser.py or qntylab/r1_retention_candidate.py"
+  },
+  "materialization_boundary_implementation_sha256": "2b0702673638f8bff90d26cde76a99d4127931f00bdea3aafb295ef06c263f54",
+  "materialization_boundary_test_sha256": "9530fd6a8a5c71b60ec807703dba32b0d68e081777efd843fcd3ff99a73513b1",
+  "record_validator_location": "validate_daily_market_evidence_v1 lives in the same module as the assemblers (qntylab/r1_daily_market_materializer.py); no separate module/hash",
+
+  "protocol_underspecification_check": {
+    "question": "Does closing the uncaught-exception gap require inventing a new contract-visible status?",
+    "finding": "No. qntylab.r1_retention_candidate.ANOMALY_CONTAINER (\"CONTAINER_ANOMALY\") is already declared and already listed in experiments/data/r1_bounded_evidence_retention_candidate_v1.json:anomaly_triggers, but was never wired to any raising code path before this task. This task activates that already-declared-but-dormant trigger; it does not introduce a new name.",
+    "instrument_instance_id_naming_note": "qntylab.r1_retention_candidate.daily_primitive's own dict key is stream_id (its internal candidate parameter name), not the contract's instrument_instance_id. The boundary performs a pure rename (record['instrument_instance_id'] = record.pop('stream_id')) when assembling Parser B's record; this is not a scientific decision and changes no computed value.",
+    "outcome": "not blocked; no new protocol invented"
+  },
+
+  "source_object_sha256_binding_rule": {
+    "parser_a_path": "parse_daily_object already embeds source_object_sha256; the boundary independently recomputes sha256(raw_bytes) and requires exact equality before accepting the record, failing closed (ANOMALY_SOURCE_MUTATION) on any mismatch",
+    "parser_b_path": "daily_primitive never receives raw bytes and never computes this field; the boundary computes sha256(raw_bytes) exactly once and binds it into the assembled record; normalized_primitive_sha256 (a hash of the primitive dict) is never reused for this field -- they are different quantities over different inputs",
+    "missingness_rule_applied": "per r1_normalized_evidence_contract_v1.json's own text (\"never null for a day with trade_count>0; null only when trade_count=0 and no object was retrievable\"), source_object_sha256 is bound in every record this boundary emits, independent of trade_count, because the boundary is only ever invoked with raw bytes already in hand -- the object was always retrievable from its point of view",
+    "exact_byte_binding_verified": "row-permutation counterfactual test confirms canonical derived fields (open/close/base_volume/quote_turnover/trade_count) are unchanged while source_object_sha256 differs between byte-different, logically-equal raw objects, for both parser paths"
+  },
+
+  "typed_malformed_object_rule": {
+    "gzip_corruption": "non-gzip / corrupt-container bytes now produce a typed MATERIALIZATION_QUARANTINED_NO_RECORD result with anomaly CONTAINER_ANOMALY, for both parser paths, instead of an uncaught GzipCorruptionError",
+    "truncated_csv": "gzip-valid but structurally truncated CSV (e.g. a single-column header) now produces the same typed quarantine result instead of an uncaught TruncatedCSVError, for both parser paths",
+    "empty_object": "zero-byte raw bytes and gzip-valid-empty-body both remain a typed MATERIALIZED_VALID_RECORD with trade_count=0 (unchanged, pre-existing typed behavior; source_object_sha256 now correctly bound even in this case)",
+    "malformed_row": "unchanged pre-existing typed PARSE_REJECTION accounting (rejected_row_count), not altered by this task"
+  },
+
+  "batch_isolation_rule": {
+    "primitive": "materialize_batch(items, materialize_fn) calls materialize_fn once per item and appends its MaterializationResult; no exception from a single item can escape because materialize_parser_a/materialize_parser_b already convert every container-level exception into a typed result before returning",
+    "verified": "valid/corrupt/valid batch fixture (both parser paths): the corrupt middle object is quarantined and the following valid object is still attempted and produces a correct record; valid_count + quarantined_count == len(items) with no unaccounted remainder"
+  },
+
+  "five_object_full_record_ab_comparison": [
+    {
+      "object": "BTCUSDT_2020-03-25",
+      "raw_sha256": "cbca6933a8f0a11429661cfa93b04056055d776ee199209e8af9719ad2060a33",
+      "parser_a_status": "MATERIALIZED_VALID_RECORD",
+      "parser_b_status": "MATERIALIZED_VALID_RECORD",
+      "parser_a_source_object_sha256": "cbca6933a8f0a11429661cfa93b04056055d776ee199209e8af9719ad2060a33",
+      "parser_b_source_object_sha256": "cbca6933a8f0a11429661cfa93b04056055d776ee199209e8af9719ad2060a33",
+      "full_17_field_record_equality": true
+    },
+    {
+      "object": "UNIUSDT_2021-11-30",
+      "raw_sha256": "8068ed2f06c280ad103b50525c4c8bc14a3a956a6ed40f4fba50ff738d59ebb4",
+      "parser_a_status": "MATERIALIZED_VALID_RECORD",
+      "parser_b_status": "MATERIALIZED_VALID_RECORD",
+      "parser_a_source_object_sha256": "8068ed2f06c280ad103b50525c4c8bc14a3a956a6ed40f4fba50ff738d59ebb4",
+      "parser_b_source_object_sha256": "8068ed2f06c280ad103b50525c4c8bc14a3a956a6ed40f4fba50ff738d59ebb4",
+      "full_17_field_record_equality": true
+    },
+    {
+      "object": "ANCUSDT_2022-03-15",
+      "raw_sha256": "cabc599c8d0b2da8df4bb07de64700092701ac8bf4987ee8b4395bef8a6398d2",
+      "parser_a_status": "MATERIALIZED_VALID_RECORD",
+      "parser_b_status": "MATERIALIZED_VALID_RECORD",
+      "parser_a_source_object_sha256": "cabc599c8d0b2da8df4bb07de64700092701ac8bf4987ee8b4395bef8a6398d2",
+      "parser_b_source_object_sha256": "cabc599c8d0b2da8df4bb07de64700092701ac8bf4987ee8b4395bef8a6398d2",
+      "full_17_field_record_equality": true
+    },
+    {
+      "object": "FTTUSDT_2022-11-13",
+      "raw_sha256": "8c085036c9b65a99379941434f3531fa7365b24e31a752cd10a0d80ea8df77fc",
+      "parser_a_status": "MATERIALIZED_VALID_RECORD",
+      "parser_b_status": "MATERIALIZED_VALID_RECORD",
+      "parser_a_source_object_sha256": "8c085036c9b65a99379941434f3531fa7365b24e31a752cd10a0d80ea8df77fc",
+      "parser_b_source_object_sha256": "8c085036c9b65a99379941434f3531fa7365b24e31a752cd10a0d80ea8df77fc",
+      "full_17_field_record_equality": true
+    },
+    {
+      "object": "1000000CHEEMSUSDT_2026-05-28",
+      "raw_sha256": "d1b50f8316c1874d7ae7bde11314d077f3cf1b2baece4a6cdd7459e83cc2ce2a",
+      "parser_a_status": "MATERIALIZED_VALID_RECORD",
+      "parser_b_status": "MATERIALIZED_VALID_RECORD",
+      "parser_a_source_object_sha256": "d1b50f8316c1874d7ae7bde11314d077f3cf1b2baece4a6cdd7459e83cc2ce2a",
+      "parser_b_source_object_sha256": "d1b50f8316c1874d7ae7bde11314d077f3cf1b2baece4a6cdd7459e83cc2ce2a",
+      "full_17_field_record_equality": true
+    }
+  ],
+
+  "known_out_of_scope_findings_still_open": {
+    "unknown_schema_ab_divergence": "Parser A's parse_daily_object returns record=None (total quarantine) for an unregistered column set; Parser B's daily_primitive still computes and returns a populated core record with schema_id=None and a SCHEMA_MISMATCH anomaly for the same input. Not exercised by any of the 5 real cached objects (all have a known schema, zero anomalies) and not one of this task's two named blockers -- observed but explicitly not repaired here, per 'do not broaden the repair after a blocker'.",
+    "receipt_precision_overclaim": "an earlier receipt (r1_timestamp_canonicalization_repair_v1.json) states source precision 'observed up to 4-6 digits'; independent token scan of all 5 real objects found a maximum of 4 fractional digits. Not corrected here (out of this task's scope; noted in the prior review)."
+  },
+
+  "verdict": "R1_DAILYMARKET_MATERIALIZATION_BOUNDARY_REPAIRED_PENDING_REVIEW"
+}

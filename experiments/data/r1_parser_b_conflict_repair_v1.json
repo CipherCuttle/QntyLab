@@ -1,0 +1,76 @@
+{
+  "artifact": "r1_parser_b_conflict_repair_v1",
+  "outcome_embargo": true,
+  "task": "R1 Parser B contract-conformance repair (Gap 2 follow-up)",
+  "blocked_validation_commit_sha": "2369336afe4fd8617682dca024f8cc5587a96762",
+  "blocked_validation_verdict": "BLOCKED_BY_REFERENCE_VALIDATION",
+  "blocked_validation_report": "experiments/results/R1_REFERENCE_PARSER_VALIDATION_V1.md",
+  "note_on_historical_artifacts": "The blocked validation result at commit 2369336 remains historically true and is not rewritten. This receipt records a new, subsequent repair event.",
+  "frozen_input_contract_sha256": {
+    "r1_normalized_evidence_contract_v1.json": "c199b9481285d80b34183b8a7681f75ef7e60e5aadad6e4e0ece3ef8f33d6c92",
+    "r1_source_precedence_freeze.json": "25b03b648774e49b04110f28637466494d35ace27ab6b210053af9224d29c51f",
+    "r1_information_loss_ledger_v1.json": "7590ea9dd60b961dfc2fb64c5b099089662d6dead4c1cb3f91d3b87d67c5df02",
+    "r1_source_schema_registry_v1.json": "02d2a75cdaa3d53a2708d2d20d5bf19f934fc68e6ee1b942404994d80ab94c4d",
+    "r1_ingest_contract.json": "b82bbc464784faf220fcb694d60c26122d6098905ea09e95ef7484962cf0bca0",
+    "bound_to_checkpoint_sha256_per_normalized_evidence_contract": "80ed752c7ea003ba354fe7f64c7f04eac300405ca4d60c6b5334cea95d1d50b0"
+  },
+  "parser_b_module": "qntylab/r1_retention_candidate.py",
+  "parser_b_pre_repair_implementation_sha256": "86d84c674069a44c7bcf145a85e0ff1a875761f809142b998ed2592dbbef4caf",
+  "parser_b_pre_repair_sha256_as_of_commit": "2369336afe4fd8617682dca024f8cc5587a96762",
+  "parser_b_post_repair_implementation_sha256": "74f59bd6d38cde3937bc464e79a7f5dc984166bd69866e379f858bec59921418",
+  "defects_repaired": [
+    {
+      "id": "DEFECT_1_ROW_ORDER_DEPENDENT_CONFLICT_HANDLING",
+      "demonstrated_by": "tests/test_r1_parser_a_vs_b_cross_validation.py::test_disagreement_conflicting_duplicate_row_order_dependence (pre-repair name; renamed post-repair, see regression_ids below)",
+      "pre_repair_behavior": "daily_primitive scanned rows sequentially with a seen_ids dict and silently kept whichever row for a given trdMatchID it encountered first, discarding conflicting rows as 'duplicates' without excluding the retained row from aggregation. close/open/high/low/base_volume/quote_turnover for a day containing a genuinely conflicting duplicate (same trdMatchID, different timestamp/size/price) therefore depended on raw input row order, contradicting the module's own reorder-determinism docstring claim.",
+      "frozen_contract_basis": "experiments/data/r1_source_precedence_freeze.json:conflict_rule -- 'Conflicting canonical values ... are fail-closed; no lower-priority source silently replaces a higher-priority fact.'",
+      "repair": "daily_primitive now groups all valid rows by trdMatchID before any classification. A group whose members share an identical (timestamp, size, price) is an ordinary exact duplicate (kept once, duplicate_count incremented, DUPLICATE_UNEXPECTED). A group with more than one distinct (timestamp, size, price) is a genuine conflict: every member of that group is excluded from the parsed/aggregated set (added to rejected_row_count) and DUPLICATE_CONFLICTING is raised. Classification depends only on the group's member set, never on which row was physically first, so the result is invariant under any permutation of the input rows.",
+      "policy_choice_source": "derived solely from r1_source_precedence_freeze.json:conflict_rule (fail-closed exclusion); no first-row, last-row, average, or other guessed policy was implemented"
+    },
+    {
+      "id": "DEFECT_2_SIDE_IN_DUPLICATE_IDENTITY",
+      "demonstrated_by": "tests/test_r1_parser_a_vs_b_cross_validation.py::test_disagreement_side_included_in_b_fingerprint_not_in_contract (pre-repair name; renamed post-repair, see regression_ids below)",
+      "pre_repair_behavior": "daily_primitive's per-row fingerprint was (timestamp, side, size, price); two rows with identical trdMatchID/timestamp/size/price but differing side were misclassified DUPLICATE_CONFLICTING.",
+      "frozen_contract_basis": "unambiguous, not contract-ambiguous: (a) experiments/data/r1_normalized_evidence_contract_v1.json, DailyMarketEvidenceV1.close.duplicate_semantics: 'exact duplicate trade rows (identical trade id/timestamp/price/size) collapse to one observation' -- side is not listed; (b) experiments/data/r1_information_loss_ledger_v1.json field 'side': classification INTENTIONALLY_DISCARDED, reconstruction_rule 'not needed by any of open/high/low/close/base_volume/quote_turnover/trade_count ... side is a taker-direction label, not a price/size/turnover input'.",
+      "repair": "canonical trade identity for grouping is trdMatchID alone; the group-distinctness check compares only (timestamp, size, price), matching the frozen contract exactly. side is read from each row (still available for future forensic use) but excluded from both the grouping key and the distinctness check.",
+      "verdict": "not ambiguous -- BLOCKED_BY_INPUT_CONTRACT_CONTRADICTION does not apply"
+    }
+  ],
+  "regression_ids": {
+    "new_file": "tests/test_r1_retention_candidate_repair_v1.py",
+    "tests": [
+      "test_identical_duplicate_rows_collapse_to_one_observation",
+      "test_conflicting_duplicate_rows_fail_closed",
+      "test_conflicting_duplicate_reversed_order_yields_identical_result",
+      "test_conflicting_duplicate_set_of_three_is_identical_under_every_permutation",
+      "test_duplicate_identity_excludes_side_per_frozen_contract",
+      "test_ordinary_valid_trades_are_reorder_invariant_including_close_and_turnover",
+      "test_conflict_diagnostics_are_deterministic_across_permutations",
+      "test_utc_day_boundary_semantics_unaffected_by_dedup_repair",
+      "test_property_mixed_fixture_invariant_under_all_permutations"
+    ],
+    "updated_cross_validation_tests": [
+      "tests/test_r1_parser_a_vs_b_cross_validation.py::test_formerly_disagreement_side_included_in_b_fingerprint_not_in_contract (was test_disagreement_side_included_in_b_fingerprint_not_in_contract)",
+      "tests/test_r1_parser_a_vs_b_cross_validation.py::test_formerly_disagreement_conflicting_duplicate_row_order_dependence (was test_disagreement_conflicting_duplicate_row_order_dependence)"
+    ]
+  },
+  "ordinary_output_regression": "test_real_objects_agree_on_core_aggregates (5 real cached objects, zero anomalies, exact/close-tolerance agreement with Parser A) and the full pre-existing tests/test_r1_retention_candidate.py suite (23 tests) pass unmodified against the repaired module.",
+  "parser_a_integrity": "qntylab/r1_reference_parser.py and tests/test_r1_reference_parser.py are byte-unmodified by this task (verified via git diff --stat against HEAD).",
+  "frozen_contract_integrity": "all five frozen input-contract artifacts listed above are byte-unmodified by this task (verified via git diff --stat against HEAD); their SHA-256 values match the values recomputed in R1_REFERENCE_PARSER_VALIDATION_V1.md.",
+  "raw_deletion_authorized": false,
+  "outcome_embargo_verified": "no H012/H014 value, factor rank, weight, forward return, PnL, IC, Sharpe, or weekly/null/replication outcome was computed, inspected, or referenced by this task.",
+  "known_out_of_scope_findings_still_open": [
+    "dangling/non-reproducible required_acquisition_sha256 (d9d8875592a2a19672372b88fa46aadcec36b7f6b58df5af17028e6bca1dc16b) -- BLOCKED_BY_PREOUTCOME_PROVENANCE, not addressed here",
+    "RPI remains UNRESOLVED; registry undercounts observed RPI objects -- not addressed here",
+    "audit-reservoir sizing -- not addressed here",
+    "retention-candidate nondeterministic live disk-free field (shutil.disk_usage in write_candidate) -- not addressed here",
+    "Parser B's float64 (not source-string-precision Decimal) representation for price/size/close/quote_turnover remains a design non-conformance identified by R1_REFERENCE_PARSER_VALIDATION_V1.md; not repaired here -- out of scope for this task (the two demonstrated defects only)"
+  ],
+  "verify": {
+    "collect_exit": 0,
+    "pytest_exit": 0,
+    "diff_check_exit": 0,
+    "total_tests_post_repair": 156
+  },
+  "verdict": "R1_PARSER_B_CONTRACT_REPAIRED"
+}

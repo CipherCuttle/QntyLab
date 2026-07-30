@@ -70,18 +70,17 @@ def test_real_objects_agree_on_core_aggregates():
         assert abs(float(a.record["base_volume"]) - b_core["base_volume"]) < 1e-9, name
 
 
-def test_disagreement_side_included_in_b_fingerprint_not_in_contract():
-    """CONFIRMED DISAGREEMENT (explained, not blocking): two rows sharing
-    trade id/timestamp/price/size but differing only in `side` are an exact
-    duplicate per the frozen contract's own definition (duplicate_semantics:
-    "identical trade id/timestamp/price/size" -- side is not listed, and the
-    information-loss ledger classifies `side` as INTENTIONALLY_DISCARDED).
-    Parser B's fingerprint additionally includes `side`, so it labels this
-    case DUPLICATE_CONFLICTING. The final aggregate numbers happen to still
-    match here (this docstring documents why, not that it is safe to ignore
-    in every case -- see the genuinely-conflicting-price test below, where
-    fingerprint-inclusion of an extra field changes the *output*, not just
-    the anomaly label)."""
+def test_formerly_disagreement_side_included_in_b_fingerprint_not_in_contract():
+    """REPAIRED (was a CONFIRMED DISAGREEMENT at blocked commit 2369336, see
+    experiments/results/R1_REFERENCE_PARSER_VALIDATION_V1.md and
+    tests/test_r1_retention_candidate_repair_v1.py for the repair record):
+    two rows sharing trade id/timestamp/price/size but differing only in
+    `side` are an exact duplicate per the frozen contract's own definition
+    (duplicate_semantics: "identical trade id/timestamp/price/size" -- side
+    is not listed, and the information-loss ledger classifies `side` as
+    INTENTIONALLY_DISCARDED). Parser B's fingerprint used to additionally
+    include `side`, mislabeling this case DUPLICATE_CONFLICTING; post-repair
+    it agrees with Parser A that this is an ordinary exact duplicate."""
     rows = [
         ("1700000000.000", "TESTUSDT", "Buy", "1", "100", "PlusTick", "id-1", "1e8", "1", "100"),
         ("1700000000.000", "TESTUSDT", "Sell", "1", "100", "PlusTick", "id-1", "1e8", "1", "100"),
@@ -89,42 +88,40 @@ def test_disagreement_side_included_in_b_fingerprint_not_in_contract():
     a, b, banom = _run_both(rows)
     assert a.record["duplicate_count"] == 1
     assert a.record["rejected_row_count"] == 0
-    assert "DUPLICATE_CONFLICTING" in banom  # Parser B's classification, per its side-inclusive fingerprint
-    # numeric aggregates still agree in this specific case
+    assert "DUPLICATE_CONFLICTING" not in banom
+    assert "DUPLICATE_UNEXPECTED" in banom
     assert a.record["trade_count"] == b["trade_count"] == 1
 
 
-def test_disagreement_conflicting_duplicate_row_order_dependence():
-    """CONFIRMED DISAGREEMENT (blocking, traced to the frozen contract):
-    r1_source_precedence_freeze.json:conflict_rule requires conflicting
-    canonical values to be fail-closed ("no lower-priority source silently
-    replaces a higher-priority fact"). For a genuinely conflicting duplicate
-    (same trade id, different price), Parser A excludes both rows from
-    aggregation regardless of input row order (fail-closed, order-invariant).
-    Parser B instead silently retains whichever row it encounters FIRST in
-    iteration order and discards the rest as "duplicates" -- so its `close`
-    value for logically identical data changes depending on raw row order.
-    This also contradicts Parser B's own docstring claim ("Deterministic
-    under row-input reordering (sorts internally)"), since the retained
-    value is chosen before the internal sort ever runs."""
+def test_formerly_disagreement_conflicting_duplicate_row_order_dependence():
+    """REPAIRED (was a CONFIRMED DISAGREEMENT, blocking, at blocked commit
+    2369336; see tests/test_r1_retention_candidate_repair_v1.py for the
+    repair record). r1_source_precedence_freeze.json:conflict_rule requires
+    conflicting canonical values to be fail-closed ("no lower-priority
+    source silently replaces a higher-priority fact"). For a genuinely
+    conflicting duplicate (same trade id, different price), Parser A
+    excludes both rows from aggregation regardless of input row order
+    (fail-closed, order-invariant). Parser B used to silently retain
+    whichever row it encountered FIRST in iteration order -- so its `close`
+    value for logically identical data changed depending on raw row order.
+    Post-repair, Parser B groups by trade identity before classifying, so it
+    now agrees with Parser A: fail-closed and order-invariant."""
     rows_fwd = [
         ("1700000000.000", "TESTUSDT", "Buy", "1", "100", "PlusTick", "id-1", "1e8", "1", "100"),
         ("1700000005.000", "TESTUSDT", "Buy", "1", "999", "PlusTick", "id-1", "1e8", "1", "999"),
     ]
     rows_rev = list(reversed(rows_fwd))
 
-    a_f, b_f, _ = _run_both(rows_fwd)
-    a_r, b_r, _ = _run_both(rows_rev)
+    a_f, b_f, banom_f = _run_both(rows_fwd)
+    a_r, b_r, banom_r = _run_both(rows_rev)
 
     # Parser A: fail-closed and order-invariant
     assert a_f.record["trade_count"] == 0
     assert a_r.record["trade_count"] == 0
     assert a_f.record["rejected_row_count"] == a_r.record["rejected_row_count"] == 2
 
-    # Parser B: retains a value, and that value depends on row order
-    # (this assertion documents the observed non-conformance; it is not an
-    # endorsement of the behavior)
-    assert b_f["close"] != b_r["close"], (
-        "expected Parser B's order-dependence on conflicting duplicates to reproduce; "
-        "if this now fails, Parser B's behavior has changed and this finding should be re-verified"
-    )
+    # Parser B (post-repair): also fail-closed and order-invariant
+    assert b_f["close"] == b_r["close"] is None
+    assert b_f["trade_count"] == b_r["trade_count"] == 0
+    assert b_f["rejected_row_count"] == b_r["rejected_row_count"] == 2
+    assert "DUPLICATE_CONFLICTING" in banom_f and "DUPLICATE_CONFLICTING" in banom_r

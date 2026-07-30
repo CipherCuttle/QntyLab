@@ -114,10 +114,8 @@ def daily_primitive(*, stream_id: str, utc_date: str, header: tuple[str, ...],
     day_start = datetime.fromisoformat(utc_date + "T00:00:00+00:00").timestamp()
     day_end = datetime.fromisoformat(utc_date + "T23:59:59.999999+00:00").timestamp()
 
-    parsed: list[tuple[float, str, float, float, str, str]] = []
-    seen_ids: dict[str, tuple] = {}
+    valid_rows: list[tuple[float, str, float, float, str, str]] = []
     rejected = 0
-    duplicate_count = 0
     for index, row in enumerate(rows):
         try:
             ts = float(row["timestamp"])
@@ -138,16 +136,37 @@ def daily_primitive(*, stream_id: str, utc_date: str, header: tuple[str, ...],
             continue
         if not redundant_fields_consistent(size=size, price=price, home=home, foreign=foreign, gross=gross):
             anomalies.append(ANOMALY_REDUNDANT_FIELD_MISMATCH)
-        fingerprint = (ts, side, size, price)
-        if trdid in seen_ids:
-            duplicate_count += 1
-            if seen_ids[trdid] != fingerprint:
-                anomalies.append(ANOMALY_DUPLICATE_CONFLICTING)
-            else:
-                anomalies.append(ANOMALY_DUPLICATE_UNEXPECTED)
+        valid_rows.append((ts, side, size, price, tickdir, trdid))
+
+    # Canonical trade identity is trdMatchID alone: `side` is
+    # INTENTIONALLY_DISCARDED per r1_information_loss_ledger_v1.json and is
+    # not part of the frozen contract's duplicate definition ("identical
+    # trade id/timestamp/price/size" — r1_normalized_evidence_contract_v1.json
+    # DailyMarketEvidenceV1.close.duplicate_semantics). Grouping first and
+    # classifying each group by its full member set (rather than an
+    # order-dependent first-wins scan) keeps the result invariant under row
+    # permutation, and lets a genuinely conflicting group (same trdMatchID,
+    # different timestamp/size/price) be excluded from aggregation entirely
+    # — fail-closed per r1_source_precedence_freeze.json:conflict_rule,
+    # rather than silently keeping whichever row happened to appear first.
+    by_id: dict[str, list[tuple]] = {}
+    for r in valid_rows:
+        by_id.setdefault(r[5], []).append(r)
+
+    parsed: list[tuple[float, str, float, float, str, str]] = []
+    duplicate_count = 0
+    for trdid, group in by_id.items():
+        if len(group) == 1:
+            parsed.append(group[0])
             continue
-        seen_ids[trdid] = fingerprint
-        parsed.append((ts, side, size, price, tickdir, trdid))
+        distinct = {(g[0], g[2], g[3]) for g in group}  # (timestamp, size, price)
+        if len(distinct) == 1:
+            parsed.append(group[0])
+            duplicate_count += len(group) - 1
+            anomalies.append(ANOMALY_DUPLICATE_UNEXPECTED)
+        else:
+            anomalies.append(ANOMALY_DUPLICATE_CONFLICTING)
+            rejected += len(group)
 
     if not parsed:
         core = {"stream_id": stream_id, "utc_date": utc_date, "schema_id": schema_id,

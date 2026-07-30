@@ -56,7 +56,7 @@ def test_identical_duplicate_rows_collapse_to_one_observation():
     primitive, anomalies = _primitive(rows)
     assert primitive["trade_count"] == 1
     assert primitive["duplicate_count"] == 1
-    assert primitive["close"] == 10.0
+    assert primitive["close"] == "10"
     assert ANOMALY_DUPLICATE_UNEXPECTED in anomalies
     assert ANOMALY_DUPLICATE_CONFLICTING not in anomalies
 
@@ -136,12 +136,12 @@ def test_ordinary_valid_trades_are_reorder_invariant_including_close_and_turnove
     assert len(results) == 1, "ordinary valid-trade aggregation must be identical under every permutation"
     primitive, anomalies = _primitive(trades)
     assert primitive["trade_count"] == 3
-    assert primitive["open"] == 5.0
-    assert primitive["close"] == 3.0
-    assert primitive["high"] == 8.0
-    assert primitive["low"] == 3.0
-    assert primitive["base_volume"] == 4.5
-    assert abs(primitive["quote_turnover"] - (1.0 * 5 + 2.0 * 8 + 1.5 * 3)) < 1e-9
+    assert primitive["open"] == "5"
+    assert primitive["close"] == "3"
+    assert primitive["high"] == "8"
+    assert primitive["low"] == "3"
+    assert primitive["base_volume"] == "4.5"
+    assert primitive["quote_turnover"] == "25.5"
     assert anomalies == []
 
 
@@ -160,7 +160,7 @@ def test_conflict_diagnostics_are_deterministic_across_permutations():
     assert anomalies == sorted(set(anomalies))
     assert ANOMALY_DUPLICATE_CONFLICTING in anomalies
     assert primitive["trade_count"] == 1
-    assert primitive["close"] == 42.0
+    assert primitive["close"] == "42"
     assert primitive["rejected_row_count"] == 2
 
 
@@ -170,10 +170,10 @@ def test_utc_day_boundary_semantics_unaffected_by_dedup_repair():
     late = row("1751414399.999", price="9", trdid="1" * 32)   # 2025-07-01T23:59:59.999Z
     early = row("1751414400.0", price="12", trdid="2" * 32)   # 2025-07-02T00:00:00Z
     day1, anomalies1 = _primitive([late, early], utc_date="2025-07-01")
-    assert day1["trade_count"] == 1 and day1["close"] == 9.0
+    assert day1["trade_count"] == 1 and day1["close"] == "9"
     assert ANOMALY_TIMESTAMP_CONTAINMENT in anomalies1
     day2, anomalies2 = _primitive([late, early], utc_date="2025-07-02")
-    assert day2["trade_count"] == 1 and day2["close"] == 12.0
+    assert day2["trade_count"] == 1 and day2["close"] == "12"
     assert ANOMALY_TIMESTAMP_CONTAINMENT in anomalies2
 
 
@@ -201,10 +201,10 @@ def test_property_mixed_fixture_invariant_under_all_permutations():
     primitive, anomalies = _primitive(fixture)
     # valid records (x, y) aggregate deterministically
     assert primitive["trade_count"] == 2
-    assert primitive["open"] == 5.0
-    assert primitive["close"] == 8.0
-    assert primitive["base_volume"] == 2.0
-    assert abs(primitive["quote_turnover"] - (5.0 + 8.0)) < 1e-9
+    assert primitive["open"] == "5"
+    assert primitive["close"] == "8"
+    assert primitive["base_volume"] == "2.0"
+    assert primitive["quote_turnover"] == "13.0"
     # conflicting identity fails closed, deterministically, every time
     assert primitive["rejected_row_count"] == 2
     assert primitive["duplicate_count"] == 0

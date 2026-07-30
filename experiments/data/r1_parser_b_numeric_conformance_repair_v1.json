@@ -1,0 +1,163 @@
+{
+  "artifact": "r1_parser_b_numeric_conformance_repair_v1",
+  "outcome_embargo": true,
+  "task": "R1 Parser B float64-vs-Decimal numeric-precision contract-conformance repair (Gap 2 follow-up, numeric-only)",
+  "blocked_validation_commit_sha": "2369336afe4fd8617682dca024f8cc5587a96762",
+  "blocked_validation_verdict": "BLOCKED_BY_REFERENCE_VALIDATION",
+  "blocked_validation_report": "experiments/results/R1_REFERENCE_PARSER_VALIDATION_V1.md",
+  "duplicate_conflict_repair_commit_sha": "0edadf31aa7496e881a931b88c098aa7152ea400",
+  "duplicate_conflict_repair_receipt": "experiments/data/r1_parser_b_conflict_repair_v1.json",
+  "note_on_historical_artifacts": "Neither the blocked validation result at commit 2369336 nor the duplicate/row-order repair receipt at commit 0edadf3 is rewritten by this task. This receipt records a new, subsequent repair event that closes the one item those left explicitly open: known_out_of_scope_findings_still_open[4] in r1_parser_b_conflict_repair_v1.json.",
+  "frozen_input_contract_sha256": {
+    "r1_normalized_evidence_contract_v1.json": "c199b9481285d80b34183b8a7681f75ef7e60e5aadad6e4e0ece3ef8f33d6c92",
+    "r1_source_precedence_freeze.json": "25b03b648774e49b04110f28637466494d35ace27ab6b210053af9224d29c51f",
+    "r1_information_loss_ledger_v1.json": "7590ea9dd60b961dfc2fb64c5b099089662d6dead4c1cb3f91d3b87d67c5df02",
+    "r1_source_schema_registry_v1.json": "02d2a75cdaa3d53a2708d2d20d5bf19f934fc68e6ee1b942404994d80ab94c4d",
+    "r1_ingest_contract.json": "b82bbc464784faf220fcb694d60c26122d6098905ea09e95ef7484962cf0bca0",
+    "bound_to_checkpoint_sha256_per_normalized_evidence_contract": "80ed752c7ea003ba354fe7f64c7f04eac300405ca4d60c6b5334cea95d1d50b0",
+    "verified": "recomputed independently against the working tree at repair time; all five values match the pre-repair receipt (r1_parser_b_conflict_repair_v1.json) exactly, and git diff HEAD on all five files is empty"
+  },
+  "frozen_numeric_semantics": {
+    "source": "experiments/data/r1_normalized_evidence_contract_v1.json:DailyMarketEvidenceV1.fields",
+    "canonical_type_all_price_size_derived_fields": "decimal (source-native precision, string-encoded)",
+    "fields_covered": ["open", "high", "low", "close", "base_volume", "quote_turnover"],
+    "close.raw_derivation": "last qualifying trade by UTC event timestamp, then immutable trade identity as tie-break",
+    "close.precision_semantics": "preserve source string precision; no float rounding on ingest",
+    "quote_turnover.raw_derivation": "sum(price * size) for canonical unique trades in the UTC day",
+    "quote_turnover.precision_semantics": "computed in source-native decimal precision, not float64",
+    "open_high_low.precision_semantics": "preserve source string precision; never round before storage",
+    "base_volume.precision_semantics": "preserve source string precision",
+    "duplicate_equality_semantics": "identical trade id/timestamp/price/size collapse to one observation -- numeric equality, not string-spelling equality (Decimal('10') == Decimal('10.0'))",
+    "resolution": "unambiguous; not a case for BLOCKED_BY_INPUT_CONTRACT_CONTRADICTION",
+    "not_in_scope_of_this_repair": "first_source_timestamp_utc / last_source_timestamp_utc are typed 'timestamp (ISO 8601, millisecond or finer)', not 'decimal' -- their internal epoch-float representation in daily_primitive's return value is an unrelated pre-existing shape gap, not a numeric-precision defect, and is left untouched per narrow scope"
+  },
+  "parser_b_module": "qntylab/r1_retention_candidate.py",
+  "parser_b_pre_repair_implementation_sha256": "74f59bd6d38cde3937bc464e79a7f5dc984166bd69866e379f858bec59921418",
+  "parser_b_pre_repair_sha256_as_of_commit": "0edadf31aa7496e881a931b88c098aa7152ea400",
+  "parser_b_post_repair_implementation_sha256": "46b42c4f9118faf3f19920beb8e55e2499cee60198f798cc2f7529b30e1053fc",
+  "pre_repair_counterexamples": [
+    {
+      "id": "CE1_PRICE_TIMES_SIZE_ROUNDING_ERROR",
+      "fixture": "tests/test_r1_retention_candidate_numeric_repair_v1.py::test_exact_price_times_size_no_float64_error",
+      "input": "price=4.35, size=100 (one ordinary ASCII-decimal trade, no exotic input)",
+      "expected_canonical_value": "435.00",
+      "parser_a_reference_value": "435.00",
+      "parser_b_pre_repair_value": "434.99999999999994",
+      "difference": "-5.684e-14 (float(4.35) * float(100) != 435.00 exactly under IEEE-754 binary64)"
+    },
+    {
+      "id": "CE2_HIGH_PRECISION_PRICE_STRING",
+      "fixture": "tests/test_r1_retention_candidate_numeric_repair_v1.py::test_exact_decimal_parsing_preserves_source_string_precision",
+      "input": "price=12345.678901234567891 (20 significant digits, exceeds float64's ~15-17 digit mantissa)",
+      "expected_canonical_value": "12345.678901234567891",
+      "parser_a_reference_value": "12345.678901234567891",
+      "parser_b_pre_repair_value": "12345.678901234567 (str(float(...)); already lossy at parse time, before any arithmetic)",
+      "difference": "last 3 significant digits silently dropped"
+    },
+    {
+      "id": "CE3_NONASSOCIATIVE_ACCUMULATION",
+      "fixture": "tests/test_r1_retention_candidate_numeric_repair_v1.py::test_exact_turnover_accumulation_across_multiple_trades",
+      "input": "three trades, price=0.1/0.2/0.3, size=1 each, same day",
+      "expected_canonical_value": "0.6",
+      "parser_a_reference_value": "0.6",
+      "parser_b_pre_repair_value": "0.6 by repr(), but internal float value is 0.59999999999999997780 (verified via .20f formatting) -- the textbook float(0.1)+float(0.2)+float(0.3) non-associativity error, masked by Python's shortest-round-trip repr() in this particular instance",
+      "difference": "-2.22e-17 internally; demonstrates repr()-based comparison alone is an unsafe conformance check, motivating the exact string assertions used throughout this repair's tests"
+    },
+    {
+      "id": "CE4_LARGE_ROW_COUNT_ACCUMULATION",
+      "fixture": "tests/test_r1_retention_candidate_numeric_repair_v1.py::test_high_row_count_accumulation_exact",
+      "input": "1000 synthetic bounded rows, price=0.01, size=1 each",
+      "expected_canonical_value": "10.00",
+      "parser_a_reference_value": "10.00",
+      "parser_b_pre_repair_value": "10.0 (float sum; correct magnitude here but wrong string form -- fails the contract's 'preserve source string precision' requirement independent of numeric correctness)",
+      "difference": "serialization-shape non-conformance (missing trailing zero) in this instance; CE1 shows the same code path also produces numerically wrong values on other inputs"
+    },
+    {
+      "id": "CE5_MIXED_LARGE_AND_SMALL_VALUES",
+      "fixture": "tests/test_r1_retention_candidate_numeric_repair_v1.py::test_mixed_large_and_small_decimal_values_exact",
+      "input": "price=100000000.123456789 size=1, plus price=0.000000001 size=1, same day",
+      "expected_canonical_value": "100000000.123456790",
+      "parser_a_reference_value": "100000000.123456790",
+      "parser_b_pre_repair_value": "100000000.12345679 (float64 mantissa exhausted; last input digit and trailing zero both lost)",
+      "difference": "1 significant digit lost"
+    },
+    {
+      "id": "CE6_CLOSE_SERIALIZATION_TRAILING_PRECISION",
+      "fixture": "tests/test_r1_retention_candidate_numeric_repair_v1.py::test_close_serialization_preserves_trailing_zeros_no_ambiguity",
+      "input": "price=1.10 (single trade)",
+      "expected_canonical_value": "1.10",
+      "parser_a_reference_value": "1.10",
+      "parser_b_pre_repair_value": "1.1 (float drops the trailing zero the source string carried)",
+      "difference": "serialization ambiguity forbidden by the SERIALIZATION section of this task's brief"
+    },
+    {
+      "id": "CE7_ROW_REORDER_EXACT",
+      "fixture": "tests/test_r1_retention_candidate_numeric_repair_v1.py::test_row_reorder_invariance_is_exact_not_approximate",
+      "input": "three trades incl. price=4.35/size=100, forward vs. reversed row order",
+      "note": "pre-repair Parser B was already float-sum order-invariant for this fixture (float addition order did not change the result here); the defect demonstrated is CE1-style rounding error, present identically in both orders -- reorder invariance alone does not imply numeric correctness",
+      "post_repair_value_both_orders": "435.30"
+    },
+    {
+      "id": "CE8_EQUIVALENT_DECIMAL_SPELLINGS",
+      "fixture": "tests/test_r1_retention_candidate_numeric_repair_v1.py::test_equivalent_decimal_spellings_treated_as_same_value_for_duplicate_grouping",
+      "input": "two rows, same trdMatchID/timestamp/size, price spelled \"10\" vs \"10.0\"",
+      "expected_behavior": "ordinary exact duplicate (numerically equal), not DUPLICATE_CONFLICTING",
+      "note": "pre- and post-repair both group by (timestamp, size, price) equality; float(\"10\")==float(\"10.0\") and Decimal(\"10\")==Decimal(\"10.0\") agree here, so this dimension was not itself broken pre-repair -- included per the task's required adversarial-case list and to pin the post-repair behavior as a regression test"
+    }
+  ],
+  "error_amplification_check": {
+    "question": "can current Parser B arithmetic change any frozen canonical evidence field, specifically quote_turnover",
+    "answer": "yes, pre-repair -- CE1 above is a direct demonstration on a single, completely ordinary trade (no adversarial edge case needed): quote_turnover computed as 434.99999999999994 instead of the contract-exact 435.00",
+    "scope_of_check": "primitive-level only; no PIT ranking, universe membership, H012, H014, returns, or outcome value was computed or inspected"
+  },
+  "repair": {
+    "module": "qntylab/r1_retention_candidate.py:daily_primitive",
+    "change_summary": "size and price are now parsed as Decimal (not float) at row-parse time; open/high/low/close/base_volume/quote_turnover are aggregated as Decimal and serialized via str() at the end -- a single canonical numeric representation from parse through aggregation through serialization, matching Parser A's approach exactly (no float-then-Decimal-convert, no post-hoc rounding, no tolerance). The zero-trade-day empty record's base_volume/quote_turnover changed from float 0.0 to string \"0\", matching Parser A's _empty_record and the contract's missingness_semantics.",
+    "unchanged": "the redundant-field diagnostic cross-check (homeNotional/foreignNotional/grossValue vs size*price) remains float/tolerance-based, since it is not a canonical DailyMarketEvidenceV1 field and the frozen contract does not specify decimal precision for it; size/price are explicitly cast to float only at that diagnostic call site. Duplicate/conflict grouping, row-order invariance, UTC-day boundary logic, schema identification, and all anomaly triggers from the 0edadf3 repair are unchanged.",
+    "policy_choice_source": "derived solely from r1_normalized_evidence_contract_v1.json's precision_semantics fields; no rounding rule, tick size, or symbol-specific precision was invented or inferred"
+  },
+  "row_order_invariance_preserved": true,
+  "duplicate_repairs_preserved": true,
+  "parser_a_integrity": "qntylab/r1_reference_parser.py and tests/test_r1_reference_parser.py are byte-unmodified by this task (git diff HEAD is empty for both). No Parser A defect was exposed by this repair: Parser A and post-repair Parser B agree byte-for-byte (exact Decimal-string equality, no tolerance) on all 5 real cached objects (BTCUSDT_2020-03-25, UNIUSDT_2021-11-30, ANCUSDT_2022-03-15, FTTUSDT_2022-11-13 (112,618 rows), 1000000CHEEMSUSDT_2026-05-28) on open/high/low/close/base_volume/quote_turnover, and on trade_count.",
+  "frozen_contract_integrity": "all five frozen input-contract artifacts listed above are byte-unmodified by this task (git diff HEAD is empty for all five); their SHA-256 values match both the pre-repair receipt and independent recomputation.",
+  "raw_deletion_authorized": false,
+  "outcome_embargo_verified": "no H012/H014 value, factor rank, weight, forward return, PnL, IC, Sharpe, or weekly/null/replication outcome was computed, inspected, or referenced by this task.",
+  "known_out_of_scope_findings_still_open": [
+    "dangling/non-reproducible required_acquisition_sha256 (d9d8875592a2a19672372b88fa46aadcec36b7f6b58df5af17028e6bca1dc16b) -- BLOCKED_BY_PREOUTCOME_PROVENANCE, not addressed here",
+    "RPI remains UNRESOLVED; registry undercounts observed RPI objects -- not addressed here",
+    "audit-reservoir sizing -- not addressed here",
+    "retention-candidate nondeterministic live disk-free field (shutil.disk_usage in write_candidate) -- not addressed here",
+    "first_source_timestamp_utc / last_source_timestamp_utc are returned as raw epoch floats rather than ISO 8601 strings by daily_primitive -- a pre-existing field-shape gap distinct from the numeric-precision defect this task repairs; not addressed here"
+  ],
+  "regression_ids": {
+    "new_file": "tests/test_r1_retention_candidate_numeric_repair_v1.py",
+    "tests": [
+      "test_exact_decimal_parsing_preserves_source_string_precision",
+      "test_exact_price_times_size_no_float64_error",
+      "test_exact_turnover_accumulation_across_multiple_trades",
+      "test_high_row_count_accumulation_exact",
+      "test_mixed_large_and_small_decimal_values_exact",
+      "test_close_serialization_preserves_trailing_zeros_no_ambiguity",
+      "test_row_reorder_invariance_is_exact_not_approximate",
+      "test_equivalent_decimal_spellings_treated_as_same_value_for_duplicate_grouping",
+      "test_duplicate_handling_still_correct_after_numeric_repair",
+      "test_conflicting_duplicates_still_fail_closed_after_numeric_repair",
+      "test_known_old_schema_bybit_trade_v1_numeric_fields_are_decimal_strings",
+      "test_known_rpi_schema_behavior_unchanged_by_numeric_repair",
+      "test_zero_trade_day_base_volume_and_quote_turnover_are_string_zero",
+      "test_property_precision_sensitive_fixture_invariant_under_all_permutations"
+    ],
+    "updated_existing_tests": [
+      "tests/test_r1_retention_candidate.py (4 assertions: float literals -> Decimal-string literals)",
+      "tests/test_r1_retention_candidate_repair_v1.py (5 assertions: float literals/tolerance -> exact Decimal-string literals)",
+      "tests/test_r1_parser_a_vs_b_cross_validation.py::test_real_objects_agree_on_core_aggregates (tolerance-band assertions on close/quote_turnover/base_volume replaced with exact string equality, now provably correct post-repair)"
+    ]
+  },
+  "verify": {
+    "collect_exit": 0,
+    "pytest_exit": 0,
+    "diff_check_exit": 0,
+    "total_tests_post_repair": 170
+  },
+  "verdict": "R1_PARSER_B_NUMERIC_CONTRACT_REPAIRED"
+}

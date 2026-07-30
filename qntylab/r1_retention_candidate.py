@@ -18,6 +18,7 @@ unmutated) REHYDRATABILITY; it does not give PRESERVATION.
 from __future__ import annotations
 
 from datetime import datetime
+from decimal import Decimal, InvalidOperation
 from hashlib import sha256
 from pathlib import Path
 from typing import Iterable
@@ -114,15 +115,15 @@ def daily_primitive(*, stream_id: str, utc_date: str, header: tuple[str, ...],
     day_start = datetime.fromisoformat(utc_date + "T00:00:00+00:00").timestamp()
     day_end = datetime.fromisoformat(utc_date + "T23:59:59.999999+00:00").timestamp()
 
-    valid_rows: list[tuple[float, str, float, float, str, str]] = []
+    valid_rows: list[tuple[float, str, Decimal, Decimal, str, str]] = []
     rejected = 0
     for index, row in enumerate(rows):
         try:
             ts = float(row["timestamp"])
-            size, price = float(row["size"]), float(row["price"])
+            size, price = Decimal(row["size"]), Decimal(row["price"])
             side, trdid, tickdir = row["side"], row["trdMatchID"], row["tickDirection"]
             home, foreign, gross = float(row["homeNotional"]), float(row["foreignNotional"]), float(row["grossValue"])
-        except (KeyError, ValueError):
+        except (KeyError, ValueError, InvalidOperation):
             anomalies.append(ANOMALY_PARSE_REJECTION)
             rejected += 1
             continue
@@ -134,7 +135,12 @@ def daily_primitive(*, stream_id: str, utc_date: str, header: tuple[str, ...],
             anomalies.append(ANOMALY_TIMESTAMP_CONTAINMENT)
             rejected += 1
             continue
-        if not redundant_fields_consistent(size=size, price=price, home=home, foreign=foreign, gross=gross):
+        # price/size are canonical Decimal (frozen contract: "computed in
+        # source-native decimal precision, not float64" for quote_turnover;
+        # "preserve source string precision" for open/high/low/close). The
+        # redundant-field cross-check is a diagnostic only, not a canonical
+        # DailyMarketEvidenceV1 field, and stays float/tolerance-based.
+        if not redundant_fields_consistent(size=float(size), price=float(price), home=home, foreign=foreign, gross=gross):
             anomalies.append(ANOMALY_REDUNDANT_FIELD_MISMATCH)
         valid_rows.append((ts, side, size, price, tickdir, trdid))
 
@@ -172,13 +178,18 @@ def daily_primitive(*, stream_id: str, utc_date: str, header: tuple[str, ...],
         core = {"stream_id": stream_id, "utc_date": utc_date, "schema_id": schema_id,
                 "trade_count": 0, "duplicate_count": duplicate_count, "rejected_row_count": rejected,
                 "open": None, "high": None, "low": None, "close": None,
-                "base_volume": 0.0, "quote_turnover": 0.0,
+                "base_volume": "0", "quote_turnover": "0",
                 "first_source_timestamp_utc": None, "last_source_timestamp_utc": None,
                 "first_source_trade_id": None, "last_source_trade_id": None}
         return core, sorted(set(anomalies))
 
     parsed.sort(key=lambda r: (r[0], r[5]))  # (timestamp, trade id) — deterministic under input reordering
     prices = [r[3] for r in parsed]
+    # Canonical numeric primitive is Decimal end-to-end (parsed as Decimal
+    # above, aggregated as Decimal here, serialized via str()) so that the
+    # source string's exact precision is preserved through to storage, per
+    # r1_normalized_evidence_contract_v1.json's precision_semantics for
+    # open/high/low/close/base_volume/quote_turnover. No float64 detour.
     core = {
         "stream_id": stream_id,
         "utc_date": utc_date,
@@ -186,12 +197,12 @@ def daily_primitive(*, stream_id: str, utc_date: str, header: tuple[str, ...],
         "trade_count": len(parsed),
         "duplicate_count": duplicate_count,
         "rejected_row_count": rejected,
-        "open": prices[0],
-        "high": max(prices),
-        "low": min(prices),
-        "close": prices[-1],
-        "base_volume": sum(r[2] for r in parsed),
-        "quote_turnover": sum(r[2] * r[3] for r in parsed),
+        "open": str(prices[0]),
+        "high": str(max(prices)),
+        "low": str(min(prices)),
+        "close": str(prices[-1]),
+        "base_volume": str(sum(r[2] for r in parsed)),
+        "quote_turnover": str(sum(r[2] * r[3] for r in parsed)),
         "first_source_timestamp_utc": parsed[0][0],
         "last_source_timestamp_utc": parsed[-1][0],
         "first_source_trade_id": parsed[0][5],

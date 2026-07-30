@@ -45,11 +45,14 @@ def _run_both(rows, day="2023-11-14"):
 
 
 def test_real_objects_agree_on_core_aggregates():
-    """Across all 5 real cached objects, A and B agree exactly on trade_count
-    and to float precision on close/open/high/low/base_volume/quote_turnover.
-    This is the positive convergence result: no anomalies present in these
-    objects, so the precision-representation difference (Decimal-string vs
-    float64) never manifests as a numeric disagreement here."""
+    """Across all 5 real cached objects, A and B agree exactly (byte-identical
+    Decimal-string canonical values, no tolerance) on trade_count and on
+    open/high/low/close/base_volume/quote_turnover. Post numeric-conformance
+    repair (see experiments/data/r1_parser_b_numeric_conformance_repair_v1.json),
+    Parser B computes these fields as Decimal end-to-end like Parser A, so the
+    former float64-vs-Decimal representation gap can no longer manifest as a
+    numeric disagreement here, and exact equality is the correct assertion
+    rather than a tolerance band."""
     import csv
     import io
 
@@ -65,9 +68,12 @@ def test_real_objects_agree_on_core_aggregates():
         )
         assert b_anom == [], f"{name}: unexpected Parser B anomalies {b_anom}"
         assert a.record["trade_count"] == b_core["trade_count"], name
-        assert abs(float(a.record["close"]) - b_core["close"]) < 1e-9, name
-        assert abs(float(a.record["quote_turnover"]) - b_core["quote_turnover"]) < 1e-6, name
-        assert abs(float(a.record["base_volume"]) - b_core["base_volume"]) < 1e-9, name
+        assert a.record["open"] == b_core["open"], name
+        assert a.record["high"] == b_core["high"], name
+        assert a.record["low"] == b_core["low"], name
+        assert a.record["close"] == b_core["close"], name
+        assert a.record["quote_turnover"] == b_core["quote_turnover"], name
+        assert a.record["base_volume"] == b_core["base_volume"], name
 
 
 def test_formerly_disagreement_side_included_in_b_fingerprint_not_in_contract():

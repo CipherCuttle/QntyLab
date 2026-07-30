@@ -41,7 +41,7 @@ def test_pilot_reproduction_is_deterministic_and_order_invariant():
                                               rows=list(reversed(rows)), historical_cutoff_utc=CUTOFF)
     assert forward == reversed_
     assert anomalies_f == anomalies_r == []
-    assert forward["open"] == 10.0 and forward["close"] == 11.0
+    assert forward["open"] == "10" and forward["close"] == "11"
 
 
 def test_utc_day_boundary_23_59_59_and_00_00_00_are_assigned_to_correct_day():
@@ -49,11 +49,11 @@ def test_utc_day_boundary_23_59_59_and_00_00_00_are_assigned_to_correct_day():
     early = row("1751414400.0", price="12")   # 2025-07-02T00:00:00Z
     day1, anomalies1 = daily_primitive(stream_id="s", utc_date="2025-07-01", header=BASE_SCHEMA,
                                         rows=[late, early], historical_cutoff_utc=CUTOFF)
-    assert day1["trade_count"] == 1 and day1["close"] == 9.0
+    assert day1["trade_count"] == 1 and day1["close"] == "9"
     assert ANOMALY_TIMESTAMP_CONTAINMENT in anomalies1
     day2, anomalies2 = daily_primitive(stream_id="s", utc_date="2025-07-02", header=BASE_SCHEMA,
                                         rows=[late, early], historical_cutoff_utc=CUTOFF)
-    assert day2["trade_count"] == 1 and day2["close"] == 12.0
+    assert day2["trade_count"] == 1 and day2["close"] == "12"
     assert ANOMALY_TIMESTAMP_CONTAINMENT in anomalies2
 
 
@@ -70,7 +70,7 @@ def test_identical_timestamps_break_ties_by_trade_id_deterministically():
     r2 = row("1751328000.0", price="7", trdid="b" * 32)
     primitive, _ = daily_primitive(stream_id="s", utc_date="2025-07-01", header=BASE_SCHEMA,
                                     rows=[r2, r1], historical_cutoff_utc=CUTOFF)
-    assert primitive["open"] == 5.0 and primitive["close"] == 7.0
+    assert primitive["open"] == "5" and primitive["close"] == "7"
 
 
 # --- duplicate handling ---------------------------------------------------

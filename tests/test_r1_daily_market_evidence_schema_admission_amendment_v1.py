@@ -43,6 +43,7 @@ import json
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
+from types import MappingProxyType
 from typing import Mapping, Optional
 
 from qntylab import r1_reference_parser as rp
@@ -111,9 +112,11 @@ def test_amendment_addresses_the_audited_verdict():
 def test_repair_history_records_the_registry_time_repair():
     amendment = _load_amendment()
     history = amendment["repair_history"]
-    assert len(history) == 1
+    assert len(history) == 2
     assert history[0]["addressed_review_verdict"] == "BLOCK_REGISTRY_TIME_AMBIGUITY"
+    assert history[1]["addressed_review_verdict"] == "BLOCK_UNBOUND_REGISTRY_HASH"
     assert history[0]["still_not_frozen"] is True
+    assert history[1]["still_not_frozen"] is True
 
 
 def test_amendment_semantic_content_digest_is_self_consistent():
@@ -162,88 +165,161 @@ def test_registry_snapshot_binding_section_present_and_adopted():
     assert binding["closes"].startswith("Independent hostile review verdict BLOCK_REGISTRY_TIME_AMBIGUITY")
 
 
-# --- 2. standalone reimplementation of the registry-snapshot-bound predicate
-# Deliberately not importing either parser's schema_identify/identify_schema:
-# this is an independent re-derivation of the amendment's stated predicate
-# from its own text, evaluated against the real registry file.
+# --- 2. standalone reimplementation of the exact-artifact predicate --------
 
 SCHEMA_ADMISSIBLE = "SCHEMA_ADMISSIBLE"
 SCHEMA_INADMISSIBLE = "SCHEMA_INADMISSIBLE"
+EVALUATION_RECEIPT_KIND = "SCHEMA_ADMISSION_EVALUATION_RECEIPT_V1"
+_SOURCE_X = "a" * 64
+
+
+def _require_sha256(value: str, field: str) -> None:
+    if not isinstance(value, str) or len(value) != 64 or any(c not in "0123456789abcdef" for c in value):
+        raise ValueError(f"{field} must be a 64-character lowercase SHA-256")
+
+
+@dataclass(frozen=True)
+class RegistrySnapshot:
+    """One immutable registry artifact: variants and R are derived together."""
+    exact_artifact_bytes: bytes
+    known_schema_variants: Mapping[str, object]
+    registry_snapshot_sha256: str
+
+    @classmethod
+    def from_exact_artifact_bytes(cls, artifact_bytes: bytes) -> "RegistrySnapshot":
+        parsed = json.loads(artifact_bytes)
+        variants = parsed.get("known_schema_variants")
+        if not isinstance(variants, dict):
+            raise ValueError("registry artifact lacks object known_schema_variants")
+        return cls(
+            exact_artifact_bytes=artifact_bytes,
+            known_schema_variants=MappingProxyType(dict(variants)),
+            registry_snapshot_sha256=hashlib.sha256(artifact_bytes).hexdigest(),
+        )
+
+
+@dataclass(frozen=True)
+class GoverningRule:
+    effective_combined_contract_binding_sha256: str
+
+    @classmethod
+    def from_amendment_bytes(cls, amendment_bytes: bytes) -> "GoverningRule":
+        amendment = json.loads(amendment_bytes)
+        semantic_hash = _canonical_hash(amendment["semantic_body"])
+        if semantic_hash != amendment["amendment_semantic_content_sha256"]:
+            raise ValueError("amendment semantic content hash mismatch")
+        binding = amendment["effective_combined_contract_binding"]
+        binding_hash = _canonical_hash(binding)
+        if binding_hash != amendment["effective_combined_contract_binding_sha256"]:
+            raise ValueError("effective combined contract binding mismatch")
+        if binding["amendment_semantic_content_sha256"] != semantic_hash:
+            raise ValueError("binding does not name the governing semantics")
+        return cls(binding_hash)
 
 
 @dataclass(frozen=True)
 class SchemaAdmissionEvaluation:
-    """An admission evaluation is a recorded fact bound to a specific
-    registry snapshot -- it is never mutated after construction (frozen), so
-    a later evaluation under a different registry snapshot cannot silently
-    alter an earlier one, only produce a new, distinct instance."""
-    disposition: str
+    """Canonical durable X/R/C/D provenance, not an in-memory-only fact."""
+    source_object_sha256: str
     schema_id: Optional[str]
     registry_snapshot_sha256: str
+    governing_effective_combined_contract_binding_sha256: str
+    disposition: str
+
+    @property
+    def identity(self) -> tuple[str, str, str]:
+        return (self.source_object_sha256, self.registry_snapshot_sha256,
+                self.governing_effective_combined_contract_binding_sha256)
+
+    def durable_value(self) -> dict:
+        return {
+            "disposition": self.disposition,
+            "governing_effective_combined_contract_binding_sha256": self.governing_effective_combined_contract_binding_sha256,
+            "receipt_kind": EVALUATION_RECEIPT_KIND,
+            "registry_snapshot_sha256": self.registry_snapshot_sha256,
+            "schema_id": self.schema_id,
+            "source_object_sha256": self.source_object_sha256,
+        }
+
+    def durable_bytes(self) -> bytes:
+        return _canonical_bytes(self.durable_value())
+
+    @classmethod
+    def from_durable_bytes(cls, receipt_bytes: bytes) -> "SchemaAdmissionEvaluation":
+        value = json.loads(receipt_bytes)
+        expected = {"receipt_kind", "source_object_sha256", "registry_snapshot_sha256",
+                    "governing_effective_combined_contract_binding_sha256", "schema_id", "disposition"}
+        if set(value) != expected or value["receipt_kind"] != EVALUATION_RECEIPT_KIND:
+            raise ValueError("invalid schema-admission evaluation receipt shape")
+        if _canonical_bytes(value) != receipt_bytes:
+            raise ValueError("evaluation receipt must use canonical durable bytes")
+        _require_sha256(value["source_object_sha256"], "source_object_sha256")
+        _require_sha256(value["registry_snapshot_sha256"], "registry_snapshot_sha256")
+        _require_sha256(value["governing_effective_combined_contract_binding_sha256"], "governing binding")
+        if value["disposition"] not in (SCHEMA_ADMISSIBLE, SCHEMA_INADMISSIBLE):
+            raise ValueError("invalid schema-admission disposition")
+        return cls(value["source_object_sha256"], value["schema_id"], value["registry_snapshot_sha256"],
+                   value["governing_effective_combined_contract_binding_sha256"], value["disposition"])
+
+
+def _r1_snapshot() -> RegistrySnapshot:
+    return RegistrySnapshot.from_exact_artifact_bytes(SCHEMA_REGISTRY_PATH.read_bytes())
+
+
+def _governing_rule() -> GoverningRule:
+    return GoverningRule.from_amendment_bytes(AMENDMENT_PATH.read_bytes())
 
 
 def daily_market_evidence_v1_schema_admission(
-    schema_id: Optional[str],
-    known_schema_variants: Mapping[str, object],
-    registry_snapshot_sha256: str,
+    source_object_sha256: str, schema_id: Optional[str], registry_snapshot: RegistrySnapshot,
+    governing_rule: GoverningRule,
 ) -> SchemaAdmissionEvaluation:
-    """Standalone reimplementation of
-    semantic_body.schema_admission_rule.predicate_definition, per the
-    registry_snapshot_binding repair: registry_snapshot_sha256 is a required
-    positional argument (no default), and the function reads no ambient or
-    global registry state -- it is a pure function of its three explicit
-    arguments only. Governs only the schema_id dimension: necessary, not
-    sufficient, for overall record validity."""
-    if not isinstance(registry_snapshot_sha256, str) or len(registry_snapshot_sha256) != 64:
-        raise ValueError(
-            "registry_snapshot_sha256 is a required 64-hex-char binding, not optional "
-            "(schema_admission_rule.predicate_definition)"
-        )
-    if schema_id is None or schema_id not in known_schema_variants:
-        disposition = SCHEMA_INADMISSIBLE
-    else:
-        disposition = SCHEMA_ADMISSIBLE
-    return SchemaAdmissionEvaluation(
-        disposition=disposition,
-        schema_id=schema_id,
-        registry_snapshot_sha256=registry_snapshot_sha256,
+    """Pure X/R/C evaluation; R and C are derived objects, never assertions."""
+    _require_sha256(source_object_sha256, "source_object_sha256")
+    if not isinstance(registry_snapshot, RegistrySnapshot) or not isinstance(governing_rule, GoverningRule):
+        raise TypeError("evaluation requires exact RegistrySnapshot and GoverningRule objects")
+    if hashlib.sha256(registry_snapshot.exact_artifact_bytes).hexdigest() != registry_snapshot.registry_snapshot_sha256:
+        raise ValueError("registry snapshot identity does not match its exact artifact bytes")
+    disposition = (SCHEMA_INADMISSIBLE if schema_id is None or schema_id not in registry_snapshot.known_schema_variants
+                   else SCHEMA_ADMISSIBLE)
+    return SchemaAdmissionEvaluation(source_object_sha256, schema_id, registry_snapshot.registry_snapshot_sha256,
+                                     governing_rule.effective_combined_contract_binding_sha256, disposition)
+
+
+def _evaluate(schema_id: Optional[str], snapshot: Optional[RegistrySnapshot] = None,
+              governing_rule: Optional[GoverningRule] = None) -> SchemaAdmissionEvaluation:
+    return daily_market_evidence_v1_schema_admission(_SOURCE_X, schema_id, snapshot or _r1_snapshot(),
+                                                      governing_rule or _governing_rule())
+
+
+def _r2_snapshot(schema_id: str = "future_variant_not_yet_registered") -> RegistrySnapshot:
+    registry = json.loads(SCHEMA_REGISTRY_PATH.read_bytes())
+    registry["known_schema_variants"][schema_id] = {"status": "KNOWN_VALID_SCHEMA_VARIANT"}
+    return RegistrySnapshot.from_exact_artifact_bytes(
+        (json.dumps(registry, indent=2, ensure_ascii=True) + "\n").encode()
     )
 
 
-def test_predicate_requires_registry_snapshot_sha256():
-    known = _load_known_schema_variants()
+def test_registry_identity_uses_exact_artifact_bytes_not_canonical_json():
+    snapshot = _r1_snapshot()
+    assert snapshot.registry_snapshot_sha256 == _registry_snapshot_sha256()
+    assert snapshot.registry_snapshot_sha256 != _canonical_hash(json.loads(snapshot.exact_artifact_bytes))
+
+
+def test_predicate_requires_derived_snapshot_and_governing_rule_not_claimed_hash():
     import pytest
-    with pytest.raises(ValueError):
-        daily_market_evidence_v1_schema_admission("bybit_trade_v1", known, None)
-    with pytest.raises(ValueError):
-        daily_market_evidence_v1_schema_admission("bybit_trade_v1", known, "")
-    with pytest.raises(ValueError):
-        daily_market_evidence_v1_schema_admission("bybit_trade_v1", known, "not-a-sha256")
+    with pytest.raises(TypeError):
+        daily_market_evidence_v1_schema_admission(_SOURCE_X, "bybit_trade_v1", {}, _governing_rule())
+    with pytest.raises(TypeError):
+        daily_market_evidence_v1_schema_admission(_SOURCE_X, "bybit_trade_v1", _r1_snapshot(), "f" * 64)
 
 
-def test_predicate_registered_schema_is_admissible():
-    known = _load_known_schema_variants()
-    r1 = _registry_snapshot_sha256()
-    for schema_id in known:
-        evaluation = daily_market_evidence_v1_schema_admission(schema_id, known, r1)
-        assert evaluation.disposition == SCHEMA_ADMISSIBLE
-        assert evaluation.registry_snapshot_sha256 == r1
-
-
-def test_predicate_none_schema_id_is_inadmissible():
-    known = _load_known_schema_variants()
-    r1 = _registry_snapshot_sha256()
-    evaluation = daily_market_evidence_v1_schema_admission(None, known, r1)
-    assert evaluation.disposition == SCHEMA_INADMISSIBLE
-    assert evaluation.registry_snapshot_sha256 == r1
-
-
-def test_predicate_unregistered_schema_id_is_inadmissible():
-    known = _load_known_schema_variants()
-    r1 = _registry_snapshot_sha256()
-    evaluation = daily_market_evidence_v1_schema_admission("some_never_seen_variant", known, r1)
-    assert evaluation.disposition == SCHEMA_INADMISSIBLE
-    assert evaluation.registry_snapshot_sha256 == r1
+def test_predicate_registered_none_and_unknown_schema_dispositions():
+    snapshot = _r1_snapshot()
+    for schema_id in snapshot.known_schema_variants:
+        assert _evaluate(schema_id, snapshot).disposition == SCHEMA_ADMISSIBLE
+    assert _evaluate(None, snapshot).disposition == SCHEMA_INADMISSIBLE
+    assert _evaluate("some_never_seen_variant", snapshot).disposition == SCHEMA_INADMISSIBLE
 
 
 # --- 3. countermodel: current implementation reproduces the audited gap ----
@@ -296,12 +372,12 @@ def test_countermodel_rejected_under_new_predicate():
     MATERIALIZED_VALID is SCHEMA_INADMISSIBLE under the amendment's
     registry-snapshot-bound predicate -- the protocol-level contradiction the
     amendment resolves, without requiring any code change here."""
-    known = _load_known_schema_variants()
-    r1 = _registry_snapshot_sha256()
     raw = _unknown_schema_raw_bytes()
     result = materialize_parser_b(raw, "2023-11-14", "s", CUTOFF)
     assert result.status == MATERIALIZED_VALID  # current implementation, unchanged
-    evaluation = daily_market_evidence_v1_schema_admission(result.record["schema_id"], known, r1)
+    evaluation = daily_market_evidence_v1_schema_admission(
+        result.record["source_object_sha256"], result.record["schema_id"], _r1_snapshot(), _governing_rule(),
+    )
     assert evaluation.disposition == SCHEMA_INADMISSIBLE
     assert result.is_valid is True and evaluation.disposition == SCHEMA_INADMISSIBLE, (
         "this contradiction between implementation-level is_valid and the new "
@@ -338,19 +414,18 @@ def test_raw_retention_independent_of_admission_parser_a():
 
 
 def test_raw_retention_independent_of_admission_parser_b():
-    known = _load_known_schema_variants()
-    r1 = _registry_snapshot_sha256()
     raw = _unknown_schema_raw_bytes()
     result = materialize_parser_b(raw, "2023-11-14", "s", CUTOFF)
-    evaluation = daily_market_evidence_v1_schema_admission(result.record["schema_id"], known, r1)
+    evaluation = daily_market_evidence_v1_schema_admission(
+        result.record["source_object_sha256"], result.record["schema_id"], _r1_snapshot(), _governing_rule(),
+    )
     assert evaluation.disposition == SCHEMA_INADMISSIBLE
     # raw identity is present regardless of the (inadmissible) predicate result
     assert result.raw_object_sha256 == hashlib.sha256(raw).hexdigest()
     assert result.record["source_object_sha256"] == hashlib.sha256(raw).hexdigest()
 
 
-# --- 5. red-team scenario C: registered schema confers no automatic validity,
-# under more than one registry snapshot (mutation D coverage)
+# --- 5. red-team scenario C: registration is not overall validity (M6) -----
 
 def test_registered_schema_with_missing_required_field_still_invalid():
     """A record with a SCHEMA_ADMISSIBLE schema_id but a pre-existing
@@ -358,16 +433,12 @@ def test_registered_schema_with_missing_required_field_still_invalid():
     remains invalid under the unmodified validator -- schema registration is
     necessary, not sufficient. Checked under both R1 and a simulated R2 to
     prove the sufficiency-collapse a later registry snapshot must not grant."""
-    known_r1 = _load_known_schema_variants()
-    r1 = _registry_snapshot_sha256()
-    known_r2 = dict(known_r1)
-    known_r2["future_variant_not_yet_registered"] = {"status": "KNOWN_VALID_SCHEMA_VARIANT"}
-    r2 = _canonical_hash(known_r2)  # stand-in for a distinct future registry artifact's own sha256
-    assert r2 != r1
+    r1, r2 = _r1_snapshot(), _r2_snapshot()
+    assert r1.registry_snapshot_sha256 != r2.registry_snapshot_sha256
 
-    for schema_id, known, r in (("bybit_trade_v1", known_r1, r1),
-                                 ("future_variant_not_yet_registered", known_r2, r2)):
-        evaluation = daily_market_evidence_v1_schema_admission(schema_id, known, r)
+    for schema_id, snapshot in (("bybit_trade_v1", r1),
+                                ("future_variant_not_yet_registered", r2)):
+        evaluation = _evaluate(schema_id, snapshot)
         assert evaluation.disposition == SCHEMA_ADMISSIBLE
 
         record = {f: None for f in ALL_CONTRACT_FIELDS}
@@ -389,99 +460,93 @@ def test_registered_schema_with_missing_required_field_still_invalid():
         )
 
 
-# --- 6. the actual registry-time repair: real T1/T2 counterfactual ---------
+# --- 6. hostile exact-snapshot and durable X/R/C/D counterfactuals ---------
 
-def test_r1_evaluation_is_immutable_and_survives_a_later_r2_evaluation():
-    """The real T1/T2 counterfactual (not the old, insufficient 'a Python
-    variable does not spontaneously mutate' test): raw bytes X evaluated
-    under registry snapshot R1 (schema S absent) are SCHEMA_INADMISSIBLE. A
-    later, distinct registry snapshot R2 (schema S registered) is then
-    constructed and X is evaluated fresh under R2. The R1 evaluation object,
-    obtained BEFORE R2 existed, must still report SCHEMA_INADMISSIBLE
-    afterward -- it must not have been silently reclassified -- and the R1
-    and R2 evaluations must be distinct, separately identified facts."""
-    known_r1 = _load_known_schema_variants()
-    r1 = _registry_snapshot_sha256()
-    schema_id = "future_variant_not_yet_registered"
+_AMBIENT_REGISTRY_FOR_DETERMINISM_TEST = {"latest": None}
 
-    # T1: evaluate under R1 (S absent). Keep the resulting evaluation object.
-    evaluation_r1 = daily_market_evidence_v1_schema_admission(schema_id, known_r1, r1)
-    assert evaluation_r1.disposition == SCHEMA_INADMISSIBLE
-    assert evaluation_r1.registry_snapshot_sha256 == r1
 
-    # A later, independently reviewed amendment creates a DISTINCT registry
-    # snapshot R2 that registers S. This is a new artifact/identity, not an
-    # in-place mutation of R1's known_schema_variants dict.
-    known_r2 = dict(known_r1)
-    known_r2[schema_id] = {"status": "KNOWN_VALID_SCHEMA_VARIANT"}
-    r2 = _canonical_hash(known_r2)
-    assert r2 != r1
-
-    # T2: the R1 evaluation, obtained before R2 existed, is unchanged -- values
-    # are immutable (frozen dataclass) and nothing re-derives it from live state.
-    assert evaluation_r1.disposition == SCHEMA_INADMISSIBLE
-    assert evaluation_r1.registry_snapshot_sha256 == r1
-
-    # A fresh, explicit evaluation of the SAME raw schema_id under R2 is a
-    # NEW, separately identified fact -- SCHEMA_ADMISSIBLE under R2 only.
-    evaluation_r2 = daily_market_evidence_v1_schema_admission(schema_id, known_r2, r2)
+def test_r1_r2_explicit_snapshots_are_distinct_and_ambient_independent():
+    """M1/M4: R2 cannot replace an explicitly supplied R1 snapshot."""
+    schema_id, r1, r2 = "future_variant_not_yet_registered", _r1_snapshot(), _r2_snapshot()
+    _AMBIENT_REGISTRY_FOR_DETERMINISM_TEST["latest"] = r2
+    evaluation_r1_t1 = _evaluate(schema_id, r1)
+    _AMBIENT_REGISTRY_FOR_DETERMINISM_TEST["latest"] = r1
+    evaluation_r1_t2 = _evaluate(schema_id, r1)
+    evaluation_r2 = _evaluate(schema_id, r2)
+    assert evaluation_r1_t1 == evaluation_r1_t2
+    assert evaluation_r1_t1.disposition == SCHEMA_INADMISSIBLE
     assert evaluation_r2.disposition == SCHEMA_ADMISSIBLE
-    assert evaluation_r2.registry_snapshot_sha256 == r2
-
-    # The two evaluations are distinct facts, not the same fact overwritten.
-    assert evaluation_r1 != evaluation_r2
-    assert evaluation_r1.registry_snapshot_sha256 != evaluation_r2.registry_snapshot_sha256
-    assert evaluation_r1.disposition != evaluation_r2.disposition
-    # And the R1 fact, inspected one more time after R2's evaluation exists,
-    # still reads exactly as it did at T1 -- no retroactive reclassification.
-    assert evaluation_r1.disposition == SCHEMA_INADMISSIBLE
+    assert evaluation_r1_t1.identity != evaluation_r2.identity
 
 
-_AMBIENT_REGISTRY_FOR_DETERMINISM_TEST = {"known_schema_variants": {}, "registry_snapshot_sha256": "0" * 64}
+def test_hostile_r1_hash_plus_r2_contents_is_structurally_unavailable():
+    """M2: no evaluator argument exists for a separately claimed R hash."""
+    import pytest
+    r1, r2 = _r1_snapshot(), _r2_snapshot()
+    with pytest.raises(TypeError):
+        daily_market_evidence_v1_schema_admission(_SOURCE_X, "future_variant_not_yet_registered", r2, _governing_rule(),
+                                                   claimed_registry_hash=r1.registry_snapshot_sha256)
+    evaluation = _evaluate("future_variant_not_yet_registered", r2)
+    assert evaluation.registry_snapshot_sha256 == hashlib.sha256(r2.exact_artifact_bytes).hexdigest()
+    assert evaluation.registry_snapshot_sha256 != r1.registry_snapshot_sha256
 
 
-def test_evaluation_is_deterministic_and_independent_of_ambient_registry_state():
-    """admission(X, R, C, t1) == admission(X, R, C, t2): calling the predicate
-    twice with the exact same explicit (schema_id, known_schema_variants,
-    registry_snapshot_sha256) arguments must yield the same result even if
-    some unrelated ambient/global value that a naive implementation might
-    mistake for 'the current registry' changes in between -- because the
-    predicate must never read such ambient state, only its own arguments."""
-    known = _load_known_schema_variants()
-    r1 = _registry_snapshot_sha256()
-
-    _AMBIENT_REGISTRY_FOR_DETERMINISM_TEST["known_schema_variants"] = dict(known)
-    _AMBIENT_REGISTRY_FOR_DETERMINISM_TEST["registry_snapshot_sha256"] = r1
-    evaluation_t1 = daily_market_evidence_v1_schema_admission("bybit_trade_v1", known, r1)
-
-    # Mutate the ambient stand-in between calls -- a correct, argument-pure
-    # predicate must be unaffected because it never consults this dict.
-    _AMBIENT_REGISTRY_FOR_DETERMINISM_TEST["known_schema_variants"] = {}
-    _AMBIENT_REGISTRY_FOR_DETERMINISM_TEST["registry_snapshot_sha256"] = "f" * 64
-
-    evaluation_t2 = daily_market_evidence_v1_schema_admission("bybit_trade_v1", known, r1)
-    assert evaluation_t1 == evaluation_t2
-    assert evaluation_t1.disposition == SCHEMA_ADMISSIBLE == evaluation_t2.disposition
+def test_registry_byte_mutation_cannot_retain_old_identity():
+    """M9: any byte change creates a new exact-byte snapshot identity."""
+    r1 = _r1_snapshot()
+    mutated = RegistrySnapshot.from_exact_artifact_bytes(r1.exact_artifact_bytes.replace(b'"artifact"', b'"Artifact"', 1))
+    assert mutated.registry_snapshot_sha256 != r1.registry_snapshot_sha256
+    assert mutated.known_schema_variants == r1.known_schema_variants
 
 
-def test_r2_admission_requires_its_own_explicit_registry_snapshot():
-    """A caller cannot obtain R2's admissibility by reusing R1's
-    registry_snapshot_sha256 with R2's known_schema_variants (mutation A:
-    'evaluator silently uses latest/current registry') -- the snapshot
-    identity and the variant map must agree, and every evaluation records
-    its own explicit snapshot rather than an implicit 'current' one."""
-    known_r1 = _load_known_schema_variants()
-    r1 = _registry_snapshot_sha256()
-    known_r2 = dict(known_r1)
-    known_r2["future_variant_not_yet_registered"] = {"status": "KNOWN_VALID_SCHEMA_VARIANT"}
-    r2 = _canonical_hash(known_r2)
+def test_durable_receipt_replays_x_r_c_and_d_after_object_loss():
+    """M8: canonical receipt bytes, not dataclass persistence, survive replay."""
+    schema_id, r1, r2 = "future_variant_not_yet_registered", _r1_snapshot(), _r2_snapshot()
+    receipt_r1 = _evaluate(schema_id, r1).durable_bytes()
+    receipt_r2 = _evaluate(schema_id, r2).durable_bytes()
+    del r1, r2
+    replay_r1 = SchemaAdmissionEvaluation.from_durable_bytes(receipt_r1)
+    replay_r2 = SchemaAdmissionEvaluation.from_durable_bytes(receipt_r2)
+    assert replay_r1.disposition == SCHEMA_INADMISSIBLE
+    assert replay_r2.disposition == SCHEMA_ADMISSIBLE
+    assert replay_r1.identity != replay_r2.identity
+    assert replay_r1.durable_bytes() == receipt_r1
 
-    # Evaluating with R2's variant map still records itself as governed by R2
-    # -- never silently mislabeled as R1 (mutation B: registry identity
-    # omitted/mismatched in provenance).
-    evaluation = daily_market_evidence_v1_schema_admission("future_variant_not_yet_registered", known_r2, r2)
-    assert evaluation.registry_snapshot_sha256 == r2
-    assert evaluation.registry_snapshot_sha256 != r1
+
+def test_same_x_r_c_is_deterministic_and_different_c_is_distinct():
+    """M5/M10: C is derived from verified governing bytes and part of identity."""
+    r1, c1 = _r1_snapshot(), _governing_rule()
+    first = _evaluate("bybit_trade_v1", r1, c1)
+    second = _evaluate("bybit_trade_v1", r1, c1)
+    assert first == second and first.durable_bytes() == second.durable_bytes()
+
+    amendment = _load_amendment()
+    amended = dict(amendment)
+    semantic = dict(amendment["semantic_body"])
+    semantic["schema_admission_rule"] = dict(semantic["schema_admission_rule"])
+    semantic["schema_admission_rule"]["why_minimum_vocabulary"] += " distinct C"
+    amended["semantic_body"] = semantic
+    amended["amendment_semantic_content_sha256"] = _canonical_hash(semantic)
+    binding = dict(amended["effective_combined_contract_binding"])
+    binding["amendment_semantic_content_sha256"] = amended["amendment_semantic_content_sha256"]
+    amended["effective_combined_contract_binding"] = binding
+    amended["effective_combined_contract_binding_sha256"] = _canonical_hash(binding)
+    c2 = GoverningRule.from_amendment_bytes(_canonical_bytes(amended))
+    changed_rule = _evaluate("bybit_trade_v1", r1, c2)
+    assert changed_rule.disposition == first.disposition
+    assert changed_rule.identity != first.identity
+
+
+def test_receipt_rejects_noncanonical_or_missing_identity_components():
+    """M3/M8: omission or noncanonical process memory stand-ins fail closed."""
+    import pytest
+    receipt = _evaluate("bybit_trade_v1").durable_bytes()
+    value = json.loads(receipt)
+    del value["registry_snapshot_sha256"]
+    with pytest.raises(ValueError):
+        SchemaAdmissionEvaluation.from_durable_bytes(_canonical_bytes(value))
+    with pytest.raises(ValueError):
+        SchemaAdmissionEvaluation.from_durable_bytes(receipt.rstrip())
 
 
 # --- 7. red-team scenario E: unrelated frozen semantics left untouched -----

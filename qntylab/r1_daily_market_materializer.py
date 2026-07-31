@@ -119,6 +119,8 @@ from typing import Optional
 
 from qntylab import r1_reference_parser as rp
 from qntylab import r1_retention_candidate as rc
+from qntylab import r1_schema_admission as admission
+from qntylab import r1_schema_recognizer as recognizer
 
 # --- materialization outcome (boundary-local bookkeeping, not itself new
 # frozen scientific protocol -- mirrors the pattern Parser A already uses for
@@ -338,6 +340,65 @@ def materialize_parser_a(raw_bytes: bytes, expected_utc_date: date, instrument_i
     return MaterializationResult(
         status=MATERIALIZED_VALID, parser="A", raw_object_sha256=raw_sha, record=record, anomalies=[],
     )
+
+
+SCHEMA_INADMISSIBLE = "SCHEMA_INADMISSIBLE"
+
+
+def materialize_admitted_parser_a(raw_bytes: bytes, expected_utc_date: date, instrument_instance_id: str,
+                                   expected_raw_sha256: Optional[str] = None) -> MaterializationResult:
+    """The canonical schema-admitted runtime path: one exact source object X
+    -> FROZEN schema admission gate (qntylab.r1_schema_admission) -> Parser A
+    materialization, permitted only when admission passes. `raw_bytes` is
+    read once by the caller and threaded, as the same immutable bytes object,
+    through hashing, admission, and (if admitted) Parser A parsing -- there is
+    no separate re-open/re-read step that could desynchronize the bytes
+    admission evaluated from the bytes Parser A parses.
+
+    Recognition is necessarily evaluated twice on the admitted path (once
+    inside qntylab.r1_schema_admission.evaluate_schema_admission, once again
+    inside rp.parse_daily_object via qntylab.r1_schema_recognizer): both
+    evaluations apply the identical frozen G to the identical X and R, so
+    they are redundant but deterministic, not divergent. No recognition
+    receipt/cache is introduced solely to avoid this recomputation (R1
+    correctness-first scope; see task notes).
+
+    A structurally recognized-but-unauthorized schema (e.g.
+    bybit_trade_v1_rpi) never reaches Parser A through this function, even
+    though Parser A's own row-semantics support scope happens to include it:
+    schema admission denial is a gate on materialization, not merely
+    advisory metadata.
+    """
+    raw_sha = sha256(raw_bytes).hexdigest()
+
+    if expected_raw_sha256 is not None and expected_raw_sha256 != raw_sha:
+        return MaterializationResult(
+            status=MATERIALIZATION_QUARANTINED, parser="A", raw_object_sha256=raw_sha,
+            anomalies=[rc.ANOMALY_SOURCE_MUTATION],
+            reason=f"raw bytes do not match expected_raw_sha256 (expected {expected_raw_sha256}, got {raw_sha})",
+        )
+
+    evaluation = admission.evaluate_schema_admission(raw_bytes)
+
+    if evaluation.admission != admission.ADMISSIBLE:
+        # Frozen schema_admission_rule text's one explicit carve-out: "EMPTY_OBJECT
+        # receives no fabricated schema authorization; its downstream zero-trade
+        # handling remains governed only by existing materialization/completeness
+        # semantics." EMPTY_OBJECT is a FRAMING_FAILURE (never SCHEMA_ADMISSIBLE),
+        # but the frozen text places its materialization outside this gate's
+        # jurisdiction rather than leaving it silently blocked -- so, uniquely for
+        # this one reason, evaluation continues to Parser A's own pre-existing
+        # zero-trade record path below instead of stopping here.
+        if not (evaluation.recognition_disposition == recognizer.FRAMING_FAILURE
+                and "EMPTY_OBJECT" in evaluation.reasons):
+            return MaterializationResult(
+                status=MATERIALIZATION_QUARANTINED, parser="A", raw_object_sha256=raw_sha,
+                anomalies=[SCHEMA_INADMISSIBLE],
+                reason=(f"frozen schema admission denied: recognition_disposition="
+                        f"{evaluation.recognition_disposition!r} schema_id={evaluation.schema_id!r}"),
+            )
+
+    return materialize_parser_a(raw_bytes, expected_utc_date, instrument_instance_id)
 
 
 def _decode_container(raw_bytes: bytes) -> tuple[str, list[str]]:

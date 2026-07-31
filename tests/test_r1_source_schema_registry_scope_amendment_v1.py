@@ -7,6 +7,7 @@ record validity.
 """
 import hashlib
 import json
+import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -115,14 +116,50 @@ def _r2_registry_bytes():
     return (json.dumps(registry, sort_keys=True, separators=(",", ":")) + "\n").encode()
 
 
-def test_candidate_is_unfrozen_and_hashes_its_own_semantics():
+def test_candidate_is_frozen_and_hashes_its_own_semantics():
     candidate = _candidate()
     assert candidate["artifact_kind"] == "PROTOCOL_AMENDMENT_CANDIDATE"
-    assert candidate["status"] == "CANDIDATE_NOT_YET_FROZEN"
+    assert candidate["status"] == "FROZEN"
     assert candidate["self_freeze_authorized"] is False
     assert _canonical_hash(candidate["semantic_body"]) == candidate["amendment_semantic_content_sha256"]
     binding = candidate["effective_combined_contract_binding"]
     assert _canonical_hash(binding) == candidate["effective_combined_contract_binding_sha256"]
+
+
+def test_freeze_is_governance_only_and_binds_the_retrospective_external_review():
+    reviewed_sha = "52c0d877587cf0c2d18d96ee79ec692ee361ef13"
+    candidate = _candidate()
+    review = json.loads((REPO_ROOT / "experiments/data/r1_source_schema_registry_scope_amendment_review_v1.json").read_bytes())
+    original = json.loads(subprocess.check_output(
+        ["git", "show", f"{reviewed_sha}:experiments/data/r1_source_schema_registry_scope_amendment_v1.json"],
+        cwd=REPO_ROOT,
+        text=True,
+    ))
+    frozen_semantics = dict(candidate)
+    original_semantics = dict(original)
+    for payload in (frozen_semantics, original_semantics):
+        payload.pop("status", None)
+        payload.pop("freeze_provenance", None)
+    assert frozen_semantics == original_semantics
+    assert candidate["freeze_provenance"] == {
+        "candidate_commit_reviewed_sha": reviewed_sha,
+        "frozen_amendment_semantic_content_sha256": candidate["amendment_semantic_content_sha256"],
+        "frozen_effective_combined_contract_binding_sha256": candidate["effective_combined_contract_binding_sha256"],
+        "operator_authorization": "explicit operator authorization supplied for this governance-only freeze of the exact independently hostile-reviewed candidate; no semantic changes authorized",
+        "review_receipt": "r1_source_schema_registry_scope_amendment_review_v1.json",
+        "review_receipt_payload_sha256": review["review_payload_sha256"],
+        "review_receipt_repository_native_at_review_time": False,
+    }
+    review_payload = dict(review)
+    review_payload.pop("review_payload_sha256")
+    assert review["review_payload_sha256"] == _canonical_hash(review_payload)
+    assert review["reviewed_candidate_sha"] == candidate["freeze_provenance"]["candidate_commit_reviewed_sha"]
+    assert review["review_type"] == "hostile/read-only"
+    assert review["changeset"] == "NONE"
+    assert review["verdict"] == "PASS_SAFE_TO_FREEZE"
+    assert review["origin"] == "external session transcript supplied by operator"
+    assert review["repository_native_at_review_time"] is False
+    assert review["persisted_retrospectively"] is True
 
 
 def test_candidate_binds_the_actual_unchanged_r1_authority_bytes():

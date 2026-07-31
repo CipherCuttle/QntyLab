@@ -1,7 +1,7 @@
 {
   "artifact": "r1_source_schema_registry_scope_amendment_v1",
   "artifact_kind": "PROTOCOL_AMENDMENT_CANDIDATE",
-  "status": "CANDIDATE_NOT_YET_FROZEN",
+  "status": "FROZEN",
   "self_freeze_authorized": false,
   "outcome_embargo": true,
   "raw_deletion_authorized": false,
@@ -86,5 +86,14 @@
     "source_precedence_freeze_artifact": "experiments/data/r1_source_precedence_freeze.json",
     "source_precedence_freeze_sha256": "25b03b648774e49b04110f28637466494d35ace27ab6b210053af9224d29c51f"
   },
-  "effective_combined_contract_binding_sha256": "3291c33ff0d4d33a1b9f43938c832bc6d0ba32e0c45b3628a80dc55e1c155ac0"
+  "effective_combined_contract_binding_sha256": "3291c33ff0d4d33a1b9f43938c832bc6d0ba32e0c45b3628a80dc55e1c155ac0",
+  "freeze_provenance": {
+    "candidate_commit_reviewed_sha": "52c0d877587cf0c2d18d96ee79ec692ee361ef13",
+    "frozen_amendment_semantic_content_sha256": "f1645ce186c73232bb5e4945f734f2ea1c94db856255da0332272bedacd87571",
+    "frozen_effective_combined_contract_binding_sha256": "3291c33ff0d4d33a1b9f43938c832bc6d0ba32e0c45b3628a80dc55e1c155ac0",
+    "operator_authorization": "explicit operator authorization supplied for this governance-only freeze of the exact independently hostile-reviewed candidate; no semantic changes authorized",
+    "review_receipt": "r1_source_schema_registry_scope_amendment_review_v1.json",
+    "review_receipt_payload_sha256": "d0d1e374a6f56cb2aaacbb4bd1b7e05ca01aae06ba3b4030582d63d02212795c",
+    "review_receipt_repository_native_at_review_time": false
+  }
 }

@@ -1,10 +1,20 @@
 """Conformance model for the unfrozen R1 schema-admission candidate.
 
 Admission is deliberately tested as a semantic contract, not wired runtime:
-frozen recognition produces schema identity; frozen scope authorizes it.
+schema admission derives recognition_result := recognize_G,R(X) directly from
+the exact source-object bytes X being admitted, by applying frozen G to X and
+exact R at evaluation time. No disposition, schema_id, or recognition-result/
+receipt-shaped value is ever accepted as an admission input from outside that
+derivation -- not even one whose X/G/R identity hashes are individually
+correct. This closes BLOCK_FORGED_RECOGNITION_RESULT (repair_history
+repair_index 5): a source object whose genuine recognition is NO_MATCH can no
+longer be admitted by asserting disposition=RECOGNIZED with an otherwise
+well-bound claim, because there is no admission input through which such a
+claim could be asserted in the first place.
 """
 import gzip
 import hashlib
+import inspect
 import json
 import sys
 from dataclasses import dataclass
@@ -53,27 +63,11 @@ def _registry_snapshot(registry_bytes=None):
 
 
 @dataclass(frozen=True)
-class RecognitionReceipt:
-    source_object_sha256: str
-    recognition_contract_sha256: str
-    registry_snapshot_sha256: str
-    disposition: str
-    schema_id: str | None
-
-
-@dataclass(frozen=True)
 class Admission:
+    source_object_sha256: str
+    recognition_disposition: str
     schema_id: str | None
     disposition: str
-
-
-def _recognized(raw_bytes, snapshot=None):
-    snapshot = snapshot or _registry_snapshot()
-    result = recognizer.recognize_source_object(raw_bytes, snapshot)
-    return RecognitionReceipt(
-        _hash(raw_bytes), _hash(RECOGNITION.read_bytes()), snapshot.registry_snapshot_sha256,
-        result.disposition, result.schema_id,
-    )
 
 
 def _candidate():
@@ -123,26 +117,34 @@ def _scope_authorization(schema_id, registry_bytes):
     return entry["daily_market_authorization"] if entry else NOT_AUTHORIZED
 
 
-def admit(receipt, source_object_sha256, registry_bytes=None):
-    """The candidate's only schema input is a frozen-G recognition output."""
+def admit(raw_bytes, registry_bytes=None, recognition_bytes=None):
+    """Schema admission: recognition_result := recognize_G,R(X), derived here.
+
+    The only source-identity input is the exact raw bytes X being admitted.
+    registry_bytes/recognition_bytes are accepted only to exercise fail-closed
+    G/R binding mismatches (Section 13/20 R4) -- callers cannot use them to
+    supply a disposition or schema_id, because none exists as a parameter.
+    """
     candidate = _verify_candidate_authorities()
-    if receipt.source_object_sha256 != source_object_sha256:
-        raise ValueError("recognition X binding mismatch")
-    registry_bytes = registry_bytes or REGISTRY.read_bytes()
+    registry_bytes = registry_bytes if registry_bytes is not None else REGISTRY.read_bytes()
+    recognition_bytes = recognition_bytes if recognition_bytes is not None else RECOGNITION.read_bytes()
     if _hash(registry_bytes) != candidate["bound_authority"]["base_registry_sha256"]:
         raise ValueError("candidate registry binding mismatch")
-    if receipt.recognition_contract_sha256 != candidate["bound_authority"]["frozen_source_structure_recognition_amendment_sha256"]:
+    if _hash(recognition_bytes) != candidate["bound_authority"]["frozen_source_structure_recognition_amendment_sha256"]:
         raise ValueError("recognition G binding mismatch")
-    if receipt.registry_snapshot_sha256 != _hash(registry_bytes):
-        raise ValueError("recognition R binding mismatch")
-    if receipt.disposition != recognizer.RECOGNIZED or receipt.schema_id is None:
-        return Admission(receipt.schema_id, INADMISSIBLE)
+
+    snapshot = recognizer.VerifiedRegistrySnapshot.from_exact_artifact_bytes(registry_bytes, _hash(registry_bytes))
+    result = recognizer.recognize_source_object(raw_bytes, snapshot)
+    source_object_sha256 = _hash(raw_bytes)
+
+    if result.disposition != recognizer.RECOGNIZED or result.schema_id is None:
+        return Admission(source_object_sha256, result.disposition, result.schema_id, INADMISSIBLE)
     known = json.loads(registry_bytes)["known_schema_variants"]
-    if receipt.schema_id not in known:
-        return Admission(receipt.schema_id, INADMISSIBLE)
-    if _scope_authorization(receipt.schema_id, registry_bytes) != AUTHORIZED:
-        return Admission(receipt.schema_id, INADMISSIBLE)
-    return Admission(receipt.schema_id, ADMISSIBLE)
+    if result.schema_id not in known:
+        return Admission(source_object_sha256, result.disposition, result.schema_id, INADMISSIBLE)
+    if _scope_authorization(result.schema_id, registry_bytes) != AUTHORIZED:
+        return Admission(source_object_sha256, result.disposition, result.schema_id, INADMISSIBLE)
+    return Admission(source_object_sha256, result.disposition, result.schema_id, ADMISSIBLE)
 
 
 def test_candidate_is_unfrozen_and_binds_exact_frozen_authorities():
@@ -167,65 +169,162 @@ def test_authority_hashes_and_scope_matrix_match_disk():
         assert matrix[schema_id]["daily_market_authorization"] == NOT_AUTHORIZED
 
 
-def test_a1_authorized_recognized_schema_passes():
-    fields = json.loads(REGISTRY.read_bytes())["known_schema_variants"]["bybit_trade_v1"]["field_set"]
-    receipt = _recognized(_raw(",".join(fields)))
-    assert receipt.disposition == recognizer.RECOGNIZED and receipt.schema_id == "bybit_trade_v1"
-    assert admit(receipt, receipt.source_object_sha256).disposition == ADMISSIBLE
+def test_interface_takes_only_x_no_recognition_shaped_input():
+    """R1/R2/R3 (Section 20): the admission interface has no field a caller
+    could use to assert a disposition, schema_id, or independent X hash."""
+    params = set(inspect.signature(admit).parameters)
+    assert params == {"raw_bytes", "registry_bytes", "recognition_bytes"}
+    for forbidden in ("disposition", "schema_id", "recognition_result", "receipt", "source_object_sha256"):
+        assert forbidden not in params
 
 
-@pytest.mark.parametrize("schema_id", ["bybit_trade_v1_rpi", "tardis_derivative_ticker_v1", "bybit_instruments_info_current_v1"])
-def test_a2_to_a4_registered_but_scope_unauthorized_is_inadmissible(schema_id):
-    fields = json.loads(REGISTRY.read_bytes())["known_schema_variants"][schema_id]["field_set"]
-    receipt = _recognized(_raw(",".join(fields)))
-    assert receipt.disposition == recognizer.RECOGNIZED and receipt.schema_id == schema_id
-    assert _scope_authorization(schema_id, REGISTRY.read_bytes()) == NOT_AUTHORIZED
-    assert admit(receipt, receipt.source_object_sha256).disposition == INADMISSIBLE
+def test_experiment_a_no_match_forgery_is_now_inadmissible_by_construction():
+    """Mandatory Experiment A: genuine recognition of X_bad is NO_MATCH; there
+    is no way to assert RECOGNIZED(bybit_trade_v1) for it through admit()."""
+    raw_bad = _raw("not,a,registered,header")
+    genuine = recognizer.recognize_source_object(raw_bad, _registry_snapshot())
+    assert genuine.disposition == recognizer.NO_MATCH and genuine.schema_id is None
+
+    result = admit(raw_bad)
+    assert result.recognition_disposition == recognizer.NO_MATCH
+    assert result.schema_id is None
+    assert result.disposition == INADMISSIBLE
+    assert result.source_object_sha256 == _hash(raw_bad)
 
 
-def test_a5_and_a6_unlisted_or_caller_substituted_schema_cannot_pass():
-    receipt = _recognized(_raw("not,a,registered,header"))
-    assert receipt.disposition == recognizer.NO_MATCH
-    assert admit(receipt, receipt.source_object_sha256).disposition == INADMISSIBLE
-    forged = RecognitionReceipt(receipt.source_object_sha256, receipt.recognition_contract_sha256,
-                                receipt.registry_snapshot_sha256, recognizer.NO_MATCH, "bybit_trade_v1")
-    assert admit(forged, forged.source_object_sha256).disposition == INADMISSIBLE
-    future = RecognitionReceipt("a" * 64, _hash(RECOGNITION.read_bytes()), _hash(REGISTRY.read_bytes()),
-                                recognizer.RECOGNIZED, "future_schema")
-    assert admit(future, future.source_object_sha256).disposition == INADMISSIBLE
-    with pytest.raises(ValueError, match="recognition X binding mismatch"):
-        admit(forged, "b" * 64)
+def test_experiment_b_rpi_object_cannot_be_relabeled_authorized():
+    """Mandatory Experiment B: a genuine RPI object recognizes as
+    bybit_trade_v1_rpi, which is registered-but-NOT_AUTHORIZED; nothing in the
+    admission interface can relabel it as bybit_trade_v1."""
+    fields = json.loads(REGISTRY.read_bytes())["known_schema_variants"]["bybit_trade_v1_rpi"]["field_set"]
+    raw_rpi = _raw(",".join(fields))
+    genuine = recognizer.recognize_source_object(raw_rpi, _registry_snapshot())
+    assert genuine.disposition == recognizer.RECOGNIZED and genuine.schema_id == "bybit_trade_v1_rpi"
+
+    result = admit(raw_rpi)
+    assert result.recognition_disposition == recognizer.RECOGNIZED
+    assert result.schema_id == "bybit_trade_v1_rpi"
+    assert result.schema_id != "bybit_trade_v1"
+    assert _scope_authorization("bybit_trade_v1_rpi", REGISTRY.read_bytes()) == NOT_AUTHORIZED
+    assert result.disposition == INADMISSIBLE
 
 
-def test_a7_ambiguous_cannot_become_first_match():
+def test_experiment_c_ambiguity_cannot_be_resolved_by_scope():
+    """Mandatory Experiment C: a scratch-only synthetic registry with a
+    field_set collision makes recognition AMBIGUOUS. Even though one of the
+    matching schemas (bybit_trade_v1) would otherwise be AUTHORIZED, AMBIGUOUS
+    is not RECOGNIZED, so admission is impossible -- scope cannot pick a
+    winner among ambiguous matches."""
     variants = json.loads(REGISTRY.read_bytes())["known_schema_variants"]
     custom = dict(variants)
     custom["collision"] = dict(custom["bybit_trade_v1"])
     payload = _canonical({"known_schema_variants": custom})
     snapshot = _registry_snapshot(payload)
     raw = _raw(",".join(custom["bybit_trade_v1"]["field_set"]))
+
     result = recognizer.recognize_source_object(raw, snapshot)
     assert result.disposition == recognizer.AMBIGUOUS
-    receipt = RecognitionReceipt(_hash(raw), _hash(RECOGNITION.read_bytes()), snapshot.registry_snapshot_sha256,
-                                 result.disposition, result.schema_id)
-    with pytest.raises(ValueError, match="registry binding mismatch"):
-        admit(receipt, receipt.source_object_sha256, payload)
+    assert "bybit_trade_v1" in result.matching_schema_ids
+    assert _scope_authorization("bybit_trade_v1", REGISTRY.read_bytes()) == AUTHORIZED
+    assert result.disposition != recognizer.RECOGNIZED
+
+    # The frozen candidate is bound to the exact frozen R; a synthetic,
+    # differently-byte'd registry (even a self-consistent one) fails closed
+    # at the admission boundary before scope is ever consulted.
+    with pytest.raises(ValueError, match="candidate registry binding mismatch"):
+        admit(raw, registry_bytes=payload)
 
 
-def test_a8_a9_exact_r_or_frozen_scope_mismatch_fails_closed(monkeypatch):
-    receipt = _recognized(_raw("not,a,registered,header"))
-    bad_r = RecognitionReceipt(receipt.source_object_sha256, receipt.recognition_contract_sha256,
-                               "0" * 64, receipt.disposition, receipt.schema_id)
-    with pytest.raises(ValueError, match="recognition R binding mismatch"):
-        admit(bad_r, bad_r.source_object_sha256)
+def test_experiment_d_positive_control():
+    """Mandatory Experiment D: a genuine, authorized, recognized object is
+    admissible. The repair must not simply deny everything."""
+    fields = json.loads(REGISTRY.read_bytes())["known_schema_variants"]["bybit_trade_v1"]["field_set"]
+    raw_base = _raw(",".join(fields))
+    genuine = recognizer.recognize_source_object(raw_base, _registry_snapshot())
+    assert genuine.disposition == recognizer.RECOGNIZED and genuine.schema_id == "bybit_trade_v1"
+    assert _scope_authorization("bybit_trade_v1", REGISTRY.read_bytes()) == AUTHORIZED
+
+    result = admit(raw_base)
+    assert result.recognition_disposition == recognizer.RECOGNIZED
+    assert result.schema_id == "bybit_trade_v1"
+    assert result.disposition == ADMISSIBLE
+
+
+@pytest.mark.parametrize("schema_id", ["bybit_trade_v1_rpi", "tardis_derivative_ticker_v1", "bybit_instruments_info_current_v1"])
+def test_registered_but_scope_unauthorized_is_inadmissible(schema_id):
+    fields = json.loads(REGISTRY.read_bytes())["known_schema_variants"][schema_id]["field_set"]
+    raw = _raw(",".join(fields))
+    genuine = recognizer.recognize_source_object(raw, _registry_snapshot())
+    assert genuine.disposition == recognizer.RECOGNIZED and genuine.schema_id == schema_id
+    assert _scope_authorization(schema_id, REGISTRY.read_bytes()) == NOT_AUTHORIZED
+    assert admit(raw).disposition == INADMISSIBLE
+
+
+def test_unlisted_or_future_schema_defaults_deny():
+    result = admit(_raw("not,a,registered,header"))
+    assert result.disposition == INADMISSIBLE
+    assert result.schema_id is None
+    # No such thing as a "future_schema" registered anywhere on disk; the
+    # registry itself is the only source of matchable schema_ids, so an
+    # unlisted/future layout can only ever surface as NO_MATCH here.
+    assert "future_schema" not in json.loads(REGISTRY.read_bytes())["known_schema_variants"]
+
+
+@pytest.mark.parametrize("header", ["a", "a,,b", "a,b,a", '"a",b', "not,a,registered,header"])
+def test_failure_results_are_never_admissible(header):
+    raw = _raw(header)
+    result = admit(raw)
+    assert result.recognition_disposition in {recognizer.FRAMING_FAILURE, recognizer.MALFORMED_HEADER, recognizer.NO_MATCH}
+    assert result.disposition == INADMISSIBLE
+
+
+def test_empty_object_has_no_fabricated_schema_authorization():
+    raw = gzip.compress(b"")
+    result = admit(raw)
+    assert result.recognition_disposition == recognizer.FRAMING_FAILURE
+    assert result.schema_id is None
+    assert result.disposition == INADMISSIBLE
+
+
+def test_wrong_registry_binding_fails_closed():
+    """Section 13/20 R4: a wrong R (even self-consistent bytes) is rejected
+    before recognition or scope is ever consulted."""
+    mutated_registry = json.loads(REGISTRY.read_bytes())
+    mutated_registry["known_schema_variants"]["bybit_trade_v1"]["field_set"].append("extra_field")
+    payload = _canonical(mutated_registry)
+    raw = _raw(",".join(json.loads(REGISTRY.read_bytes())["known_schema_variants"]["bybit_trade_v1"]["field_set"]))
+    with pytest.raises(ValueError, match="candidate registry binding mismatch"):
+        admit(raw, registry_bytes=payload)
+
+
+def test_wrong_recognition_binding_fails_closed():
+    """Section 13/20 R4: a wrong G is rejected before recognition is derived."""
+    raw = _raw(",".join(json.loads(REGISTRY.read_bytes())["known_schema_variants"]["bybit_trade_v1"]["field_set"]))
+    with pytest.raises(ValueError, match="recognition G binding mismatch"):
+        admit(raw, recognition_bytes=b"not the frozen recognition amendment bytes")
+
+
+def test_wrong_scope_binding_fails_closed(monkeypatch):
+    raw = _raw(",".join(json.loads(REGISTRY.read_bytes())["known_schema_variants"]["bybit_trade_v1"]["field_set"]))
+    assert admit(raw).disposition == ADMISSIBLE
     mutated = _scope()
     mutated["semantic_body"]["structural_authorization_matrix"]["bybit_trade_v1"]["daily_market_authorization"] = NOT_AUTHORIZED
     monkeypatch.setattr(sys.modules[__name__], "_scope", lambda: mutated)
     with pytest.raises(ValueError, match="frozen scope semantic binding mismatch"):
-        _scope_authorization("bybit_trade_v1", REGISTRY.read_bytes())
+        admit(raw)
 
 
-def test_a10_ordering_changes_recognition_neither_semantics_nor_first_match():
+def test_explicit_scope_authority_not_ambient_state(monkeypatch):
+    raw = _raw(",".join(json.loads(REGISTRY.read_bytes())["known_schema_variants"]["bybit_trade_v1"]["field_set"]))
+    assert admit(raw).disposition == ADMISSIBLE
+    altered = _scope()
+    altered["semantic_body"]["structural_authorization_matrix"]["bybit_trade_v1"]["daily_market_authorization"] = NOT_AUTHORIZED
+    monkeypatch.setattr(sys.modules[__name__], "_scope", lambda: altered)
+    with pytest.raises(ValueError, match="frozen scope semantic binding mismatch"):
+        admit(raw)
+
+
+def test_ordering_changes_recognition_neither_semantics_nor_first_match():
     registry = json.loads(REGISTRY.read_bytes())
     reversed_variants = dict(reversed(list(registry["known_schema_variants"].items())))
     reordered = _canonical({**registry, "known_schema_variants": reversed_variants})
@@ -235,28 +334,15 @@ def test_a10_ordering_changes_recognition_neither_semantics_nor_first_match():
     assert _hash(reordered) != _hash(REGISTRY.read_bytes())  # it cannot masquerade as frozen R1
 
 
-def test_a11_explicit_scope_authority_not_ambient_state(monkeypatch):
-    receipt = _recognized(_raw(",".join(json.loads(REGISTRY.read_bytes())["known_schema_variants"]["bybit_trade_v1"]["field_set"])))
-    assert admit(receipt, receipt.source_object_sha256).disposition == ADMISSIBLE
-    altered = _scope()
-    altered["semantic_body"]["structural_authorization_matrix"]["bybit_trade_v1"]["daily_market_authorization"] = NOT_AUTHORIZED
-    monkeypatch.setattr(sys.modules[__name__], "_scope", lambda: altered)
-    with pytest.raises(ValueError, match="frozen scope semantic binding mismatch"):
-        admit(receipt, receipt.source_object_sha256)
-
-
-@pytest.mark.parametrize("header", ["a", "a,,b", "a,b,a", '"a",b', "not,a,registered,header"])
-def test_failure_results_are_never_admissible(header):
-    receipt = _recognized(_raw(header))
-    assert receipt.disposition in {recognizer.FRAMING_FAILURE, recognizer.MALFORMED_HEADER, recognizer.NO_MATCH}
-    assert admit(receipt, receipt.source_object_sha256).disposition == INADMISSIBLE
-
-
-def test_empty_object_has_no_fabricated_schema_authorization():
-    receipt = _recognized(gzip.compress(b""))
-    assert receipt.disposition == recognizer.FRAMING_FAILURE
-    assert receipt.schema_id is None
-    assert admit(receipt, receipt.source_object_sha256).disposition == INADMISSIBLE
+def test_historical_replay_is_deterministic_and_not_ambient():
+    """Section 17/20 R8: same X, G, R, Scope -> same admission result, and the
+    evaluator reads no ambient/wall-clock state -- only re-running the exact
+    same X through the same derivation twice."""
+    fields = json.loads(REGISTRY.read_bytes())["known_schema_variants"]["bybit_trade_v1"]["field_set"]
+    raw = _raw(",".join(fields))
+    first = admit(raw)
+    second = admit(raw)
+    assert first == second
 
 
 def test_parser_status_snapshots_match_current_module_bytes():
@@ -273,3 +359,10 @@ def test_candidate_does_not_claim_runtime_wiring_or_h001_semantics():
     assert "does not claim that runtime persisted recognition/admission receipt transport exists" in text
     assert "H001" not in text
     assert "first-match" in text
+
+
+def test_repair_history_records_forged_recognition_result_fix():
+    repairs = _candidate()["repair_history"]
+    entry = next(item for item in repairs if item["addressed_review_verdict"] == "BLOCK_FORGED_RECOGNITION_RESULT")
+    assert entry["still_not_frozen"] is True
+    assert entry["repair_index"] == 5

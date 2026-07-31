@@ -1,0 +1,320 @@
+{
+  "amendment_semantic_content_sha256": "4c50be84a84b9ba4817fd92ef1cb5dde075b66135e1a00bacf532ac1b6876c46",
+  "artifact": "r1_empty_object_result_algebra_amendment_v1",
+  "artifact_kind": "PROTOCOL_AMENDMENT_CANDIDATE",
+  "bound_authority": {
+    "base_contract_artifact": "experiments/data/r1_normalized_evidence_contract_v1.json",
+    "base_contract_sha256": "c199b9481285d80b34183b8a7681f75ef7e60e5aadad6e4e0ece3ef8f33d6c92",
+    "base_registry_artifact": "experiments/data/r1_source_schema_registry_v1.json",
+    "base_registry_sha256": "02d2a75cdaa3d53a2708d2d20d5bf19f934fc68e6ee1b942404994d80ab94c4d",
+    "empty_object_schema_id_contract_forensic_review_artifact": "experiments/data/r1_empty_object_schema_id_contract_forensic_review_v1.json",
+    "empty_object_schema_id_contract_forensic_review_sha256": "745d20c2232036f9465920cf76b81019c411d210311cdce9ab9f8a38a51c9ccc",
+    "frozen_daily_market_evidence_schema_admission_amendment_artifact": "experiments/data/r1_daily_market_evidence_schema_admission_amendment_v1.json",
+    "frozen_daily_market_evidence_schema_admission_amendment_sha256": "e169550074281c3a147ec915ad394c190612fe71f5c875ff945e516ee2d3fd37",
+    "frozen_daily_market_evidence_schema_admission_effective_binding_sha256": "a3786f875057484b5dcea1f85194ffc17237d7bc21ce7335a639d4ab64612067",
+    "frozen_daily_market_evidence_schema_admission_semantic_sha256": "99e8f4e6c9a741f33f1a9bd9528eb3c00a2775ee84557f724663c3154b2df445",
+    "frozen_source_schema_registry_scope_amendment_artifact": "experiments/data/r1_source_schema_registry_scope_amendment_v1.json",
+    "frozen_source_schema_registry_scope_amendment_sha256": "aeb23da1f6f9558616ce2dd9f4430da61396b865c72963d52aaf9a9c072f9809",
+    "frozen_source_schema_registry_scope_effective_binding_sha256": "3291c33ff0d4d33a1b9f43938c832bc6d0ba32e0c45b3628a80dc55e1c155ac0",
+    "frozen_source_schema_registry_scope_semantic_sha256": "f1645ce186c73232bb5e4945f734f2ea1c94db856255da0332272bedacd87571",
+    "frozen_source_structure_recognition_amendment_artifact": "experiments/data/r1_source_structure_recognition_amendment_v1.json",
+    "frozen_source_structure_recognition_amendment_sha256": "3861a6ce8639badf4cdde23cb2143f9a75a1bb84ba4293bf81da4d41299c5544",
+    "frozen_source_structure_recognition_effective_binding_sha256": "222b5edcb7370accd73526a034bf129f537a9cb5aac4b8ad157399d32899662c",
+    "frozen_source_structure_recognition_semantic_sha256": "9a919ec68af8cee6caf661286315b61dd104d61c070676a75bfe89448c7e9758"
+  },
+  "effective_combined_contract_binding": {
+    "amendment_semantic_content_sha256": "4c50be84a84b9ba4817fd92ef1cb5dde075b66135e1a00bacf532ac1b6876c46",
+    "base_contract_artifact": "experiments/data/r1_normalized_evidence_contract_v1.json",
+    "base_contract_sha256": "c199b9481285d80b34183b8a7681f75ef7e60e5aadad6e4e0ece3ef8f33d6c92",
+    "base_registry_artifact": "experiments/data/r1_source_schema_registry_v1.json",
+    "base_registry_sha256": "02d2a75cdaa3d53a2708d2d20d5bf19f934fc68e6ee1b942404994d80ab94c4d",
+    "frozen_daily_market_evidence_schema_admission_amendment_artifact": "experiments/data/r1_daily_market_evidence_schema_admission_amendment_v1.json",
+    "frozen_daily_market_evidence_schema_admission_amendment_sha256": "e169550074281c3a147ec915ad394c190612fe71f5c875ff945e516ee2d3fd37",
+    "frozen_daily_market_evidence_schema_admission_effective_binding_sha256": "a3786f875057484b5dcea1f85194ffc17237d7bc21ce7335a639d4ab64612067",
+    "frozen_source_schema_registry_scope_amendment_artifact": "experiments/data/r1_source_schema_registry_scope_amendment_v1.json",
+    "frozen_source_schema_registry_scope_amendment_sha256": "aeb23da1f6f9558616ce2dd9f4430da61396b865c72963d52aaf9a9c072f9809",
+    "frozen_source_schema_registry_scope_effective_binding_sha256": "3291c33ff0d4d33a1b9f43938c832bc6d0ba32e0c45b3628a80dc55e1c155ac0",
+    "frozen_source_structure_recognition_amendment_artifact": "experiments/data/r1_source_structure_recognition_amendment_v1.json",
+    "frozen_source_structure_recognition_amendment_sha256": "3861a6ce8639badf4cdde23cb2143f9a75a1bb84ba4293bf81da4d41299c5544",
+    "frozen_source_structure_recognition_effective_binding_sha256": "222b5edcb7370accd73526a034bf129f537a9cb5aac4b8ad157399d32899662c"
+  },
+  "effective_combined_contract_binding_sha256": "5406f96160662e3d7da6d04c43dda58e96e0f965c7f73ac321a63283710899d6",
+  "next_step": "Independent hostile review of this exact, fully-determinate candidate semantics is the required next step (next lane: R1_EMPTY_OBJECT_RESULT_ALGEBRA_HOSTILE_REVIEW). Only after review (and repair/re-review if a genuine defect is found) may a separate, explicitly-authorized governance-only freeze action occur, following the identical two-part pattern already used by r1_source_structure_recognition_amendment_v1.json and r1_daily_market_evidence_schema_admission_amendment_v1.json. No freeze is authorized or performed by this candidate itself. Runtime remediation of qntylab/r1_daily_market_materializer.py to conform to this result algebra is explicitly out of scope until after freeze.",
+  "outcome_embargo": true,
+  "parent_head": "ce9e2ceed932e338141cbc144e9c22af1d9d138b",
+  "raw_deletion_authorized": false,
+  "self_freeze_authorized": false,
+  "semantic_body": {
+    "amends": {
+      "also_informed_by_unchanged": {
+        "r1_daily_market_evidence_schema_admission_amendment_v1.json_sha256": "e169550074281c3a147ec915ad394c190612fe71f5c875ff945e516ee2d3fd37",
+        "r1_empty_object_schema_id_contract_forensic_review_v1.json_sha256": "745d20c2232036f9465920cf76b81019c411d210311cdce9ab9f8a38a51c9ccc",
+        "r1_source_schema_registry_scope_amendment_v1.json_sha256": "aeb23da1f6f9558616ce2dd9f4430da61396b865c72963d52aaf9a9c072f9809",
+        "r1_source_structure_recognition_amendment_v1.json_sha256": "3861a6ce8639badf4cdde23cb2143f9a75a1bb84ba4293bf81da4d41299c5544"
+      },
+      "amendment_relationship": "ADDITIVE_CLARIFICATION_NOT_IN_PLACE_REWRITE",
+      "frozen_recognition_amendment_bytes_unchanged_by_this_amendment": true,
+      "frozen_registry_scope_amendment_bytes_unchanged_by_this_amendment": true,
+      "frozen_schema_admission_amendment_bytes_unchanged_by_this_amendment": true,
+      "how_to_read": "effective_contract = original r1_normalized_evidence_contract_v1.json (unmodified) PLUS original r1_source_schema_registry_v1.json (unmodified) PLUS the frozen source-structure-recognition amendment (unmodified) PLUS the frozen registry-scope amendment (unmodified) PLUS the frozen schema-admission amendment (unmodified) PLUS this amendment. This amendment adds a normative public materialization RESULT ENVELOPE (a tagged union of exactly three mutually exclusive outcomes) that no frozen artifact currently defines; DailyMarketEvidenceV1 becomes one tagged variant's payload inside that envelope, not the sole possible outcome shape. It neither edits nor overrides any existing DailyMarketEvidenceV1 field's type, missingness, or precision spec, and it does not touch schema_admission_rule, the recognition function, or registry membership -- it governs strictly what the public materialization boundary is permitted to return once recognition and admission have already produced their result.",
+      "original_contract_bytes_unchanged_by_this_amendment": true,
+      "original_registry_bytes_unchanged_by_this_amendment": true,
+      "target_artifact": "experiments/data/r1_normalized_evidence_contract_v1.json",
+      "target_artifact_sha256_at_amendment_time": "c199b9481285d80b34183b8a7681f75ef7e60e5aadad6e4e0ece3ef8f33d6c92",
+      "target_fields_amended": [
+        "DailyMarketEvidenceV1 (envelope-level only: this amendment wraps the existing record shape inside a new three-way tagged public result envelope; it adds no field to, and changes no existing field's type/missingness/precision spec within, DailyMarketEvidenceV1 itself)"
+      ]
+    },
+    "audit_origin": {
+      "note": "The forensic receipt at r1_empty_object_schema_id_contract_forensic_review_v1.json (CONFIRMED, read-only) established that the canonical public materialization entrypoint currently returns status=MATERIALIZED_VALID_RECORD, is_valid=True, record.schema_id=None for a raw object whose own frozen schema admission evaluates to SCHEMA_INADMISSIBLE -- a direct contradiction of the frozen schema_admission_rule (r1_daily_market_evidence_schema_admission_amendment_v1.json), and that the binary MATERIALIZED_VALID_RECORD / MATERIALIZATION_QUARANTINED_NO_RECORD result model has no representable outcome for a legitimate, schema-inadmissible, zero-trade EMPTY_OBJECT observation other than forcing it into one of those two ill-fitting boxes. The forensic receipt explicitly rejected schema_id=None -> schema_id='UNKNOWN_SCHEMA' -> continue-as-MATERIALIZED_VALID_RECORD as an implementation-ready repair, because UNKNOWN_SCHEMA is classification/missingness language (r1_normalized_evidence_contract_v1.json:schema_id.missingness_semantics; r1_source_schema_registry_v1.json:policy), not a key of known_schema_variants, and recorded R1_EMPTY_OBJECT_RESULT_ALGEBRA_AMENDMENT_CANDIDATE as the recommended next lane. This candidate is that lane.",
+      "verdict_addressed": "R1_EMPTY_OBJECT_RUNTIME_ENFORCEMENT_REPAIR_REQUIRED"
+    },
+    "countermodel_proof": {
+      "countermodel_a_current_contradiction": {
+        "classification": "FORBIDDEN_BY_RESULT_ALGEBRA",
+        "reason": "status == MATERIALIZED_VALID_RECORD requires admission == SCHEMA_ADMISSIBLE; here admission == SCHEMA_INADMISSIBLE, so this state violates the outcome's necessary-and-jointly-sufficient conditions. This is exactly the confirmed current runtime contradiction the forensic receipt reproduced; this amendment names it forbidden, it does not itself repair the runtime.",
+        "state": {
+          "admission": "SCHEMA_INADMISSIBLE",
+          "is_valid": true,
+          "recognition": "FRAMING_FAILURE(EMPTY_OBJECT)",
+          "record.schema_id": null,
+          "status": "MATERIALIZED_VALID_RECORD"
+        }
+      },
+      "countermodel_b_sentinel_laundering": {
+        "classification": "FORBIDDEN_NOT_REGISTERED_OR_ADMITTED_SCHEMA_ID",
+        "reason": "UNKNOWN_SCHEMA is not a known_schema_variants key (unknown_schema_treatment above); record.schema_id must be a non-null string equal to the admission-derived schema_id, which is only ever a registered, authorized known_schema_variants key when admission == SCHEMA_ADMISSIBLE.",
+        "state": {
+          "record.schema_id": "UNKNOWN_SCHEMA",
+          "status": "MATERIALIZED_VALID_RECORD"
+        }
+      },
+      "countermodel_c_arbitrary_schema_substitution": {
+        "classification": "FORBIDDEN_SCHEMA_IDENTITY_MISMATCH",
+        "reason": "record.schema_id == admission-derived schema_id is a required condition; it is violated here.",
+        "state": {
+          "admission.schema_id": "bybit_trade_v1",
+          "record.schema_id": "future_unlisted_schema_v999"
+        }
+      },
+      "countermodel_d_registered_but_unauthorized": {
+        "classification": "FORBIDDEN_REGISTERED_DOES_NOT_IMPLY_AUTHORIZED",
+        "reason": "bybit_trade_v1_rpi is registered (STRUCTURAL_LAYOUT_KNOWN) but NOT_AUTHORIZED_FOR_DAILYMARKET under the frozen registry-scope authority, so admission == SCHEMA_INADMISSIBLE; MATERIALIZED_VALID_RECORD requires admission == SCHEMA_ADMISSIBLE regardless of registry membership.",
+        "state": {
+          "admission": "SCHEMA_INADMISSIBLE",
+          "recognized_schema": "bybit_trade_v1_rpi",
+          "record": "present",
+          "status": "MATERIALIZED_VALID_RECORD"
+        }
+      },
+      "countermodel_e_payload_overlap": {
+        "classification": "FORBIDDEN_NON_EXCLUSIVE_RESULT_VARIANT",
+        "reason": "mutual_exclusivity requires record absent when observation is present; both present violates the tagged-union invariant.",
+        "state": {
+          "observation": "present",
+          "record": "present",
+          "status": "EMPTY_OBJECT_ZERO_TRADE_OBSERVATION"
+        }
+      },
+      "countermodel_f_near_empty_widening": {
+        "classification": "FORBIDDEN_NOT_EXACT_EMPTY_OBJECT",
+        "reason": "A decoded body of '\\n' has non-zero length and reaches FRAMING_FAILURE(FEWER_THAN_TWO_TOKENS), not FRAMING_FAILURE(EMPTY_OBJECT), under the frozen recognition amendment (see empty_object_boundary.not_eligible). Only an exactly zero-length decoded body qualifies; this state is a widening of the carve-out and is forbidden.",
+        "state": {
+          "decoded_body": "\\n",
+          "status": "EMPTY_OBJECT_ZERO_TRADE_OBSERVATION"
+        }
+      }
+    },
+    "empty_object_boundary": {
+      "eligible": "decoded body length == 0 -> FRAMING_FAILURE(EMPTY_OBJECT) (per r1_source_structure_recognition_amendment_v1.json:derive_header.steps, step 4) -> eligible for EMPTY_OBJECT_ZERO_TRADE_OBSERVATION",
+      "no_broadening": "This amendment does not broaden, narrow, or otherwise redefine the EMPTY_OBJECT carve-out itself -- that boundary is entirely owned by the frozen recognition amendment. It only defines what the public result envelope is permitted to do once recognition has already classified a source object as FRAMING_FAILURE(EMPTY_OBJECT).",
+      "not_eligible": "decoded body containing a newline, spaces, a comma, a BOM, a malformed header, or any other non-zero content -> not eligible for EMPTY_OBJECT_ZERO_TRADE_OBSERVATION -> ordinary quarantine/admission behavior applies instead. In particular a decoded body of exactly '\\n' reaches FRAMING_FAILURE(FEWER_THAN_TWO_TOKENS) under the frozen recognition amendment's own step 5-7 (header line = '' up to the first LF, tokenizes to a single empty-string token, which fails the minimum-width-2 check) -- a different, non-EMPTY_OBJECT reason, and therefore MATERIALIZATION_QUARANTINED_NO_RECORD, never EMPTY_OBJECT_ZERO_TRADE_OBSERVATION."
+    },
+    "explicitly_not_addressed_by_this_amendment": [
+      "container/encoding corruption dispositions beyond the existing CONTAINER_ANOMALY vocabulary (reused, not replaced)",
+      "structural recognition (derive_header, recognize, E_G) -- governed entirely by r1_source_structure_recognition_amendment_v1.json, unmodified",
+      "schema registry membership -- governed entirely by r1_source_schema_registry_v1.json, unmodified",
+      "evidence-family authorization scope -- governed entirely by r1_source_schema_registry_scope_amendment_v1.json, unmodified",
+      "schema admission -- governed entirely by r1_daily_market_evidence_schema_admission_amendment_v1.json, unmodified",
+      "the field set, types, missingness, or precision semantics of DailyMarketEvidenceV1",
+      "duplicate semantics (governed entirely by r1_normalized_evidence_duplicate_semantics_amendment_v1.json, unmodified)",
+      "timestamp canonicalization",
+      "funding settlement semantics",
+      "market gap classification",
+      "lifecycle/identity ambiguity",
+      "Parser B semantics or scope",
+      "the exact code location/mechanism used to implement this result envelope (a required subsequent implementation task, to be performed and independently reviewed as its own task)",
+      "any R1 hypothesis, factor, weight, return, PnL, IC, or Sharpe computation"
+    ],
+    "low_level_capability_boundary": {
+      "current_implementation_status_diagnostic_only": "Diagnostic only, per the parser_status/recognition_status convention already used in prior frozen amendments -- observed, not remediated, not authoritative, not required to be acted on by this candidate. At this candidate's parent_head, qntylab/r1_daily_market_materializer.py already contains an internal, non-public primitive performing unadmitted Parser-A materialization (module docstring: 'This primitive exists only for two callers ... its output is Parser-A implementation capability, not schema-admitted evidence authority -- do not call this from ordinary production code'), and a separate public, admission-gated entry point composing it behind the frozen schema-admission gate. This candidate's low_level_capability_boundary rule is already the evident engineering intent of that existing split; it is not itself remediated or renamed by this amendment.",
+      "no_prescribed_private_type_or_function_name": "This candidate does not prescribe the exact private implementation type or function name for the unadmitted capability. A later, separately reviewed runtime implementation may split 'mechanically contract-shaped parser candidate' from 'schema-admitted valid evidence' however it sees fit, provided the public boundary's exclusivity above holds; this candidate defines the semantic requirement, not the framework.",
+      "private_primitive_is_not_public_authority": "An unadmitted/private Parser-A capability -- one that demonstrates Parser A can mechanically construct a record-shaped candidate from raw bytes within its own row-semantics support scope, whether or not that object's schema is authorized for DailyMarketEvidenceV1 -- may continue to exist as an internal implementation detail, but it must not itself constitute or be labeled public schema-admitted evidence authority. Its output is Parser-A implementation capability, never admitted evidence, regardless of how record-shaped or field-complete it looks.",
+      "public_boundary_exclusivity": "Only the canonical, admission-gated public materialization boundary may emit MATERIALIZED_VALID_RECORD. Recognition and admission must both have run and produced RECOGNIZED / SCHEMA_ADMISSIBLE for the exact X being materialized before this status is reachable."
+    },
+    "mutual_exclusivity": {
+      "exactly_one_outcome_per_attempted_source_object": "Every attempted exact source object X, evaluated under the bound frozen authorities, resolves to exactly one of the three outcomes above -- never both, never none. This is the same totality discipline already required of recognize() (r1_source_structure_recognition_amendment_v1.json:match_set_and_dispositions.totality) and of schema admission, applied one layer up at the public result-envelope level.",
+      "forbidden_states": [
+        "record present AND observation present",
+        "status == MATERIALIZED_VALID_RECORD AND schema admission != SCHEMA_ADMISSIBLE",
+        "status == MATERIALIZED_VALID_RECORD AND record.schema_id != admission-derived schema_id",
+        "status == EMPTY_OBJECT_ZERO_TRADE_OBSERVATION AND is_valid == true",
+        "status == EMPTY_OBJECT_ZERO_TRADE_OBSERVATION AND observation carries any schema_id field",
+        "status == MATERIALIZATION_QUARANTINED_NO_RECORD AND a DailyMarketEvidenceV1 record is present"
+      ],
+      "tagged_union_invariant": {
+        "EMPTY_OBJECT_ZERO_TRADE_OBSERVATION": "record absent, observation present",
+        "MATERIALIZATION_QUARANTINED_NO_RECORD": "record absent, observation absent",
+        "MATERIALIZED_VALID_RECORD": "record present, observation absent"
+      }
+    },
+    "next_step_for_implementation": "Runtime remediation of the canonical materialization boundary (qntylab/r1_daily_market_materializer.py) to conform to this result algebra -- once this candidate is independently hostile-reviewed and frozen -- is a REQUIRED SUBSEQUENT IMPLEMENTATION TASK, to be performed and independently reviewed as its own task, mirroring the identical convention already used by every prior frozen amendment's own parser_status/disposition text. No such remediation is performed, or authorized, by this candidate.",
+    "non_goals": [
+      "runtime implementation of this result envelope (no code is modified by this candidate)",
+      "a new Python result class or status constant being introduced anywhere in qntylab/",
+      "acquisition, H001, or old-Qnty integration",
+      "raw deletion authorization",
+      "outcome computation of any kind",
+      "freezing or self-reviewing this candidate",
+      "fabricating schema authorization for EMPTY_OBJECT or any other unrecognized/unauthorized object",
+      "inventing a registered schema variant for EMPTY_OBJECT",
+      "changing frozen recognition, frozen schema admission, or DailyMarketEvidenceV1's field definitions"
+    ],
+    "outcome_embargo_verified": "no H012/H014, PIT rank, weight, forward return, PnL, IC, Sharpe, or weekly/null/replication outcome was computed, inspected, or referenced in producing this amendment",
+    "problem_statement": {
+      "current_binary_model": [
+        "MATERIALIZED_VALID_RECORD",
+        "MATERIALIZATION_QUARANTINED_NO_RECORD"
+      ],
+      "entailed_semantic_situations": [
+        "1. Schema-admitted DailyMarketEvidenceV1 record (recognition RECOGNIZED, admission SCHEMA_ADMISSIBLE).",
+        "2. Legitimate EMPTY_OBJECT zero-trade observation: recognition FRAMING_FAILURE(EMPTY_OBJECT), admission SCHEMA_INADMISSIBLE by the frozen schema_admission_rule's own explicit carve-out text ('EMPTY_OBJECT receives no fabricated schema authorization'), with no recognized/authorized schema identity of any kind.",
+        "3. Quarantined malformed, unrecognized, unauthorized, inconsistent, or contract-invalid object (every other non-admitted disposition)."
+      ],
+      "gap": "The binary result model has no slot for situation 2 that is not situation 1 or situation 3. The current runtime forces it into situation 1 (MATERIALIZED_VALID_RECORD, is_valid=True, record.schema_id=None), which is a direct contradiction of schema_admission_rule condition (b). This amendment defines the missing third state without fabricating schema authorization, inventing a registered schema ID, treating an observation as admitted evidence, or changing frozen recognition, frozen schema admission, or any DailyMarketEvidenceV1 field."
+    },
+    "result_algebra": {
+      "EMPTY_OBJECT_ZERO_TRADE_OBSERVATION": {
+        "is": "a typed observation about the exact source object and its expected market day -- provenance and classification only, never a record.",
+        "is_not": [
+          "a DailyMarketEvidenceV1 record",
+          "schema-admitted evidence",
+          "a registered schema variant",
+          "UNKNOWN_SCHEMA-as-schema_id",
+          "a quarantine caused by malformed near-empty content (see empty_object_boundary below)"
+        ],
+        "observation_payload": {
+          "fields": [
+            "instrument_instance_id",
+            "utc_date",
+            "source_object_sha256",
+            "trade_count",
+            "recognition_disposition",
+            "recognition_reasons",
+            "schema_admission"
+          ],
+          "forbidden_in_payload": [
+            "schema_id=None",
+            "schema_id='UNKNOWN_SCHEMA'",
+            "any fabricated known_schema_variants key",
+            "any DailyMarketEvidenceV1 OHLC field (open, high, low, close, base_volume, quote_turnover)",
+            "an is_valid=true flag"
+          ],
+          "no_shadow_schema": "This payload is not a registered schema variant and must never be added to known_schema_variants or otherwise treated as a fifth schema entry. It carries only the minimum provenance and classification necessary to truthfully preserve the permitted zero-trade observation -- nothing resembling a DailyMarketEvidenceV1 record shape.",
+          "required_values": {
+            "recognition_disposition": "FRAMING_FAILURE",
+            "recognition_reasons": "exact EMPTY_OBJECT reason representation, e.g. ('EMPTY_OBJECT',)",
+            "schema_admission": "SCHEMA_INADMISSIBLE",
+            "trade_count": 0
+          }
+        },
+        "permitted_only_when": [
+          "recognition disposition == FRAMING_FAILURE",
+          "recognition reasons identify the exact EMPTY_OBJECT condition for a zero-length decoded body (per r1_source_structure_recognition_amendment_v1.json:derive_header.steps, step 4: 'if the decoded text has zero length, FRAMING_FAILURE(EMPTY_OBJECT)')",
+          "schema admission == SCHEMA_INADMISSIBLE",
+          "no schema authorization is fabricated",
+          "DailyMarketEvidenceV1 record is absent",
+          "is_valid == false"
+        ]
+      },
+      "MATERIALIZATION_QUARANTINED_NO_RECORD": {
+        "covers": [
+          "NO_MATCH",
+          "MALFORMED_HEADER",
+          "AMBIGUOUS",
+          "non-EMPTY_OBJECT FRAMING_FAILURE (including near-empty bodies -- see empty_object_boundary)",
+          "recognized-but-unauthorized schema (e.g. bybit_trade_v1_rpi)",
+          "authority-binding mismatch (X/G/R/scope identity mismatch)",
+          "source mutation (raw bytes do not match expected_raw_sha256)",
+          "contract violation (mechanical field-completeness failure)",
+          "schema identity mismatch (record.schema_id != admission-derived schema_id)",
+          "invalid result-envelope combination (any state forbidden by mutual_exclusivity below)"
+        ],
+        "required_invariant": "record absent; EMPTY_OBJECT observation payload absent; is_valid == false.",
+        "wire_value_unchanged": "MATERIALIZATION_QUARANTINED_NO_RECORD"
+      },
+      "MATERIALIZED_VALID_RECORD": {
+        "mechanical_completeness_is_necessary_not_sufficient": "A record-only mechanical field-completeness validator (required-key presence, non-null conditions, basic type/shape checks -- the existing validate_daily_market_evidence_v1 shape) is necessary but never by itself sufficient authority for this status. Zero mechanical field violations does not by itself imply schema admission or evidence validity: a record can be field-complete and still be SCHEMA_INADMISSIBLE (e.g. a structurally recognized but scope-unauthorized bybit_trade_v1_rpi record), in which case MATERIALIZED_VALID_RECORD remains impossible.",
+        "necessary_and_jointly_sufficient_conditions": [
+          "schema admission == SCHEMA_ADMISSIBLE",
+          "recognition disposition == RECOGNIZED",
+          "record is present",
+          "EMPTY_OBJECT observation payload is absent",
+          "record satisfies every pre-existing DailyMarketEvidenceV1 field requirement (validate_daily_market_evidence_v1-shaped completeness check returns zero violations)",
+          "record.schema_id is a non-null string",
+          "record.schema_id == admission-derived schema_id",
+          "admission-derived schema_id is authorized for DailyMarketEvidenceV1 under the exact bound registry-scope authority (already entailed by admission == SCHEMA_ADMISSIBLE per the frozen schema_admission_rule; restated here, not independently re-derived, and not requiring a second live registry read)"
+        ],
+        "required_invariant": "is_valid == true IFF status == MATERIALIZED_VALID_RECORD AND every condition above holds. There is no is_valid=true state outside status == MATERIALIZED_VALID_RECORD, and no MATERIALIZED_VALID_RECORD state with is_valid != true.",
+        "wire_value_unchanged": "MATERIALIZED_VALID_RECORD"
+      },
+      "outcome_enum": [
+        "MATERIALIZED_VALID_RECORD",
+        "EMPTY_OBJECT_ZERO_TRADE_OBSERVATION",
+        "MATERIALIZATION_QUARANTINED_NO_RECORD"
+      ],
+      "outcome_enum_is_exhaustive_and_pairwise_exclusive": true
+    },
+    "scope": {
+      "does_not_govern": [
+        "structural recognition (r1_source_structure_recognition_amendment_v1.json, unmodified)",
+        "schema registry membership (r1_source_schema_registry_v1.json, unmodified)",
+        "evidence-family authorization scope (r1_source_schema_registry_scope_amendment_v1.json, unmodified)",
+        "schema admission (r1_daily_market_evidence_schema_admission_amendment_v1.json, unmodified)",
+        "the field set, types, missingness, or precision semantics of DailyMarketEvidenceV1 (r1_normalized_evidence_contract_v1.json, unmodified)",
+        "Parser B semantics or scope",
+        "acquisition, H001, or old-Qnty integration",
+        "any R1 hypothesis, factor, weight, return, PnL, IC, or Sharpe computation"
+      ],
+      "governs": "The canonical PUBLIC materialization result envelope returned by the admission-gated Parser-A materialization boundary, and the validity semantics of each of its three tagged outcomes."
+    },
+    "serialization_and_replay": {
+      "is_valid_is_derived": "is_valid is derived solely from status and the tagged payload slots per mutual_exclusivity above; it is never independently caller-supplied authority and never settable to a value inconsistent with status.",
+      "no_new_infrastructure": "No signatures, PKI, services, databases, or receipt-transport framework are added by this amendment beyond the plain tagged-union envelope described above.",
+      "observation_grain_binding": "instrument_instance_id and utc_date in the EMPTY_OBJECT observation payload bind the observation to its intended grain, mirroring the identical fields already required on DailyMarketEvidenceV1.",
+      "replay_determinism": "Replay of the same X under the same bound frozen authorities (recognition G, registry R, scope authority, schema-admission authority, and this amendment) yields the same outcome variant and the same payload, deterministically -- reusing the identical no_silent_reclassification / explicit_reevaluation_only pattern already hostile-tested in the recognition and schema-admission amendments, applied one layer up at the result-envelope level. A later authority producing a different outcome for the same X is a distinct, separately identified evaluation, never a silent rewrite of an earlier one.",
+      "source_object_sha256_binds_x": "source_object_sha256 is present on every outcome (record, observation, and quarantine alike) and binds the result to the exact retrieved raw bytes X, reusing the existing binding already established for DailyMarketEvidenceV1.source_object_sha256 -- no new hash boundary is introduced.",
+      "status_mandatory": true,
+      "tagged_payload_slots": "record and observation are separate, independently-nullable payload slots on the result envelope; both are represented consistently using the repository's existing canonical-JSON absence convention (an explicit null, not a missing key) rather than an implicit ad hoc convention invented by this amendment."
+    },
+    "unknown_schema_treatment": {
+      "classification_language_only": "UNKNOWN_SCHEMA is classification/missingness language for an unmatched schema condition (r1_normalized_evidence_contract_v1.json:schema_id.missingness_semantics; r1_source_schema_registry_v1.json:policy). It is not, under current frozen authority, a key in known_schema_variants.",
+      "may": "appear in reason, classification, or quarantine metadata where already authorized by existing frozen text (e.g. as a diagnostic reason string inside a MATERIALIZATION_QUARANTINED_NO_RECORD result), but never as admitted record schema identity.",
+      "must_not": [
+        "be inserted into DailyMarketEvidenceV1.schema_id as though it were a registered or authorized schema variant",
+        "be added to known_schema_variants by this or any future amendment without a separately reviewed authority that explicitly defines it as a registered variant",
+        "be used as admitted record schema identity under any status, including MATERIALIZED_VALID_RECORD"
+      ],
+      "registry_unchanged": "This amendment does not change r1_source_schema_registry_v1.json in any way."
+    },
+    "validity_predicate": {
+      "consequences": "Each of the following makes MATERIALIZED_VALID_RECORD impossible for the affected record: schema_id missing; schema_id null; schema_id wrong type; schema_id empty string; schema_id == 'UNKNOWN_SCHEMA'; schema_id unregistered (not a known_schema_variants key); schema_id registered but unauthorized (e.g. bybit_trade_v1_rpi, tardis_derivative_ticker_v1, bybit_instruments_info_current_v1); schema_id different from the admission-derived schema_id.",
+      "definition": "valid_admitted_daily_market_record(record, admission_evaluation) :=\n    pre_existing_contract_requirements_hold(record)\n    AND admission_evaluation.admission == SCHEMA_ADMISSIBLE\n    AND admission_evaluation.recognition_disposition == RECOGNIZED\n    AND record.schema_id == admission_evaluation.schema_id\n    AND admission_evaluation.schema_id is authorized for DailyMarketEvidenceV1 under the exact bound registry-scope authority (entailed by admission_evaluation.admission == SCHEMA_ADMISSIBLE, not independently re-derived from a live registry read)",
+      "no_live_registry_read_required": "A conforming validator derives authorization from the already-bound admission_evaluation (or another exact authority-bound input carrying the same information), never from an implicit, ambient, or independently re-opened live registry file read at validation time."
+    }
+  },
+  "status": "CANDIDATE_NOT_YET_FROZEN",
+  "tests": [
+    "tests/test_r1_empty_object_result_algebra_amendment_v1.py"
+  ]
+}

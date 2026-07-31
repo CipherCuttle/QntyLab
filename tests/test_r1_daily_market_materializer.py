@@ -2,6 +2,16 @@
 (qntylab.r1_daily_market_materializer), closing the two blockers an
 independent NEW CHAT review of commit 1d52ec1 established as open:
 
+These tests exercise the INTERNAL, low-level, non-admission-gated
+_materialize_parser_a_unadmitted primitive directly -- they verify the
+boundary's own mechanical behavior (raw-hash binding, container-anomaly
+conversion, contract-completeness validation, batch isolation), which is
+independent of and predates schema admission. They do not exercise, and
+must not be read as asserting anything about, the admission-gated public
+materialize_parser_a entry point or schema-admitted evidence authority --
+that is covered separately by
+tests/test_r1_schema_admission_runtime_wiring_v1.py.
+
   1. source_object_sha256 was not bound into a complete DailyMarketEvidenceV1
      record for the Parser B path (daily_primitive() never receives raw
      bytes and never returns this field).
@@ -13,7 +23,7 @@ A subsequent independent NEW CHAT review of the first repair attempt
 object whose decompressed body is not valid UTF-8 raises a bare
 UnicodeDecodeError out of rp.parse_daily_object() (Parser A's own
 _decompress() does not wrap that specific case in GzipCorruptionError), and
-materialize_parser_a() did not catch it -- so it still escaped and still
+_materialize_parser_a_unadmitted() did not catch it -- so it still escaped and still
 terminated materialize_batch() before later objects were attempted. The
 tests from "gzip-valid invalid utf8 body" onward close that specific gap and
 verify batch isolation directly (not just the isolated per-object
@@ -75,7 +85,7 @@ from qntylab.r1_retention_candidate import BASE_SCHEMA
 from qntylab.r1_daily_market_materializer import (
     MATERIALIZED_VALID,
     MATERIALIZATION_QUARANTINED,
-    materialize_parser_a,
+    _materialize_parser_a_unadmitted,
     materialize_parser_b,
     materialize_batch,
     validate_daily_market_evidence_v1,
@@ -114,7 +124,7 @@ def _raw_bytes(rows):
 
 def test_parser_a_raw_sha_binding():
     raw = _raw_bytes([_row("1700000000.000", size="1", price="1", trdid="t-1")])
-    result = materialize_parser_a(raw, date(2023, 11, 14), "x")
+    result = _materialize_parser_a_unadmitted(raw, date(2023, 11, 14), "x")
     assert result.status == MATERIALIZED_VALID
     assert result.record["source_object_sha256"] == hashlib.sha256(raw).hexdigest()
     assert result.raw_object_sha256 == hashlib.sha256(raw).hexdigest()
@@ -146,7 +156,7 @@ def test_ab_complete_record_equality_synthetic():
         _row("1700000000.000", size="1", price="100", trdid="t-1"),
         _row("1700000100.000", size="2", price="103", trdid="t-2"),
     ])
-    a = materialize_parser_a(raw, date(2023, 11, 14), "obj")
+    a = _materialize_parser_a_unadmitted(raw, date(2023, 11, 14), "obj")
     b = materialize_parser_b(raw, "2023-11-14", "obj", CUTOFF)
     assert a.status == b.status == MATERIALIZED_VALID
     for field in ALL_CONTRACT_FIELDS:
@@ -160,7 +170,7 @@ def test_real_5_objects_full_record_equality():
         if not path.exists():
             continue
         raw = path.read_bytes()
-        a = materialize_parser_a(raw, day, name)
+        a = _materialize_parser_a_unadmitted(raw, day, name)
         b = materialize_parser_b(raw, day.isoformat(), name, CUTOFF)
         assert a.status == MATERIALIZED_VALID, (name, a.reason)
         assert b.status == MATERIALIZED_VALID, (name, b.reason)
@@ -183,8 +193,8 @@ def test_source_sha_differs_on_byte_different_logically_equal_objects():
     raw_rev = _raw_bytes(list(reversed(rows)))
     assert raw_fwd != raw_rev  # sanity: genuinely different raw bytes
 
-    a_fwd = materialize_parser_a(raw_fwd, date(2023, 11, 14), "x")
-    a_rev = materialize_parser_a(raw_rev, date(2023, 11, 14), "x")
+    a_fwd = _materialize_parser_a_unadmitted(raw_fwd, date(2023, 11, 14), "x")
+    a_rev = _materialize_parser_a_unadmitted(raw_rev, date(2023, 11, 14), "x")
     b_fwd = materialize_parser_b(raw_fwd, "2023-11-14", "s", CUTOFF)
     b_rev = materialize_parser_b(raw_rev, "2023-11-14", "s", CUTOFF)
 
@@ -237,7 +247,7 @@ def test_missing_source_object_sha256_cannot_be_a_valid_record():
 
 def test_parser_a_wrong_expected_raw_sha256_fails_closed():
     raw = _raw_bytes([_row("1700000000.000", size="1", price="1", trdid="t-1")])
-    result = materialize_parser_a(raw, date(2023, 11, 14), "x", expected_raw_sha256="0" * 64)
+    result = _materialize_parser_a_unadmitted(raw, date(2023, 11, 14), "x", expected_raw_sha256="0" * 64)
     assert result.status == MATERIALIZATION_QUARANTINED
     assert result.record is None
 
@@ -253,7 +263,7 @@ def test_parser_b_wrong_expected_raw_sha256_fails_closed():
 
 def test_gzip_corrupt_bytes_typed_quarantine_both_parsers():
     garbage = b"not gzip data at all!!"
-    a = materialize_parser_a(garbage, date(2023, 11, 14), "x")
+    a = _materialize_parser_a_unadmitted(garbage, date(2023, 11, 14), "x")
     b = materialize_parser_b(garbage, "2023-11-14", "s", CUTOFF)
     assert a.status == b.status == MATERIALIZATION_QUARANTINED
     assert a.record is None and b.record is None
@@ -263,7 +273,7 @@ def test_gzip_corrupt_bytes_typed_quarantine_both_parsers():
 
 def test_gzip_valid_truncated_one_column_header_typed_quarantine_both_parsers():
     truncated = gzip.compress(b"t\n")
-    a = materialize_parser_a(truncated, date(2023, 11, 14), "x")
+    a = _materialize_parser_a_unadmitted(truncated, date(2023, 11, 14), "x")
     b = materialize_parser_b(truncated, "2023-11-14", "s", CUTOFF)
     assert a.status == b.status == MATERIALIZATION_QUARANTINED
     assert "CONTAINER_ANOMALY" in a.anomalies
@@ -280,7 +290,7 @@ def test_gzip_valid_invalid_utf8_body_typed_quarantine_both_parsers():
     container-level corruption, not let the exception escape."""
     bad_utf8 = b"\xff\xfe\x00invalid utf8 csv content\n"
     raw = gzip.compress(bad_utf8)
-    a = materialize_parser_a(raw, date(2023, 11, 14), "x")
+    a = _materialize_parser_a_unadmitted(raw, date(2023, 11, 14), "x")
     b = materialize_parser_b(raw, "2023-11-14", "s", CUTOFF)
     assert a.status == b.status == MATERIALIZATION_QUARANTINED
     assert a.record is None and b.record is None
@@ -302,7 +312,7 @@ def test_empty_raw_bytes_now_quarantined_for_parser_a_still_valid_for_parser_b()
     unchanged, non-frozen-conformant treatment of raw b"" as a valid
     zero-trade record is left as-is and verified here only so this
     divergence is explicit, not silently lost."""
-    a = materialize_parser_a(b"", date(2023, 11, 14), "x")
+    a = _materialize_parser_a_unadmitted(b"", date(2023, 11, 14), "x")
     assert a.status == MATERIALIZATION_QUARANTINED
     assert a.record is None
     assert "CONTAINER_ANOMALY" in a.anomalies
@@ -315,7 +325,7 @@ def test_empty_raw_bytes_now_quarantined_for_parser_a_still_valid_for_parser_b()
 
 def test_gzip_valid_empty_body_typed_valid_zero_trade_record():
     empty_body = gzip.compress(b"")
-    a = materialize_parser_a(empty_body, date(2023, 11, 14), "x")
+    a = _materialize_parser_a_unadmitted(empty_body, date(2023, 11, 14), "x")
     b = materialize_parser_b(empty_body, "2023-11-14", "s", CUTOFF)
     assert a.status == MATERIALIZED_VALID
     assert b.status == MATERIALIZED_VALID
@@ -328,7 +338,7 @@ def test_malformed_row_still_typed_valid_with_rejection_accounted():
             + "notanumber,X,Buy,1,1,PlusTick,id1,1e8,1,1\n"
             + "1700000000,X,Buy,1,1,PlusTick,id2,1e8,1,1\n")
     raw = gzip.compress(text.encode())
-    a = materialize_parser_a(raw, date(2023, 11, 14), "x")
+    a = _materialize_parser_a_unadmitted(raw, date(2023, 11, 14), "x")
     b = materialize_parser_b(raw, "2023-11-14", "s", CUTOFF)
     assert a.status == MATERIALIZED_VALID
     assert b.status == MATERIALIZED_VALID
@@ -350,7 +360,7 @@ def test_batch_isolation_valid_corrupt_valid():
         (corrupt, date(2023, 11, 14), "x|B"),
         (valid_c, date(2023, 11, 14), "x|C"),
     ]
-    results = materialize_batch(items, materialize_parser_a)
+    results = materialize_batch(items, _materialize_parser_a_unadmitted)
 
     assert len(results) == 3
     assert results[0].status == MATERIALIZED_VALID
@@ -382,7 +392,7 @@ def test_batch_isolation_parser_b():
 
 def test_batch_isolation_invalid_utf8_valid_corrupt_valid_parser_a():
     """Direct regression for the reproduced review blocker: previously the
-    bare UnicodeDecodeError from object B escaped materialize_parser_a and
+    bare UnicodeDecodeError from object B escaped _materialize_parser_a_unadmitted and
     terminated materialize_batch's loop before object C was ever attempted."""
     valid_a = _raw_bytes([_row("1700000000.000", size="1", price="1", trdid="a-1")])
     bad_utf8 = gzip.compress(b"\xff\xfe\x00invalid utf8 csv content\n")
@@ -393,7 +403,7 @@ def test_batch_isolation_invalid_utf8_valid_corrupt_valid_parser_a():
         (bad_utf8, date(2023, 11, 14), "x|B"),
         (valid_c, date(2023, 11, 14), "x|C"),
     ]
-    results = materialize_batch(items, materialize_parser_a)
+    results = materialize_batch(items, _materialize_parser_a_unadmitted)
 
     assert len(results) == 3, "object C was not attempted -- batch terminated early"
     assert results[0].status == MATERIALIZED_VALID
@@ -442,7 +452,7 @@ def test_batch_isolation_alternating_corrupt_valid_four_objects_both_parsers():
         (corrupt_c, date(2023, 11, 14), "x|C"),
         (valid_d, date(2023, 11, 14), "x|D"),
     ]
-    a_results = materialize_batch(a_items, materialize_parser_a)
+    a_results = materialize_batch(a_items, _materialize_parser_a_unadmitted)
     assert len(a_results) == 4, "batch did not run to completion"
     assert [r.status for r in a_results] == [
         MATERIALIZATION_QUARANTINED, MATERIALIZED_VALID, MATERIALIZATION_QUARANTINED, MATERIALIZED_VALID,
@@ -463,8 +473,8 @@ def test_batch_isolation_alternating_corrupt_valid_four_objects_both_parsers():
     assert b_results[3].record["first_source_trade_id"] == "d-1"
 
 
-def test_materialize_parser_a_does_not_swallow_unrelated_exceptions(monkeypatch):
-    """Narrow-catch safety: materialize_parser_a must only convert the three
+def test_unadmitted_parser_a_does_not_swallow_unrelated_exceptions(monkeypatch):
+    """Narrow-catch safety: _materialize_parser_a_unadmitted must only convert the three
     explicitly-authorized container-corruption classes (GzipCorruptionError,
     TruncatedCSVError, UnicodeDecodeError) into CONTAINER_ANOMALY. Any other
     exception -- e.g. a genuine programming error inside rp.parse_daily_object
@@ -477,7 +487,7 @@ def test_materialize_parser_a_does_not_swallow_unrelated_exceptions(monkeypatch)
     monkeypatch.setattr(rp, "parse_daily_object", _boom)
     raw = _raw_bytes([_row("1700000000.000", size="1", price="1", trdid="t-1")])
     with pytest.raises(RuntimeError, match="unrelated programming error"):
-        materialize_parser_a(raw, date(2023, 11, 14), "x")
+        _materialize_parser_a_unadmitted(raw, date(2023, 11, 14), "x")
 
 
 def test_materialize_parser_b_does_not_swallow_unrelated_exceptions(monkeypatch):
@@ -509,7 +519,7 @@ def _oversized_field_row_text(field_len=None):
 
 def test_csv_error_oversized_data_field_typed_quarantine_both_parsers():
     raw = gzip.compress((",".join(HEADER) + "\n" + _oversized_field_row_text()).encode())
-    a = materialize_parser_a(raw, date(2023, 11, 14), "x")
+    a = _materialize_parser_a_unadmitted(raw, date(2023, 11, 14), "x")
     b = materialize_parser_b(raw, "2023-11-14", "s", CUTOFF)
     assert a.status == b.status == MATERIALIZATION_QUARANTINED
     assert a.record is None and b.record is None
@@ -537,7 +547,7 @@ def test_csv_error_oversized_header_field_typed_quarantine_both_parsers():
     huge = "X" * (csv.field_size_limit() + 1)
     text = f"timestamp,{huge},side,size,price,tickDirection,trdMatchID,grossValue,homeNotional,foreignNotional\n1700000000.000,SYM,Buy,1,1,PlusTick,t-1,1,1,1\n"
     raw = gzip.compress(text.encode())
-    a = materialize_parser_a(raw, date(2023, 11, 14), "x")
+    a = _materialize_parser_a_unadmitted(raw, date(2023, 11, 14), "x")
     b = materialize_parser_b(raw, "2023-11-14", "s", CUTOFF)
     assert a.status == b.status == MATERIALIZATION_QUARANTINED
     assert a.record is None and b.record is None
@@ -547,7 +557,7 @@ def test_csv_error_oversized_header_field_typed_quarantine_both_parsers():
 
 def test_batch_isolation_csv_error_valid_corrupt_valid_parser_a():
     """Direct regression for the reproduced review blocker: previously the
-    bare csv.Error from object B escaped materialize_parser_a and terminated
+    bare csv.Error from object B escaped _materialize_parser_a_unadmitted and terminated
     materialize_batch's loop before object C was ever attempted."""
     valid_a = _raw_bytes([_row("1700000000.000", size="1", price="1", trdid="a-1")])
     csv_corrupt = gzip.compress((",".join(HEADER) + "\n" + _oversized_field_row_text()).encode())
@@ -558,7 +568,7 @@ def test_batch_isolation_csv_error_valid_corrupt_valid_parser_a():
         (csv_corrupt, date(2023, 11, 14), "x|B"),
         (valid_c, date(2023, 11, 14), "x|C"),
     ]
-    results = materialize_batch(items, materialize_parser_a)
+    results = materialize_batch(items, _materialize_parser_a_unadmitted)
 
     assert len(results) == 3, "object C was not attempted -- batch terminated early"
     assert results[0].status == MATERIALIZED_VALID
@@ -608,7 +618,7 @@ def test_batch_isolation_alternating_csv_error_corrupt_valid_four_objects_both_p
         (corrupt_c, date(2023, 11, 14), "x|C"),
         (valid_d, date(2023, 11, 14), "x|D"),
     ]
-    a_results = materialize_batch(a_items, materialize_parser_a)
+    a_results = materialize_batch(a_items, _materialize_parser_a_unadmitted)
     assert len(a_results) == 4, "batch did not run to completion"
     assert [r.status for r in a_results] == [
         MATERIALIZATION_QUARANTINED, MATERIALIZED_VALID, MATERIALIZATION_QUARANTINED, MATERIALIZED_VALID,
@@ -629,18 +639,18 @@ def test_batch_isolation_alternating_csv_error_corrupt_valid_four_objects_both_p
     assert b_results[3].record["first_source_trade_id"] == "d-1"
 
 
-def test_materialize_parser_a_does_not_swallow_unrelated_typeerror(monkeypatch):
+def test_unadmitted_parser_a_does_not_swallow_unrelated_typeerror(monkeypatch):
     """Section-9 no-catch-all safety, specific to TypeError: an arbitrary,
     unrelated TypeError raised inside rp.parse_daily_object (a genuine
     programming error, NOT the csv.DictReader restval=None row shape this
     repair targets) must still propagate uncaught. The repair never adds
-    TypeError to materialize_parser_a's catch tuple -- only csv.Error -- so
+    TypeError to _materialize_parser_a_unadmitted's catch tuple -- only csv.Error -- so
     this should already hold, but is asserted directly rather than inferred."""
     monkeypatch.setattr(rp, "parse_daily_object",
                          lambda *a, **k: (_ for _ in ()).throw(TypeError("unrelated programming TypeError")))
     raw = _raw_bytes([_row("1700000000.000", size="1", price="1", trdid="t-1")])
     with pytest.raises(TypeError, match="unrelated programming TypeError"):
-        materialize_parser_a(raw, date(2023, 11, 14), "x")
+        _materialize_parser_a_unadmitted(raw, date(2023, 11, 14), "x")
 
 
 def test_materialize_parser_b_does_not_swallow_unrelated_typeerror(monkeypatch):
@@ -678,7 +688,7 @@ def _unterminated_quote_body(n_good_rows=50):
 
 def test_unterminated_quote_malformed_row_parser_a_and_b_agree_no_exception():
     raw = gzip.compress(_unterminated_quote_body(n_good_rows=50).encode())
-    a = materialize_parser_a(raw, date(2023, 11, 14), "x")
+    a = _materialize_parser_a_unadmitted(raw, date(2023, 11, 14), "x")
     b = materialize_parser_b(raw, "2023-11-14", "s", CUTOFF)
 
     assert a.status == MATERIALIZED_VALID
@@ -727,7 +737,7 @@ def test_batch_isolation_unterminated_quote_valid_before_and_after():
 
 def test_validator_used_on_both_parser_outputs_directly():
     raw = _raw_bytes([_row("1700000000.000", size="1", price="1", trdid="t-1")])
-    a = materialize_parser_a(raw, date(2023, 11, 14), "x")
+    a = _materialize_parser_a_unadmitted(raw, date(2023, 11, 14), "x")
     b = materialize_parser_b(raw, "2023-11-14", "s", CUTOFF)
     assert validate_daily_market_evidence_v1(a.record) == []
     assert validate_daily_market_evidence_v1(b.record) == []
@@ -774,7 +784,7 @@ def test_regression_timestamp_numeric_duplicate_event_order_untouched():
     later = _row("1700000100.000", size="5", price="4.35", trdid="dup-later")
     for perm in itertools.permutations([later, dup_b, dup_a]):
         raw = _raw_bytes(list(perm))
-        a = materialize_parser_a(raw, date(2023, 11, 14), "x")
+        a = _materialize_parser_a_unadmitted(raw, date(2023, 11, 14), "x")
         b = materialize_parser_b(raw, "2023-11-14", "s", CUTOFF)
         assert a.record["open"] == b.record["open"] == "1.1"
         assert a.record["close"] == b.record["close"] == "4.35"

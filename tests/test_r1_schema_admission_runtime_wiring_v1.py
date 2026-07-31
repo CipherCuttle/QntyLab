@@ -1,10 +1,17 @@
 """Runtime wiring: FROZEN R1 schema admission gating Parser-A materialization.
 
-Covers the required test matrix (A-L) and the hostile red-team checklist
+Covers the required test matrix (A-M) and the hostile red-team checklist
 (R1-R10) for qntylab.r1_schema_admission + r1_daily_market_materializer.
-materialize_admitted_parser_a, the first runtime integration of the frozen
-schema-admission amendment (experiments/data/
-r1_daily_market_evidence_schema_admission_amendment_v1.json).
+
+As of R1_CANONICAL_MATERIALIZATION_ENTRYPOINT_ENFORCEMENT,
+materializer.materialize_parser_a IS the canonical, admission-gated public
+Parser-A entry point (previously named materialize_admitted_parser_a, which
+remains as a compatibility alias -- literally the same function object, see
+test_m_compatibility_alias_is_the_same_object_not_a_peer_implementation
+below). The former ungated materialize_parser_a implementation is now the
+internal, leading-underscore _materialize_parser_a_unadmitted primitive,
+used here only where a test must prove what Parser A alone (bypassing the
+gate) would do -- see test_b below.
 """
 from __future__ import annotations
 
@@ -95,9 +102,14 @@ class _CallSpy:
 
 @pytest.fixture()
 def call_spy(monkeypatch):
+    """Spies on the two calls the canonical, gated materialize_parser_a
+    makes internally: the admission evaluation, and (only if admitted) the
+    internal _materialize_parser_a_unadmitted primitive. Deliberately does
+    NOT patch materialize_parser_a itself -- that is the function under
+    test in most of this file, called directly and unspied."""
     spy = _CallSpy()
     real_evaluate = admission.evaluate_schema_admission
-    real_materialize_a = materializer.materialize_parser_a
+    real_materialize_a = materializer._materialize_parser_a_unadmitted
     real_materialize_b = materializer.materialize_parser_b
 
     def spy_evaluate(*args, **kwargs):
@@ -113,7 +125,7 @@ def call_spy(monkeypatch):
         return real_materialize_b(*args, **kwargs)
 
     monkeypatch.setattr(materializer.admission, "evaluate_schema_admission", spy_evaluate)
-    monkeypatch.setattr(materializer, "materialize_parser_a", spy_materialize_a)
+    monkeypatch.setattr(materializer, "_materialize_parser_a_unadmitted", spy_materialize_a)
     monkeypatch.setattr(materializer, "materialize_parser_b", spy_materialize_b)
     return spy
 
@@ -122,7 +134,7 @@ def call_spy(monkeypatch):
 
 def test_a_authorized_base_object_admits_and_materializes(call_spy):
     raw = _raw_base_object()
-    result = materializer.materialize_admitted_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
+    result = materializer.materialize_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
     assert result.is_valid
     assert result.parser == "A"
     assert result.record["schema_id"] == "bybit_trade_v1"
@@ -136,16 +148,19 @@ def test_a_authorized_base_object_admits_and_materializes(call_spy):
 def test_b_rpi_recognized_but_not_authorized_blocks_materialization(call_spy):
     raw = _raw_rpi_object()
 
-    # Prove RPI genuinely recognizes and that Parser A (run directly, bypassing
-    # the gate) WOULD happily materialize it -- RPI is inside Parser A's own
-    # row-semantics support scope. This is exactly why the gate, not Parser A
-    # itself, must be the thing that stops it.
-    direct = materializer.materialize_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
+    # Prove RPI genuinely recognizes and that the internal, ungated
+    # low-level primitive (bypassing the admission gate entirely) WOULD
+    # happily materialize it -- RPI is inside Parser A's own row-semantics
+    # support scope. This is exactly why the gate, not Parser A itself, must
+    # be the thing that stops it. This is implementation capability, NOT
+    # schema-admitted evidence -- see _materialize_parser_a_unadmitted's own
+    # docstring.
+    direct = materializer._materialize_parser_a_unadmitted(raw, BASE_UTC_DATE, INSTRUMENT)
     assert direct.status == materializer.MATERIALIZED_VALID
     assert direct.record["schema_id"] == "bybit_trade_v1_rpi"
     call_spy.calls.clear()
 
-    result = materializer.materialize_admitted_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
+    result = materializer.materialize_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
     assert result.status == materializer.MATERIALIZATION_QUARANTINED
     assert result.record is None
     assert materializer.SCHEMA_INADMISSIBLE in result.anomalies
@@ -157,7 +172,7 @@ def test_b_rpi_recognized_but_not_authorized_blocks_materialization(call_spy):
 
 def test_c_no_match_blocks_materialization(call_spy):
     raw = _raw_unknown_object()
-    result = materializer.materialize_admitted_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
+    result = materializer.materialize_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
     assert result.status == materializer.MATERIALIZATION_QUARANTINED
     assert result.record is None
     assert materializer.SCHEMA_INADMISSIBLE in result.anomalies
@@ -168,7 +183,7 @@ def test_c_no_match_blocks_materialization(call_spy):
 
 def test_d_malformed_header_blocks_materialization(call_spy):
     raw = _raw_malformed_object()
-    result = materializer.materialize_admitted_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
+    result = materializer.materialize_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
     assert result.status == materializer.MATERIALIZATION_QUARANTINED
     assert result.record is None
     assert materializer.SCHEMA_INADMISSIBLE in result.anomalies
@@ -179,7 +194,7 @@ def test_d_malformed_header_blocks_materialization(call_spy):
 
 def test_e_framing_failure_blocks_materialization(call_spy):
     raw = _raw_framing_failure_object()
-    result = materializer.materialize_admitted_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
+    result = materializer.materialize_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
     assert result.status == materializer.MATERIALIZATION_QUARANTINED
     assert result.record is None
     assert materializer.SCHEMA_INADMISSIBLE in result.anomalies
@@ -197,7 +212,7 @@ def test_f_no_recognition_shaped_admission_input_exists():
     for forbidden in ("disposition", "schema_id", "recognition_result", "receipt"):
         assert forbidden not in params
 
-    params_gate = set(inspect.signature(materializer.materialize_admitted_parser_a).parameters)
+    params_gate = set(inspect.signature(materializer.materialize_parser_a).parameters)
     assert params_gate == {"raw_bytes", "expected_utc_date", "instrument_instance_id", "expected_raw_sha256"}
     for forbidden in ("disposition", "schema_id", "recognition_result", "receipt"):
         assert forbidden not in params_gate
@@ -255,8 +270,8 @@ def test_j_deterministic_replay_same_x_same_authorities():
     second = admission.evaluate_schema_admission(raw)
     assert first == second
 
-    m1 = materializer.materialize_admitted_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
-    m2 = materializer.materialize_admitted_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
+    m1 = materializer.materialize_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
+    m2 = materializer.materialize_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
     assert m1 == m2
 
 
@@ -277,8 +292,8 @@ def test_k_byte_different_equivalent_content_objects_keep_separate_identity():
     assert e1.admission == e2.admission == admission.ADMISSIBLE
     assert e1.schema_id == e2.schema_id == "bybit_trade_v1"
 
-    r1 = materializer.materialize_admitted_parser_a(x1, BASE_UTC_DATE, INSTRUMENT)
-    r2 = materializer.materialize_admitted_parser_a(x2, BASE_UTC_DATE, INSTRUMENT)
+    r1 = materializer.materialize_parser_a(x1, BASE_UTC_DATE, INSTRUMENT)
+    r2 = materializer.materialize_parser_a(x2, BASE_UTC_DATE, INSTRUMENT)
     assert r1.record["source_object_sha256"] == _sha256(x1)
     assert r2.record["source_object_sha256"] == _sha256(x2)
     assert r1.record["source_object_sha256"] != r2.record["source_object_sha256"]
@@ -291,7 +306,7 @@ def test_k_byte_different_equivalent_content_objects_keep_separate_identity():
 ])
 def test_l_inadmissible_cases_never_invoke_parser_a(build_raw, call_spy):
     raw = build_raw()
-    result = materializer.materialize_admitted_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
+    result = materializer.materialize_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
     assert result.status == materializer.MATERIALIZATION_QUARANTINED
     assert "parser_a" not in call_spy.calls
     assert "parser_b" not in call_spy.calls
@@ -300,7 +315,7 @@ def test_l_inadmissible_cases_never_invoke_parser_a(build_raw, call_spy):
 # --- Hostile red-team R1-R10 -------------------------------------------------
 
 def test_r1_admission_always_precedes_materialization(call_spy):
-    materializer.materialize_admitted_parser_a(_raw_base_object(), BASE_UTC_DATE, INSTRUMENT)
+    materializer.materialize_parser_a(_raw_base_object(), BASE_UTC_DATE, INSTRUMENT)
     assert call_spy.calls.index("admission") < call_spy.calls.index("parser_a")
 
 
@@ -309,19 +324,19 @@ def test_r2_parser_a_success_cannot_override_admission_denial(call_spy):
     the admitted path must still deny it -- Parser A's own success is never
     consulted as an override for admission's decision."""
     raw = _raw_rpi_object()
-    result = materializer.materialize_admitted_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
+    result = materializer.materialize_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
     assert result.status == materializer.MATERIALIZATION_QUARANTINED
     assert "parser_a" not in call_spy.calls
 
 
 def test_r3_rpi_cannot_reach_materialization():
-    result = materializer.materialize_admitted_parser_a(_raw_rpi_object(), BASE_UTC_DATE, INSTRUMENT)
+    result = materializer.materialize_parser_a(_raw_rpi_object(), BASE_UTC_DATE, INSTRUMENT)
     assert result.record is None
 
 
 def test_r4_caller_cannot_inject_schema_or_disposition():
     sig_admit = inspect.signature(admission.evaluate_schema_admission)
-    sig_gate = inspect.signature(materializer.materialize_admitted_parser_a)
+    sig_gate = inspect.signature(materializer.materialize_parser_a)
     for sig in (sig_admit, sig_gate):
         assert "schema_id" not in sig.parameters
         assert "disposition" not in sig.parameters
@@ -331,7 +346,7 @@ def test_r4_caller_cannot_inject_schema_or_disposition():
 def test_r5_x_admitted_is_exactly_x_parsed():
     raw = _raw_base_object()
     evaluation = admission.evaluate_schema_admission(raw)
-    result = materializer.materialize_admitted_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
+    result = materializer.materialize_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
     assert evaluation.source_object_sha256 == result.record["source_object_sha256"] == _sha256(raw)
 
 
@@ -364,10 +379,10 @@ def test_r7_wrong_r_or_scope_cannot_combine_with_valid_x():
 
 def test_r8_parser_b_never_acts_as_fallback(call_spy):
     for build_raw in (_raw_base_object, _raw_rpi_object, _raw_unknown_object, _raw_malformed_object):
-        materializer.materialize_admitted_parser_a(build_raw(), BASE_UTC_DATE, INSTRUMENT)
+        materializer.materialize_parser_a(build_raw(), BASE_UTC_DATE, INSTRUMENT)
     assert "parser_b" not in call_spy.calls
-    assert "materialize_parser_b" not in inspect.getsource(materializer.materialize_admitted_parser_a)
-    assert "daily_primitive" not in inspect.getsource(materializer.materialize_admitted_parser_a)
+    assert "materialize_parser_b" not in inspect.getsource(materializer.materialize_parser_a)
+    assert "daily_primitive" not in inspect.getsource(materializer.materialize_parser_a)
 
 
 def test_r9_empty_object_gets_no_fabricated_schema_authorization():
@@ -380,7 +395,7 @@ def test_r9_empty_object_gets_no_fabricated_schema_authorization():
 
     # The frozen carve-out lets Parser A's pre-existing zero-trade path run,
     # but it must never emit an authorized schema_id for it.
-    result = materializer.materialize_admitted_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
+    result = materializer.materialize_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
     assert result.status == materializer.MATERIALIZED_VALID
     assert result.record["schema_id"] is None
     assert result.record["trade_count"] == 0
@@ -410,7 +425,7 @@ def test_r10_runtime_module_matches_frozen_artifact_bytes_exactly():
 
 def test_positive_replay_record_fields_are_fully_expected(call_spy):
     raw = _raw_base_object()
-    result = materializer.materialize_admitted_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
+    result = materializer.materialize_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
     assert result.is_valid
     record = result.record
     assert record["instrument_instance_id"] == INSTRUMENT
@@ -426,3 +441,85 @@ def test_positive_replay_record_fields_are_fully_expected(call_spy):
 
     violations = materializer.validate_daily_market_evidence_v1(record)
     assert violations == []
+
+
+# --- Canonical-entrypoint-enforcement matrix (R1_CANONICAL_MATERIALIZATION_ENTRYPOINT_ENFORCEMENT) ----
+
+def test_low_level_capability_rpi_materializes_via_internal_primitive_only():
+    """C: explicit low-level implementation-capability test. Proves
+    _materialize_parser_a_unadmitted retains Parser A's existing RPI
+    row-semantics support -- this is implementation capability, not
+    schema-admitted evidence, and must never be read as such."""
+    raw = _raw_rpi_object()
+    result = materializer._materialize_parser_a_unadmitted(raw, BASE_UTC_DATE, INSTRUMENT)
+    assert result.status == materializer.MATERIALIZED_VALID
+    assert result.record["schema_id"] == "bybit_trade_v1_rpi"
+
+
+def test_g_compatibility_alias_produces_identical_results_to_canonical():
+    """G: materialize_admitted_parser_a(X) == materialize_parser_a(X) for
+    every disposition class, for all inputs and explicit authorities --
+    trivially true since they are the same function object (see
+    test_m_compatibility_alias_is_the_same_object_not_a_peer_implementation),
+    but asserted here at the behavioral level too."""
+    for build_raw in (
+        _raw_base_object, _raw_rpi_object, _raw_unknown_object,
+        _raw_malformed_object, _raw_framing_failure_object, _raw_empty_object,
+    ):
+        raw = build_raw()
+        via_canonical = materializer.materialize_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
+        via_compat = materializer.materialize_admitted_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
+        assert via_canonical == via_compat
+
+
+def test_l_ordinary_public_batch_usage_selects_the_gated_function():
+    """L: an ordinary caller building a batch out of the public
+    materialize_parser_a name gets admission-gated behavior for every item,
+    including denying an RPI object mixed into the same batch as an
+    authorized one -- no separate 'batch mode' bypasses the gate."""
+    items = [
+        (_raw_base_object(), BASE_UTC_DATE, INSTRUMENT),
+        (_raw_rpi_object(), BASE_UTC_DATE, INSTRUMENT),
+    ]
+    results = materializer.materialize_batch(items, materializer.materialize_parser_a)
+    assert results[0].status == materializer.MATERIALIZED_VALID
+    assert results[0].record["schema_id"] == "bybit_trade_v1"
+    assert results[1].status == materializer.MATERIALIZATION_QUARANTINED
+    assert results[1].record is None
+    assert materializer.SCHEMA_INADMISSIBLE in results[1].anomalies
+
+
+def test_m_public_names_are_admission_gated_private_primitive_is_not():
+    """M: API-surface enforcement. The only two publicly-named Parser-A
+    materialization entry points (materialize_parser_a and its compatibility
+    alias materialize_admitted_parser_a) are admission-gated; the ungated
+    implementation lives only behind a leading-underscore, non-public name."""
+    assert not materializer.materialize_parser_a.__name__.startswith("_")
+    assert materializer._materialize_parser_a_unadmitted.__name__.startswith("_")
+
+    source = inspect.getsource(materializer.materialize_parser_a)
+    assert "evaluate_schema_admission" in source
+    assert "_materialize_parser_a_unadmitted" in source
+
+    for forbidden in ("skip_admission", "trusted_schema_id", "recognition_result", "unsafe", "raw_mode"):
+        assert forbidden not in inspect.signature(materializer.materialize_parser_a).parameters
+
+
+def test_m_compatibility_alias_is_the_same_object_not_a_peer_implementation():
+    """M: materialize_admitted_parser_a must not be a second, independently
+    maintainable implementation that could drift from materialize_parser_a
+    -- it is required to be the literal same function object."""
+    assert materializer.materialize_admitted_parser_a is materializer.materialize_parser_a
+
+
+def test_optional_gate_attack_direct_import_of_public_name_still_blocks_rpi():
+    """Recreate the exact hostile-review finding
+    (SAFE_PATH_NOT_YET_STRUCTURALLY_EXCLUSIVE) as a future integrator would:
+    import the public name most likely to be guessed and used, and try RPI
+    against it. Must be denied -- there is no longer a peer public Parser-A
+    materializer that silently accepts RPI."""
+    from qntylab.r1_daily_market_materializer import materialize_parser_a as public_entrypoint
+    result = public_entrypoint(_raw_rpi_object(), BASE_UTC_DATE, INSTRUMENT)
+    assert result.status == materializer.MATERIALIZATION_QUARANTINED
+    assert result.record is None
+    assert materializer.SCHEMA_INADMISSIBLE in result.anomalies

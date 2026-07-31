@@ -42,7 +42,7 @@ owns on its own:
      decompressed body is not valid UTF-8 raises a bare UnicodeDecodeError
      out of rp.parse_daily_object(), not a GzipCorruptionError. This module
      does not edit r1_reference_parser.py to fix that internally; instead
-     materialize_parser_a() additionally catches UnicodeDecodeError at its
+     _materialize_parser_a_unadmitted() additionally catches UnicodeDecodeError at its
      own call site and maps it to the same CONTAINER_ANOMALY outcome, so
      both parser paths reach the identical typed quarantine for the
      identical raw-object corruption despite that difference in Parser A's
@@ -64,7 +64,7 @@ owns on its own:
      the entire reader, not one row -- so it is classified with the other
      structurally-corrupt-container cases (gzip corruption, invalid UTF-8,
      truncated header) as CONTAINER_ANOMALY, not as a per-row rejection.
-     materialize_parser_a() catches csv.Error at its rp.parse_daily_object()
+     _materialize_parser_a_unadmitted() catches csv.Error at its rp.parse_daily_object()
      call site (no edit to r1_reference_parser.py); materialize_parser_b()
      catches it across both its container-decode step and its own body-row
      csv.DictReader parse.
@@ -273,11 +273,30 @@ def validate_daily_market_evidence_v1(record: dict) -> list[str]:
     return violations
 
 
-def materialize_parser_a(raw_bytes: bytes, expected_utc_date: date, instrument_instance_id: str,
+def _materialize_parser_a_unadmitted(raw_bytes: bytes, expected_utc_date: date, instrument_instance_id: str,
                           expected_raw_sha256: Optional[str] = None) -> MaterializationResult:
-    """Parser A path. parse_daily_object already embeds source_object_sha256
-    in its own record; this boundary independently recomputes sha256(raw_bytes)
-    (never trusting the embedded value alone), requires exact equality, and
+    """INTERNAL low-level Parser-A materialization primitive. This function
+    performs NO schema admission: it materializes any raw object within
+    Parser A's own row-semantics support scope, whether or not that
+    object's schema is authorized for DailyMarketEvidenceV1 (e.g. it will
+    happily materialize a structurally-recognized-but-unauthorized
+    bybit_trade_v1_rpi object, which the frozen schema-admission scope
+    denies). Its output is Parser-A implementation capability, not
+    schema-admitted evidence authority -- do not call this from ordinary
+    production code.
+
+    This primitive exists only for two callers: (1) materialize_parser_a
+    below, which composes it behind the frozen schema-admission gate to
+    produce the canonical, admission-gated public entry point; and (2)
+    narrowly scoped low-level tests that must exercise Parser A's/this
+    boundary's own mechanical behavior (container-anomaly conversion,
+    contract-completeness validation, raw-hash binding) independent of
+    schema admission -- those tests must not, and do not, treat this
+    primitive's output as admitted evidence.
+
+    parse_daily_object already embeds source_object_sha256 in its own
+    record; this boundary independently recomputes sha256(raw_bytes) (never
+    trusting the embedded value alone), requires exact equality, and
     converts exactly the four explicitly-authorized, reachable
     container-corruption failure classes into a typed CONTAINER_ANOMALY
     quarantine result instead of letting them escape:
@@ -345,15 +364,23 @@ def materialize_parser_a(raw_bytes: bytes, expected_utc_date: date, instrument_i
 SCHEMA_INADMISSIBLE = "SCHEMA_INADMISSIBLE"
 
 
-def materialize_admitted_parser_a(raw_bytes: bytes, expected_utc_date: date, instrument_instance_id: str,
-                                   expected_raw_sha256: Optional[str] = None) -> MaterializationResult:
-    """The canonical schema-admitted runtime path: one exact source object X
-    -> FROZEN schema admission gate (qntylab.r1_schema_admission) -> Parser A
-    materialization, permitted only when admission passes. `raw_bytes` is
-    read once by the caller and threaded, as the same immutable bytes object,
-    through hashing, admission, and (if admitted) Parser A parsing -- there is
-    no separate re-open/re-read step that could desynchronize the bytes
-    admission evaluated from the bytes Parser A parses.
+def materialize_parser_a(raw_bytes: bytes, expected_utc_date: date, instrument_instance_id: str,
+                          expected_raw_sha256: Optional[str] = None) -> MaterializationResult:
+    """THE canonical public Parser-A materialization entry point: one exact
+    source object X -> FROZEN schema admission gate
+    (qntylab.r1_schema_admission) -> internal Parser A materialization
+    (_materialize_parser_a_unadmitted), permitted only when admission
+    passes. `raw_bytes` is read once by the caller and threaded, as the same
+    immutable bytes object, through hashing, admission, and (if admitted)
+    Parser A parsing -- there is no separate re-open/re-read step that could
+    desynchronize the bytes admission evaluated from the bytes Parser A
+    parses.
+
+    Ordinary callers should always use this function, never the internal
+    _materialize_parser_a_unadmitted primitive: this is the only public
+    Parser-A materialization path, and it is unconditionally
+    admission-gated. There is no parameter on this function that can skip,
+    override, or short-circuit that gate.
 
     Recognition is necessarily evaluated twice on the admitted path (once
     inside qntylab.r1_schema_admission.evaluate_schema_admission, once again
@@ -398,7 +425,14 @@ def materialize_admitted_parser_a(raw_bytes: bytes, expected_utc_date: date, ins
                         f"{evaluation.recognition_disposition!r} schema_id={evaluation.schema_id!r}"),
             )
 
-    return materialize_parser_a(raw_bytes, expected_utc_date, instrument_instance_id)
+    return _materialize_parser_a_unadmitted(raw_bytes, expected_utc_date, instrument_instance_id)
+
+
+# Compatibility alias for the name this gate was first reviewed and wired
+# under (see experiments/data/r1_schema_admission_runtime_wiring_review_v1.json).
+# Not a separate implementation: literally the same function object as
+# materialize_parser_a above, so the two can never drift.
+materialize_admitted_parser_a = materialize_parser_a
 
 
 def _decode_container(raw_bytes: bytes) -> tuple[str, list[str]]:
@@ -540,13 +574,20 @@ def materialize_batch(items: list, materialize_fn) -> list:
     """Bounded batch isolation primitive: one MaterializationResult per
     attempted item, in input order. A corrupt item never raises out of this
     function and never prevents later items in the same batch from being
-    attempted -- materialize_parser_a/materialize_parser_b already convert
-    every container-level exception into a typed result, so this loop needs
-    no additional exception handling of its own; it exists to make that
+    attempted -- materialize_parser_a/materialize_parser_b (and the internal
+    _materialize_parser_a_unadmitted primitive) already convert every
+    container-level exception into a typed result, so this loop needs no
+    additional exception handling of its own; it exists to make that
     per-item isolation guarantee an explicit, testable property of the
     boundary rather than an incidental consequence of each function's
     internals. Does not bulk-process a real corpus; callers pass a small,
-    explicit list."""
+    explicit list.
+
+    `materialize_fn` is caller-supplied so an ordinary caller who passes the
+    public, admission-gated materialize_parser_a naturally gets a gated
+    batch; passing the internal _materialize_parser_a_unadmitted primitive
+    is reserved for the same narrow implementation-test scope that
+    justifies calling it directly at all (see its own docstring)."""
     results = []
     for args in items:
         results.append(materialize_fn(*args))

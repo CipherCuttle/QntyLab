@@ -375,6 +375,74 @@ def test_all_six_countermodels_present_and_distinctly_classified():
 # Validity predicate
 # ---------------------------------------------------------------------------
 
+def test_is_valid_is_bidirectional_and_never_caller_supplied():
+    body = _candidate()["semantic_body"]
+    materialized = body["result_algebra"]["MATERIALIZED_VALID_RECORD"]
+    assert materialized["required_invariant"] == (
+        "is_valid == true IFF status == MATERIALIZED_VALID_RECORD AND every "
+        "condition above holds. There is no is_valid=true state outside status "
+        "== MATERIALIZED_VALID_RECORD, and no MATERIALIZED_VALID_RECORD state "
+        "with is_valid != true."
+    )
+    assert body["serialization_and_replay"]["is_valid_is_derived"] == (
+        "is_valid is derived solely from status and the tagged payload slots per "
+        "mutual_exclusivity above; it is never independently caller-supplied "
+        "authority and never settable to a value inconsistent with status."
+    )
+
+
+def test_empty_object_observation_forbidden_payload_set_is_complete():
+    forbidden = _candidate()["semantic_body"]["result_algebra"][
+        "EMPTY_OBJECT_ZERO_TRADE_OBSERVATION"
+    ]["observation_payload"]["forbidden_in_payload"]
+    assert set(forbidden) == {
+        "schema_id=None",
+        "schema_id='UNKNOWN_SCHEMA'",
+        "any fabricated known_schema_variants key",
+        "any DailyMarketEvidenceV1 OHLC field (open, high, low, close, base_volume, quote_turnover)",
+        "an is_valid=true flag",
+    }
+    assert len(forbidden) == 5
+
+
+def test_quarantine_coverage_set_is_complete_and_fail_closed():
+    covers = _candidate()["semantic_body"]["result_algebra"][
+        "MATERIALIZATION_QUARANTINED_NO_RECORD"
+    ]["covers"]
+    assert set(covers) == {
+        "NO_MATCH",
+        "MALFORMED_HEADER",
+        "AMBIGUOUS",
+        "non-EMPTY_OBJECT FRAMING_FAILURE (including near-empty bodies -- see empty_object_boundary)",
+        "recognized-but-unauthorized schema (e.g. bybit_trade_v1_rpi)",
+        "authority-binding mismatch (X/G/R/scope identity mismatch)",
+        "source mutation (raw bytes do not match expected_raw_sha256)",
+        "contract violation (mechanical field-completeness failure)",
+        "schema identity mismatch (record.schema_id != admission-derived schema_id)",
+        "invalid result-envelope combination (any state forbidden by mutual_exclusivity below)",
+    }
+    assert len(covers) == 10
+
+
+def test_private_parser_capability_is_never_public_evidence_authority():
+    boundary = _candidate()["semantic_body"]["low_level_capability_boundary"]
+    assert boundary["private_primitive_is_not_public_authority"] == (
+        "An unadmitted/private Parser-A capability -- one that demonstrates Parser A can "
+        "mechanically construct a record-shaped candidate from raw bytes within its own "
+        "row-semantics support scope, whether or not that object's schema is authorized "
+        "for DailyMarketEvidenceV1 -- may continue to exist as an internal implementation "
+        "detail, but it must not itself constitute or be labeled public schema-admitted "
+        "evidence authority. Its output is Parser-A implementation capability, never "
+        "admitted evidence, regardless of how record-shaped or field-complete it looks."
+    )
+    assert boundary["public_boundary_exclusivity"] == (
+        "Only the canonical, admission-gated public materialization boundary may emit "
+        "MATERIALIZED_VALID_RECORD. Recognition and admission must both have run and "
+        "produced RECOGNIZED / SCHEMA_ADMISSIBLE for the exact X being materialized "
+        "before this status is reachable."
+    )
+
+
 def test_validity_predicate_does_not_require_live_registry_read():
     predicate = _candidate()["semantic_body"]["validity_predicate"]
     assert "not independently re-derived from a live registry read" in predicate["definition"]

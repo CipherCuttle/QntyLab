@@ -281,12 +281,71 @@ def _verify_receipt_with_authority(receipt: Receipt, raw_bytes: bytes, g_bytes: 
 # ---------------------------------------------------------------------------
 
 
-def test_candidate_is_not_yet_frozen():
+def test_candidate_is_frozen_and_hashes_its_own_semantics():
     candidate = _candidate()
-    assert candidate["status"] == "CANDIDATE_NOT_YET_FROZEN"
+    assert candidate["status"] == "FROZEN"
     assert candidate["self_freeze_authorized"] is False
     assert candidate["artifact_kind"] == "PROTOCOL_AMENDMENT_CANDIDATE"
-    assert "freeze_provenance" not in candidate
+    assert _canonical_hash(candidate["semantic_body"]) == candidate["amendment_semantic_content_sha256"]
+    binding = candidate["effective_combined_contract_binding"]
+    recomputed_binding = _canonical_hash({
+        "amendment_semantic_content_sha256": candidate["amendment_semantic_content_sha256"],
+        "base_contract_artifact": binding["base_contract_artifact"],
+        "base_contract_sha256": binding["base_contract_sha256"],
+        "base_registry_artifact": binding["base_registry_artifact"],
+        "base_registry_sha256": binding["base_registry_sha256"],
+    })
+    assert recomputed_binding == candidate["effective_combined_contract_binding_sha256"]
+
+
+def test_freeze_is_governance_only_and_binds_the_reviewed_commit():
+    """Mirrors test_freeze_is_governance_only_and_binds_the_retrospective_external_review
+    in tests/test_r1_source_schema_registry_scope_amendment_v1.py: the freeze commit must
+    change only status/freeze_provenance, and freeze_provenance must bind the exact
+    reviewed commit and review receipt, never imply self-freeze."""
+    import subprocess
+
+    reviewed_sha = "cc36373f15c6a23ad51b5e4795a0a603c626c28c"
+    candidate = _candidate()
+    review = json.loads(
+        (REPO_ROOT / "experiments/data/r1_source_structure_recognition_amendment_review_v1.json").read_bytes()
+    )
+    original = json.loads(subprocess.check_output(
+        ["git", "show", f"{reviewed_sha}:experiments/data/r1_source_structure_recognition_amendment_v1.json"],
+        cwd=REPO_ROOT,
+        text=True,
+    ))
+    frozen_semantics = dict(candidate)
+    original_semantics = dict(original)
+    for payload in (frozen_semantics, original_semantics):
+        payload.pop("status", None)
+        payload.pop("freeze_provenance", None)
+    assert frozen_semantics == original_semantics
+
+    assert candidate["freeze_provenance"] == {
+        "candidate_commit_reviewed_sha": reviewed_sha,
+        "frozen_amendment_semantic_content_sha256": candidate["amendment_semantic_content_sha256"],
+        "frozen_effective_combined_contract_binding_sha256": candidate["effective_combined_contract_binding_sha256"],
+        "operator_authorization": "explicit operator authorization supplied for this governance-only freeze of the exact independently hostile-reviewed candidate; no semantic changes authorized",
+        "review_receipt": "r1_source_structure_recognition_amendment_review_v1.json",
+        "review_receipt_payload_sha256": review["review_payload_sha256"],
+        "review_receipt_repository_native_at_review_time": False,
+    }
+    review_payload = dict(review)
+    review_payload.pop("review_payload_sha256")
+    assert review["review_payload_sha256"] == _canonical_hash(review_payload)
+    assert review["reviewed_candidate_sha"] == candidate["freeze_provenance"]["candidate_commit_reviewed_sha"]
+    assert review["reviewed_candidate_semantic_content_sha256"] == candidate["amendment_semantic_content_sha256"]
+    assert review["reviewed_effective_combined_contract_binding_sha256"] == candidate["effective_combined_contract_binding_sha256"]
+    assert review["review_type"] == "hostile/read-only"
+    assert review["changeset"] == "NONE"
+    assert review["verdict"] == "PASS_SAFE_TO_FREEZE"
+    assert review["origin"] == "external session transcript supplied by operator"
+    assert review["repository_native_at_review_time"] is False
+    assert review["persisted_retrospectively"] is True
+    # self_freeze_authorized must remain False: the freeze is an explicit,
+    # non-self operator action, never implied by the candidate's own content.
+    assert candidate["self_freeze_authorized"] is False
 
 
 def test_candidate_semantic_content_digest_is_self_consistent():

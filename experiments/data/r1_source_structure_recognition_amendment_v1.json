@@ -172,8 +172,17 @@
       "remediation_disposition": "Parser A/B remediation against this candidate, once frozen, is a REQUIRED SUBSEQUENT IMPLEMENTATION TASK, to be performed and independently reviewed as its own task -- mirroring the identical convention already used by every prior frozen amendment's own parser_status.*.disposition text. No such remediation is performed, or authorized, by this candidate."
     }
   },
-  "status": "CANDIDATE_NOT_YET_FROZEN",
+  "status": "FROZEN",
   "tests": [
     "tests/test_r1_source_structure_recognition_amendment_v1.py"
-  ]
+  ],
+  "freeze_provenance": {
+    "candidate_commit_reviewed_sha": "cc36373f15c6a23ad51b5e4795a0a603c626c28c",
+    "frozen_amendment_semantic_content_sha256": "9a919ec68af8cee6caf661286315b61dd104d61c070676a75bfe89448c7e9758",
+    "frozen_effective_combined_contract_binding_sha256": "222b5edcb7370accd73526a034bf129f537a9cb5aac4b8ad157399d32899662c",
+    "operator_authorization": "explicit operator authorization supplied for this governance-only freeze of the exact independently hostile-reviewed candidate; no semantic changes authorized",
+    "review_receipt": "r1_source_structure_recognition_amendment_review_v1.json",
+    "review_receipt_payload_sha256": "4e9cbeb72c107282ad795cf8ada31460e70f9bd47868da4cc9c3851db3ccac97",
+    "review_receipt_repository_native_at_review_time": false
+  }
 }

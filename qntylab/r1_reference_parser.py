@@ -22,6 +22,18 @@ outside a single raw trade object; callers supply the resolved identity string.
 Outcome embargo: this module computes no momentum, funding, rank, weight,
 return, PnL, IC, or Sharpe value. It performs no network access and deletes no
 raw bytes; RAW_DELETION_AUTHORIZED remains false.
+
+Recognition authority note (post frozen-G conformance repair): this module no
+longer decides X->H->S itself. All gzip/UTF-8/BOM/line-ending framing,
+header well-formedness, and schema matching for the live raw-object path are
+delegated to qntylab.r1_schema_recognizer.recognize_source_object, the
+independently frozen-G-conformant reference recognizer bound to
+experiments/data/r1_source_structure_recognition_amendment_v1.json. This
+module never re-derives a header or a schema_id on its own for that path;
+identify_schema/KNOWN_SCHEMA_COLUMNS below are retained only as a
+backward-compatible helper and as Parser A's own row-semantics *support
+scope* (which recognized schema_ids this module knows how to turn into a
+DailyMarketEvidenceV1 record) -- never as recognition authority.
 """
 
 from __future__ import annotations
@@ -35,10 +47,65 @@ import zlib
 from dataclasses import dataclass, field
 from datetime import date, datetime, timezone
 from decimal import Decimal, InvalidOperation
+from pathlib import Path
 from typing import Optional
+
+from qntylab import r1_schema_recognizer as recognizer
 
 CUTOFF_UTC_DATE = date(2026, 6, 30)
 
+# --- exact R1 registry snapshot binding (EXPLICITLY_R1_BOUND, not
+# GENERAL_SNAPSHOT_AWARE) -----------------------------------------------
+#
+# Parser A's live raw-object path is bound to exactly one named artifact and
+# exactly one expected sha256, matching the governing recognition amendment's
+# own bound_authority.base_registry_sha256
+# (experiments/data/r1_source_structure_recognition_amendment_v1.json). This
+# is not a "load whatever is newest" mechanism and does not select by
+# recency, filename, or version order -- it names one exact artifact path and
+# fails closed (via VerifiedRegistrySnapshot.from_exact_artifact_bytes) if
+# the bytes on disk do not hash to the expected value. A caller needing a
+# different, explicitly-selected R (e.g. a historical snapshot for replay)
+# may pass its own VerifiedRegistrySnapshot into parse_daily_object directly;
+# nothing here pretends to support arbitrary historical R implicitly.
+_R1_REGISTRY_ARTIFACT_PATH = Path(__file__).resolve().parent.parent / "experiments/data/r1_source_schema_registry_v1.json"
+_R1_REGISTRY_EXPECTED_SHA256 = "02d2a75cdaa3d53a2708d2d20d5bf19f934fc68e6ee1b942404994d80ab94c4d"
+
+# Explicit, testable claim about what this binding actually supports: exactly
+# one named R1 registry artifact, verified by exact bytes -- never "whichever
+# R is newest" and never a general historical-snapshot replay capability.
+# A caller wanting a different, explicitly-selected R must pass its own
+# VerifiedRegistrySnapshot into parse_daily_object's registry_snapshot
+# parameter; nothing here pretends that is automatic.
+RECOGNITION_BINDING_MODE = "EXPLICITLY_R1_BOUND"
+
+_r1_default_registry_snapshot: "recognizer.VerifiedRegistrySnapshot | None" = None
+
+
+def _load_default_r1_registry_snapshot() -> "recognizer.VerifiedRegistrySnapshot":
+    """Fail-closed loader for the one named, exact R1 registry snapshot.
+
+    Raises ValueError (via VerifiedRegistrySnapshot.from_exact_artifact_bytes)
+    if the artifact's current bytes do not hash to
+    _R1_REGISTRY_EXPECTED_SHA256 -- never silently falls back to "whatever is
+    on disk" and never selects among multiple candidates.
+    """
+    global _r1_default_registry_snapshot
+    if _r1_default_registry_snapshot is None:
+        exact_bytes = _R1_REGISTRY_ARTIFACT_PATH.read_bytes()
+        _r1_default_registry_snapshot = recognizer.VerifiedRegistrySnapshot.from_exact_artifact_bytes(
+            exact_bytes, _R1_REGISTRY_EXPECTED_SHA256
+        )
+    return _r1_default_registry_snapshot
+
+
+# Parser A's own row-semantics SUPPORT SCOPE: which structurally-recognized
+# schema_ids this module knows how to turn into a DailyMarketEvidenceV1
+# record. This is NOT recognition authority (see module docstring) -- it is
+# consulted only *after* qntylab.r1_schema_recognizer has already returned
+# RECOGNIZED(schema_id), purely to decide whether Parser A supports that
+# schema's row semantics. It must never be used to derive or corroborate a
+# schema_id itself.
 KNOWN_SCHEMA_COLUMNS = {
     "bybit_trade_v1": frozenset(
         [
@@ -76,6 +143,9 @@ REQUIRED_ROW_FIELDS = ("timestamp", "size", "price", "trdMatchID")
 STATUS_OK = "OK"
 STATUS_UNKNOWN_SCHEMA_QUARANTINE = "UNKNOWN_SCHEMA_QUARANTINE"
 STATUS_EMPTY_OBJECT = "EMPTY_OBJECT"
+STATUS_MALFORMED_HEADER_QUARANTINE = "MALFORMED_HEADER_QUARANTINE"
+STATUS_AMBIGUOUS_SCHEMA_QUARANTINE = "AMBIGUOUS_SCHEMA_QUARANTINE"
+STATUS_RECOGNIZED_UNSUPPORTED_SCHEMA_QUARANTINE = "RECOGNIZED_UNSUPPORTED_SCHEMA_QUARANTINE"
 
 
 class GzipCorruptionError(Exception):
@@ -105,6 +175,15 @@ def _decompress(raw_bytes: bytes) -> str:
 
 
 def identify_schema(header: list) -> Optional[str]:
+    """Legacy order-insensitive matcher -- retained for backward compatibility
+    only. NOT called by parse_daily_object's live raw-object path, which
+    delegates schema recognition entirely to
+    qntylab.r1_schema_recognizer.recognize_source_object. This function
+    carries no live recognition authority: it silently collapses duplicate
+    column names (see r1_source_structure_recognition_amendment_v1.json's
+    DUPLICATE_TOKEN_NAME well-formedness rule for the countermodel this was
+    audited against) and does not consult the frozen registry snapshot.
+    """
     colset = frozenset(header)
     for schema_id, cols in KNOWN_SCHEMA_COLUMNS.items():
         if colset == cols:
@@ -203,53 +282,88 @@ def _canonical_duplicate_representative(group: list) -> tuple:
     return min(group, key=lambda g: (str(g[2]), str(g[3])))
 
 
+def _raise_legacy_framing_exception(result: "recognizer.RecognitionResult") -> None:
+    """Map a frozen-G FRAMING_FAILURE onto Parser A's pre-existing exception
+    vocabulary (GzipCorruptionError / TruncatedCSVError / UnicodeDecodeError),
+    per the one explicit legacy-mapping-layer approach: no new public
+    exception type is introduced, and the full frozen-G reason is preserved
+    in the exception's own message for diagnostics. Callers (materialize_parser_a,
+    already-frozen and unmodified) already catch exactly this tuple."""
+    reasons = ",".join(result.reasons) if result.reasons else "UNKNOWN"
+    if "INVALID_UTF8" in result.reasons:
+        raise UnicodeDecodeError(
+            "utf-8", b"", 0, 1, f"frozen recognition FRAMING_FAILURE({reasons})"
+        )
+    if "FEWER_THAN_TWO_TOKENS" in result.reasons:
+        raise TruncatedCSVError(f"frozen recognition FRAMING_FAILURE({reasons})")
+    # INVALID_GZIP, MULTI_MEMBER_GZIP, BOM_PRESENT, NON_LF_LINE_TERMINATOR all
+    # share Parser A's pre-existing generic container-corruption exception.
+    raise GzipCorruptionError(f"frozen recognition FRAMING_FAILURE({reasons})")
+
+
 def parse_daily_object(
     raw_bytes: bytes,
     expected_utc_date: date,
     instrument_instance_id: str,
+    registry_snapshot: "recognizer.VerifiedRegistrySnapshot | None" = None,
 ) -> DailyParseResult:
     """Parse one raw (gzip-compressed CSV) Bybit trade archive object.
 
     Returns a DailyParseResult whose `record`, when status is OK, is shaped
     exactly per DailyMarketEvidenceV1 (experiments/data/r1_normalized_evidence_contract_v1.json).
+
+    Recognition (X->H->S) for the raw object is delegated entirely to
+    qntylab.r1_schema_recognizer.recognize_source_object against frozen G and
+    an exact registry snapshot R -- this function performs no independent
+    gzip/UTF-8/BOM/line-ending framing decision, no independent header
+    well-formedness check, and no independent schema matching. `registry_snapshot`
+    defaults to the one named, exact, sha256-verified R1 registry artifact
+    (see _load_default_r1_registry_snapshot); callers needing a different,
+    explicitly-selected R may pass their own VerifiedRegistrySnapshot.
     """
     source_object_sha256 = hashlib.sha256(raw_bytes).hexdigest()
+    snapshot = registry_snapshot if registry_snapshot is not None else _load_default_r1_registry_snapshot()
 
-    if len(raw_bytes) == 0:
-        return DailyParseResult(
-            status=STATUS_EMPTY_OBJECT,
-            schema_id=None,
-            record=_empty_record(instrument_instance_id, expected_utc_date, source_object_sha256, schema_id=None),
-            rejected_row_count=0,
-            duplicate_count=0,
-            diagnostics={"note": "zero-byte raw object"},
-        )
+    recognition = recognizer.recognize_source_object(raw_bytes, snapshot)
 
+    if recognition.disposition == recognizer.FRAMING_FAILURE:
+        if "EMPTY_OBJECT" in recognition.reasons:
+            # Frozen G's own text explicitly reserves this disposition for
+            # downstream reinterpretation as a legitimate zero-trade day --
+            # unlike every other FRAMING_FAILURE reason, which is genuine
+            # container corruption and must fail, not construct a record.
+            return DailyParseResult(
+                status=STATUS_EMPTY_OBJECT,
+                schema_id=None,
+                record=_empty_record(instrument_instance_id, expected_utc_date, source_object_sha256, schema_id=None),
+                rejected_row_count=0,
+                duplicate_count=0,
+                diagnostics={"note": "frozen recognition FRAMING_FAILURE(EMPTY_OBJECT): zero-length decompressed body"},
+            )
+        _raise_legacy_framing_exception(recognition)
+
+    # Recognition succeeded past framing: decompression is guaranteed to
+    # reproduce the identical bytes G already validated. This re-decompresses
+    # only to obtain body text for diagnostics/row-parsing -- it makes no new
+    # framing decision (the outcome is fully determined already).
     text = _decompress(raw_bytes)
     truncated_tail = not text.endswith("\n")
     lines = text.splitlines()
 
-    if not lines:
+    if recognition.disposition == recognizer.MALFORMED_HEADER:
         return DailyParseResult(
-            status=STATUS_EMPTY_OBJECT,
+            status=STATUS_MALFORMED_HEADER_QUARANTINE,
             schema_id=None,
-            record=_empty_record(instrument_instance_id, expected_utc_date, source_object_sha256, schema_id=None),
-            rejected_row_count=0,
+            record=None,
+            rejected_row_count=max(len(lines) - 1, 0),
             duplicate_count=0,
-            diagnostics={"note": "no lines after decompression"},
+            diagnostics={
+                "observed_header_line": text.split("\n", 1)[0],
+                "malformed_header_reasons": list(recognition.reasons),
+            },
         )
 
-    reader = csv.reader(io.StringIO(text))
-    try:
-        header = next(reader)
-    except StopIteration as exc:
-        raise TruncatedCSVError("no header row present") from exc
-
-    if len(header) < 2:
-        raise TruncatedCSVError("header has fewer than 2 columns")
-
-    schema_id = identify_schema(header)
-    if schema_id is None:
+    if recognition.disposition == recognizer.NO_MATCH:
         return DailyParseResult(
             status=STATUS_UNKNOWN_SCHEMA_QUARANTINE,
             schema_id=None,
@@ -257,8 +371,43 @@ def parse_daily_object(
             rejected_row_count=max(len(lines) - 1, 0),
             duplicate_count=0,
             diagnostics={
-                "observed_columns": header,
+                "observed_columns": text.split("\n", 1)[0].split(","),
                 "quarantine_reason": "no registered known_schema_variant matches this column set",
+            },
+        )
+
+    if recognition.disposition == recognizer.AMBIGUOUS:
+        return DailyParseResult(
+            status=STATUS_AMBIGUOUS_SCHEMA_QUARANTINE,
+            schema_id=None,
+            record=None,
+            rejected_row_count=max(len(lines) - 1, 0),
+            duplicate_count=0,
+            diagnostics={
+                "observed_columns": text.split("\n", 1)[0].split(","),
+                "matching_schema_ids": list(recognition.matching_schema_ids),
+                "quarantine_reason": "header matches more than one registered known_schema_variant",
+            },
+        )
+
+    assert recognition.disposition == recognizer.RECOGNIZED
+    schema_id = recognition.schema_id
+
+    if schema_id not in KNOWN_SCHEMA_COLUMNS:
+        # Structurally recognized by frozen G against the exact registry
+        # snapshot, but outside Parser A's own DailyMarket row-semantics
+        # support scope (e.g. tardis_derivative_ticker_v1,
+        # bybit_instruments_info_current_v1). RECOGNIZED(schema_id) is never
+        # reinterpreted as NO_MATCH, and never silently fed into trade-row
+        # parsing it was never derived from.
+        return DailyParseResult(
+            status=STATUS_RECOGNIZED_UNSUPPORTED_SCHEMA_QUARANTINE,
+            schema_id=schema_id,
+            record=None,
+            rejected_row_count=max(len(lines) - 1, 0),
+            duplicate_count=0,
+            diagnostics={
+                "quarantine_reason": f"schema_id {schema_id!r} is structurally recognized but not supported by Parser A's row semantics",
             },
         )
 

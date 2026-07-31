@@ -288,14 +288,28 @@ def test_gzip_valid_invalid_utf8_body_typed_quarantine_both_parsers():
     assert "CONTAINER_ANOMALY" in b.anomalies
 
 
-def test_empty_raw_bytes_typed_valid_zero_trade_record_both_parsers():
+def test_empty_raw_bytes_now_quarantined_for_parser_a_still_valid_for_parser_b():
+    """Parser A's behavior on raw b"" changed under the frozen-G recognition
+    repair: qntylab.r1_schema_recognizer's own frozen fixture
+    (empty_raw_object in tests/test_r1_schema_recognizer.py) classifies
+    zero-length raw bytes as FRAMING_FAILURE(INVALID_GZIP) -- a
+    zlib.decompressobj configured for gzip framing never reaches a validated
+    end-of-stream on zero input, so this is genuine container corruption, not
+    an empty day. Parser A's pre-repair behavior (an ad hoc
+    `len(raw_bytes) == 0` special case bypassing recognition entirely) is
+    exactly the kind of independent framing decision this repair removes.
+    Parser B is unrepaired and out of scope for this task; its own,
+    unchanged, non-frozen-conformant treatment of raw b"" as a valid
+    zero-trade record is left as-is and verified here only so this
+    divergence is explicit, not silently lost."""
     a = materialize_parser_a(b"", date(2023, 11, 14), "x")
+    assert a.status == MATERIALIZATION_QUARANTINED
+    assert a.record is None
+    assert "CONTAINER_ANOMALY" in a.anomalies
+
     b = materialize_parser_b(b"", "2023-11-14", "s", CUTOFF)
-    assert a.status == MATERIALIZED_VALID
     assert b.status == MATERIALIZED_VALID
-    assert a.record["trade_count"] == 0
     assert b.record["trade_count"] == 0
-    assert a.record["source_object_sha256"] == hashlib.sha256(b"").hexdigest()
     assert b.record["source_object_sha256"] == hashlib.sha256(b"").hexdigest()
 
 
@@ -505,16 +519,29 @@ def test_csv_error_oversized_data_field_typed_quarantine_both_parsers():
 
 def test_csv_error_oversized_header_field_typed_quarantine_both_parsers():
     """The same csv.Error can also occur while parsing the header row itself
-    (this module's own _decode_container header-parse, and Parser A's
-    header-parse inside rp.parse_daily_object), not only the body -- a
-    distinct call site from the oversized-data-field case above."""
+    (this module's own _decode_container header-parse, and Parser B's own
+    header handling), not only the body -- a distinct call site from the
+    oversized-data-field case above.
+
+    Parser A's behavior here changed under the frozen-G recognition repair:
+    qntylab.r1_schema_recognizer derives the header via a naive comma split
+    on the header line, entirely independent of the stdlib csv module's
+    field_size_limit -- so an oversized header token is just a very long,
+    unmatched field name to frozen G, not a container-level tokenization
+    failure. It is correctly classified NO_MATCH (UNKNOWN_SCHEMA_QUARANTINE),
+    never a false MATERIALIZED_VALID. Parser B is unrepaired and still routes
+    header extraction through Python's csv module, so it still hits a bare
+    csv.Error here and is still quarantined as CONTAINER_ANOMALY -- the two
+    parsers now diverge in *anomaly label* but both still correctly refuse to
+    emit a record."""
     huge = "X" * (csv.field_size_limit() + 1)
     text = f"timestamp,{huge},side,size,price,tickDirection,trdMatchID,grossValue,homeNotional,foreignNotional\n1700000000.000,SYM,Buy,1,1,PlusTick,t-1,1,1,1\n"
     raw = gzip.compress(text.encode())
     a = materialize_parser_a(raw, date(2023, 11, 14), "x")
     b = materialize_parser_b(raw, "2023-11-14", "s", CUTOFF)
     assert a.status == b.status == MATERIALIZATION_QUARANTINED
-    assert "CONTAINER_ANOMALY" in a.anomalies
+    assert a.record is None and b.record is None
+    assert "UNKNOWN_SCHEMA_QUARANTINE" in a.anomalies
     assert "CONTAINER_ANOMALY" in b.anomalies
 
 

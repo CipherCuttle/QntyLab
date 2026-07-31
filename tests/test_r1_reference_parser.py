@@ -142,8 +142,27 @@ def test_decimal_precision_preserved():
     assert result.record["base_volume"] == "0.123456789012345"
 
 
-def test_empty_input():
-    result = rp.parse_daily_object(b"", date(2023, 11, 14), "x")
+def test_raw_empty_bytes_now_fails_frozen_gzip_framing():
+    """Per the frozen recognition amendment's own fixture (empty_raw_object in
+    tests/test_r1_schema_recognizer.py), zero-length raw bytes are
+    FRAMING_FAILURE(INVALID_GZIP), not a valid zero-trade record: a
+    zlib.decompressobj configured for gzip framing never reaches a validated
+    end-of-stream on zero input, so this is genuine container corruption, not
+    an empty day. This is a real, audit-mandated behavior change from Parser
+    A's pre-repair ad hoc `len(raw_bytes) == 0` special case, which bypassed
+    recognition entirely and silently constructed an 'empty day' record for a
+    byte sequence that was never actually gzip at all."""
+    with pytest.raises(rp.GzipCorruptionError):
+        rp.parse_daily_object(b"", date(2023, 11, 14), "x")
+
+
+def test_valid_empty_gzip_still_typed_zero_trade_record():
+    """Unlike raw b"", a *valid* single-member gzip object whose decompressed
+    body has zero length is FRAMING_FAILURE(EMPTY_OBJECT) under frozen G --
+    and the amendment's own text explicitly reserves that specific reason for
+    downstream reinterpretation as a legitimate zero-trade day, unlike every
+    other FRAMING_FAILURE reason (which is unconditional corruption)."""
+    result = rp.parse_daily_object(_gz(""), date(2023, 11, 14), "x")
     assert result.status == rp.STATUS_EMPTY_OBJECT
     assert result.record["trade_count"] == 0
 

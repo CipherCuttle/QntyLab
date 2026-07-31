@@ -94,9 +94,15 @@ def _derive_header(raw_bytes: bytes):
     truncated/incomplete member -- including any proper prefix of an
     otherwise-valid member -- must fail closed as INVALID_GZIP *before*
     header extraction, well-formedness checking, or recognition ever run.
+
+    Zero-length raw X is not a distinguished pre-gzip sentinel: it is not a
+    complete gzip member (no 10-byte header is present), so it falls through
+    to the same d.eof-based completion check as any other incomplete member
+    and is classified INVALID_GZIP, per step 1. EMPTY_OBJECT (step 4) applies
+    only to a *successfully decompressed* member whose decoded text is empty
+    -- see the d.eof / d.unused_data checks and the post-decode `text == ""`
+    check below.
     """
-    if not raw_bytes:
-        return None, Disposition(FRAMING_FAILURE, ("EMPTY_OBJECT",))
     d = zlib.decompressobj(16 + zlib.MAX_WBITS)
     try:
         decompressed = d.decompress(raw_bytes)
@@ -592,9 +598,30 @@ def test_invalid_gzip_is_framing_failure():
 
 
 def test_empty_object_is_framing_failure():
-    disp = _full_pipeline(b"", REGISTRY_PATH.read_bytes())
+    """EMPTY_OBJECT (step 4) applies to a *valid, complete* gzip member whose
+    decompressed payload is empty -- not to raw X being empty (that is a
+    distinct case, see test_raw_empty_bytes_is_invalid_gzip_not_empty_object
+    below). gzip.compress(b"") is a genuine single gzip member that reaches
+    a validated end-of-stream (d.eof is True) and decodes to "" -- the
+    correct fixture for this disposition."""
+    raw = gzip.compress(b"")
+    disp = _full_pipeline(raw, REGISTRY_PATH.read_bytes())
     assert disp.kind == FRAMING_FAILURE
     assert disp.reason == ("EMPTY_OBJECT",)
+
+
+def test_raw_empty_bytes_is_invalid_gzip_not_empty_object():
+    """Hostile-review-derived regression: X = b"" is not a complete gzip
+    member (no 10-byte header is even present), so it must fail the same
+    d.eof-based completion check as any other truncated/incomplete member
+    and be classified FRAMING_FAILURE(INVALID_GZIP) -- never treated as a
+    distinguished pre-gzip EMPTY_OBJECT sentinel, and never reaching any
+    recognition-layer disposition."""
+    disp = _full_pipeline(b"", REGISTRY_PATH.read_bytes())
+    assert disp.kind == FRAMING_FAILURE
+    assert disp.reason == ("INVALID_GZIP",)
+    assert (disp.kind, disp.reason) != (FRAMING_FAILURE, ("EMPTY_OBJECT",))
+    assert disp.kind not in (MALFORMED_HEADER, NO_MATCH, AMBIGUOUS, RECOGNIZED)
 
 
 def test_invalid_utf8_is_framing_failure():

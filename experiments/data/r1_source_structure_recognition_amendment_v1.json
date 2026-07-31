@@ -1,0 +1,179 @@
+{
+  "amendment_semantic_content_sha256": "9a919ec68af8cee6caf661286315b61dd104d61c070676a75bfe89448c7e9758",
+  "artifact": "r1_source_structure_recognition_amendment_v1",
+  "artifact_kind": "PROTOCOL_AMENDMENT_CANDIDATE",
+  "bound_authority": {
+    "base_contract_artifact": "experiments/data/r1_normalized_evidence_contract_v1.json",
+    "base_contract_sha256": "c199b9481285d80b34183b8a7681f75ef7e60e5aadad6e4e0ece3ef8f33d6c92",
+    "base_registry_artifact": "experiments/data/r1_source_schema_registry_v1.json",
+    "base_registry_sha256": "02d2a75cdaa3d53a2708d2d20d5bf19f934fc68e6ee1b942404994d80ab94c4d"
+  },
+  "effective_combined_contract_binding": {
+    "amendment_semantic_content_sha256": "9a919ec68af8cee6caf661286315b61dd104d61c070676a75bfe89448c7e9758",
+    "base_contract_artifact": "experiments/data/r1_normalized_evidence_contract_v1.json",
+    "base_contract_sha256": "c199b9481285d80b34183b8a7681f75ef7e60e5aadad6e4e0ece3ef8f33d6c92",
+    "base_registry_artifact": "experiments/data/r1_source_schema_registry_v1.json",
+    "base_registry_sha256": "02d2a75cdaa3d53a2708d2d20d5bf19f934fc68e6ee1b942404994d80ab94c4d"
+  },
+  "effective_combined_contract_binding_sha256": "222b5edcb7370accd73526a034bf129f537a9cb5aac4b8ad157399d32899662c",
+  "next_step": "Independent hostile review of this exact, fully-determinate candidate semantics is the required next step. Only after review (and repair/re-review if a genuine defect is found) may a separate, explicitly-authorized governance-only freeze action occur, following the identical two-part pattern already used by r1_normalized_evidence_duplicate_semantics_amendment_v1.json and r1_source_schema_registry_scope_amendment_v1.json. No freeze is authorized or performed by this candidate itself. A reference recognizer and Parser A/B differential conformance testing are explicitly out of scope until after freeze.",
+  "outcome_embargo": true,
+  "parent_head": "c62f58a9f5f43fc70e3f2d0362c55057d6527211",
+  "raw_deletion_authorized": false,
+  "self_freeze_authorized": false,
+  "semantic_body": {
+    "amends": {
+      "amendment_relationship": "ADDITIVE_CLARIFICATION_NOT_IN_PLACE_REWRITE",
+      "how_to_read": "effective_contract = original r1_normalized_evidence_contract_v1.json (unmodified) PLUS original r1_source_schema_registry_v1.json (unmodified) PLUS this amendment. This amendment adds a normative recognition function (X -> H -> S) that neither base artifact defines mechanically; it neither edits nor overrides any existing field text. Both original artifacts remain the historical record of what was (under-)specified before this amendment; this artifact does not retroactively imply the recognition function existed at either base artifact's freeze time.",
+      "original_contract_bytes_unchanged_by_this_amendment": true,
+      "original_registry_bytes_unchanged_by_this_amendment": true,
+      "target_artifact": "experiments/data/r1_normalized_evidence_contract_v1.json",
+      "target_artifact_sha256_at_amendment_time": "c199b9481285d80b34183b8a7681f75ef7e60e5aadad6e4e0ece3ef8f33d6c92",
+      "target_fields_clarified": [
+        "DailyMarketEvidenceV1.schema_id.raw_derivation ('matched against r1_source_schema_registry_v1.json:known_schema_variants by observed column set') -- this amendment defines exactly what 'observed column set' means mechanically; it adds no new field and changes no existing field's type, missingness, or precision spec."
+      ],
+      "target_registry_artifact": "experiments/data/r1_source_schema_registry_v1.json",
+      "target_registry_fields_clarified": [
+        "known_schema_variants[*].field_set -- this amendment defines the exact equivalence relation under which a derived header is compared against each entry's field_set; registry membership content itself is untouched."
+      ],
+      "target_registry_sha256_at_amendment_time": "02d2a75cdaa3d53a2708d2d20d5bf19f934fc68e6ee1b942404994d80ab94c4d"
+    },
+    "audit_origin": {
+      "note": "A three-pass forensic/adjudication audit (read-only, no repository mutation) at parent_head established that no frozen artifact defines a deterministic, implementation-independent function deriving schema identity S from a retained raw source object X; that Parser A (order-insensitive, set-based) and Parser B (order-sensitive, tuple-based) diverge on recognition semantics; that neither parser reads r1_source_schema_registry_v1.json at runtime; and that the registry-scope amendment (frozen at this parent_head) explicitly defers raw-header recognition to a future amendment. This candidate is that amendment.",
+      "settled_by_prior_adjudication": [
+        "the missing boundary is X->H->S, not merely header->S",
+        "E_G is unordered exact equality (justified by two independent already-frozen texts: r1_normalized_evidence_contract_v1.json's own 'observed column set' phrasing, and r1_source_schema_registry_scope_amendment_v1.json's explicit statement that adopting ordered-header identity 'could override frozen behavior' -- i.e. the reviewers of that already-frozen amendment read 'column set' as already meaning unordered set semantics)",
+        "the framing-parameter subset (gzip/UTF-8/delimiter/quote/line-ending/whitespace/well-formedness) was settled from direct inspection of all 5 real cached pilot objects, not from Python library defaults",
+        "authority selection reuses the repository's existing amends+freeze_provenance chain convention, with recency explicitly excluded as a selection criterion"
+      ]
+    },
+    "authority_selector": {
+      "competing_authority_ambiguity": "If two or more artifacts simultaneously satisfy the selector_rule for the same dimension (both bind the same base artifacts, both carry valid freeze_provenance, and neither supersedes the other), there is no single current authority. A verifier attempting to resolve 'the current governing G' without being given an explicit selection MUST fail closed with AUTHORITY_AMBIGUOUS rather than resolving the conflict via any prohibited selector above. This mirrors, one layer up, the same fail-closed discipline this amendment's own recognize() function applies when a header matches more than one registered schema signature.",
+      "identity_vs_authority": "A receipt's recognition_contract_sha256 and registry_snapshot_sha256 establish only IDENTITY (which exact bytes were used) -- never AUTHORITY (whether those bytes were the legitimately governing G/R for R1 at all). An internally self-consistent candidate artifact whose own hashes check out is not, merely by virtue of that self-consistency, an authoritative G or R. This distinction is adopted directly from TUF's client-trusted-root model: hash-binding alone never establishes authority.",
+      "prohibited_selectors": [
+        "most recently frozen / most recently modified (wall-clock recency)",
+        "highest declared version number",
+        "filesystem mtime",
+        "filename lexicographic ordering",
+        "git commit ordering / git log recency",
+        "any heuristic that resolves competing candidates without an explicit supersedes declaration"
+      ],
+      "prohibited_selectors_rationale": "This repository has already once diagnosed and fixed exactly the temporal-recency failure mode one layer down (BLOCK_REGISTRY_TIME_AMBIGUITY, repaired in r1_daily_market_evidence_schema_admission_amendment_v1.json's repair_history by replacing a wall-clock-dependent registry read with explicit snapshot binding). Selecting G or R by recency would silently reintroduce the identical bug class one layer up, at the authority-selection level instead of the snapshot-binding level.",
+      "selector_rule": "The governing recognition contract G for an R1 evaluation is the unique artifact that: (i) carries amends.target_artifact bindings to the exact current bytes of both experiments/data/r1_normalized_evidence_contract_v1.json and experiments/data/r1_source_schema_registry_v1.json (or their designated successors, reached only via explicit, separately-authorized supersession -- see supersession below); (ii) carries a freeze_provenance block recording explicit, non-self, operator-authorized freeze action following independent hostile review of one named, reviewed commit sha, following the identical convention already used by r1_normalized_evidence_duplicate_semantics_amendment_v1.json and r1_source_schema_registry_scope_amendment_v1.json; and (iii) is not itself named as a superseded artifact by any other such artifact. The governing registry snapshot R is, by the identical rule, the unique base_registry_sha256 currently named by that G's own bound_authority (or R's own designated successor via the same supersession mechanism).",
+      "supersession": "A later amendment G2 may explicitly supersede an earlier authoritative G1 by carrying a supersedes block naming G1's artifact path and exact bytes-at-supersession-time sha256, itself authorized via the identical freeze_provenance convention. Once such a declaration is itself validly frozen, G1 ceases to be the CURRENT authority for NEW evaluations, but this changes nothing about G1's own historical authority: G1 remains the correct governing contract for verifying any receipt whose recognition_contract_sha256 names G1's exact bytes, indefinitely. Supersession governs which authority produces new evaluations; it never retroactively reinterprets an evaluation already recorded under a prior authority. A verifier must be told, out of band, which authority context it is operating under (current vs. a named historical G) -- exactly as every other frozen artifact in this repository already requires an out-of-band pointer to be located at all, since git history alone never announces which file is current.",
+      "this_candidate_is_not_yet_authoritative": "This candidate artifact itself, while status=CANDIDATE_NOT_YET_FROZEN, is definitionally not yet authoritative under its own selector_rule (clause (ii) is unmet -- no freeze_provenance exists yet). self_freeze_authorized is false; no freeze occurs as part of authoring this candidate."
+    },
+    "bound_authority": {
+      "base_contract_artifact": "experiments/data/r1_normalized_evidence_contract_v1.json",
+      "base_contract_sha256": "c199b9481285d80b34183b8a7681f75ef7e60e5aadad6e4e0ece3ef8f33d6c92",
+      "base_registry_artifact": "experiments/data/r1_source_schema_registry_v1.json",
+      "base_registry_sha256": "02d2a75cdaa3d53a2708d2d20d5bf19f934fc68e6ee1b942404994d80ab94c4d"
+    },
+    "derive_header": {
+      "case_policy": "No case folding is applied at any step. Token comparison under E_G is exact case-sensitive string equality, matching both current implementations and requiring no new normalization rule.",
+      "dialect_sniffing_policy": "No delimiter or dialect auto-detection is performed. The delimiter is fixed to comma by this amendment; no alternative delimiter is probed or tolerated.",
+      "function_signature": "derive_header(X, G) -> H | FRAMING_FAILURE(reason)",
+      "gzip_completion_policy": "A valid gzip member requires reaching a fully validated end-of-stream, not merely producing some decompressed output without an exception being raised. Concretely: the member's 10-byte header, deflate-compressed payload, and 8-byte trailer (CRC32 of the decompressed payload, then ISIZE, the payload length mod 2**32) must all be present and internally consistent, and the underlying inflate stream must report a definite end-of-stream condition after consuming X (i.e. a zlib.decompressobj instance configured for gzip framing reports eof=True) before decompression is considered to have succeeded. 'The first member itself does not decompress' (step 1, below) is defined to include BOTH of the following, treated identically: (a) decompression raising an error at any point (bad magic bytes, invalid deflate stream, CRC32 mismatch, ISIZE mismatch), and (b) decompression consuming some or all of the supplied bytes without raising an error but without ever reaching a validated end-of-stream -- i.e. a truncated or otherwise incomplete gzip member, including any proper prefix of an otherwise-valid member at any truncation offset. Both (a) and (b) are FRAMING_FAILURE(INVALID_GZIP); there is no third disposition for 'partial but exception-free' decompression, and a truncated member never reaches header extraction, well-formedness checking, or recognition -- FRAMING_FAILURE(INVALID_GZIP) is decided strictly before any of those later steps run.",
+      "quoting_policy": "Header-row quoting is UNSUPPORTED in v1: no evidence from any of the 5 real cached pilot objects shows a quoted or comma-embedding header token, so no quote-aware tokenization rule is defined for the header line. A literal double-quote character appearing inside a resulting token is not a framing failure (naive comma-split still succeeds mechanically) -- it is caught at the header well-formedness step, below, as MALFORMED_HEADER(QUOTE_CHARACTER_IN_TOKEN). Row-body quoting, if ever required, remains entirely Parser A/B's existing, unmodified, out-of-scope concern: derive_header tokenizes only the header line, never row bodies.",
+      "steps": [
+        "1. GZIP: X must decompress as exactly one COMPLETE gzip member -- see gzip_completion_policy for what 'complete' requires (a validated end-of-stream, not merely exception-free partial output). Any bytes remaining after the first member's validated logical end (i.e. any concatenated second member, valid or not) is a framing failure, not a thing to silently concatenate. This closes a real, previously unaudited hazard: Python's gzip.decompress() silently decompresses and concatenates ALL concatenated gzip members by default; direct inspection of all 5 real cached pilot objects during the prior audit found zero genuine multi-member objects (one object's apparent second gzip-magic occurrence was verified, via zlib.decompressobj member-walk, to be a coincidental byte pattern inside compressed data, not a real second member), so no evidence requires multi-member tolerance. FRAMING_FAILURE(INVALID_GZIP) if the first member itself does not decompress, per gzip_completion_policy -- this explicitly includes a truncated/incomplete member that never reaches a validated end-of-stream, not only a member that raises a decode error; FRAMING_FAILURE(MULTI_MEMBER_GZIP) if bytes remain after the first member's validated end-of-stream.",
+        "2. ENCODING: the single decompressed member's bytes must decode as strict UTF-8 (no replacement, no error-skipping). FRAMING_FAILURE(INVALID_UTF8) otherwise.",
+        "3. BOM: the decoded text must not begin with U+FEFF (UTF-8 BOM). A leading BOM is never silently stripped (no real object has ever needed BOM tolerance) and is never silently ignored (today, unhandled, it would corrupt the first header token and produce an undiagnosed NO_MATCH rather than a named failure). FRAMING_FAILURE(BOM_PRESENT) if found.",
+        "4. EMPTY OBJECT: if the decoded text has zero length, FRAMING_FAILURE(EMPTY_OBJECT). (This governs recognition only; downstream layers remain free to treat this reason specially -- e.g. as a legitimate zero-trade day -- without recognition inventing a third top-level disposition beyond H | FRAMING_FAILURE for this step.)",
+        "5. HEADER LINE: the header line is the decoded text up to (but excluding) the first LF ('\\n') character, or the entire text if it contains no LF at all. If this header line contains any CR ('\\r') character, FRAMING_FAILURE(NON_LF_LINE_TERMINATOR) -- CRLF and bare-CR line endings are both rejected identically rather than silently normalized; all 5 real cached pilot objects use LF exclusively and no evidence requires tolerating either alternative.",
+        "6. TOKENIZATION: split the header line on the comma character (,) literally -- no quote-aware CSV dialect interpretation is applied to the header line (see quoting, below). This yields an ordered tuple of raw string tokens H_raw.",
+        "7. MINIMUM WIDTH: if H_raw has fewer than 2 elements, FRAMING_FAILURE(FEWER_THAN_TWO_TOKENS) (preserves the existing container-level minimum-column guard already present in both current parsers).",
+        "8. Otherwise, derive_header returns H_raw (the well-formedness step, below, operates on this ordered tuple next)."
+      ],
+      "whitespace_policy": "No leading/trailing whitespace trimming is applied to any token, at any step. A token with incidental whitespace is preserved verbatim and is not, by itself, malformed; it is simply, in nearly every real case, a token that will fail to match any registered field name under the case-sensitive, whitespace-sensitive equivalence relation E_G (defined below), yielding NO_MATCH rather than a diagnosed framing/well-formedness failure. This is a deliberate default-deny choice: no undocumented normalization is introduced merely to make a hypothetical whitespace-padded object 'just work'."
+    },
+    "equivalence_relation": {
+      "adjudication_basis": "Not ordered-tuple equality. Not subset matching (H contains every field in schema_signature). Not superset matching (schema_signature contains every field in H). Not fuzzy/alias matching. Settled from two independent already-frozen repository texts, not from either parser's behavior: (1) r1_normalized_evidence_contract_v1.json:DailyMarketEvidenceV1.schema_id.raw_derivation reads 'matched against ... known_schema_variants by observed column set'; (2) r1_source_schema_registry_scope_amendment_v1.json (FROZEN) states, in its own already-reviewed text, that adopting 'ordered-header identity' 'could override frozen behavior' -- i.e. the reviewers of that already-frozen amendment read 'column set' as already meaning unordered-set semantics, and flagged imposing order as the change that would conflict with existing frozen text, not the reverse. Subset/superset matching is independently rejected on structural grounds: bybit_trade_v1_rpi's field_set is a strict superset of bybit_trade_v1's, so any subset-based rule would make every bybit_trade_v1_rpi object simultaneously match both signatures -- an unforced ambiguity exact-set equality avoids entirely.",
+      "definition": "E_G(H, schema_signature) := (H == schema_signature), where both sides are Python-style frozensets of well-formed token strings, compared by exact set equality: same cardinality, same member strings, order-independent, duplicate-independent (duplicates already excluded by header_well_formedness before E_G is ever evaluated).",
+      "schema_signature_derivation": "For each entry in registry snapshot R's known_schema_variants, its schema_signature is frozenset(entry.field_set) -- the JSON array field_set read as an unordered set of strings, exactly matching how E_G interprets a derived header."
+    },
+    "explicitly_not_addressed_by_this_amendment": [
+      "container/encoding corruption dispositions beyond FRAMING_FAILURE's own enumerated reasons (existing CONTAINER_ANOMALY vocabulary is reused, not replaced)",
+      "malformed-row / PARSE_REJECTION dispositions for row bodies (recognition only tokenizes the header line)",
+      "duplicate trade-row semantics (governed entirely by r1_normalized_evidence_duplicate_semantics_amendment_v1.json, unmodified)",
+      "timestamp canonicalization",
+      "funding settlement semantics",
+      "market gap classification",
+      "lifecycle/identity ambiguity",
+      "which known_schema_variants entries exist or should exist (registry membership itself is untouched)",
+      "evidence-family authorization, schema admission, record validity, and materialization (see non_goals)"
+    ],
+    "header_well_formedness": {
+      "function_signature": "well_formed(H_raw) -> H | MALFORMED_HEADER(reason)",
+      "non_rules": "Whitespace-containing and case-varying tokens are NOT malformed (see derive_header's whitespace_policy/case_policy) -- they are well-formed tokens that will, in virtually every real case, simply fail to match any registered schema under E_G and yield NO_MATCH, not MALFORMED_HEADER.",
+      "output": "If H_raw satisfies all rules, H = frozenset(H_raw) -- the well-formed, unordered, duplicate-free, quote-free set of header token names that recognize() consumes next. If any rule is violated, well_formed returns MALFORMED_HEADER naming every violated reason (a header may violate more than one rule simultaneously; all applicable reasons are reported, not merely the first detected).",
+      "rules": [
+        "EMPTY_TOKEN_NAME: any element of H_raw equal to the empty string.",
+        "DUPLICATE_TOKEN_NAME: any element of H_raw occurring more than once (by exact string equality). Concrete justification: a valid, complete 10-column bybit_trade_v1 header with one existing field name appended a second time (11 physical positions) still equals the registered 10-element set under naive set equality -- frozenset(header) collapses the duplicate silently. This rule closes that reachable countermodel, verified directly against the current registry during the prior audit, not merely hypothesized.",
+        "QUOTE_CHARACTER_IN_TOKEN: any element of H_raw containing a literal double-quote character, per the quoting_policy above."
+      ]
+    },
+    "match_set_and_dispositions": {
+      "current_registry_uniqueness": "Directly re-verified against r1_source_schema_registry_v1.json's four current entries: bybit_trade_v1 (10 fields), bybit_trade_v1_rpi (11 fields, strict superset of bybit_trade_v1), tardis_derivative_ticker_v1 (11 fields, disjoint names), bybit_instruments_info_current_v1 (6 fields, disjoint names) -- all four pairwise distinct as sets. |M| > 1 does not occur under the current registry; AMBIGUOUS is defined for when a future registry snapshot makes it possible, not assumed impossible.",
+      "definition": "M = { schema_id : schema_id in R.known_schema_variants AND E_G(H, signature(schema_id)) }. |M| == 0 -> NO_MATCH. |M| == 1 -> RECOGNIZED(the sole member of M). |M| > 1 -> AMBIGUOUS(M) (every colliding schema_id is named, not merely the existence of a collision). Evaluation of M never depends on registry key iteration order, dict insertion order, or any first-match short-circuit: M is computed as a complete set membership test over every entry in R before any disposition is decided.",
+      "function_signature": "recognize(H, G, R) -> RECOGNIZED(schema_id) | NO_MATCH | AMBIGUOUS | MALFORMED_HEADER",
+      "totality": "recognize is total over every well-formed H: every input either fails header_well_formedness (MALFORMED_HEADER) or reaches exactly one of NO_MATCH / RECOGNIZED / AMBIGUOUS. There is no unreached input and no case whose disposition is left to caller discretion or implementation default."
+    },
+    "non_goals": [
+      "evidence-family authorization (governed entirely by r1_source_schema_registry_scope_amendment_v1.json, unmodified and uncited-as-input here beyond its recognition_language_boundary deferral text)",
+      "schema admission (governed by r1_daily_market_evidence_schema_admission_amendment_v1.json, a separate, still-unfrozen candidate; recognition supplies schema_id as an input to that layer, never the reverse)",
+      "record validity / DailyMarketEvidenceV1 completeness checking",
+      "materialization",
+      "schema inference or heuristic/statistical classification of any kind",
+      "fuzzy, partial, subset, superset, or alias matching of header field names",
+      "CSV dialect auto-detection/sniffing",
+      "any repair of Parser A, Parser B, or the materializer -- both remain byte-for-byte untouched by this candidate",
+      "RPI column semantic resolution",
+      "any R1 hypothesis, factor, weight, return, PnL, IC, or Sharpe computation"
+    ],
+    "object_boundary": {
+      "X_definition": "X is the exact retrieved raw bytes of one gzip-compressed source archive object, pre-decompression -- the identical bytes already bound by the existing DailyMarketEvidenceV1.source_object_sha256 semantics (r1_normalized_evidence_contract_v1.json:source_object_sha256.raw_derivation: 'sha256 of the retrieved raw compressed archive object'). This amendment introduces no new object-identity concept and no new hash boundary for X; recognition consumes exactly the same X that source_object_sha256 already binds.",
+      "toctou_note": "This amendment requires that any conforming implementation compute source_object_sha256 and derive_header from one single in-memory read of X, never from separately re-reading a path between hashing and framing. This is not a new requirement invented here: it is already the observed property of every committed hash/parse code path inspected during the prior audit (qntylab.r1_reference_parser.parse_daily_object and both qntylab.r1_daily_market_materializer.materialize_parser_a/b take raw_bytes as a single parameter and hash it directly); this amendment merely makes that property normative for recognition specifically, since no acquisition/retrieval pipeline is committed yet."
+    },
+    "outcome_embargo_verified": "no H012/H014, PIT rank, weight, forward return, PnL, IC, Sharpe, or weekly/null/replication outcome was computed, inspected, or referenced in producing this amendment",
+    "receipt_and_replay": {
+      "authority_check_is_separate_from_identity_check": "Verification of receipt self-consistency (recomputed disposition/schema_id match claimed values) is necessary but not sufficient. A verifier MUST additionally check, per authority_selector above, that the named G and R are the legitimately governing artifacts for the historical context being verified -- an internally self-consistent receipt naming a self-consistent but non-designated G'/R' pair must still be rejected.",
+      "field_semantics": {
+        "disposition": "one of RECOGNIZED, NO_MATCH, AMBIGUOUS, MALFORMED_HEADER.",
+        "recognition_contract_sha256": "G's identity: sha256 of the exact bytes of the governing recognition-contract artifact. Identity only -- see authority_selector for why this is never treated as self-authorizing.",
+        "registry_snapshot_sha256": "R's identity: sha256 of the exact bytes of the governing registry artifact.",
+        "schema_id": "present (non-null) only when disposition == RECOGNIZED; null otherwise.",
+        "source_object_sha256": "X, sha256 of the exact retrieved gzip bytes."
+      },
+      "no_observed_header_digest": "The receipt deliberately omits a hashed representation of the derived header. A verifier already holding X can deterministically re-derive H under the same frozen G (that is the entire point of freezing structural extraction under G), so X + G + R already reproduces H; a separate header hash would be a second, redundant hash boundary requiring its own canonicalization decision for zero net verification benefit. MDL-preferred: nothing beyond the five required fields above.",
+      "no_silent_reclassification": "An evaluation recorded under a given (G, R) pair is immutable: it is never overwritten, replaced, or silently reinterpreted by re-running recognition on the same X at a later time under a different G2/R2. A later authority producing a different disposition for the same X is a distinct, separately identified evaluation, never a rewrite of the earlier one. This reuses, one layer up, the identical no_silent_reclassification/explicit_reevaluation_only pattern already hostile-tested in r1_daily_market_evidence_schema_admission_amendment_v1.json's registry_snapshot_binding.",
+      "receipt_kind": "SOURCE_STRUCTURE_RECOGNITION_EVALUATION_RECEIPT_V1",
+      "replay_requirement": "A verifier establishes a VERIFIED evaluation only by independently recomputing disposition and schema_id from (X, G's exact bytes, R's exact bytes) and checking every recomputed value against the receipt's claimed values, INCLUDING schema_id. receipt.schema_id is never treated as an input authority -- it is an output assertion, checked against independently recomputed recognition, exactly like every other claimed field. A receipt whose claimed schema_id does not match recognize(derive_header(X, G), G, R) fails verification, even if every other field matches.",
+      "required_fields": [
+        "receipt_kind",
+        "source_object_sha256",
+        "recognition_contract_sha256",
+        "registry_snapshot_sha256",
+        "disposition",
+        "schema_id"
+      ]
+    },
+    "recognition_status": {
+      "note": "Diagnostic only, per parser_status conventions in prior frozen amendments -- observed, not remediated, not authoritative, not required to be acted on by this candidate.",
+      "parser_a_current": {
+        "conformance": "PARTIAL -- order-insensitive matching agrees with E_G; duplicate-token collapse (frozenset silently absorbing a repeated field name) and absent well-formedness/BOM/multi-member-gzip checks do not conform.",
+        "location": "qntylab/r1_reference_parser.py:107-112 (identify_schema), :99-104 (_decompress)"
+      },
+      "parser_b_current": {
+        "conformance": "NONCONFORMING -- order-sensitive tuple matching does not conform to E_G; no well-formedness/BOM/multi-member-gzip checks.",
+        "location": "qntylab/r1_retention_candidate.py:70-72 (schema_identify)"
+      },
+      "registry_desync": "Neither parser reads r1_source_schema_registry_v1.json at runtime; both hardcode a separate copy of the field-name data. This candidate does not repair that -- a future, separately reviewed reference recognizer is expected to read registry bytes directly, closing this gap as a structural side effect of conforming to this amendment, not as part of authoring it.",
+      "remediation_disposition": "Parser A/B remediation against this candidate, once frozen, is a REQUIRED SUBSEQUENT IMPLEMENTATION TASK, to be performed and independently reviewed as its own task -- mirroring the identical convention already used by every prior frozen amendment's own parser_status.*.disposition text. No such remediation is performed, or authorized, by this candidate."
+    }
+  },
+  "status": "CANDIDATE_NOT_YET_FROZEN",
+  "tests": [
+    "tests/test_r1_source_structure_recognition_amendment_v1.py"
+  ]
+}

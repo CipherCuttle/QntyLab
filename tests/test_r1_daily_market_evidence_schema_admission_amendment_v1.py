@@ -43,8 +43,7 @@ import json
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
-from types import MappingProxyType
-from typing import Mapping, Optional
+from typing import Optional
 
 from qntylab import r1_reference_parser as rp
 from qntylab.r1_daily_market_materializer import (
@@ -112,11 +111,13 @@ def test_amendment_addresses_the_audited_verdict():
 def test_repair_history_records_the_registry_time_repair():
     amendment = _load_amendment()
     history = amendment["repair_history"]
-    assert len(history) == 2
+    assert len(history) == 3
     assert history[0]["addressed_review_verdict"] == "BLOCK_REGISTRY_TIME_AMBIGUITY"
     assert history[1]["addressed_review_verdict"] == "BLOCK_UNBOUND_REGISTRY_HASH"
+    assert history[2]["addressed_review_verdict"] == "BLOCK_REGISTRY_CONTENT_IDENTITY_DECOUPLED"
     assert history[0]["still_not_frozen"] is True
     assert history[1]["still_not_frozen"] is True
+    assert history[2]["still_not_frozen"] is True
 
 
 def test_amendment_semantic_content_digest_is_self_consistent():
@@ -178,43 +179,83 @@ def _require_sha256(value: str, field: str) -> None:
         raise ValueError(f"{field} must be a 64-character lowercase SHA-256")
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, init=False)
 class RegistrySnapshot:
-    """One immutable registry artifact: variants and R are derived together."""
+    """A registry snapshot has exactly one authoritative input: its bytes."""
     exact_artifact_bytes: bytes
-    known_schema_variants: Mapping[str, object]
-    registry_snapshot_sha256: str
+
+    def __init__(self, exact_artifact_bytes: bytes) -> None:
+        if not isinstance(exact_artifact_bytes, bytes):
+            raise TypeError("registry artifact must be exact bytes")
+        parsed = json.loads(exact_artifact_bytes)
+        if not isinstance(parsed.get("known_schema_variants"), dict):
+            raise ValueError("registry artifact lacks object known_schema_variants")
+        object.__setattr__(self, "exact_artifact_bytes", exact_artifact_bytes)
 
     @classmethod
     def from_exact_artifact_bytes(cls, artifact_bytes: bytes) -> "RegistrySnapshot":
-        parsed = json.loads(artifact_bytes)
-        variants = parsed.get("known_schema_variants")
-        if not isinstance(variants, dict):
-            raise ValueError("registry artifact lacks object known_schema_variants")
-        return cls(
-            exact_artifact_bytes=artifact_bytes,
-            known_schema_variants=MappingProxyType(dict(variants)),
-            registry_snapshot_sha256=hashlib.sha256(artifact_bytes).hexdigest(),
-        )
+        return cls(artifact_bytes)
+
+    @property
+    def known_schema_variants(self) -> dict[str, object]:
+        return dict(json.loads(self.exact_artifact_bytes)["known_schema_variants"])
+
+    @property
+    def registry_snapshot_sha256(self) -> str:
+        return hashlib.sha256(self.exact_artifact_bytes).hexdigest()
 
 
-@dataclass(frozen=True)
+def _governing_binding_from_authoritative_artifacts(
+    amendment_bytes: bytes, base_contract_bytes: bytes, base_registry_bytes: bytes,
+) -> str:
+    """Derive C only after checking every artifact named by the binding."""
+    amendment = json.loads(amendment_bytes)
+    semantic_hash = _canonical_hash(amendment["semantic_body"])
+    if semantic_hash != amendment["amendment_semantic_content_sha256"]:
+        raise ValueError("amendment semantic content hash mismatch")
+    binding = amendment["effective_combined_contract_binding"]
+    binding_hash = _canonical_hash(binding)
+    if binding_hash != amendment["effective_combined_contract_binding_sha256"]:
+        raise ValueError("effective combined contract binding mismatch")
+    if binding["amendment_semantic_content_sha256"] != semantic_hash:
+        raise ValueError("binding does not name the governing semantics")
+    if hashlib.sha256(base_contract_bytes).hexdigest() != binding["base_contract_sha256"]:
+        raise ValueError("governing base contract bytes do not match binding")
+    if hashlib.sha256(base_registry_bytes).hexdigest() != binding["base_registry_sha256"]:
+        raise ValueError("governing base registry bytes do not match binding")
+    return binding_hash
+
+
+@dataclass(frozen=True, init=False)
 class GoverningRule:
-    effective_combined_contract_binding_sha256: str
+    """C is derived from verified governing-authority artifact bytes."""
+    amendment_bytes: bytes
+    base_contract_bytes: bytes
+    base_registry_bytes: bytes
+
+    def __init__(self, amendment_bytes: bytes, base_contract_bytes: bytes,
+                 base_registry_bytes: bytes) -> None:
+        if not all(isinstance(value, bytes) for value in
+                   (amendment_bytes, base_contract_bytes, base_registry_bytes)):
+            raise TypeError("governing rule requires authoritative artifact bytes")
+        _governing_binding_from_authoritative_artifacts(
+            amendment_bytes, base_contract_bytes, base_registry_bytes,
+        )
+        object.__setattr__(self, "amendment_bytes", amendment_bytes)
+        object.__setattr__(self, "base_contract_bytes", base_contract_bytes)
+        object.__setattr__(self, "base_registry_bytes", base_registry_bytes)
 
     @classmethod
-    def from_amendment_bytes(cls, amendment_bytes: bytes) -> "GoverningRule":
-        amendment = json.loads(amendment_bytes)
-        semantic_hash = _canonical_hash(amendment["semantic_body"])
-        if semantic_hash != amendment["amendment_semantic_content_sha256"]:
-            raise ValueError("amendment semantic content hash mismatch")
-        binding = amendment["effective_combined_contract_binding"]
-        binding_hash = _canonical_hash(binding)
-        if binding_hash != amendment["effective_combined_contract_binding_sha256"]:
-            raise ValueError("effective combined contract binding mismatch")
-        if binding["amendment_semantic_content_sha256"] != semantic_hash:
-            raise ValueError("binding does not name the governing semantics")
-        return cls(binding_hash)
+    def from_authoritative_artifacts(
+        cls, amendment_bytes: bytes, base_contract_bytes: bytes, base_registry_bytes: bytes,
+    ) -> "GoverningRule":
+        return cls(amendment_bytes, base_contract_bytes, base_registry_bytes)
+
+    @property
+    def effective_combined_contract_binding_sha256(self) -> str:
+        return _governing_binding_from_authoritative_artifacts(
+            self.amendment_bytes, self.base_contract_bytes, self.base_registry_bytes,
+        )
 
 
 @dataclass(frozen=True)
@@ -267,7 +308,9 @@ def _r1_snapshot() -> RegistrySnapshot:
 
 
 def _governing_rule() -> GoverningRule:
-    return GoverningRule.from_amendment_bytes(AMENDMENT_PATH.read_bytes())
+    return GoverningRule.from_authoritative_artifacts(
+        AMENDMENT_PATH.read_bytes(), BASE_CONTRACT_PATH.read_bytes(), SCHEMA_REGISTRY_PATH.read_bytes(),
+    )
 
 
 def daily_market_evidence_v1_schema_admission(
@@ -278,18 +321,51 @@ def daily_market_evidence_v1_schema_admission(
     _require_sha256(source_object_sha256, "source_object_sha256")
     if not isinstance(registry_snapshot, RegistrySnapshot) or not isinstance(governing_rule, GoverningRule):
         raise TypeError("evaluation requires exact RegistrySnapshot and GoverningRule objects")
-    if hashlib.sha256(registry_snapshot.exact_artifact_bytes).hexdigest() != registry_snapshot.registry_snapshot_sha256:
-        raise ValueError("registry snapshot identity does not match its exact artifact bytes")
-    disposition = (SCHEMA_INADMISSIBLE if schema_id is None or schema_id not in registry_snapshot.known_schema_variants
+    snapshot = RegistrySnapshot.from_exact_artifact_bytes(registry_snapshot.exact_artifact_bytes)
+    rule = GoverningRule.from_authoritative_artifacts(
+        governing_rule.amendment_bytes, governing_rule.base_contract_bytes,
+        governing_rule.base_registry_bytes,
+    )
+    disposition = (SCHEMA_INADMISSIBLE if schema_id is None or schema_id not in snapshot.known_schema_variants
                    else SCHEMA_ADMISSIBLE)
-    return SchemaAdmissionEvaluation(source_object_sha256, schema_id, registry_snapshot.registry_snapshot_sha256,
-                                     governing_rule.effective_combined_contract_binding_sha256, disposition)
+    return SchemaAdmissionEvaluation(source_object_sha256, schema_id, snapshot.registry_snapshot_sha256,
+                                     rule.effective_combined_contract_binding_sha256, disposition)
+
+
+def verify_schema_admission_evaluation(
+    receipt_bytes: bytes, upstream_source_object_sha256: str, registry_artifact_bytes: bytes,
+    governing_amendment_bytes: bytes, base_contract_bytes: bytes, base_registry_bytes: bytes,
+) -> SchemaAdmissionEvaluation:
+    """Accept durable provenance only when X/R/C/D all recompute from authority."""
+    parsed = SchemaAdmissionEvaluation.from_durable_bytes(receipt_bytes)
+    _require_sha256(upstream_source_object_sha256, "upstream source_object_sha256")
+    if parsed.source_object_sha256 != upstream_source_object_sha256:
+        raise ValueError("receipt source object does not match supplied upstream identity")
+    recomputed = daily_market_evidence_v1_schema_admission(
+        upstream_source_object_sha256, parsed.schema_id,
+        RegistrySnapshot.from_exact_artifact_bytes(registry_artifact_bytes),
+        GoverningRule.from_authoritative_artifacts(
+            governing_amendment_bytes, base_contract_bytes, base_registry_bytes,
+        ),
+    )
+    if parsed != recomputed:
+        raise ValueError("receipt X/R/C/schema/disposition does not verify against authoritative artifacts")
+    return recomputed
 
 
 def _evaluate(schema_id: Optional[str], snapshot: Optional[RegistrySnapshot] = None,
               governing_rule: Optional[GoverningRule] = None) -> SchemaAdmissionEvaluation:
     return daily_market_evidence_v1_schema_admission(_SOURCE_X, schema_id, snapshot or _r1_snapshot(),
                                                       governing_rule or _governing_rule())
+
+
+def _verify(receipt_bytes: bytes, registry_artifact_bytes: Optional[bytes] = None,
+            governing_amendment_bytes: Optional[bytes] = None) -> SchemaAdmissionEvaluation:
+    return verify_schema_admission_evaluation(
+        receipt_bytes, _SOURCE_X, registry_artifact_bytes or SCHEMA_REGISTRY_PATH.read_bytes(),
+        governing_amendment_bytes or AMENDMENT_PATH.read_bytes(),
+        BASE_CONTRACT_PATH.read_bytes(), SCHEMA_REGISTRY_PATH.read_bytes(),
+    )
 
 
 def _r2_snapshot(schema_id: str = "future_variant_not_yet_registered") -> RegistrySnapshot:
@@ -480,15 +556,38 @@ def test_r1_r2_explicit_snapshots_are_distinct_and_ambient_independent():
 
 
 def test_hostile_r1_hash_plus_r2_contents_is_structurally_unavailable():
-    """M2: no evaluator argument exists for a separately claimed R hash."""
+    """M2: R1 bytes/hash cannot be paired with R2 membership."""
     import pytest
     r1, r2 = _r1_snapshot(), _r2_snapshot()
     with pytest.raises(TypeError):
         daily_market_evidence_v1_schema_admission(_SOURCE_X, "future_variant_not_yet_registered", r2, _governing_rule(),
                                                    claimed_registry_hash=r1.registry_snapshot_sha256)
+    with pytest.raises(TypeError):
+        RegistrySnapshot(r1.exact_artifact_bytes, r2.known_schema_variants, r1.registry_snapshot_sha256)
     evaluation = _evaluate("future_variant_not_yet_registered", r2)
     assert evaluation.registry_snapshot_sha256 == hashlib.sha256(r2.exact_artifact_bytes).hexdigest()
     assert evaluation.registry_snapshot_sha256 != r1.registry_snapshot_sha256
+
+
+def test_hostile_r2_hash_plus_r1_contents_is_structurally_unavailable():
+    """M2b: the reverse independent-content construction is also rejected."""
+    import pytest
+    r1, r2 = _r1_snapshot(), _r2_snapshot()
+    with pytest.raises(TypeError):
+        RegistrySnapshot(r2.exact_artifact_bytes, r1.known_schema_variants, r2.registry_snapshot_sha256)
+    assert _evaluate("future_variant_not_yet_registered", r1).disposition == SCHEMA_INADMISSIBLE
+    assert _evaluate("future_variant_not_yet_registered", r2).disposition == SCHEMA_ADMISSIBLE
+
+
+def test_arbitrary_governing_binding_is_not_a_protocol_valid_input():
+    """M5: C can only be derived from verified governing authority bytes."""
+    import pytest
+    with pytest.raises(TypeError):
+        GoverningRule("f" * 64)
+    with pytest.raises(ValueError):
+        GoverningRule.from_authoritative_artifacts(
+            AMENDMENT_PATH.read_bytes(), b"different base contract", SCHEMA_REGISTRY_PATH.read_bytes(),
+        )
 
 
 def test_registry_byte_mutation_cannot_retain_old_identity():
@@ -499,14 +598,15 @@ def test_registry_byte_mutation_cannot_retain_old_identity():
     assert mutated.known_schema_variants == r1.known_schema_variants
 
 
-def test_durable_receipt_replays_x_r_c_and_d_after_object_loss():
-    """M8: canonical receipt bytes, not dataclass persistence, survive replay."""
+def test_durable_receipt_replays_and_verifies_x_r_c_and_d_after_object_loss():
+    """M8: process-state loss is safe only after authority-backed verification."""
     schema_id, r1, r2 = "future_variant_not_yet_registered", _r1_snapshot(), _r2_snapshot()
     receipt_r1 = _evaluate(schema_id, r1).durable_bytes()
     receipt_r2 = _evaluate(schema_id, r2).durable_bytes()
     del r1, r2
-    replay_r1 = SchemaAdmissionEvaluation.from_durable_bytes(receipt_r1)
-    replay_r2 = SchemaAdmissionEvaluation.from_durable_bytes(receipt_r2)
+    replay_r1 = _verify(receipt_r1)
+    r2_bytes = _r2_snapshot().exact_artifact_bytes
+    replay_r2 = _verify(receipt_r2, r2_bytes)
     assert replay_r1.disposition == SCHEMA_INADMISSIBLE
     assert replay_r2.disposition == SCHEMA_ADMISSIBLE
     assert replay_r1.identity != replay_r2.identity
@@ -531,7 +631,9 @@ def test_same_x_r_c_is_deterministic_and_different_c_is_distinct():
     binding["amendment_semantic_content_sha256"] = amended["amendment_semantic_content_sha256"]
     amended["effective_combined_contract_binding"] = binding
     amended["effective_combined_contract_binding_sha256"] = _canonical_hash(binding)
-    c2 = GoverningRule.from_amendment_bytes(_canonical_bytes(amended))
+    c2 = GoverningRule.from_authoritative_artifacts(
+        _canonical_bytes(amended), BASE_CONTRACT_PATH.read_bytes(), SCHEMA_REGISTRY_PATH.read_bytes(),
+    )
     changed_rule = _evaluate("bybit_trade_v1", r1, c2)
     assert changed_rule.disposition == first.disposition
     assert changed_rule.identity != first.identity
@@ -547,6 +649,22 @@ def test_receipt_rejects_noncanonical_or_missing_identity_components():
         SchemaAdmissionEvaluation.from_durable_bytes(_canonical_bytes(value))
     with pytest.raises(ValueError):
         SchemaAdmissionEvaluation.from_durable_bytes(receipt.rstrip())
+
+
+def test_receipt_verifier_rejects_forged_disposition_registry_and_governing_binding():
+    """M11/M12/M13: receipt fields never establish their own correctness."""
+    import pytest
+    receipt = _evaluate("bybit_trade_v1").durable_bytes()
+    value = json.loads(receipt)
+    for field, replacement in (
+        ("disposition", SCHEMA_INADMISSIBLE),
+        ("registry_snapshot_sha256", "0" * 64),
+        ("governing_effective_combined_contract_binding_sha256", "f" * 64),
+    ):
+        forged = dict(value)
+        forged[field] = replacement
+        with pytest.raises(ValueError):
+            _verify(_canonical_bytes(forged))
 
 
 # --- 7. red-team scenario E: unrelated frozen semantics left untouched -----

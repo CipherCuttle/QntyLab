@@ -11,6 +11,8 @@
     "base_contract_sha256": "c199b9481285d80b34183b8a7681f75ef7e60e5aadad6e4e0ece3ef8f33d6c92",
     "base_registry_artifact": "experiments/data/r1_source_schema_registry_v1.json",
     "base_registry_sha256": "02d2a75cdaa3d53a2708d2d20d5bf19f934fc68e6ee1b942404994d80ab94c4d",
+    "information_loss_ledger_artifact": "experiments/data/r1_information_loss_ledger_v1.json",
+    "information_loss_ledger_sha256": "7590ea9dd60b961dfc2fb64c5b099089662d6dead4c1cb3f91d3b87d67c5df02",
     "source_precedence_freeze_artifact": "experiments/data/r1_source_precedence_freeze.json",
     "source_precedence_freeze_sha256": "25b03b648774e49b04110f28637466494d35ace27ab6b210053af9224d29c51f"
   },
@@ -26,7 +28,7 @@
       "status": "NEW_CANDIDATE_SEMANTICS_NOT_CLAIMED_FROZEN",
       "invariant": "STRUCTURAL_REGISTRATION != EVIDENCE_FAMILY_AUTHORIZATION",
       "structural_registration": "STRUCTURAL_LAYOUT_KNOWN means only that a schema_id is present in the exact bound registry snapshot. It does not establish a consumer, field semantics, DailyMarket eligibility, schema admission, record completeness, or materialization validity.",
-      "scope_predicate": "daily_market_scope(schema_id, exact_registry_artifact_bytes, exact_base_contract_artifact_bytes, exact_source_precedence_freeze_artifact_bytes, requested_evidence_family) first verifies the complete load-bearing authority set: this candidate semantic body, the exact registry bytes, the exact normalized-contract bytes, and the exact source-precedence-freeze bytes. It then derives registered membership only from the verified registry bytes. It returns STRUCTURAL_LAYOUT_UNKNOWN when schema_id is absent; otherwise it returns STRUCTURAL_LAYOUT_KNOWN plus AUTHORIZED_FOR_DAILYMARKET only when the exact schema_id has an explicit DailyMarket authorization below. Every absent or non-authorized entry is NOT_AUTHORIZED_FOR_DAILYMARKET. requested_evidence_family must equal DailyMarketEvidenceV1; all other requested families fail closed under this candidate.",
+      "scope_predicate": "daily_market_scope(schema_id, exact_registry_artifact_bytes, exact_base_contract_artifact_bytes, exact_source_precedence_freeze_artifact_bytes, exact_information_loss_ledger_artifact_bytes, requested_evidence_family) first verifies the complete load-bearing authority set: this candidate semantic body, the exact registry bytes, the exact normalized-contract bytes, the exact source-precedence-freeze bytes, and the exact information-loss-ledger bytes. The ledger is load-bearing because the exact bound registry selects it for the raw-field-to-DailyMarketEvidenceV1 normalization mapping. It then derives registered membership only from the verified registry bytes. It returns STRUCTURAL_LAYOUT_UNKNOWN when schema_id is absent; otherwise it returns STRUCTURAL_LAYOUT_KNOWN plus AUTHORIZED_FOR_DAILYMARKET only when the exact schema_id has an explicit DailyMarket authorization below. Every absent or non-authorized entry is NOT_AUTHORIZED_FOR_DAILYMARKET. requested_evidence_family must equal DailyMarketEvidenceV1; all other requested families fail closed under this candidate.",
       "recognition_language_boundary": "This candidate does not define raw-header recognition. The frozen registry uses field_set and the DailyMarket contract says observed column set; therefore adopting ordered-header identity, duplicate/empty-name dispositions, normalization, malformed-header handling, or match ambiguity here could override frozen behavior. Those are expressly deferred to a separate recognition-language amendment.",
       "authorization_is_not_admission": "This candidate supplies only the scope prerequisite. AUTHORIZED_FOR_DAILYMARKET is necessary but not sufficient for future schema admission, and schema admission remains necessary but not sufficient for complete DailyMarketEvidenceV1 validity or materialization."
     },
@@ -35,7 +37,7 @@
         "structural_state": "STRUCTURAL_LAYOUT_KNOWN",
         "source_family": "BYBIT_HISTORICAL_PUBLIC_TRADE_ARCHIVE",
         "daily_market_authorization": "AUTHORIZED_FOR_DAILYMARKET",
-        "authorization_basis": "r1_source_precedence_freeze.json:market_trades identifies the Bybit public historical trade archive with a retained object receipt as primary; the frozen normalized contract derives DailyMarketEvidenceV1 from this trade layout."
+        "authorization_basis": "r1_source_precedence_freeze.json:market_trades identifies the Bybit public historical trade archive with a retained object receipt as primary; r1_source_schema_registry_v1.json selects r1_information_loss_ledger_v1.json:trade_stream_fields for this exact layout's raw-field-to-DailyMarketEvidenceV1 mapping; the frozen normalized contract defines the resulting DailyMarketEvidenceV1 requirements."
       },
       "bybit_trade_v1_rpi": {
         "structural_state": "STRUCTURAL_LAYOUT_KNOWN",
@@ -72,15 +74,17 @@
     ],
     "outcome_embargo_verified": "No acquisition, population/PIT/strategy execution, outcome inspection, or outcome-shaped computation was performed."
   },
-  "amendment_semantic_content_sha256": "fe0dd73636d1564d4b1d6bf905cb0266b27364aa88d8f2ea56073b3ffd8992cd",
+  "amendment_semantic_content_sha256": "f1645ce186c73232bb5e4945f734f2ea1c94db856255da0332272bedacd87571",
   "effective_combined_contract_binding": {
-    "amendment_semantic_content_sha256": "fe0dd73636d1564d4b1d6bf905cb0266b27364aa88d8f2ea56073b3ffd8992cd",
+    "amendment_semantic_content_sha256": "f1645ce186c73232bb5e4945f734f2ea1c94db856255da0332272bedacd87571",
     "base_contract_artifact": "experiments/data/r1_normalized_evidence_contract_v1.json",
     "base_contract_sha256": "c199b9481285d80b34183b8a7681f75ef7e60e5aadad6e4e0ece3ef8f33d6c92",
     "base_registry_artifact": "experiments/data/r1_source_schema_registry_v1.json",
     "base_registry_sha256": "02d2a75cdaa3d53a2708d2d20d5bf19f934fc68e6ee1b942404994d80ab94c4d",
+    "information_loss_ledger_artifact": "experiments/data/r1_information_loss_ledger_v1.json",
+    "information_loss_ledger_sha256": "7590ea9dd60b961dfc2fb64c5b099089662d6dead4c1cb3f91d3b87d67c5df02",
     "source_precedence_freeze_artifact": "experiments/data/r1_source_precedence_freeze.json",
     "source_precedence_freeze_sha256": "25b03b648774e49b04110f28637466494d35ace27ab6b210053af9224d29c51f"
   },
-  "effective_combined_contract_binding_sha256": "fd31e23ebefba1914285d6961145d65c9a187775dff92f6dfa90aa59c26771fb"
+  "effective_combined_contract_binding_sha256": "3291c33ff0d4d33a1b9f43938c832bc6d0ba32e0c45b3628a80dc55e1c155ac0"
 }

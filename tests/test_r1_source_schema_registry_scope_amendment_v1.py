@@ -18,6 +18,7 @@ CANDIDATE_PATH = REPO_ROOT / "experiments/data/r1_source_schema_registry_scope_a
 REGISTRY_PATH = REPO_ROOT / "experiments/data/r1_source_schema_registry_v1.json"
 CONTRACT_PATH = REPO_ROOT / "experiments/data/r1_normalized_evidence_contract_v1.json"
 SOURCE_PRECEDENCE_FREEZE_PATH = REPO_ROOT / "experiments/data/r1_source_precedence_freeze.json"
+INFORMATION_LOSS_LEDGER_PATH = REPO_ROOT / "experiments/data/r1_information_loss_ledger_v1.json"
 
 STRUCTURAL_LAYOUT_UNKNOWN = "STRUCTURAL_LAYOUT_UNKNOWN"
 STRUCTURAL_LAYOUT_KNOWN = "STRUCTURAL_LAYOUT_KNOWN"
@@ -65,6 +66,7 @@ def _evaluate_r1(schema_id, exact_registry_bytes, candidate, requested_evidence_
             "base_registry": exact_registry_bytes,
             "base_contract": CONTRACT_PATH.read_bytes(),
             "source_precedence_freeze": SOURCE_PRECEDENCE_FREEZE_PATH.read_bytes(),
+            "information_loss_ledger": INFORMATION_LOSS_LEDGER_PATH.read_bytes(),
         }
     _verify_r1_authority(candidate, authority_bytes)
     return _scope(schema_id, exact_registry_bytes, candidate, requested_evidence_family)
@@ -76,6 +78,7 @@ def _verify_r1_authority(candidate, authority_bytes):
     required = {
         "base_registry": bound["base_registry_sha256"],
         "base_contract": bound["base_contract_sha256"],
+        "information_loss_ledger": bound["information_loss_ledger_sha256"],
         "source_precedence_freeze": bound["source_precedence_freeze_sha256"],
     }
     for authority, expected_sha256 in required.items():
@@ -92,6 +95,8 @@ def _verify_r1_authority(candidate, authority_bytes):
         "base_contract_sha256": bound["base_contract_sha256"],
         "base_registry_artifact": bound["base_registry_artifact"],
         "base_registry_sha256": bound["base_registry_sha256"],
+        "information_loss_ledger_artifact": bound["information_loss_ledger_artifact"],
+        "information_loss_ledger_sha256": bound["information_loss_ledger_sha256"],
         "source_precedence_freeze_artifact": bound["source_precedence_freeze_artifact"],
         "source_precedence_freeze_sha256": bound["source_precedence_freeze_sha256"],
     }:
@@ -125,6 +130,7 @@ def test_candidate_binds_the_actual_unchanged_r1_authority_bytes():
     bound = candidate["bound_authority"]
     assert hashlib.sha256(REGISTRY_PATH.read_bytes()).hexdigest() == bound["base_registry_sha256"]
     assert hashlib.sha256(CONTRACT_PATH.read_bytes()).hexdigest() == bound["base_contract_sha256"]
+    assert hashlib.sha256(INFORMATION_LOSS_LEDGER_PATH.read_bytes()).hexdigest() == bound["information_loss_ledger_sha256"]
     assert hashlib.sha256(SOURCE_PRECEDENCE_FREEZE_PATH.read_bytes()).hexdigest() == bound["source_precedence_freeze_sha256"]
     assert candidate["semantic_body"]["amends"]["base_registry_bytes_unchanged"] is True
     assert candidate["semantic_body"]["amends"]["base_contract_bytes_unchanged"] is True
@@ -195,6 +201,7 @@ def test_candidate_defers_recognition_language_instead_of_overriding_field_set_a
 
 @pytest.mark.parametrize("authority", [
     "base_registry", "base_contract", "source_precedence_freeze",
+    "information_loss_ledger",
 ])
 def test_substitution_of_each_load_bearing_external_authority_fails_closed(authority):
     candidate = _candidate()
@@ -202,6 +209,7 @@ def test_substitution_of_each_load_bearing_external_authority_fails_closed(autho
         "base_registry": _r1_registry_bytes(),
         "base_contract": CONTRACT_PATH.read_bytes(),
         "source_precedence_freeze": SOURCE_PRECEDENCE_FREEZE_PATH.read_bytes(),
+        "information_loss_ledger": INFORMATION_LOSS_LEDGER_PATH.read_bytes(),
     }
     authority_bytes[authority] += b"substitution"
     with pytest.raises(ValueError, match=rf"exact bound {authority} authority"):
@@ -220,3 +228,51 @@ def test_effective_binding_cannot_omit_source_precedence_authority():
     candidate["effective_combined_contract_binding"].pop("source_precedence_freeze_sha256")
     with pytest.raises(ValueError, match="exact complete authority binding"):
         _evaluate_r1("bybit_trade_v1", _r1_registry_bytes(), candidate)
+
+
+def test_substitution_of_valid_alternate_ledger_fails_closed():
+    candidate = _candidate()
+    authority_bytes = {
+        "base_registry": _r1_registry_bytes(),
+        "base_contract": CONTRACT_PATH.read_bytes(),
+        "source_precedence_freeze": SOURCE_PRECEDENCE_FREEZE_PATH.read_bytes(),
+        "information_loss_ledger": _canonical_bytes({
+            **json.loads(INFORMATION_LOSS_LEDGER_PATH.read_bytes()),
+            "trade_stream_fields": [],
+        }),
+    }
+    with pytest.raises(ValueError, match="exact bound information_loss_ledger authority"):
+        _evaluate_r1("bybit_trade_v1", _r1_registry_bytes(), candidate, authority_bytes=authority_bytes)
+
+
+def test_effective_binding_cannot_omit_information_loss_ledger_authority():
+    candidate = _candidate()
+    candidate["effective_combined_contract_binding"].pop("information_loss_ledger_sha256")
+    with pytest.raises(ValueError, match="exact complete authority binding"):
+        _evaluate_r1("bybit_trade_v1", _r1_registry_bytes(), candidate)
+
+
+def test_changed_base_trade_mapping_cannot_retain_governing_identity():
+    candidate = _candidate()
+    changed_ledger = json.loads(INFORMATION_LOSS_LEDGER_PATH.read_bytes())
+    changed_ledger["trade_stream_fields"][0]["target"] = "not DailyMarketEvidenceV1"
+    assert _canonical_hash(changed_ledger) != candidate["bound_authority"]["information_loss_ledger_sha256"]
+    authority_bytes = {
+        "base_registry": _r1_registry_bytes(),
+        "base_contract": CONTRACT_PATH.read_bytes(),
+        "source_precedence_freeze": SOURCE_PRECEDENCE_FREEZE_PATH.read_bytes(),
+        "information_loss_ledger": _canonical_bytes(changed_ledger),
+    }
+    with pytest.raises(ValueError, match="exact bound information_loss_ledger authority"):
+        _evaluate_r1("bybit_trade_v1", _r1_registry_bytes(), candidate, authority_bytes=authority_bytes)
+
+
+def test_unchanged_complete_authority_set_is_deterministic():
+    candidate = _candidate()
+    authority_bytes = {
+        "base_registry": _r1_registry_bytes(),
+        "base_contract": CONTRACT_PATH.read_bytes(),
+        "source_precedence_freeze": SOURCE_PRECEDENCE_FREEZE_PATH.read_bytes(),
+        "information_loss_ledger": INFORMATION_LOSS_LEDGER_PATH.read_bytes(),
+    }
+    assert _evaluate_r1("bybit_trade_v1", _r1_registry_bytes(), candidate, authority_bytes=authority_bytes) == _evaluate_r1("bybit_trade_v1", _r1_registry_bytes(), candidate, authority_bytes=authority_bytes)

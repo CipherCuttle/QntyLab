@@ -147,12 +147,55 @@ def admit(raw_bytes, registry_bytes=None, recognition_bytes=None):
     return Admission(source_object_sha256, result.disposition, result.schema_id, ADMISSIBLE)
 
 
-def test_candidate_is_unfrozen_and_binds_exact_frozen_authorities():
+def test_candidate_is_frozen_and_binds_exact_frozen_authorities():
     candidate = _verify_candidate_authorities()
-    assert candidate["status"] == "CANDIDATE_NOT_YET_FROZEN"
+    assert candidate["status"] == "FROZEN"
     assert candidate["self_freeze_authorized"] is False
     assert candidate["artifact_kind"] == "PROTOCOL_AMENDMENT_CANDIDATE"
     assert candidate["bound_authority"]["base_registry_sha256"] == _hash(REGISTRY.read_bytes())
+
+
+def test_freeze_is_governance_only_and_binds_the_reviewed_commit():
+    """Mirrors test_freeze_is_governance_only_and_binds_the_reviewed_commit in
+    tests/test_r1_source_structure_recognition_amendment_v1.py: the freeze commit
+    must change only status/freeze_provenance, and freeze_provenance must bind the
+    exact reviewed commit and review receipt, never imply self-freeze."""
+    import subprocess
+
+    reviewed_sha = "9df8a724e526559f742b5f9e3a95f99017c8d3ec"
+    candidate = _candidate()
+    review = json.loads(
+        (DATA / "r1_daily_market_evidence_schema_admission_amendment_review_v1.json").read_bytes()
+    )
+    original = json.loads(subprocess.check_output(
+        ["git", "show", f"{reviewed_sha}:experiments/data/r1_daily_market_evidence_schema_admission_amendment_v1.json"],
+        cwd=ROOT,
+        text=True,
+    ))
+    frozen_semantics = dict(candidate)
+    original_semantics = dict(original)
+    for payload in (frozen_semantics, original_semantics):
+        payload.pop("status", None)
+        payload.pop("freeze_provenance", None)
+    assert frozen_semantics == original_semantics
+
+    assert candidate["freeze_provenance"] == {
+        "candidate_commit_reviewed_sha": reviewed_sha,
+        "frozen_amendment_semantic_content_sha256": candidate["amendment_semantic_content_sha256"],
+        "frozen_effective_combined_contract_binding_sha256": candidate["effective_combined_contract_binding_sha256"],
+        "operator_authorization": "explicit operator authorization supplied for this governance-only freeze of the exact independently hostile-reviewed candidate; no semantic changes authorized",
+        "review_receipt": "r1_daily_market_evidence_schema_admission_amendment_review_v1.json",
+        "review_receipt_payload_sha256": review["review_payload_sha256"],
+        "review_receipt_repository_native_at_review_time": False,
+    }
+    review_payload = dict(review)
+    review_payload.pop("review_payload_sha256")
+    assert review["review_payload_sha256"] == _semantic_hash(review_payload)
+    assert review["reviewed_candidate_sha"] == candidate["freeze_provenance"]["candidate_commit_reviewed_sha"]
+    assert review["reviewed_candidate_semantic_content_sha256"] == candidate["amendment_semantic_content_sha256"]
+    assert review["reviewed_effective_combined_contract_binding_sha256"] == candidate["effective_combined_contract_binding_sha256"]
+    assert review["verdict"] == "PASS_SAFE_TO_FREEZE"
+    assert candidate["self_freeze_authorized"] is False
 
 
 def test_authority_hashes_and_scope_matrix_match_disk():

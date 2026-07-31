@@ -194,8 +194,17 @@
       "gap": "unregistered schema / UNKNOWN_SCHEMA does not normatively entail invalid or inadmissible DailyMarketEvidenceV1"
     }
   },
-  "status": "CANDIDATE_NOT_YET_FROZEN",
+  "status": "FROZEN",
   "tests": [
     "tests/test_r1_daily_market_evidence_schema_admission_amendment_v1.py"
-  ]
+  ],
+  "freeze_provenance": {
+    "candidate_commit_reviewed_sha": "9df8a724e526559f742b5f9e3a95f99017c8d3ec",
+    "frozen_amendment_semantic_content_sha256": "99e8f4e6c9a741f33f1a9bd9528eb3c00a2775ee84557f724663c3154b2df445",
+    "frozen_effective_combined_contract_binding_sha256": "a3786f875057484b5dcea1f85194ffc17237d7bc21ce7335a639d4ab64612067",
+    "operator_authorization": "explicit operator authorization supplied for this governance-only freeze of the exact independently hostile-reviewed candidate; no semantic changes authorized",
+    "review_receipt": "r1_daily_market_evidence_schema_admission_amendment_review_v1.json",
+    "review_receipt_payload_sha256": "ecf3ed01f48fab2143ec14e938584cdaa7ecf8dc67d5e2ba9ff8b29a555e8b2c",
+    "review_receipt_repository_native_at_review_time": false
+  }
 }

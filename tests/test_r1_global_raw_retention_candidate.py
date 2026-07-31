@@ -1,6 +1,7 @@
 import copy
 import json
 from pathlib import Path
+import subprocess
 
 import pytest
 
@@ -87,7 +88,7 @@ def test_existing_source_dispositions_are_total_and_non_lifecycle():
 def test_additive_candidate_receipt_binds_the_generated_spec_without_claiming_corpus_bytes():
     receipt = json.loads((ROOT / "experiments/data/r1_global_raw_retention_scope_candidate_v1.json").read_text())
     candidate = build_candidate(frozen_acquisition(), parent_head=PARENT)
-    assert receipt["status"] == STATUS
+    assert receipt["status"] == "FROZEN"
     assert receipt["candidate_specification_sha256"] == canonical_hash(candidate)
     assert receipt["stream_binding"] == {
         "identity": "(venue, symbol, contract_type)",
@@ -101,3 +102,38 @@ def test_additive_candidate_receipt_binds_the_generated_spec_without_claiming_co
     assert receipt["acquisition_performed"] is False
     assert receipt["acquired_raw_corpus_sha256"] is None
     assert receipt["self_freeze_authorized"] is False
+
+
+def test_freeze_is_governance_only_and_binds_the_retrospective_external_review():
+    receipt = json.loads((ROOT / "experiments/data/r1_global_raw_retention_scope_candidate_v1.json").read_text())
+    review = json.loads((ROOT / "experiments/data/r1_global_raw_retention_scope_review_v1.json").read_text())
+    original = json.loads(subprocess.check_output(
+        ["git", "show", "c023713180e3afcf8e2e668539208db923ab67b7:experiments/data/r1_global_raw_retention_scope_candidate_v1.json"],
+        cwd=ROOT,
+        text=True,
+    ))
+    frozen_semantics = dict(receipt)
+    original_semantics = dict(original)
+    for payload in (frozen_semantics, original_semantics):
+        payload.pop("status", None)
+        payload.pop("freeze_provenance", None)
+    assert frozen_semantics == original_semantics
+    assert receipt["freeze_provenance"] == {
+        "candidate_commit_reviewed_sha": "c023713180e3afcf8e2e668539208db923ab67b7",
+        "frozen_candidate_specification_sha256": receipt["candidate_specification_sha256"],
+        "frozen_source_acquisition_semantics_sha256": receipt["authoritative_artifacts"]["frozen_source_acquisition_semantics_sha256"],
+        "operator_authorization": "explicit operator authorization supplied for this governance-only freeze of the exact externally reviewed candidate; no semantic changes authorized",
+        "review_receipt": "r1_global_raw_retention_scope_review_v1.json",
+        "review_receipt_payload_sha256": review["review_payload_sha256"],
+        "review_receipt_repository_native_at_review_time": False,
+    }
+    review_payload = dict(review)
+    review_payload.pop("review_payload_sha256")
+    assert review["review_payload_sha256"] == canonical_hash(review_payload)
+    assert review["reviewed_candidate_sha"] == receipt["freeze_provenance"]["candidate_commit_reviewed_sha"]
+    assert review["review_type"] == "hostile/read-only"
+    assert review["changeset"] == "NONE"
+    assert review["verdict"] == "PASS_SAFE_TO_FREEZE"
+    assert review["origin"] == "external session transcript supplied by operator"
+    assert review["repository_native_at_review_time"] is False
+    assert review["persisted_retrospectively"] is True

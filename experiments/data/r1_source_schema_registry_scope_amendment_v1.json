@@ -1,0 +1,84 @@
+{
+  "artifact": "r1_source_schema_registry_scope_amendment_v1",
+  "artifact_kind": "PROTOCOL_AMENDMENT_CANDIDATE",
+  "status": "CANDIDATE_NOT_YET_FROZEN",
+  "self_freeze_authorized": false,
+  "outcome_embargo": true,
+  "raw_deletion_authorized": false,
+  "parent_head": "396def5002bf2553069107c7f06ccc15cb0fe9ba",
+  "bound_authority": {
+    "base_contract_artifact": "experiments/data/r1_normalized_evidence_contract_v1.json",
+    "base_contract_sha256": "c199b9481285d80b34183b8a7681f75ef7e60e5aadad6e4e0ece3ef8f33d6c92",
+    "base_registry_artifact": "experiments/data/r1_source_schema_registry_v1.json",
+    "base_registry_sha256": "02d2a75cdaa3d53a2708d2d20d5bf19f934fc68e6ee1b942404994d80ab94c4d",
+    "source_precedence_freeze_artifact": "experiments/data/r1_source_precedence_freeze.json",
+    "source_precedence_freeze_sha256": "25b03b648774e49b04110f28637466494d35ace27ab6b210053af9224d29c51f"
+  },
+  "semantic_body": {
+    "amends": {
+      "amendment_relationship": "ADDITIVE_CLARIFICATION_NOT_IN_PLACE_REWRITE",
+      "base_contract_bytes_unchanged": true,
+      "base_registry_bytes_unchanged": true,
+      "target_registry_artifact": "experiments/data/r1_source_schema_registry_v1.json",
+      "target_registry_sha256_at_amendment_time": "02d2a75cdaa3d53a2708d2d20d5bf19f934fc68e6ee1b942404994d80ab94c4d"
+    },
+    "new_candidate_semantics": {
+      "status": "NEW_CANDIDATE_SEMANTICS_NOT_CLAIMED_FROZEN",
+      "invariant": "STRUCTURAL_REGISTRATION != EVIDENCE_FAMILY_AUTHORIZATION",
+      "structural_registration": "STRUCTURAL_LAYOUT_KNOWN means only that a schema_id is present in the exact bound registry snapshot. It does not establish a consumer, field semantics, DailyMarket eligibility, schema admission, record completeness, or materialization validity.",
+      "scope_predicate": "daily_market_scope(schema_id, exact_registry_artifact_bytes, requested_evidence_family) first verifies sha256(exact_registry_artifact_bytes) against the bound registry snapshot, then derives registered membership only from those bytes. It returns STRUCTURAL_LAYOUT_UNKNOWN when schema_id is absent; otherwise it returns STRUCTURAL_LAYOUT_KNOWN plus AUTHORIZED_FOR_DAILYMARKET only when the exact schema_id has an explicit DailyMarket authorization below. Every absent or non-authorized entry is NOT_AUTHORIZED_FOR_DAILYMARKET. requested_evidence_family must equal DailyMarketEvidenceV1; all other requested families fail closed under this candidate.",
+      "recognition_language_boundary": "This candidate does not define raw-header recognition. The frozen registry uses field_set and the DailyMarket contract says observed column set; therefore adopting ordered-header identity, duplicate/empty-name dispositions, normalization, malformed-header handling, or match ambiguity here could override frozen behavior. Those are expressly deferred to a separate recognition-language amendment.",
+      "authorization_is_not_admission": "This candidate supplies only the scope prerequisite. AUTHORIZED_FOR_DAILYMARKET is necessary but not sufficient for future schema admission, and schema admission remains necessary but not sufficient for complete DailyMarketEvidenceV1 validity or materialization."
+    },
+    "structural_authorization_matrix": {
+      "bybit_trade_v1": {
+        "structural_state": "STRUCTURAL_LAYOUT_KNOWN",
+        "source_family": "BYBIT_HISTORICAL_PUBLIC_TRADE_ARCHIVE",
+        "daily_market_authorization": "AUTHORIZED_FOR_DAILYMARKET",
+        "authorization_basis": "r1_source_precedence_freeze.json:market_trades identifies the Bybit public historical trade archive with a retained object receipt as primary; the frozen normalized contract derives DailyMarketEvidenceV1 from this trade layout."
+      },
+      "bybit_trade_v1_rpi": {
+        "structural_state": "STRUCTURAL_LAYOUT_KNOWN",
+        "source_family": "BYBIT_HISTORICAL_PUBLIC_TRADE_ARCHIVE",
+        "daily_market_authorization": "NOT_AUTHORIZED_FOR_DAILYMARKET",
+        "authorization_basis": "RPI semantic meaning and authorization evidence remain unresolved. Initial DOLOUSDT observation and later independent 1000000CHEEMSUSDT observation establish layout occurrence only; neither observation authorizes RPI for DailyMarket."
+      },
+      "tardis_derivative_ticker_v1": {
+        "structural_state": "STRUCTURAL_LAYOUT_KNOWN",
+        "source_family": "TARDIS_DERIVATIVE_TICKER",
+        "daily_market_authorization": "NOT_AUTHORIZED_FOR_DAILYMARKET",
+        "authorization_basis": "The frozen source precedence identifies ticker funding values as diagnostic/corroborative and non-canonical for realized settlement; this is not a DailyMarket trade layout."
+      },
+      "bybit_instruments_info_current_v1": {
+        "structural_state": "STRUCTURAL_LAYOUT_KNOWN",
+        "source_family": "BYBIT_CURRENT_INSTRUMENTS_INFO",
+        "daily_market_authorization": "NOT_AUTHORIZED_FOR_DAILYMARKET",
+        "authorization_basis": "Current metadata is CURRENT_STATE_ONLY and never a historical DailyMarket trade record."
+      }
+    },
+    "versioning_and_replay": {
+      "exact_snapshot_identity": "R1 scope evaluation is bound to sha256 of exact registry bytes, not parsed JSON or semantic equivalence.",
+      "no_silent_reinterpretation": "A later layout, correction, authorization change, family-scope change, or recognition-policy change requires an explicit successor authority and a new evaluation. It cannot mutate or reinterpret an R1 evaluation in place.",
+      "default_deny_for_future_layouts": "A layout added to a future structural registry snapshot has no DailyMarket authorization unless that successor authority explicitly supplies it."
+    },
+    "dependency_edge": "structural recognition -> evidence-family authorization -> schema admission -> record validity/materialization. The existing r1_daily_market_evidence_schema_admission_amendment_v1 candidate is blocked from treating registry membership as sufficient until this candidate is independently reviewed and frozen; it is not modified here.",
+    "explicitly_not_addressed": [
+      "raw-header recognition language",
+      "Parser A, Parser B, or materializer behavior",
+      "DailyMarketEvidenceV1 fields or completeness rules",
+      "schema admission implementation or amendment repair",
+      "RPI semantic authorization",
+      "raw retention, lifecycle, PIT, acquisition, population, strategy, or outcomes"
+    ],
+    "outcome_embargo_verified": "No acquisition, population/PIT/strategy execution, outcome inspection, or outcome-shaped computation was performed."
+  },
+  "amendment_semantic_content_sha256": "de50c0de86c4a9f3465bcb6f840b4052e65a8aa2a1ad7ddf77322d4f2d773845",
+  "effective_combined_contract_binding": {
+    "amendment_semantic_content_sha256": "de50c0de86c4a9f3465bcb6f840b4052e65a8aa2a1ad7ddf77322d4f2d773845",
+    "base_contract_artifact": "experiments/data/r1_normalized_evidence_contract_v1.json",
+    "base_contract_sha256": "c199b9481285d80b34183b8a7681f75ef7e60e5aadad6e4e0ece3ef8f33d6c92",
+    "base_registry_artifact": "experiments/data/r1_source_schema_registry_v1.json",
+    "base_registry_sha256": "02d2a75cdaa3d53a2708d2d20d5bf19f934fc68e6ee1b942404994d80ab94c4d"
+  },
+  "effective_combined_contract_binding_sha256": "7d7136812febbf48f5ce71bc5545412b29caa89b2fcf78b3b695bab7361996b3"
+}

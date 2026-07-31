@@ -1,0 +1,115 @@
+{
+  "amendment_semantic_content_sha256": "f505d3bccf0efbacd4ce8c2e09d392f2e2cdebcec1f608673359e617e760f211",
+  "artifact": "r1_daily_market_evidence_schema_admission_amendment_v1",
+  "artifact_kind": "PROTOCOL_AMENDMENT_CANDIDATE",
+  "audit_origin": {
+    "note": "Independent read-only audit at parent_head established that the frozen protocol entails unregistered-schema -> UNKNOWN_SCHEMA -> SCHEMA_MISMATCH -> fail-closed raw retention, but does NOT normatively entail unregistered-schema -> invalid/inadmissible DailyMarketEvidenceV1. This amendment closes exactly that gap and no other.",
+    "verdict_addressed": "H1_PROTOCOL_UNDERSPECIFICATION"
+  },
+  "bound_authority": {
+    "base_contract_artifact": "experiments/data/r1_normalized_evidence_contract_v1.json",
+    "base_contract_sha256": "c199b9481285d80b34183b8a7681f75ef7e60e5aadad6e4e0ece3ef8f33d6c92",
+    "base_registry_artifact": "experiments/data/r1_source_schema_registry_v1.json",
+    "base_registry_sha256": "02d2a75cdaa3d53a2708d2d20d5bf19f934fc68e6ee1b942404994d80ab94c4d",
+    "duplicate_semantics_amendment_artifact": "experiments/data/r1_normalized_evidence_duplicate_semantics_amendment_v1.json",
+    "duplicate_semantics_amendment_sha256": "6e6657cd88f1a8d47d44cbb85a7c78a9863877726dd2fc9c19bcff2ccdb6ac16",
+    "source_precedence_freeze_artifact": "experiments/data/r1_source_precedence_freeze.json",
+    "source_precedence_freeze_sha256": "25b03b648774e49b04110f28637466494d35ace27ab6b210053af9224d29c51f"
+  },
+  "effective_combined_contract_binding": {
+    "amendment_semantic_content_sha256": "f505d3bccf0efbacd4ce8c2e09d392f2e2cdebcec1f608673359e617e760f211",
+    "base_contract_artifact": "experiments/data/r1_normalized_evidence_contract_v1.json",
+    "base_contract_sha256": "c199b9481285d80b34183b8a7681f75ef7e60e5aadad6e4e0ece3ef8f33d6c92",
+    "base_registry_artifact": "experiments/data/r1_source_schema_registry_v1.json",
+    "base_registry_sha256": "02d2a75cdaa3d53a2708d2d20d5bf19f934fc68e6ee1b942404994d80ab94c4d"
+  },
+  "effective_combined_contract_binding_sha256": "800de3826273770a39cefd58a050b6bdb2cb847c94e54c2be8633ba943e54bf3",
+  "next_step": "Parser B / materializer remediation (enforcing schema_admission_rule in validate_daily_market_evidence_v1 or an equivalent boundary check) against the now-candidate effective protocol is a required subsequent implementation task, per semantic_body.parser_status.parser_b_current.disposition. This candidate must itself be reviewed and frozen (self_freeze_authorized: false; no self-freeze performed here) before that remediation task treats it as authoritative.",
+  "outcome_embargo": true,
+  "parent_head": "6469ce9f59ed6d326cda7578d76a67ca8d26c795",
+  "raw_deletion_authorized": false,
+  "self_freeze_authorized": false,
+  "semantic_body": {
+    "amends": {
+      "also_informed_by_unchanged": {
+        "r1_normalized_evidence_duplicate_semantics_amendment_v1.json_sha256": "6e6657cd88f1a8d47d44cbb85a7c78a9863877726dd2fc9c19bcff2ccdb6ac16",
+        "r1_source_precedence_freeze.json_sha256": "25b03b648774e49b04110f28637466494d35ace27ab6b210053af9224d29c51f"
+      },
+      "amendment_relationship": "ADDITIVE_CLARIFICATION_NOT_IN_PLACE_REWRITE",
+      "how_to_read": "effective_contract = original r1_normalized_evidence_contract_v1.json (unmodified) PLUS original r1_source_schema_registry_v1.json (unmodified) PLUS this amendment. Neither original artifact's bytes are edited by this amendment; both remain the historical record of what was (under-)specified before this amendment. This artifact does not retroactively imply the resolved rule existed at freeze time.",
+      "original_contract_bytes_unchanged_by_this_amendment": true,
+      "original_schema_registry_bytes_unchanged_by_this_amendment": true,
+      "target_artifact": "experiments/data/r1_normalized_evidence_contract_v1.json",
+      "target_artifact_sha256_at_amendment_time": "c199b9481285d80b34183b8a7681f75ef7e60e5aadad6e4e0ece3ef8f33d6c92",
+      "target_fields_amended": [
+        "DailyMarketEvidenceV1 (record-level: adds a new normative admission rule; does not alter any individual field's existing type, missingness, or precision spec)"
+      ],
+      "target_registry_artifact": "experiments/data/r1_source_schema_registry_v1.json",
+      "target_registry_sha256_at_amendment_time": "02d2a75cdaa3d53a2708d2d20d5bf19f934fc68e6ee1b942404994d80ab94c4d"
+    },
+    "countermodel_proof": {
+      "impossible_state": {
+        "reproduced_prior_countermodel": "The auditor's exact countermodel (schema_id=UNKNOWN_SCHEMA, SCHEMA_MISMATCH present, raw retained, record otherwise complete, status=MATERIALIZED_VALID, is_valid=true) is now a direct violation of schema_admission_rule.rule under this amendment: condition (b) fails (schema_id is not a known_schema_variants key), so the record is SCHEMA_INADMISSIBLE by definition, contradicting is_valid=true. The countermodel remains constructible in the CURRENT, unmodified Parser B implementation (see underspecification_recorded.empirical_corroboration_not_itself_the_gap) -- that implementation gap is exactly why parser_status.parser_b_current below records NONCONFORMING; remediating it is the required subsequent implementation task, not part of this amendment.",
+        "statement": "Under this amendment, the state {schema_id NOT IN known_schema_variants (or schema_id is None/UNKNOWN_SCHEMA)} AND {record is SCHEMA_ADMISSIBLE (or otherwise treated as a valid, admitted DailyMarketEvidenceV1 record)} is a direct contradiction of schema_admission_rule.rule condition (b), which is a conjunctive necessary condition for admission. No combination of field-completeness, raw retention, or any other pre-existing contract condition can satisfy admission when (b) fails, because schema_admission_rule.rule requires (a) AND (b), not (a) OR (b)."
+      },
+      "registered_schema_does_not_imply_valid": {
+        "statement": "Under this amendment, {schema_id IN known_schema_variants} does NOT by itself imply {record is a valid/admitted DailyMarketEvidenceV1 record}. Condition (a) -- every other pre-existing, already-frozen requirement -- still applies in full and independently; a record can satisfy (b) and still fail (a) (e.g. a registered-schema record missing a required non-null field when trade_count>0 remains inadmissible under that pre-existing rule, unaffected by this amendment)."
+      }
+    },
+    "explicitly_not_addressed_by_this_amendment": [
+      "container/encoding corruption (gzip, UTF-8, CSV-tokenization) dispositions",
+      "malformed-row / PARSE_REJECTION dispositions unrelated to schema identity",
+      "duplicate semantics (governed entirely by r1_normalized_evidence_duplicate_semantics_amendment_v1.json, unmodified)",
+      "timestamp canonicalization",
+      "funding settlement semantics",
+      "market gap classification",
+      "lifecycle/identity ambiguity",
+      "which known_schema_variants entries exist or should exist (registry membership itself is untouched -- see amends.original_schema_registry_bytes_unchanged_by_this_amendment)",
+      "the exact code location/mechanism used to enforce schema_admission_rule (a required subsequent implementation task; see parser_status)",
+      "any R1 hypothesis, factor, weight, return, PnL, IC, or Sharpe computation"
+    ],
+    "outcome_embargo_verified": "no H012/H014, PIT rank, weight, forward return, PnL, IC, Sharpe, or weekly/null/replication outcome was computed, inspected, or referenced in producing this amendment",
+    "parser_status": {
+      "parser_a_current": {
+        "conformance": "CONFORMS",
+        "current_sha256": "76bfd763afbce1167ff931b912c7bb12e6c90e4b07d9ef862f6400e14a63823e",
+        "location": "qntylab/r1_reference_parser.py:251-256 (identify_schema returns None -> DailyParseResult(status=STATUS_UNKNOWN_SCHEMA_QUARANTINE, record=None))",
+        "reason": "Parser A already never emits a non-None record for an unrecognized column set; every unknown-schema object already reaches materialize_parser_a's 'result.record is None' branch and is quarantined (MATERIALIZATION_QUARANTINED), never MATERIALIZED_VALID. This predates and is unmodified by this amendment; it already satisfies schema_admission_rule."
+      },
+      "parser_b_current": {
+        "conformance": "NONCONFORMING (expected, not remediated by this amendment)",
+        "current_sha256": "65aea38964fe18ad702376937aee9caa410125f0b8dd2efbd5833f5219d3f075",
+        "disposition": "This amendment is a protocol document; it deliberately does not modify Parser B, Parser A, or the materializer (no shared runtime recognition gate is implemented here). Remediating Parser B / the materializer's validate_daily_market_evidence_v1 to enforce schema_admission_rule is recorded here as a REQUIRED SUBSEQUENT IMPLEMENTATION STEP, to be performed and reviewed as its own task, mirroring parser_status.parser_a.disposition's convention in r1_normalized_evidence_duplicate_semantics_amendment_v1.json.",
+        "location": "qntylab/r1_retention_candidate.py:149-152 (daily_primitive); qntylab/r1_daily_market_materializer.py:validate_daily_market_evidence_v1 (never inspects schema_id or anomalies)",
+        "materializer_sha256_at_amendment_time": "bb81486980771cca27d7f780c6b575b9e6dae7df8cf112ffbd631d1ed586152c",
+        "reason": "daily_primitive() appends SCHEMA_MISMATCH to its anomalies list on an unknown header but does not stop building a complete trade-count/OHLC/turnover record from the (still-parsed) rows, and validate_daily_market_evidence_v1 checks only required-key/non-null/type conditions -- never schema_id registry membership or the anomalies list -- so materialize_parser_b currently returns MaterializationResult(status=MATERIALIZED_VALID, is_valid=True, ...) for an unknown-schema object with parseable rows. This is exactly the countermodel this amendment closes at the protocol level."
+      }
+    },
+    "raw_deletion_authorized": false,
+    "raw_scientific_firewall": {
+      "firewall_statement": "RAW RETENTION != SCIENTIFIC ADMISSION. This distinction, already established for the broader raw-retention scope candidate (r1_global_raw_retention_scope_candidate_v1.json:firewall_invariants, 'RAW_RETAINED != STRUCTURALLY_REQUIRED != ASSIGNED != NORMALIZED != PIT_ELIGIBLE != STRATEGY_INPUT'), is extended by exactly one further link for the schema dimension this amendment governs: RAW_RETAINED != SCHEMA_ADMISSIBLE. Nothing in that existing chain is edited; this amendment adds a link, it does not renumber or remove any existing one.",
+      "later_registration_does_not_silently_reinterpret_frozen_inputs": "If a future amendment adds a previously-unregistered schema variant to r1_source_schema_registry_v1.json:known_schema_variants, that registration is prospective only: it does not, by itself, retroactively reclassify a DailyMarketEvidenceV1 record that was already correctly evaluated as SCHEMA_INADMISSIBLE under this amendment's rule at its own materialization time. Retroactive reclassification of previously frozen scientific inputs remains possible only through an explicit, independently reviewed future amendment that says so by name -- this amendment neither performs that reclassification itself nor forecloses a future amendment's ability to. This mirrors the existing, unedited convention already established by r1_normalized_evidence_duplicate_semantics_amendment_v1.json:amends.amendment_relationship (ADDITIVE_CLARIFICATION_NOT_IN_PLACE_REWRITE) and avoids treating raw_retained-but-unregistered evidence as a permanent, unrepairable dead end.",
+      "retention_does_not_imply_assignment": "Retaining an unknown-schema raw object does not assign it to any instrument_instance_id-scoped evidence population; assignment remains governed entirely by its own pre-existing, unmodified rules.",
+      "retention_does_not_imply_dailymarket_admission": "Retaining an unknown-schema raw object never, by itself or in combination with any other condition this amendment states, makes a DailyMarketEvidenceV1 record derived from it SCHEMA_ADMISSIBLE. Only schema_id registry membership at materialization time does.",
+      "retention_does_not_imply_interpretation": "An unknown-schema raw object being RAW_RETAINED (per r1_source_schema_registry_v1.json:policy's fail-closed raw retention) carries no implication about what, if anything, its bytes mean; this amendment does not authorize or require any interpretation of SCHEMA_INADMISSIBLE raw bytes.",
+      "unknown_schema_raw_bytes_may_remain_retained": true
+    },
+    "schema_admission_rule": {
+      "adopted": true,
+      "no_automatic_validity_from_registration": "SCHEMA_ADMISSIBLE (condition (b) holding) does not itself make a record valid or admitted. Every other already-frozen DailyMarketEvidenceV1 requirement -- required-key presence, required-non-null conditions (including the trade_count=0 null exceptions), decimal-string precision_semantics, and the duplicate-semantics amendment's row-order-non-interference and representative-selection rules -- continues to apply unchanged and independently. A record with a registered schema_id that violates any of those pre-existing rules remains inadmissible under the pre-existing rule that it violates; this amendment neither weakens nor bypasses any of them.",
+      "predicate_definition": "daily_market_evidence_v1_schema_admission(record, known_schema_variants) -> SCHEMA_ADMISSIBLE | SCHEMA_INADMISSIBLE. Returns SCHEMA_INADMISSIBLE if record['schema_id'] is None, or is not a key of known_schema_variants as read from r1_source_schema_registry_v1.json:known_schema_variants at the time of evaluation; returns SCHEMA_ADMISSIBLE otherwise. This predicate governs only the schema_id dimension of admission; it is a necessary, not sufficient, condition for a record to be a valid/admitted DailyMarketEvidenceV1 record (see no_automatic_validity_from_registration below).",
+      "predicate_name": "daily_market_evidence_v1_schema_admission",
+      "rule": "A candidate DailyMarketEvidenceV1 record is SCIENTIFICALLY_ADMISSIBLE only if both of the following hold: (a) it satisfies every pre-existing, already-frozen required-key / required-non-null / missingness / type condition stated in r1_normalized_evidence_contract_v1.json:DailyMarketEvidenceV1 for each of its own fields (this amendment restates none of those conditions and relaxes none of them), AND (b) its schema_id names an entry present in r1_source_schema_registry_v1.json:known_schema_variants at materialization time (i.e. schema_id is not UNKNOWN_SCHEMA and the record does not carry a SCHEMA_MISMATCH disposition). A record for which (b) does not hold is SCHEMA_INADMISSIBLE and MUST NOT be treated as a valid or admitted DailyMarketEvidenceV1 record by any consumer, regardless of whether (a) holds.",
+      "why_minimum_vocabulary": "SCHEMA_ADMISSIBLE/SCHEMA_INADMISSIBLE are the only new terms this amendment introduces. UNKNOWN_SCHEMA, SCHEMA_MISMATCH, and DailyMarketEvidenceV1 are reused verbatim from the already-frozen contract and registry text, per the task's instruction to prefer existing terms."
+    },
+    "underspecification_recorded": {
+      "empirical_corroboration_not_itself_the_gap": "This amendment is a protocol-text gap, not a code bug report. It is empirically corroborated (not established) by the fact that the current, unmodified Parser B path already exhibits exactly this countermodel: qntylab.r1_retention_candidate.daily_primitive continues to build a complete trade-count/OHLC/turnover record and append SCHEMA_MISMATCH to its anomalies list when schema_identify() returns schema_known=False (qntylab/r1_retention_candidate.py:149-152), and qntylab.r1_daily_market_materializer.validate_daily_market_evidence_v1 never inspects schema_id or the anomalies list, so materialize_parser_b returns MaterializationResult(status=MATERIALIZED_VALID, is_valid=True, ...) for such a record today. Parser A's own STATUS_UNKNOWN_SCHEMA_QUARANTINE path (record=None on unknown schema) independently corroborates that fail-closed non-admission for unknown schema is the evident engineering intent, not that it was ever written down as a normative DailyMarketEvidenceV1-layer rule binding on every implementation path. See parser_status below; this amendment does not modify either parser or the materializer -- it makes the rule normative so that Parser B's current behavior becomes a documented, reviewable nonconformance rather than an undetectable protocol gap.",
+      "explicit_statement": "As written prior to this amendment, the frozen contract and schema registry establish that an unregistered/unmatched source-schema variant is UNKNOWN_SCHEMA and triggers SCHEMA_MISMATCH with fail-closed RAW retention (r1_source_schema_registry_v1.json:policy; r1_normalized_evidence_contract_v1.json:DailyMarketEvidenceV1.schema_id.missingness_semantics), but neither artifact, nor any other frozen artifact reviewed for this amendment, states that UNKNOWN_SCHEMA/SCHEMA_MISMATCH makes the resulting DailyMarketEvidenceV1 record scientifically invalid or inadmissible. A countermodel in which schema_id=UNKNOWN_SCHEMA, SCHEMA_MISMATCH is present, raw bytes are retained, the record is otherwise field-complete, and the record is nonetheless treated as a valid, admitted DailyMarketEvidenceV1 violates no existing frozen rule text.",
+      "gap": "unregistered schema / UNKNOWN_SCHEMA does not normatively entail invalid or inadmissible DailyMarketEvidenceV1"
+    }
+  },
+  "status": "CANDIDATE_NOT_YET_FROZEN",
+  "tests": [
+    "tests/test_r1_daily_market_evidence_schema_admission_amendment_v1.py"
+  ]
+}

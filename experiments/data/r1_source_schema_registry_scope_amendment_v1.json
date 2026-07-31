@@ -26,7 +26,7 @@
       "status": "NEW_CANDIDATE_SEMANTICS_NOT_CLAIMED_FROZEN",
       "invariant": "STRUCTURAL_REGISTRATION != EVIDENCE_FAMILY_AUTHORIZATION",
       "structural_registration": "STRUCTURAL_LAYOUT_KNOWN means only that a schema_id is present in the exact bound registry snapshot. It does not establish a consumer, field semantics, DailyMarket eligibility, schema admission, record completeness, or materialization validity.",
-      "scope_predicate": "daily_market_scope(schema_id, exact_registry_artifact_bytes, requested_evidence_family) first verifies sha256(exact_registry_artifact_bytes) against the bound registry snapshot, then derives registered membership only from those bytes. It returns STRUCTURAL_LAYOUT_UNKNOWN when schema_id is absent; otherwise it returns STRUCTURAL_LAYOUT_KNOWN plus AUTHORIZED_FOR_DAILYMARKET only when the exact schema_id has an explicit DailyMarket authorization below. Every absent or non-authorized entry is NOT_AUTHORIZED_FOR_DAILYMARKET. requested_evidence_family must equal DailyMarketEvidenceV1; all other requested families fail closed under this candidate.",
+      "scope_predicate": "daily_market_scope(schema_id, exact_registry_artifact_bytes, exact_base_contract_artifact_bytes, exact_source_precedence_freeze_artifact_bytes, requested_evidence_family) first verifies the complete load-bearing authority set: this candidate semantic body, the exact registry bytes, the exact normalized-contract bytes, and the exact source-precedence-freeze bytes. It then derives registered membership only from the verified registry bytes. It returns STRUCTURAL_LAYOUT_UNKNOWN when schema_id is absent; otherwise it returns STRUCTURAL_LAYOUT_KNOWN plus AUTHORIZED_FOR_DAILYMARKET only when the exact schema_id has an explicit DailyMarket authorization below. Every absent or non-authorized entry is NOT_AUTHORIZED_FOR_DAILYMARKET. requested_evidence_family must equal DailyMarketEvidenceV1; all other requested families fail closed under this candidate.",
       "recognition_language_boundary": "This candidate does not define raw-header recognition. The frozen registry uses field_set and the DailyMarket contract says observed column set; therefore adopting ordered-header identity, duplicate/empty-name dispositions, normalization, malformed-header handling, or match ambiguity here could override frozen behavior. Those are expressly deferred to a separate recognition-language amendment.",
       "authorization_is_not_admission": "This candidate supplies only the scope prerequisite. AUTHORIZED_FOR_DAILYMARKET is necessary but not sufficient for future schema admission, and schema admission remains necessary but not sufficient for complete DailyMarketEvidenceV1 validity or materialization."
     },
@@ -72,13 +72,15 @@
     ],
     "outcome_embargo_verified": "No acquisition, population/PIT/strategy execution, outcome inspection, or outcome-shaped computation was performed."
   },
-  "amendment_semantic_content_sha256": "de50c0de86c4a9f3465bcb6f840b4052e65a8aa2a1ad7ddf77322d4f2d773845",
+  "amendment_semantic_content_sha256": "fe0dd73636d1564d4b1d6bf905cb0266b27364aa88d8f2ea56073b3ffd8992cd",
   "effective_combined_contract_binding": {
-    "amendment_semantic_content_sha256": "de50c0de86c4a9f3465bcb6f840b4052e65a8aa2a1ad7ddf77322d4f2d773845",
+    "amendment_semantic_content_sha256": "fe0dd73636d1564d4b1d6bf905cb0266b27364aa88d8f2ea56073b3ffd8992cd",
     "base_contract_artifact": "experiments/data/r1_normalized_evidence_contract_v1.json",
     "base_contract_sha256": "c199b9481285d80b34183b8a7681f75ef7e60e5aadad6e4e0ece3ef8f33d6c92",
     "base_registry_artifact": "experiments/data/r1_source_schema_registry_v1.json",
-    "base_registry_sha256": "02d2a75cdaa3d53a2708d2d20d5bf19f934fc68e6ee1b942404994d80ab94c4d"
+    "base_registry_sha256": "02d2a75cdaa3d53a2708d2d20d5bf19f934fc68e6ee1b942404994d80ab94c4d",
+    "source_precedence_freeze_artifact": "experiments/data/r1_source_precedence_freeze.json",
+    "source_precedence_freeze_sha256": "25b03b648774e49b04110f28637466494d35ace27ab6b210053af9224d29c51f"
   },
-  "effective_combined_contract_binding_sha256": "7d7136812febbf48f5ce71bc5545412b29caa89b2fcf78b3b695bab7361996b3"
+  "effective_combined_contract_binding_sha256": "fd31e23ebefba1914285d6961145d65c9a187775dff92f6dfa90aa59c26771fb"
 }

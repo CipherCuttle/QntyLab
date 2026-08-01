@@ -110,11 +110,13 @@ from __future__ import annotations
 import csv
 import gzip
 import io
+import json
 import re
 import zlib
 from dataclasses import dataclass, field
 from datetime import date
 from hashlib import sha256
+from pathlib import Path
 from typing import Optional
 
 from qntylab import r1_reference_parser as rp
@@ -125,8 +127,88 @@ from qntylab import r1_schema_recognizer as recognizer
 # --- materialization outcome (boundary-local bookkeeping, not itself new
 # frozen scientific protocol -- mirrors the pattern Parser A already uses for
 # its own local, non-contract STATUS_* constants) -----------------------------
+# Public three-way result algebra per the FROZEN
+# experiments/data/r1_empty_object_result_algebra_amendment_v1.json. Only
+# materialize_parser_a (and its compatibility alias) may emit these.
 MATERIALIZED_VALID = "MATERIALIZED_VALID_RECORD"
+EMPTY_OBJECT_OBSERVATION = "EMPTY_OBJECT_ZERO_TRADE_OBSERVATION"
 MATERIALIZATION_QUARANTINED = "MATERIALIZATION_QUARANTINED_NO_RECORD"
+
+# Internal-only status for _materialize_parser_a_unadmitted's own mechanically
+# record-shaped candidate output. Distinct in VALUE, not merely by leading
+# underscore, from MATERIALIZED_VALID above: per the frozen result algebra's
+# low_level_capability_boundary, this primitive's output is Parser-A
+# implementation capability, never public schema-admitted evidence, no matter
+# how record-shaped or field-complete it looks. Only materialize_parser_a's
+# own additional admission-derived-schema-id validation may promote a
+# candidate carrying this status to public MATERIALIZED_VALID.
+INTERNAL_PARSER_A_CANDIDATE = "INTERNAL_PARSER_A_CANDIDATE_RECORD_NOT_PUBLIC_EVIDENCE"
+
+# --- FROZEN EMPTY_OBJECT result-algebra authority binding -------------------
+#
+# Same exact-hash-verification pattern qntylab.r1_schema_admission already
+# uses for its own frozen authority: one named artifact, verified by exact
+# bytes, cached once per process -- never "whichever is newest" and never an
+# ambient fallback on mismatch.
+_ROOT = Path(__file__).resolve().parent.parent
+_DATA = _ROOT / "experiments/data"
+_RESULT_ALGEBRA_ARTIFACT_PATH = _DATA / "r1_empty_object_result_algebra_amendment_v1.json"
+
+_EXPECTED_RESULT_ALGEBRA_SEMANTIC_SHA256 = (
+    "4c50be84a84b9ba4817fd92ef1cb5dde075b66135e1a00bacf532ac1b6876c46"
+)
+_EXPECTED_RESULT_ALGEBRA_EFFECTIVE_SHA256 = (
+    "5406f96160662e3d7da6d04c43dda58e96e0f965c7f73ac321a63283710899d6"
+)
+_EXPECTED_RESULT_ALGEBRA_REVIEWED_CANDIDATE_SHA = "a720c79a9580e164775e5b9ff2a08c0824aee343"
+_EXPECTED_RESULT_ALGEBRA_REVIEW_PAYLOAD_SHA256 = (
+    "3466a29be7fa01b63f7843c375024a4bc35ca343d64d35034c62ab59830e88b6"
+)
+
+
+def _canonical(value) -> bytes:
+    return (json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True) + "\n").encode("utf-8")
+
+
+def _semantic_sha256(value) -> str:
+    return sha256(_canonical(value)).hexdigest()
+
+
+def _verify_result_algebra_authority(result_algebra_bytes: bytes) -> dict:
+    """Fail-closed verification that the supplied bytes are byte-identical to
+    the FROZEN, independently hostile-reviewed EMPTY_OBJECT result-algebra
+    amendment this module conforms to. Raises ValueError on any mismatch --
+    never proceeds to derive a public outcome against unverified authority.
+    Callers at the public boundary must catch this and fail closed to
+    MATERIALIZATION_QUARANTINED, never let it escape as an untyped exception
+    or be treated as license to emit a valid/observation result."""
+    doc = json.loads(result_algebra_bytes)
+    if doc.get("status") != "FROZEN" or doc.get("self_freeze_authorized") is not False:
+        raise ValueError("result algebra artifact is not a frozen, non-self-frozen candidate")
+    if _semantic_sha256(doc["semantic_body"]) != _EXPECTED_RESULT_ALGEBRA_SEMANTIC_SHA256:
+        raise ValueError("result algebra semantic content mismatch")
+    if _semantic_sha256(doc["effective_combined_contract_binding"]) != _EXPECTED_RESULT_ALGEBRA_EFFECTIVE_SHA256:
+        raise ValueError("result algebra effective binding mismatch")
+    provenance = doc.get("freeze_provenance") or {}
+    if provenance.get("candidate_commit_reviewed_sha") != _EXPECTED_RESULT_ALGEBRA_REVIEWED_CANDIDATE_SHA:
+        raise ValueError("result algebra freeze provenance reviewed-candidate sha mismatch")
+    if provenance.get("review_receipt_payload_sha256") != _EXPECTED_RESULT_ALGEBRA_REVIEW_PAYLOAD_SHA256:
+        raise ValueError("result algebra review receipt payload sha mismatch")
+    return doc
+
+
+_default_result_algebra_bytes: bytes | None = None
+
+
+def _load_default_result_algebra_bytes() -> bytes:
+    """Fail-closed loader for the one named, exact result-algebra authority.
+    Cached once per process, mirroring r1_schema_admission's own
+    _load_default_authority_bytes precedent -- never re-reads the mutable
+    ambient file on every call."""
+    global _default_result_algebra_bytes
+    if _default_result_algebra_bytes is None:
+        _default_result_algebra_bytes = _RESULT_ALGEBRA_ARTIFACT_PATH.read_bytes()
+    return _default_result_algebra_bytes
 
 # Frozen DailyMarketEvidenceV1 field set, read directly from
 # r1_normalized_evidence_contract_v1.json:layers.DailyMarketEvidenceV1.fields.
@@ -175,19 +257,31 @@ _DECIMAL_STRING_PATTERN = re.compile(r"^-?[0-9]+(\.[0-9]+)?$")
 
 @dataclass
 class MaterializationResult:
-    """One result per attempted raw object: either a complete, contract-valid
-    DailyMarketEvidenceV1 record, or an explicit typed non-valid result.
-    Never both, never neither."""
+    """One result per attempted raw object. For the canonical public
+    Parser-A boundary (materialize_parser_a), exactly one of three tagged
+    outcomes per the FROZEN EMPTY_OBJECT result algebra: a complete,
+    contract-valid DailyMarketEvidenceV1 record (`record` present,
+    `observation` absent), a typed EMPTY_OBJECT zero-trade observation
+    (`observation` present, `record` absent), or quarantine (both absent).
+    Parser B and the internal Parser-A candidate primitive never populate
+    `observation`; it exists on this shared dataclass so the public
+    boundary's tagged-union invariant is representable without a second
+    result type."""
     status: str
     parser: str  # "A" or "B"
     raw_object_sha256: str
     record: Optional[dict] = None
+    observation: Optional[dict] = None
     anomalies: list = field(default_factory=list)
     reason: Optional[str] = None
 
     @property
     def is_valid(self) -> bool:
-        return self.status == MATERIALIZED_VALID
+        return (
+            self.status == MATERIALIZED_VALID
+            and self.record is not None
+            and self.observation is None
+        )
 
 
 def validate_daily_market_evidence_v1(record: dict) -> list[str]:
@@ -357,11 +451,41 @@ def _materialize_parser_a_unadmitted(raw_bytes: bytes, expected_utc_date: date, 
         )
 
     return MaterializationResult(
-        status=MATERIALIZED_VALID, parser="A", raw_object_sha256=raw_sha, record=record, anomalies=[],
+        status=INTERNAL_PARSER_A_CANDIDATE, parser="A", raw_object_sha256=raw_sha, record=record, anomalies=[],
     )
 
 
 SCHEMA_INADMISSIBLE = "SCHEMA_INADMISSIBLE"
+
+# Exact recognition reasons for the frozen recognition amendment's one
+# EMPTY_OBJECT condition (r1_schema_recognizer._framing_failure("EMPTY_OBJECT")
+# always returns this exact 1-tuple). Matched by exact tuple equality, never
+# substring/`in`, per the frozen result algebra's "no broadening" requirement.
+_EMPTY_OBJECT_REASONS = ("EMPTY_OBJECT",)
+
+
+def _validate_admitted_record(record: dict, evaluation: "admission.SchemaAdmissionEvaluation") -> list[str]:
+    """Narrow admitted-record validator per the frozen result algebra's
+    validity_predicate: enforces record.schema_id against the already-derived
+    SchemaAdmissionEvaluation only. Never re-opens a live registry file --
+    evaluation.schema_id is the sole schema-authority input. Returns a list
+    of violations (empty == valid)."""
+    violations: list[str] = []
+    if evaluation.admission != admission.ADMISSIBLE:
+        violations.append("schema admission is not SCHEMA_ADMISSIBLE")
+    if evaluation.recognition_disposition != recognizer.RECOGNIZED:
+        violations.append("recognition disposition is not RECOGNIZED")
+    if not isinstance(evaluation.schema_id, str) or not evaluation.schema_id:
+        violations.append("admission-derived schema_id is not a non-null string")
+
+    schema_id = record.get("schema_id")
+    if not isinstance(schema_id, str) or not schema_id:
+        violations.append(f"record.schema_id is not a non-null string: {schema_id!r}")
+    elif schema_id != evaluation.schema_id:
+        violations.append(
+            f"record.schema_id {schema_id!r} != admission-derived schema_id {evaluation.schema_id!r}"
+        )
+    return violations
 
 
 def materialize_parser_a(raw_bytes: bytes, expected_utc_date: date, instrument_instance_id: str,
@@ -395,6 +519,13 @@ def materialize_parser_a(raw_bytes: bytes, expected_utc_date: date, instrument_i
     though Parser A's own row-semantics support scope happens to include it:
     schema admission denial is a gate on materialization, not merely
     advisory metadata.
+
+    Return value conforms to the FROZEN EMPTY_OBJECT result algebra
+    (experiments/data/r1_empty_object_result_algebra_amendment_v1.json):
+    exactly one of MATERIALIZED_VALID_RECORD (record present, observation
+    absent), EMPTY_OBJECT_ZERO_TRADE_OBSERVATION (observation present,
+    record absent), or MATERIALIZATION_QUARANTINED_NO_RECORD (both absent)
+    is ever returned -- never both payloads, never neither status.
     """
     raw_sha = sha256(raw_bytes).hexdigest()
 
@@ -405,27 +536,71 @@ def materialize_parser_a(raw_bytes: bytes, expected_utc_date: date, instrument_i
             reason=f"raw bytes do not match expected_raw_sha256 (expected {expected_raw_sha256}, got {raw_sha})",
         )
 
+    try:
+        _verify_result_algebra_authority(_load_default_result_algebra_bytes())
+    except (ValueError, OSError, json.JSONDecodeError, KeyError) as exc:
+        return MaterializationResult(
+            status=MATERIALIZATION_QUARANTINED, parser="A", raw_object_sha256=raw_sha,
+            anomalies=["RESULT_ALGEBRA_AUTHORITY_MISMATCH"],
+            reason=f"{type(exc).__name__}: {exc}",
+        )
+
     evaluation = admission.evaluate_schema_admission(raw_bytes)
 
     if evaluation.admission != admission.ADMISSIBLE:
         # Frozen schema_admission_rule text's one explicit carve-out: "EMPTY_OBJECT
         # receives no fabricated schema authorization; its downstream zero-trade
         # handling remains governed only by existing materialization/completeness
-        # semantics." EMPTY_OBJECT is a FRAMING_FAILURE (never SCHEMA_ADMISSIBLE),
-        # but the frozen text places its materialization outside this gate's
-        # jurisdiction rather than leaving it silently blocked -- so, uniquely for
-        # this one reason, evaluation continues to Parser A's own pre-existing
-        # zero-trade record path below instead of stopping here.
-        if not (evaluation.recognition_disposition == recognizer.FRAMING_FAILURE
-                and "EMPTY_OBJECT" in evaluation.reasons):
+        # semantics." Per the FROZEN result algebra, that downstream handling is
+        # now the typed EMPTY_OBJECT_ZERO_TRADE_OBSERVATION outcome -- an
+        # observation, never a DailyMarketEvidenceV1 record and never
+        # MATERIALIZED_VALID_RECORD. Matched by exact reason-tuple equality
+        # (never substring/`in`), so no other FRAMING_FAILURE -- including
+        # near-empty bodies that are FEWER_THAN_TWO_TOKENS, EMPTY_TOKEN_NAME,
+        # BOM_PRESENT, INVALID_GZIP, or INVALID_UTF8 -- can qualify.
+        if (evaluation.recognition_disposition == recognizer.FRAMING_FAILURE
+                and evaluation.reasons == _EMPTY_OBJECT_REASONS):
+            observation = {
+                "instrument_instance_id": instrument_instance_id,
+                "utc_date": expected_utc_date.isoformat(),
+                "source_object_sha256": raw_sha,
+                "trade_count": 0,
+                "recognition_disposition": evaluation.recognition_disposition,
+                "recognition_reasons": evaluation.reasons,
+                "schema_admission": evaluation.admission,
+            }
             return MaterializationResult(
-                status=MATERIALIZATION_QUARANTINED, parser="A", raw_object_sha256=raw_sha,
-                anomalies=[SCHEMA_INADMISSIBLE],
-                reason=(f"frozen schema admission denied: recognition_disposition="
-                        f"{evaluation.recognition_disposition!r} schema_id={evaluation.schema_id!r}"),
+                status=EMPTY_OBJECT_OBSERVATION, parser="A", raw_object_sha256=raw_sha,
+                observation=observation, anomalies=[],
             )
+        return MaterializationResult(
+            status=MATERIALIZATION_QUARANTINED, parser="A", raw_object_sha256=raw_sha,
+            anomalies=[SCHEMA_INADMISSIBLE],
+            reason=(f"frozen schema admission denied: recognition_disposition="
+                    f"{evaluation.recognition_disposition!r} schema_id={evaluation.schema_id!r}"),
+        )
 
-    return _materialize_parser_a_unadmitted(raw_bytes, expected_utc_date, instrument_instance_id)
+    candidate = _materialize_parser_a_unadmitted(raw_bytes, expected_utc_date, instrument_instance_id)
+
+    if candidate.status != INTERNAL_PARSER_A_CANDIDATE or candidate.record is None:
+        # A private-primitive failure (container anomaly, contract-completeness
+        # violation, source mutation) becomes public quarantine -- never public
+        # validity. candidate.reason/anomalies are passed through unchanged.
+        return MaterializationResult(
+            status=MATERIALIZATION_QUARANTINED, parser="A", raw_object_sha256=raw_sha,
+            anomalies=list(candidate.anomalies), reason=candidate.reason,
+        )
+
+    schema_violations = _validate_admitted_record(candidate.record, evaluation)
+    if schema_violations:
+        return MaterializationResult(
+            status=MATERIALIZATION_QUARANTINED, parser="A", raw_object_sha256=raw_sha,
+            anomalies=["SCHEMA_IDENTITY_MISMATCH"], reason="; ".join(schema_violations),
+        )
+
+    return MaterializationResult(
+        status=MATERIALIZED_VALID, parser="A", raw_object_sha256=raw_sha, record=candidate.record, anomalies=[],
+    )
 
 
 # Compatibility alias for the name this gate was first reviewed and wired

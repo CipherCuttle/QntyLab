@@ -584,30 +584,50 @@ def test_low_level_capability_boundary_names_no_mandatory_function_name():
 
 
 # ---------------------------------------------------------------------------
-# The confirmed current runtime contradiction still reproduces (expected --
-# this lane makes no runtime change; it only names the state forbidden).
+# The confirmed prior runtime contradiction is now repaired. This test
+# originally asserted the pre-repair defect was still reproducible, on the
+# stated premise that runtime remediation of
+# qntylab/r1_daily_market_materializer.py was a required subsequent,
+# separately reviewed implementation task and explicitly out of scope for the
+# candidate/freeze commits this file otherwise pins byte-for-byte. That
+# subsequent task (lane R1_EMPTY_OBJECT_RESULT_ALGEBRA_RUNTIME_IMPLEMENTATION)
+# has now landed, so the old assertion of the unrepaired defect would itself
+# be asserting a state the frozen result algebra forbids
+# (countermodel_a_current_contradiction, FORBIDDEN_BY_RESULT_ALGEBRA). This is
+# the one narrow, explicitly authorized exception to this file's otherwise
+# byte-for-byte-preserved status: every other test in this file, and the
+# candidate/freeze/review artifacts themselves, are unchanged.
 # ---------------------------------------------------------------------------
 
-def test_confirmed_runtime_contradiction_still_reproduces_unrepaired():
+def test_confirmed_runtime_contradiction_is_repaired():
     import gzip
     from datetime import date
 
-    from qntylab.r1_daily_market_materializer import materialize_parser_a, MATERIALIZED_VALID
+    from qntylab.r1_daily_market_materializer import (
+        materialize_parser_a, EMPTY_OBJECT_OBSERVATION,
+    )
     from qntylab import r1_schema_admission as admission
     from qntylab import r1_schema_recognizer as recognizer
 
-    result = materialize_parser_a(gzip.compress(b""), date(2024, 1, 1), "BYBIT_TEST_1h")
-    evaluation = admission.evaluate_schema_admission(gzip.compress(b""))
+    raw = gzip.compress(b"")
+    result = materialize_parser_a(raw, date(2024, 1, 1), "BYBIT_TEST_1h")
+    evaluation = admission.evaluate_schema_admission(raw)
 
-    assert result.status == MATERIALIZED_VALID
-    assert result.is_valid is True
-    assert result.record["schema_id"] is None
     assert evaluation.admission == admission.INADMISSIBLE
     assert evaluation.recognition_disposition == recognizer.FRAMING_FAILURE
     assert "EMPTY_OBJECT" in evaluation.reasons
 
-    # This is exactly Countermodel A, unrepaired at this commit -- naming it
-    # FORBIDDEN_BY_RESULT_ALGEBRA in the candidate does not itself change
-    # runtime behavior; that is a required subsequent implementation task.
+    # Repaired outcome: the frozen third result-algebra variant, never the
+    # forbidden MATERIALIZED_VALID_RECORD/is_valid=True/schema_id=None state.
+    assert result.status == EMPTY_OBJECT_OBSERVATION
+    assert result.is_valid is False
+    assert result.record is None
+    assert result.observation is not None
+    assert result.observation["trade_count"] == 0
+    assert "schema_id" not in result.observation
+    assert result.observation["recognition_disposition"] == evaluation.recognition_disposition
+    assert result.observation["recognition_reasons"] == evaluation.reasons
+    assert result.observation["schema_admission"] == evaluation.admission
+
     cm = _candidate()["semantic_body"]["countermodel_proof"]["countermodel_a_current_contradiction"]
     assert cm["classification"] == "FORBIDDEN_BY_RESULT_ALGEBRA"

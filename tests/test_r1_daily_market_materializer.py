@@ -85,6 +85,7 @@ from qntylab.r1_retention_candidate import BASE_SCHEMA
 from qntylab.r1_daily_market_materializer import (
     MATERIALIZED_VALID,
     MATERIALIZATION_QUARANTINED,
+    INTERNAL_PARSER_A_CANDIDATE,
     _materialize_parser_a_unadmitted,
     materialize_parser_b,
     materialize_batch,
@@ -125,7 +126,7 @@ def _raw_bytes(rows):
 def test_parser_a_raw_sha_binding():
     raw = _raw_bytes([_row("1700000000.000", size="1", price="1", trdid="t-1")])
     result = _materialize_parser_a_unadmitted(raw, date(2023, 11, 14), "x")
-    assert result.status == MATERIALIZED_VALID
+    assert result.status == INTERNAL_PARSER_A_CANDIDATE
     assert result.record["source_object_sha256"] == hashlib.sha256(raw).hexdigest()
     assert result.raw_object_sha256 == hashlib.sha256(raw).hexdigest()
 
@@ -158,7 +159,8 @@ def test_ab_complete_record_equality_synthetic():
     ])
     a = _materialize_parser_a_unadmitted(raw, date(2023, 11, 14), "obj")
     b = materialize_parser_b(raw, "2023-11-14", "obj", CUTOFF)
-    assert a.status == b.status == MATERIALIZED_VALID
+    assert a.status == INTERNAL_PARSER_A_CANDIDATE
+    assert b.status == MATERIALIZED_VALID
     for field in ALL_CONTRACT_FIELDS:
         assert a.record[field] == b.record[field], field
 
@@ -172,7 +174,7 @@ def test_real_5_objects_full_record_equality():
         raw = path.read_bytes()
         a = _materialize_parser_a_unadmitted(raw, day, name)
         b = materialize_parser_b(raw, day.isoformat(), name, CUTOFF)
-        assert a.status == MATERIALIZED_VALID, (name, a.reason)
+        assert a.status == INTERNAL_PARSER_A_CANDIDATE, (name, a.reason)
         assert b.status == MATERIALIZED_VALID, (name, b.reason)
         for field in ALL_CONTRACT_FIELDS:
             assert a.record[field] == b.record[field], (name, field, a.record[field], b.record[field])
@@ -327,7 +329,7 @@ def test_gzip_valid_empty_body_typed_valid_zero_trade_record():
     empty_body = gzip.compress(b"")
     a = _materialize_parser_a_unadmitted(empty_body, date(2023, 11, 14), "x")
     b = materialize_parser_b(empty_body, "2023-11-14", "s", CUTOFF)
-    assert a.status == MATERIALIZED_VALID
+    assert a.status == INTERNAL_PARSER_A_CANDIDATE
     assert b.status == MATERIALIZED_VALID
     assert a.record["trade_count"] == 0
     assert b.record["trade_count"] == 0
@@ -340,7 +342,7 @@ def test_malformed_row_still_typed_valid_with_rejection_accounted():
     raw = gzip.compress(text.encode())
     a = _materialize_parser_a_unadmitted(raw, date(2023, 11, 14), "x")
     b = materialize_parser_b(raw, "2023-11-14", "s", CUTOFF)
-    assert a.status == MATERIALIZED_VALID
+    assert a.status == INTERNAL_PARSER_A_CANDIDATE
     assert b.status == MATERIALIZED_VALID
     assert a.record["rejected_row_count"] == 1
     assert b.record["rejected_row_count"] == 1
@@ -363,16 +365,16 @@ def test_batch_isolation_valid_corrupt_valid():
     results = materialize_batch(items, _materialize_parser_a_unadmitted)
 
     assert len(results) == 3
-    assert results[0].status == MATERIALIZED_VALID
+    assert results[0].status == INTERNAL_PARSER_A_CANDIDATE
     assert results[1].status == MATERIALIZATION_QUARANTINED
-    assert results[2].status == MATERIALIZED_VALID
+    assert results[2].status == INTERNAL_PARSER_A_CANDIDATE
     # object B's corruption did not prevent C from being attempted/valid
     assert results[2].record["first_source_trade_id"] == "c-1"
 
-    valid_count = sum(1 for r in results if r.status == MATERIALIZED_VALID)
+    valid_count = sum(1 for r in results if r.status == INTERNAL_PARSER_A_CANDIDATE)
     quarantined_count = sum(1 for r in results if r.status == MATERIALIZATION_QUARANTINED)
     assert valid_count + quarantined_count == len(items) == 3
-    assert all(r.status in (MATERIALIZED_VALID, MATERIALIZATION_QUARANTINED) for r in results)
+    assert all(r.status in (INTERNAL_PARSER_A_CANDIDATE, MATERIALIZATION_QUARANTINED) for r in results)
 
 
 def test_batch_isolation_parser_b():
@@ -406,13 +408,13 @@ def test_batch_isolation_invalid_utf8_valid_corrupt_valid_parser_a():
     results = materialize_batch(items, _materialize_parser_a_unadmitted)
 
     assert len(results) == 3, "object C was not attempted -- batch terminated early"
-    assert results[0].status == MATERIALIZED_VALID
+    assert results[0].status == INTERNAL_PARSER_A_CANDIDATE
     assert results[1].status == MATERIALIZATION_QUARANTINED
     assert "CONTAINER_ANOMALY" in results[1].anomalies
-    assert results[2].status == MATERIALIZED_VALID
+    assert results[2].status == INTERNAL_PARSER_A_CANDIDATE
     assert results[2].record["first_source_trade_id"] == "c-1"
 
-    valid_count = sum(1 for r in results if r.status == MATERIALIZED_VALID)
+    valid_count = sum(1 for r in results if r.status == INTERNAL_PARSER_A_CANDIDATE)
     typed_nonvalid_count = sum(1 for r in results if r.status == MATERIALIZATION_QUARANTINED)
     assert valid_count + typed_nonvalid_count == len(items) == 3
 
@@ -455,7 +457,7 @@ def test_batch_isolation_alternating_corrupt_valid_four_objects_both_parsers():
     a_results = materialize_batch(a_items, _materialize_parser_a_unadmitted)
     assert len(a_results) == 4, "batch did not run to completion"
     assert [r.status for r in a_results] == [
-        MATERIALIZATION_QUARANTINED, MATERIALIZED_VALID, MATERIALIZATION_QUARANTINED, MATERIALIZED_VALID,
+        MATERIALIZATION_QUARANTINED, INTERNAL_PARSER_A_CANDIDATE, MATERIALIZATION_QUARANTINED, INTERNAL_PARSER_A_CANDIDATE,
     ]
     assert a_results[3].record["first_source_trade_id"] == "d-1"
 
@@ -571,13 +573,13 @@ def test_batch_isolation_csv_error_valid_corrupt_valid_parser_a():
     results = materialize_batch(items, _materialize_parser_a_unadmitted)
 
     assert len(results) == 3, "object C was not attempted -- batch terminated early"
-    assert results[0].status == MATERIALIZED_VALID
+    assert results[0].status == INTERNAL_PARSER_A_CANDIDATE
     assert results[1].status == MATERIALIZATION_QUARANTINED
     assert "CONTAINER_ANOMALY" in results[1].anomalies
-    assert results[2].status == MATERIALIZED_VALID
+    assert results[2].status == INTERNAL_PARSER_A_CANDIDATE
     assert results[2].record["first_source_trade_id"] == "c-1"
 
-    valid_count = sum(1 for r in results if r.status == MATERIALIZED_VALID)
+    valid_count = sum(1 for r in results if r.status == INTERNAL_PARSER_A_CANDIDATE)
     typed_nonvalid_count = sum(1 for r in results if r.status == MATERIALIZATION_QUARANTINED)
     assert valid_count + typed_nonvalid_count == len(items) == 3
 
@@ -621,7 +623,7 @@ def test_batch_isolation_alternating_csv_error_corrupt_valid_four_objects_both_p
     a_results = materialize_batch(a_items, _materialize_parser_a_unadmitted)
     assert len(a_results) == 4, "batch did not run to completion"
     assert [r.status for r in a_results] == [
-        MATERIALIZATION_QUARANTINED, MATERIALIZED_VALID, MATERIALIZATION_QUARANTINED, MATERIALIZED_VALID,
+        MATERIALIZATION_QUARANTINED, INTERNAL_PARSER_A_CANDIDATE, MATERIALIZATION_QUARANTINED, INTERNAL_PARSER_A_CANDIDATE,
     ]
     assert a_results[3].record["first_source_trade_id"] == "d-1"
 
@@ -691,7 +693,7 @@ def test_unterminated_quote_malformed_row_parser_a_and_b_agree_no_exception():
     a = _materialize_parser_a_unadmitted(raw, date(2023, 11, 14), "x")
     b = materialize_parser_b(raw, "2023-11-14", "s", CUTOFF)
 
-    assert a.status == MATERIALIZED_VALID
+    assert a.status == INTERNAL_PARSER_A_CANDIDATE
     assert b.status == MATERIALIZED_VALID
     # Parser A already had its own REQUIRED_ROW_FIELDS row-rejection check
     # for exactly this row shape; Parser B's boundary-level pre-filter must

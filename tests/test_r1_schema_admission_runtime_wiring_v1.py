@@ -156,7 +156,7 @@ def test_b_rpi_recognized_but_not_authorized_blocks_materialization(call_spy):
     # schema-admitted evidence -- see _materialize_parser_a_unadmitted's own
     # docstring.
     direct = materializer._materialize_parser_a_unadmitted(raw, BASE_UTC_DATE, INSTRUMENT)
-    assert direct.status == materializer.MATERIALIZED_VALID
+    assert direct.status == materializer.INTERNAL_PARSER_A_CANDIDATE
     assert direct.record["schema_id"] == "bybit_trade_v1_rpi"
     call_spy.calls.clear()
 
@@ -394,11 +394,18 @@ def test_r9_empty_object_gets_no_fabricated_schema_authorization():
     assert evaluation.admission == admission.INADMISSIBLE
 
     # The frozen carve-out lets Parser A's pre-existing zero-trade path run,
-    # but it must never emit an authorized schema_id for it.
+    # but it must never emit an authorized schema_id for it. Post-repair
+    # (R1_EMPTY_OBJECT_RESULT_ALGEBRA_RUNTIME_IMPLEMENTATION), that downstream
+    # handling is the frozen EMPTY_OBJECT_ZERO_TRADE_OBSERVATION outcome, never
+    # MATERIALIZED_VALID_RECORD -- no record, and no schema_id of any kind
+    # (including None), is ever attached to admitted evidence.
     result = materializer.materialize_parser_a(raw, BASE_UTC_DATE, INSTRUMENT)
-    assert result.status == materializer.MATERIALIZED_VALID
-    assert result.record["schema_id"] is None
-    assert result.record["trade_count"] == 0
+    assert result.status == materializer.EMPTY_OBJECT_OBSERVATION
+    assert result.is_valid is False
+    assert result.record is None
+    assert result.observation is not None
+    assert "schema_id" not in result.observation
+    assert result.observation["trade_count"] == 0
 
 
 def test_r10_runtime_module_matches_frozen_artifact_bytes_exactly():
@@ -452,7 +459,7 @@ def test_low_level_capability_rpi_materializes_via_internal_primitive_only():
     schema-admitted evidence, and must never be read as such."""
     raw = _raw_rpi_object()
     result = materializer._materialize_parser_a_unadmitted(raw, BASE_UTC_DATE, INSTRUMENT)
-    assert result.status == materializer.MATERIALIZED_VALID
+    assert result.status == materializer.INTERNAL_PARSER_A_CANDIDATE
     assert result.record["schema_id"] == "bybit_trade_v1_rpi"
 
 

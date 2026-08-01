@@ -313,8 +313,17 @@
       "no_live_registry_read_required": "A conforming validator derives authorization from the already-bound admission_evaluation (or another exact authority-bound input carrying the same information), never from an implicit, ambient, or independently re-opened live registry file read at validation time."
     }
   },
-  "status": "CANDIDATE_NOT_YET_FROZEN",
+  "status": "FROZEN",
   "tests": [
     "tests/test_r1_empty_object_result_algebra_amendment_v1.py"
-  ]
+  ],
+  "freeze_provenance": {
+    "candidate_commit_reviewed_sha": "a720c79a9580e164775e5b9ff2a08c0824aee343",
+    "frozen_amendment_semantic_content_sha256": "4c50be84a84b9ba4817fd92ef1cb5dde075b66135e1a00bacf532ac1b6876c46",
+    "frozen_effective_combined_contract_binding_sha256": "5406f96160662e3d7da6d04c43dda58e96e0f965c7f73ac321a63283710899d6",
+    "operator_authorization": "explicit operator authorization supplied for this governance-only freeze of the exact independently hostile-reviewed candidate; no semantic changes authorized",
+    "review_receipt": "r1_empty_object_result_algebra_amendment_review_v1.json",
+    "review_receipt_payload_sha256": "3466a29be7fa01b63f7843c375024a4bc35ca343d64d35034c62ab59830e88b6",
+    "review_receipt_repository_native_at_review_time": false
+  }
 }

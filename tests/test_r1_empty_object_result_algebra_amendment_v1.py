@@ -27,6 +27,7 @@ own text, not that the runtime has stopped producing it.
 """
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -78,13 +79,12 @@ def _frozen(path):
 # Candidate governance shape
 # ---------------------------------------------------------------------------
 
-def test_candidate_is_unfrozen_candidate_not_yet_reviewed():
+def test_candidate_is_frozen_and_retains_non_self_freeze_invariants():
     candidate = _candidate()
-    assert candidate["status"] == "CANDIDATE_NOT_YET_FROZEN"
+    assert candidate["status"] == "FROZEN"
     assert candidate["self_freeze_authorized"] is False
     assert candidate["artifact_kind"] == "PROTOCOL_AMENDMENT_CANDIDATE"
     assert candidate["artifact"] == "r1_empty_object_result_algebra_amendment_v1"
-    assert "freeze_provenance" not in candidate
     assert candidate["raw_deletion_authorized"] is False
     assert candidate["outcome_embargo"] is True
 
@@ -124,8 +124,9 @@ def test_candidate_top_level_shape_has_no_unreviewed_escape_hatch():
     """Keep semantic_body as the sole normative semantic payload.
 
     An unexpected top-level field must not become a shadow semantic channel.
-    Freeze-time additions such as freeze_provenance require an explicit,
-    reviewable test update as part of the governance-only freeze commit.
+    freeze_provenance is the sole newly authorized top-level key; its addition
+    is the explicit governance-only freeze event. Any other top-level field
+    would be an unreviewed escape hatch.
     """
     assert set(_candidate()) == {
         "amendment_semantic_content_sha256",
@@ -134,6 +135,7 @@ def test_candidate_top_level_shape_has_no_unreviewed_escape_hatch():
         "bound_authority",
         "effective_combined_contract_binding",
         "effective_combined_contract_binding_sha256",
+        "freeze_provenance",
         "next_step",
         "outcome_embargo",
         "parent_head",
@@ -143,6 +145,64 @@ def test_candidate_top_level_shape_has_no_unreviewed_escape_hatch():
         "status",
         "tests",
     }
+
+
+def test_freeze_is_governance_only_and_binds_exact_reviewed_candidate():
+    """The freeze changes only governance metadata and binds its reviewed source."""
+    reviewed_sha = "a720c79a9580e164775e5b9ff2a08c0824aee343"
+    candidate = _candidate()
+    review = json.loads(
+        (DATA / "r1_empty_object_result_algebra_amendment_review_v1.json").read_bytes()
+    )
+    reviewed = json.loads(subprocess.check_output(
+        [
+            "git", "show",
+            f"{reviewed_sha}:experiments/data/r1_empty_object_result_algebra_amendment_v1.json",
+        ],
+        cwd=ROOT,
+        text=True,
+    ))
+    assert reviewed["status"] == "CANDIDATE_NOT_YET_FROZEN"
+    assert candidate["status"] == "FROZEN"
+
+    frozen_without_governance = dict(candidate)
+    reviewed_without_governance = dict(reviewed)
+    for payload in (frozen_without_governance, reviewed_without_governance):
+        payload.pop("status", None)
+        payload.pop("freeze_provenance", None)
+    assert frozen_without_governance == reviewed_without_governance
+    for key in (
+        "semantic_body", "bound_authority", "effective_combined_contract_binding", "tests",
+    ):
+        assert candidate[key] == reviewed[key]
+    for key in (
+        "amendment_semantic_content_sha256", "effective_combined_contract_binding_sha256",
+        "next_step", "parent_head", "artifact", "artifact_kind", "outcome_embargo",
+        "raw_deletion_authorized", "self_freeze_authorized",
+    ):
+        assert candidate[key] == reviewed[key]
+
+    assert candidate["freeze_provenance"] == {
+        "candidate_commit_reviewed_sha": reviewed_sha,
+        "frozen_amendment_semantic_content_sha256": EXPECTED_REVIEWED_SEMANTIC_CONTENT_SHA256,
+        "frozen_effective_combined_contract_binding_sha256": EXPECTED_REVIEWED_EFFECTIVE_BINDING_SHA256,
+        "operator_authorization": "explicit operator authorization supplied for this governance-only freeze of the exact independently hostile-reviewed candidate; no semantic changes authorized",
+        "review_receipt": "r1_empty_object_result_algebra_amendment_review_v1.json",
+        "review_receipt_payload_sha256": "3466a29be7fa01b63f7843c375024a4bc35ca343d64d35034c62ab59830e88b6",
+        "review_receipt_repository_native_at_review_time": False,
+    }
+    review_payload = dict(review)
+    review_payload.pop("review_payload_sha256")
+    assert review["review_payload_sha256"] == _semantic_hash(review_payload)
+    assert review["reviewed_candidate_sha"] == candidate["freeze_provenance"]["candidate_commit_reviewed_sha"]
+    assert review["reviewed_candidate_semantic_content_sha256"] == candidate["amendment_semantic_content_sha256"]
+    assert review["reviewed_effective_combined_contract_binding_sha256"] == candidate["effective_combined_contract_binding_sha256"]
+    assert review["verdict"] == "PASS_SAFE_TO_FREEZE_RESULT_ALGEBRA_CANDIDATE"
+    assert review["blockers"] == review["changeset"] == "NONE"
+    assert review["repository_native_at_review_time"] is False
+    assert candidate["self_freeze_authorized"] is False
+    assert _semantic_hash(candidate["semantic_body"]) == EXPECTED_REVIEWED_SEMANTIC_CONTENT_SHA256
+    assert _semantic_hash(candidate["effective_combined_contract_binding"]) == EXPECTED_REVIEWED_EFFECTIVE_BINDING_SHA256
 
 
 def test_candidate_binds_exact_current_bytes_of_every_named_authority():

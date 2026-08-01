@@ -598,6 +598,35 @@ def materialize_parser_a(raw_bytes: bytes, expected_utc_date: date, instrument_i
             anomalies=["SCHEMA_IDENTITY_MISMATCH"], reason="; ".join(schema_violations),
         )
 
+    # Defense-in-depth: independently reverify, at this public boundary, that
+    # every exact-X identity available here still names the same raw bytes --
+    # never trust the private primitive's own internal source-hash check
+    # alone (that check must also remain, unmodified, in
+    # _materialize_parser_a_unadmitted). A hostile mutation that silently
+    # removes/weakens the private check must still be caught here.
+    source_identity_violations = []
+    if candidate.raw_object_sha256 != raw_sha:
+        source_identity_violations.append(
+            f"candidate.raw_object_sha256 {candidate.raw_object_sha256!r} != sha256(raw_bytes) {raw_sha!r}"
+        )
+    if candidate.record is None:
+        source_identity_violations.append("candidate.record is not present")
+    else:
+        candidate_source_sha = candidate.record.get("source_object_sha256")
+        if candidate_source_sha != raw_sha:
+            source_identity_violations.append(
+                f"candidate.record['source_object_sha256'] {candidate_source_sha!r} != sha256(raw_bytes) {raw_sha!r}"
+            )
+    if evaluation.source_object_sha256 != raw_sha:
+        source_identity_violations.append(
+            f"evaluation.source_object_sha256 {evaluation.source_object_sha256!r} != sha256(raw_bytes) {raw_sha!r}"
+        )
+    if source_identity_violations:
+        return MaterializationResult(
+            status=MATERIALIZATION_QUARANTINED, parser="A", raw_object_sha256=raw_sha,
+            anomalies=[rc.ANOMALY_SOURCE_MUTATION], reason="; ".join(source_identity_violations),
+        )
+
     return MaterializationResult(
         status=MATERIALIZED_VALID, parser="A", raw_object_sha256=raw_sha, record=candidate.record, anomalies=[],
     )

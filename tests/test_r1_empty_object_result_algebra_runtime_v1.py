@@ -280,6 +280,94 @@ def test_public_path_rejects_candidate_with_substituted_schema_id(monkeypatch):
     assert result.is_valid is False
 
 
+def test_public_path_rejects_candidate_with_substituted_source_object_sha256(monkeypatch):
+    """End-to-end reproduction of the hostile-review blocker
+    PUBLIC_VALID_WITH_WRONG_SOURCE_OBJECT_HASH: even if the private
+    primitive's candidate record carried a forged record.source_object_sha256
+    (e.g. because the private primitive's own check were mutated away), the
+    public boundary must independently reverify record.source_object_sha256
+    against sha256(raw_bytes) itself and quarantine on mismatch -- there is
+    no caller-facing parameter to inject this."""
+    raw = _valid_object()
+    raw_sha = _sha256(raw)
+    real_unadmitted = materializer._materialize_parser_a_unadmitted
+
+    def forged(*a, **k):
+        result = real_unadmitted(*a, **k)
+        forged_record = dict(result.record)
+        forged_record["source_object_sha256"] = "b" * 64
+        return materializer.MaterializationResult(
+            status=result.status, parser=result.parser, raw_object_sha256=result.raw_object_sha256,
+            record=forged_record, anomalies=result.anomalies,
+        )
+
+    monkeypatch.setattr(materializer, "_materialize_parser_a_unadmitted", forged)
+    result = materializer.materialize_parser_a(raw, UTC_DATE, INSTRUMENT)
+
+    assert result.status == materializer.MATERIALIZATION_QUARANTINED
+    assert result.is_valid is False
+    assert result.record is None
+    assert result.observation is None
+    assert result.raw_object_sha256 == raw_sha
+    assert materializer.rc.ANOMALY_SOURCE_MUTATION in result.anomalies
+
+
+def test_public_path_rejects_candidate_with_substituted_raw_object_sha256(monkeypatch):
+    """Second substitution channel: candidate.raw_object_sha256 itself forged
+    to a wrong-but-syntactically-valid hash, even though the record's own
+    embedded source_object_sha256 is correct. The public boundary must reject
+    this channel too, independent of the record-embedded check above."""
+    raw = _valid_object()
+    raw_sha = _sha256(raw)
+    real_unadmitted = materializer._materialize_parser_a_unadmitted
+
+    def forged(*a, **k):
+        result = real_unadmitted(*a, **k)
+        return materializer.MaterializationResult(
+            status=result.status, parser=result.parser, raw_object_sha256="b" * 64,
+            record=dict(result.record), anomalies=result.anomalies,
+        )
+
+    monkeypatch.setattr(materializer, "_materialize_parser_a_unadmitted", forged)
+    result = materializer.materialize_parser_a(raw, UTC_DATE, INSTRUMENT)
+
+    assert result.status == materializer.MATERIALIZATION_QUARANTINED
+    assert result.is_valid is False
+    assert result.record is None
+    assert result.observation is None
+    assert result.raw_object_sha256 == raw_sha
+    assert materializer.rc.ANOMALY_SOURCE_MUTATION in result.anomalies
+
+
+def test_public_path_rejects_admission_evaluation_with_substituted_source_object_sha256(monkeypatch):
+    """Third substitution channel: evaluation.source_object_sha256 itself
+    forged to a wrong-but-syntactically-valid hash, even though both the
+    candidate's raw_object_sha256 and its record's embedded
+    source_object_sha256 are correct. The public boundary must
+    independently reject this channel too -- it must not rely solely on the
+    candidate-side checks and skip re-verifying the admission evaluation's
+    own source-identity binding."""
+    raw = _valid_object()
+    raw_sha = _sha256(raw)
+    real_evaluation = admission.evaluate_schema_admission(raw)
+    forged_evaluation = admission.SchemaAdmissionEvaluation(
+        source_object_sha256="b" * 64,
+        recognition_disposition=real_evaluation.recognition_disposition,
+        schema_id=real_evaluation.schema_id,
+        admission=real_evaluation.admission,
+        reasons=real_evaluation.reasons,
+    )
+    monkeypatch.setattr(materializer.admission, "evaluate_schema_admission", lambda *a, **k: forged_evaluation)
+    result = materializer.materialize_parser_a(raw, UTC_DATE, INSTRUMENT)
+
+    assert result.status == materializer.MATERIALIZATION_QUARANTINED
+    assert result.is_valid is False
+    assert result.record is None
+    assert result.observation is None
+    assert result.raw_object_sha256 == raw_sha
+    assert materializer.rc.ANOMALY_SOURCE_MUTATION in result.anomalies
+
+
 def test_no_caller_facing_parameter_can_inject_schema_id():
     params = set(inspect.signature(materializer.materialize_parser_a).parameters)
     assert params == {"raw_bytes", "expected_utc_date", "instrument_instance_id", "expected_raw_sha256"}

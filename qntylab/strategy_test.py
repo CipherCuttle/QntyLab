@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
 import json
 import math
@@ -19,8 +20,14 @@ from .strategies import positions
 SCHEMA_VERSION = 1
 STRATEGY_VERSION = "existing-qntylab-strategies-v1"
 EXPLORATORY_ONLY = True
-BOUNDARY_MODES = {"STRICTLY_BEFORE_BAR_OPEN", "AT_OR_BEFORE_BAR_OPEN"}
-STRATEGIES = {"H002_momentum"}
+NOT_APPLICABLE = "NOT_APPLICABLE"
+BOUNDARY_MODES = {NOT_APPLICABLE, "STRICTLY_BEFORE_BAR_OPEN", "AT_OR_BEFORE_BAR_OPEN"}
+STRATEGIES = {
+    "H002_momentum": {"parameters": {"lookback": int, "mode": str}, "uses_funding": False},
+    "H003_moving_average": {"parameters": {"fast": int, "slow": int, "mode": str}, "uses_funding": False},
+    "H004_mean_reversion": {"parameters": {"lookback": int, "threshold": float, "mode": str}, "uses_funding": False},
+    "H005_donchian": {"parameters": {"lookback": int, "mode": str}, "uses_funding": False},
+}
 CONFIG_KEYS = {
     "schema_version",
     "strategy_id",
@@ -34,6 +41,21 @@ CONFIG_KEYS = {
     "funding_boundary_mode",
     "parameters",
 }
+SUMMARY_FIELDS = (
+    "run_id",
+    "strategy_id",
+    "symbol",
+    "window_start",
+    "window_end",
+    "observation_count",
+    "trade_count",
+    "gross_return",
+    "net_return",
+    "total_cost",
+    "maximum_drawdown",
+    "status",
+    "receipt_path",
+)
 
 
 def _canonical_bytes(value: Any) -> bytes:
@@ -68,6 +90,25 @@ def _finite_number(config: dict[str, Any], key: str, *, minimum: float | None = 
     return number
 
 
+def _validate_parameters(strategy_id: str, params: dict[str, Any]) -> None:
+    expected = STRATEGIES[strategy_id]["parameters"]
+    if set(params) != set(expected):
+        raise ValueError(f"{strategy_id} parameters must contain exactly {sorted(expected)}")
+    for key, kind in expected.items():
+        value = params[key]
+        if kind is int:
+            if not isinstance(value, int) or isinstance(value, bool) or value < 1:
+                raise ValueError(f"parameters.{key} must be a positive integer")
+        elif kind is float:
+            if not isinstance(value, (int, float)) or isinstance(value, bool) or not math.isfinite(float(value)) or float(value) <= 0:
+                raise ValueError(f"parameters.{key} must be a positive finite number")
+    mode = params.get("mode")
+    if mode is not None and mode not in {"long_flat", "long_short"}:
+        raise ValueError("parameters.mode must be long_flat or long_short")
+    if strategy_id == "H003_moving_average" and params["fast"] >= params["slow"]:
+        raise ValueError("parameters.fast must be less than parameters.slow")
+
+
 def load_config(path: Path, *, input_path: Path | None = None, strategy_id: str | None = None) -> dict[str, Any]:
     config = _load_json(path)
     extra = set(config) - CONFIG_KEYS
@@ -86,15 +127,11 @@ def load_config(path: Path, *, input_path: Path | None = None, strategy_id: str 
         raise ValueError(f"unsupported strategy_version: {config['strategy_version']!r}")
     if config["funding_boundary_mode"] not in BOUNDARY_MODES:
         raise ValueError(f"unknown funding_boundary_mode: {config['funding_boundary_mode']!r}")
+    if not STRATEGIES[config["strategy_id"]]["uses_funding"] and config["funding_boundary_mode"] != NOT_APPLICABLE:
+        raise ValueError(f"{config['strategy_id']} does not use funding; funding_boundary_mode must be {NOT_APPLICABLE}")
     if not isinstance(config["parameters"], dict):
         raise ValueError("parameters must be an object")
-    params = config["parameters"]
-    if set(params) != {"lookback", "mode"}:
-        raise ValueError("H002_momentum parameters must contain exactly lookback and mode")
-    if not isinstance(params["lookback"], int) or isinstance(params["lookback"], bool) or params["lookback"] < 1:
-        raise ValueError("parameters.lookback must be a positive integer")
-    if params["mode"] not in {"long_flat", "long_short"}:
-        raise ValueError("parameters.mode must be long_flat or long_short")
+    _validate_parameters(config["strategy_id"], config["parameters"])
     if not isinstance(config["evaluation_start"], str) or not isinstance(config["evaluation_end"], str):
         raise ValueError("evaluation_start and evaluation_end must be strings")
     if config["evaluation_start"] > config["evaluation_end"]:
@@ -116,6 +153,14 @@ def _normalize_input_path(path: Path, config_path: Path) -> Path:
     if candidate.exists():
         return candidate
     return (config_path.parent / path).resolve()
+
+
+def _symbol_from_input(path: Path) -> str:
+    name = path.name
+    for suffix in ("-perp-1h.csv", "-1h.csv", "-perp-1d.csv"):
+        if name.endswith(suffix):
+            return name.removesuffix(suffix)
+    return path.stem
 
 
 def _evaluation_window(rows: list[dict[str, str]], start: str, end: str) -> tuple[int, int]:
@@ -140,6 +185,47 @@ def _metrics(close: np.ndarray, position: np.ndarray, total_cost_bps: float) -> 
     }
     _canonical_bytes(metrics)
     return metrics
+
+
+def _validate_positions(position: np.ndarray) -> None:
+    if not np.all(np.isfinite(position)):
+        raise ValueError("non-finite position values")
+    values = set(position.tolist())
+    if not values <= {-1.0, 0.0, 1.0}:
+        raise ValueError(f"positions must be bounded to -1, 0, and 1; got {sorted(values)}")
+
+
+def sanity_warnings(metrics: dict[str, Any]) -> list[str]:
+    warnings: list[str] = []
+    numeric = ("gross_return", "net_return", "total_cost", "maximum_drawdown")
+    if any(not isinstance(metrics.get(key), (int, float)) or isinstance(metrics.get(key), bool) or not math.isfinite(float(metrics[key])) for key in numeric):
+        warnings.append("non-finite metric")
+    if metrics.get("trade_count") == 0:
+        warnings.append("zero trades")
+    if isinstance(metrics.get("trade_count"), int) and 0 < metrics["trade_count"] < 10:
+        warnings.append("fewer than 10 trades")
+    if isinstance(metrics.get("net_return"), (int, float)) and not isinstance(metrics.get("net_return"), bool) and math.isfinite(float(metrics["net_return"])) and abs(float(metrics["net_return"])) > 1:
+        warnings.append("absolute net return above 100%")
+    if isinstance(metrics.get("maximum_drawdown"), (int, float)) and not isinstance(metrics.get("maximum_drawdown"), bool) and math.isfinite(float(metrics["maximum_drawdown"])) and float(metrics["maximum_drawdown"]) < -0.8:
+        warnings.append("maximum drawdown below -80%")
+    if (
+        isinstance(metrics.get("gross_return"), (int, float))
+        and isinstance(metrics.get("net_return"), (int, float))
+        and isinstance(metrics.get("total_cost"), (int, float))
+        and math.isfinite(float(metrics["gross_return"]))
+        and math.isfinite(float(metrics["net_return"]))
+        and math.isfinite(float(metrics["total_cost"]))
+        and float(metrics["total_cost"]) > 0
+        and float(metrics["gross_return"]) < float(metrics["net_return"])
+    ):
+        warnings.append("gross return lower than net return when costs are positive")
+    return warnings
+
+
+def _validate_finite_metrics(metrics: dict[str, Any]) -> None:
+    for key, value in metrics.items():
+        if isinstance(value, float) and not math.isfinite(value):
+            raise ValueError(f"non-finite metric: {key}")
 
 
 def run_strategy(
@@ -168,8 +254,10 @@ def run_strategy(
     if not np.all(np.isfinite(close)):
         raise ValueError("non-finite close values in evaluation window")
     position = positions(strategy_id, close, config["parameters"])
+    _validate_positions(position)
     total_cost_bps = float(config["fee_bps"]) + float(config["slippage_bps"])
     metrics = _metrics(close, position, total_cost_bps)
+    _validate_finite_metrics(metrics)
     run_id = output.name
     output.mkdir(parents=True, exist_ok=True)
     metrics_path = output / "metrics.json"
@@ -181,10 +269,13 @@ def run_strategy(
         "created_at_utc": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
         "repository_commit": _repository_commit(),
         "strategy_id": strategy_id,
+        "symbol": _symbol_from_input(normalized_input),
         "strategy_version": config["strategy_version"],
+        "parameters": config["parameters"],
         "config_sha256": sha256_path(config_path),
         "input_sha256": sha256_path(normalized_input),
         "funding_boundary_mode": config["funding_boundary_mode"],
+        "initial_capital": float(config["initial_capital"]),
         "fee_assumption": {"fee_bps": float(config["fee_bps"])},
         "slippage_assumption": {"slippage_bps": float(config["slippage_bps"])},
         "evaluation_range": {"start": config["evaluation_start"], "end": config["evaluation_end"]},
@@ -193,11 +284,54 @@ def run_strategy(
         "result_artifact_paths": result_paths,
         "result_artifact_sha256": result_hashes,
         "status": "completed",
+        "warnings": sanity_warnings(metrics),
         "exploratory_only": EXPLORATORY_ONLY,
     }
     receipt_path = output / "run_receipt.json"
     receipt_path.write_bytes(_canonical_bytes(receipt) + b"\n")
     return {"metrics": metrics, "receipt": receipt, "metrics_path": metrics_path, "receipt_path": receipt_path}
+
+
+def summarize_runs(run_dirs: list[Path], output_path: Path) -> dict[str, Any]:
+    rows: list[dict[str, Any]] = []
+    warning_count = 0
+    for run_dir in sorted(run_dirs):
+        receipt_path = run_dir / "run_receipt.json"
+        metrics_path = run_dir / "metrics.json"
+        if not receipt_path.exists() or not metrics_path.exists():
+            raise FileNotFoundError(f"missing run artifacts: {run_dir}")
+        receipt = _load_json(receipt_path)
+        metrics = _load_json(metrics_path)
+        if receipt.get("result_artifact_sha256", {}).get("metrics") != sha256_path(metrics_path):
+            warning_count += 1
+            status = "receipt/hash mismatch"
+        else:
+            status = str(receipt.get("status", "UNKNOWN"))
+        warnings = set(sanity_warnings(metrics)) | set(receipt.get("warnings", []))
+        warning_count += len(warnings)
+        row = {
+            "run_id": receipt["run_id"],
+            "strategy_id": receipt["strategy_id"],
+            "symbol": receipt.get("symbol", ""),
+            "window_start": receipt["evaluation_range"]["start"],
+            "window_end": receipt["evaluation_range"]["end"],
+            "observation_count": metrics["observation_count"],
+            "trade_count": metrics["trade_count"],
+            "gross_return": metrics["gross_return"],
+            "net_return": metrics["net_return"],
+            "total_cost": metrics["total_cost"],
+            "maximum_drawdown": metrics["maximum_drawdown"],
+            "status": status,
+            "receipt_path": str(receipt_path),
+        }
+        rows.append(row)
+    rows.sort(key=lambda row: (row["strategy_id"], row["symbol"], row["window_start"]))
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with output_path.open("w", newline="", encoding="utf-8") as out:
+        writer = csv.DictWriter(out, fieldnames=SUMMARY_FIELDS)
+        writer.writeheader()
+        writer.writerows(rows)
+    return {"rows": rows, "warning_count": warning_count, "summary_path": output_path, "summary_sha256": sha256_path(output_path)}
 
 
 def _repository_commit() -> str:

@@ -1,16 +1,16 @@
 {
   "schema_version": 1,
-  "strategy_id": "H002_momentum",
+  "strategy_id": "H005_donchian",
   "strategy_version": "existing-qntylab-strategies-v1",
   "input_path": "data/raw/BTCUSDT-1h.csv",
-  "evaluation_start": "2021-01-01T00:00:00Z",
-  "evaluation_end": "2021-01-15T00:00:00Z",
+  "evaluation_start": "2023-10-15T00:00:00Z",
+  "evaluation_end": "2024-01-12T23:00:00Z",
   "initial_capital": 10000,
   "fee_bps": 10,
   "slippage_bps": 0,
   "funding_boundary_mode": "NOT_APPLICABLE",
   "parameters": {
-    "lookback": 24,
+    "lookback": 72,
     "mode": "long_flat"
   }
 }

@@ -42,6 +42,15 @@ FORENSIC_PATH = DATA / "r1_empty_object_schema_id_contract_forensic_review_v1.js
 
 PARENT_HEAD = "ce9e2ceed932e338141cbc144e9c22af1d9d138b"
 
+EXPECTED_REVIEWED_SEMANTIC_CONTENT_SHA256 = (
+    "4c50be84a84b9ba4817fd92ef1cb5dde"
+    "075b66135e1a00bacf532ac1b6876c46"
+)
+EXPECTED_REVIEWED_EFFECTIVE_BINDING_SHA256 = (
+    "5406f96160662e3d7da6d04c43dda58e"
+    "96e0f965c7f73ac321a63283710899d6"
+)
+
 
 def _canonical_bytes(value):
     return (json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True) + "\n").encode()
@@ -92,6 +101,48 @@ def test_candidate_semantic_content_hash_recomputes_exactly():
 def test_candidate_effective_binding_hash_recomputes_exactly():
     candidate = _candidate()
     assert _semantic_hash(candidate["effective_combined_contract_binding"]) == candidate["effective_combined_contract_binding_sha256"]
+
+
+def test_candidate_semantics_are_pinned_to_exact_reviewed_digest():
+    """Pin the independently reviewed semantics and authority composition.
+
+    The candidate's self-declared hashes establish internal consistency.
+    These externally pinned expected values establish preservation of the
+    exact semantic body and authority composition independently reviewed at
+    candidate commit 223c320 and unchanged at test-hardening commit cfb8d7e.
+    Any intended semantic change must update this oracle visibly and undergo
+    fresh hostile review.
+    """
+    candidate = _candidate()
+    assert _semantic_hash(candidate["semantic_body"]) == EXPECTED_REVIEWED_SEMANTIC_CONTENT_SHA256
+    assert candidate["amendment_semantic_content_sha256"] == EXPECTED_REVIEWED_SEMANTIC_CONTENT_SHA256
+    assert _semantic_hash(candidate["effective_combined_contract_binding"]) == EXPECTED_REVIEWED_EFFECTIVE_BINDING_SHA256
+    assert candidate["effective_combined_contract_binding_sha256"] == EXPECTED_REVIEWED_EFFECTIVE_BINDING_SHA256
+
+
+def test_candidate_top_level_shape_has_no_unreviewed_escape_hatch():
+    """Keep semantic_body as the sole normative semantic payload.
+
+    An unexpected top-level field must not become a shadow semantic channel.
+    Freeze-time additions such as freeze_provenance require an explicit,
+    reviewable test update as part of the governance-only freeze commit.
+    """
+    assert set(_candidate()) == {
+        "amendment_semantic_content_sha256",
+        "artifact",
+        "artifact_kind",
+        "bound_authority",
+        "effective_combined_contract_binding",
+        "effective_combined_contract_binding_sha256",
+        "next_step",
+        "outcome_embargo",
+        "parent_head",
+        "raw_deletion_authorized",
+        "self_freeze_authorized",
+        "semantic_body",
+        "status",
+        "tests",
+    }
 
 
 def test_candidate_binds_exact_current_bytes_of_every_named_authority():

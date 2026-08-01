@@ -16,4 +16,18 @@ python -m qntylab.cli run experiments/specs/sprint_v1_perp.json
 python -m pytest -q
 ```
 
+Minimum single-strategy test path:
+
+```bash
+python -m qntylab.strategy_test run --strategy H002_momentum --input data/raw/BTCUSDT-1h.csv --config experiments/specs/minimum_strategy_test_h002_momentum.json --output experiments/runs/h002_momentum_btcusdt_20210101_20210115
+```
+
+The strategy-test config is strict JSON with `schema_version`,
+`strategy_id`, `strategy_version`, `input_path`, `evaluation_start`,
+`evaluation_end`, `initial_capital`, `fee_bps`, `slippage_bps`,
+`funding_boundary_mode`, and `parameters`. The funding boundary is always
+explicit in the config and receipt; this exploratory path does not resolve any
+Formal QNTY C2 rule. A completed run writes `metrics.json` and
+`run_receipt.json` under the requested run directory.
+
 The source is Binance's documented public-market-data endpoint. The downloader excludes the currently open candle and validates monotonic timestamps, OHLC consistency, finite positive prices, non-negative volume, and gaps without filling them.

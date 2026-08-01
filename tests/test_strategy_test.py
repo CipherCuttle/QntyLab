@@ -1,12 +1,22 @@
 import csv
 import json
+import subprocess
 from pathlib import Path
 
 import numpy as np
 import pytest
 
 from qntylab.backtest import evaluate
-from qntylab.strategy_test import load_config, run_strategy, sanity_warnings, sha256_path, summarize_runs
+from qntylab.strategy_test import (
+    assert_relevant_source_clean,
+    load_config,
+    relevant_source_clean,
+    relevant_source_sha256,
+    run_strategy,
+    sanity_warnings,
+    sha256_path,
+    summarize_runs,
+)
 from qntylab.strategies import positions
 
 
@@ -25,6 +35,8 @@ def config(tmp_path, **overrides):
         "fee_bps": 10,
         "slippage_bps": 0,
         "funding_boundary_mode": "NOT_APPLICABLE",
+        "gap_policy": "REJECT",
+        "expected_interval": "1h",
         "parameters": {"lookback": 3, "mode": "long_flat"},
     }
     value.update(overrides)
@@ -41,6 +53,66 @@ def run_once(tmp_path, cfg=None, name="run"):
         config_path=cfg,
         output=tmp_path / name,
     )
+
+
+def write_fixture(path: Path, closes: list[float], *, skip_hour: int | None = None) -> None:
+    rows = []
+    for i, close in enumerate(closes):
+        hour = i if skip_hour is None or i < skip_hour else i + 1
+        rows.append(
+            {
+                "timestamp": f"2021-01-01T{hour:02d}:00:00Z",
+                "open": str(close),
+                "high": str(close),
+                "low": str(close),
+                "close": str(close),
+                "volume": "1",
+            }
+        )
+    with path.open("w", newline="", encoding="utf-8") as out:
+        writer = csv.DictWriter(out, fieldnames=["timestamp", "open", "high", "low", "close", "volume"])
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def test_relevant_clean_source_runs(tmp_path):
+    assert relevant_source_clean()
+    assert run_once(tmp_path)["receipt"]["relevant_source_clean"] is True
+
+
+def test_relevant_source_cleanliness_checks_only_bound_tracked_files(tmp_path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init"], cwd=repo, check=True, stdout=subprocess.DEVNULL)
+    subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=repo, check=True)
+    subprocess.run(["git", "config", "user.name", "Test"], cwd=repo, check=True)
+    bound = repo / "qntylab/strategy_test.py"
+    unrelated = repo / "data/manifests/dirty.json"
+    bound.parent.mkdir(parents=True)
+    unrelated.parent.mkdir(parents=True)
+    bound.write_text("one\n", encoding="utf-8")
+    unrelated.write_text("one\n", encoding="utf-8")
+    subprocess.run(["git", "add", "qntylab/strategy_test.py", "data/manifests/dirty.json"], cwd=repo, check=True)
+    subprocess.run(["git", "commit", "-m", "init"], cwd=repo, check=True, stdout=subprocess.DEVNULL)
+
+    unrelated.write_text("two\n", encoding="utf-8")
+    assert relevant_source_clean(repo, ("qntylab/strategy_test.py",))
+    assert_relevant_source_clean(repo, ("qntylab/strategy_test.py",))
+
+    bound.write_text("two\n", encoding="utf-8")
+    assert not relevant_source_clean(repo, ("qntylab/strategy_test.py",))
+    with pytest.raises(RuntimeError, match="relevant tracked source"):
+        assert_relevant_source_clean(repo, ("qntylab/strategy_test.py",))
+
+
+def test_relevant_source_digest_changes_when_bound_bytes_change(tmp_path):
+    repo = tmp_path / "repo"
+    (repo / "qntylab").mkdir(parents=True)
+    source = repo / "qntylab/data.py"
+    source.write_text("one\n", encoding="utf-8")
+    first = relevant_source_sha256(repo, ("qntylab/data.py",))
+    source.write_text("one!\n", encoding="utf-8")
+    assert relevant_source_sha256(repo, ("qntylab/data.py",)) != first
 
 
 def test_valid_config_parses(tmp_path):
@@ -65,6 +137,13 @@ def test_selected_real_strategy_executes_on_fixture(tmp_path):
     assert result["receipt"]["status"] == "completed"
     assert result["metrics"]["observation_count"] == 29
     assert result["metrics"]["trade_count"] > 0
+
+
+def test_receipt_binds_actual_current_commit_and_source_digest(tmp_path):
+    result = run_once(tmp_path)
+    expected_commit = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+    assert result["receipt"]["repository_commit"] == expected_commit
+    assert result["receipt"]["relevant_source_sha256"] == relevant_source_sha256()
 
 
 def test_hand_computable_accounting_fixture():
@@ -92,6 +171,16 @@ def test_hand_computable_accounting_fixture():
     assert result["max_drawdown"] == pytest.approx(float(drawdown.min()))
     assert result["fee_cost"] == pytest.approx(0.004)
     assert result["trade_count"] == 3
+
+
+def test_hand_computable_benchmark_excess_and_exposure_metrics(tmp_path):
+    fixture = tmp_path / "fixture.csv"
+    write_fixture(fixture, [100.0, 110.0, 121.0, 108.9, 119.79, 131.769])
+    cfg = config(tmp_path, input_path=str(fixture), evaluation_end="2021-01-01T05:00:00Z", parameters={"lookback": 1, "mode": "long_flat"}, fee_bps=0)
+    result = run_strategy(strategy_id="H002_momentum", input_path=fixture, config_path=cfg, output=tmp_path / "metrics")["metrics"]
+    assert result["buy_and_hold_return"] == pytest.approx(0.31769)
+    assert result["excess_return_vs_buy_and_hold"] == pytest.approx(result["net_return"] - result["buy_and_hold_return"])
+    assert result["exposure_fraction"] == pytest.approx(3 / 6)
 
 
 def test_cost_units_are_basis_points_per_abs_position_change():
@@ -129,6 +218,18 @@ def test_supported_existing_strategy_ids_dispatch(tmp_path, strategy_id, params)
     assert result["receipt"]["parameters"] == params
 
 
+def test_fixed_h002_followup_dispatch(tmp_path):
+    cfg = config(tmp_path, parameters={"lookback": 24, "mode": "long_flat"})
+    parsed = load_config(cfg, strategy_id="H002_momentum")
+    assert parsed["parameters"] == {"lookback": 24, "mode": "long_flat"}
+
+
+def test_fixed_h003_followup_dispatch(tmp_path):
+    cfg = config(tmp_path, strategy_id="H003_moving_average", parameters={"fast": 24, "slow": 96, "mode": "long_flat"})
+    parsed = load_config(cfg, strategy_id="H003_moving_average")
+    assert parsed["parameters"] == {"fast": 24, "slow": 96, "mode": "long_flat"}
+
+
 def test_future_data_cannot_influence_earlier_decision(tmp_path):
     changed = tmp_path / "changed.csv"
     rows = list(csv.DictReader(FIXTURE.open(newline="", encoding="utf-8")))
@@ -156,6 +257,18 @@ def test_output_collision_fails_without_overwrite(tmp_path):
         run_once(tmp_path, name="collision")
 
 
+def test_gap_free_fixture_succeeds_and_missing_hour_fails(tmp_path):
+    good = tmp_path / "good.csv"
+    bad = tmp_path / "bad.csv"
+    closes = [100.0, 101.0, 102.0, 103.0, 104.0]
+    write_fixture(good, closes)
+    write_fixture(bad, closes, skip_hour=3)
+    cfg = config(tmp_path, input_path=str(good), evaluation_end="2021-01-01T04:00:00Z", parameters={"lookback": 1, "mode": "long_flat"})
+    assert run_strategy(strategy_id="H002_momentum", input_path=good, config_path=cfg, output=tmp_path / "good")["receipt"]["gap_policy"] == "REJECT"
+    with pytest.raises(ValueError, match="timestamp gap rejected"):
+        run_strategy(strategy_id="H002_momentum", input_path=bad, config_path=cfg, output=tmp_path / "bad")
+
+
 def test_receipt_binds_input_config_code_and_results(tmp_path):
     cfg = config(tmp_path)
     result = run_once(tmp_path, cfg)
@@ -163,6 +276,8 @@ def test_receipt_binds_input_config_code_and_results(tmp_path):
     assert receipt["config_sha256"] == sha256_path(cfg)
     assert receipt["input_sha256"] == sha256_path(FIXTURE)
     assert receipt["repository_commit"]
+    assert receipt["relevant_source_clean"] is True
+    assert receipt["relevant_source_sha256"] == relevant_source_sha256()
     assert receipt["result_artifact_sha256"]["metrics"] == sha256_path(result["metrics_path"])
     assert receipt["parameters"] == {"lookback": 3, "mode": "long_flat"}
 
@@ -212,6 +327,8 @@ def test_batch_summary_is_deterministic_and_reads_artifacts(tmp_path):
     assert [row["strategy_id"] for row in first["rows"]] == ["H002_momentum", "H005_donchian"]
     assert first["rows"] == second["rows"]
     assert first["rows"][0]["gross_return"] == h002["metrics"]["gross_return"]
+    assert "repository_commit" in first["rows"][0]
+    assert "buy_and_hold_return" in first["rows"][0]
 
 
 def test_summary_flags_receipt_hash_mismatch(tmp_path):

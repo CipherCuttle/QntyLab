@@ -1,0 +1,18 @@
+{
+  "evaluation_end": "2022-12-31T23:00:00Z",
+  "evaluation_start": "2022-01-01T00:00:00Z",
+  "expected_interval": "1h",
+  "fee_bps": 10,
+  "funding_boundary_mode": "NOT_APPLICABLE",
+  "gap_policy": "REJECT",
+  "initial_capital": 10000,
+  "input_path": "data/raw/BTCUSDT-1h.csv",
+  "parameters": {
+    "lookback": 24,
+    "mode": "long_flat"
+  },
+  "schema_version": 1,
+  "slippage_bps": 10,
+  "strategy_id": "H002_momentum",
+  "strategy_version": "existing-qntylab-strategies-v1"
+}

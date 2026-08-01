@@ -7,7 +7,7 @@ import json
 import math
 import subprocess
 import sys
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -21,6 +21,14 @@ SCHEMA_VERSION = 1
 STRATEGY_VERSION = "existing-qntylab-strategies-v1"
 EXPLORATORY_ONLY = True
 NOT_APPLICABLE = "NOT_APPLICABLE"
+GAP_POLICY_REJECT = "REJECT"
+EXPECTED_INTERVAL_1H = "1h"
+RELEVANT_SOURCE_PATHS = (
+    "qntylab/strategy_test.py",
+    "qntylab/backtest.py",
+    "qntylab/strategies.py",
+    "qntylab/data.py",
+)
 BOUNDARY_MODES = {NOT_APPLICABLE, "STRICTLY_BEFORE_BAR_OPEN", "AT_OR_BEFORE_BAR_OPEN"}
 STRATEGIES = {
     "H002_momentum": {"parameters": {"lookback": int, "mode": str}, "uses_funding": False},
@@ -39,18 +47,25 @@ CONFIG_KEYS = {
     "fee_bps",
     "slippage_bps",
     "funding_boundary_mode",
+    "gap_policy",
+    "expected_interval",
     "parameters",
 }
 SUMMARY_FIELDS = (
     "run_id",
+    "repository_commit",
+    "relevant_source_sha256",
     "strategy_id",
     "symbol",
-    "window_start",
-    "window_end",
+    "period",
+    "cost_mode",
     "observation_count",
     "trade_count",
+    "exposure_fraction",
     "gross_return",
     "net_return",
+    "buy_and_hold_return",
+    "excess_return_vs_buy_and_hold",
     "total_cost",
     "maximum_drawdown",
     "status",
@@ -68,6 +83,37 @@ def sha256_bytes(data: bytes) -> str:
 
 def sha256_path(path: Path) -> str:
     return sha256_bytes(path.read_bytes())
+
+
+def relevant_source_digests(repo_root: Path | None = None, paths: tuple[str, ...] = RELEVANT_SOURCE_PATHS) -> dict[str, str]:
+    root = repo_root or Path.cwd()
+    return {path: sha256_path(root / path) for path in sorted(paths)}
+
+
+def relevant_source_sha256(repo_root: Path | None = None, paths: tuple[str, ...] = RELEVANT_SOURCE_PATHS) -> str:
+    digest_rows = [{"path": path, "sha256": digest} for path, digest in relevant_source_digests(repo_root, paths).items()]
+    return sha256_bytes(_canonical_bytes(digest_rows))
+
+
+def relevant_source_dirty_paths(repo_root: Path | None = None, paths: tuple[str, ...] = RELEVANT_SOURCE_PATHS) -> list[str]:
+    root = repo_root or Path.cwd()
+    dirty: list[str] = []
+    for path in sorted(paths):
+        worktree = subprocess.run(["git", "diff", "--quiet", "--", path], cwd=root, stderr=subprocess.DEVNULL)
+        staged = subprocess.run(["git", "diff", "--cached", "--quiet", "--", path], cwd=root, stderr=subprocess.DEVNULL)
+        if worktree.returncode or staged.returncode:
+            dirty.append(path)
+    return dirty
+
+
+def relevant_source_clean(repo_root: Path | None = None, paths: tuple[str, ...] = RELEVANT_SOURCE_PATHS) -> bool:
+    return not relevant_source_dirty_paths(repo_root, paths)
+
+
+def assert_relevant_source_clean(repo_root: Path | None = None, paths: tuple[str, ...] = RELEVANT_SOURCE_PATHS) -> None:
+    dirty = relevant_source_dirty_paths(repo_root, paths)
+    if dirty:
+        raise RuntimeError(f"relevant tracked source has uncommitted changes: {dirty}")
 
 
 def _load_json(path: Path) -> dict[str, Any]:
@@ -111,6 +157,8 @@ def _validate_parameters(strategy_id: str, params: dict[str, Any]) -> None:
 
 def load_config(path: Path, *, input_path: Path | None = None, strategy_id: str | None = None) -> dict[str, Any]:
     config = _load_json(path)
+    config.setdefault("gap_policy", GAP_POLICY_REJECT)
+    config.setdefault("expected_interval", EXPECTED_INTERVAL_1H)
     extra = set(config) - CONFIG_KEYS
     missing = CONFIG_KEYS - set(config)
     if extra:
@@ -143,6 +191,10 @@ def load_config(path: Path, *, input_path: Path | None = None, strategy_id: str 
         config["input_path"] = str(input_path)
     if not isinstance(config["input_path"], str) or not config["input_path"]:
         raise ValueError("input_path must be a non-empty string")
+    if config["gap_policy"] != GAP_POLICY_REJECT:
+        raise ValueError(f"unsupported gap_policy: {config['gap_policy']!r}")
+    if config["expected_interval"] != EXPECTED_INTERVAL_1H:
+        raise ValueError(f"unsupported expected_interval: {config['expected_interval']!r}")
     return config
 
 
@@ -163,6 +215,13 @@ def _symbol_from_input(path: Path) -> str:
     return path.stem
 
 
+def _run_labels(run_id: str) -> dict[str, str]:
+    parts = run_id.split("__")
+    if len(parts) == 4:
+        return {"strategy_id": parts[0], "symbol": parts[1], "period": parts[2], "cost_mode": parts[3]}
+    return {"period": "", "cost_mode": ""}
+
+
 def _evaluation_window(rows: list[dict[str, str]], start: str, end: str) -> tuple[int, int]:
     stamps = [row["timestamp"] for row in rows]
     indices = [i for i, stamp in enumerate(stamps) if start <= stamp <= end]
@@ -173,13 +232,34 @@ def _evaluation_window(rows: list[dict[str, str]], start: str, end: str) -> tupl
     return indices[0], indices[-1] + 1
 
 
+def _parse_timestamp(value: str) -> datetime:
+    return datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+
+def _reject_timestamp_gaps(rows: list[dict[str, str]], expected_interval: str) -> None:
+    if expected_interval != EXPECTED_INTERVAL_1H:
+        raise ValueError(f"unsupported expected_interval: {expected_interval!r}")
+    expected_delta = timedelta(hours=1)
+    previous: datetime | None = None
+    for row in rows:
+        current = _parse_timestamp(row["timestamp"])
+        if previous is not None and current - previous != expected_delta:
+            raise ValueError(f"timestamp gap rejected: {previous.isoformat()} -> {current.isoformat()} ({current - previous})")
+        previous = current
+
+
 def _metrics(close: np.ndarray, position: np.ndarray, total_cost_bps: float) -> dict[str, Any]:
     result = evaluate(close, position, total_cost_bps)
+    buy_and_hold_return = float(close[-1] / close[0] - 1)
+    net_return = result["net_cumulative_return"]
     metrics = {
         "observation_count": int(len(close) - 1),
         "trade_count": result["trade_count"],
+        "exposure_fraction": float(np.abs(position).mean()),
         "gross_return": result["gross_cumulative_return"],
-        "net_return": result["net_cumulative_return"],
+        "net_return": net_return,
+        "buy_and_hold_return": buy_and_hold_return,
+        "excess_return_vs_buy_and_hold": float(net_return - buy_and_hold_return),
         "total_cost": result["fee_cost"],
         "maximum_drawdown": result["max_drawdown"],
     }
@@ -244,12 +324,15 @@ def run_strategy(
             raise FileExistsError(f"output directory already exists: {output}")
         if not output.is_dir():
             raise FileExistsError(f"output path exists and is not a directory: {output}")
+    assert_relevant_source_clean()
+    source_sha256 = relevant_source_sha256()
     config = load_config(config_path, input_path=input_path, strategy_id=strategy_id)
     normalized_input = _normalize_input_path(Path(config["input_path"]), config_path)
     if not normalized_input.exists():
         raise FileNotFoundError(f"missing input: {normalized_input}")
     rows = load(normalized_input)
     lo, hi = _evaluation_window(rows, config["evaluation_start"], config["evaluation_end"])
+    _reject_timestamp_gaps(rows[lo:hi], config["expected_interval"])
     close = np.array([float(row["close"]) for row in rows[lo:hi]], dtype=float)
     if not np.all(np.isfinite(close)):
         raise ValueError("non-finite close values in evaluation window")
@@ -264,12 +347,17 @@ def run_strategy(
     metrics_path.write_bytes(_canonical_bytes(metrics) + b"\n")
     result_paths = {"metrics": str(metrics_path)}
     result_hashes = {"metrics": sha256_path(metrics_path)}
+    labels = _run_labels(run_id)
     receipt = {
         "run_id": run_id,
         "created_at_utc": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
         "repository_commit": _repository_commit(),
+        "relevant_source_clean": True,
+        "relevant_source_sha256": source_sha256,
         "strategy_id": strategy_id,
         "symbol": _symbol_from_input(normalized_input),
+        "period": labels["period"],
+        "cost_mode": labels["cost_mode"],
         "strategy_version": config["strategy_version"],
         "parameters": config["parameters"],
         "config_sha256": sha256_path(config_path),
@@ -278,6 +366,8 @@ def run_strategy(
         "initial_capital": float(config["initial_capital"]),
         "fee_assumption": {"fee_bps": float(config["fee_bps"])},
         "slippage_assumption": {"slippage_bps": float(config["slippage_bps"])},
+        "gap_policy": config["gap_policy"],
+        "expected_interval": config["expected_interval"],
         "evaluation_range": {"start": config["evaluation_start"], "end": config["evaluation_end"]},
         "determinism_seed": None,
         "command": command or [],
@@ -311,21 +401,26 @@ def summarize_runs(run_dirs: list[Path], output_path: Path) -> dict[str, Any]:
         warning_count += len(warnings)
         row = {
             "run_id": receipt["run_id"],
+            "repository_commit": receipt.get("repository_commit", ""),
+            "relevant_source_sha256": receipt.get("relevant_source_sha256", ""),
             "strategy_id": receipt["strategy_id"],
             "symbol": receipt.get("symbol", ""),
-            "window_start": receipt["evaluation_range"]["start"],
-            "window_end": receipt["evaluation_range"]["end"],
+            "period": receipt.get("period") or receipt["evaluation_range"]["start"][:4],
+            "cost_mode": receipt.get("cost_mode") or "unknown",
             "observation_count": metrics["observation_count"],
             "trade_count": metrics["trade_count"],
+            "exposure_fraction": metrics["exposure_fraction"],
             "gross_return": metrics["gross_return"],
             "net_return": metrics["net_return"],
+            "buy_and_hold_return": metrics["buy_and_hold_return"],
+            "excess_return_vs_buy_and_hold": metrics["excess_return_vs_buy_and_hold"],
             "total_cost": metrics["total_cost"],
             "maximum_drawdown": metrics["maximum_drawdown"],
             "status": status,
             "receipt_path": str(receipt_path),
         }
         rows.append(row)
-    rows.sort(key=lambda row: (row["strategy_id"], row["symbol"], row["window_start"]))
+    rows.sort(key=lambda row: (row["strategy_id"], row["symbol"], row["period"], row["cost_mode"]))
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", newline="", encoding="utf-8") as out:
         writer = csv.DictWriter(out, fieldnames=SUMMARY_FIELDS)

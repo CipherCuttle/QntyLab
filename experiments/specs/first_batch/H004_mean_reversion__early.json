@@ -1,17 +1,19 @@
 {
-  "schema_version": 1,
-  "strategy_id": "H004_mean_reversion",
-  "strategy_version": "existing-qntylab-strategies-v1",
-  "input_path": "data/raw/BTCUSDT-1h.csv",
-  "evaluation_start": "2021-01-01T00:00:00Z",
+  "candidate_id": "CANDIDATE_H004_MEAN_REVERSION_48_2_LONG_SHORT",
   "evaluation_end": "2021-03-31T23:00:00Z",
-  "initial_capital": 10000,
+  "evaluation_start": "2021-01-01T00:00:00Z",
   "fee_bps": 10,
-  "slippage_bps": 0,
   "funding_boundary_mode": "NOT_APPLICABLE",
+  "initial_capital": 10000,
+  "input_path": "data/raw/BTCUSDT-1h.csv",
   "parameters": {
     "lookback": 48,
     "mode": "long_short",
     "threshold": 2.0
-  }
+  },
+  "research_intent": "SCREEN",
+  "schema_version": 1,
+  "slippage_bps": 0,
+  "strategy_id": "H004_mean_reversion",
+  "strategy_version": "existing-qntylab-strategies-v1"
 }

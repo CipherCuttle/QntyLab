@@ -1,4 +1,5 @@
 {
+  "candidate_id": "CANDIDATE_H002_MOMENTUM_24_LONG_FLAT",
   "evaluation_end": "2026-07-27T23:00:00Z",
   "evaluation_start": "2026-01-01T00:00:00Z",
   "expected_interval": "1h",
@@ -11,6 +12,7 @@
     "lookback": 24,
     "mode": "long_flat"
   },
+  "research_intent": "FOLLOW_UP",
   "schema_version": 1,
   "slippage_bps": 10,
   "strategy_id": "H002_momentum",

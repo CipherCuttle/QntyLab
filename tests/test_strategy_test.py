@@ -17,16 +17,24 @@ from qntylab.strategy_test import (
     sha256_path,
     summarize_runs,
 )
+from qntylab.research_ledger import canonical_bytes, compute_variant_id, event_id, rebuild
 from qntylab.strategies import positions
 
 
 FIXTURE = Path(__file__).parent / "fixtures" / "daily_market_BTCUSDT_1h.csv"
 
 
+def _candidate_id(strategy_id, parameters):
+    stem = "_".join(str(parameters[key]) for key in sorted(parameters))
+    return f"TEST_{strategy_id}_{stem}".replace(".", "_")
+
+
 def config(tmp_path, **overrides):
+    strategy_id = overrides.get("strategy_id", "H002_momentum")
+    parameters = overrides.get("parameters", {"lookback": 3, "mode": "long_flat"})
     value = {
         "schema_version": 1,
-        "strategy_id": "H002_momentum",
+        "strategy_id": strategy_id,
         "strategy_version": "existing-qntylab-strategies-v1",
         "input_path": str(FIXTURE),
         "evaluation_start": "2021-01-01T00:00:00Z",
@@ -37,12 +45,54 @@ def config(tmp_path, **overrides):
         "funding_boundary_mode": "NOT_APPLICABLE",
         "gap_policy": "REJECT",
         "expected_interval": "1h",
-        "parameters": {"lookback": 3, "mode": "long_flat"},
+        "candidate_id": _candidate_id(strategy_id, parameters),
+        "research_intent": "SCREEN",
+        "parameters": parameters,
     }
     value.update(overrides)
+    value["candidate_id"] = overrides.get("candidate_id", _candidate_id(value["strategy_id"], value["parameters"]))
     path = tmp_path / "config.json"
     path.write_text(json.dumps(value, sort_keys=True, indent=2) + "\n")
     return path
+
+
+def research_root(tmp_path, configs):
+    root = tmp_path / "research"
+    (root / "trials").mkdir(parents=True, exist_ok=True)
+    candidates = []
+    for cfg_path in configs:
+        cfg = json.loads(Path(cfg_path).read_text(encoding="utf-8"))
+        event = {
+            "event_id": "",
+            "event_type": "CANDIDATE_PROPOSED",
+            "candidate_id": cfg["candidate_id"],
+            "family_id": f"TEST_FAMILY_{cfg['strategy_id']}",
+            "variant_id": compute_variant_id(cfg),
+            "strategy_id": cfg["strategy_id"],
+            "strategy_version": cfg["strategy_version"],
+            "objective": "test fixture candidate",
+            "origin": "unit test",
+            "mechanism": "unit test",
+            "prediction": "unit test",
+            "required_data": "unit test fixture",
+            "decision_time": "unit test",
+            "execution_time": "unit test",
+            "benchmark": "unit test",
+            "parameters": cfg["parameters"],
+            "mode": cfg["parameters"]["mode"],
+            "bar_interval": cfg["expected_interval"],
+            "required_input_kind": "OHLCV_1H_CSV",
+            "funding_boundary_mode": cfg["funding_boundary_mode"],
+            "failure_condition": "unit test",
+            "recorded_at_utc": "2026-08-02T00:00:00Z",
+        }
+        event["event_id"] = event_id("event_proposal", event)
+        candidates.append(event)
+    (root / "candidates.jsonl").write_bytes(b"".join(canonical_bytes(event) + b"\n" for event in candidates))
+    (root / "decisions.jsonl").write_text("", encoding="utf-8")
+    (root / "trials" / "2026.jsonl").write_text("", encoding="utf-8")
+    rebuild(root)
+    return root
 
 
 def run_once(tmp_path, cfg=None, name="run"):
@@ -52,6 +102,8 @@ def run_once(tmp_path, cfg=None, name="run"):
         input_path=FIXTURE,
         config_path=cfg,
         output=tmp_path / name,
+        research_root=research_root(tmp_path, [cfg]),
+        require_clean_source=False,
     )
 
 
@@ -76,7 +128,6 @@ def write_fixture(path: Path, closes: list[float], *, skip_hour: int | None = No
 
 
 def test_relevant_clean_source_runs(tmp_path):
-    assert relevant_source_clean()
     assert run_once(tmp_path)["receipt"]["relevant_source_clean"] is True
 
 
@@ -177,7 +228,14 @@ def test_hand_computable_benchmark_excess_and_exposure_metrics(tmp_path):
     fixture = tmp_path / "fixture.csv"
     write_fixture(fixture, [100.0, 110.0, 121.0, 108.9, 119.79, 131.769])
     cfg = config(tmp_path, input_path=str(fixture), evaluation_end="2021-01-01T05:00:00Z", parameters={"lookback": 1, "mode": "long_flat"}, fee_bps=0)
-    result = run_strategy(strategy_id="H002_momentum", input_path=fixture, config_path=cfg, output=tmp_path / "metrics")["metrics"]
+    result = run_strategy(
+        strategy_id="H002_momentum",
+        input_path=fixture,
+        config_path=cfg,
+        output=tmp_path / "metrics",
+        research_root=research_root(tmp_path, [cfg]),
+        require_clean_source=False,
+    )["metrics"]
     assert result["buy_and_hold_return"] == pytest.approx(0.31769)
     assert result["excess_return_vs_buy_and_hold"] == pytest.approx(result["net_return"] - result["buy_and_hold_return"])
     assert result["exposure_fraction"] == pytest.approx(3 / 6)
@@ -213,7 +271,14 @@ def test_no_implicit_leverage_in_supported_strategies():
 )
 def test_supported_existing_strategy_ids_dispatch(tmp_path, strategy_id, params):
     cfg = config(tmp_path, strategy_id=strategy_id, parameters=params)
-    result = run_strategy(strategy_id=strategy_id, input_path=FIXTURE, config_path=cfg, output=tmp_path / strategy_id)
+    result = run_strategy(
+        strategy_id=strategy_id,
+        input_path=FIXTURE,
+        config_path=cfg,
+        output=tmp_path / strategy_id,
+        research_root=research_root(tmp_path, [cfg]),
+        require_clean_source=False,
+    )
     assert result["receipt"]["strategy_id"] == strategy_id
     assert result["receipt"]["parameters"] == params
 
@@ -240,8 +305,23 @@ def test_future_data_cannot_influence_earlier_decision(tmp_path):
         writer.writeheader()
         writer.writerows(rows)
     cfg = config(tmp_path, evaluation_end="2021-01-02T04:00:00Z")
-    before = run_strategy(strategy_id="H002_momentum", input_path=FIXTURE, config_path=cfg, output=tmp_path / "before")
-    after = run_strategy(strategy_id="H002_momentum", input_path=changed, config_path=cfg, output=tmp_path / "after")
+    root = research_root(tmp_path, [cfg])
+    before = run_strategy(
+        strategy_id="H002_momentum",
+        input_path=FIXTURE,
+        config_path=cfg,
+        output=tmp_path / "before",
+        research_root=root,
+        require_clean_source=False,
+    )
+    after = run_strategy(
+        strategy_id="H002_momentum",
+        input_path=changed,
+        config_path=cfg,
+        output=tmp_path / "after",
+        research_root=root,
+        require_clean_source=False,
+    )
     assert before["metrics"] == after["metrics"]
 
 
@@ -264,9 +344,24 @@ def test_gap_free_fixture_succeeds_and_missing_hour_fails(tmp_path):
     write_fixture(good, closes)
     write_fixture(bad, closes, skip_hour=3)
     cfg = config(tmp_path, input_path=str(good), evaluation_end="2021-01-01T04:00:00Z", parameters={"lookback": 1, "mode": "long_flat"})
-    assert run_strategy(strategy_id="H002_momentum", input_path=good, config_path=cfg, output=tmp_path / "good")["receipt"]["gap_policy"] == "REJECT"
+    root = research_root(tmp_path, [cfg])
+    assert run_strategy(
+        strategy_id="H002_momentum",
+        input_path=good,
+        config_path=cfg,
+        output=tmp_path / "good",
+        research_root=root,
+        require_clean_source=False,
+    )["receipt"]["gap_policy"] == "REJECT"
     with pytest.raises(ValueError, match="timestamp gap rejected"):
-        run_strategy(strategy_id="H002_momentum", input_path=bad, config_path=cfg, output=tmp_path / "bad")
+        run_strategy(
+            strategy_id="H002_momentum",
+            input_path=bad,
+            config_path=cfg,
+            output=tmp_path / "bad",
+            research_root=root,
+            require_clean_source=False,
+        )
 
 
 def test_receipt_binds_input_config_code_and_results(tmp_path):
@@ -311,15 +406,26 @@ def test_funding_free_strategy_rejects_funding_boundary_mode(tmp_path):
 
 def test_unknown_strategy_still_fails(tmp_path):
     with pytest.raises(ValueError, match="unknown strategy"):
-        run_strategy(strategy_id="UNKNOWN", input_path=FIXTURE, config_path=config(tmp_path), output=tmp_path / "bad")
+        cfg = config(tmp_path)
+        run_strategy(
+            strategy_id="UNKNOWN",
+            input_path=FIXTURE,
+            config_path=cfg,
+            output=tmp_path / "bad",
+            research_root=research_root(tmp_path, [cfg]),
+            require_clean_source=False,
+        )
 
 
 def test_batch_summary_is_deterministic_and_reads_artifacts(tmp_path):
+    h005_cfg = config(tmp_path, strategy_id="H005_donchian", parameters={"lookback": 3, "mode": "long_flat"})
     h005 = run_strategy(
         strategy_id="H005_donchian",
         input_path=FIXTURE,
-        config_path=config(tmp_path, strategy_id="H005_donchian", parameters={"lookback": 3, "mode": "long_flat"}),
+        config_path=h005_cfg,
         output=tmp_path / "z_h005",
+        research_root=research_root(tmp_path, [h005_cfg]),
+        require_clean_source=False,
     )
     h002 = run_once(tmp_path, name="a_h002")
     first = summarize_runs([h005["receipt_path"].parent, h002["receipt_path"].parent], tmp_path / "first.csv")

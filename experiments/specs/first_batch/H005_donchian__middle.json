@@ -1,16 +1,18 @@
 {
-  "schema_version": 1,
-  "strategy_id": "H005_donchian",
-  "strategy_version": "existing-qntylab-strategies-v1",
-  "input_path": "data/raw/BTCUSDT-1h.csv",
-  "evaluation_start": "2023-10-15T00:00:00Z",
+  "candidate_id": "CANDIDATE_H005_DONCHIAN_72_LONG_FLAT",
   "evaluation_end": "2024-01-12T23:00:00Z",
-  "initial_capital": 10000,
+  "evaluation_start": "2023-10-15T00:00:00Z",
   "fee_bps": 10,
-  "slippage_bps": 0,
   "funding_boundary_mode": "NOT_APPLICABLE",
+  "initial_capital": 10000,
+  "input_path": "data/raw/BTCUSDT-1h.csv",
   "parameters": {
     "lookback": 72,
     "mode": "long_flat"
-  }
+  },
+  "research_intent": "SCREEN",
+  "schema_version": 1,
+  "slippage_bps": 0,
+  "strategy_id": "H005_donchian",
+  "strategy_version": "existing-qntylab-strategies-v1"
 }

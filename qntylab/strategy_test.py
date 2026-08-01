@@ -15,6 +15,15 @@ import numpy as np
 
 from .backtest import evaluate
 from .data import load
+from .research_ledger import (
+    RESEARCH_ROOT,
+    RESEARCH_INTENTS,
+    LedgerError,
+    append_canonical_event,
+    build_trial_completed_event,
+    compute_variant_id,
+    preflight,
+)
 from .strategies import positions
 
 SCHEMA_VERSION = 1
@@ -24,6 +33,7 @@ NOT_APPLICABLE = "NOT_APPLICABLE"
 GAP_POLICY_REJECT = "REJECT"
 EXPECTED_INTERVAL_1H = "1h"
 RELEVANT_SOURCE_PATHS = (
+    "qntylab/research_ledger.py",
     "qntylab/strategy_test.py",
     "qntylab/backtest.py",
     "qntylab/strategies.py",
@@ -49,6 +59,8 @@ CONFIG_KEYS = {
     "funding_boundary_mode",
     "gap_policy",
     "expected_interval",
+    "candidate_id",
+    "research_intent",
     "parameters",
 }
 SUMMARY_FIELDS = (
@@ -195,6 +207,10 @@ def load_config(path: Path, *, input_path: Path | None = None, strategy_id: str 
         raise ValueError(f"unsupported gap_policy: {config['gap_policy']!r}")
     if config["expected_interval"] != EXPECTED_INTERVAL_1H:
         raise ValueError(f"unsupported expected_interval: {config['expected_interval']!r}")
+    if not isinstance(config["candidate_id"], str) or not config["candidate_id"].strip():
+        raise ValueError("candidate_id must be a non-empty string")
+    if config["research_intent"] not in RESEARCH_INTENTS:
+        raise ValueError(f"unsupported research_intent: {config['research_intent']!r}")
     return config
 
 
@@ -316,6 +332,8 @@ def run_strategy(
     output: Path,
     overwrite: bool = False,
     command: list[str] | None = None,
+    research_root: Path = RESEARCH_ROOT,
+    require_clean_source: bool = True,
 ) -> dict[str, Any]:
     if strategy_id not in STRATEGIES:
         raise ValueError(f"unknown strategy: {strategy_id!r}")
@@ -324,12 +342,19 @@ def run_strategy(
             raise FileExistsError(f"output directory already exists: {output}")
         if not output.is_dir():
             raise FileExistsError(f"output path exists and is not a directory: {output}")
-    assert_relevant_source_clean()
+    if require_clean_source:
+        assert_relevant_source_clean()
     source_sha256 = relevant_source_sha256()
     config = load_config(config_path, input_path=input_path, strategy_id=strategy_id)
     normalized_input = _normalize_input_path(Path(config["input_path"]), config_path)
     if not normalized_input.exists():
         raise FileNotFoundError(f"missing input: {normalized_input}")
+    input_sha256 = sha256_path(normalized_input)
+    symbol = _symbol_from_input(normalized_input)
+    computed_variant_id = compute_variant_id(config)
+    ledger_binding = preflight(config=config, symbol=symbol, input_sha256=input_sha256, root=research_root)
+    if ledger_binding["variant_id"] != computed_variant_id:
+        raise LedgerError("variant identity mismatch")
     rows = load(normalized_input)
     lo, hi = _evaluation_window(rows, config["evaluation_start"], config["evaluation_end"])
     _reject_timestamp_gaps(rows[lo:hi], config["expected_interval"])
@@ -360,8 +385,16 @@ def run_strategy(
         "cost_mode": labels["cost_mode"],
         "strategy_version": config["strategy_version"],
         "parameters": config["parameters"],
+        "candidate_id": ledger_binding["candidate_id"],
+        "family_id": ledger_binding["family_id"],
+        "variant_id": ledger_binding["variant_id"],
+        "trial_id": ledger_binding["trial_id"],
+        "research_intent": ledger_binding["research_intent"],
+        "candidate_event_id": ledger_binding["candidate_event_id"],
+        "latest_decision_event_id": ledger_binding["latest_decision_event_id"],
+        "ledger_sha256_before_run": ledger_binding["ledger_sha256_before_run"],
         "config_sha256": sha256_path(config_path),
-        "input_sha256": sha256_path(normalized_input),
+        "input_sha256": input_sha256,
         "funding_boundary_mode": config["funding_boundary_mode"],
         "initial_capital": float(config["initial_capital"]),
         "fee_assumption": {"fee_bps": float(config["fee_bps"])},
@@ -379,6 +412,16 @@ def run_strategy(
     }
     receipt_path = output / "run_receipt.json"
     receipt_path.write_bytes(_canonical_bytes(receipt) + b"\n")
+    receipt_sha256 = sha256_path(receipt_path)
+    append_canonical_event(
+        build_trial_completed_event(
+            receipt=receipt,
+            receipt_path=receipt_path,
+            receipt_sha256=receipt_sha256,
+            metrics=metrics,
+        ),
+        research_root,
+    )
     return {"metrics": metrics, "receipt": receipt, "metrics_path": metrics_path, "receipt_path": receipt_path}
 
 
@@ -445,6 +488,7 @@ def _parser() -> argparse.ArgumentParser:
     run.add_argument("--config", required=True, type=Path)
     run.add_argument("--output", required=True, type=Path)
     run.add_argument("--overwrite", action="store_true")
+    run.add_argument("--research-root", type=Path, default=RESEARCH_ROOT)
     return parser
 
 
@@ -458,6 +502,7 @@ def main(argv: list[str] | None = None) -> None:
             config_path=args.config,
             output=args.output,
             overwrite=args.overwrite,
+            research_root=args.research_root,
             command=(["python", "-m", "qntylab.strategy_test", *argv] if argv is not None else sys.argv),
         )
         print(json.dumps({"status": result["receipt"]["status"], "run_id": result["receipt"]["run_id"]}, sort_keys=True))

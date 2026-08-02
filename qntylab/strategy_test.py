@@ -45,6 +45,19 @@ STRATEGIES = {
     "H003_moving_average": {"parameters": {"fast": int, "slow": int, "mode": str}, "uses_funding": False},
     "H004_mean_reversion": {"parameters": {"lookback": int, "threshold": float, "mode": str}, "uses_funding": False},
     "H005_donchian": {"parameters": {"lookback": int, "mode": str}, "uses_funding": False},
+    "H006_short_horizon_reversal": {"parameters": {"lookback": int, "mode": str}, "uses_funding": False},
+    "H007_volatility_scaled_moving_average": {
+        "parameters": {
+            "fast": int,
+            "slow": int,
+            "realized_volatility_window": int,
+            "volatility_baseline_window": int,
+            "minimum_multiplier": float,
+            "maximum_multiplier": float,
+            "mode": str,
+        },
+        "uses_funding": False,
+    },
 }
 CONFIG_KEYS = {
     "schema_version",
@@ -163,8 +176,15 @@ def _validate_parameters(strategy_id: str, params: dict[str, Any]) -> None:
     mode = params.get("mode")
     if mode is not None and mode not in {"long_flat", "long_short"}:
         raise ValueError("parameters.mode must be long_flat or long_short")
-    if strategy_id == "H003_moving_average" and params["fast"] >= params["slow"]:
+    if strategy_id in {"H003_moving_average", "H007_volatility_scaled_moving_average"} and params["fast"] >= params["slow"]:
         raise ValueError("parameters.fast must be less than parameters.slow")
+    if strategy_id == "H007_volatility_scaled_moving_average":
+        if params["mode"] != "long_flat":
+            raise ValueError("H007_volatility_scaled_moving_average mode must be long_flat")
+        if float(params["minimum_multiplier"]) < 0 or float(params["maximum_multiplier"]) > 1:
+            raise ValueError("H007 multipliers must be within [0, 1]")
+        if float(params["minimum_multiplier"]) > float(params["maximum_multiplier"]):
+            raise ValueError("minimum_multiplier must be <= maximum_multiplier")
 
 
 def load_config(path: Path, *, input_path: Path | None = None, strategy_id: str | None = None) -> dict[str, Any]:
@@ -264,6 +284,23 @@ def _reject_timestamp_gaps(rows: list[dict[str, str]], expected_interval: str) -
         previous = current
 
 
+def _strategy_warmup_bars(strategy_id: str, params: dict[str, Any]) -> int:
+    if strategy_id == "H006_short_horizon_reversal":
+        return int(params["lookback"]) + 1
+    if strategy_id == "H007_volatility_scaled_moving_average":
+        rv_window = int(params["realized_volatility_window"])
+        baseline_window = int(params["volatility_baseline_window"])
+        return max(int(params["slow"]), rv_window + baseline_window + 1)
+    return 0
+
+
+def _warmup_window(lo: int, strategy_id: str, params: dict[str, Any]) -> tuple[int, int]:
+    required = _strategy_warmup_bars(strategy_id, params)
+    if lo < required:
+        raise ValueError(f"insufficient warmup observations: need {required}, got {lo}")
+    return lo - required, required
+
+
 def _metrics(close: np.ndarray, position: np.ndarray, total_cost_bps: float) -> dict[str, Any]:
     result = evaluate(close, position, total_cost_bps)
     buy_and_hold_return = float(close[-1] / close[0] - 1)
@@ -283,12 +320,12 @@ def _metrics(close: np.ndarray, position: np.ndarray, total_cost_bps: float) -> 
     return metrics
 
 
-def _validate_positions(position: np.ndarray) -> None:
+def _validate_positions(position: np.ndarray, strategy_id: str, params: dict[str, Any]) -> None:
     if not np.all(np.isfinite(position)):
         raise ValueError("non-finite position values")
-    values = set(position.tolist())
-    if not values <= {-1.0, 0.0, 1.0}:
-        raise ValueError(f"positions must be bounded to -1, 0, and 1; got {sorted(values)}")
+    lower, upper = (-1.0, 1.0) if params.get("mode") == "long_short" else (0.0, 1.0)
+    if np.any(position < lower) or np.any(position > upper):
+        raise ValueError(f"positions must be finite and within [{lower}, {upper}] for {strategy_id}")
 
 
 def sanity_warnings(metrics: dict[str, Any]) -> list[str]:
@@ -357,12 +394,16 @@ def run_strategy(
         raise LedgerError("variant identity mismatch")
     rows = load(normalized_input)
     lo, hi = _evaluation_window(rows, config["evaluation_start"], config["evaluation_end"])
-    _reject_timestamp_gaps(rows[lo:hi], config["expected_interval"])
-    close = np.array([float(row["close"]) for row in rows[lo:hi]], dtype=float)
+    warmup_lo, warmup_observations = _warmup_window(lo, strategy_id, config["parameters"])
+    selected_rows = rows[warmup_lo:hi]
+    _reject_timestamp_gaps(selected_rows, config["expected_interval"])
+    close_all = np.array([float(row["close"]) for row in selected_rows], dtype=float)
+    close = close_all[warmup_observations:]
     if not np.all(np.isfinite(close)):
         raise ValueError("non-finite close values in evaluation window")
-    position = positions(strategy_id, close, config["parameters"])
-    _validate_positions(position)
+    position_all = positions(strategy_id, close_all, config["parameters"])
+    position = position_all[warmup_observations:]
+    _validate_positions(position, strategy_id, config["parameters"])
     total_cost_bps = float(config["fee_bps"]) + float(config["slippage_bps"])
     metrics = _metrics(close, position, total_cost_bps)
     _validate_finite_metrics(metrics)
@@ -402,6 +443,11 @@ def run_strategy(
         "gap_policy": config["gap_policy"],
         "expected_interval": config["expected_interval"],
         "evaluation_range": {"start": config["evaluation_start"], "end": config["evaluation_end"]},
+        "warmup_range": {
+            "start": selected_rows[0]["timestamp"],
+            "end": rows[lo - 1]["timestamp"] if warmup_observations else None,
+            "observation_count": warmup_observations,
+        },
         "determinism_seed": None,
         "command": command or [],
         "result_artifact_paths": result_paths,

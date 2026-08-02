@@ -1,0 +1,291 @@
+{
+  "assets": [
+    {
+      "asset": "BTCUSDT",
+      "authoritative_raw_path": "data/raw/BTCUSDT-1h.csv",
+      "authoritative_raw_sha256": "6dcc8c6293f24e2e91957b286a96d9b87fd646e4b57c846495bd41d1aa225b65",
+      "derived_bar": {
+        "close": "28080.00000000",
+        "high": "28080.00000000",
+        "low": "28080.00000000",
+        "open": "28080.00000000",
+        "timestamp": "2023-03-24T13:00:00Z",
+        "volume": "0.00000000"
+      },
+      "derived_path": "data/derived/focused_trend_validation_v1/BTCUSDT-spot-1h-2023-halt-normalized.csv",
+      "first_post_halt_trade_timestamp": "2023-03-24T14:00:00.062Z",
+      "halt_reference_price": "28080.00000000",
+      "official_archive_sources": {
+        "aggTrades": {
+          "archive_sha256": "e4a0626d79f7476485c8eb71caf466ebb939c6863300cc4456ba27ff13914241",
+          "checksum_file_sha256": "b16e004758be4a6ee63c402162c004b67249061d2cabf6b51f819ec259ecd1a5",
+          "url": "https://data.binance.vision/data/spot/daily/aggTrades/BTCUSDT/BTCUSDT-aggTrades-2023-03-24.zip"
+        },
+        "klines_1h": {
+          "archive_sha256": "ea9d94f28a39ad8029c9c2863cbb7769137188edd957fea35d0313ae4183561f",
+          "checksum_file_sha256": "838a86096f5a24e520a31d14e8b41428a781b0647f970142d5639a6fb1108243",
+          "url": "https://data.binance.vision/data/spot/daily/klines/BTCUSDT/1h/BTCUSDT-1h-2023-03-24.zip"
+        },
+        "klines_1m": {
+          "archive_sha256": "305d0f6cdb8a6cfd8063a7d48c66f14b33727d934857746d549663e94b41312d",
+          "checksum_file_sha256": "e50d1875c88f0cf246e8b568e552f43604832fddaa76e754c5acadde9436f5c6",
+          "url": "https://data.binance.vision/data/spot/daily/klines/BTCUSDT/1m/BTCUSDT-1m-2023-03-24.zip"
+        },
+        "trades": {
+          "archive_sha256": "bceaa0b664b055318c22e509d33c04d532da143e7de41ca2fc3457100439c587",
+          "checksum_file_sha256": "d27fe9d9b81e16fb5cd05c863795fd959d6efc11e07052e4994da942a6108117",
+          "url": "https://data.binance.vision/data/spot/daily/trades/BTCUSDT/BTCUSDT-trades-2023-03-24.zip"
+        }
+      },
+      "reference_trade_timestamp": "2023-03-24T11:27:23.146Z"
+    },
+    {
+      "asset": "ETHUSDT",
+      "authoritative_raw_path": "data/raw/ETHUSDT-1h.csv",
+      "authoritative_raw_sha256": "3584c161874dc3b8d8f9961901e5abaadebe32a1aaba6d321106b8ccb1f61187",
+      "derived_bar": {
+        "close": "1789.52000000",
+        "high": "1789.52000000",
+        "low": "1789.52000000",
+        "open": "1789.52000000",
+        "timestamp": "2023-03-24T13:00:00Z",
+        "volume": "0.00000000"
+      },
+      "derived_path": "data/derived/focused_trend_validation_v1/ETHUSDT-spot-1h-2023-halt-normalized.csv",
+      "first_post_halt_trade_timestamp": "2023-03-24T14:00:00.059Z",
+      "halt_reference_price": "1789.52000000",
+      "official_archive_sources": {
+        "aggTrades": {
+          "archive_sha256": "add3e8f4b0db74f05de94752baa906321c6ad286b34cc40b93b30be3ad85e1c2",
+          "checksum_file_sha256": "e9eb043e6030e97b2a00c3b54679b0861840a34777aebe20042ca56e3a3c0ce8",
+          "url": "https://data.binance.vision/data/spot/daily/aggTrades/ETHUSDT/ETHUSDT-aggTrades-2023-03-24.zip"
+        },
+        "klines_1h": {
+          "archive_sha256": "7b9d19487c37b354003717872987ae5ecb2178b4ff0de1ecdd5a5c84da2f10b1",
+          "checksum_file_sha256": "9f5b755a256d7a3e0a67d7ec9961be91ca0c6d3f6d66643f611e67d4be178163",
+          "url": "https://data.binance.vision/data/spot/daily/klines/ETHUSDT/1h/ETHUSDT-1h-2023-03-24.zip"
+        },
+        "klines_1m": {
+          "archive_sha256": "dd327f356876b38b6b93f07d3ccac87b5abbe2c285d7f8dbbe6363faa7b05e0a",
+          "checksum_file_sha256": "211e83d6007b603c541e56dcb2de2f3fd00e3fdf5b03d41c9f92d087d6e84f8b",
+          "url": "https://data.binance.vision/data/spot/daily/klines/ETHUSDT/1m/ETHUSDT-1m-2023-03-24.zip"
+        },
+        "trades": {
+          "archive_sha256": "69a25e6df194bc5eab14e831d518af07525a1fb93a6eecdccd4aa67232efb09f",
+          "checksum_file_sha256": "38f9b1cf782f2ea87bddbed21d9bca047592c8eee8d5d6cfa7546bfec3db852a",
+          "url": "https://data.binance.vision/data/spot/daily/trades/ETHUSDT/ETHUSDT-trades-2023-03-24.zip"
+        }
+      },
+      "reference_trade_timestamp": "2023-03-24T11:27:22.918Z"
+    },
+    {
+      "asset": "SOLUSDT",
+      "authoritative_raw_path": "data/raw/SOLUSDT-1h.csv",
+      "authoritative_raw_sha256": "c431aa068acbfedf3cb0c38845dfac275044a9cf83367075b47d47f06974e99d",
+      "derived_bar": {
+        "close": "21.73000000",
+        "high": "21.73000000",
+        "low": "21.73000000",
+        "open": "21.73000000",
+        "timestamp": "2023-03-24T13:00:00Z",
+        "volume": "0.00000000"
+      },
+      "derived_path": "data/derived/focused_trend_validation_v1/SOLUSDT-spot-1h-2023-halt-normalized.csv",
+      "first_post_halt_trade_timestamp": "2023-03-24T14:00:00.104Z",
+      "halt_reference_price": "21.73000000",
+      "official_archive_sources": {
+        "aggTrades": {
+          "archive_sha256": "83c5e06dbf1ab23972c95f74b7a0f571a705102865fdeebe36765d609ab4642f",
+          "checksum_file_sha256": "cdb830ff1a29ae689a6c45532b722a1a68ced9c3be9f45fcb16d22cedcff4eb0",
+          "url": "https://data.binance.vision/data/spot/daily/aggTrades/SOLUSDT/SOLUSDT-aggTrades-2023-03-24.zip"
+        },
+        "klines_1h": {
+          "archive_sha256": "ec4941f66dd4579e321046b7fc6403417b965f319d01ca77fef930078856b5d5",
+          "checksum_file_sha256": "5956c70eb22e4d0ee6ff1dc9b29cd772b033422934248182d7571531ad74a522",
+          "url": "https://data.binance.vision/data/spot/daily/klines/SOLUSDT/1h/SOLUSDT-1h-2023-03-24.zip"
+        },
+        "klines_1m": {
+          "archive_sha256": "1b23b0641da34897afa1364cadefea90d02508e4389ee99c6675352552055b65",
+          "checksum_file_sha256": "530bc0e9afb2ecd84d6df305d082eacbaba973594ae2278632c869e09583bde6",
+          "url": "https://data.binance.vision/data/spot/daily/klines/SOLUSDT/1m/SOLUSDT-1m-2023-03-24.zip"
+        },
+        "trades": {
+          "archive_sha256": "9abf92ef3c3bfad4eb32270c183faaa902bcfebf5a1278e82e0fd7a0ad1f31ca",
+          "checksum_file_sha256": "d1fae1ab12ada3bc3d29f540932e218ca2043bd5138a6b4253a2ec06730b66c9",
+          "url": "https://data.binance.vision/data/spot/daily/trades/SOLUSDT/SOLUSDT-trades-2023-03-24.zip"
+        }
+      },
+      "reference_trade_timestamp": "2023-03-24T11:27:21.938Z"
+    }
+  ],
+  "authorized_event": {
+    "authorized_interval": {
+      "end": "2023-03-24T13:59:59.999Z",
+      "start": "2023-03-24T13:00:00Z"
+    },
+    "authorized_timestamp": "2023-03-24T13:00:00Z",
+    "event": "Binance Spot halt on 2023-03-24",
+    "interval": "1h",
+    "market": "Binance Spot"
+  },
+  "causality_invariants": {
+    "engine_semantics": "information available through close t -> position applies to t -> t+1",
+    "invariants": [
+      "changes no official traded price",
+      "creates no artificial intrahour range",
+      "creates no artificial volume",
+      "preserves chronological hourly continuity",
+      "preserves the first post-halt price movement after reopening"
+    ],
+    "normalized_return_semantics": {
+      "2023-03-24T12:00:00Z_to_2023-03-24T13:00:00Z": "zero return when both closes equal the verified halt reference price",
+      "2023-03-24T13:00:00Z_to_2023-03-24T14:00:00Z": "first post-halt hourly movement remains in the 14:00 bar transition"
+    }
+  },
+  "derived_ohlcv_rule": {
+    "activity": {
+      "volume": "0.00000000"
+    },
+    "price_source": "last authoritative Binance Spot execution price before the verified halt",
+    "rule": "open = high = low = close = halt_reference_price",
+    "schema_fields": [
+      "timestamp",
+      "open",
+      "high",
+      "low",
+      "close",
+      "volume"
+    ]
+  },
+  "explicit_forbidden_behavior": [
+    "strategy execution",
+    "backtest invocation",
+    "2023 performance inspection",
+    "creation of normalized production CSVs during preregistration",
+    "mutation of authoritative raw CSVs",
+    "trial-completion events",
+    "decision events",
+    "candidate or parameter changes",
+    "interpolation",
+    "ordinary-gap forward fill",
+    "normalization outside the authorized event",
+    "cross-venue data",
+    "futures substitution",
+    "universal missing-candle filler"
+  ],
+  "gap_policy": {
+    "allowed_normalization_count": 3,
+    "allowed_policy": "NORMALIZE_ONLY_PREREGISTERED_AUTHORITATIVE_HALT",
+    "global_policy_remains": "REJECT",
+    "reject_policy": "REJECT_ALL_OTHER_GAPS",
+    "rules": [
+      "exactly one asset-specific row for BTCUSDT is allowed",
+      "exactly one asset-specific row for ETHUSDT is allowed",
+      "exactly one asset-specific row for SOLUSDT is allowed",
+      "all normalized rows use timestamp 2023-03-24T13:00:00Z",
+      "no other timestamp may be synthesized",
+      "any additional warmup or evaluation gap fails closed",
+      "any source-hash mismatch fails closed",
+      "any source-resolution-artifact mismatch fails closed",
+      "any overlap mismatch between derived and authoritative rows fails closed",
+      "any nonzero volume on the normalized bar fails",
+      "any unequal OHLC value on the normalized bar fails",
+      "any normalization of a period containing authoritative trades fails"
+    ]
+  },
+  "manifest_schema": [
+    "normalization_id",
+    "normalization_version",
+    "screen_or_validation_id",
+    "asset",
+    "market_type",
+    "interval",
+    "derived_path",
+    "authoritative_raw_path",
+    "authoritative_raw_sha256",
+    "derived_sha256",
+    "evaluation_start",
+    "evaluation_end",
+    "warmup_start",
+    "normalized_timestamp",
+    "reason_code",
+    "reference_price",
+    "reference_trade_timestamp",
+    "first_post_halt_trade_timestamp",
+    "source_resolution_artifact_path",
+    "source_resolution_artifact_sha256",
+    "source_resolution_commit",
+    "official_archive_sources",
+    "official_archive_sha256_values",
+    "official_checksum_verification",
+    "created_at_utc",
+    "tool_version"
+  ],
+  "materialization_acceptance_criteria": [
+    "authoritative raw CSV hashes match preregistered values",
+    "source-resolution artifact hashes match",
+    "exactly one derived row is added per asset",
+    "normalized timestamp is exactly 2023-03-24T13:00:00Z",
+    "OHLC equals the verified asset reference price",
+    "volume equals zero",
+    "no authoritative source row is modified",
+    "derived 2023 coverage is exactly 8760 unique hourly timestamps",
+    "no remaining warmup or evaluation gaps exist",
+    "all non-normalized rows match the authoritative raw input",
+    "deterministic rerun is byte-identical",
+    "derived manifests contain complete provenance",
+    "no strategy executes during materialization",
+    "no trial or decision event is added",
+    "raw files remain unchanged",
+    "unrelated WIP remains unchanged"
+  ],
+  "next_task": "MATERIALIZE_NORMALIZED_2023_HOLDOUT_INPUTS_V1",
+  "normalization_id": "PREREGISTER_BINANCE_SPOT_HALT_NORMALIZATION_V1",
+  "normalization_version": "BINANCE_SPOT_HALT_NORMALIZATION_V1",
+  "official_checksum_verification": "passed",
+  "raw_versus_derived_boundary": {
+    "authoritative_raw_rows": "copied byte/value-equivalently",
+    "derived_rows": "exactly one per asset",
+    "other_modified_rows": 0,
+    "raw_files_must_remain_unchanged": true
+  },
+  "reason_code": "BINANCE_SPOT_AUTHORITATIVE_NO_TRADE_HALT",
+  "registered_at_utc": "2026-08-02T00:00:00Z",
+  "schema_version": "1.0.0",
+  "screen_or_validation_id": "focused_trend_validation_v1",
+  "source_predicates": {
+    "affected_symbols": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "SOLUSDT"
+    ],
+    "interval": "1h",
+    "market": "Binance Spot",
+    "official_1h_kline_during_interval": "absent",
+    "official_1m_klines_during_interval": 0,
+    "official_aggTrades_during_interval": 0,
+    "official_source_agreement": "REST and checksum-verified archives",
+    "official_trades_during_interval": 0,
+    "source_resolution_finding": "AUTHORITATIVE_NO_TRADE_INTERVAL_CONFIRMED",
+    "timestamp": "2023-03-24T13:00:00Z"
+  },
+  "source_resolution_artifacts": {
+    "json": {
+      "path": "experiments/research/summaries/focused_trend_validation_v1_2023_source_resolution.json",
+      "sha256": "a945478ce34aec6d4e44c57e407b1a14027b4e9b99b788f9fd08c435804e54b6"
+    },
+    "markdown": {
+      "path": "experiments/research/summaries/focused_trend_validation_v1_2023_source_resolution.md",
+      "sha256": "b9100250f3a850ec433b8c0cf66e5b86ba76c3ff171dfe1b41966c916d00fe88"
+    }
+  },
+  "source_resolution_commit": "5a0fe6baae1d3ec9762384e192adb9b20e472263",
+  "status": "REGISTERED_NOT_MATERIALIZED",
+  "trial_identity_requirements": {
+    "derived_file_sha256_becomes_input_sha256": true,
+    "normalization_version_and_provenance_recorded_in_run_receipt": true,
+    "normalized_holdout_trials_must_not_collide_with_raw_input_trials": true,
+    "original_18_trial_preregistration_scientific_design_unchanged": true,
+    "performance_result_inspection_before_identity_freeze": "forbidden"
+  }
+}

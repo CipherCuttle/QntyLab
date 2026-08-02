@@ -1,0 +1,1002 @@
+{
+  "audit_id": "AUDIT_2023_HOLDOUT_DATA_V1",
+  "authoritative_repair_options": [
+    {
+      "assessment": "preferred",
+      "description": "Reacquire each affected complete spot asset-period from the recorded Binance Spot REST source with source hashes.",
+      "route": "A"
+    },
+    {
+      "assessment": "possible but weaker than complete-period reacquisition",
+      "description": "Reacquire only the exact missing spot raw bar from the same source with immutable provenance.",
+      "route": "B"
+    },
+    {
+      "assessment": "not currently available for registered spot 1h input",
+      "description": "Reconstruct from lower-level authoritative trades or klines already stored locally.",
+      "route": "C"
+    },
+    {
+      "assessment": "not required while recorded source identity supports reacquisition",
+      "description": "Declare the holdout unusable.",
+      "route": "D"
+    }
+  ],
+  "data_mutation": "NOT_PERFORMED",
+  "exact_gaps": {
+    "BTCUSDT": [
+      "2023-03-24T13:00:00Z"
+    ],
+    "ETHUSDT": [
+      "2023-03-24T13:00:00Z"
+    ],
+    "SOLUSDT": [
+      "2023-03-24T13:00:00Z"
+    ]
+  },
+  "explicit_non_actions": [
+    "no data acquisition",
+    "no raw CSV modification",
+    "no manifest modification",
+    "no strategy execution",
+    "no trial event",
+    "no decision event"
+  ],
+  "gap_geometry": {
+    "all_assets_miss_same_timestamp": true,
+    "gap_policy": "REJECT",
+    "gaps_at_start_or_end": false,
+    "missing_bar_invalidates": "full asset-period block for each affected asset under registered REJECT policy"
+  },
+  "generated_by": "qntylab.holdout_data_audit",
+  "holdout_contamination": {
+    "classification": "NO_EVIDENCE_OF_PRIOR_2023_INSPECTION",
+    "exact_variant_2023_evidence_paths": [],
+    "generic_2023_evidence_paths": [
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/research/summaries/curated_breadth_screen_v1_cells.csv"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/research/summaries/curated_breadth_screen_v1_mechanical_summary.md"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/research/summaries/first_batch_summary_compact.csv"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/research/trials/2026.jsonl"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/results/R1_BOUNDED_EVIDENCE_RETENTION_CANDIDATE_V1.md"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/results/R1_FREE_CENSUS.md"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/results/R1_LIFECYCLE_PROOF.md"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/results/R1_PROCUREMENT_PLAN.md"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/results/R1_REFERENCE_PARSER_VALIDATION_V1.md"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/results/SPRINT_V0_REPORT.md"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/results/SPRINT_V2_CROSS_SECTIONAL_REPORT.md"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/results/SPRINT_V2_R1_PRE_FEASIBILITY.md"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/results/sprint_v0_results.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/results/sprint_v1_perp_results.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/results/sprint_v2_results.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/results/sprint_v2_summary.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/119__CANDIDATE_H003_MA_48_192_LONG_FLAT__SOLUSDT__2026YTD__baseline__trial_78599c666ac80a5685865c19/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/142__CANDIDATE_H003_MA_168_720_LONG_FLAT__SOLUSDT__2025__stress__trial_9d180bc6b3efce6a3d9fa837/metrics.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/195__CANDIDATE_H006_REVERSAL_1_LONG_SHORT__BTCUSDT__2024__baseline__trial_3aa6ab1473bfb4e860a49e6e/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/196__CANDIDATE_H006_REVERSAL_1_LONG_SHORT__BTCUSDT__2024__stress__trial_4059276f40d8560642f76688/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/203__CANDIDATE_H006_REVERSAL_1_LONG_SHORT__ETHUSDT__2024__baseline__trial_2cfff6b1899e9d658afc725e/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/204__CANDIDATE_H006_REVERSAL_1_LONG_SHORT__ETHUSDT__2024__stress__trial_b1fd69454b3ea6cf03598608/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/211__CANDIDATE_H006_REVERSAL_1_LONG_SHORT__SOLUSDT__2024__baseline__trial_67c55ab7e3c2130f86a52215/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/212__CANDIDATE_H006_REVERSAL_1_LONG_SHORT__SOLUSDT__2024__stress__trial_c116e0c2bd9fb57048efca50/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/219__CANDIDATE_H006_REVERSAL_3_LONG_SHORT__BTCUSDT__2024__baseline__trial_8d28714cb5925b1c444ffbef/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/220__CANDIDATE_H006_REVERSAL_3_LONG_SHORT__BTCUSDT__2024__stress__trial_1ed1e1ada60fce7b5192641d/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/227__CANDIDATE_H006_REVERSAL_3_LONG_SHORT__ETHUSDT__2024__baseline__trial_112434781b284aa900daa365/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/228__CANDIDATE_H006_REVERSAL_3_LONG_SHORT__ETHUSDT__2024__stress__trial_da7da2515061fd3d63862c7a/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/235__CANDIDATE_H006_REVERSAL_3_LONG_SHORT__SOLUSDT__2024__baseline__trial_5b5ecc62b7c3ff7f8260799a/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/236__CANDIDATE_H006_REVERSAL_3_LONG_SHORT__SOLUSDT__2024__stress__trial_9e04b5f9c36f1c2a4fd048c6/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/242__CANDIDATE_H006_REVERSAL_6_LONG_SHORT__BTCUSDT__2022__stress__trial_6d807b24f3df4941cceb7c65/metrics.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/243__CANDIDATE_H006_REVERSAL_6_LONG_SHORT__BTCUSDT__2024__baseline__trial_b522733a5a5e6739ee210236/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/244__CANDIDATE_H006_REVERSAL_6_LONG_SHORT__BTCUSDT__2024__stress__trial_b31d0f6a0c1967e8afa0ce3d/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/251__CANDIDATE_H006_REVERSAL_6_LONG_SHORT__ETHUSDT__2024__baseline__trial_289c9056f7c525419a69841e/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/252__CANDIDATE_H006_REVERSAL_6_LONG_SHORT__ETHUSDT__2024__stress__trial_bc1babc24ff10270a60ca851/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/259__CANDIDATE_H006_REVERSAL_6_LONG_SHORT__SOLUSDT__2024__baseline__trial_2def868158b40c03ae8bed77/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/260__CANDIDATE_H006_REVERSAL_6_LONG_SHORT__SOLUSDT__2024__stress__trial_4d701f4814acc61d1d270c7d/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/267__CANDIDATE_H006_REVERSAL_12_LONG_SHORT__BTCUSDT__2024__baseline__trial_33f20a291cf03dfe1fd96ac2/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/268__CANDIDATE_H006_REVERSAL_12_LONG_SHORT__BTCUSDT__2024__stress__trial_fce2e03edf82d76fcb1431f1/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/275__CANDIDATE_H006_REVERSAL_12_LONG_SHORT__ETHUSDT__2024__baseline__trial_e219a8c29555f57926a6f254/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/276__CANDIDATE_H006_REVERSAL_12_LONG_SHORT__ETHUSDT__2024__stress__trial_7c53834f6c32dd2462537cc8/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/283__CANDIDATE_H006_REVERSAL_12_LONG_SHORT__SOLUSDT__2024__baseline__trial_cbdcaff8e634c1390424b7a9/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/284__CANDIDATE_H006_REVERSAL_12_LONG_SHORT__SOLUSDT__2024__stress__trial_fbd095ff5b082fe4232d966b/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/291__CANDIDATE_H007_VOL_SCALED_MA_24_96_RV24__BTCUSDT__2024__baseline__trial_565d5982a4ab1530b08e28f0/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/292__CANDIDATE_H007_VOL_SCALED_MA_24_96_RV24__BTCUSDT__2024__stress__trial_c24d69fc0699539798c74842/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/299__CANDIDATE_H007_VOL_SCALED_MA_24_96_RV24__ETHUSDT__2024__baseline__trial_f91039caf685ef125608f95a/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/300__CANDIDATE_H007_VOL_SCALED_MA_24_96_RV24__ETHUSDT__2024__stress__trial_d43f871bf4dbddb95205c177/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/307__CANDIDATE_H007_VOL_SCALED_MA_24_96_RV24__SOLUSDT__2024__baseline__trial_b14ac0153eb99cc94b06a3ed/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/308__CANDIDATE_H007_VOL_SCALED_MA_24_96_RV24__SOLUSDT__2024__stress__trial_e434cd945e02705604683d79/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/311__CANDIDATE_H007_VOL_SCALED_MA_24_96_RV24__SOLUSDT__2026YTD__baseline__trial_f6b529073394019ef07b1c37/metrics.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/312__CANDIDATE_H007_VOL_SCALED_MA_24_96_RV24__SOLUSDT__2026YTD__stress__trial_d304ce24ddef36b9843803e1/metrics.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/315__CANDIDATE_H007_VOL_SCALED_MA_24_96_RV72__BTCUSDT__2024__baseline__trial_46a643c75fbe512eb7adfcc8/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/316__CANDIDATE_H007_VOL_SCALED_MA_24_96_RV72__BTCUSDT__2024__stress__trial_b12c99cc0faad3d6e85f3df0/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/323__CANDIDATE_H007_VOL_SCALED_MA_24_96_RV72__ETHUSDT__2024__baseline__trial_c0acdbe241d9ed7daa737807/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/324__CANDIDATE_H007_VOL_SCALED_MA_24_96_RV72__ETHUSDT__2024__stress__trial_68950c06006b89db5f89e155/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/331__CANDIDATE_H007_VOL_SCALED_MA_24_96_RV72__SOLUSDT__2024__baseline__trial_f04cb9655db6d8b3c6ed0c94/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/332__CANDIDATE_H007_VOL_SCALED_MA_24_96_RV72__SOLUSDT__2024__stress__trial_fc226690451f37d12dfbe14c/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/339__CANDIDATE_H007_VOL_SCALED_MA_24_96_RV168__BTCUSDT__2024__baseline__trial_d18312adcb80c36dc7535f1b/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/340__CANDIDATE_H007_VOL_SCALED_MA_24_96_RV168__BTCUSDT__2024__stress__trial_b1415c1d5441de5ef0287c59/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/347__CANDIDATE_H007_VOL_SCALED_MA_24_96_RV168__ETHUSDT__2024__baseline__trial_1fdc90835bbcfc6823fc9914/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/348__CANDIDATE_H007_VOL_SCALED_MA_24_96_RV168__ETHUSDT__2024__stress__trial_0f262ab8b8d36e1f27f2dc2e/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/355__CANDIDATE_H007_VOL_SCALED_MA_24_96_RV168__SOLUSDT__2024__baseline__trial_ac7e62203a064629a70915b4/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/curated_breadth_screen_v1/356__CANDIDATE_H007_VOL_SCALED_MA_24_96_RV168__SOLUSDT__2024__stress__trial_5b1ca616aced0032f166b5ca/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/first_batch/H002_momentum__BTCUSDT__middle/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/first_batch/H002_momentum__ETHUSDT__middle/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/first_batch/H002_momentum__SOLUSDT__middle/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/first_batch/H003_moving_average__BTCUSDT__middle/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/first_batch/H003_moving_average__ETHUSDT__middle/metrics.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/first_batch/H003_moving_average__ETHUSDT__middle/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/first_batch/H003_moving_average__SOLUSDT__middle/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/first_batch/H004_mean_reversion__BTCUSDT__middle/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/first_batch/H004_mean_reversion__ETHUSDT__middle/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/first_batch/H004_mean_reversion__SOLUSDT__middle/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/first_batch/H005_donchian__BTCUSDT__middle/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/first_batch/H005_donchian__ETHUSDT__middle/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/first_batch/H005_donchian__SOLUSDT__middle/run_receipt.json"
+      },
+      {
+        "evidence": "generic H002/H003 or 2023-period evidence",
+        "path": "experiments/runs/first_batch_summary.csv"
+      }
+    ],
+    "notes": [
+      "Generic committed 2023 H002/H003 evidence is separated from exact registered variant evidence.",
+      "No strategy performance is calculated by this audit."
+    ],
+    "registration_or_state_exact_variant_paths": [
+      {
+        "evidence": "exact variant/candidate term and unrelated 2023 text",
+        "path": "experiments/research/summaries/curated_breadth_screen_v1_cells.csv"
+      },
+      {
+        "evidence": "exact variant/candidate term and unrelated 2023 text",
+        "path": "experiments/research/summaries/curated_breadth_screen_v1_mechanical_summary.md"
+      },
+      {
+        "evidence": "exact variant/candidate term and unrelated 2023 text",
+        "path": "experiments/research/trials/2026.jsonl"
+      },
+      {
+        "evidence": "exact variant/candidate term and unrelated 2023 text",
+        "path": "experiments/runs/curated_breadth_screen_v1/119__CANDIDATE_H003_MA_48_192_LONG_FLAT__SOLUSDT__2026YTD__baseline__trial_78599c666ac80a5685865c19/run_receipt.json"
+      },
+      {
+        "evidence": "exact variant/candidate term and unrelated 2023 text",
+        "path": "experiments/runs/curated_breadth_screen_v1/142__CANDIDATE_H003_MA_168_720_LONG_FLAT__SOLUSDT__2025__stress__trial_9d180bc6b3efce6a3d9fa837/metrics.json"
+      }
+    ]
+  },
+  "provenance_assessment": {
+    "BTCUSDT": {
+      "classification": "SUFFICIENT_FOR_AUTHORITATIVE_REPAIR",
+      "perp_manifest_matches_registered_raw": false,
+      "scientific_match_to_holdout": true,
+      "spot_manifest_matches_raw": true
+    },
+    "ETHUSDT": {
+      "classification": "SUFFICIENT_FOR_AUTHORITATIVE_REPAIR",
+      "perp_manifest_matches_registered_raw": false,
+      "scientific_match_to_holdout": true,
+      "spot_manifest_matches_raw": true
+    },
+    "SOLUSDT": {
+      "classification": "SUFFICIENT_FOR_AUTHORITATIVE_REPAIR",
+      "perp_manifest_matches_registered_raw": false,
+      "scientific_match_to_holdout": true,
+      "spot_manifest_matches_raw": true
+    }
+  },
+  "raw_input_inventory": {
+    "BTCUSDT": {
+      "duplicate_timestamp_count_2023": 0,
+      "duplicate_timestamps": [],
+      "file_size": 4690975,
+      "first_timestamp": "2023-01-01T00:00:00Z",
+      "last_timestamp": "2023-12-31T23:00:00Z",
+      "malformed_timestamps": [],
+      "missing_present_elsewhere_in_same_file": [],
+      "missing_present_in_other_local_sources": [
+        {
+          "path": "data/raw/BTCUSDT-perp-1h.csv",
+          "timestamp": "2023-03-24T13:00:00Z"
+        }
+      ],
+      "missing_timestamp_count": 1,
+      "missing_timestamps": [
+        "2023-03-24T13:00:00Z"
+      ],
+      "non_finite_ohlcv_rows": [],
+      "non_hour_aligned_timestamps": [],
+      "ohlc_consistency_failures": [],
+      "out_of_order_timestamp_count_2023": 0,
+      "path": "data/raw/BTCUSDT-1h.csv",
+      "perp_manifest": {
+        "file_size": 1090,
+        "path": "data/manifests/BTCUSDT-perp-1h.json",
+        "recorded_acquisition_timestamp": "2026-07-28T23:58:37.825678Z",
+        "recorded_end_coverage": "2026-06-30T23:00:00Z",
+        "recorded_gap_policy": "gaps-recorded-reject-required-by-spec",
+        "recorded_gaps": [
+          "2020-12-01T22:00:00+00:00 -> 2020-12-02T00:00:00+00:00 (2:00:00)",
+          "2021-06-30T23:00:00+00:00 -> 2021-07-02T00:00:00+00:00 (1 day, 1:00:00)",
+          "2021-07-23T23:00:00+00:00 -> 2021-07-28T00:00:00+00:00 (4 days, 1:00:00)",
+          "2022-10-01T23:00:00+00:00 -> 2022-10-03T00:00:00+00:00 (1 day, 1:00:00)",
+          "2023-02-23T23:00:00+00:00 -> 2023-02-25T00:00:00+00:00 (1 day, 1:00:00)",
+          "2026-06-28T23:00:00+00:00 -> 2026-06-30T00:00:00+00:00 (1 day, 1:00:00)"
+        ],
+        "recorded_interval": "1h",
+        "recorded_market_type": "USD-M perpetual",
+        "recorded_sha256": {
+          "funding": "db8f5d1739a7b1271f915602854392875ef30384e943094b2f937ddffa672428",
+          "perp": "5a3a14822885c47067609c08170029fe42a314d082f7113983c3a644154e9ec9"
+        },
+        "recorded_source": "https://data.binance.vision/data/futures/um/monthly",
+        "recorded_source_url_or_endpoint": "https://data.binance.vision/data/futures/um/monthly",
+        "recorded_start_coverage": "2020-01-01T00:00:00Z",
+        "recorded_symbol": "BTCUSDT",
+        "recorded_transformation_steps": {
+          "complete_archive_months_only": true,
+          "data_type": [
+            "klines",
+            "premiumIndexKlines",
+            "fundingRate"
+          ]
+        },
+        "sha256": "c3625af650373ec32fedeee4f0409ae818f4c9b26bdc313fa35899d51467694d"
+      },
+      "row_count_2023": 8759,
+      "schema": [
+        "timestamp",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume"
+      ],
+      "sha256": "6dcc8c6293f24e2e91957b286a96d9b87fd646e4b57c846495bd41d1aa225b65",
+      "spot_manifest": {
+        "file_size": 932,
+        "path": "data/manifests/BTCUSDT-1h.json",
+        "recorded_acquisition_timestamp": "2026-07-28T19:30:53.690356Z",
+        "recorded_end_coverage": "2026-07-28T18:00:00Z",
+        "recorded_gap_policy": "gaps-recorded-reject-required-by-spec",
+        "recorded_gaps": [
+          "2021-02-11T03:00:00+00:00 -> 2021-02-11T05:00:00+00:00 (2:00:00)",
+          "2021-03-06T01:00:00+00:00 -> 2021-03-06T03:00:00+00:00 (2:00:00)",
+          "2021-04-20T01:00:00+00:00 -> 2021-04-20T04:00:00+00:00 (3:00:00)",
+          "2021-04-25T04:00:00+00:00 -> 2021-04-25T08:00:00+00:00 (4:00:00)",
+          "2021-08-13T01:00:00+00:00 -> 2021-08-13T06:00:00+00:00 (5:00:00)",
+          "2021-09-29T06:00:00+00:00 -> 2021-09-29T09:00:00+00:00 (3:00:00)",
+          "2023-03-24T12:00:00+00:00 -> 2023-03-24T14:00:00+00:00 (2:00:00)"
+        ],
+        "recorded_interval": "1h",
+        "recorded_market_type": "Binance Spot public market-data REST",
+        "recorded_sha256": "6dcc8c6293f24e2e91957b286a96d9b87fd646e4b57c846495bd41d1aa225b65",
+        "recorded_source": "https://data-api.binance.vision/api/v3/klines",
+        "recorded_source_url_or_endpoint": "https://data-api.binance.vision/api/v3/klines",
+        "recorded_start_coverage": "2021-01-01T00:00:00Z",
+        "recorded_symbol": "BTCUSDT",
+        "recorded_transformation_steps": {
+          "complete_candles_only": true
+        },
+        "sha256": "95fc32f787667dbf539968dbbf3b47c5c1b028d536f5b5aa191446ebffcca7a4"
+      },
+      "timestamp_semantics": "open_time",
+      "timestamp_unit": "ISO-8601 second precision",
+      "timezone": "UTC",
+      "unexpected_extra_timestamps": [],
+      "unique_timestamp_count_2023": 8759,
+      "zero_or_negative_price_rows": []
+    },
+    "ETHUSDT": {
+      "duplicate_timestamp_count_2023": 0,
+      "duplicate_timestamps": [],
+      "file_size": 4526218,
+      "first_timestamp": "2023-01-01T00:00:00Z",
+      "last_timestamp": "2023-12-31T23:00:00Z",
+      "malformed_timestamps": [],
+      "missing_present_elsewhere_in_same_file": [],
+      "missing_present_in_other_local_sources": [
+        {
+          "path": "data/raw/ETHUSDT-perp-1h.csv",
+          "timestamp": "2023-03-24T13:00:00Z"
+        }
+      ],
+      "missing_timestamp_count": 1,
+      "missing_timestamps": [
+        "2023-03-24T13:00:00Z"
+      ],
+      "non_finite_ohlcv_rows": [],
+      "non_hour_aligned_timestamps": [],
+      "ohlc_consistency_failures": [],
+      "out_of_order_timestamp_count_2023": 0,
+      "path": "data/raw/ETHUSDT-1h.csv",
+      "perp_manifest": {
+        "file_size": 1090,
+        "path": "data/manifests/ETHUSDT-perp-1h.json",
+        "recorded_acquisition_timestamp": "2026-07-29T00:07:07.785191Z",
+        "recorded_end_coverage": "2026-06-30T23:00:00Z",
+        "recorded_gap_policy": "gaps-recorded-reject-required-by-spec",
+        "recorded_gaps": [
+          "2020-12-01T22:00:00+00:00 -> 2020-12-02T00:00:00+00:00 (2:00:00)",
+          "2021-06-30T23:00:00+00:00 -> 2021-07-02T00:00:00+00:00 (1 day, 1:00:00)",
+          "2021-07-23T23:00:00+00:00 -> 2021-07-28T00:00:00+00:00 (4 days, 1:00:00)",
+          "2022-10-01T23:00:00+00:00 -> 2022-10-03T00:00:00+00:00 (1 day, 1:00:00)",
+          "2023-04-08T23:00:00+00:00 -> 2023-04-10T00:00:00+00:00 (1 day, 1:00:00)",
+          "2026-06-28T23:00:00+00:00 -> 2026-06-30T00:00:00+00:00 (1 day, 1:00:00)"
+        ],
+        "recorded_interval": "1h",
+        "recorded_market_type": "USD-M perpetual",
+        "recorded_sha256": {
+          "funding": "5fdae20506f21ddf7a302920cf048ef2c1aafed50b8f5c2c373080d36e8788a5",
+          "perp": "6ff1a163e1f0ba630e3d183531b7ad6d64f42803cce2a71d6918948544187fad"
+        },
+        "recorded_source": "https://data.binance.vision/data/futures/um/monthly",
+        "recorded_source_url_or_endpoint": "https://data.binance.vision/data/futures/um/monthly",
+        "recorded_start_coverage": "2020-01-01T00:00:00Z",
+        "recorded_symbol": "ETHUSDT",
+        "recorded_transformation_steps": {
+          "complete_archive_months_only": true,
+          "data_type": [
+            "klines",
+            "premiumIndexKlines",
+            "fundingRate"
+          ]
+        },
+        "sha256": "9e9f88b17fc5758c27899f8f7924c16c697933b8c8cf61da1338a239fcabce0e"
+      },
+      "row_count_2023": 8759,
+      "schema": [
+        "timestamp",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume"
+      ],
+      "sha256": "3584c161874dc3b8d8f9961901e5abaadebe32a1aaba6d321106b8ccb1f61187",
+      "spot_manifest": {
+        "file_size": 932,
+        "path": "data/manifests/ETHUSDT-1h.json",
+        "recorded_acquisition_timestamp": "2026-07-28T19:31:28.418770Z",
+        "recorded_end_coverage": "2026-07-28T18:00:00Z",
+        "recorded_gap_policy": "gaps-recorded-reject-required-by-spec",
+        "recorded_gaps": [
+          "2021-02-11T03:00:00+00:00 -> 2021-02-11T05:00:00+00:00 (2:00:00)",
+          "2021-03-06T01:00:00+00:00 -> 2021-03-06T03:00:00+00:00 (2:00:00)",
+          "2021-04-20T01:00:00+00:00 -> 2021-04-20T04:00:00+00:00 (3:00:00)",
+          "2021-04-25T04:00:00+00:00 -> 2021-04-25T08:00:00+00:00 (4:00:00)",
+          "2021-08-13T01:00:00+00:00 -> 2021-08-13T06:00:00+00:00 (5:00:00)",
+          "2021-09-29T06:00:00+00:00 -> 2021-09-29T09:00:00+00:00 (3:00:00)",
+          "2023-03-24T12:00:00+00:00 -> 2023-03-24T14:00:00+00:00 (2:00:00)"
+        ],
+        "recorded_interval": "1h",
+        "recorded_market_type": "Binance Spot public market-data REST",
+        "recorded_sha256": "3584c161874dc3b8d8f9961901e5abaadebe32a1aaba6d321106b8ccb1f61187",
+        "recorded_source": "https://data-api.binance.vision/api/v3/klines",
+        "recorded_source_url_or_endpoint": "https://data-api.binance.vision/api/v3/klines",
+        "recorded_start_coverage": "2021-01-01T00:00:00Z",
+        "recorded_symbol": "ETHUSDT",
+        "recorded_transformation_steps": {
+          "complete_candles_only": true
+        },
+        "sha256": "e7fb5615d13718b736eab4ef89a6ca33a081bb2e69cc525f2518437dfea6707b"
+      },
+      "timestamp_semantics": "open_time",
+      "timestamp_unit": "ISO-8601 second precision",
+      "timezone": "UTC",
+      "unexpected_extra_timestamps": [],
+      "unique_timestamp_count_2023": 8759,
+      "zero_or_negative_price_rows": []
+    },
+    "SOLUSDT": {
+      "duplicate_timestamp_count_2023": 0,
+      "duplicate_timestamps": [],
+      "file_size": 4264014,
+      "first_timestamp": "2023-01-01T00:00:00Z",
+      "last_timestamp": "2023-12-31T23:00:00Z",
+      "malformed_timestamps": [],
+      "missing_present_elsewhere_in_same_file": [],
+      "missing_present_in_other_local_sources": [
+        {
+          "path": "data/raw/SOLUSDT-perp-1h.csv",
+          "timestamp": "2023-03-24T13:00:00Z"
+        }
+      ],
+      "missing_timestamp_count": 1,
+      "missing_timestamps": [
+        "2023-03-24T13:00:00Z"
+      ],
+      "non_finite_ohlcv_rows": [],
+      "non_hour_aligned_timestamps": [],
+      "ohlc_consistency_failures": [],
+      "out_of_order_timestamp_count_2023": 0,
+      "path": "data/raw/SOLUSDT-1h.csv",
+      "perp_manifest": {
+        "file_size": 1171,
+        "path": "data/manifests/SOLUSDT-perp-1h.json",
+        "recorded_acquisition_timestamp": "2026-07-29T00:38:13.790394Z",
+        "recorded_end_coverage": "2026-06-30T23:00:00Z",
+        "recorded_gap_policy": "gaps-recorded-reject-required-by-spec",
+        "recorded_gaps": [
+          "2020-12-01T22:00:00+00:00 -> 2020-12-02T00:00:00+00:00 (2:00:00)",
+          "2021-06-30T23:00:00+00:00 -> 2021-07-02T00:00:00+00:00 (1 day, 1:00:00)",
+          "2021-07-23T23:00:00+00:00 -> 2021-07-28T00:00:00+00:00 (4 days, 1:00:00)",
+          "2022-02-25T23:00:00+00:00 -> 2022-03-01T00:00:00+00:00 (3 days, 1:00:00)",
+          "2022-03-31T23:00:00+00:00 -> 2022-04-03T00:00:00+00:00 (2 days, 1:00:00)",
+          "2023-04-08T23:00:00+00:00 -> 2023-04-10T00:00:00+00:00 (1 day, 1:00:00)",
+          "2026-06-28T23:00:00+00:00 -> 2026-06-30T00:00:00+00:00 (1 day, 1:00:00)"
+        ],
+        "recorded_interval": "1h",
+        "recorded_market_type": "USD-M perpetual",
+        "recorded_sha256": {
+          "funding": "a9fac3e7cbc9136abcecd32dbda37e9e7dab836ca7f950259ce9fd75f11636fe",
+          "perp": "6da86dd82f965a3e9a8ac840ff45f4364705e94447ddc5c056927cc72d7e69f3"
+        },
+        "recorded_source": "https://data.binance.vision/data/futures/um/monthly",
+        "recorded_source_url_or_endpoint": "https://data.binance.vision/data/futures/um/monthly",
+        "recorded_start_coverage": "2020-09-14T07:00:00Z",
+        "recorded_symbol": "SOLUSDT",
+        "recorded_transformation_steps": {
+          "complete_archive_months_only": true,
+          "data_type": [
+            "klines",
+            "premiumIndexKlines",
+            "fundingRate"
+          ]
+        },
+        "sha256": "ba2f41411b8a82549dca5215cdbad19ce82943df5c93929ebb8428ec08f4afea"
+      },
+      "row_count_2023": 8759,
+      "schema": [
+        "timestamp",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume"
+      ],
+      "sha256": "c431aa068acbfedf3cb0c38845dfac275044a9cf83367075b47d47f06974e99d",
+      "spot_manifest": {
+        "file_size": 932,
+        "path": "data/manifests/SOLUSDT-1h.json",
+        "recorded_acquisition_timestamp": "2026-07-28T19:31:45.598913Z",
+        "recorded_end_coverage": "2026-07-28T18:00:00Z",
+        "recorded_gap_policy": "gaps-recorded-reject-required-by-spec",
+        "recorded_gaps": [
+          "2021-02-11T03:00:00+00:00 -> 2021-02-11T05:00:00+00:00 (2:00:00)",
+          "2021-03-06T01:00:00+00:00 -> 2021-03-06T03:00:00+00:00 (2:00:00)",
+          "2021-04-20T01:00:00+00:00 -> 2021-04-20T04:00:00+00:00 (3:00:00)",
+          "2021-04-25T04:00:00+00:00 -> 2021-04-25T08:00:00+00:00 (4:00:00)",
+          "2021-08-13T01:00:00+00:00 -> 2021-08-13T06:00:00+00:00 (5:00:00)",
+          "2021-09-29T06:00:00+00:00 -> 2021-09-29T09:00:00+00:00 (3:00:00)",
+          "2023-03-24T12:00:00+00:00 -> 2023-03-24T14:00:00+00:00 (2:00:00)"
+        ],
+        "recorded_interval": "1h",
+        "recorded_market_type": "Binance Spot public market-data REST",
+        "recorded_sha256": "c431aa068acbfedf3cb0c38845dfac275044a9cf83367075b47d47f06974e99d",
+        "recorded_source": "https://data-api.binance.vision/api/v3/klines",
+        "recorded_source_url_or_endpoint": "https://data-api.binance.vision/api/v3/klines",
+        "recorded_start_coverage": "2021-01-01T00:00:00Z",
+        "recorded_symbol": "SOLUSDT",
+        "recorded_transformation_steps": {
+          "complete_candles_only": true
+        },
+        "sha256": "834ecbf8d230c68a51b6786866314ddcedaacd8dd0eda0b421e2eed813c084f1"
+      },
+      "timestamp_semantics": "open_time",
+      "timestamp_unit": "ISO-8601 second precision",
+      "timezone": "UTC",
+      "unexpected_extra_timestamps": [],
+      "unique_timestamp_count_2023": 8759,
+      "zero_or_negative_price_rows": []
+    }
+  },
+  "recommended_repair_path": "Reacquire complete affected spot 1h asset-periods from the recorded Binance Spot source; do not manually edit CSVs or borrow bars.",
+  "spec": {
+    "assets": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "SOLUSDT"
+    ],
+    "expected_2023_count": 8760,
+    "gap_policy": {
+      "acquisition_provenance_required": true,
+      "authoritative_source_acquisition_required": true,
+      "exact_hourly_timestamps_required": true,
+      "fail_closed_if_complete_valid_data_cannot_be_established": true,
+      "no_cross_gap_returns": true,
+      "no_forward_fill": true,
+      "no_interpolation": true,
+      "source_sha256_required": true
+    },
+    "path": "experiments/specs/focused_trend_validation_v1.json",
+    "period": {
+      "end": "2023-12-31T23:00:00Z",
+      "id": "2023_UNTOUCHED_HOLDOUT",
+      "start": "2023-01-01T00:00:00Z"
+    },
+    "preregistration_id": "PREREGISTER_FOCUSED_TREND_VALIDATION_V1",
+    "source_input_paths": {
+      "BTCUSDT": "data/raw/BTCUSDT-1h.csv",
+      "ETHUSDT": "data/raw/ETHUSDT-1h.csv",
+      "SOLUSDT": "data/raw/SOLUSDT-1h.csv"
+    },
+    "variants": [
+      {
+        "candidate_id": "CANDIDATE_H002_MOMENTUM_720_LONG_FLAT",
+        "family_id": "time_series_momentum",
+        "parameters": {
+          "lookback": 720,
+          "mode": "long_flat"
+        },
+        "state_required_at_registration": "FOLLOW_UP",
+        "strategy_id": "H002_momentum",
+        "variant_id": "variant_f201cbb38819b1e09e763ac7"
+      },
+      {
+        "candidate_id": "CANDIDATE_H003_MA_48_192_LONG_FLAT",
+        "family_id": "moving_average_trend",
+        "parameters": {
+          "fast": 48,
+          "mode": "long_flat",
+          "slow": 192
+        },
+        "state_required_at_registration": "FOLLOW_UP",
+        "strategy_id": "H003_moving_average",
+        "variant_id": "variant_00eb140f03a5f6ab40600160"
+      },
+      {
+        "candidate_id": "CANDIDATE_H003_MA_168_720_LONG_FLAT",
+        "family_id": "moving_average_trend",
+        "parameters": {
+          "fast": 168,
+          "mode": "long_flat",
+          "slow": 720
+        },
+        "state_required_at_registration": "FOLLOW_UP",
+        "strategy_id": "H003_moving_average",
+        "variant_id": "variant_296a2973dfde57cec911715b"
+      }
+    ]
+  },
+  "strategy_execution": "NOT_RUN",
+  "timestamp_coverage": {
+    "BTCUSDT": {
+      "duplicate_timestamp_count_2023": 0,
+      "first_timestamp": "2023-01-01T00:00:00Z",
+      "last_timestamp": "2023-12-31T23:00:00Z",
+      "missing_timestamp_count": 1,
+      "out_of_order_timestamp_count_2023": 0,
+      "row_count_2023": 8759,
+      "unique_timestamp_count_2023": 8759
+    },
+    "ETHUSDT": {
+      "duplicate_timestamp_count_2023": 0,
+      "first_timestamp": "2023-01-01T00:00:00Z",
+      "last_timestamp": "2023-12-31T23:00:00Z",
+      "missing_timestamp_count": 1,
+      "out_of_order_timestamp_count_2023": 0,
+      "row_count_2023": 8759,
+      "unique_timestamp_count_2023": 8759
+    },
+    "SOLUSDT": {
+      "duplicate_timestamp_count_2023": 0,
+      "first_timestamp": "2023-01-01T00:00:00Z",
+      "last_timestamp": "2023-12-31T23:00:00Z",
+      "missing_timestamp_count": 1,
+      "out_of_order_timestamp_count_2023": 0,
+      "row_count_2023": 8759,
+      "unique_timestamp_count_2023": 8759
+    }
+  },
+  "verdict": "2023_HOLDOUT_DATA_REPAIRABLE",
+  "warmup_coverage": {
+    "BTCUSDT": [
+      {
+        "actual_available_warmup_start": "2021-01-01T00:00:00Z",
+        "candidate_id": "CANDIDATE_H002_MOMENTUM_720_LONG_FLAT",
+        "evaluation_gaps": [
+          "2023-03-24T13:00:00Z"
+        ],
+        "gap_lies_in": "evaluation",
+        "gap_policy_blocks_execution": true,
+        "missing_warmup_timestamps": [],
+        "parameters": {
+          "lookback": 720,
+          "mode": "long_flat"
+        },
+        "required_warmup_start": "2022-12-02T00:00:00Z",
+        "strategy_id": "H002_momentum",
+        "structurally_affected_rolling_feature_timestamps": 6059,
+        "variant_id": "variant_f201cbb38819b1e09e763ac7",
+        "warmup_gaps": []
+      },
+      {
+        "actual_available_warmup_start": "2021-01-01T00:00:00Z",
+        "candidate_id": "CANDIDATE_H003_MA_48_192_LONG_FLAT",
+        "evaluation_gaps": [
+          "2023-03-24T13:00:00Z"
+        ],
+        "gap_lies_in": "evaluation",
+        "gap_policy_blocks_execution": true,
+        "missing_warmup_timestamps": [],
+        "parameters": {
+          "fast": 48,
+          "mode": "long_flat",
+          "slow": 192
+        },
+        "required_warmup_start": "2022-12-24T00:00:00Z",
+        "strategy_id": "H003_moving_average",
+        "structurally_affected_rolling_feature_timestamps": 6587,
+        "variant_id": "variant_00eb140f03a5f6ab40600160",
+        "warmup_gaps": []
+      },
+      {
+        "actual_available_warmup_start": "2021-01-01T00:00:00Z",
+        "candidate_id": "CANDIDATE_H003_MA_168_720_LONG_FLAT",
+        "evaluation_gaps": [
+          "2023-03-24T13:00:00Z"
+        ],
+        "gap_lies_in": "evaluation",
+        "gap_policy_blocks_execution": true,
+        "missing_warmup_timestamps": [],
+        "parameters": {
+          "fast": 168,
+          "mode": "long_flat",
+          "slow": 720
+        },
+        "required_warmup_start": "2022-12-02T00:00:00Z",
+        "strategy_id": "H003_moving_average",
+        "structurally_affected_rolling_feature_timestamps": 6059,
+        "variant_id": "variant_296a2973dfde57cec911715b",
+        "warmup_gaps": []
+      }
+    ],
+    "ETHUSDT": [
+      {
+        "actual_available_warmup_start": "2021-01-01T00:00:00Z",
+        "candidate_id": "CANDIDATE_H002_MOMENTUM_720_LONG_FLAT",
+        "evaluation_gaps": [
+          "2023-03-24T13:00:00Z"
+        ],
+        "gap_lies_in": "evaluation",
+        "gap_policy_blocks_execution": true,
+        "missing_warmup_timestamps": [],
+        "parameters": {
+          "lookback": 720,
+          "mode": "long_flat"
+        },
+        "required_warmup_start": "2022-12-02T00:00:00Z",
+        "strategy_id": "H002_momentum",
+        "structurally_affected_rolling_feature_timestamps": 6059,
+        "variant_id": "variant_f201cbb38819b1e09e763ac7",
+        "warmup_gaps": []
+      },
+      {
+        "actual_available_warmup_start": "2021-01-01T00:00:00Z",
+        "candidate_id": "CANDIDATE_H003_MA_48_192_LONG_FLAT",
+        "evaluation_gaps": [
+          "2023-03-24T13:00:00Z"
+        ],
+        "gap_lies_in": "evaluation",
+        "gap_policy_blocks_execution": true,
+        "missing_warmup_timestamps": [],
+        "parameters": {
+          "fast": 48,
+          "mode": "long_flat",
+          "slow": 192
+        },
+        "required_warmup_start": "2022-12-24T00:00:00Z",
+        "strategy_id": "H003_moving_average",
+        "structurally_affected_rolling_feature_timestamps": 6587,
+        "variant_id": "variant_00eb140f03a5f6ab40600160",
+        "warmup_gaps": []
+      },
+      {
+        "actual_available_warmup_start": "2021-01-01T00:00:00Z",
+        "candidate_id": "CANDIDATE_H003_MA_168_720_LONG_FLAT",
+        "evaluation_gaps": [
+          "2023-03-24T13:00:00Z"
+        ],
+        "gap_lies_in": "evaluation",
+        "gap_policy_blocks_execution": true,
+        "missing_warmup_timestamps": [],
+        "parameters": {
+          "fast": 168,
+          "mode": "long_flat",
+          "slow": 720
+        },
+        "required_warmup_start": "2022-12-02T00:00:00Z",
+        "strategy_id": "H003_moving_average",
+        "structurally_affected_rolling_feature_timestamps": 6059,
+        "variant_id": "variant_296a2973dfde57cec911715b",
+        "warmup_gaps": []
+      }
+    ],
+    "SOLUSDT": [
+      {
+        "actual_available_warmup_start": "2021-01-01T00:00:00Z",
+        "candidate_id": "CANDIDATE_H002_MOMENTUM_720_LONG_FLAT",
+        "evaluation_gaps": [
+          "2023-03-24T13:00:00Z"
+        ],
+        "gap_lies_in": "evaluation",
+        "gap_policy_blocks_execution": true,
+        "missing_warmup_timestamps": [],
+        "parameters": {
+          "lookback": 720,
+          "mode": "long_flat"
+        },
+        "required_warmup_start": "2022-12-02T00:00:00Z",
+        "strategy_id": "H002_momentum",
+        "structurally_affected_rolling_feature_timestamps": 6059,
+        "variant_id": "variant_f201cbb38819b1e09e763ac7",
+        "warmup_gaps": []
+      },
+      {
+        "actual_available_warmup_start": "2021-01-01T00:00:00Z",
+        "candidate_id": "CANDIDATE_H003_MA_48_192_LONG_FLAT",
+        "evaluation_gaps": [
+          "2023-03-24T13:00:00Z"
+        ],
+        "gap_lies_in": "evaluation",
+        "gap_policy_blocks_execution": true,
+        "missing_warmup_timestamps": [],
+        "parameters": {
+          "fast": 48,
+          "mode": "long_flat",
+          "slow": 192
+        },
+        "required_warmup_start": "2022-12-24T00:00:00Z",
+        "strategy_id": "H003_moving_average",
+        "structurally_affected_rolling_feature_timestamps": 6587,
+        "variant_id": "variant_00eb140f03a5f6ab40600160",
+        "warmup_gaps": []
+      },
+      {
+        "actual_available_warmup_start": "2021-01-01T00:00:00Z",
+        "candidate_id": "CANDIDATE_H003_MA_168_720_LONG_FLAT",
+        "evaluation_gaps": [
+          "2023-03-24T13:00:00Z"
+        ],
+        "gap_lies_in": "evaluation",
+        "gap_policy_blocks_execution": true,
+        "missing_warmup_timestamps": [],
+        "parameters": {
+          "fast": 168,
+          "mode": "long_flat",
+          "slow": 720
+        },
+        "required_warmup_start": "2022-12-02T00:00:00Z",
+        "strategy_id": "H003_moving_average",
+        "structurally_affected_rolling_feature_timestamps": 6059,
+        "variant_id": "variant_296a2973dfde57cec911715b",
+        "warmup_gaps": []
+      }
+    ]
+  }
+}

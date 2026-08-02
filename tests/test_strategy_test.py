@@ -16,6 +16,7 @@ from qntylab.strategy_test import (
     sanity_warnings,
     sha256_path,
     summarize_runs,
+    validate_normalization_provenance,
 )
 from qntylab.research_ledger import canonical_bytes, compute_variant_id, event_id, rebuild
 from qntylab.strategies import positions
@@ -125,6 +126,49 @@ def write_fixture(path: Path, closes: list[float], *, skip_hour: int | None = No
         writer = csv.DictWriter(out, fieldnames=["timestamp", "open", "high", "low", "close", "volume"])
         writer.writeheader()
         writer.writerows(rows)
+
+
+def normalization_fixture(tmp_path):
+    derived = tmp_path / "BTCUSDT-spot-1h-2023-halt-normalized.csv"
+    raw = tmp_path / "raw.csv"
+    source = tmp_path / "source-resolution.json"
+    manifest = tmp_path / "derived.manifest.json"
+    rows = list(csv.DictReader(FIXTURE.open(newline="", encoding="utf-8")))
+    for path in (derived, raw):
+        with path.open("w", newline="", encoding="utf-8") as out:
+            writer = csv.DictWriter(out, fieldnames=["timestamp", "open", "high", "low", "close", "volume"])
+            writer.writeheader()
+            writer.writerows(rows)
+    source.write_text(json.dumps({"finding": "fixture"}) + "\n", encoding="utf-8")
+    provenance = {
+        "normalization_id": "PREREGISTER_BINANCE_SPOT_HALT_NORMALIZATION_V1",
+        "normalization_version": "BINANCE_SPOT_HALT_NORMALIZATION_V1",
+        "reason_code": "BINANCE_SPOT_AUTHORITATIVE_NO_TRADE_HALT",
+        "derived_input_path": str(derived),
+        "derived_input_sha256": sha256_path(derived),
+        "derived_manifest_path": str(manifest),
+        "derived_manifest_sha256": "",
+        "source_resolution_artifact_path": str(source),
+        "source_resolution_artifact_sha256": sha256_path(source),
+        "authoritative_raw_path": str(raw),
+        "authoritative_raw_sha256": sha256_path(raw),
+        "normalized_timestamp": "2023-03-24T13:00:00Z",
+    }
+    manifest_value = {
+        "normalization_id": provenance["normalization_id"],
+        "normalization_version": provenance["normalization_version"],
+        "reason_code": provenance["reason_code"],
+        "derived_path": provenance["derived_input_path"],
+        "derived_sha256": provenance["derived_input_sha256"],
+        "source_resolution_artifact_path": provenance["source_resolution_artifact_path"],
+        "source_resolution_artifact_sha256": provenance["source_resolution_artifact_sha256"],
+        "authoritative_raw_path": provenance["authoritative_raw_path"],
+        "authoritative_raw_sha256": provenance["authoritative_raw_sha256"],
+        "normalized_timestamp": provenance["normalized_timestamp"],
+    }
+    manifest.write_text(json.dumps(manifest_value, sort_keys=True, indent=2) + "\n", encoding="utf-8")
+    provenance["derived_manifest_sha256"] = sha256_path(manifest)
+    return derived, provenance
 
 
 def test_relevant_clean_source_runs(tmp_path):
@@ -375,6 +419,64 @@ def test_receipt_binds_input_config_code_and_results(tmp_path):
     assert receipt["relevant_source_sha256"] == relevant_source_sha256()
     assert receipt["result_artifact_sha256"]["metrics"] == sha256_path(result["metrics_path"])
     assert receipt["parameters"] == {"lookback": 3, "mode": "long_flat"}
+
+
+def test_raw_input_legacy_receipt_has_no_normalization_provenance(tmp_path):
+    receipt = run_once(tmp_path)["receipt"]
+    assert "normalization_provenance" not in receipt
+
+
+def test_normalization_provenance_is_validated_and_recorded(tmp_path):
+    derived, provenance = normalization_fixture(tmp_path)
+    cfg = config(tmp_path, input_path=str(derived), normalization_provenance=provenance)
+    result = run_strategy(
+        strategy_id="H002_momentum",
+        input_path=derived,
+        config_path=cfg,
+        output=tmp_path / "normalized",
+        research_root=research_root(tmp_path, [cfg]),
+        require_clean_source=False,
+    )
+    assert result["receipt"]["input_sha256"] == provenance["derived_input_sha256"]
+    assert result["receipt"]["symbol"] == "BTCUSDT"
+    assert result["receipt"]["normalization_provenance"] == dict(sorted(provenance.items()))
+
+
+def test_normalization_provenance_mismatch_fails_closed_before_strategy(tmp_path, monkeypatch):
+    derived, provenance = normalization_fixture(tmp_path)
+    provenance["derived_input_sha256"] = "0" * 64
+    cfg = config(tmp_path, input_path=str(derived), normalization_provenance=provenance)
+
+    def fail_positions(*args, **kwargs):
+        raise AssertionError("strategy positions must not be reached")
+
+    monkeypatch.setattr("qntylab.strategy_test.positions", fail_positions)
+    with pytest.raises(ValueError, match="derived input SHA-256 mismatch"):
+        run_strategy(
+            strategy_id="H002_momentum",
+            input_path=derived,
+            config_path=cfg,
+            output=tmp_path / "bad-normalized",
+            research_root=research_root(tmp_path, [cfg]),
+            require_clean_source=False,
+        )
+    assert not (tmp_path / "bad-normalized").exists()
+
+
+def test_normalization_provenance_manifest_mismatch_fails_closed(tmp_path):
+    derived, provenance = normalization_fixture(tmp_path)
+    manifest = Path(provenance["derived_manifest_path"])
+    value = json.loads(manifest.read_text(encoding="utf-8"))
+    value["normalized_timestamp"] = "2023-03-24T14:00:00Z"
+    manifest.write_text(json.dumps(value, sort_keys=True, indent=2) + "\n", encoding="utf-8")
+    provenance["derived_manifest_sha256"] = sha256_path(manifest)
+    with pytest.raises(ValueError, match="normalized_timestamp does not match manifest"):
+        validate_normalization_provenance(
+            provenance=provenance,
+            normalized_input=derived,
+            input_sha256=sha256_path(derived),
+            config_path=tmp_path / "config.json",
+        )
 
 
 def test_costs_affect_net_return_correctly(tmp_path):

@@ -4,7 +4,6 @@ import csv
 import hashlib
 import json
 import shutil
-import sys
 from pathlib import Path
 
 import pytest
@@ -14,6 +13,23 @@ from qntylab import materialize_halt_normalized_holdout as m
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ("BTCUSDT", "ETHUSDT", "SOLUSDT")
+EXPECTED_RAW_SHA256 = {
+    "BTCUSDT": "6dcc8c6293f24e2e91957b286a96d9b87fd646e4b57c846495bd41d1aa225b65",
+    "ETHUSDT": "3584c161874dc3b8d8f9961901e5abaadebe32a1aaba6d321106b8ccb1f61187",
+    "SOLUSDT": "c431aa068acbfedf3cb0c38845dfac275044a9cf83367075b47d47f06974e99d",
+}
+EXPECTED_DERIVED_SHA256 = {
+    "BTCUSDT": "08d5649e86743e9485fb55a3978b96f7b0b5483b33223534d52d4fe0a745d10e",
+    "ETHUSDT": "a3cfb7733aad701b43fd383ac32f52252d229d2275147698449b2007bdff0d40",
+    "SOLUSDT": "62cee85e0a0f7b903fadc77a8f275e774f0ff3ecfff9fba9ea51a535376f70f1",
+}
+EXPECTED_MANIFEST_SHA256 = {
+    "BTCUSDT": "eeed7e295a651ba9620ef1c425e5fc3795beac00a79121bb29aa442c458c0aee",
+    "ETHUSDT": "1c8d871c79c5f696a02dc9874fd9dd5bbdf2058e2b986cb59beaa83573e3f75d",
+    "SOLUSDT": "232b42f1d9d968faedc4fe86018cbc5767261af901391bb7e189fd1aa1a6e5af",
+}
+EXPECTED_RECEIPT_JSON_SHA256 = "cf75e96438c0da3ac27177b5c0bd49b394bef3564ea404369bc433d46c26823d"
+EXPECTED_RECEIPT_MD_SHA256 = "b4355b15307669b031f9e45f1914ab647b90a9e3793fae66be5c7b4527966077"
 RAW_PATHS = tuple(ROOT / f"data/raw/{asset}-1h.csv" for asset in ASSETS)
 PERP_MANIFEST_PATHS = tuple(ROOT / f"data/manifests/{asset}-perp-1h.json" for asset in ASSETS)
 CANONICAL_STREAMS = (
@@ -81,6 +97,16 @@ def test_materializes_exactly_three_authorized_assets(rendered: dict):
     assert len(rendered["derived_sha256"]) == 3
 
 
+def test_committed_raw_derived_manifest_and_receipt_hashes_match_frozen_values(rendered: dict):
+    assert {asset: sha256(ROOT / f"data/raw/{asset}-1h.csv") for asset in ASSETS} == EXPECTED_RAW_SHA256
+    assert rendered["derived_sha256"] == EXPECTED_DERIVED_SHA256
+    assert rendered["manifest_sha256"] == EXPECTED_MANIFEST_SHA256
+    assert rendered["receipt_json_sha256"] == EXPECTED_RECEIPT_JSON_SHA256
+    assert rendered["receipt_md_sha256"] == EXPECTED_RECEIPT_MD_SHA256
+    for asset, expected in EXPECTED_DERIVED_SHA256.items():
+        assert sha256(ROOT / f"data/derived/focused_trend_validation_v1/{asset}-spot-1h-2023-halt-normalized.csv") == expected
+
+
 def test_exactly_one_halt_row_per_asset_with_frozen_ohlcv(rendered: dict):
     for asset, data in rendered["receipt"]["assets"].items():
         row = data["inserted_row"]
@@ -105,8 +131,10 @@ def test_all_non_normalized_rows_match_source_data(rendered: dict):
         derived = {row["timestamp"]: row for row in derived_rows if row["timestamp"] != halt_ts}
         assert source == derived
         assert data["source_rows_compared"] == len(source)
+        assert data["source_rows_compared"] == 48821
         assert data["source_mismatches"] == 0
         assert data["unexpected_derived_rows"] == 0
+        assert len(derived_rows) == 48822
 
 
 def test_2023_coverage_and_warmup_range_are_sufficient(rendered: dict):
@@ -130,6 +158,17 @@ def test_repeated_generation_is_byte_identical_and_hashes_are_stable(rendered: d
     assert rendered["receipt_md_sha256"] == rerendered["receipt_md_sha256"]
     for path, content in rendered["files"].items():
         assert content == rerendered["files"][path]
+
+
+def test_temporary_rematerialization_is_byte_identical_to_committed_files(temp_root: Path):
+    result = m.materialize(temp_root)
+    committed = m.render_materialization(ROOT)
+    assert result["derived_sha256"] == committed["derived_sha256"]
+    assert result["manifest_sha256"] == committed["manifest_sha256"]
+    assert result["receipt_json_sha256"] == committed["receipt_json_sha256"]
+    assert result["receipt_md_sha256"] == committed["receipt_md_sha256"]
+    for relative, content in committed["files"].items():
+        assert (temp_root / relative).read_bytes() == content
 
 
 def test_manifest_and_receipt_hashes_are_deterministic(rendered: dict):
@@ -166,7 +205,6 @@ def test_no_strategy_backtest_or_ledger_module_is_invoked_by_materializer():
     assert "from .backtest" not in source
     assert "import qntylab.backtest" not in source
     assert "research_ledger" not in source
-    assert "qntylab.strategy_test" not in sys.modules
 
 
 def test_no_candidate_trial_decision_raw_or_perp_manifest_mutation(rendered: dict):

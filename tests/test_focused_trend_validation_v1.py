@@ -2,6 +2,8 @@ import json
 from collections import Counter
 from pathlib import Path
 
+import qntylab.strategy_test as strategy_test
+from qntylab.focused_trend_validation import expand_planned_holdout_runs
 
 ROOT = Path(__file__).resolve().parents[1]
 SPEC_PATH = ROOT / "experiments/specs/focused_trend_validation_v1.json"
@@ -139,3 +141,28 @@ def test_focused_trend_validation_v1_registration_contract():
     assert len(trials) == 360
     assert "ledger_events" not in spec
     assert "trial_completed" not in json.dumps(spec).lower()
+
+
+def test_focused_holdout_plan_expands_to_18_unique_2023_follow_up_identities(monkeypatch):
+    def fail_run_strategy(*args, **kwargs):
+        raise AssertionError("holdout plan expansion must not execute a strategy")
+
+    monkeypatch.setattr(strategy_test, "run_strategy", fail_run_strategy)
+    planned = expand_planned_holdout_runs(SPEC_PATH, repo_root=ROOT)
+    assert len(planned) == 18
+    assert len({row["trial_id"] for row in planned}) == 18
+    assert Counter(row["variant_id"] for row in planned) == {variant_id: 6 for variant_id in EXPECTED_VARIANTS}
+    assert Counter(row["asset"] for row in planned) == {"BTCUSDT": 6, "ETHUSDT": 6, "SOLUSDT": 6}
+    assert Counter(row["cost_mode"] for row in planned) == {"baseline": 9, "stress": 9}
+    assert {row["period"] for row in planned} == {"2023_UNTOUCHED_HOLDOUT"}
+    assert {row["research_intent"] for row in planned} == {"FOLLOW_UP"}
+    assert {row["config"]["evaluation_start"] for row in planned} == {"2023-01-01T00:00:00Z"}
+    assert {row["config"]["evaluation_end"] for row in planned} == {"2023-12-31T23:00:00Z"}
+    assert all(row["config"]["normalization_provenance"]["derived_input_sha256"] == row["input_sha256"] for row in planned)
+
+
+def test_focused_holdout_plan_has_no_collision_with_completed_breadth_screen_trials():
+    planned = expand_planned_holdout_runs(SPEC_PATH, repo_root=ROOT)
+    completed = {event["trial_id"] for event in _jsonl(RESEARCH / "trials/2026.jsonl")}
+    assert len(completed) == 360
+    assert {row["trial_id"] for row in planned}.isdisjoint(completed)

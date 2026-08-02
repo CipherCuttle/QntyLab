@@ -75,6 +75,22 @@ CONFIG_KEYS = {
     "candidate_id",
     "research_intent",
     "parameters",
+    "normalization_provenance",
+}
+OPTIONAL_CONFIG_KEYS = {"normalization_provenance"}
+NORMALIZATION_PROVENANCE_KEYS = {
+    "normalization_id",
+    "normalization_version",
+    "reason_code",
+    "derived_input_path",
+    "derived_input_sha256",
+    "derived_manifest_path",
+    "derived_manifest_sha256",
+    "source_resolution_artifact_path",
+    "source_resolution_artifact_sha256",
+    "authoritative_raw_path",
+    "authoritative_raw_sha256",
+    "normalized_timestamp",
 }
 SUMMARY_FIELDS = (
     "run_id",
@@ -151,6 +167,16 @@ def _load_json(path: Path) -> dict[str, Any]:
     return value
 
 
+def _load_json_object(path: Path, label: str) -> dict[str, Any]:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"invalid {label} JSON: {exc}") from exc
+    if not isinstance(value, dict):
+        raise ValueError(f"{label} must be a JSON object")
+    return value
+
+
 def _finite_number(config: dict[str, Any], key: str, *, minimum: float | None = None) -> float:
     value = config.get(key)
     if not isinstance(value, (int, float)) or isinstance(value, bool) or not math.isfinite(float(value)):
@@ -192,11 +218,13 @@ def load_config(path: Path, *, input_path: Path | None = None, strategy_id: str 
     config.setdefault("gap_policy", GAP_POLICY_REJECT)
     config.setdefault("expected_interval", EXPECTED_INTERVAL_1H)
     extra = set(config) - CONFIG_KEYS
-    missing = CONFIG_KEYS - set(config)
+    missing = CONFIG_KEYS - OPTIONAL_CONFIG_KEYS - set(config)
     if extra:
         raise ValueError(f"unknown config keys: {sorted(extra)}")
     if missing:
         raise ValueError(f"missing config keys: {sorted(missing)}")
+    if "normalization_provenance" in config:
+        _validate_normalization_provenance_shape(config["normalization_provenance"])
     if config["schema_version"] != SCHEMA_VERSION:
         raise ValueError(f"unsupported schema_version: {config['schema_version']!r}")
     if not isinstance(config["strategy_id"], str) or config["strategy_id"] not in STRATEGIES:
@@ -234,6 +262,76 @@ def load_config(path: Path, *, input_path: Path | None = None, strategy_id: str 
     return config
 
 
+def _validate_normalization_provenance_shape(provenance: Any) -> None:
+    if not isinstance(provenance, dict):
+        raise ValueError("normalization_provenance must be an object")
+    extra = set(provenance) - NORMALIZATION_PROVENANCE_KEYS
+    missing = NORMALIZATION_PROVENANCE_KEYS - set(provenance)
+    if extra:
+        raise ValueError(f"unknown normalization_provenance keys: {sorted(extra)}")
+    if missing:
+        raise ValueError(f"missing normalization_provenance keys: {sorted(missing)}")
+    for key in sorted(NORMALIZATION_PROVENANCE_KEYS):
+        if not isinstance(provenance[key], str) or not provenance[key].strip():
+            raise ValueError(f"normalization_provenance.{key} must be a non-empty string")
+
+
+def _resolve_receipt_path(path_value: str, config_path: Path) -> Path:
+    path = Path(path_value)
+    if path.is_absolute():
+        return path
+    candidate = (Path.cwd() / path).resolve()
+    if candidate.exists():
+        return candidate
+    return (config_path.parent / path).resolve()
+
+
+def validate_normalization_provenance(
+    *,
+    provenance: dict[str, str] | None,
+    normalized_input: Path,
+    input_sha256: str,
+    config_path: Path,
+) -> dict[str, str] | None:
+    if provenance is None:
+        return None
+    _validate_normalization_provenance_shape(provenance)
+    derived_input = _resolve_receipt_path(provenance["derived_input_path"], config_path)
+    if derived_input.resolve() != normalized_input.resolve():
+        raise ValueError("normalization provenance derived input path does not match run input")
+    if provenance["derived_input_sha256"] != input_sha256:
+        raise ValueError("normalization provenance derived input SHA-256 mismatch")
+    manifest_path = _resolve_receipt_path(provenance["derived_manifest_path"], config_path)
+    source_path = _resolve_receipt_path(provenance["source_resolution_artifact_path"], config_path)
+    raw_path = _resolve_receipt_path(provenance["authoritative_raw_path"], config_path)
+    for label, path in (("derived manifest", manifest_path), ("source-resolution artifact", source_path), ("authoritative raw", raw_path)):
+        if not path.exists():
+            raise FileNotFoundError(f"missing normalization provenance {label}: {path}")
+    if sha256_path(manifest_path) != provenance["derived_manifest_sha256"]:
+        raise ValueError("normalization provenance manifest SHA-256 mismatch")
+    if sha256_path(source_path) != provenance["source_resolution_artifact_sha256"]:
+        raise ValueError("normalization provenance source-resolution SHA-256 mismatch")
+    if sha256_path(raw_path) != provenance["authoritative_raw_sha256"]:
+        raise ValueError("normalization provenance authoritative raw SHA-256 mismatch")
+    manifest = _load_json_object(manifest_path, "normalization manifest")
+    expected = {
+        "normalization_id": "normalization_id",
+        "normalization_version": "normalization_version",
+        "reason_code": "reason_code",
+        "derived_input_path": "derived_path",
+        "derived_input_sha256": "derived_sha256",
+        "source_resolution_artifact_path": "source_resolution_artifact_path",
+        "source_resolution_artifact_sha256": "source_resolution_artifact_sha256",
+        "authoritative_raw_path": "authoritative_raw_path",
+        "authoritative_raw_sha256": "authoritative_raw_sha256",
+        "normalized_timestamp": "normalized_timestamp",
+    }
+    for provenance_key, manifest_key in expected.items():
+        if provenance[provenance_key] != manifest.get(manifest_key):
+            raise ValueError(f"normalization provenance {provenance_key} does not match manifest")
+    return {key: provenance[key] for key in sorted(NORMALIZATION_PROVENANCE_KEYS)}
+
+
 def _normalize_input_path(path: Path, config_path: Path) -> Path:
     if path.is_absolute():
         return path
@@ -245,7 +343,7 @@ def _normalize_input_path(path: Path, config_path: Path) -> Path:
 
 def _symbol_from_input(path: Path) -> str:
     name = path.name
-    for suffix in ("-perp-1h.csv", "-1h.csv", "-perp-1d.csv"):
+    for suffix in ("-spot-1h-2023-halt-normalized.csv", "-perp-1h.csv", "-1h.csv", "-perp-1d.csv"):
         if name.endswith(suffix):
             return name.removesuffix(suffix)
     return path.stem
@@ -387,6 +485,12 @@ def run_strategy(
     if not normalized_input.exists():
         raise FileNotFoundError(f"missing input: {normalized_input}")
     input_sha256 = sha256_path(normalized_input)
+    normalization_provenance = validate_normalization_provenance(
+        provenance=config.get("normalization_provenance"),
+        normalized_input=normalized_input,
+        input_sha256=input_sha256,
+        config_path=config_path,
+    )
     symbol = _symbol_from_input(normalized_input)
     computed_variant_id = compute_variant_id(config)
     ledger_binding = preflight(config=config, symbol=symbol, input_sha256=input_sha256, root=research_root)
@@ -456,6 +560,8 @@ def run_strategy(
         "warnings": sanity_warnings(metrics),
         "exploratory_only": EXPLORATORY_ONLY,
     }
+    if normalization_provenance is not None:
+        receipt["normalization_provenance"] = normalization_provenance
     receipt_path = output / "run_receipt.json"
     receipt_path.write_bytes(_canonical_bytes(receipt) + b"\n")
     receipt_sha256 = sha256_path(receipt_path)

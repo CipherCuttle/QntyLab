@@ -19,6 +19,24 @@ from qntylab.curated_breadth_summary import (
 
 ROOT = Path(__file__).resolve().parents[1]
 RESEARCH = ROOT / "experiments/research"
+DECISION_REVIEW = RESEARCH / "summaries/curated_breadth_screen_v1_decision_review.md"
+EXPECTED_REVIEW_DECISIONS = {
+    "CANDIDATE_H002_MOMENTUM_72_LONG_FLAT": ("variant_d145d2024811f49eea291a29", "GRAVEYARDED"),
+    "CANDIDATE_H002_MOMENTUM_168_LONG_FLAT": ("variant_f7167cdc0acf445a69f10b5c", "GRAVEYARDED"),
+    "CANDIDATE_H002_MOMENTUM_720_LONG_FLAT": ("variant_f201cbb38819b1e09e763ac7", "FOLLOW_UP"),
+    "CANDIDATE_H003_MA_12_48_LONG_FLAT": ("variant_546746242433ddc20c85b34e", "GRAVEYARDED"),
+    "CANDIDATE_H003_MA_48_192_LONG_FLAT": ("variant_00eb140f03a5f6ab40600160", "FOLLOW_UP"),
+    "CANDIDATE_H003_MA_168_720_LONG_FLAT": ("variant_296a2973dfde57cec911715b", "FOLLOW_UP"),
+    "CANDIDATE_H005_DONCHIAN_168_LONG_FLAT": ("variant_03c4724abe6c8715f5eaa727", "GRAVEYARDED"),
+    "CANDIDATE_H005_DONCHIAN_720_LONG_FLAT": ("variant_9537b83ca36824b3cd47adc1", "GRAVEYARDED"),
+    "CANDIDATE_H006_REVERSAL_1_LONG_SHORT": ("variant_66cfc915025fc7745f4c51e2", "GRAVEYARDED"),
+    "CANDIDATE_H006_REVERSAL_3_LONG_SHORT": ("variant_c21463e36d437e98cf38698b", "GRAVEYARDED"),
+    "CANDIDATE_H006_REVERSAL_6_LONG_SHORT": ("variant_1e859ceb2d7330750601ba1c", "GRAVEYARDED"),
+    "CANDIDATE_H006_REVERSAL_12_LONG_SHORT": ("variant_b2704b638049f154fd8799bd", "GRAVEYARDED"),
+    "CANDIDATE_H007_VOL_SCALED_MA_24_96_RV24": ("variant_622da030e9dacdf22315383b", "BLOCKED"),
+    "CANDIDATE_H007_VOL_SCALED_MA_24_96_RV72": ("variant_66992d55a7d8a402179ce209", "BLOCKED"),
+    "CANDIDATE_H007_VOL_SCALED_MA_24_96_RV168": ("variant_2ec6b5a20cd8e3181a6a46f0", "BLOCKED"),
+}
 
 
 def _read_csv(path: Path) -> list[dict[str, str]]:
@@ -137,6 +155,48 @@ def test_h007_comparison_fails_closed_when_historical_evidence_is_not_comparable
     for row in summary["variants"][-3:]:
         assert row["primary_result_metric"] == "H003_24_96_ANCHOR_DELTA_LIMITED"
         assert row["stressed_positive_primary_gate_pass"] == "H007_COMPARISON_LIMITED_BY_HISTORICAL_EVIDENCE"
+
+
+def test_decision_review_exact_identities_match_registered_variants(summary):
+    spec_pairs = {row["candidate_id"]: row["variant_id"] for row in summary["spec"]["candidate_details"]}
+    assert {candidate_id: variant_id for candidate_id, (variant_id, _) in EXPECTED_REVIEW_DECISIONS.items()} == spec_pairs
+    assert set(EXPECTED_REVIEW_DECISIONS) == set(summary["spec"]["new_candidate_ids"])
+
+
+def test_decision_review_no_family_decision_is_inferred():
+    text = DECISION_REVIEW.read_text(encoding="utf-8")
+    assert "No family-wide decision is appended." in text
+    assert "| family | tested variants | plausible variants |" in text
+
+
+def test_canonical_review_decisions_are_exact_scope_and_no_family_scope():
+    decisions = [json.loads(line) for line in (RESEARCH / "decisions.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
+    review_decisions = [
+        event
+        for event in decisions
+        if "experiments/research/summaries/curated_breadth_screen_v1_decision_review.md" in event["evidence_paths"]
+    ]
+    assert len(review_decisions) == len(EXPECTED_REVIEW_DECISIONS)
+    for event in review_decisions:
+        expected_variant_id, expected_status = EXPECTED_REVIEW_DECISIONS[event["candidate_id"]]
+        assert event["variant_id"] == expected_variant_id
+        assert event["status"] == expected_status
+        assert event["scope"] == "EXACT_VARIANT"
+    assert not [event for event in review_decisions if event["scope"] == "FAMILY"]
+
+
+def test_decision_review_did_not_add_trials_or_candidates():
+    candidates = [json.loads(line) for line in (RESEARCH / "candidates.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
+    trials = [
+        json.loads(line)
+        for path in sorted((RESEARCH / "trials").glob("*.jsonl"))
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    assert len(candidates) == 19
+    assert {event["event_type"] for event in candidates} <= {"CANDIDATE_PROPOSED", "CANDIDATE_REOPENED"}
+    assert len(trials) == 360
+    assert {event["event_type"] for event in trials} == {"TRIAL_COMPLETED"}
 
 
 def test_unrelated_wip_paths_are_not_touched(summary):

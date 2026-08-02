@@ -371,6 +371,39 @@ def test_append_duplicate_id_fails_and_append_keeps_canonical_if_rebuild_fails(t
         preflight(config=cfg(candidate_id="NEW", parameters={"fast": 5, "slow": 9, "mode": "long_flat"}), symbol="BTCUSDT", input_sha256="input", root=root)
 
 
+def test_append_exact_decision_preserves_candidate_and_trial_streams(tmp_path):
+    prop = proposal()
+    root = write_root(tmp_path, [prop], trials=[trial(cfg())])
+    candidate_before = (root / "candidates.jsonl").read_bytes()
+    trial_before = (root / "trials" / "2026.jsonl").read_bytes()
+    event = decision(prop, "BLOCKED", reason_codes=["UNIT_NON_COMPARABLE_EVIDENCE"])
+
+    append_canonical_event(event, root)
+
+    assert (root / "candidates.jsonl").read_bytes() == candidate_before
+    assert (root / "trials" / "2026.jsonl").read_bytes() == trial_before
+    state = json.loads((root / "state.json").read_text(encoding="utf-8"))
+    assert state["variants"][prop["variant_id"]]["status"] == "BLOCKED"
+    first = ((root / "state.json").read_bytes(), (root / "trial_index.json").read_bytes())
+    rebuild(root)
+    assert first == ((root / "state.json").read_bytes(), (root / "trial_index.json").read_bytes())
+
+
+def test_exact_decision_does_not_accidentally_become_family_decision(tmp_path):
+    prop = proposal()
+    sibling_config = cfg(candidate_id="SIBLING", parameters={"fast": 3, "slow": 6, "mode": "long_flat"})
+    sibling = proposal(sibling_config)
+    root = write_root(tmp_path, [prop, sibling])
+
+    append_canonical_event(decision(prop, "FOLLOW_UP"), root)
+
+    state = json.loads((root / "state.json").read_text(encoding="utf-8"))
+    assert state["variants"][prop["variant_id"]]["status"] == "FOLLOW_UP"
+    assert state["variants"][sibling["variant_id"]]["status"] == "PROPOSED"
+    stored = json.loads((root / "decisions.jsonl").read_text(encoding="utf-8"))
+    assert stored["scope"] == "EXACT_VARIANT"
+
+
 def test_rebuild_recovers_removed_index(tmp_path):
     root = write_root(tmp_path, [proposal()])
     (root / "state.json").unlink()

@@ -1,0 +1,396 @@
+{
+  "architecture_review": {
+    "recommendation": "KEEP_WITH_SMALL_REDUCTION_LATER",
+    "symbols": {
+      "PublicEconomicFixtureReason": "USEFUL_BUT_NONESSENTIAL",
+      "_decimal_from_string": "REDUNDANT",
+      "_expected_verification_metadata": "LOAD_BEARING",
+      "_identity_payload": "LOAD_BEARING",
+      "_parse_plain_decimal": "LOAD_BEARING",
+      "main": "USEFUL_BUT_NONESSENTIAL",
+      "reconstruct_transfer": "LOAD_BEARING",
+      "verify_receipt": "LOAD_BEARING",
+      "verify_receipt_batch": "USEFUL_BUT_NONESSENTIAL",
+      "verify_source_artifacts": "LOAD_BEARING"
+    }
+  },
+  "blocker_reproduction": {
+    "ORIGINAL_BLOCKER_REPRODUCED": true,
+    "REPAIR_BLOCKER_CLOSED": true
+  },
+  "cli_review": {
+    "absolute_path_leakage": "Only temporary bad-fixture path appears in explicit CLI argument echo context; typed error output itself contains no QNTY source absolute path.",
+    "bad_decimal": {
+      "cmd": [
+        "/home/swirky/DevHub/repos/Qnty/.venv/bin/python",
+        "-m",
+        "quantbot.paper.public_funding_economic_fixture",
+        "--fixture",
+        "/home/swirky/.cache/agent-tmp/codex/fresh-hostile-rereview-public-economic-fixture-v0/work/bad-cli-ghc57ecw.json",
+        "--verify"
+      ],
+      "duration": 0.036,
+      "returncode": 1,
+      "stderr": "{\"detail\":\"QUANTITY_INVALID: '1e1000000'\",\"reason\":\"QUANTITY_INVALID\",\"verdict\":\"PUBLIC_ECONOMIC_FIXTURE_V0_REJECTED\"}\n",
+      "stdout": ""
+    },
+    "classification": "CLI_REPAIR_CONFIRMED",
+    "no_file_mutation_observed": true,
+    "no_network_observed": true,
+    "runs": [
+      {
+        "cmd": [
+          "/home/swirky/DevHub/repos/Qnty/.venv/bin/python",
+          "-m",
+          "quantbot.paper.public_funding_economic_fixture",
+          "--fixture",
+          "/home/swirky/DevHub/repos/Qnty/tests/fixtures/public_funding_economic_v0/input.json",
+          "--verify"
+        ],
+        "duration": 0.037,
+        "returncode": 0,
+        "stderr": "",
+        "stdout": "{\"claim_scope\":\"HYPOTHETICAL_PUBLIC_FUNDING_ECONOMIC_RECONSTRUCTION_ONLY\",\"claim_verdict\":\"PROVEN_FOR_PINNED_FIXTURE\",\"receipt_id\":\"3833f2fb83a0c59031236cf5bb29b2de0ad2122765f03074f219a2c24bf5bd9b\",\"receipt_sha256\":\"d7a8827d8054ac2a843baf25dcc9dd547f4235ef10571e30d43cb69ef20b294f\",\"verdict\":\"PUBLIC_ECONOMIC_FIXTURE_V0_VERIFIED\"}\n"
+      },
+      {
+        "cmd": [
+          "/home/swirky/DevHub/repos/Qnty/.venv/bin/python",
+          "-m",
+          "quantbot.paper.public_funding_economic_fixture",
+          "--fixture",
+          "/home/swirky/DevHub/repos/Qnty/tests/fixtures/public_funding_economic_v0/input.json",
+          "--verify"
+        ],
+        "duration": 0.036,
+        "returncode": 0,
+        "stderr": "",
+        "stdout": "{\"claim_scope\":\"HYPOTHETICAL_PUBLIC_FUNDING_ECONOMIC_RECONSTRUCTION_ONLY\",\"claim_verdict\":\"PROVEN_FOR_PINNED_FIXTURE\",\"receipt_id\":\"3833f2fb83a0c59031236cf5bb29b2de0ad2122765f03074f219a2c24bf5bd9b\",\"receipt_sha256\":\"d7a8827d8054ac2a843baf25dcc9dd547f4235ef10571e30d43cb69ef20b294f\",\"verdict\":\"PUBLIC_ECONOMIC_FIXTURE_V0_VERIFIED\"}\n"
+      }
+    ],
+    "status_unchanged": true,
+    "stderr_identical": true,
+    "stdout_bytes_identical": true
+  },
+  "commit_chain": {
+    "expected_parent": "8ebe61bdecd2d72239cf8d0618df87d6e1171c5a",
+    "implementation": "432d5326a7e0d63c704b170cf663d74929257df5",
+    "repair": "45bda3eb037d34d324433c5da867d466386c00ba",
+    "verified": true
+  },
+  "decimal_policy_review": {
+    "accepted_synthetic_count": 4,
+    "boundary_checked": [
+      127,
+      128,
+      129
+    ],
+    "classification": "DECIMAL_POLICY_SOUND_AND_ENFORCED",
+    "raw_decimal_exception_remains": false,
+    "rejected_synthetic_count": 20,
+    "source_accepted_count": 4,
+    "source_decimal_policy": "plain strings required; trailing zeros allowed; exponent, plus, whitespace, non-string, non-finite, and >128 chars rejected",
+    "source_rejected_count": 8,
+    "synthetic_decimal_policy": "canonical plain strings required; aliases and negative zero rejected"
+  },
+  "failure_state_review": {
+    "classifications": {
+      "CALCULATED_NOTIONAL_MISMATCH": "DIRECTLY_REACHABLE_AND_TESTED",
+      "CALCULATED_TRANSFER_MISMATCH": "DIRECTLY_REACHABLE_AND_TESTED",
+      "CONTRACT_MULTIPLIER_UNRESOLVED": "DIRECTLY_REACHABLE_AND_TESTED",
+      "DUPLICATE_APPLICATION": "DIRECTLY_REACHABLE_AND_TESTED",
+      "EVENT_IDENTITY_MISMATCH": "DIRECTLY_REACHABLE_NOT_TESTED",
+      "FUNDING_RATE_INVALID": "DIRECTLY_REACHABLE_AND_TESTED",
+      "FUNDING_TIME_INVALID": "DIRECTLY_REACHABLE_AND_TESTED",
+      "MARK_PRICE_MISSING": "DIRECTLY_REACHABLE_AND_TESTED",
+      "MARK_PRICE_NON_POSITIVE": "DIRECTLY_REACHABLE_AND_TESTED",
+      "NUMERIC_POLICY_VIOLATION": "DIRECTLY_REACHABLE_AND_TESTED",
+      "QNTY_EXTENSION_BOUNDARY_UNSAFE": "DIRECTLY_REACHABLE_AND_TESTED",
+      "QUANTITY_INVALID": "DIRECTLY_REACHABLE_AND_TESTED",
+      "QUANTITY_UNIT_UNRESOLVED": "DIRECTLY_REACHABLE_AND_TESTED",
+      "RATE_TYPE_INVALID": "DIRECTLY_REACHABLE_AND_TESTED",
+      "RECEIPT_IDENTITY_MISMATCH": "DIRECTLY_REACHABLE_AND_TESTED",
+      "SIGN_CONVENTION_UNRESOLVED": "DIRECTLY_REACHABLE_AND_TESTED",
+      "SOURCE_EVENT_NOT_FOUND": "DIRECTLY_REACHABLE_NOT_TESTED",
+      "SOURCE_FIXTURE_MISSING": "DIRECTLY_REACHABLE_AND_TESTED",
+      "SOURCE_HASH_MISMATCH": "DIRECTLY_REACHABLE_NOT_TESTED",
+      "SYMBOL_MISMATCH": "DIRECTLY_REACHABLE_AND_TESTED",
+      "VERIFICATION_METADATA_MISMATCH": "DIRECTLY_REACHABLE_AND_TESTED"
+    },
+    "counts": {
+      "DIRECTLY_REACHABLE_AND_TESTED": 18,
+      "DIRECTLY_REACHABLE_NOT_TESTED": 3
+    },
+    "new_reason_present": true,
+    "reason_count": 21
+  },
+  "findings": [
+    {
+      "evidence": "parse_fixture() loads JSON and rejects only forbidden scope fields before reading known keys; no exact top-level fixture schema check exists.",
+      "file": "quantbot/paper/public_funding_economic_fixture.py",
+      "finding_id": "R-F-001",
+      "integration_blocked": false,
+      "line": 155,
+      "minimal_remediation": "Reject unknown top-level fixture keys or document extension-tolerant parsing explicitly.",
+      "severity": "MINOR",
+      "title": "Unexpected non-forbidden fixture fields remain accepted",
+      "why_it_matters": "Future fixture extensions can be silently ignored, creating schema ambiguity even though current load-bearing fields are verified."
+    },
+    {
+      "evidence": "verify_receipt_batch() and several non-core reason paths are useful but not necessary for the single pinned V0 fixture.",
+      "file": "quantbot/paper/public_funding_economic_fixture.py",
+      "finding_id": "R-F-002",
+      "integration_blocked": false,
+      "line": 377,
+      "minimal_remediation": "Defer a small cleanup pass: either add callers/tests for batch behavior or split/remove it, and trim decorative reason surfaces.",
+      "severity": "OBSERVATION",
+      "title": "Batch verifier and broad enum remain more architecture than V0 needs",
+      "why_it_matters": "The feature is correct, but later maintenance can be simpler if nonessential surfaces are reduced after integration."
+    }
+  ],
+  "generated_at_utc": "2026-08-02T20:24:59Z",
+  "identity_review": {
+    "all_load_bearing_mutations_change_identity_or_are_rejected": true,
+    "canonical_receipt_sha256": "d7a8827d8054ac2a843baf25dcc9dd547f4235ef10571e30d43cb69ef20b294f",
+    "classification": "IDENTITY_POLICY_SOUND",
+    "global_decimal_context_unchanged": true,
+    "receipt_id": "3833f2fb83a0c59031236cf5bb29b2de0ad2122765f03074f219a2c24bf5bd9b"
+  },
+  "independent_arithmetic_oracle": {
+    "classification": "FRESH_HOSTILE_ARITHMETIC_ORACLE_PASS",
+    "implementation": {
+      "long": {
+        "notional": "73.65356663043",
+        "transfer": "-0.0042004629049334229"
+      },
+      "short": {
+        "notional": "73.65356663043",
+        "transfer": "0.0042004629049334229"
+      },
+      "zero": {
+        "notional": "0",
+        "transfer": "0"
+      }
+    },
+    "match": true,
+    "oracle": {
+      "long": {
+        "notional": "73.65356663043",
+        "quantity": "0.001",
+        "transfer": "-0.0042004629049334229"
+      },
+      "short": {
+        "notional": "73.65356663043",
+        "quantity": "-0.001",
+        "transfer": "0.0042004629049334229"
+      },
+      "zero": {
+        "notional": "0",
+        "quantity": "0",
+        "transfer": "0"
+      }
+    }
+  },
+  "independent_identity_oracle": {
+    "all_mutations_change_identity": true,
+    "canonical_receipt_sha256": "d7a8827d8054ac2a843baf25dcc9dd547f4235ef10571e30d43cb69ef20b294f",
+    "classification": "INDEPENDENT_IDENTITY_ORACLE_PASS",
+    "implementation_receipt_id": "3833f2fb83a0c59031236cf5bb29b2de0ad2122765f03074f219a2c24bf5bd9b",
+    "mutations": {
+      "claim_scope": true,
+      "contract_id": true,
+      "contract_multiplier": true,
+      "contract_version": true,
+      "formula_version": true,
+      "funding_mark_price": true,
+      "funding_rate": true,
+      "funding_time": true,
+      "numeric_policy": true,
+      "quantity_unit": true,
+      "rate_type": true,
+      "signed_position_quantity": true,
+      "source_event_identity": true,
+      "source_raw_sha256": true,
+      "source_selected_event_sha256": true,
+      "symbol": true
+    },
+    "payload_sha256": "3833f2fb83a0c59031236cf5bb29b2de0ad2122765f03074f219a2c24bf5bd9b"
+  },
+  "integration_gate": "READY_TO_PREPARE_DEDICATED_INTEGRATION_BRANCH",
+  "integration_review": {
+    "cherry_pick_order": [
+      "432d5326a7e0d63c704b170cf663d74929257df5",
+      "45bda3eb037d34d324433c5da867d466386c00ba"
+    ],
+    "classification": "TWO_COMMIT_SERIES_SELF_CONTAINED_WRONG_BRANCH",
+    "perform_cherry_pick_now": false
+  },
+  "next_action": "PREPARE_DEDICATED_INTEGRATION_BRANCH_AND_CHERRY_PICK_V0",
+  "prior_finding_dispositions": [
+    {
+      "evidence": "Original accepts verification.source_hashes_verified=false; repaired HEAD rejects it with VERIFICATION_METADATA_MISMATCH.",
+      "finding_id": "F-001",
+      "prior_severity": "BLOCKER",
+      "status": "CLOSED"
+    },
+    {
+      "evidence": "CANONICAL_PLAIN_DECIMAL_V1 rejects synthetic decimal aliases, exponent forms, negative zero, NaN/Infinity, and >128 byte strings with typed fixture errors; source decimals allow trailing zeros but reject non-plain forms.",
+      "finding_id": "F-002",
+      "prior_severity": "MAJOR",
+      "status": "CLOSED"
+    },
+    {
+      "evidence": "Current branch is still chore/external-trust-root-dispatcher-repair-v046, but the two commits are self-contained and can be cherry-picked in order.",
+      "finding_id": "F-003",
+      "prior_severity": "MAJOR",
+      "status": "STILL_OPEN"
+    },
+    {
+      "evidence": "Snapshot remains, but repair adds independent arithmetic, identity, and verification metadata oracles.",
+      "finding_id": "F-004",
+      "prior_severity": "MINOR",
+      "status": "CLOSED"
+    },
+    {
+      "evidence": "Malformed decimal CLI input exits nonzero with concise JSON reason QUANTITY_INVALID and no traceback.",
+      "finding_id": "F-005",
+      "prior_severity": "MINOR",
+      "status": "CLOSED"
+    },
+    {
+      "evidence": "Unexpected non-forbidden fixture keys are still not rejected; this remains a non-blocking schema strictness issue.",
+      "finding_id": "F-006",
+      "prior_severity": "MINOR",
+      "status": "STILL_OPEN"
+    }
+  ],
+  "prior_review": {
+    "actual_counts": {
+      "BLOCKER": 1,
+      "MAJOR": 2,
+      "MINOR": 3,
+      "OBSERVATION": 0
+    },
+    "commit": "7f65d858074846697586d12449606540922fcdb3",
+    "files_present": true,
+    "reachable_from_qntylab_head": true
+  },
+  "repair_diff": {
+    "changed_paths": [
+      "docs/receipts/PUBLIC_ECONOMIC_FIXTURE_V0_REPAIR.md",
+      "quantbot/paper/public_funding_economic_fixture.py",
+      "tests/test_public_funding_economic_fixture_v0.py"
+    ],
+    "deletions": 60,
+    "documentation_line_growth": 226,
+    "hidden_changes_detected": false,
+    "insertions": 592,
+    "module_line_growth": 68,
+    "test_line_growth": 238,
+    "total_implementation_size_after_both_commits": {
+      "expected_receipt": 1,
+      "fixture_input": 51,
+      "implementation_doc": 163,
+      "module": 899,
+      "repair_doc": 226,
+      "tests": 523,
+      "total_inserted_lines_vs_parent": 1863
+    }
+  },
+  "report_id": "FRESH_HOSTILE_REREVIEW_PUBLIC_ECONOMIC_FIXTURE_V0",
+  "repositories": {
+    "QNTY": {
+      "branch": "chore/external-trust-root-dispatcher-repair-v046",
+      "head": "45bda3eb037d34d324433c5da867d466386c00ba",
+      "root": "/home/swirky/DevHub/repos/Qnty",
+      "tracked_dirty_paths": [],
+      "untracked_paths": [
+        "plans/",
+        "qnty_ruleset_rollout.sh"
+      ]
+    },
+    "QntyLab": {
+      "branch": "master",
+      "pre_existing_tracked_wip_hashes": {
+        "data/manifests/BTCUSDT-perp-1h.json": "c3625af650373ec32fedeee4f0409ae818f4c9b26bdc313fa35899d51467694d",
+        "data/manifests/ETHUSDT-perp-1h.json": "9e9f88b17fc5758c27899f8f7924c16c697933b8c8cf61da1338a239fcabce0e",
+        "data/manifests/SOLUSDT-perp-1h.json": "ba2f41411b8a82549dca5215cdbad19ce82943df5c93929ebb8428ec08f4afea"
+      },
+      "root": "/home/swirky/DevHub/repos/QntyLab",
+      "starting_head": "7f65d858074846697586d12449606540922fcdb3"
+    }
+  },
+  "scope_review": {
+    "account_posting_not_applicable": true,
+    "candidate_trial_decision_policy_forbidden": true,
+    "claim_scope_bounded": true,
+    "classification": "SCOPE_HONEST",
+    "no_profitability_alpha_or_production_claim": true
+  },
+  "snapshot_circularity": {
+    "classification": "CIRCULARITY_RESOLVED_TO_REGRESSION_ONLY",
+    "independent_oracles_load_bearing": true,
+    "snapshot_still_present": true
+  },
+  "test_oracle_review": {
+    "counts": {
+      "IMPLEMENTATION_MIRROR": 2,
+      "INDEPENDENT_CORRECTNESS_ORACLE": 3,
+      "MEANINGFUL_INVARIANT": 35,
+      "MEANINGFUL_REGRESSION": 12,
+      "SNAPSHOT_ONLY": 1,
+      "TRIVIAL_ASSERTION": 0
+    },
+    "required_oracles_present": true
+  },
+  "test_results": [
+    {
+      "command": "env -u TMPDIR .venv/bin/python -m pytest tests/test_public_funding_economic_fixture_v0.py -q",
+      "does_not_prove": "Broad repository health or live exchange correctness.",
+      "duration_seconds": 0.288,
+      "failed": 0,
+      "passed": 53,
+      "proves": "Focused fixture behavior, repair regressions, and added independent oracles pass.",
+      "return_code": 0,
+      "skipped": 0
+    },
+    {
+      "command": "env -u TMPDIR .venv/bin/python -m pytest tests/test_paper_pnl.py tests/test_funding_source_snapshot_schema.py tests/test_funding_source_digest_window_semantics.py tests/test_funding_source_immutable_bundle_semantics.py tests/test_paper_sqlite_writer.py tests/test_paper_sqlite_verify.py tests/test_paper_sqlite_verify_report.py tests/test_paper_matched_null.py tests/test_receipt_schema.py -q",
+      "does_not_prove": "Full suite health or live behavior.",
+      "duration_seconds": 19.117,
+      "failed": 0,
+      "passed": 413,
+      "proves": "No regression in selected offline paper/funding/sqlite/receipt slice.",
+      "return_code": 0,
+      "skipped": 0
+    },
+    {
+      "command": "env -u TMPDIR .venv/bin/python -m compileall quantbot/paper/public_funding_economic_fixture.py",
+      "does_not_prove": "Runtime correctness beyond syntax/import compilation.",
+      "duration_seconds": 0.036,
+      "failed": 0,
+      "passed": 1,
+      "proves": "Module compiles.",
+      "return_code": 0,
+      "skipped": 0
+    },
+    {
+      "command": "env -u TMPDIR .venv/bin/python -m pytest -q",
+      "does_not_prove": "That the reviewed fixture is failing; failing test is outside fixture diff.",
+      "duration_seconds": 135.586,
+      "failed": 1,
+      "failure": "tests/control/test_no_self_hash_source_binding.py::test_no_new_self_hash_source_binding_in_repo",
+      "passed": 7625,
+      "proves": "Full suite has one unrelated continuity-control failure.",
+      "return_code": 1,
+      "skipped": 1
+    }
+  ],
+  "verdict": "FRESH_HOSTILE_REREVIEW_PASS_WITH_MINOR_REDUCTIONS",
+  "verification_metadata_review": {
+    "all_rejected_with": "VERIFICATION_METADATA_MISMATCH",
+    "classification": "VERIFICATION_METADATA_REPAIR_CONFIRMED",
+    "does_not_trust_supplied_booleans": true,
+    "tamper_cases": 25,
+    "unexpected_fields_rejected": true
+  }
+}

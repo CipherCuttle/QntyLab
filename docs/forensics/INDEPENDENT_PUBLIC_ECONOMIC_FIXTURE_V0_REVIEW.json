@@ -1,0 +1,440 @@
+{
+  "architecture_review": {
+    "classification": "REQUIRES_CORRECTNESS_REPAIR",
+    "component_classification": {
+      "CLI": "USEFUL_BUT_NONESSENTIAL",
+      "Decimal arithmetic": "LOAD_BEARING",
+      "batch verifier": "USEFUL_BUT_NONESSENTIAL",
+      "expected receipt snapshot": "USEFUL_BUT_NONESSENTIAL",
+      "large reason enum": "USEFUL_BUT_NONESSENTIAL",
+      "receipt builder/verifier": "LOAD_BEARING",
+      "source verifier": "LOAD_BEARING"
+    },
+    "recommendation": "Keep additive module but repair verification metadata and decimal identity before integration; then consider small reductions"
+  },
+  "cli_review": {
+    "classification": "DETERMINISTIC_BUT_CRASHY_FAILURES",
+    "does_not_prove": "fresh Binance re-acquisition",
+    "malformed_fixture": "rc=1 traceback stderr",
+    "missing_fixture": "rc=1 traceback stderr",
+    "proves": "QNTY vector and expected receipt match plus QntyLab source hashes exist",
+    "success_runs": {
+      "return_codes": [
+        0,
+        0
+      ],
+      "stable_stdout": true,
+      "stderr_empty": true,
+      "stdout_sha256": "4f8e8cbf0678554a4fd6c2c045c1e984af0c51b85e9b781834ca870c283119d1"
+    },
+    "unexpected_extra_fields": "accepted when expected receipt path supplied"
+  },
+  "commit_isolation": {
+    "changed_paths": [
+      "docs/receipts/PUBLIC_ECONOMIC_FIXTURE_V0_IMPLEMENTATION.md",
+      "quantbot/paper/public_funding_economic_fixture.py",
+      "tests/fixtures/public_funding_economic_v0/expected_receipt.json",
+      "tests/fixtures/public_funding_economic_v0/input.json",
+      "tests/test_public_funding_economic_fixture_v0.py"
+    ],
+    "classification": "SELF_CONTAINED_BUT_WRONG_BRANCH",
+    "hidden_dependencies_found": false,
+    "integration_recommendation": "cherry-pick to dedicated branch after correctness repair",
+    "parent_exact": true
+  },
+  "commit_under_review": "432d5326a7e0d63c704b170cf663d74929257df5",
+  "decimal_review": {
+    "aliases": {
+      " 0.001": {
+        "notional": "73.65356663043",
+        "receipt_id": "ed2c386b462e3525f162a2562b2a259e7c7747f6736de941c9fb1b6bdfd107c4",
+        "transfer": "-0.0042004629049334229"
+      },
+      "+0.001": {
+        "notional": "73.65356663043",
+        "receipt_id": "ef7ee53c7e2aa56429f8ce4d53c4e4391bd65645d16df72443d3d805ade428e8",
+        "transfer": "-0.0042004629049334229"
+      },
+      "-0": {
+        "notional": "0",
+        "receipt_id": "41ce8388cf8c9cd7a7c34ce000a1f8cc03f6a691ac6f37ab16e68760c02cac58",
+        "transfer": "0"
+      },
+      "0.001": {
+        "notional": "73.65356663043",
+        "receipt_id": "3833f2fb83a0c59031236cf5bb29b2de0ad2122765f03074f219a2c24bf5bd9b",
+        "transfer": "-0.0042004629049334229"
+      },
+      "0.0010": {
+        "notional": "73.653566630430",
+        "receipt_id": "5077f52942da6a8993e25fdb0b076f2f71e18f337e3de6241fb48796c5cbf32e",
+        "transfer": "-0.00420046290493342290"
+      },
+      "1E-3": {
+        "notional": "73.65356663043",
+        "receipt_id": "2ca690707a8297ca8d1c5e143ad3eeb446e345f3a12dcdbb872c71ac697a5a63",
+        "transfer": "-0.0042004629049334229"
+      }
+    },
+    "classification": "DECIMAL_IDENTITY_MALLEABLE",
+    "global_context_unchanged": true
+  },
+  "diff_inventory": {
+    "candidate_trial_decision_changes": false,
+    "database_writes": false,
+    "executable_binaries": false,
+    "files_changed": 5,
+    "hidden_generated_files": false,
+    "insertions": 1331,
+    "network_calls": false,
+    "paper_engine_edits": false,
+    "strategy_code": false
+  },
+  "failure_state_review": {
+    "directly_reachable_and_tested": 18,
+    "directly_reachable_not_tested": 2,
+    "duplicate_or_out_of_scope": 0,
+    "misclassified": 0,
+    "not_in_probe_but_reachable": [
+      "SOURCE_HASH_MISMATCH",
+      "SOURCE_EVENT_NOT_FOUND"
+    ],
+    "probe_results": {
+      "CALCULATED_NOTIONAL_MISMATCH": "CALCULATED_NOTIONAL_MISMATCH",
+      "CALCULATED_TRANSFER_MISMATCH": "CALCULATED_TRANSFER_MISMATCH",
+      "CONTRACT_MULTIPLIER_UNRESOLVED": "CONTRACT_MULTIPLIER_UNRESOLVED",
+      "DUPLICATE_APPLICATION": "DUPLICATE_APPLICATION",
+      "EVENT_IDENTITY_MISMATCH": "EVENT_IDENTITY_MISMATCH",
+      "FUNDING_RATE_INVALID": "FUNDING_RATE_INVALID",
+      "FUNDING_TIME_INVALID": "FUNDING_TIME_INVALID",
+      "MARK_PRICE_MISSING": "MARK_PRICE_MISSING",
+      "MARK_PRICE_NON_POSITIVE": "MARK_PRICE_NON_POSITIVE",
+      "NUMERIC_POLICY_VIOLATION": "NUMERIC_POLICY_VIOLATION",
+      "QNTY_EXTENSION_BOUNDARY_UNSAFE": "QNTY_EXTENSION_BOUNDARY_UNSAFE",
+      "QUANTITY_INVALID": "QUANTITY_INVALID",
+      "QUANTITY_UNIT_UNRESOLVED": "QUANTITY_UNIT_UNRESOLVED",
+      "RATE_TYPE_INVALID": "RATE_TYPE_INVALID",
+      "RECEIPT_IDENTITY_MISMATCH": "RECEIPT_IDENTITY_MISMATCH",
+      "SIGN_CONVENTION_UNRESOLVED": "SIGN_CONVENTION_UNRESOLVED",
+      "SOURCE_FIXTURE_MISSING": "SOURCE_FIXTURE_MISSING",
+      "SYMBOL_MISMATCH": "SYMBOL_MISMATCH"
+    },
+    "reported_reason_codes": 20,
+    "unreachable": 0
+  },
+  "findings": [
+    {
+      "blocks_integration": true,
+      "evidence": "Mutation of verification.source_hashes_verified to false was accepted by verify_receipt; lines 371-387 only require verification to be a mapping and check claim_scope and claim_verdict.",
+      "file": "/home/swirky/DevHub/repos/Qnty/quantbot/paper/public_funding_economic_fixture.py",
+      "id": "F-001",
+      "line": 371,
+      "minimal_remediation": "Require verification to exactly equal the expected verification block, or remove mutable verification booleans from the receipt and output them only as verifier return data.",
+      "severity": "BLOCKER",
+      "title": "Receipt verifier accepts tampered verification metadata",
+      "why_it_matters": "A receipt can carry contradictory verification flags while the verifier returns success, invalidating deterministic receipt verification for load-bearing receipt metadata."
+    },
+    {
+      "blocks_integration": true,
+      "evidence": "Decimal(\"0.001\"), Decimal(\"1E-3\"), Decimal(\"+0.001\"), and Decimal(\" 0.001\") are accepted; identity binds the raw string at line 641, producing different receipt_id values for the same economic quantity.",
+      "file": "/home/swirky/DevHub/repos/Qnty/quantbot/paper/public_funding_economic_fixture.py",
+      "id": "F-002",
+      "line": 649,
+      "minimal_remediation": "Define and enforce a decimal lexical grammar for V0 source and quantity strings, or canonicalize decimal representation before identity and duplicate checks. Reject leading plus, surrounding whitespace, and exponent notation if the contract intends fixed decimal strings.",
+      "severity": "BLOCKER",
+      "title": "Decimal syntax aliases produce distinct receipt identities for equivalent quantities",
+      "why_it_matters": "Semantically identical positions can bypass receipt-id based duplicate detection and make the identity policy representation-malleable. The contract metadata states scientific notation conversion is not allowed, but the implementation accepts it."
+    },
+    {
+      "blocks_integration": false,
+      "evidence": "test_committed_fixture_matches_committed_expected_receipt compares implementation output to expected_receipt.json using the same module canonicalization. It is useful regression coverage but not an independent oracle.",
+      "file": "/home/swirky/DevHub/repos/Qnty/tests/test_public_funding_economic_fixture_v0.py",
+      "id": "F-003",
+      "line": 261,
+      "minimal_remediation": "Add a small independent test oracle for arithmetic and identity payload bytes, or mark expected_receipt.json as snapshot-only regression coverage.",
+      "severity": "MAJOR",
+      "title": "Correctness tests are partially snapshot-circular",
+      "why_it_matters": "A shared generator/verifier bug can be preserved in the committed expected receipt and still pass this test. The suite has hard-coded arithmetic vectors, but receipt identity and canonical SHA remain implementation-defined in tests."
+    },
+    {
+      "blocks_integration": false,
+      "evidence": "A fixture containing unexpected_extra_field was accepted when the expected receipt path was provided. parse_fixture reads expected keys and only rejects a small forbidden-field set.",
+      "file": "/home/swirky/DevHub/repos/Qnty/quantbot/paper/public_funding_economic_fixture.py",
+      "id": "F-004",
+      "line": 151,
+      "minimal_remediation": "Reject unknown top-level fixture keys and unknown receipt keys, or document permissive-ignore behavior as non-load-bearing.",
+      "severity": "MINOR",
+      "title": "Fixture parser accepts unexpected extra fields",
+      "why_it_matters": "For a pinned V0 fixture, strict schemas are simpler to audit and reduce silent drift. The current behavior did not change the receipt, but it weakens schema strictness."
+    },
+    {
+      "blocks_integration": false,
+      "evidence": "verify_receipt_batch provides in-memory duplicate detection for supplied receipts only; the fixture makes no persistent exactly-once claim and does not integrate with a ledger.",
+      "file": "/home/swirky/DevHub/repos/Qnty/quantbot/paper/public_funding_economic_fixture.py",
+      "id": "F-005",
+      "line": 390,
+      "minimal_remediation": "Remove batch verification from V0 or keep it explicitly labeled as optional regression utility after decimal identity is repaired.",
+      "severity": "MINOR",
+      "title": "Batch duplicate verifier is nonessential V0 framework code",
+      "why_it_matters": "It increases API surface and test surface without improving the single pinned economic vector. Because of F-002, its receipt-id based duplicate policy is also too weak for decimal aliases."
+    }
+  ],
+  "formula_review": {
+    "classification": "FORMULA_CONFIRMED",
+    "dimensions": "BTC * USDT/BTC * dimensionless * 1 = USDT",
+    "negative_rate_long_transfer": "0.0042004629049334229",
+    "notional": "abs(signed_quantity) * mark_price * multiplier",
+    "transfer": "-signed_quantity * mark_price * funding_rate * multiplier"
+  },
+  "generated_at_utc": "2026-08-02T19:23:18Z",
+  "idempotency_review": {
+    "batch_verifier_necessary_for_v0": false,
+    "byte_identical_duplicate_rejected": true,
+    "classification": "IDENTITY_ALIAS_BYPASS",
+    "persistent_exactly_once_claim": false,
+    "semantic_decimal_alias_duplicate_rejected": false
+  },
+  "identity_review": {
+    "classification": "IDENTITY_MALLEABLE",
+    "complete_for_raw_committed_vector": true,
+    "decimal_alias_bypass": true,
+    "verification_metadata_not_bound": true
+  },
+  "independent_oracle": {
+    "expected_receipt_canonical_sha256": "d7a8827d8054ac2a843baf25dcc9dd547f4235ef10571e30d43cb69ef20b294f",
+    "expected_receipt_sha256": "35a42ea4c3dfbd62c9c0aeac8e30975723193df7f85b2a4edb30cf165f88044d",
+    "long_matches_expected_receipt": true,
+    "long_transfer": "-0.0042004629049334229",
+    "result": "HOSTILE_PUBLIC_ECONOMIC_FIXTURE_ORACLE_PASS",
+    "short_transfer": "0.0042004629049334229",
+    "zero_transfer": "0"
+  },
+  "integration_gate": "NOT_READY_FOR_INTEGRATION",
+  "line_count": {
+    "estimated_minimum_responsible_implementation_size": "about 450-550 inserted lines: one strict fixture parser, source verifier, Decimal calculator, receipt builder/verifier, and focused tests; batch framework and duplicated expected skeleton can be reduced",
+    "insertions": {
+      "documentation": 163,
+      "expected_receipt": 1,
+      "input_fixture": 51,
+      "module": 831,
+      "tests": 285,
+      "total": 1331
+    },
+    "profiles": {
+      "documentation": {
+        "blank": 72,
+        "comment": 0,
+        "docstring": 0,
+        "executable_or_content": 91,
+        "path": "/home/swirky/DevHub/repos/Qnty/docs/receipts/PUBLIC_ECONOMIC_FIXTURE_V0_IMPLEMENTATION.md",
+        "total": 163
+      },
+      "expected_receipt": {
+        "blank": 0,
+        "comment": 0,
+        "docstring": 0,
+        "executable_or_content": 1,
+        "path": "/home/swirky/DevHub/repos/Qnty/tests/fixtures/public_funding_economic_v0/expected_receipt.json",
+        "total": 1
+      },
+      "input_fixture": {
+        "blank": 0,
+        "comment": 0,
+        "docstring": 0,
+        "executable_or_content": 51,
+        "path": "/home/swirky/DevHub/repos/Qnty/tests/fixtures/public_funding_economic_v0/input.json",
+        "total": 51
+      },
+      "module": {
+        "blank": 85,
+        "comment": 0,
+        "docstring": 7,
+        "executable_or_content": 739,
+        "path": "/home/swirky/DevHub/repos/Qnty/quantbot/paper/public_funding_economic_fixture.py",
+        "total": 831
+      },
+      "tests": {
+        "blank": 46,
+        "comment": 0,
+        "docstring": 0,
+        "executable_or_content": 239,
+        "path": "/home/swirky/DevHub/repos/Qnty/tests/test_public_funding_economic_fixture_v0.py",
+        "total": 285
+      }
+    }
+  },
+  "next_action": "Repair receipt verification metadata checks and decimal lexical/identity policy, then rerun hostile review before cherry-pick.",
+  "parent_commit": "8ebe61bdecd2d72239cf8d0618df87d6e1171c5a",
+  "provenance_review": {
+    "classification": "LIVE_CROSS_REPOSITORY_SOURCE_VERIFICATION",
+    "documentation_confusion_found": false,
+    "fixture_binds_source_hashes": true,
+    "runtime_opens_qntylab_artifacts": true
+  },
+  "regression_tests": [
+    {
+      "command": ".venv/bin/python -m pytest tests/test_public_funding_economic_fixture_v0.py -q",
+      "does_not_prove": "independent correctness of expected receipt",
+      "duration": "0.14s",
+      "failed": 0,
+      "passed": 26,
+      "proves": "new fixture regression behavior",
+      "return_code": 0,
+      "skipped": 0
+    },
+    {
+      "command": ".venv/bin/python -m pytest tests/test_paper_pnl.py tests/test_funding_source_snapshot_schema.py tests/test_funding_source_digest_window_semantics.py tests/test_funding_source_immutable_bundle_semantics.py tests/test_paper_sqlite_writer.py tests/test_paper_sqlite_verify.py tests/test_paper_sqlite_verify_report.py tests/test_paper_matched_null.py tests/test_receipt_schema.py -q",
+      "does_not_prove": "full offline suite or hostile oracle properties",
+      "duration": "46.29s",
+      "failed": 0,
+      "passed": 413,
+      "proves": "reported focused paper/funding regression slice still passes",
+      "return_code": 0,
+      "skipped": 0
+    },
+    {
+      "command": ".venv/bin/python -m compileall -q quantbot/paper/public_funding_economic_fixture.py tests/test_public_funding_economic_fixture_v0.py",
+      "does_not_prove": "runtime correctness",
+      "duration": "<1s",
+      "failed": 0,
+      "passed": 2,
+      "proves": "Python syntax/import compilation",
+      "return_code": 0,
+      "skipped": 0
+    },
+    {
+      "command": "ruff check ...",
+      "does_not_prove": "lint cleanliness",
+      "duration": "<1s",
+      "failed": 0,
+      "passed": 0,
+      "proves": "ruff unavailable, no dependency installed",
+      "return_code": 0,
+      "skipped": 1
+    },
+    {
+      "command": "mypy ...",
+      "does_not_prove": "type cleanliness",
+      "duration": "<1s",
+      "failed": 0,
+      "passed": 0,
+      "proves": "mypy unavailable, no dependency installed",
+      "return_code": 0,
+      "skipped": 1
+    }
+  ],
+  "report_id": "INDEPENDENT_PUBLIC_ECONOMIC_FIXTURE_V0_REVIEW",
+  "repositories": {
+    "QNTY": {
+      "branch": "chore/external-trust-root-dispatcher-repair-v046",
+      "head": "432d5326a7e0d63c704b170cf663d74929257df5",
+      "root": "/home/swirky/DevHub/repos/Qnty",
+      "status": "pre-existing untracked plans/ and qnty_ruleset_rollout.sh only"
+    },
+    "QntyLab": {
+      "branch": "master",
+      "head_at_report_write": "5ba89e5c5f320391ee9321b1929bb079be590aa8",
+      "root": "/home/swirky/DevHub/repos/QntyLab",
+      "starting_head": "5ba89e5c5f320391ee9321b1929bb079be590aa8",
+      "status": "pre-existing manifest WIP and untracked acquisition outputs recorded"
+    }
+  },
+  "scope_review": {
+    "classification": "SCOPE_HONEST",
+    "non_claims_present": true,
+    "overclaim_language": "claim_verdict PROVEN_FOR_PINNED_FIXTURE is bounded by adjacent claim_scope in generated receipt and CLI output"
+  },
+  "security_review": {
+    "classification": "REASONABLE_FUTURE_HARDENING",
+    "risks": {
+      "absolute_path_disclosure": "tracebacks disclose local paths on CLI failures",
+      "duplicate_json_keys": "not detected by json.loads",
+      "network": "not present",
+      "sqlite": "not present",
+      "unbounded_file_reads": "reasonable future hardening for offline fixture",
+      "unicode_confusable_keys": "unknown keys ignored"
+    }
+  },
+  "snapshot_circularity": {
+    "classification": "PARTIAL_SNAPSHOT_CIRCULARITY",
+    "independent_oracle_in_tests": false,
+    "meaningful_hardcoded_arithmetic_tests": true
+  },
+  "source_chain": {
+    "classification": "SOURCE_CONTRACT_CHAIN_VALID",
+    "contract_binds_selected_identity": true,
+    "contract_selected_identity": {
+      "fundingTime": 1780272000001,
+      "fundingTimeUtc": "2026-06-01T00:00:00.001Z",
+      "market": "USD-M Futures",
+      "selected_event_sha256": "fcc0682d5a30976d860fbbefaf415b0e0c0d0585835a4a8ef089acd9c5376b59",
+      "source_array_index": 0,
+      "symbol": "BTCUSDT",
+      "venue": "Binance"
+    },
+    "hashes": {
+      "/home/swirky/DevHub/repos/QntyLab/docs/forensics/PUBLIC_ECONOMIC_FIXTURE_CONTRACT_V0.json": "b6c9ad8f3b21c983952820c6bb05d4ca6e8a8695cc3b5b57db34413e7391b5c3",
+      "/home/swirky/DevHub/repos/QntyLab/docs/forensics/PUBLIC_ECONOMIC_FIXTURE_CONTRACT_V0.md": "fd60173f71c9a7180ce0ce5c31023ae4b63ea6c8df6259620cc5646b8e6f347d",
+      "/home/swirky/DevHub/repos/QntyLab/docs/forensics/evidence/binance_public_funding_event_v0/BTCUSDT-fundingRate-2026-06.raw.json": "01d38d5b8c8581388621015a2bc618673cac1ff51ff88672aea52f9bdb31bafd",
+      "/home/swirky/DevHub/repos/QntyLab/docs/forensics/evidence/binance_public_funding_event_v0/BTCUSDT-fundingRate-2026-06.receipt.json": "456e7918e3d9c7caeee67a8bde729867cbe0143f2002e7496ef5234382278c1c",
+      "/home/swirky/DevHub/repos/QntyLab/docs/forensics/evidence/binance_public_funding_event_v0/BTCUSDT-fundingRate-2026-06.selected-event.json": "fcc0682d5a30976d860fbbefaf415b0e0c0d0585835a4a8ef089acd9c5376b59"
+    },
+    "raw_count": 90,
+    "raw_numeric_fields_are_strings": true,
+    "raw_parses": true,
+    "selected_fields_match_expected": true,
+    "selected_fields_match_raw_row": true,
+    "selected_index": 0,
+    "selected_row_exists": true,
+    "selected_row_values_present_in_raw_bytes": true,
+    "source_receipt_binds_raw_hash": true
+  },
+  "static_review": {
+    "compileall": "PASS",
+    "dead_code": "no unused imports found by AST inventory; batch verifier and reconstruct flag branch are nonessential",
+    "import_check": "IMPORT_OK",
+    "mypy": "UNAVAILABLE",
+    "path_handling": "default QntyLab sibling path and relative source artifact paths; absolute artifact paths rejected",
+    "ruff": "UNAVAILABLE"
+  },
+  "tamper_review": {
+    "classification": "FAILS_VERIFICATION_METADATA_TAMPER",
+    "mutation_results": {
+      "account_status": "EVENT_IDENTITY_MISMATCH",
+      "direction": "CALCULATED_TRANSFER_MISMATCH",
+      "evidence_level": "EVENT_IDENTITY_MISMATCH",
+      "implementation_owner": "EVENT_IDENTITY_MISMATCH",
+      "non_claim_changed": "EVENT_IDENTITY_MISMATCH",
+      "non_claim_removed": "EVENT_IDENTITY_MISMATCH",
+      "precision_status": "EVENT_IDENTITY_MISMATCH",
+      "research_state_policy": "EVENT_IDENTITY_MISMATCH",
+      "verification_metadata": "ACCEPTED"
+    }
+  },
+  "test_quality": {
+    "classification": "PARTIAL_SNAPSHOT_CIRCULARITY",
+    "classification_counts": {
+      "IMPLEMENTATION_MIRROR": 4,
+      "INDEPENDENT_CORRECTNESS_ORACLE": 0,
+      "MEANINGFUL_INVARIANT": 14,
+      "MEANINGFUL_REGRESSION": 7,
+      "SNAPSHOT_ONLY": 1,
+      "TRIVIAL_ASSERTION": 0,
+      "UNREACHABLE_SETUP": 0
+    },
+    "missing_cases": [
+      "decimal lexical aliases",
+      "verification metadata tamper",
+      "unexpected extra fields",
+      "source receipt hash mutation",
+      "semantic duplicate aliases"
+    ]
+  },
+  "verdict": {
+    "blocker_count": 2,
+    "major_count": 1,
+    "minor_count": 2,
+    "observation_count": 0,
+    "primary": "INDEPENDENT_REVIEW_REQUIRES_CORRECTNESS_REPAIR"
+  }
+}

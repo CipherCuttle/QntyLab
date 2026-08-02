@@ -9,10 +9,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SPEC_PATH = ROOT / "experiments/specs/binance_spot_halt_normalization_v1.json"
 SOURCE_JSON_PATH = ROOT / "experiments/research/summaries/focused_trend_validation_v1_2023_source_resolution.json"
 SOURCE_MD_PATH = ROOT / "experiments/research/summaries/focused_trend_validation_v1_2023_source_resolution.md"
-LEDGER_PATHS = {
+PROTECTED_LEDGER_PATHS = {
     "experiments/research/candidates.jsonl": "e4f1cfa931d0effe740d31d6d441a6479f5ebb0196f7241236622895d7c15006",
-    "experiments/research/decisions.jsonl": "6b44b52333dc4ff6488948762294408523f161a5fabd146a6ed726a46ed3d6ff",
-    "experiments/research/trials/2026.jsonl": "a9500c06f6eae8c991d5404603198ba3a65543df4e575814b59fcdb41bf7644b",
 }
 ASSETS = ("BTCUSDT", "ETHUSDT", "SOLUSDT")
 NORMALIZED_TIMESTAMP = "2023-03-24T13:00:00Z"
@@ -153,9 +151,9 @@ def test_normalization_version_affects_provenance_and_receipt_identity():
     assert asset["authoritative_raw_sha256"] != "derived-file-hash"
 
 
-def test_no_raw_file_candidate_trial_or_decision_event_is_added():
+def test_no_raw_file_or_candidate_event_is_added_by_normalization_lifecycle():
     spec = _spec()
-    for relative, expected in LEDGER_PATHS.items():
+    for relative, expected in PROTECTED_LEDGER_PATHS.items():
         assert _sha256(ROOT / relative) == expected
     for asset in spec["assets"]:
         rows = list(csv.DictReader((ROOT / asset["authoritative_raw_path"]).open(newline="", encoding="utf-8")))

@@ -4,6 +4,7 @@ from collections import Counter
 from pathlib import Path
 
 from qntylab.research_ledger import compute_variant_id, context_text, doctor
+from qntylab.curated_breadth_screen import expand_planned_runs
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -88,9 +89,17 @@ def test_curated_breadth_screen_v1_registration_is_frozen():
     assert state["variants"]["variant_83e1fee345fb3915774652a5"]["status"] == "GRAVEYARDED"
     assert state["variants"]["variant_282aa437c78189c7c8b2c124"]["status"] == "GRAVEYARDED"
     assert all(event["scope"] == "EXACT_VARIANT" for event in decisions)
-    assert len(decisions) == 4
-    assert len(trials) == 360
-    assert Counter(event["variant_id"] for event in trials if event["variant_id"] in spec["new_variant_ids"]) == {
+    assert {
+        "variant_aa66ba0edf856ac06f055917",
+        "variant_966eea454bc9ac3d22603a7c",
+        "variant_83e1fee345fb3915774652a5",
+        "variant_282aa437c78189c7c8b2c124",
+    } <= {event["variant_id"] for event in decisions}
+    planned = expand_planned_runs(SPEC_PATH, repo_root=ROOT)
+    planned_ids = {row["trial_id"] for row in planned}
+    assert len(planned_ids) == 360
+    assert Counter(event["trial_id"] for event in trials if event["trial_id"] in planned_ids) == {trial_id: 1 for trial_id in planned_ids}
+    assert Counter(event["variant_id"] for event in trials if event["trial_id"] in planned_ids) == {
         variant_id: 24 for variant_id in spec["new_variant_ids"]
     }
 
@@ -140,5 +149,5 @@ def test_curated_breadth_screen_v1_registration_is_frozen():
     assert doctor(RESEARCH) == []
     context = context_text(RESEARCH)
     assert "total candidate variants: 19" in context
-    assert "total completed trials: 360" in context
+    assert "total completed trials: 378" in context
     assert len(context.splitlines()) < 80

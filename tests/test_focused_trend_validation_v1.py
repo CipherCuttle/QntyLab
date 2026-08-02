@@ -3,6 +3,7 @@ from collections import Counter
 from pathlib import Path
 
 import qntylab.strategy_test as strategy_test
+from qntylab.curated_breadth_screen import expand_planned_runs
 from qntylab.focused_trend_validation import expand_planned_holdout_runs
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -56,6 +57,9 @@ def test_focused_trend_validation_v1_registration_contract():
     assert [item["variant_id"] for item in spec["variants"]] == list(EXPECTED_VARIANTS)
     by_source_variant = {item["variant_id"]: item for item in source["candidate_details"]}
     by_candidate_variant = {event["variant_id"]: event for event in candidates if event["event_type"] == "CANDIDATE_PROPOSED"}
+    by_decision_variant = {}
+    for event in decisions:
+        by_decision_variant[event["variant_id"]] = event
     for item in spec["variants"]:
         expected = EXPECTED_VARIANTS[item["variant_id"]]
         assert item["candidate_id"] == expected["candidate_id"]
@@ -63,8 +67,10 @@ def test_focused_trend_validation_v1_registration_contract():
         assert item["parameters"] == expected["parameters"]
         assert by_source_variant[item["variant_id"]]["parameters"] == expected["parameters"]
         assert by_candidate_variant[item["variant_id"]]["parameters"] == expected["parameters"]
-        assert state["variants"][item["variant_id"]]["status"] == "FOLLOW_UP"
         assert item["state_required_at_registration"] == "FOLLOW_UP"
+        assert state["variants"][item["variant_id"]]["status"] == "GRAVEYARDED"
+        assert by_decision_variant[item["variant_id"]]["status"] == "GRAVEYARDED"
+        assert by_decision_variant[item["variant_id"]]["reason_codes"] == ["FAILED_2023_HOLDOUT_MULTIPLE_GATES"]
 
     track_a = spec["tracks"]["A_untouched_2023_holdout"]
     assert track_a["planned_trial_count"] == 18
@@ -98,7 +104,13 @@ def test_focused_trend_validation_v1_registration_contract():
     assert track_a["continuation_gate"]["aggregate_stressed_primary_result_positive"] is True
     assert track_a["continuation_gate"]["minimum_stressed_primary_positive_asset_count"] == 2
     assert "not universal statistical laws" in track_a["continuation_gate"]["note"]
-    assert all("2023" not in str(event["evaluation_start"]) for event in trials if event["variant_id"] in EXPECTED_VARIANTS)
+    planned_holdout = expand_planned_holdout_runs(SPEC_PATH, repo_root=ROOT)
+    holdout_ids = {row["trial_id"] for row in planned_holdout}
+    holdout_events = [event for event in trials if event["trial_id"] in holdout_ids]
+    assert len(holdout_events) == 18
+    assert Counter(event["trial_id"] for event in holdout_events) == {trial_id: 1 for trial_id in holdout_ids}
+    assert {event["evaluation_start"] for event in holdout_events} == {"2023-01-01T00:00:00Z"}
+    assert {event["evaluation_end"] for event in holdout_events} == {"2023-12-31T23:00:00Z"}
 
     track_b = spec["tracks"]["B_forward_paper_shadow_validation"]
     assert track_b["first_eligible_timestamp_after_registration_commit"] == "2026-08-02T01:00:00Z"
@@ -137,8 +149,12 @@ def test_focused_trend_validation_v1_registration_contract():
     assert spa["resampling"] == "dependence-aware resampling"
     assert spa["fake_p_values_from_aggregate_summary_rows_prohibited"] is True
 
-    assert len(decisions) == 19
-    assert len(trials) == 360
+    assert all(event["scope"] == "EXACT_VARIANT" for event in decisions)
+    breadth_planned = expand_planned_runs(SOURCE_SPEC_PATH, repo_root=ROOT)
+    breadth_ids = {row["trial_id"] for row in breadth_planned}
+    assert len(breadth_ids) == 360
+    assert Counter(event["trial_id"] for event in trials if event["trial_id"] in breadth_ids) == {trial_id: 1 for trial_id in breadth_ids}
+    assert holdout_ids.isdisjoint(breadth_ids)
     assert "ledger_events" not in spec
     assert "trial_completed" not in json.dumps(spec).lower()
 
@@ -161,8 +177,23 @@ def test_focused_holdout_plan_expands_to_18_unique_2023_follow_up_identities(mon
     assert all(row["config"]["normalization_provenance"]["derived_input_sha256"] == row["input_sha256"] for row in planned)
 
 
-def test_focused_holdout_plan_has_no_collision_with_completed_breadth_screen_trials():
+def test_focused_holdout_plan_is_completed_once_and_disjoint_from_breadth_screen_trials():
     planned = expand_planned_holdout_runs(SPEC_PATH, repo_root=ROOT)
-    completed = {event["trial_id"] for event in _jsonl(RESEARCH / "trials/2026.jsonl")}
-    assert len(completed) == 360
-    assert {row["trial_id"] for row in planned}.isdisjoint(completed)
+    breadth = expand_planned_runs(SOURCE_SPEC_PATH, repo_root=ROOT)
+    trials = _jsonl(RESEARCH / "trials/2026.jsonl")
+    focused_ids = {row["trial_id"] for row in planned}
+    breadth_ids = {row["trial_id"] for row in breadth}
+    assert len(focused_ids) == 18
+    assert len(breadth_ids) == 360
+    assert focused_ids.isdisjoint(breadth_ids)
+    assert Counter(event["trial_id"] for event in trials if event["trial_id"] in focused_ids) == {trial_id: 1 for trial_id in focused_ids}
+    assert Counter(event["trial_id"] for event in trials if event["trial_id"] in breadth_ids) == {trial_id: 1 for trial_id in breadth_ids}
+    unauthorized = [
+        event["trial_id"]
+        for event in trials
+        if event["variant_id"] in EXPECTED_VARIANTS
+        and event["evaluation_start"] == "2023-01-01T00:00:00Z"
+        and event["evaluation_end"] == "2023-12-31T23:00:00Z"
+        and event["trial_id"] not in focused_ids
+    ]
+    assert unauthorized == []

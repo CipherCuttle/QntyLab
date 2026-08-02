@@ -120,7 +120,10 @@ def test_raw_paths_and_derived_paths_are_distinct_and_raw_hashes_match():
         assert raw.startswith("data/raw/")
         assert derived.startswith("data/derived/focused_trend_validation_v1/")
         assert _sha256(ROOT / raw) == asset["authoritative_raw_sha256"]
-        assert not (ROOT / derived).exists()
+        if (ROOT / derived).exists():
+            rows = list(csv.DictReader((ROOT / derived).open(newline="", encoding="utf-8")))
+            inserted = [row for row in rows if row["timestamp"] == NORMALIZED_TIMESTAMP]
+            assert inserted == [asset["derived_bar"]]
 
 
 def test_only_one_normalized_row_per_asset_and_all_other_gaps_reject():

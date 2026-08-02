@@ -1,0 +1,54 @@
+{
+  "asset": "ETHUSDT",
+  "authoritative_raw_path": "data/raw/ETHUSDT-1h.csv",
+  "authoritative_raw_sha256": "3584c161874dc3b8d8f9961901e5abaadebe32a1aaba6d321106b8ccb1f61187",
+  "created_at_utc": "2026-08-02T00:00:00Z",
+  "derived_path": "data/derived/focused_trend_validation_v1/ETHUSDT-spot-1h-2023-halt-normalized.csv",
+  "derived_sha256": "a3cfb7733aad701b43fd383ac32f52252d229d2275147698449b2007bdff0d40",
+  "evaluation_end": "2023-12-31T23:00:00Z",
+  "evaluation_start": "2023-01-01T00:00:00Z",
+  "first_post_halt_trade_timestamp": "2023-03-24T14:00:00.059Z",
+  "interval": "1h",
+  "market_type": "Binance Spot",
+  "normalization_id": "PREREGISTER_BINANCE_SPOT_HALT_NORMALIZATION_V1",
+  "normalization_version": "BINANCE_SPOT_HALT_NORMALIZATION_V1",
+  "normalized_timestamp": "2023-03-24T13:00:00Z",
+  "official_archive_sha256_values": {
+    "aggTrades": "add3e8f4b0db74f05de94752baa906321c6ad286b34cc40b93b30be3ad85e1c2",
+    "klines_1h": "7b9d19487c37b354003717872987ae5ecb2178b4ff0de1ecdd5a5c84da2f10b1",
+    "klines_1m": "dd327f356876b38b6b93f07d3ccac87b5abbe2c285d7f8dbbe6363faa7b05e0a",
+    "trades": "69a25e6df194bc5eab14e831d518af07525a1fb93a6eecdccd4aa67232efb09f"
+  },
+  "official_archive_sources": {
+    "aggTrades": {
+      "archive_sha256": "add3e8f4b0db74f05de94752baa906321c6ad286b34cc40b93b30be3ad85e1c2",
+      "checksum_file_sha256": "e9eb043e6030e97b2a00c3b54679b0861840a34777aebe20042ca56e3a3c0ce8",
+      "url": "https://data.binance.vision/data/spot/daily/aggTrades/ETHUSDT/ETHUSDT-aggTrades-2023-03-24.zip"
+    },
+    "klines_1h": {
+      "archive_sha256": "7b9d19487c37b354003717872987ae5ecb2178b4ff0de1ecdd5a5c84da2f10b1",
+      "checksum_file_sha256": "9f5b755a256d7a3e0a67d7ec9961be91ca0c6d3f6d66643f611e67d4be178163",
+      "url": "https://data.binance.vision/data/spot/daily/klines/ETHUSDT/1h/ETHUSDT-1h-2023-03-24.zip"
+    },
+    "klines_1m": {
+      "archive_sha256": "dd327f356876b38b6b93f07d3ccac87b5abbe2c285d7f8dbbe6363faa7b05e0a",
+      "checksum_file_sha256": "211e83d6007b603c541e56dcb2de2f3fd00e3fdf5b03d41c9f92d087d6e84f8b",
+      "url": "https://data.binance.vision/data/spot/daily/klines/ETHUSDT/1m/ETHUSDT-1m-2023-03-24.zip"
+    },
+    "trades": {
+      "archive_sha256": "69a25e6df194bc5eab14e831d518af07525a1fb93a6eecdccd4aa67232efb09f",
+      "checksum_file_sha256": "38f9b1cf782f2ea87bddbed21d9bca047592c8eee8d5d6cfa7546bfec3db852a",
+      "url": "https://data.binance.vision/data/spot/daily/trades/ETHUSDT/ETHUSDT-trades-2023-03-24.zip"
+    }
+  },
+  "official_checksum_verification": "passed",
+  "reason_code": "BINANCE_SPOT_AUTHORITATIVE_NO_TRADE_HALT",
+  "reference_price": "1789.52000000",
+  "reference_trade_timestamp": "2023-03-24T11:27:22.918Z",
+  "screen_or_validation_id": "focused_trend_validation_v1",
+  "source_resolution_artifact_path": "experiments/research/summaries/focused_trend_validation_v1_2023_source_resolution.json",
+  "source_resolution_artifact_sha256": "a945478ce34aec6d4e44c57e407b1a14027b4e9b99b788f9fd08c435804e54b6",
+  "source_resolution_commit": "5a0fe6baae1d3ec9762384e192adb9b20e472263",
+  "tool_version": "qntylab.materialize_halt_normalized_holdout.v1",
+  "warmup_start": "2022-12-02T00:00:00Z"
+}

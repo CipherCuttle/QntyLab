@@ -89,7 +89,10 @@ def test_curated_breadth_screen_v1_registration_is_frozen():
     assert state["variants"]["variant_282aa437c78189c7c8b2c124"]["status"] == "GRAVEYARDED"
     assert all(event["scope"] == "EXACT_VARIANT" for event in decisions)
     assert len(decisions) == 4
-    assert len(trials) == 0
+    assert len(trials) == 360
+    assert Counter(event["variant_id"] for event in trials if event["variant_id"] in spec["new_variant_ids"]) == {
+        variant_id: 24 for variant_id in spec["new_variant_ids"]
+    }
 
     assert "variant_282aa437c78189c7c8b2c124" in spec["historical_anchor_variant_ids"]
     assert "variant_282aa437c78189c7c8b2c124" not in spec["new_variant_ids"]
@@ -137,5 +140,5 @@ def test_curated_breadth_screen_v1_registration_is_frozen():
     assert doctor(RESEARCH) == []
     context = context_text(RESEARCH)
     assert "total candidate variants: 19" in context
-    assert "total completed trials: 0" in context
+    assert "total completed trials: 360" in context
     assert len(context.splitlines()) < 80

@@ -1,0 +1,54 @@
+{
+  "asset": "BTCUSDT",
+  "authoritative_raw_path": "data/raw/BTCUSDT-1h.csv",
+  "authoritative_raw_sha256": "6dcc8c6293f24e2e91957b286a96d9b87fd646e4b57c846495bd41d1aa225b65",
+  "created_at_utc": "2026-08-02T00:00:00Z",
+  "derived_path": "data/derived/focused_trend_validation_v1/BTCUSDT-spot-1h-2023-halt-normalized.csv",
+  "derived_sha256": "08d5649e86743e9485fb55a3978b96f7b0b5483b33223534d52d4fe0a745d10e",
+  "evaluation_end": "2023-12-31T23:00:00Z",
+  "evaluation_start": "2023-01-01T00:00:00Z",
+  "first_post_halt_trade_timestamp": "2023-03-24T14:00:00.062Z",
+  "interval": "1h",
+  "market_type": "Binance Spot",
+  "normalization_id": "PREREGISTER_BINANCE_SPOT_HALT_NORMALIZATION_V1",
+  "normalization_version": "BINANCE_SPOT_HALT_NORMALIZATION_V1",
+  "normalized_timestamp": "2023-03-24T13:00:00Z",
+  "official_archive_sha256_values": {
+    "aggTrades": "e4a0626d79f7476485c8eb71caf466ebb939c6863300cc4456ba27ff13914241",
+    "klines_1h": "ea9d94f28a39ad8029c9c2863cbb7769137188edd957fea35d0313ae4183561f",
+    "klines_1m": "305d0f6cdb8a6cfd8063a7d48c66f14b33727d934857746d549663e94b41312d",
+    "trades": "bceaa0b664b055318c22e509d33c04d532da143e7de41ca2fc3457100439c587"
+  },
+  "official_archive_sources": {
+    "aggTrades": {
+      "archive_sha256": "e4a0626d79f7476485c8eb71caf466ebb939c6863300cc4456ba27ff13914241",
+      "checksum_file_sha256": "b16e004758be4a6ee63c402162c004b67249061d2cabf6b51f819ec259ecd1a5",
+      "url": "https://data.binance.vision/data/spot/daily/aggTrades/BTCUSDT/BTCUSDT-aggTrades-2023-03-24.zip"
+    },
+    "klines_1h": {
+      "archive_sha256": "ea9d94f28a39ad8029c9c2863cbb7769137188edd957fea35d0313ae4183561f",
+      "checksum_file_sha256": "838a86096f5a24e520a31d14e8b41428a781b0647f970142d5639a6fb1108243",
+      "url": "https://data.binance.vision/data/spot/daily/klines/BTCUSDT/1h/BTCUSDT-1h-2023-03-24.zip"
+    },
+    "klines_1m": {
+      "archive_sha256": "305d0f6cdb8a6cfd8063a7d48c66f14b33727d934857746d549663e94b41312d",
+      "checksum_file_sha256": "e50d1875c88f0cf246e8b568e552f43604832fddaa76e754c5acadde9436f5c6",
+      "url": "https://data.binance.vision/data/spot/daily/klines/BTCUSDT/1m/BTCUSDT-1m-2023-03-24.zip"
+    },
+    "trades": {
+      "archive_sha256": "bceaa0b664b055318c22e509d33c04d532da143e7de41ca2fc3457100439c587",
+      "checksum_file_sha256": "d27fe9d9b81e16fb5cd05c863795fd959d6efc11e07052e4994da942a6108117",
+      "url": "https://data.binance.vision/data/spot/daily/trades/BTCUSDT/BTCUSDT-trades-2023-03-24.zip"
+    }
+  },
+  "official_checksum_verification": "passed",
+  "reason_code": "BINANCE_SPOT_AUTHORITATIVE_NO_TRADE_HALT",
+  "reference_price": "28080.00000000",
+  "reference_trade_timestamp": "2023-03-24T11:27:23.146Z",
+  "screen_or_validation_id": "focused_trend_validation_v1",
+  "source_resolution_artifact_path": "experiments/research/summaries/focused_trend_validation_v1_2023_source_resolution.json",
+  "source_resolution_artifact_sha256": "a945478ce34aec6d4e44c57e407b1a14027b4e9b99b788f9fd08c435804e54b6",
+  "source_resolution_commit": "5a0fe6baae1d3ec9762384e192adb9b20e472263",
+  "tool_version": "qntylab.materialize_halt_normalized_holdout.v1",
+  "warmup_start": "2022-12-02T00:00:00Z"
+}

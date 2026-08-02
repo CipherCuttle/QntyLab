@@ -1,0 +1,1779 @@
+{
+  "browser_report_claim_audit": [
+    {
+      "claim": "QntyLab can build infrastructure but not scientific exact retrospective carry validation",
+      "corrected_statement": "Current local state supports infrastructure feasibility only; QNTY adds paper/funding-source primitives but not full carry validation.",
+      "importance": "HIGH",
+      "qnty_evidence": "QNTY also provides stronger infrastructure primitives than browser report saw",
+      "qntylab_evidence": "QntyLab README and code agree exploratory only",
+      "report_section_or_line": "Executive verdict",
+      "verdict": "CONFIRMED_CURRENT"
+    },
+    {
+      "claim": "Current funding schema is timestamp, funding_interval_hours, funding_rate",
+      "corrected_statement": "Correct for QntyLab only; false if generalized to QNTY.",
+      "importance": "HIGH",
+      "qnty_evidence": "QNTY snapshot source rows include fundingTime/fundingRate/markPrice",
+      "qntylab_evidence": "QntyLab FUNDING_FIELDS line 14 confirms",
+      "report_section_or_line": "Repository capability map",
+      "verdict": "CONFIRMED_CURRENT"
+    },
+    {
+      "claim": "Funding ingestion exists but lossy",
+      "corrected_statement": "Understated cross-repo capacity: QNTY has richer source receipt capacity.",
+      "importance": "HIGH",
+      "qnty_evidence": "QNTY has funding source snapshots, bundles, DB refs",
+      "qntylab_evidence": "QntyLab fetch_funding lossy",
+      "report_section_or_line": "Capability map",
+      "verdict": "CONFIRMED_BUT_UNDERSTATED"
+    },
+    {
+      "claim": "Funding-to-hour alignment exists",
+      "corrected_statement": "Alignment primitive exists in both; QNTY is stronger for settlement windows.",
+      "importance": "HIGH",
+      "qnty_evidence": "QNTY has open-closed funding window normalization",
+      "qntylab_evidence": "QntyLab funding_to_bars exists",
+      "report_section_or_line": "Capability map",
+      "verdict": "CONFIRMED_BUT_UNDERSTATED"
+    },
+    {
+      "claim": "Causal delay of settled funding as signal exists",
+      "corrected_statement": "Correct for QntyLab; still no pre-settlement estimate history.",
+      "importance": "HIGH",
+      "qnty_evidence": "QNTY settlement windows do not provide estimate tape",
+      "qntylab_evidence": "QntyLab causal helper exists",
+      "report_section_or_line": "Capability map",
+      "verdict": "CONFIRMED_CURRENT"
+    },
+    {
+      "claim": "Simplified perpetual PnL only normalized single-series",
+      "corrected_statement": "Correct for QntyLab, outdated/false if used as a two-repo statement.",
+      "importance": "HIGH",
+      "qnty_evidence": "False for QNTY paper engine, which has qty/fills/funding/equity for one product",
+      "qntylab_evidence": "True for QntyLab evaluate_perp",
+      "report_section_or_line": "Capability map",
+      "verdict": "PARTIALLY_CORRECT"
+    },
+    {
+      "claim": "Two independent product legs absent",
+      "corrected_statement": "Still absent.",
+      "importance": "HIGH",
+      "qnty_evidence": "QNTY has one-product paper ledger, not spot-plus-perp two legs",
+      "qntylab_evidence": "QntyLab absent",
+      "report_section_or_line": "Capability map",
+      "verdict": "CONFIRMED_CURRENT"
+    },
+    {
+      "claim": "Basis ledger partial",
+      "corrected_statement": "Partial only as diagnostic basis inputs, not ledger.",
+      "importance": "MEDIUM",
+      "qnty_evidence": "QNTY has no matched spot/perp basis ledger",
+      "qntylab_evidence": "QntyLab premium/perp close diagnostics only",
+      "report_section_or_line": "Capability map",
+      "verdict": "PARTIALLY_CORRECT"
+    },
+    {
+      "claim": "Full capital ledger absent",
+      "corrected_statement": "Capital ledger partially exists in QNTY paper accounting but not carry-complete.",
+      "importance": "HIGH",
+      "qnty_evidence": "QNTY has initial_equity/notional/equity snapshots but no committed-capital account ledger",
+      "qntylab_evidence": "QntyLab absent",
+      "report_section_or_line": "Capability map",
+      "verdict": "PARTIALLY_CORRECT"
+    },
+    {
+      "claim": "Margin state absent",
+      "corrected_statement": "Confirmed absent.",
+      "importance": "HIGH",
+      "qnty_evidence": "No QNTY margin/liquidation engine found",
+      "qntylab_evidence": "No QntyLab margin engine",
+      "report_section_or_line": "Capability map",
+      "verdict": "CONFIRMED_CURRENT"
+    },
+    {
+      "claim": "Maintenance tiers absent",
+      "corrected_statement": "Confirmed absent.",
+      "importance": "HIGH",
+      "qnty_evidence": "No QNTY rule tier registry found",
+      "qntylab_evidence": "No QntyLab rule registry",
+      "report_section_or_line": "Capability map",
+      "verdict": "CONFIRMED_CURRENT"
+    },
+    {
+      "claim": "Liquidation absent",
+      "corrected_statement": "Confirmed absent.",
+      "importance": "HIGH",
+      "qnty_evidence": "No QNTY liquidation model found",
+      "qntylab_evidence": "No QntyLab liquidation model",
+      "report_section_or_line": "Capability map",
+      "verdict": "CONFIRMED_CURRENT"
+    },
+    {
+      "claim": "ADL absent",
+      "corrected_statement": "Confirmed absent.",
+      "importance": "HIGH",
+      "qnty_evidence": "No QNTY ADL state found",
+      "qntylab_evidence": "No QntyLab ADL state",
+      "report_section_or_line": "Capability map",
+      "verdict": "CONFIRMED_CURRENT"
+    },
+    {
+      "claim": "Fee accounting partial fixed bps",
+      "corrected_statement": "QNTY has stronger fill-level fixed-fee accounting; historical venue fee versioning still absent.",
+      "importance": "HIGH",
+      "qnty_evidence": "QNTY paper engine/verifier implements fill fees from fill_price*qty*fee_rate",
+      "qntylab_evidence": "QntyLab fixed bps turnover",
+      "report_section_or_line": "Capability map",
+      "verdict": "CONFIRMED_BUT_UNDERSTATED"
+    },
+    {
+      "claim": "Slippage absent/fixed bps only",
+      "corrected_statement": "Fixed-bps slippage exists; order-book/depth slippage absent.",
+      "importance": "HIGH",
+      "qnty_evidence": "QNTY has fill_price adjusted by slippage bps",
+      "qntylab_evidence": "QntyLab slippage_bps folded into total cost",
+      "report_section_or_line": "Capability map",
+      "verdict": "PARTIALLY_CORRECT"
+    },
+    {
+      "claim": "Product identity partial",
+      "corrected_statement": "Understated QNTY diagnostics but historical product rule identity remains partial.",
+      "importance": "MEDIUM",
+      "qnty_evidence": "QNTY has lane identity and offline instance-domain diagnostics, not full Binance product master",
+      "qntylab_evidence": "QntyLab filename/manifest identity",
+      "report_section_or_line": "Capability map",
+      "verdict": "CONFIRMED_BUT_UNDERSTATED"
+    },
+    {
+      "claim": "Historical rule versioning absent",
+      "corrected_statement": "Confirmed absent.",
+      "importance": "HIGH",
+      "qnty_evidence": "No rule-version registry found",
+      "qntylab_evidence": "No rule-version registry found",
+      "report_section_or_line": "Capability map",
+      "verdict": "CONFIRMED_CURRENT"
+    },
+    {
+      "claim": "Benchmark ledger absent",
+      "corrected_statement": "Confirmed for SOFR/opportunity-cost ledger.",
+      "importance": "HIGH",
+      "qnty_evidence": "QNTY docs note null/benchmark contract not defined; no SOFR ledger",
+      "qntylab_evidence": "QntyLab buy-and-hold metric only",
+      "report_section_or_line": "Capability map",
+      "verdict": "CONFIRMED_CURRENT"
+    },
+    {
+      "claim": "Provenance and receipts strong",
+      "corrected_statement": "Understated because QNTY current local capacity is materially stronger.",
+      "importance": "HIGH",
+      "qnty_evidence": "QNTY has SQLite verifier, funding snapshots, immutable bundles",
+      "qntylab_evidence": "QntyLab manifests/receipts",
+      "report_section_or_line": "Capability map",
+      "verdict": "CONFIRMED_BUT_UNDERSTATED"
+    },
+    {
+      "claim": "Frozen-universe support exists for prior work",
+      "corrected_statement": "Frozen support exists in bounded contexts, not carry dataset freeze.",
+      "importance": "MEDIUM",
+      "qnty_evidence": "QNTY has offline-edge frozen diagnostics; not QntyLab carry freeze",
+      "qntylab_evidence": "QntyLab aux/free census and holdout artifacts",
+      "report_section_or_line": "Capability map",
+      "verdict": "CONFIRMED_CURRENT"
+    },
+    {
+      "claim": "Retired-symbol preservation exists",
+      "corrected_statement": "Confirmed as diagnostic/partial, not complete contract lineage.",
+      "importance": "MEDIUM",
+      "qnty_evidence": "QNTY instance/reuse tests and docs exist",
+      "qntylab_evidence": "QntyLab archive_usdt_perp_symbols and free census tests",
+      "report_section_or_line": "Capability map",
+      "verdict": "CONFIRMED_CURRENT"
+    },
+    {
+      "claim": "Fail-closed handling partial",
+      "corrected_statement": "Understated QNTY fail-closed behavior; economic fail states still incomplete.",
+      "importance": "HIGH",
+      "qnty_evidence": "QNTY has fail-closed funding source gates and verifier corrupt statuses",
+      "qntylab_evidence": "QntyLab gap/provenance/ledger failures",
+      "report_section_or_line": "Capability map",
+      "verdict": "CONFIRMED_BUT_UNDERSTATED"
+    },
+    {
+      "claim": "Research-state verification absent on remote",
+      "corrected_statement": "Remote connector absence is not current local absence.",
+      "importance": "HIGH",
+      "qnty_evidence": "Local QNTY distinct; local QntyLab has research ledger doctor ok",
+      "qntylab_evidence": "Local QntyLab has files and doctor ok",
+      "report_section_or_line": "Repository identity",
+      "verdict": "OUTDATED"
+    },
+    {
+      "claim": "Proposed new receipt layer required",
+      "corrected_statement": "Need extension, not greenfield receipt layer.",
+      "importance": "HIGH",
+      "qnty_evidence": "QNTY funding snapshots/bundles and SQLite receipts already exist",
+      "qntylab_evidence": "QntyLab receipts exist but not carry settlement",
+      "report_section_or_line": "Proposal",
+      "verdict": "PARTIALLY_CORRECT"
+    },
+    {
+      "claim": "Proposed event schemas required",
+      "corrected_statement": "Only carry-specific settlement/margin events are new.",
+      "importance": "HIGH",
+      "qnty_evidence": "QNTY has funding snapshot schema and ledger event tables; QntyLab has research streams",
+      "qntylab_evidence": "QntyLab candidate/trial/decision schemas exist",
+      "report_section_or_line": "Proposal",
+      "verdict": "PARTIALLY_CORRECT"
+    },
+    {
+      "claim": "Proposed deterministic root required",
+      "corrected_statement": "Need a carry-specific root built from existing primitives.",
+      "importance": "HIGH",
+      "qnty_evidence": "QNTY bundles and QntyLab manifests already have deterministic hashes",
+      "qntylab_evidence": "QntyLab source/relevant digest roots exist",
+      "report_section_or_line": "Proposal",
+      "verdict": "PARTIALLY_CORRECT"
+    },
+    {
+      "claim": "Proposed failure states required",
+      "corrected_statement": "New economic failure states needed, but terminal-state primitives exist.",
+      "importance": "HIGH",
+      "qnty_evidence": "QNTY has many funding_source_* refusal reasons and verifier statuses",
+      "qntylab_evidence": "QntyLab BLOCKED/GRAVEYARDED and fail-closed errors",
+      "report_section_or_line": "Proposal",
+      "verdict": "PARTIALLY_CORRECT"
+    },
+    {
+      "claim": "Proposed ledger boundary required",
+      "corrected_statement": "Carry ledger boundary should extend QNTY paper/accounting, not rebuild QntyLab research ledger.",
+      "importance": "HIGH",
+      "qnty_evidence": "QNTY paper ledger boundary exists; no two-leg carry ledger",
+      "qntylab_evidence": "QntyLab research ledger boundary exists",
+      "report_section_or_line": "Proposal",
+      "verdict": "PARTIALLY_CORRECT"
+    }
+  ],
+  "browser_reviewer_questions": [
+    "Do not rebuild existing receipt/hash/funding snapshot/research ledger primitives",
+    "Audit official exchange rules externally",
+    "Challenge QNTY extension boundary",
+    "Assess benchmark appropriateness"
+  ],
+  "capabilities": [
+    {
+      "actual_gap": "No tick/order-book execution convention",
+      "capability": "Spot klines",
+      "domain": "A Data ingestion",
+      "duplicate_build_risk": "MEDIUM",
+      "notes": "QNTY has loaders for OHLCV in multi_asset_loader but not audited as spot archive ingestion owner.",
+      "overlap": "LOW",
+      "qnty_classification": "PARTIAL_IMPLEMENTATION",
+      "qnty_confidence": "MEDIUM",
+      "qntylab_classification": "IMPLEMENTED_AND_TESTED",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "QntyLab"
+    },
+    {
+      "actual_gap": "QntyLab downloader exists; QNTY consumes local bars for paper engine",
+      "capability": "USD-M futures/perp klines",
+      "domain": "A Data ingestion",
+      "duplicate_build_risk": "MEDIUM",
+      "notes": "Do not rebuild QntyLab archive downloader unless QNTY needs same contract.",
+      "overlap": "MEDIUM",
+      "qnty_classification": "PARTIAL_IMPLEMENTATION",
+      "qnty_confidence": "MEDIUM",
+      "qntylab_classification": "IMPLEMENTED_AND_TESTED",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "SHARED CONTRACT"
+    },
+    {
+      "actual_gap": "No historical methodology versioning",
+      "capability": "Premium-index data",
+      "domain": "A Data ingestion",
+      "duplicate_build_risk": "LOW",
+      "notes": "QntyLab stores premium close only.",
+      "overlap": "LOW",
+      "qnty_classification": "UNKNOWN",
+      "qnty_confidence": "LOW",
+      "qntylab_classification": "IMPLEMENTED_UNTESTED",
+      "qntylab_confidence": "MEDIUM",
+      "recommended_owner": "QntyLab"
+    },
+    {
+      "actual_gap": "QntyLab schema lossy; QNTY richer source snapshot layer",
+      "capability": "Funding history",
+      "domain": "A Data ingestion",
+      "duplicate_build_risk": "HIGH",
+      "notes": "Existing primitives should be reused rather than new blank receipt layer.",
+      "overlap": "HIGH",
+      "qnty_classification": "IMPLEMENTED_AND_TESTED",
+      "qnty_confidence": "HIGH",
+      "qntylab_classification": "IMPLEMENTED_AND_TESTED",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "SHARED CONTRACT"
+    },
+    {
+      "actual_gap": "No general trade ingestion pipeline for execution simulation",
+      "capability": "Trades/aggregate trades",
+      "domain": "A Data ingestion",
+      "duplicate_build_risk": "MEDIUM",
+      "notes": "QntyLab only uses trades to justify specific halt normalization.",
+      "overlap": "LOW",
+      "qnty_classification": "VALIDATION_ONLY",
+      "qnty_confidence": "MEDIUM",
+      "qntylab_classification": "EXPERIMENT_SPEC_ONLY",
+      "qntylab_confidence": "MEDIUM",
+      "recommended_owner": "QNTY"
+    },
+    {
+      "actual_gap": "No order book data ingestion",
+      "capability": "Order book/depth",
+      "domain": "A Data ingestion",
+      "duplicate_build_risk": "LOW",
+      "notes": "Do not claim executable bid/ask/depth.",
+      "overlap": "NONE",
+      "qnty_classification": "ABSENT",
+      "qnty_confidence": "HIGH",
+      "qntylab_classification": "ABSENT",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "NEITHER"
+    },
+    {
+      "actual_gap": "Rule endpoints not versioned historically",
+      "capability": "Source URL/endpoint identity",
+      "domain": "B Provenance",
+      "duplicate_build_risk": "HIGH",
+      "notes": "Existing source/provenance primitives overlap.",
+      "overlap": "HIGH",
+      "qnty_classification": "IMPLEMENTED_AND_TESTED",
+      "qnty_confidence": "HIGH",
+      "qntylab_classification": "IMPLEMENTED_AND_TESTED",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "SHARED CONTRACT"
+    },
+    {
+      "actual_gap": "Event-level raw hashes absent in QntyLab funding rows",
+      "capability": "Raw byte hashes",
+      "domain": "B Provenance",
+      "duplicate_build_risk": "HIGH",
+      "notes": "Do not rebuild sha256/canonical JSON helpers.",
+      "overlap": "HIGH",
+      "qnty_classification": "IMPLEMENTED_AND_TESTED",
+      "qnty_confidence": "HIGH",
+      "qntylab_classification": "IMPLEMENTED_AND_TESTED",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "SHARED CONTRACT"
+    },
+    {
+      "actual_gap": "Not universal across all archive kinds",
+      "capability": "Checksum validation",
+      "domain": "B Provenance",
+      "duplicate_build_risk": "MEDIUM",
+      "notes": "QntyLab checksum only in daily perp archive path.",
+      "overlap": "MEDIUM",
+      "qnty_classification": "PARTIAL_IMPLEMENTATION",
+      "qnty_confidence": "MEDIUM",
+      "qntylab_classification": "PARTIAL_IMPLEMENTATION",
+      "qntylab_confidence": "MEDIUM",
+      "recommended_owner": "QntyLab"
+    },
+    {
+      "actual_gap": "Carry-specific combined deterministic root incomplete",
+      "capability": "Input/derived manifests",
+      "domain": "B Provenance",
+      "duplicate_build_risk": "HIGH",
+      "notes": "Report proposes deterministic root; analogues already exist.",
+      "overlap": "HIGH",
+      "qnty_classification": "IMPLEMENTED_AND_TESTED",
+      "qnty_confidence": "HIGH",
+      "qntylab_classification": "IMPLEMENTED_AND_TESTED",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "SHARED CONTRACT"
+    },
+    {
+      "actual_gap": "Not a full carry dataset materializer",
+      "capability": "Deterministic materialization",
+      "domain": "B Provenance",
+      "duplicate_build_risk": "HIGH",
+      "notes": "Reusable primitive exists.",
+      "overlap": "HIGH",
+      "qnty_classification": "IMPLEMENTED_AND_TESTED",
+      "qnty_confidence": "HIGH",
+      "qntylab_classification": "IMPLEMENTED_AND_TESTED",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "SHARED CONTRACT"
+    },
+    {
+      "actual_gap": "Coverage differs per file type",
+      "capability": "Duplicate/missing/malformed row detection",
+      "domain": "C Integrity",
+      "duplicate_build_risk": "HIGH",
+      "notes": "Use existing validators.",
+      "overlap": "HIGH",
+      "qnty_classification": "IMPLEMENTED_AND_TESTED",
+      "qnty_confidence": "HIGH",
+      "qntylab_classification": "IMPLEMENTED_AND_TESTED",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "SHARED CONTRACT"
+    },
+    {
+      "actual_gap": "Per-file semantics differ",
+      "capability": "Timestamp ordering/gap/frequency validation",
+      "domain": "C Integrity",
+      "duplicate_build_risk": "HIGH",
+      "notes": "Funding-to-bars alignment is solved as a diagnostic primitive, not full settlement.",
+      "overlap": "HIGH",
+      "qnty_classification": "IMPLEMENTED_AND_TESTED",
+      "qnty_confidence": "HIGH",
+      "qntylab_classification": "IMPLEMENTED_AND_TESTED",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "SHARED CONTRACT"
+    },
+    {
+      "actual_gap": "QNTY paper verifier does not rederive OHLCV marks",
+      "capability": "OHLC/non-finite validation",
+      "domain": "C Integrity",
+      "duplicate_build_risk": "LOW",
+      "notes": "QNTY verifier explicitly disclaims price mark rederivation.",
+      "overlap": "LOW",
+      "qnty_classification": "VALIDATION_ONLY",
+      "qnty_confidence": "MEDIUM",
+      "qntylab_classification": "IMPLEMENTED_AND_TESTED",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "QntyLab"
+    },
+    {
+      "actual_gap": "Contract replacements/relist identity still partial",
+      "capability": "Retired symbol preservation",
+      "domain": "C Integrity",
+      "duplicate_build_risk": "MEDIUM",
+      "notes": "Existing identity diagnostics should be reused.",
+      "overlap": "MEDIUM",
+      "qnty_classification": "DIAGNOSTIC_ONLY",
+      "qnty_confidence": "MEDIUM",
+      "qntylab_classification": "IMPLEMENTED_AND_TESTED",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "SHARED CONTRACT"
+    },
+    {
+      "actual_gap": "Historical estimated funding observation tape absent",
+      "capability": "Event-time vs observation-time distinction",
+      "domain": "D Temporal",
+      "duplicate_build_risk": "HIGH",
+      "notes": "Settlement timing exists; pre-settlement information timing does not.",
+      "overlap": "MEDIUM",
+      "qnty_classification": "PARTIAL_IMPLEMENTATION",
+      "qnty_confidence": "MEDIUM",
+      "qntylab_classification": "PARTIAL_IMPLEMENTATION",
+      "qntylab_confidence": "MEDIUM",
+      "recommended_owner": "SHARED CONTRACT"
+    },
+    {
+      "actual_gap": "Alignment solved at bar/window level, not exchange wallet posting exactness",
+      "capability": "Funding settlement alignment",
+      "domain": "D Temporal",
+      "duplicate_build_risk": "HIGH",
+      "notes": "Do not rebuild from scratch.",
+      "overlap": "HIGH",
+      "qnty_classification": "IMPLEMENTED_AND_TESTED",
+      "qnty_confidence": "HIGH",
+      "qntylab_classification": "IMPLEMENTED_AND_TESTED",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "SHARED CONTRACT"
+    },
+    {
+      "actual_gap": "No bid/ask simultaneous execution",
+      "capability": "Next-bar causality",
+      "domain": "D Temporal",
+      "duplicate_build_risk": "MEDIUM",
+      "notes": "Existing conventions differ; contract needed before carry.",
+      "overlap": "HIGH",
+      "qnty_classification": "IMPLEMENTED_AND_TESTED",
+      "qnty_confidence": "HIGH",
+      "qntylab_classification": "IMPLEMENTED_AND_TESTED",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "SHARED CONTRACT"
+    },
+    {
+      "actual_gap": "QNTY paper marks not independently rederived",
+      "capability": "No-gap return bridging",
+      "domain": "D Temporal",
+      "duplicate_build_risk": "MEDIUM",
+      "notes": "Do not weaken fail-closed gap semantics.",
+      "overlap": "HIGH",
+      "qnty_classification": "IMPLEMENTED_AND_TESTED",
+      "qnty_confidence": "HIGH",
+      "qntylab_classification": "IMPLEMENTED_AND_TESTED",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "SHARED CONTRACT"
+    },
+    {
+      "actual_gap": "QntyLab schema loses markPrice/rateType; QNTY snapshot richer but paper engine uses rate/notional",
+      "capability": "Funding schema",
+      "domain": "E Funding",
+      "duplicate_build_risk": "HIGH",
+      "notes": "Browser report understated QNTY.",
+      "overlap": "HIGH",
+      "qnty_classification": "IMPLEMENTED_AND_TESTED",
+      "qnty_confidence": "HIGH",
+      "qntylab_classification": "PARTIAL_IMPLEMENTATION",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "SHARED CONTRACT"
+    },
+    {
+      "actual_gap": "Historical interval rule versioning absent",
+      "capability": "Funding rate/time/interval",
+      "domain": "E Funding",
+      "duplicate_build_risk": "HIGH",
+      "notes": "Existing timestamp normalization should be reused.",
+      "overlap": "HIGH",
+      "qnty_classification": "IMPLEMENTED_AND_TESTED",
+      "qnty_confidence": "HIGH",
+      "qntylab_classification": "IMPLEMENTED_AND_TESTED",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "SHARED CONTRACT"
+    },
+    {
+      "actual_gap": "No quantity*markPrice exact settlement accounting",
+      "capability": "Funding mark price",
+      "domain": "E Funding",
+      "duplicate_build_risk": "MEDIUM",
+      "notes": "QNTY has source field but not exact venue settlement.",
+      "overlap": "LOW",
+      "qnty_classification": "SCHEMA_ONLY",
+      "qnty_confidence": "MEDIUM",
+      "qntylab_classification": "ABSENT",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "QNTY"
+    },
+    {
+      "actual_gap": "No prospective estimate archive or historical estimate tape",
+      "capability": "Finalized vs estimated funding",
+      "domain": "E Funding",
+      "duplicate_build_risk": "HIGH",
+      "notes": "Browser report remains correct for pre-settlement timing.",
+      "overlap": "HIGH",
+      "qnty_classification": "PARTIAL_IMPLEMENTATION",
+      "qnty_confidence": "MEDIUM",
+      "qntylab_classification": "PARTIAL_IMPLEMENTATION",
+      "qntylab_confidence": "MEDIUM",
+      "recommended_owner": "SHARED CONTRACT"
+    },
+    {
+      "actual_gap": "Exact venue quantity*mark settlement/rounding not solved",
+      "capability": "Funding cash-flow calculation",
+      "domain": "E Funding",
+      "duplicate_build_risk": "HIGH",
+      "notes": "QNTY should own extension from paper ledger.",
+      "overlap": "MEDIUM",
+      "qnty_classification": "PARTIAL_IMPLEMENTATION",
+      "qnty_confidence": "HIGH",
+      "qntylab_classification": "SYNTHETIC_ONLY",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "QNTY"
+    },
+    {
+      "actual_gap": "QntyLab lacks per-event raw schema receipts",
+      "capability": "Raw funding event receipts",
+      "domain": "E Funding",
+      "duplicate_build_risk": "HIGH",
+      "notes": "Do not create new layer without reusing QNTY snapshot schema.",
+      "overlap": "MEDIUM",
+      "qnty_classification": "IMPLEMENTED_AND_TESTED",
+      "qnty_confidence": "HIGH",
+      "qntylab_classification": "PARTIAL_IMPLEMENTATION",
+      "qntylab_confidence": "MEDIUM",
+      "recommended_owner": "QNTY"
+    },
+    {
+      "actual_gap": "No exact spot/perp settlement ledger",
+      "capability": "Funding settlement ledger",
+      "domain": "E Funding",
+      "duplicate_build_risk": "HIGH",
+      "notes": "Extend QNTY paper ledger if funding carry proceeds.",
+      "overlap": "LOW",
+      "qnty_classification": "PARTIAL_IMPLEMENTATION",
+      "qnty_confidence": "HIGH",
+      "qntylab_classification": "ABSENT",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "QNTY"
+    },
+    {
+      "actual_gap": "Different governance vocabularies",
+      "capability": "Strategy registry/variant identity",
+      "domain": "F Strategy",
+      "duplicate_build_risk": "HIGH",
+      "notes": "QntyLab owns exploratory candidate lifecycle.",
+      "overlap": "LOW",
+      "qnty_classification": "DIAGNOSTIC_ONLY",
+      "qnty_confidence": "MEDIUM",
+      "qntylab_classification": "IMPLEMENTED_AND_TESTED",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "QntyLab"
+    },
+    {
+      "actual_gap": "QNTY paper is long-only; QntyLab normalized positions not fills",
+      "capability": "Position generation/fractional/long-short",
+      "domain": "F Strategy",
+      "duplicate_build_risk": "MEDIUM",
+      "notes": "Carry strategy proposal should start in QntyLab only after concept approval.",
+      "overlap": "MEDIUM",
+      "qnty_classification": "PARTIAL_IMPLEMENTATION",
+      "qnty_confidence": "MEDIUM",
+      "qntylab_classification": "IMPLEMENTED_AND_TESTED",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "QntyLab"
+    },
+    {
+      "actual_gap": "Not a funding-carry economic ledger",
+      "capability": "Single-series return evaluation",
+      "domain": "G Backtest/accounting",
+      "duplicate_build_risk": "LOW",
+      "notes": "Existing exploratory engine sufficient for price-only diagnostics.",
+      "overlap": "MEDIUM",
+      "qnty_classification": "IMPLEMENTED_AND_TESTED",
+      "qnty_confidence": "MEDIUM",
+      "qntylab_classification": "IMPLEMENTED_AND_TESTED",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "QntyLab"
+    },
+    {
+      "actual_gap": "No historical maker/taker/VIP/versioned fee engine",
+      "capability": "Fees/slippage/turnover",
+      "domain": "G Backtest/accounting",
+      "duplicate_build_risk": "MEDIUM",
+      "notes": "Do not confuse fixed bps with venue fee reconstruction.",
+      "overlap": "HIGH",
+      "qnty_classification": "IMPLEMENTED_AND_TESTED",
+      "qnty_confidence": "HIGH",
+      "qntylab_classification": "IMPLEMENTED_AND_TESTED",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "QNTY"
+    },
+    {
+      "actual_gap": "No spot inventory for carry",
+      "capability": "Spot inventory",
+      "domain": "G Backtest/accounting",
+      "duplicate_build_risk": "LOW",
+      "notes": "Genuinely missing.",
+      "overlap": "NONE",
+      "qnty_classification": "ABSENT",
+      "qnty_confidence": "HIGH",
+      "qntylab_classification": "ABSENT",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "QNTY"
+    },
+    {
+      "actual_gap": "QNTY qty is single product, not Binance perp contract settlement exactness",
+      "capability": "Perpetual quantity",
+      "domain": "G Backtest/accounting",
+      "duplicate_build_risk": "HIGH",
+      "notes": "Partially reusable.",
+      "overlap": "LOW",
+      "qnty_classification": "IMPLEMENTED_AND_TESTED",
+      "qnty_confidence": "HIGH",
+      "qntylab_classification": "ABSENT",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "QNTY"
+    },
+    {
+      "actual_gap": "Two-leg spot/perp ledger absent",
+      "capability": "Two independent legs/fills",
+      "domain": "G Backtest/accounting",
+      "duplicate_build_risk": "LOW",
+      "notes": "Genuine missing economic state machine.",
+      "overlap": "NONE",
+      "qnty_classification": "ABSENT",
+      "qnty_confidence": "HIGH",
+      "qntylab_classification": "ABSENT",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "QNTY"
+    },
+    {
+      "actual_gap": "No reserve cash/transfers/two-account capital denominator",
+      "capability": "Capital ledger/committed capital",
+      "domain": "G Backtest/accounting",
+      "duplicate_build_risk": "HIGH",
+      "notes": "Extend paper ledger.",
+      "overlap": "LOW",
+      "qnty_classification": "PARTIAL_IMPLEMENTATION",
+      "qnty_confidence": "MEDIUM",
+      "qntylab_classification": "ABSENT",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "QNTY"
+    },
+    {
+      "actual_gap": "No SOFR/cash benchmark ledger",
+      "capability": "Benchmark accrual",
+      "domain": "G Backtest/accounting",
+      "duplicate_build_risk": "MEDIUM",
+      "notes": "Needs external benchmark choice and local adapter.",
+      "overlap": "LOW",
+      "qnty_classification": "DIAGNOSTIC_ONLY",
+      "qnty_confidence": "MEDIUM",
+      "qntylab_classification": "PARTIAL_IMPLEMENTATION",
+      "qntylab_confidence": "MEDIUM",
+      "recommended_owner": "UNRESOLVED"
+    },
+    {
+      "actual_gap": "Full margin path absent",
+      "capability": "Isolated/cross margin, wallet, initial/maintenance margin",
+      "domain": "H Margin",
+      "duplicate_build_risk": "LOW",
+      "notes": "Genuine missing.",
+      "overlap": "NONE",
+      "qnty_classification": "ABSENT",
+      "qnty_confidence": "HIGH",
+      "qntylab_classification": "ABSENT",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "QNTY"
+    },
+    {
+      "actual_gap": "No liquidation or ADL model",
+      "capability": "Liquidation/bankruptcy/insurance/ADL",
+      "domain": "H Margin",
+      "duplicate_build_risk": "LOW",
+      "notes": "Genuine missing; likely fail-state interface first.",
+      "overlap": "NONE",
+      "qnty_classification": "ABSENT",
+      "qnty_confidence": "HIGH",
+      "qntylab_classification": "ABSENT",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "QNTY"
+    },
+    {
+      "actual_gap": "Do not port QntyLab lifecycle into QNTY blindly",
+      "capability": "Candidate/trial/decision streams",
+      "domain": "I Governance",
+      "duplicate_build_risk": "HIGH",
+      "notes": "QntyLab research lifecycle is solved for its scope.",
+      "overlap": "LOW",
+      "qnty_classification": "DIAGNOSTIC_ONLY",
+      "qnty_confidence": "MEDIUM",
+      "qntylab_classification": "IMPLEMENTED_AND_TESTED",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "QntyLab"
+    },
+    {
+      "actual_gap": "Different append-only domains",
+      "capability": "Append-only behavior",
+      "domain": "I Governance",
+      "duplicate_build_risk": "HIGH",
+      "notes": "Reuse concept, not internals.",
+      "overlap": "HIGH",
+      "qnty_classification": "IMPLEMENTED_AND_TESTED",
+      "qnty_confidence": "HIGH",
+      "qntylab_classification": "IMPLEMENTED_AND_TESTED",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "SHARED CONTRACT"
+    },
+    {
+      "actual_gap": "Carry-specific preregistration absent",
+      "capability": "Holdout/preregistration",
+      "domain": "I Governance",
+      "duplicate_build_risk": "MEDIUM",
+      "notes": "QntyLab owns strategy lifecycle.",
+      "overlap": "LOW",
+      "qnty_classification": "VALIDATION_ONLY",
+      "qnty_confidence": "MEDIUM",
+      "qntylab_classification": "IMPLEMENTED_AND_TESTED",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "QntyLab"
+    },
+    {
+      "actual_gap": "No carry-specific economic/stat gates",
+      "capability": "Primary metrics/cost stress/breadth/holdout",
+      "domain": "J Evaluation",
+      "duplicate_build_risk": "MEDIUM",
+      "notes": "No scientific validation claim.",
+      "overlap": "LOW",
+      "qnty_classification": "VALIDATION_ONLY",
+      "qnty_confidence": "MEDIUM",
+      "qntylab_classification": "IMPLEMENTED_AND_TESTED",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "QntyLab"
+    },
+    {
+      "actual_gap": "Carry statistical plan absent",
+      "capability": "Walk-forward/PBO/statistical corrections",
+      "domain": "J Evaluation",
+      "duplicate_build_risk": "MEDIUM",
+      "notes": "Future reviewers should audit QNTY stats separately.",
+      "overlap": "LOW",
+      "qnty_classification": "PARTIAL_IMPLEMENTATION",
+      "qnty_confidence": "MEDIUM",
+      "qntylab_classification": "ABSENT",
+      "qntylab_confidence": "MEDIUM",
+      "recommended_owner": "UNRESOLVED"
+    },
+    {
+      "actual_gap": "Carry settlement receipt absent but primitives exist",
+      "capability": "Run/metrics receipts",
+      "domain": "K Reporting",
+      "duplicate_build_risk": "HIGH",
+      "notes": "Browser report understated QNTY receipts.",
+      "overlap": "HIGH",
+      "qnty_classification": "IMPLEMENTED_AND_TESTED",
+      "qnty_confidence": "HIGH",
+      "qntylab_classification": "IMPLEMENTED_AND_TESTED",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "SHARED CONTRACT"
+    },
+    {
+      "actual_gap": "Combined carry root absent",
+      "capability": "Machine-readable deterministic outputs",
+      "domain": "K Reporting",
+      "duplicate_build_risk": "HIGH",
+      "notes": "Extend existing deterministic artifact style.",
+      "overlap": "HIGH",
+      "qnty_classification": "IMPLEMENTED_AND_TESTED",
+      "qnty_confidence": "HIGH",
+      "qntylab_classification": "IMPLEMENTED_AND_TESTED",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "SHARED CONTRACT"
+    },
+    {
+      "actual_gap": "No live trading capability",
+      "capability": "Live market access/order submission",
+      "domain": "L Operations",
+      "duplicate_build_risk": "LOW",
+      "notes": "Do not infer live trading from exchange data.",
+      "overlap": "NONE",
+      "qnty_classification": "ABSENT",
+      "qnty_confidence": "HIGH",
+      "qntylab_classification": "ABSENT",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "NEITHER"
+    },
+    {
+      "actual_gap": "QNTY paper is single product, long-only",
+      "capability": "Paper trading/mock execution",
+      "domain": "L Operations",
+      "duplicate_build_risk": "HIGH",
+      "notes": "Funding carry accounting extension belongs near QNTY paper.",
+      "overlap": "LOW",
+      "qnty_classification": "IMPLEMENTED_AND_TESTED",
+      "qnty_confidence": "HIGH",
+      "qntylab_classification": "ABSENT",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "QNTY"
+    },
+    {
+      "actual_gap": "Operational scripts not funding-carry evidence",
+      "capability": "Scheduling/monitoring/alerts",
+      "domain": "L Operations",
+      "duplicate_build_risk": "LOW",
+      "notes": "Do not treat as live order authority.",
+      "overlap": "LOW",
+      "qnty_classification": "DOCUMENTATION_ONLY",
+      "qnty_confidence": "MEDIUM",
+      "qntylab_classification": "ABSENT",
+      "qntylab_confidence": "HIGH",
+      "recommended_owner": "QNTY"
+    }
+  ],
+  "capability_evidence": {
+    "qnty_cross_check": {
+      "behavior": "Diagnostic independent replay-vs-engine comparison with classified disagreements for fill/cost, funding/spec ambiguity, checker candidate, or QNTY bug candidate.",
+      "commit": "8ebe61bdecd2d72239cf8d0618df87d6e1171c5a",
+      "executed_now": true,
+      "execution_result": "QNTY focused suite: 337 passed in 21.32s",
+      "limitations": "Diagnostic lane only; clean comparison does not validate alpha or exchange completeness.",
+      "lines": "1-23,94-125,151-265",
+      "path": "quantbot/lab/cross_check.py",
+      "repository": "QNTY",
+      "symbol": "cross_check, compare, classify_disagreement",
+      "test_name": "row-by-row cross-check tests",
+      "test_path": "tests/lab/test_replay_cross_check.py"
+    },
+    "qnty_funding_bundle": {
+      "behavior": "Builds and resolves immutable content-addressed funding-source bundles so clean-carry verification can use frozen funding rows instead of mutable live CSVs.",
+      "commit": "8ebe61bdecd2d72239cf8d0618df87d6e1171c5a",
+      "executed_now": true,
+      "execution_result": "QNTY focused suite: 337 passed in 21.32s",
+      "limitations": "Funding-source identity primitive only; not an economic two-leg or margin model.",
+      "lines": "1-26,159-260",
+      "path": "quantbot/paper/funding_source_bundle.py",
+      "repository": "QNTY",
+      "symbol": "build_funding_source_bundle_v1, resolve_funding_source_bundle",
+      "test_name": "immutable bundle semantics tests",
+      "test_path": "tests/test_funding_source_immutable_bundle_semantics.py"
+    },
+    "qnty_funding_loader": {
+      "behavior": "Loads local data/{symbol}_8h_funding.csv, parses fundingTime to UTC dt, keeps fundingRate and abs_rate, builds lookup.",
+      "commit": "8ebe61bdecd2d72239cf8d0618df87d6e1171c5a",
+      "executed_now": true,
+      "execution_result": "QNTY focused suite: 337 passed in 21.32s",
+      "limitations": "Loads local CSVs; missing files are skipped by loader, with fail-closed behavior enforced downstream in writer/verifier gates.",
+      "lines": "20-143",
+      "path": "quantbot/data/funding_loader.py",
+      "repository": "QNTY",
+      "symbol": "load_funding_csv, load_all_funding, build_funding_lookup",
+      "test_name": "funding coverage and paper writer/verifier tests",
+      "test_path": "tests/test_funding_coverage.py; paper tests"
+    },
+    "qnty_funding_source_snapshot": {
+      "behavior": "Builds deterministic funding source snapshot payloads with schema/version, required windows, funding row classification, source file SHA-256, canonical row subset SHA-256, provenance, lane, scope, and reason codes.",
+      "commit": "8ebe61bdecd2d72239cf8d0618df87d6e1171c5a",
+      "executed_now": true,
+      "execution_result": "QNTY focused suite: 337 passed in 21.32s",
+      "limitations": "Snapshot proves source row identity/coverage, not full exchange account state or publication timing before settlement.",
+      "lines": "27-82,266-278,515-620",
+      "path": "quantbot/paper/funding_source_snapshot.py",
+      "repository": "QNTY",
+      "symbol": "build_funding_source_snapshot_payload_v1, build_canonical_row_subset_digest, clean_mode_decision_from_snapshot_v1",
+      "test_name": "snapshot schema/digest/window tests",
+      "test_path": "tests/test_funding_source_snapshot_schema.py; tests/test_funding_source_digest_window_semantics.py"
+    },
+    "qnty_funding_time": {
+      "behavior": "Pure funding timestamp normalization for open-closed windows with same-second endpoint canonicalization and duplicate/missing/outside/open-boundary reason codes.",
+      "commit": "8ebe61bdecd2d72239cf8d0618df87d6e1171c5a",
+      "executed_now": true,
+      "execution_result": "QNTY focused suite: 337 passed in 21.32s",
+      "limitations": "Normalizes observed source rows; does not reconstruct historical estimate observation tape.",
+      "lines": "16-184",
+      "path": "quantbot/paper/funding_time.py",
+      "repository": "QNTY",
+      "symbol": "canonicalize_funding_timestamp, classify_funding_timestamp_for_window",
+      "test_name": "funding timestamp normalization spec tests",
+      "test_path": "tests/test_funding_timestamp_normalization_spec.py"
+    },
+    "qnty_offline_edge_validation": {
+      "behavior": "Real-validation/offline-edge diagnostic scaffolding emits receipts and deliberately avoids PnL/trades/portfolio in those paths.",
+      "commit": "8ebe61bdecd2d72239cf8d0618df87d6e1171c5a",
+      "executed_now": true,
+      "execution_result": "QNTY focused suite: 337 passed with TMPDIR=/tmp; prior run failed because agent TMPDIR was outside literal /tmp",
+      "limitations": "Validation scaffold, not strategy execution or funding-carry accounting.",
+      "lines": "130-369 (key non-PnL boundaries found by search)",
+      "path": "quantbot/experiment/offline_edge_validation_cli.py",
+      "repository": "QNTY",
+      "symbol": "offline edge validation CLI diagnostics",
+      "test_name": "offline-edge validation CLI and data-quality tests",
+      "test_path": "tests/experiment/test_offline_edge_validation_cli.py; tests/experiment/test_offline_edge_data_quality.py"
+    },
+    "qnty_paper_engine": {
+      "behavior": "Deterministic long-only paper accounting engine with next-bar-open fills, fixed notional quantity, slippage, fees, funding over held intervals, realized/unrealized PnL, position/equity snapshots, and gap flags for unavailable funding.",
+      "commit": "8ebe61bdecd2d72239cf8d0618df87d6e1171c5a",
+      "executed_now": true,
+      "execution_result": "QNTY focused suite: 337 passed in 21.32s",
+      "limitations": "Single product paper engine; long-only; fixed-notional; no spot-plus-perp matched legs, margin wallet, liquidation, ADL, or venue order book.",
+      "lines": "90-134,168-453",
+      "path": "quantbot/paper/engine.py",
+      "repository": "QNTY",
+      "symbol": "run_engine, funding_in_interval, canonical_net_pnl",
+      "test_name": "test_engine_applies_costs_and_funding_through_same_path; writer close-position tests; cross-check tests",
+      "test_path": "tests/test_paper_sqlite_writer.py; tests/test_paper_matched_null.py; tests/lab/test_replay_cross_check.py"
+    },
+    "qnty_sqlite_schema": {
+      "behavior": "SQLite/WAL paper ledger schema with paper_config, ledger_batches, ledger_events, signal_snapshots, fills, trades, funding, position snapshots, equity snapshots, ledger_state, open_positions, append-only triggers, and funding-source snapshot reference columns.",
+      "commit": "8ebe61bdecd2d72239cf8d0618df87d6e1171c5a",
+      "executed_now": true,
+      "execution_result": "QNTY focused suite included sqlite writer/verifier tests; broader schema tests inspected but not all executed now",
+      "limitations": "Mutable ledger_state/open_positions by design; this is paper accounting, not exchange account state.",
+      "lines": "150-383,391-458",
+      "path": "quantbot/paper/db.py",
+      "repository": "QNTY",
+      "symbol": "_SCHEMA_SQL, _build_trigger_sql",
+      "test_name": "schema/additive lane/batch stamping tests",
+      "test_path": "tests/test_paper_sqlite.py; tests/test_paper_additive_lane_schema.py; tests/test_paper_ledger_batch_lane_stamping.py"
+    },
+    "qnty_sqlite_verifier": {
+      "behavior": "Read-only verifier checks ledger tables, event/typed-row mapping, batches, fill fees, trade lifecycle from fills/funding, cumulative equity, content digests, and funding clean-carry labels.",
+      "commit": "8ebe61bdecd2d72239cf8d0618df87d6e1171c5a",
+      "executed_now": true,
+      "execution_result": "QNTY focused suite: 337 passed in 21.32s",
+      "limitations": "Verifier disclaimer states it does not independently rederive OHLCV marks/unrealized PnL/exposure from source price data.",
+      "lines": "1-58,725-940",
+      "path": "quantbot/paper/sqlite_verify.py",
+      "repository": "QNTY",
+      "symbol": "verify_database, _validate_arithmetic, _validate_trades, _validate_equity_cumulative, clean-carry gate",
+      "test_name": "test_fabricated_funding_is_corrupt; clean-carry gate tests",
+      "test_path": "tests/test_paper_sqlite_verify.py; tests/test_paper_sqlite_verifier_clean_net_of_carry_gate.py"
+    },
+    "qnty_sqlite_writer": {
+      "behavior": "Transactional SQLite writer inserts typed event rows, reconciles event-chain, fill fee arithmetic, trade net arithmetic, funding rows, position snapshots, and commits only after reconciliation.",
+      "commit": "8ebe61bdecd2d72239cf8d0618df87d6e1171c5a",
+      "executed_now": true,
+      "execution_result": "QNTY focused suite: 337 passed in 21.32s",
+      "limitations": "Writes paper ledger, not live orders. Funding source CSV/snapshot gates are separate.",
+      "lines": "1-21,341-555,730-900",
+      "path": "quantbot/paper/sqlite_writer.py",
+      "repository": "QNTY",
+      "symbol": "run_sqlite_accounting, _insert_typed_rows_for_bar, _reconcile_batch_inside_tx",
+      "test_name": "writer funding fail-closed and trade/position tests",
+      "test_path": "tests/test_paper_sqlite_writer.py; tests/test_paper_sqlite_writer_funding_coverage.py"
+    },
+    "qntylab_funding_to_bars": {
+      "behavior": "Assigns settled funding events to containing hourly bar, with separate one-bar causal delay helper.",
+      "commit": "53a06926b9985e11fc132a088eea4ca86510f4e4",
+      "executed_now": true,
+      "execution_result": "QntyLab focused subset: 131 passed in 50.74s",
+      "limitations": "Bar diagnostic alignment only; no raw settlement ledger, information publication tape, or quantity settlement.",
+      "lines": "4-13",
+      "path": "qntylab/perp.py",
+      "repository": "QntyLab",
+      "symbol": "funding_to_bars, causal",
+      "test_name": "funding assignment/sign/compiled funding tests",
+      "test_path": "tests/test_lab.py; tests/test_sprint_v2_execute.py"
+    },
+    "qntylab_halt_normalization": {
+      "behavior": "Materializes preregistered Binance spot halt normalization with source-resolution and derived-manifest hashes for three 2023 holdout assets.",
+      "commit": "53a06926b9985e11fc132a088eea4ca86510f4e4",
+      "executed_now": true,
+      "execution_result": "QntyLab focused subset: 131 passed",
+      "limitations": "Narrow normalization for specified spot halt rows, not a general exchange-rule registry.",
+      "lines": "file inventory, tests bound behavior",
+      "path": "qntylab/materialize_halt_normalized_holdout.py",
+      "repository": "QntyLab",
+      "symbol": "materialization functions",
+      "test_name": "test_committed_raw_derived_manifest_and_receipt_hashes_match_frozen_values; test_source_raw_hashes_are_enforced",
+      "test_path": "tests/test_materialize_halt_normalized_holdout.py; tests/test_binance_spot_halt_normalization_v1.py"
+    },
+    "qntylab_perp_eval": {
+      "behavior": "Computes normalized perpetual return stream using close returns, absolute position-change fees, and funding_cash += -position * funding_rate. Suppresses return bridging across timestamp gaps.",
+      "commit": "53a06926b9985e11fc132a088eea4ca86510f4e4",
+      "executed_now": true,
+      "execution_result": "QntyLab focused subset: 131 passed in 50.74s",
+      "limitations": "Normalized exposure approximation; no signed contract quantity, wallet, collateral, two-leg spot/perp fills, mark-price notional, rounding, margin, liquidation, or ADL.",
+      "lines": "52-67",
+      "path": "qntylab/perp.py",
+      "repository": "QntyLab",
+      "symbol": "evaluate_perp",
+      "test_name": "test_forced_gap_funding_sign_costs_and_objective_classification; test_compiled_funding_and_optimized_execution_are_byte_equal_to_oracle",
+      "test_path": "tests/test_lab.py; tests/test_sprint_v2_execute.py"
+    },
+    "qntylab_perp_fetch_funding": {
+      "behavior": "Materializes Binance USD-M monthly kline, premiumIndexKlines, and fundingRate archive data into normalized CSVs and manifest hashes. Funding rows persist timestamp, funding_interval_hours, funding_rate.",
+      "commit": "53a06926b9985e11fc132a088eea4ca86510f4e4",
+      "executed_now": true,
+      "execution_result": "QntyLab focused subset: 131 passed in 50.74s",
+      "limitations": "Funding schema discards markPrice/rateType/venue/contract identity fields; downloader uses network if executed, not run now.",
+      "lines": "118-146,202-217",
+      "path": "qntylab/data.py",
+      "repository": "QntyLab",
+      "symbol": "fetch_premium_perp, fetch_funding, fetch_perp",
+      "test_name": "perp/funding behavior tests in focused subset",
+      "test_path": "tests/test_lab.py; tests/test_sprint_v2_execute.py"
+    },
+    "qntylab_research_ledger": {
+      "behavior": "Append-only candidate/decision/trial streams, deterministic variant/trial ids, exact duplicate trial rejection unless REPLICATION, graveyard/blocked preflight refusal, reproducible state/trial indexes and doctor.",
+      "commit": "53a06926b9985e11fc132a088eea4ca86510f4e4",
+      "executed_now": true,
+      "execution_result": "QntyLab focused subset: 131 passed; doctor returned ledger ok",
+      "limitations": "Governance for QntyLab strategy research only; not a QNTY control-state system and not trading authorization.",
+      "lines": "384-588,656-737",
+      "path": "qntylab/research_ledger.py",
+      "repository": "QntyLab",
+      "symbol": "compute_variant_id, compute_trial_id, replay, doctor, preflight, append_canonical_event",
+      "test_name": "research ledger unit tests; doctor command",
+      "test_path": "tests/test_research_ledger.py"
+    },
+    "qntylab_spot_fetch_validate": {
+      "behavior": "Downloads Binance spot 1h klines, excludes open candle, validates monotonic timestamps, OHLC, finite prices, nonnegative volume, writes raw CSV and manifest with source URL, retrieval time, row count, gaps, sha256.",
+      "commit": "53a06926b9985e11fc132a088eea4ca86510f4e4",
+      "executed_now": true,
+      "execution_result": "QntyLab focused subset: 131 passed in 50.74s",
+      "limitations": "REST path only; no order book, spot trades execution, or historical fee/rule state.",
+      "lines": "11-82",
+      "path": "qntylab/data.py",
+      "repository": "QntyLab",
+      "symbol": "fetch, validate",
+      "test_name": "test_gap_free_fixture_succeeds_and_missing_hour_fails; test_source_raw_hashes_are_enforced",
+      "test_path": "tests/test_strategy_test.py; tests/test_materialize_halt_normalized_holdout.py"
+    },
+    "qntylab_strategy_runner": {
+      "behavior": "Official strategy runner validates strict config, funding boundary mode, gap policy, source cleanliness, normalization provenance, ledger preflight, deterministic trial id, and writes metrics/receipt plus trial event.",
+      "commit": "53a06926b9985e11fc132a088eea4ca86510f4e4",
+      "executed_now": true,
+      "execution_result": "QntyLab focused subset: 131 passed in 50.74s",
+      "limitations": "Price-only strategies in official runner; no funding strategy is registered in STRATEGIES; no execution simulation beyond single close series.",
+      "lines": "29-79,216-262,462-579",
+      "path": "qntylab/strategy_test.py",
+      "repository": "QntyLab",
+      "symbol": "load_config, run_strategy, preflight integration",
+      "test_name": "test_receipt_binds_input_config_code_and_results; test_funding_boundary_mode_is_explicit; test_gap_free_fixture_succeeds_and_missing_hour_fails",
+      "test_path": "tests/test_strategy_test.py"
+    }
+  },
+  "classification_vocabulary": [
+    "PRODUCTION_IMPLEMENTED",
+    "IMPLEMENTED_AND_TESTED",
+    "IMPLEMENTED_UNTESTED",
+    "PARTIAL_IMPLEMENTATION",
+    "DIAGNOSTIC_ONLY",
+    "VALIDATION_ONLY",
+    "SCHEMA_ONLY",
+    "SYNTHETIC_ONLY",
+    "EXPERIMENT_SPEC_ONLY",
+    "DOCUMENTATION_ONLY",
+    "LEGACY_OR_RETIRED",
+    "ABSENT",
+    "UNKNOWN"
+  ],
+  "counts": {
+    "browser_claim_counts": {
+      "CONFIRMED_BUT_UNDERSTATED": 6,
+      "CONFIRMED_CURRENT": 12,
+      "OUTDATED": 1,
+      "PARTIALLY_CORRECT": 9
+    },
+    "capability_class_counts": {
+      "QNTY": {
+        "ABSENT": 6,
+        "DIAGNOSTIC_ONLY": 4,
+        "DOCUMENTATION_ONLY": 1,
+        "IMPLEMENTED_AND_TESTED": 20,
+        "PARTIAL_IMPLEMENTATION": 10,
+        "SCHEMA_ONLY": 1,
+        "UNKNOWN": 1,
+        "VALIDATION_ONLY": 4
+      },
+      "QntyLab": {
+        "ABSENT": 13,
+        "EXPERIMENT_SPEC_ONLY": 1,
+        "IMPLEMENTED_AND_TESTED": 25,
+        "IMPLEMENTED_UNTESTED": 1,
+        "PARTIAL_IMPLEMENTATION": 6,
+        "SYNTHETIC_ONLY": 1
+      }
+    },
+    "duplicate_build_risks_confirmed": 11,
+    "genuinely_absent_components": 8
+  },
+  "duplicate_build_analysis": [
+    {
+      "action": "EXTEND",
+      "do_not_rebuild": "YES",
+      "existing_qnty_analogue": "SQLite ledger_events; funding snapshot schema",
+      "existing_qntylab_analogue": "research ledger JSONL streams",
+      "missing_delta": "carry-specific event names",
+      "proposed_component": "immutable event schemas",
+      "reuse_quality": "HIGH"
+    },
+    {
+      "action": "EXTEND",
+      "do_not_rebuild": "YES",
+      "existing_qnty_analogue": "funding_source_snapshot_v1; funding table",
+      "existing_qntylab_analogue": "timestamp/funding_interval/rate CSV",
+      "missing_delta": "markPrice/rateType/versioned product binding",
+      "proposed_component": "funding-event schema",
+      "reuse_quality": "HIGH"
+    },
+    {
+      "action": "EXTEND",
+      "do_not_rebuild": "YES",
+      "existing_qnty_analogue": "funding_in_interval/open-closed funding_time",
+      "existing_qntylab_analogue": "funding_to_bars/causal",
+      "missing_delta": "publication/estimate tape",
+      "proposed_component": "funding-to-bars alignment",
+      "reuse_quality": "HIGH"
+    },
+    {
+      "action": "EXTEND",
+      "do_not_rebuild": "YES",
+      "existing_qnty_analogue": "funding timestamp/window diagnostics; cross-check",
+      "existing_qntylab_analogue": "lifecycle/strategy gap rejection",
+      "missing_delta": "carry-specific join report",
+      "proposed_component": "temporal joinability",
+      "reuse_quality": "HIGH"
+    },
+    {
+      "action": "EXTEND",
+      "do_not_rebuild": "YES",
+      "existing_qnty_analogue": "source_file_sha256; bundles",
+      "existing_qntylab_analogue": "sha256 manifests and provenance",
+      "missing_delta": "unified carry root",
+      "proposed_component": "raw-source hashing",
+      "reuse_quality": "HIGH"
+    },
+    {
+      "action": "EXTEND",
+      "do_not_rebuild": "YES",
+      "existing_qnty_analogue": "artifact/funding snapshots",
+      "existing_qntylab_analogue": "data/manifests and derived manifests",
+      "missing_delta": "carry dataset freeze",
+      "proposed_component": "dataset manifests",
+      "reuse_quality": "HIGH"
+    },
+    {
+      "action": "EXTEND",
+      "do_not_rebuild": "YES",
+      "existing_qnty_analogue": "verifier statuses and funding refusal reasons",
+      "existing_qntylab_analogue": "BLOCKED/GRAVEYARDED and fail-closed errors",
+      "missing_delta": "economic margin/rule failure states",
+      "proposed_component": "terminal failure states",
+      "reuse_quality": "HIGH"
+    },
+    {
+      "action": "DO NOT REBUILD",
+      "do_not_rebuild": "YES",
+      "existing_qnty_analogue": "QNTY research/control differs",
+      "existing_qntylab_analogue": "compute_trial_id",
+      "missing_delta": "cross-repo mapping not needed",
+      "proposed_component": "trial identity",
+      "reuse_quality": "MEDIUM"
+    },
+    {
+      "action": "DO NOT REBUILD",
+      "do_not_rebuild": "YES",
+      "existing_qnty_analogue": "QNTY control state not same model",
+      "existing_qntylab_analogue": "research_ledger.py",
+      "missing_delta": "none for QntyLab strategy research",
+      "proposed_component": "research ledger",
+      "reuse_quality": "HIGH"
+    },
+    {
+      "action": "EXTEND QntyLab only",
+      "do_not_rebuild": "YES",
+      "existing_qnty_analogue": "QNTY experiment CLIs/paper engine",
+      "existing_qntylab_analogue": "qntylab.strategy_test",
+      "missing_delta": "carry concept approval and strategy spec",
+      "proposed_component": "strategy runner",
+      "reuse_quality": "MEDIUM"
+    },
+    {
+      "action": "EXTEND QNTY",
+      "do_not_rebuild": "NO",
+      "existing_qnty_analogue": "notional*rate funding ledger partial",
+      "existing_qntylab_analogue": "normalized approximation",
+      "missing_delta": "exact mark/quantity/rounding/wallet",
+      "proposed_component": "funding settlement accounting",
+      "reuse_quality": "MEDIUM"
+    },
+    {
+      "action": "NEW COMPONENT REQUIRED",
+      "do_not_rebuild": "NO",
+      "existing_qnty_analogue": "absent",
+      "existing_qntylab_analogue": "absent",
+      "missing_delta": "full component",
+      "proposed_component": "two-leg ledger",
+      "reuse_quality": "NONE"
+    },
+    {
+      "action": "EXTEND QNTY",
+      "do_not_rebuild": "NO",
+      "existing_qnty_analogue": "equity snapshots partial",
+      "existing_qntylab_analogue": "initial_capital only",
+      "missing_delta": "two-account committed capital",
+      "proposed_component": "capital ledger",
+      "reuse_quality": "MEDIUM"
+    },
+    {
+      "action": "NEW COMPONENT REQUIRED",
+      "do_not_rebuild": "NO",
+      "existing_qnty_analogue": "diagnostic/null absent",
+      "existing_qntylab_analogue": "buy-and-hold metric",
+      "missing_delta": "SOFR/accrual ledger",
+      "proposed_component": "benchmark ledger",
+      "reuse_quality": "LOW"
+    },
+    {
+      "action": "NEW COMPONENT REQUIRED",
+      "do_not_rebuild": "NO",
+      "existing_qnty_analogue": "absent",
+      "existing_qntylab_analogue": "absent",
+      "missing_delta": "full component",
+      "proposed_component": "margin engine",
+      "reuse_quality": "NONE"
+    },
+    {
+      "action": "NEW COMPONENT REQUIRED",
+      "do_not_rebuild": "NO",
+      "existing_qnty_analogue": "absent",
+      "existing_qntylab_analogue": "absent",
+      "missing_delta": "historical rule versions",
+      "proposed_component": "rule registry",
+      "reuse_quality": "NONE"
+    },
+    {
+      "action": "NEW COMPONENT REQUIRED",
+      "do_not_rebuild": "NO",
+      "existing_qnty_analogue": "absent",
+      "existing_qntylab_analogue": "absent",
+      "missing_delta": "full component",
+      "proposed_component": "liquidation model",
+      "reuse_quality": "NONE"
+    },
+    {
+      "action": "NEW COMPONENT REQUIRED",
+      "do_not_rebuild": "NO",
+      "existing_qnty_analogue": "absent",
+      "existing_qntylab_analogue": "absent",
+      "missing_delta": "state/fail representation",
+      "proposed_component": "ADL state",
+      "reuse_quality": "NONE"
+    }
+  ],
+  "evidence_validation": {
+    "browser_claims": 28,
+    "capabilities": 47,
+    "checks": [
+      "repository paths exist",
+      "commits resolve",
+      "symbols present",
+      "line ranges valid",
+      "named test paths exist",
+      "test result summaries match captured output",
+      "QNTY/QntyLab evidence not swapped",
+      "IMPLEMENTED_AND_TESTED rows carry confidence"
+    ],
+    "evidence_entries": 17,
+    "status": "VALIDATION_OK",
+    "validator_path": "$TMPDIR/qnty-qntylab-capability-forensics-v1/validate_report.py"
+  },
+  "funding_carry_question_readiness": [
+    {
+      "actual_missing_capacity": "Prospective estimate archive or fail-closed rule for pre-settlement decisions.",
+      "current_answer": "PARTIAL",
+      "duplicate_build_risk": "HIGH",
+      "evidence": "qnty funding_time.py; qntylab perp.py funding_to_bars/causal",
+      "qnty_capacity": "QNTY settlement/source windows and funding snapshots; no historical estimate tape.",
+      "qntylab_capacity": "QntyLab settled funding plus causal delay; no estimate observation tape.",
+      "question": "Funding information timing",
+      "recommended_owner": "SHARED CONTRACT",
+      "shared_or_overlapping_capacity": "Both distinguish settled funding from signal use."
+    },
+    {
+      "actual_missing_capacity": "Versioned venue/product/rule identity schema.",
+      "current_answer": "PARTIAL",
+      "duplicate_build_risk": "MEDIUM",
+      "evidence": "qntylab data.py archive_usdt_perp_symbols; QNTY instance-domain tests/docs",
+      "qnty_capacity": "QNTY instance diagnostics and lane identity, but no full Binance historical symbol master.",
+      "qntylab_capacity": "QntyLab filename/manifest symbol identity and retired-symbol archive discovery.",
+      "question": "Product identity",
+      "recommended_owner": "SHARED CONTRACT",
+      "shared_or_overlapping_capacity": "Both partial."
+    },
+    {
+      "actual_missing_capacity": "Two independent spot/perp fill convention with legging policy.",
+      "current_answer": "NO",
+      "duplicate_build_risk": "HIGH",
+      "evidence": "qnty paper engine lines 357-447; qntylab backtest.py",
+      "qnty_capacity": "QNTY has one-product next-bar fill model.",
+      "qntylab_capacity": "QntyLab has single-series next-bar return accounting.",
+      "question": "Two-leg executable-price convention",
+      "recommended_owner": "QNTY",
+      "shared_or_overlapping_capacity": "Only next-bar convention overlaps."
+    },
+    {
+      "actual_missing_capacity": "Signed contract quantity, markPrice notional, rounding, wallet posting.",
+      "current_answer": "PARTIAL",
+      "duplicate_build_risk": "HIGH",
+      "evidence": "qnty paper engine lines 256-276; qntylab perp.py 52-67",
+      "qnty_capacity": "QNTY has notional*rate funding rows and source snapshots; no venue exact mark/rounding wallet settlement.",
+      "qntylab_capacity": "QntyLab has normalized -position*rate approximation.",
+      "question": "Exact funding cash-flow reconstruction",
+      "recommended_owner": "QNTY",
+      "shared_or_overlapping_capacity": "Funding-rate settlement primitives overlap."
+    },
+    {
+      "actual_missing_capacity": "Wallet, margin balance, brackets, collateral, maintenance, liquidation state.",
+      "current_answer": "NO",
+      "duplicate_build_risk": "LOW",
+      "evidence": "absence search for margin/liquidation/maintenance",
+      "qnty_capacity": "No margin engine.",
+      "qntylab_capacity": "No margin engine.",
+      "question": "Full margin-path reconstruction",
+      "recommended_owner": "QNTY",
+      "shared_or_overlapping_capacity": "None."
+    },
+    {
+      "actual_missing_capacity": "Fail-state interface and model/rule registry.",
+      "current_answer": "NO",
+      "duplicate_build_risk": "LOW",
+      "evidence": "absence search",
+      "qnty_capacity": "No liquidation/ADL model.",
+      "qntylab_capacity": "No liquidation/ADL model.",
+      "question": "Liquidation and ADL representation",
+      "recommended_owner": "QNTY",
+      "shared_or_overlapping_capacity": "None."
+    },
+    {
+      "actual_missing_capacity": "Reserve cash, transfers, two accounts, opportunity cash denominator.",
+      "current_answer": "PARTIAL",
+      "duplicate_build_risk": "MEDIUM",
+      "evidence": "qnty db.py paper_config/equity tables",
+      "qnty_capacity": "QNTY has initial_equity/notional/equity snapshots.",
+      "qntylab_capacity": "QntyLab initial_capital only.",
+      "question": "Total committed-capital accounting",
+      "recommended_owner": "QNTY",
+      "shared_or_overlapping_capacity": "Both know initial capital."
+    },
+    {
+      "actual_missing_capacity": "Benchmark rate adapter and accrual ledger.",
+      "current_answer": "NO",
+      "duplicate_build_risk": "MEDIUM",
+      "evidence": "search SOFR/benchmark",
+      "qnty_capacity": "Docs/tests show null benchmark diagnostics but no SOFR ledger.",
+      "qntylab_capacity": "Buy-and-hold metric only.",
+      "question": "Opportunity-cost benchmark",
+      "recommended_owner": "UNRESOLVED",
+      "shared_or_overlapping_capacity": "No SOFR/cash ledger."
+    },
+    {
+      "actual_missing_capacity": "Versioned rule snapshots and source policy.",
+      "current_answer": "NO",
+      "duplicate_build_risk": "LOW",
+      "evidence": "search exchangeInfo/rule version/leverage brackets",
+      "qnty_capacity": "No historical rule registry found.",
+      "qntylab_capacity": "No historical rule registry found.",
+      "question": "Historical exchange-rule versioning",
+      "recommended_owner": "SHARED CONTRACT",
+      "shared_or_overlapping_capacity": "None."
+    },
+    {
+      "actual_missing_capacity": "Carry-specific frozen non-selected universe/data contract.",
+      "current_answer": "PARTIAL",
+      "duplicate_build_risk": "HIGH",
+      "evidence": "qnty funding_source_bundle.py; qntylab aux_v2.py/materialize tests",
+      "qnty_capacity": "QNTY immutable funding bundles and offline-edge diagnostics.",
+      "qntylab_capacity": "QntyLab frozen holdout/aux datasets and manifests.",
+      "question": "Frozen non-selected dataset support",
+      "recommended_owner": "SHARED CONTRACT",
+      "shared_or_overlapping_capacity": "Both have frozen artifact primitives."
+    }
+  ],
+  "generated_from": {
+    "qnty_head": "8ebe61bdecd2d72239cf8d0618df87d6e1171c5a",
+    "qntylab_head": "53a06926b9985e11fc132a088eea4ca86510f4e4",
+    "source_report_path": "/home/swirky/Documents/deep-research-report.md",
+    "source_report_sha256": "9b7ad47f1ba6ecc03af0782d8069a3e31b0eb77e4d90bab7ceadb39fee818c57"
+  },
+  "methodology": [
+    "Loaded QntyLab research ledger context before strategy/research-state analysis.",
+    "Verified repository identity, branch, HEAD, remotes, status, and recent history for both repos.",
+    "Captured pre-task state under TMPDIR/qnty-qntylab-capability-forensics-v1 with dirty/untracked paths and tracked dirty file SHA-256 where applicable.",
+    "Read the browser report from /home/swirky/Documents/deep-research-report.md as claim input, not authority.",
+    "Built rg inventories, symbol inventories, schema/config/test inventories, and keyword searches under TMPDIR.",
+    "Inspected current source code, tests, docs, manifests, receipts, and selected history/search output.",
+    "Ran focused offline tests only; no network fetches, no backtests, no experiments, no ledger events.",
+    "Established absence claims through path inventory, rg keyword search, symbol search, test search, schema search, and selected docs/status search."
+  ],
+  "missing_components": [
+    {
+      "component": "two-leg spot/perpetual ledger",
+      "owner": "QNTY",
+      "reason": "QNTY owns paper fills/ledger/accounting; QntyLab owns research registry only."
+    },
+    {
+      "component": "exact signed-quantity funding settlement receipt",
+      "owner": "QNTY",
+      "reason": "QNTY already has funding rows, qty, source snapshots and verifier."
+    },
+    {
+      "component": "capital ledger with reserve cash/transfers/two accounts",
+      "owner": "QNTY",
+      "reason": "Closest to QNTY paper ledger/equity state."
+    },
+    {
+      "component": "margin verdict interface and rule-version registry",
+      "owner": "shared schema/contract then QNTY implementation",
+      "reason": "Stable cross-project contract needed; implementation belongs near accounting."
+    },
+    {
+      "component": "liquidation/ADL unresolved state",
+      "owner": "QNTY",
+      "reason": "Accounting failure state, not strategy-research lifecycle."
+    },
+    {
+      "component": "SOFR/opportunity-cost benchmark adapter",
+      "owner": "UNRESOLVED",
+      "reason": "Requires browser research for benchmark source, licensing, and investment interpretation."
+    },
+    {
+      "component": "carry-specific frozen non-selected dataset contract",
+      "owner": "shared schema/contract",
+      "reason": "Both repos have freeze primitives but neither has the carry contract."
+    },
+    {
+      "component": "prospective funding-estimate archive",
+      "owner": "QNTY",
+      "reason": "Operational/public-data collection adjacent to QNTY data/paper lane; not QntyLab experiment runner."
+    }
+  ],
+  "mission_boundaries": {
+    "QNTY": "paper/replay/accounting/verifier/validation diagnostics; not live trading or QntyLab research ledger",
+    "QntyLab": "exploratory strategy candidates, official trials, research ledger, data/manifests; not paper/live accounting"
+  },
+  "overlap_matrix": [
+    {
+      "component": "immutable event schemas",
+      "decision": "EXTEND",
+      "do_not_rebuild": "YES",
+      "missing_delta": "carry-specific event names",
+      "qnty_analogue": "SQLite ledger_events; funding snapshot schema",
+      "qntylab_analogue": "research ledger JSONL streams",
+      "reuse_quality": "HIGH"
+    },
+    {
+      "component": "funding-event schema",
+      "decision": "EXTEND",
+      "do_not_rebuild": "YES",
+      "missing_delta": "markPrice/rateType/versioned product binding",
+      "qnty_analogue": "funding_source_snapshot_v1; funding table",
+      "qntylab_analogue": "timestamp/funding_interval/rate CSV",
+      "reuse_quality": "HIGH"
+    },
+    {
+      "component": "funding-to-bars alignment",
+      "decision": "EXTEND",
+      "do_not_rebuild": "YES",
+      "missing_delta": "publication/estimate tape",
+      "qnty_analogue": "funding_in_interval/open-closed funding_time",
+      "qntylab_analogue": "funding_to_bars/causal",
+      "reuse_quality": "HIGH"
+    },
+    {
+      "component": "temporal joinability",
+      "decision": "EXTEND",
+      "do_not_rebuild": "YES",
+      "missing_delta": "carry-specific join report",
+      "qnty_analogue": "funding timestamp/window diagnostics; cross-check",
+      "qntylab_analogue": "lifecycle/strategy gap rejection",
+      "reuse_quality": "HIGH"
+    },
+    {
+      "component": "raw-source hashing",
+      "decision": "EXTEND",
+      "do_not_rebuild": "YES",
+      "missing_delta": "unified carry root",
+      "qnty_analogue": "source_file_sha256; bundles",
+      "qntylab_analogue": "sha256 manifests and provenance",
+      "reuse_quality": "HIGH"
+    },
+    {
+      "component": "dataset manifests",
+      "decision": "EXTEND",
+      "do_not_rebuild": "YES",
+      "missing_delta": "carry dataset freeze",
+      "qnty_analogue": "artifact/funding snapshots",
+      "qntylab_analogue": "data/manifests and derived manifests",
+      "reuse_quality": "HIGH"
+    },
+    {
+      "component": "terminal failure states",
+      "decision": "EXTEND",
+      "do_not_rebuild": "YES",
+      "missing_delta": "economic margin/rule failure states",
+      "qnty_analogue": "verifier statuses and funding refusal reasons",
+      "qntylab_analogue": "BLOCKED/GRAVEYARDED and fail-closed errors",
+      "reuse_quality": "HIGH"
+    },
+    {
+      "component": "trial identity",
+      "decision": "DO NOT REBUILD",
+      "do_not_rebuild": "YES",
+      "missing_delta": "cross-repo mapping not needed",
+      "qnty_analogue": "QNTY research/control differs",
+      "qntylab_analogue": "compute_trial_id",
+      "reuse_quality": "MEDIUM"
+    },
+    {
+      "component": "research ledger",
+      "decision": "DO NOT REBUILD",
+      "do_not_rebuild": "YES",
+      "missing_delta": "none for QntyLab strategy research",
+      "qnty_analogue": "QNTY control state not same model",
+      "qntylab_analogue": "research_ledger.py",
+      "reuse_quality": "HIGH"
+    },
+    {
+      "component": "strategy runner",
+      "decision": "EXTEND QntyLab only",
+      "do_not_rebuild": "YES",
+      "missing_delta": "carry concept approval and strategy spec",
+      "qnty_analogue": "QNTY experiment CLIs/paper engine",
+      "qntylab_analogue": "qntylab.strategy_test",
+      "reuse_quality": "MEDIUM"
+    },
+    {
+      "component": "funding settlement accounting",
+      "decision": "EXTEND QNTY",
+      "do_not_rebuild": "NO",
+      "missing_delta": "exact mark/quantity/rounding/wallet",
+      "qnty_analogue": "notional*rate funding ledger partial",
+      "qntylab_analogue": "normalized approximation",
+      "reuse_quality": "MEDIUM"
+    },
+    {
+      "component": "two-leg ledger",
+      "decision": "NEW COMPONENT REQUIRED",
+      "do_not_rebuild": "NO",
+      "missing_delta": "full component",
+      "qnty_analogue": "absent",
+      "qntylab_analogue": "absent",
+      "reuse_quality": "NONE"
+    },
+    {
+      "component": "capital ledger",
+      "decision": "EXTEND QNTY",
+      "do_not_rebuild": "NO",
+      "missing_delta": "two-account committed capital",
+      "qnty_analogue": "equity snapshots partial",
+      "qntylab_analogue": "initial_capital only",
+      "reuse_quality": "MEDIUM"
+    },
+    {
+      "component": "benchmark ledger",
+      "decision": "NEW COMPONENT REQUIRED",
+      "do_not_rebuild": "NO",
+      "missing_delta": "SOFR/accrual ledger",
+      "qnty_analogue": "diagnostic/null absent",
+      "qntylab_analogue": "buy-and-hold metric",
+      "reuse_quality": "LOW"
+    },
+    {
+      "component": "margin engine",
+      "decision": "NEW COMPONENT REQUIRED",
+      "do_not_rebuild": "NO",
+      "missing_delta": "full component",
+      "qnty_analogue": "absent",
+      "qntylab_analogue": "absent",
+      "reuse_quality": "NONE"
+    },
+    {
+      "component": "rule registry",
+      "decision": "NEW COMPONENT REQUIRED",
+      "do_not_rebuild": "NO",
+      "missing_delta": "historical rule versions",
+      "qnty_analogue": "absent",
+      "qntylab_analogue": "absent",
+      "reuse_quality": "NONE"
+    },
+    {
+      "component": "liquidation model",
+      "decision": "NEW COMPONENT REQUIRED",
+      "do_not_rebuild": "NO",
+      "missing_delta": "full component",
+      "qnty_analogue": "absent",
+      "qntylab_analogue": "absent",
+      "reuse_quality": "NONE"
+    },
+    {
+      "component": "ADL state",
+      "decision": "NEW COMPONENT REQUIRED",
+      "do_not_rebuild": "NO",
+      "missing_delta": "state/fail representation",
+      "qnty_analogue": "absent",
+      "qntylab_analogue": "absent",
+      "reuse_quality": "NONE"
+    }
+  ],
+  "ownership_recommendations": [
+    {
+      "component": "two-leg spot/perpetual ledger",
+      "owner": "QNTY",
+      "reason": "QNTY owns paper fills/ledger/accounting; QntyLab owns research registry only."
+    },
+    {
+      "component": "exact signed-quantity funding settlement receipt",
+      "owner": "QNTY",
+      "reason": "QNTY already has funding rows, qty, source snapshots and verifier."
+    },
+    {
+      "component": "capital ledger with reserve cash/transfers/two accounts",
+      "owner": "QNTY",
+      "reason": "Closest to QNTY paper ledger/equity state."
+    },
+    {
+      "component": "margin verdict interface and rule-version registry",
+      "owner": "shared schema/contract then QNTY implementation",
+      "reason": "Stable cross-project contract needed; implementation belongs near accounting."
+    },
+    {
+      "component": "liquidation/ADL unresolved state",
+      "owner": "QNTY",
+      "reason": "Accounting failure state, not strategy-research lifecycle."
+    },
+    {
+      "component": "SOFR/opportunity-cost benchmark adapter",
+      "owner": "UNRESOLVED",
+      "reason": "Requires browser research for benchmark source, licensing, and investment interpretation."
+    },
+    {
+      "component": "carry-specific frozen non-selected dataset contract",
+      "owner": "shared schema/contract",
+      "reason": "Both repos have freeze primitives but neither has the carry contract."
+    },
+    {
+      "component": "prospective funding-estimate archive",
+      "owner": "QNTY",
+      "reason": "Operational/public-data collection adjacent to QNTY data/paper lane; not QntyLab experiment runner."
+    }
+  ],
+  "report_id": "FORENSIC_QNTY_QNTYLAB_CAPABILITY_REPORT_V1",
+  "repositories": {
+    "QNTY": {
+      "branch": "chore/external-trust-root-dispatcher-repair-v046",
+      "head": "8ebe61bdecd2d72239cf8d0618df87d6e1171c5a",
+      "path": "/home/swirky/DevHub/repos/Qnty",
+      "remote": "git@github.com:CipherCuttle/Qnty.git",
+      "status_summary": "no upstream shown for current branch; pre-existing untracked plans/ and qnty_ruleset_rollout.sh; main/origin/main at 5cf88b9"
+    },
+    "QntyLab": {
+      "branch": "master",
+      "head": "53a06926b9985e11fc132a088eea4ca86510f4e4",
+      "path": "/home/swirky/DevHub/repos/QntyLab",
+      "remote": "https://github.com/CipherCuttle/QntyLab.git",
+      "status_summary": "ahead 17; pre-existing modified data/manifests BTC/ETH/SOL perp and many untracked manifests/run artifacts/logs"
+    }
+  },
+  "repository_identities": {
+    "QNTY": {
+      "branch": "chore/external-trust-root-dispatcher-repair-v046",
+      "head": "8ebe61bdecd2d72239cf8d0618df87d6e1171c5a",
+      "path": "/home/swirky/DevHub/repos/Qnty",
+      "remote": "git@github.com:CipherCuttle/Qnty.git",
+      "status_summary": "no upstream shown for current branch; pre-existing untracked plans/ and qnty_ruleset_rollout.sh; main/origin/main at 5cf88b9"
+    },
+    "QntyLab": {
+      "branch": "master",
+      "head": "53a06926b9985e11fc132a088eea4ca86510f4e4",
+      "path": "/home/swirky/DevHub/repos/QntyLab",
+      "remote": "https://github.com/CipherCuttle/QntyLab.git",
+      "status_summary": "ahead 17; pre-existing modified data/manifests BTC/ETH/SOL perp and many untracked manifests/run artifacts/logs"
+    }
+  },
+  "test_runs": [
+    {
+      "command": "python -m pytest -q tests/test_lab.py tests/test_sprint_v2_execute.py tests/test_strategy_test.py tests/test_research_ledger.py tests/test_lifecycle.py tests/test_materialize_halt_normalized_holdout.py tests/test_binance_spot_halt_normalization_v1.py tests/test_free_census.py",
+      "does_not_prove": "No carry economic state machine or live execution.",
+      "duration": "50.74s",
+      "failed": 0,
+      "passed": 131,
+      "proves": "Focused QntyLab funding/perp, strategy runner, ledger, lifecycle, source normalization tests pass",
+      "repository": "QntyLab",
+      "return_code": 0,
+      "skipped": 0
+    },
+    {
+      "command": "python -m pytest -q ... plus tests/test_holdout_data_audit.py",
+      "does_not_prove": "Does not invalidate report; shows local state changed from old no-contamination assumption.",
+      "duration": "57.12s",
+      "failed": 1,
+      "passed": 140,
+      "proves": "Holdout audit detects current contamination state",
+      "repository": "QntyLab",
+      "return_code": 1,
+      "skipped": 0
+    },
+    {
+      "command": "TMPDIR=/tmp .venv/bin/python -m pytest -q tests/test_funding_source_snapshot_schema.py ... tests/experiment/test_offline_edge_validation_cli.py",
+      "does_not_prove": "No full two-leg carry, margin, liquidation, ADL, live trading.",
+      "duration": "21.32s",
+      "failed": 0,
+      "passed": 337,
+      "proves": "Funding source snapshots/bundles, paper SQLite writer/verifier, clean-carry gates, cross-check, offline-edge diagnostics pass offline",
+      "repository": "QNTY",
+      "return_code": 0,
+      "skipped": 0
+    }
+  ],
+  "unresolved_questions": [
+    "historical Binance rule sources",
+    "benchmark source/convention",
+    "prospective estimate archive feasibility",
+    "official historical product identity"
+  ],
+  "verdict": "QNTY_QNTYLAB_CAPABILITY_FORENSICS_V1_COMPLETE"
+}

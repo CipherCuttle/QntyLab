@@ -1,0 +1,21 @@
+{
+  "candidate_id": "CANDIDATE_H003_MA_24_96_LONG_FLAT",
+  "evaluation_end": "2026-07-27T23:00:00Z",
+  "evaluation_start": "2026-01-01T00:00:00Z",
+  "expected_interval": "1h",
+  "fee_bps": 10,
+  "funding_boundary_mode": "NOT_APPLICABLE",
+  "gap_policy": "REJECT",
+  "initial_capital": 10000,
+  "input_path": "data/raw/BTCUSDT-1h.csv",
+  "parameters": {
+    "fast": 24,
+    "mode": "long_flat",
+    "slow": 96
+  },
+  "research_intent": "FOLLOW_UP",
+  "schema_version": 1,
+  "slippage_bps": 0,
+  "strategy_id": "H003_moving_average",
+  "strategy_version": "existing-qntylab-strategies-v1"
+}

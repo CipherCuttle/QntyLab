@@ -1,0 +1,54 @@
+{
+  "asset": "SOLUSDT",
+  "authoritative_raw_path": "data/raw/SOLUSDT-1h.csv",
+  "authoritative_raw_sha256": "c431aa068acbfedf3cb0c38845dfac275044a9cf83367075b47d47f06974e99d",
+  "created_at_utc": "2026-08-02T00:00:00Z",
+  "derived_path": "data/derived/focused_trend_validation_v1/SOLUSDT-spot-1h-2023-halt-normalized.csv",
+  "derived_sha256": "62cee85e0a0f7b903fadc77a8f275e774f0ff3ecfff9fba9ea51a535376f70f1",
+  "evaluation_end": "2023-12-31T23:00:00Z",
+  "evaluation_start": "2023-01-01T00:00:00Z",
+  "first_post_halt_trade_timestamp": "2023-03-24T14:00:00.104Z",
+  "interval": "1h",
+  "market_type": "Binance Spot",
+  "normalization_id": "PREREGISTER_BINANCE_SPOT_HALT_NORMALIZATION_V1",
+  "normalization_version": "BINANCE_SPOT_HALT_NORMALIZATION_V1",
+  "normalized_timestamp": "2023-03-24T13:00:00Z",
+  "official_archive_sha256_values": {
+    "aggTrades": "83c5e06dbf1ab23972c95f74b7a0f571a705102865fdeebe36765d609ab4642f",
+    "klines_1h": "ec4941f66dd4579e321046b7fc6403417b965f319d01ca77fef930078856b5d5",
+    "klines_1m": "1b23b0641da34897afa1364cadefea90d02508e4389ee99c6675352552055b65",
+    "trades": "9abf92ef3c3bfad4eb32270c183faaa902bcfebf5a1278e82e0fd7a0ad1f31ca"
+  },
+  "official_archive_sources": {
+    "aggTrades": {
+      "archive_sha256": "83c5e06dbf1ab23972c95f74b7a0f571a705102865fdeebe36765d609ab4642f",
+      "checksum_file_sha256": "cdb830ff1a29ae689a6c45532b722a1a68ced9c3be9f45fcb16d22cedcff4eb0",
+      "url": "https://data.binance.vision/data/spot/daily/aggTrades/SOLUSDT/SOLUSDT-aggTrades-2023-03-24.zip"
+    },
+    "klines_1h": {
+      "archive_sha256": "ec4941f66dd4579e321046b7fc6403417b965f319d01ca77fef930078856b5d5",
+      "checksum_file_sha256": "5956c70eb22e4d0ee6ff1dc9b29cd772b033422934248182d7571531ad74a522",
+      "url": "https://data.binance.vision/data/spot/daily/klines/SOLUSDT/1h/SOLUSDT-1h-2023-03-24.zip"
+    },
+    "klines_1m": {
+      "archive_sha256": "1b23b0641da34897afa1364cadefea90d02508e4389ee99c6675352552055b65",
+      "checksum_file_sha256": "530bc0e9afb2ecd84d6df305d082eacbaba973594ae2278632c869e09583bde6",
+      "url": "https://data.binance.vision/data/spot/daily/klines/SOLUSDT/1m/SOLUSDT-1m-2023-03-24.zip"
+    },
+    "trades": {
+      "archive_sha256": "9abf92ef3c3bfad4eb32270c183faaa902bcfebf5a1278e82e0fd7a0ad1f31ca",
+      "checksum_file_sha256": "d1fae1ab12ada3bc3d29f540932e218ca2043bd5138a6b4253a2ec06730b66c9",
+      "url": "https://data.binance.vision/data/spot/daily/trades/SOLUSDT/SOLUSDT-trades-2023-03-24.zip"
+    }
+  },
+  "official_checksum_verification": "passed",
+  "reason_code": "BINANCE_SPOT_AUTHORITATIVE_NO_TRADE_HALT",
+  "reference_price": "21.73000000",
+  "reference_trade_timestamp": "2023-03-24T11:27:21.938Z",
+  "screen_or_validation_id": "focused_trend_validation_v1",
+  "source_resolution_artifact_path": "experiments/research/summaries/focused_trend_validation_v1_2023_source_resolution.json",
+  "source_resolution_artifact_sha256": "a945478ce34aec6d4e44c57e407b1a14027b4e9b99b788f9fd08c435804e54b6",
+  "source_resolution_commit": "5a0fe6baae1d3ec9762384e192adb9b20e472263",
+  "tool_version": "qntylab.materialize_halt_normalized_holdout.v1",
+  "warmup_start": "2022-12-02T00:00:00Z"
+}

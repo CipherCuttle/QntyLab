@@ -1,0 +1,288 @@
+{
+  "account_receipt_status": {
+    "authentic_account_side_records_found": 0,
+    "status": "MISSING"
+  },
+  "authenticity_classification": {
+    "AUTHENTIC_ACCOUNT_EXPORT": 0,
+    "AUTHENTIC_API_RESPONSE_PRESERVED_LOCALLY": 0,
+    "DERIVED_DATA": 674,
+    "IRRELEVANT": 9,
+    "PUBLIC_BINANCE_MARKET_DATA": 193,
+    "SYNTHETIC_TEST_DATA": 10
+  },
+  "candidate_evidence": {
+    "format_counts": {
+      "csv": 200,
+      "json": 595,
+      "jsonl": 3,
+      "md": 83,
+      "pdf": 1,
+      "xlsx": 4
+    },
+    "representative_sources": [
+      {
+        "classification": "PUBLIC_BINANCE_MARKET_DATA",
+        "field_presence": {
+          "fundingRate": true,
+          "fundingTime": true,
+          "markPrice": true,
+          "symbol": true
+        },
+        "file_sha256": "2edd068c6a882d60b4f67204c4d7133931b8b098d639fccd9cb1b6d50abb3f90",
+        "format": "csv",
+        "public_side_class": "NORMALIZED_DERIVATIVE",
+        "redacted_identifier": null,
+        "redacted_path": "QNTY/data/BTCUSDT_8h_funding.csv",
+        "source_kind": "repository_public_funding_csv",
+        "symbol": "BTCUSDT",
+        "timestamp": null
+      },
+      {
+        "classification": "PUBLIC_BINANCE_MARKET_DATA",
+        "field_presence": {
+          "funding_interval_hours": true,
+          "funding_rate": true,
+          "timestamp": true
+        },
+        "file_sha256": "db8f5d1739a7b1271f915602854392875ef30384e943094b2f937ddffa672428",
+        "format": "csv",
+        "public_side_class": "NORMALIZED_DERIVATIVE",
+        "redacted_identifier": null,
+        "redacted_path": "QntyLab/data/raw/BTCUSDT-funding.csv",
+        "source_kind": "repository_public_funding_csv",
+        "symbol": "BTCUSDT",
+        "timestamp": null
+      },
+      {
+        "classification": "IRRELEVANT",
+        "field_presence": {
+          "binance_account_income_fields": false
+        },
+        "file_sha256": "cd37d312923013a5fa47557f52121e234177f4006864128d3078fff600d1e8e2",
+        "format": "xlsx",
+        "public_side_class": "MISSING",
+        "redacted_identifier": {
+          "identifier_type": "redacted_path",
+          "sha256": "private-path-redacted-in-temp-inventory"
+        },
+        "redacted_path": "Documents/<redacted>.xlsx",
+        "source_kind": "personal_candidate_metadata_only",
+        "symbol": null,
+        "timestamp": null
+      }
+    ],
+    "sanitized_temp_inventory_sha256": "d8a4e91d0880db70fc5f2cf75c4abac342afd8b49a736aa571fe249402e12bf3"
+  },
+  "candidate_file_count": 886,
+  "duplicate_capability_assessment": {
+    "assessment": "NO_DUPLICATE_EXACT_CAPABILITY",
+    "would_new_verifier_duplicate_existing_functionality": false
+  },
+  "evidence_verdict": "PUBLIC_SIDE_ONLY",
+  "implementation_gate": {
+    "authentic_account_receipt_exists": false,
+    "existing_qnty_already_proves_claim": false,
+    "implementation_can_remain_one_additive_qnty_lane": null,
+    "manual_reconciliation_is_informative": false,
+    "matching_public_funding_event_exists": false,
+    "matching_signed_position_exists": false,
+    "precision_policy_is_pinned": false,
+    "product_identity_is_pinned": false,
+    "quantity_units_are_pinned": false,
+    "status": "CLOSED"
+  },
+  "manual_reconciliation": {
+    "difference": null,
+    "matching_keys": [],
+    "observed_amount": null,
+    "performed": false,
+    "reason": "Incomplete evidence tuple; account receipt and signed position evidence are missing.",
+    "status": "ACCOUNT_RECEIPT_MISSING"
+  },
+  "matching_keys": {
+    "ambiguities": [
+      "public funding rows are unmatched without account receipt and position evidence"
+    ],
+    "duplicate_candidates": null,
+    "exact_keys_matched": [],
+    "tolerance_used": null,
+    "why_tolerance_authorized": null
+  },
+  "next_action": "EXPORT_EXISTING_BINANCE_FUTURES_INCOME_HISTORY",
+  "position_evidence_status": {
+    "matching_position_records_found": 0,
+    "status": "MISSING"
+  },
+  "precision_status": {
+    "amount_scale": "MISSING",
+    "price_scale": "MISSING",
+    "rounding_policy_evidence": "MISSING",
+    "status": "MISSING"
+  },
+  "privacy_redactions": [
+    "private candidate basenames redacted",
+    "no raw private records included",
+    "no complete account identifiers included",
+    "no transaction identifiers included"
+  ],
+  "product_identity_status": {
+    "base_asset": "MISSING",
+    "contract_multiplier": "MISSING",
+    "contract_type": "INFERRED",
+    "margin_asset": "MISSING",
+    "market": "INFERRED",
+    "quantity_unit": "MISSING",
+    "quote_asset": "MISSING",
+    "settlement_asset": "MISSING",
+    "status": "INCOMPLETE",
+    "symbol": "PINNED_REPOSITORY_ARTIFACT",
+    "timestamp_units": "PARTIALLY_PINNED_REPOSITORY_ARTIFACT",
+    "venue": "INFERRED"
+  },
+  "public_event_status": {
+    "matching_public_funding_events_found": 0,
+    "status": "PUBLIC_SIDE_ONLY_NORMALIZED_DERIVATIVE"
+  },
+  "qnty_existing_capability": [
+    {
+      "answer": "Paper long-only quantity exists; authentic signed Binance account position does not.",
+      "classification": "PARTIALLY_SOLVED",
+      "confidence": "High",
+      "file": "quantbot/paper/db.py",
+      "limitation": "Paper quantity is not account-side position evidence.",
+      "symbol": "open_positions.qty, position_snapshot_symbols.qty",
+      "test": "tests/test_paper_sqlite.py"
+    },
+    {
+      "answer": "Funding-time mark price is not stored as load-bearing settlement evidence.",
+      "classification": "NOT_SOLVED",
+      "confidence": "High",
+      "file": "quantbot/paper/engine.py",
+      "limitation": "Uses OHLCV close/entry approximation; nonzero markPrice only in fixtures.",
+      "symbol": "run_engine",
+      "test": "tests/fixtures/edge_validation_golden"
+    },
+    {
+      "answer": "Paper expected funding is rederived as notional_usd * funding_rate.",
+      "classification": "PARTIALLY_SOLVED",
+      "confidence": "High",
+      "file": "quantbot/paper/reconcile.py",
+      "limitation": "No authentic account settlement reconciliation.",
+      "symbol": "reconcile",
+      "test": "tests/test_paper_sqlite_verify.py"
+    },
+    {
+      "answer": "Long/short sign diagnostics exist in research scaffolding; paper path is long-only.",
+      "classification": "PARTIALLY_SOLVED",
+      "confidence": "High",
+      "file": "quantbot/experiment/offline_edge_real_validation.py",
+      "limitation": "No account receipt sign matching.",
+      "symbol": "LONG_NEGATES_FUNDING_RATE_SHORT_PRESERVES_FUNDING_RATE_TIMES_NOTIONAL",
+      "test": "tests/experiment/test_offline_edge_real_validation.py"
+    },
+    {
+      "answer": "No wallet/account row for Binance funding income.",
+      "classification": "NOT_SOLVED",
+      "confidence": "High",
+      "file": "quantbot/paper/db.py",
+      "limitation": "Paper equity accumulator only.",
+      "symbol": "funding, equity_snapshots",
+      "test": "tests/test_paper_sqlite.py"
+    },
+    {
+      "answer": "No observed account record reconciliation exists.",
+      "classification": "NOT_SOLVED",
+      "confidence": "High",
+      "file": "quantbot/paper/reconcile.py",
+      "limitation": "Internal paper-ledger reconciliation only.",
+      "symbol": "reconcile",
+      "test": "tests/test_paper_sqlite_verify.py"
+    },
+    {
+      "answer": "Synthetic idempotent paper event identity exists; Binance transaction identity does not.",
+      "classification": "PARTIALLY_SOLVED",
+      "confidence": "High",
+      "file": "quantbot/paper/engine.py",
+      "limitation": "funding_id is synthetic and not tranId.",
+      "symbol": "funding_id",
+      "test": "tests/test_paper_sqlite_writer.py"
+    },
+    {
+      "answer": "Paper precision conventions exist; venue precision is not pinned.",
+      "classification": "PARTIALLY_SOLVED",
+      "confidence": "High",
+      "file": "quantbot/paper/engine.py",
+      "limitation": "No Binance product-unit or rounding policy evidence.",
+      "symbol": "_round8",
+      "test": "tests/test_paper_sqlite_verify.py"
+    },
+    {
+      "answer": "No fixture proves the bounded authentic Binance settlement claim.",
+      "classification": "NOT_SOLVED",
+      "confidence": "High",
+      "file": "tests/",
+      "limitation": "Fixtures are public/derived or synthetic.",
+      "symbol": "FUNDING_FEE search",
+      "test": "bounded rg over candidate files"
+    },
+    {
+      "answer": "A settlement verifier would not duplicate existing exact functionality, but evidence gate is closed.",
+      "classification": "NOT_SOLVED",
+      "confidence": "High",
+      "file": "quantbot/paper/sqlite_verify.py",
+      "limitation": "Existing verifier scope is paper SQLite integrity and clean-carry source coverage.",
+      "symbol": "verify_database",
+      "test": "tests/test_paper_sqlite_verifier_clean_net_of_carry_gate.py"
+    }
+  ],
+  "reconciliation_verdict": "ACCOUNT_RECEIPT_MISSING",
+  "report_id": "AUDIT_AUTHENTIC_BINANCE_FUNDING_SETTLEMENT_EVIDENCE_V0",
+  "repository_identities": {
+    "QNTY": {
+      "branch": "chore/external-trust-root-dispatcher-repair-v046",
+      "head": "8ebe61bdecd2d72239cf8d0618df87d6e1171c5a",
+      "remote": "git@github.com:CipherCuttle/Qnty.git",
+      "root": "/home/swirky/DevHub/repos/Qnty"
+    },
+    "QntyLab": {
+      "branch": "master",
+      "remote": "https://github.com/CipherCuttle/QntyLab.git",
+      "root": "/home/swirky/DevHub/repos/QntyLab",
+      "starting_head": "282f09d2e798cf57c258b1d5dd53adc8964027b1"
+    }
+  },
+  "search_scope": [
+    "/home/swirky/DevHub/repos/Qnty",
+    "/home/swirky/DevHub/repos/QntyLab",
+    "/home/swirky/Downloads",
+    "/home/swirky/Documents",
+    "/home/swirky/Desktop"
+  ],
+  "test_runs": [
+    {
+      "command": ".venv/bin/python -m pytest -q tests/test_funding_source_snapshot_schema.py tests/test_funding_source_immutable_bundle_semantics.py tests/test_funding_timestamp_normalization_spec.py tests/test_paper_sqlite_writer.py tests/test_paper_sqlite_verify.py tests/test_paper_sqlite_verifier_clean_net_of_carry_gate.py tests/test_paper_sqlite_writer_funding_fail_closed_proof.py tests/test_paper_sqlite_writer_source_snapshot_emission.py tests/test_paper_sqlite_writer_snapshot_reference_transaction.py tests/test_paper_sqlite_verifier_source_path_resolution.py tests/test_paper_sqlite_verifier_db_linked_snapshot_selector.py tests/test_paper_sqlite.py",
+      "failed": 0,
+      "passed": 0,
+      "return_code": 4,
+      "skipped": 0,
+      "what_it_does_not_prove": "Does not verify repository behavior.",
+      "what_it_proves": "Nothing; bad filename, no tests ran."
+    },
+    {
+      "command": ".venv/bin/python -m pytest -q tests/test_funding_source_snapshot_schema.py tests/test_funding_source_immutable_bundle_semantics.py tests/test_funding_timestamp_normalization_spec.py tests/test_paper_sqlite_writer.py tests/test_paper_sqlite_verify.py tests/test_paper_sqlite_verifier_clean_net_of_carry_gate.py tests/test_paper_sqlite_writer_funding_fail_closed_proof.py tests/test_paper_sqlite_writer_source_snapshot_emission.py tests/test_paper_sqlite_writer_snapshot_reference_transaction.py tests/test_paper_sqlite_verifier_db_linked_snapshot_selector.py tests/test_paper_sqlite.py",
+      "failed": 0,
+      "passed": 259,
+      "return_code": 0,
+      "skipped": 0,
+      "what_it_does_not_prove": "Does not prove authentic Binance account receipt, position, product precision, or exact settlement reconciliation.",
+      "what_it_proves": "Existing offline paper funding snapshot/bundle, timestamp normalization, SQLite writer/verifier, reconciliation, idempotency, and numeric checks pass."
+    }
+  ],
+  "verification": {
+    "binance_api_called": false,
+    "complete_evidence_tuple_exists": false,
+    "network_used_for_binance": false,
+    "qnty_production_code_modified": false
+  }
+}

@@ -1,0 +1,182 @@
+{
+  "assets": {
+    "BTCUSDT": {
+      "authoritative_raw_path": "data/raw/BTCUSDT-1h.csv",
+      "authoritative_raw_sha256": "6dcc8c6293f24e2e91957b286a96d9b87fd646e4b57c846495bd41d1aa225b65",
+      "authorized_derived_rows": 1,
+      "causality": {
+        "close_12": "28080.00000000",
+        "close_12_equals_close_13": true,
+        "close_13": "28080.00000000",
+        "close_14": "27989.06000000",
+        "close_to_close_return_12_to_13": "0",
+        "post_halt_transition_13_to_14_preserved": true
+      },
+      "coverage_2023": {
+        "first_timestamp": "2023-01-01T00:00:00Z",
+        "last_timestamp": "2023-12-31T23:00:00Z",
+        "missing_timestamps": 0,
+        "row_count": 8760,
+        "unique_timestamp_count": 8760
+      },
+      "derived_path": "data/derived/focused_trend_validation_v1/BTCUSDT-spot-1h-2023-halt-normalized.csv",
+      "derived_row_count": 48822,
+      "derived_sha256": "08d5649e86743e9485fb55a3978b96f7b0b5483b33223534d52d4fe0a745d10e",
+      "derived_sha256_differs_from_raw_sha256": true,
+      "inserted_row": {
+        "close": "28080.00000000",
+        "high": "28080.00000000",
+        "low": "28080.00000000",
+        "open": "28080.00000000",
+        "timestamp": "2023-03-24T13:00:00Z",
+        "volume": "0.00000000"
+      },
+      "manifest_path": "data/derived/focused_trend_validation_v1/BTCUSDT-spot-1h-2023-halt-normalized.manifest.json",
+      "manifest_sha256": "eeed7e295a651ba9620ef1c425e5fc3795beac00a79121bb29aa442c458c0aee",
+      "source_mismatches": 0,
+      "source_rows_compared": 48821,
+      "unexpected_derived_rows": 0,
+      "validation": {
+        "duplicate_timestamps": 0,
+        "non_finite_ohlcv_rows": 0,
+        "non_hour_aligned_timestamps": 0,
+        "ohlc_consistency_failures": 0,
+        "out_of_order_timestamps": 0,
+        "zero_or_negative_price_rows": 0
+      }
+    },
+    "ETHUSDT": {
+      "authoritative_raw_path": "data/raw/ETHUSDT-1h.csv",
+      "authoritative_raw_sha256": "3584c161874dc3b8d8f9961901e5abaadebe32a1aaba6d321106b8ccb1f61187",
+      "authorized_derived_rows": 1,
+      "causality": {
+        "close_12": "1789.52000000",
+        "close_12_equals_close_13": true,
+        "close_13": "1789.52000000",
+        "close_14": "1763.12000000",
+        "close_to_close_return_12_to_13": "0",
+        "post_halt_transition_13_to_14_preserved": true
+      },
+      "coverage_2023": {
+        "first_timestamp": "2023-01-01T00:00:00Z",
+        "last_timestamp": "2023-12-31T23:00:00Z",
+        "missing_timestamps": 0,
+        "row_count": 8760,
+        "unique_timestamp_count": 8760
+      },
+      "derived_path": "data/derived/focused_trend_validation_v1/ETHUSDT-spot-1h-2023-halt-normalized.csv",
+      "derived_row_count": 48822,
+      "derived_sha256": "a3cfb7733aad701b43fd383ac32f52252d229d2275147698449b2007bdff0d40",
+      "derived_sha256_differs_from_raw_sha256": true,
+      "inserted_row": {
+        "close": "1789.52000000",
+        "high": "1789.52000000",
+        "low": "1789.52000000",
+        "open": "1789.52000000",
+        "timestamp": "2023-03-24T13:00:00Z",
+        "volume": "0.00000000"
+      },
+      "manifest_path": "data/derived/focused_trend_validation_v1/ETHUSDT-spot-1h-2023-halt-normalized.manifest.json",
+      "manifest_sha256": "1c8d871c79c5f696a02dc9874fd9dd5bbdf2058e2b986cb59beaa83573e3f75d",
+      "source_mismatches": 0,
+      "source_rows_compared": 48821,
+      "unexpected_derived_rows": 0,
+      "validation": {
+        "duplicate_timestamps": 0,
+        "non_finite_ohlcv_rows": 0,
+        "non_hour_aligned_timestamps": 0,
+        "ohlc_consistency_failures": 0,
+        "out_of_order_timestamps": 0,
+        "zero_or_negative_price_rows": 0
+      }
+    },
+    "SOLUSDT": {
+      "authoritative_raw_path": "data/raw/SOLUSDT-1h.csv",
+      "authoritative_raw_sha256": "c431aa068acbfedf3cb0c38845dfac275044a9cf83367075b47d47f06974e99d",
+      "authorized_derived_rows": 1,
+      "causality": {
+        "close_12": "21.73000000",
+        "close_12_equals_close_13": true,
+        "close_13": "21.73000000",
+        "close_14": "21.45000000",
+        "close_to_close_return_12_to_13": "0",
+        "post_halt_transition_13_to_14_preserved": true
+      },
+      "coverage_2023": {
+        "first_timestamp": "2023-01-01T00:00:00Z",
+        "last_timestamp": "2023-12-31T23:00:00Z",
+        "missing_timestamps": 0,
+        "row_count": 8760,
+        "unique_timestamp_count": 8760
+      },
+      "derived_path": "data/derived/focused_trend_validation_v1/SOLUSDT-spot-1h-2023-halt-normalized.csv",
+      "derived_row_count": 48822,
+      "derived_sha256": "62cee85e0a0f7b903fadc77a8f275e774f0ff3ecfff9fba9ea51a535376f70f1",
+      "derived_sha256_differs_from_raw_sha256": true,
+      "inserted_row": {
+        "close": "21.73000000",
+        "high": "21.73000000",
+        "low": "21.73000000",
+        "open": "21.73000000",
+        "timestamp": "2023-03-24T13:00:00Z",
+        "volume": "0.00000000"
+      },
+      "manifest_path": "data/derived/focused_trend_validation_v1/SOLUSDT-spot-1h-2023-halt-normalized.manifest.json",
+      "manifest_sha256": "232b42f1d9d968faedc4fe86018cbc5767261af901391bb7e189fd1aa1a6e5af",
+      "source_mismatches": 0,
+      "source_rows_compared": 48821,
+      "unexpected_derived_rows": 0,
+      "validation": {
+        "duplicate_timestamps": 0,
+        "non_finite_ohlcv_rows": 0,
+        "non_hour_aligned_timestamps": 0,
+        "ohlc_consistency_failures": 0,
+        "out_of_order_timestamps": 0,
+        "zero_or_negative_price_rows": 0
+      }
+    }
+  },
+  "created_at_utc": "2026-08-02T00:00:00Z",
+  "determinism_check": {
+    "byte_identical": true,
+    "method": "rendered output bytes are regenerated before write and compared after write"
+  },
+  "evaluation_end": "2023-12-31T23:00:00Z",
+  "evaluation_start": "2023-01-01T00:00:00Z",
+  "explicit_non_actions": [
+    "no strategy execution",
+    "no backtest invocation",
+    "no 2023 performance calculation",
+    "no trial event",
+    "no decision event",
+    "no candidate event",
+    "no raw CSV mutation",
+    "no perpetual manifest mutation"
+  ],
+  "gap_policy": "NORMALIZE_ONLY_PREREGISTERED_AUTHORITATIVE_HALT; REJECT_ALL_OTHER_GAPS",
+  "materialization_id": "MATERIALIZE_NORMALIZED_2023_HOLDOUT_INPUTS_V1",
+  "normalization_id": "PREREGISTER_BINANCE_SPOT_HALT_NORMALIZATION_V1",
+  "normalization_version": "BINANCE_SPOT_HALT_NORMALIZATION_V1",
+  "screen_or_validation_id": "focused_trend_validation_v1",
+  "source_resolution_artifacts": {
+    "json": {
+      "path": "experiments/research/summaries/focused_trend_validation_v1_2023_source_resolution.json",
+      "sha256": "a945478ce34aec6d4e44c57e407b1a14027b4e9b99b788f9fd08c435804e54b6"
+    },
+    "markdown": {
+      "path": "experiments/research/summaries/focused_trend_validation_v1_2023_source_resolution.md",
+      "sha256": "b9100250f3a850ec433b8c0cf66e5b86ba76c3ff171dfe1b41966c916d00fe88"
+    }
+  },
+  "source_resolution_commit": "5a0fe6baae1d3ec9762384e192adb9b20e472263",
+  "status": "MATERIALIZED",
+  "tool_version": "qntylab.materialize_halt_normalized_holdout.v1",
+  "trial_identity_readiness": {
+    "derived_file_sha256_becomes_input_sha256": true,
+    "normalization_version_and_provenance_recorded_in_run_receipt": true,
+    "normalized_holdout_trials_must_not_collide_with_raw_input_trials": true,
+    "original_18_trial_preregistration_scientific_design_unchanged": true,
+    "performance_result_inspection_before_identity_freeze": "forbidden"
+  },
+  "warmup_start": "2022-12-02T00:00:00Z"
+}

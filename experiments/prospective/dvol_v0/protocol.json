@@ -1,0 +1,160 @@
+{
+  "amendment_policy": {
+    "after_first_eligible_primary_observation": "Any change to assets, source, timing, predictors, benchmark, outcome, horizon, primary comparison, missing-data policy, or stopping rules creates a new experiment identity; preserve V0 history and do not rewrite V0 in place.",
+    "before_first_eligible_primary_observation": "A material amendment requires a new protocol version and preservation of this prior protocol."
+  },
+  "assets": [
+    "BTC",
+    "ETH"
+  ],
+  "authority": {
+    "capture_implementation_authorized": false,
+    "historical_backfill_authorized": false,
+    "live_authorized": false,
+    "network_access_authorized": false,
+    "paper_authorized": false,
+    "qnty_validation_authorized": false,
+    "shadow_authorized": false,
+    "strategy_generation_authorized": false,
+    "trading_claim_authorized": false
+  },
+  "benchmark": {
+    "description": "Trailing 30-day realized volatility alone, using the identical hourly-close return convention and annualization as the outcome.",
+    "forecast": "The benchmark forecast equals the formation-time trailing_30_day_realized_volatility_percent."
+  },
+  "created_date": "2026-08-03",
+  "experiment_class": "PROSPECTIVE_PUBLIC_MARKET_OBSERVATION",
+  "forecast_comparison": {
+    "dvol_forecast": "The DVOL-based forecast equals the formation-time Deribit volatility-index close as returned, in percent units; it has zero fitted parameters.",
+    "forecast_formula_status": "FROZEN_SIMPLE_ZERO_FITTED_PARAMETERS",
+    "primary_metric": "absolute_forecast_error_percent_points",
+    "primary_metric_definition": "For each complete asset-week and each frozen forecast, absolute forecast error is abs(forecast_percent - realized_volatility_percent). The primary comparison is the equally asset-weighted pooled arithmetic mean of that error across exactly 104 complete BTC weeks and 104 complete ETH weeks.",
+    "retention_rule": "At the minimum sample, retain only if the DVOL-based pooled mean absolute forecast error is strictly lower than the benchmark pooled mean absolute forecast error; otherwise classify KILLED. This comparison does not establish statistical significance, edge, or trading utility."
+  },
+  "minimum_sample_and_stopping": {
+    "analysis_before_minimum": "FORBIDDEN",
+    "minimum_complete_primary_weeks_per_asset": 104,
+    "minimum_complete_primary_weeks_total": 208,
+    "upper_review_complete_primary_weeks_per_asset": 156,
+    "upper_review_rule": "At 156 complete primary weeks per asset, stop adding observations and reassess only by terminal classification or a separately registered experiment; V0 may not run indefinitely."
+  },
+  "missing_data_and_invalid_observation_policy": {
+    "action": "A failed primary week is not imputed, substituted, silently discarded, or analyzed. It immediately classifies V0 as BLOCKED; the failed week is retained as an invalid-observation record if a later separately authorized implementation exists.",
+    "fail_closed_conditions": [
+      "missing BTC or ETH primary observation",
+      "malformed response",
+      "non-finite value",
+      "protocol hash mismatch",
+      "capture outside primary tolerance",
+      "incomplete future outcome window",
+      "source timestamp ambiguity",
+      "raw-response loss",
+      "normalization or hash mismatch"
+    ]
+  },
+  "outcome": {
+    "annualization": "sqrt(365 * 24), with result expressed as percent",
+    "definition": "Realized volatility over the next complete seven UTC days from hourly log returns of the declared Deribit perpetual close series.",
+    "end": "The outcome ends at 00:00:00 UTC on the Monday seven calendar days after outcome-window start; its ending boundary is excluded.",
+    "incomplete_window": "FORBIDDEN",
+    "missing_bar_policy": "Any missing, duplicate, non-finite, non-positive, or non-hourly-cadence close invalidates the entire primary observation.",
+    "return_sampling_interval": "1 hour",
+    "return_transform": "natural logarithm of consecutive declared hourly closes",
+    "start": "The outcome begins at 00:00:00 UTC on the Monday containing the eligible formation capture, inclusive.",
+    "standard_deviation": "sample standard deviation of the 167 hourly log returns formed from 168 complete hourly closes; no population estimator, interpolation, or forward fill is allowed."
+  },
+  "predictors": {
+    "formation_timestamp": "The actual UTC receipt time of the complete paired raw-response set, which must fall within the primary capture tolerance. Only bytes received no later than that timestamp may be used.",
+    "trailing_30_day_realized_volatility": "Annualized percent sample standard deviation of the 719 hourly log returns from the 720 most recent complete eligible hourly perpetual closes available in the paired formation response. The returned timestamps must be unambiguous, strictly increasing, and exactly one hour apart; otherwise fail closed.",
+    "volatility_index_close": "The close element of the latest complete one-second volatility-index candle returned in the formation response for the asset. The source row is retained verbatim; if its timestamp or completeness cannot be verified from the response and receipt, fail closed."
+  },
+  "primary_question": "Does the Deribit volatility index contain incremental prospective information about future realized BTC and ETH volatility beyond trailing realized volatility alone?",
+  "protocol_id": "qntylab_deribit_dvol_prospective_forecast_v0",
+  "protocol_status": "FROZEN_DESIGN_ONLY_NO_CAPTURE_AUTHORIZATION",
+  "research_claim_scope": "FORECAST_INFORMATION_ONLY_NO_TRADING_OR_EDGE_CLAIM",
+  "research_question": {
+    "alternative": "The frozen DVOL-based forecast has lower prospective absolute forecast error than the trailing-realized-volatility benchmark.",
+    "null": "The DVOL-based forecast does not improve absolute seven-day realized-volatility forecast error relative to the trailing-realized-volatility benchmark."
+  },
+  "schedule": {
+    "eligible_observation_time": "Monday 00:05 UTC",
+    "frequency": "weekly primary observations",
+    "outside_tolerance": "NON_PRIMARY_AND_BLOCKED: outside-window data may not be silently accepted, normalized, or substituted for a primary observation.",
+    "primary_capture_tolerance": "Monday 00:00:00 UTC through Monday 00:10:00 UTC inclusive",
+    "timezone": "UTC"
+  },
+  "schema_version": "1.0.0",
+  "source": {
+    "authentication": "Not required for public methods, per official Deribit authentication documentation.",
+    "data_family": "volatility index and perpetual chart candles",
+    "documentation": [
+      {
+        "retrieved_date": "2026-08-03",
+        "url": "https://docs.deribit.com/api-reference/market-data/public-get_volatility_index_data"
+      },
+      {
+        "retrieved_date": "2026-08-03",
+        "url": "https://docs.deribit.com/api-reference/market-data/public-get_tradingview_chart_data"
+      },
+      {
+        "retrieved_date": "2026-08-03",
+        "url": "https://docs.deribit.com/articles/authentication"
+      },
+      {
+        "retrieved_date": "2026-08-03",
+        "url": "https://docs.deribit.com/articles/rate-limits"
+      }
+    ],
+    "official_api_methods": {
+      "perpetual_hourly_closes": {
+        "method": "public/get_tradingview_chart_data",
+        "request_parameters": {
+          "end_timestamp": "formation-dependent UNIX epoch milliseconds; request exactly the required closed-bar range",
+          "instrument_name": {
+            "BTC": "BTC-PERPETUAL",
+            "ETH": "ETH-PERPETUAL"
+          },
+          "resolution": "60",
+          "start_timestamp": "formation-dependent UNIX epoch milliseconds; request exactly the required closed-bar range"
+        },
+        "returned_fields_used": [
+          "result.close",
+          "result.status",
+          "result.ticks"
+        ]
+      },
+      "volatility_index": {
+        "method": "public/get_volatility_index_data",
+        "request_parameters": {
+          "currency": [
+            "BTC",
+            "ETH"
+          ],
+          "end_timestamp": "formation-dependent UNIX epoch milliseconds",
+          "resolution": "1",
+          "start_timestamp": "formation-dependent UNIX epoch milliseconds; no historical backfill is permitted"
+        },
+        "returned_fields_used": [
+          "result.continuation",
+          "result.data[][0] timestamp_ms",
+          "result.data[][4] close"
+        ],
+        "returned_row_semantics": "Each documented row is [timestamp_ms, open, high, low, close].",
+        "supported_resolutions": [
+          "1",
+          "60",
+          "3600",
+          "43200",
+          "1D"
+        ]
+      }
+    },
+    "request_limit_policy": "The documented volatility-index response may return continuation, which must be null for this bounded request; a non-null continuation is invalid rather than paginated. Public API rate-limit errors, including too_many_requests, are invalid observations and are not retried within the primary window.",
+    "venue": "Deribit public market-data API"
+  },
+  "terminal_classifications": {
+    "BLOCKED": "A required observation, provenance check, source contract, or complete outcome cannot be produced under this protocol; no substitute or repair is permitted within V0.",
+    "KILLED": "At the minimum complete sample, the DVOL-based pooled mean absolute forecast error is not strictly lower than the benchmark's, or a repository-level kill criterion applies.",
+    "RETAIN_FOR_SEPARATELY_REGISTERED_FOLLOWUP": "At the minimum complete sample, the frozen DVOL-based forecast is strictly lower on the frozen primary comparison; this is exploratory retention only and requires a new registered protocol before any further work."
+  }
+}

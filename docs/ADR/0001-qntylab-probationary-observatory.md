@@ -1,88 +1,61 @@
 # ADR 0001: QntyLab Probationary Prospective Observatory
 
-**Status:** `FROZEN_DESIGN_ONLY_SOURCE_CONTRACT_BLOCKED`
-
-This decision accepts a bounded design-only protocol. It does not authorize capture
-implementation, network access, an observation, analysis, or a strategy test.
+**Status:** `FROZEN_DESIGN_ONLY_SOURCE_CONTRACT_RESOLVED_NO_IMPLEMENTATION_AUTHORIZATION`
 
 ## Context
 
 QntyLab must not become a second QNTY, a historical strategy-tournament engine,
-an autonomous multi-agent research platform, a formal validator, or a trading
-system. Historical-search throughput increases false-discovery risk: many flexible
-searches can make retrospective coincidences look persuasive.
-
-The probationary lane is deliberately narrower. It asks whether QntyLab can create
-genuinely new, timestamped information under a frozen hypothesis, and can preserve
-a negative result rather than manufacture a candidate.
-
-## Decision
-
-Freeze the following responsibility boundary.
+an autonomous research platform, a formal validator, or a trading system. This
+ADR freezes a single exploratory, prospective, public-market observation design.
+It authorizes neither implementation nor network access.
 
 | Repository | Frozen role |
 | --- | --- |
-| QntyLab | prospective public-market observation; point-in-time provenance; data-feasibility research; hypothesis preregistration; negative-result memory; bounded exploratory closure |
-| QNTY | independent confirmation; protected evidence; canonical accounting; formal scientific classification; paper/shadow/live authority |
+| QntyLab | prospective public-market observation, point-in-time provenance, hypothesis preregistration, and bounded exploratory closure |
+| QNTY | independent confirmation, protected evidence, canonical accounting, formal classification, and paper/shadow/live authority |
 
-The V0 forecasting question is:
+## Decision
 
-> Does the raw Deribit volatility-index close have lower prospective forecast error than the trailing-realized-volatility benchmark for future BTC and ETH realized volatility?
+Select `DERIBIT_DVOL_PLUS_BINANCE_SPOT_KLINES` for DVOL V0.
 
-It is a bounded exploratory forecast horse race, not a test of incremental
-information conditional on realized volatility, and not a trading or
-profitability hypothesis.
+The registered question is: “Does a timestamped Deribit DVOL observation produce
+lower forecast error than trailing Binance Spot realized volatility for future
+Binance Spot realized volatility?” It is a forecast horse race, not a claim of
+causality, unbiasedness, edge, tradability, profitability, or QNTY validation.
 
-For V0, QntyLab may eventually retrieve one declared public source, preserve exact
-raw responses, normalize only declared fields, produce timestamped hash-bound
-observations, calculate the preregistered forecast comparison after the minimum
-prospective sample exists, and terminate as killed, blocked, or retained for a
-separately registered follow-up.
+Deribit public WebSocket notifications provide a timestamped `volatility` value
+for `deribit_volatility_index.btc_usd` and `.eth_usd`. Official Deribit
+publications define DVOL as 30-day forward-looking annualized implied volatility;
+the documented example where DVOL 57 implies about a 3% daily move fixes the
+numeric source value as annualized percentage points. Binance Spot `/api/v3/klines`
+provides UTC one-hour bars with explicit open and close timestamps and a 1,000-row
+limit. Therefore the 721 trailing and 169 outcome close requirements each fit one
+bounded response per asset, with no pagination.
 
-The official Deribit pages reviewed on 2026-08-03 establish request and response
-shapes but do not establish candle-boundary/completeness semantics or the DVOL
-unit and economic horizon required by this protocol. Until an authoritative
-source contract resolves those facts, the protocol remains non-executable and
-cannot be used to authorize Phase 1, network access, capture, or analysis.
+The cross-venue choice is material: Deribit options-implied volatility forecasts
+realized volatility measured from Binance Spot BTCUSDT/ETHUSDT closes. The result
+must never be called generic BTC or ETH realized volatility.
 
-V0 forbids: historical strategy tournaments; return optimization; trading signals;
-position generation; PnL or edge ranking; paper/shadow/live execution; QNTY
-control-state mutation; QNTY holdout access; QNTY verdict-feedback tuning; a
-multi-agent framework; a knowledge graph; a feature store; a generic observatory
-platform; a generic candidate-pack framework; and historical options backfill.
+`DERIBIT_ONLY_PROSPECTIVE_STREAMS` was rejected. Although its price-index and
+DVOL notifications have source timestamps, it would require retaining a
+continuous prospective price stream through a 30-day warm-up and every future
+outcome window, deterministic boundary selection, and loss handling. That is a
+larger, less bounded collector with more undocumented operational assumptions than
+the closed-kline contract. It is not selected or authorized.
 
-Authority is one way: QntyLab may later propose. QNTY may independently confirm.
-QntyLab may not use iterative QNTY verdict feedback to tune the same hypothesis
-family.
+## Consequences and limits
 
-No generic permanent capability may be promoted until at least three completed
-independent prospective experiments have required it. V0 remains experiment-specific.
+The exact source identities, timing, retention, retry, terminal, unit, and
+amendment rules are frozen in `experiments/prospective/dvol_v0/protocol.json`.
+All authority booleans remain false. A later task would need separate authority
+before any implementation, API/WebSocket request, observation, retrieval,
+analysis, QNTY work, paper/shadow/live activity, or trading activity.
 
-## Probation success criteria
+V0 forbids historical primary-observation backfill, source substitution,
+interpolation, generic registries or platforms, candidate handoffs, QNTY control
+state mutation, and copying QNTY governance machinery. A missed Deribit formation
+observation cannot be recreated from any later DVOL value.
 
-1. It introduces a genuinely new observable.
-2. It freezes the hypothesis before eligible outcomes accumulate.
-3. It makes observation timing and raw-byte identity independently auditable.
-4. It does not duplicate QNTY validation, accounting, custody, or authority.
-5. It can honestly terminate without producing a candidate.
-6. It requires no prior chat transcript to understand or reproduce.
-7. It keeps generic infrastructure smaller than experiment-specific work.
-
-## Repository-level kill criteria
-
-- `K1` Generic infrastructure exceeds experiment-specific code.
-- `K2` QNTY accounting or validation logic is duplicated.
-- `K3` The hypothesis changes after eligible outcomes exist.
-- `K4` Observation timestamps or raw responses cannot be verified.
-- `K5` Historical strategy tournaments are added.
-- `K6` QNTY feedback is used for adaptive tuning.
-- `K7` A general agent framework is introduced prematurely.
-- `K8` A permanent abstraction is promoted before three completed uses.
-- `K9` The experiment cannot terminate as killed or blocked.
-- `K10` A bounded QNTY exploratory worktree would be materially simpler.
-
-## Consequences
-
-The separately frozen V0 protocol is the only Phase 0 experiment surface. A
-separately authorized next task may implement only one experiment-specific capture
-module. This ADR does not authorize that implementation.
+The only terminal classifications are `KILLED`, `BLOCKED`, and
+`RETAIN_FOR_SEPARATELY_REGISTERED_FOLLOWUP`. This resolution permits independent
+review of the docs-only design only.

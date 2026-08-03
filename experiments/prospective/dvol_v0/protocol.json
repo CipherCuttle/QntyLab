@@ -1,7 +1,7 @@
 {
   "amendment_policy": {
-    "after_first_eligible_primary_observation": "Any change to assets, source, timing, predictors, benchmark, outcome, horizon, primary comparison, missing-data policy, or stopping rules creates a new experiment identity; preserve V0 history and do not rewrite V0 in place.",
-    "before_first_eligible_primary_observation": "A material amendment requires a new protocol version and preservation of this prior protocol."
+    "after_first_eligible_primary_observation": "Any material change to source identity, timing, symbols, unit conversion, predictors, benchmark, outcome, metric, missing-data rule, or stopping rule creates a new protocol identity; V0 is preserved and never rewritten.",
+    "before_first_eligible_primary_observation": "A material amendment requires a new version, byte preservation of this protocol, and independent review."
   },
   "assets": [
     "BTC",
@@ -21,153 +21,127 @@
     "trading_claim_authorized": false
   },
   "benchmark": {
-    "description": "Trailing 30-day realized volatility alone, using the identical hourly-close return convention and annualization as the outcome.",
-    "forecast": "The benchmark forecast equals the formation-time trailing_30_day_realized_volatility_percent."
+    "definition": "Trailing Binance Spot realized volatility from 720 hourly log returns ending at the last fully closed Monday 00:00 UTC boundary.",
+    "forecast": "The benchmark forecast is the formation-time trailing_30_day_realized_volatility_percent with zero fitted parameters."
   },
   "created_date": "2026-08-03",
   "experiment_class": "PROSPECTIVE_PUBLIC_MARKET_OBSERVATION",
   "forecast_comparison": {
-    "dvol_forecast": "If and only if a separately reviewed official source contract establishes the DVOL close scale and horizon, the DVOL-based forecast is the formation-time volatility-index close converted under that source contract with zero fitted parameters. Until then this forecast is undefined and V0 is non-executable.",
+    "dvol_forecast": "The DVOL forecast is the accepted Deribit volatility numeric value in annualized percentage points; conversion to decimal for arithmetic is raw_value / 100. It has zero fitted parameters.",
     "forecast_formula_status": "FROZEN_SIMPLE_ZERO_FITTED_PARAMETERS",
-    "primary_metric": "absolute_forecast_error_percent_points",
-    "primary_metric_definition": "For each complete asset-week and each frozen forecast, absolute forecast error is abs(forecast_percent - realized_volatility_percent). The primary comparison is the equally asset-weighted pooled arithmetic mean of that error across exactly 104 complete BTC weeks and 104 complete ETH weeks.",
-    "retention_rule": "At the minimum sample, retain only if the equally asset-weighted pooled DVOL mean absolute error is at least 0.25 percentage points lower than the benchmark and neither asset's DVOL mean absolute error exceeds that asset's benchmark mean absolute error. Otherwise classify KILLED. The 0.25 percentage-point practical margin is a pre-observation exploratory decision threshold, not an uncertainty estimate, significance test, edge claim, or trading-utility finding."
+    "primary_metric": "absolute_forecast_error_percentage_points",
+    "primary_metric_definition": "For every complete asset-week, error is abs(forecast_percentage_points - outcome_realized_volatility_percentage_points). The sole primary metric is the equally asset-weighted pooled arithmetic mean across exactly 104 complete BTC weeks and 104 complete ETH weeks.",
+    "retention_rule": "At the minimum sample, retain only if pooled DVOL mean absolute error is strictly lower than pooled benchmark mean absolute error and neither asset DVOL mean absolute error exceeds its benchmark. Otherwise classify KILLED. This is exploratory, not significance, power, causality, edge, or trading utility."
+  },
+  "formation": {
+    "acceptance_window": "Monday 00:05:00.000 UTC through Monday 00:10:00.000 UTC inclusive",
+    "completion_rule": "The formation completion timestamp is max(accepted BTC DVOL source timestamp, accepted ETH DVOL source timestamp). Both values must be the first valid notification for their asset with source timestamp at or after the target and inside the acceptance window.",
+    "no_last_known_value_rule": "FORBIDDEN: a pre-target, stale, missing, later out-of-window, or substituted notification is invalid.",
+    "target": "Monday 00:05:00.000 UTC"
   },
   "minimum_sample_and_stopping": {
     "analysis_before_minimum": "FORBIDDEN",
     "maximum_scheduled_primary_weeks": 156,
     "minimum_complete_primary_weeks_per_asset": 104,
     "minimum_complete_primary_weeks_total": 208,
-    "sample_size_rationale": "104 complete paired weeks is a two-calendar-year descriptive observation target, not a power calculation or a basis for confirmatory inference. 156 scheduled weeks is a three-calendar-year finite operational stop that allows predeclared retained skips without indefinite collection.",
-    "upper_review_rule": "Stop after the 156th scheduled Monday. If fewer than 104 complete paired weeks then exist, classify BLOCKED; otherwise the frozen terminal rule applies. No analysis occurs before the 104-complete-week minimum."
+    "sample_size_rationale": "104 paired weeks is a descriptive two-calendar-year target, not a power or significance calculation. 156 scheduled weeks is a finite three-year stop that permits frozen skipped-week handling.",
+    "upper_review_rule": "After scheduled week 156, classify BLOCKED if fewer than 104 complete paired weeks exist; otherwise apply the frozen terminal rule."
   },
-  "missing_data_and_invalid_observation_policy": {
-    "action": "A failed primary week is not imputed, substituted, silently discarded, or analyzed. Source-data, provenance, timing, integrity, or outcome failure immediately classifies V0 as BLOCKED. A transport or local operational failure is a retained predeclared skipped scheduled week: it is not an eligible observation and is never replaced or retrospectively backfilled. Collection may proceed only on later scheduled Mondays through the fixed 156-scheduled-week limit.",
-    "bounded_retry_policy": "For a scheduled formation or outcome retrieval, each required logical response may have at most two attempts, both completed within its declared receipt window and both using the already-fixed source-data cutoff. Every request, raw response, and error is retained. A retry may not widen a receipt window, move a cutoff, substitute a later candle, or convert a skipped week into an observation.",
-    "fail_closed_conditions": [
-      "missing BTC or ETH primary observation",
-      "malformed response",
-      "non-finite value",
-      "protocol hash mismatch",
-      "capture outside primary tolerance",
-      "incomplete future outcome window",
-      "source timestamp ambiguity",
-      "raw-response loss",
-      "normalization or hash mismatch"
-    ]
+  "missing_data_and_retry_policy": {
+    "allowed_retry": "At most one reconnect and one resubscribe attempt may occur after a transport failure, both completed before 00:10:00.000 UTC. Attempts may not alter target, source timestamp rule, lookback cutoff, or outcome boundaries. Retain every sent request, acknowledgement, received message, local monotonic receipt time, UTC receipt time, error, and close reason as raw bytes or an explicit local operational record.",
+    "categories": {
+      "incomplete_outcome": "BLOCKED",
+      "integrity_failure": "BLOCKED",
+      "local_operational_failure": "DECLARED_SKIPPED_WEEK",
+      "missed_formation_observation": "DECLARED_SKIPPED_WEEK",
+      "source_data_invalidity": "BLOCKED",
+      "source_notification_absence": "DECLARED_SKIPPED_WEEK",
+      "transport_failure": "DECLARED_SKIPPED_WEEK"
+    },
+    "maximum_declared_skipped_scheduled_weeks": 52,
+    "record_rule": "Every scheduled Monday produces exactly one retained status record. No status is silently dropped, imputed, replaced, or backfilled. A DECLARED_SKIPPED_WEEK is not an eligible observation. The 53rd declared skipped scheduled week classifies V0 as BLOCKED; collection may otherwise continue only within the 156-week cap."
   },
   "outcome": {
-    "annualization": "sqrt(365 * 24), with result expressed as percent",
-    "definition": "Realized volatility over 168 strictly future hourly intervals from hourly log returns of the declared Deribit perpetual close series; it is not described as seven complete UTC calendar days.",
-    "eligibility_and_retrieval": "The outcome becomes eligible only after its ending boundary. The earliest permissible outcome retrieval is that boundary plus the same documented candle-completeness delay required for a formation candle; because no official completeness delay is documented, no retrieval is authorized. A future outcome retrieval is not historical primary-observation backfill.",
-    "end": "The outcome ends at the boundary 168 hours after outcome-window start; 169 boundary closes are required to form 168 hourly returns.",
+    "annualization": "sqrt(365 * 24); calculate decimal realized volatility then multiply by 100 for percentage points",
+    "boundary_closes_required": 169,
+    "definition": "Binance Spot realized volatility over 168 strictly future one-hour log returns from BTCUSDT or ETHUSDT closed kline close prices.",
+    "end": "The 169th boundary is Monday 01:00:00 UTC seven days after the first outcome boundary; retrieve only after its originating kline has closed.",
+    "first_boundary": "Monday 01:00:00 UTC on the formation Monday",
+    "first_return": "Monday 01:00:00 UTC to Monday 02:00:00 UTC",
     "incomplete_window": "FORBIDDEN",
-    "missing_bar_policy": "Any missing, duplicate, non-finite, non-positive, or non-hourly-cadence close invalidates the entire primary observation.",
-    "return_sampling_interval": "1 hour",
-    "return_transform": "natural logarithm of consecutive declared hourly closes",
-    "standard_deviation": "sample standard deviation of 168 hourly log returns formed from 169 complete boundary closes; no population estimator, interpolation, or forward fill is allowed.",
-    "start": "The outcome begins at the first eligible hourly boundary strictly after formation; no return beginning before formation is included."
+    "return_count": 168,
+    "return_transform": "natural logarithm of each consecutive pair of boundary close prices",
+    "standard_deviation": "sample standard deviation of exactly 168 returns; no interpolation, forward fill, duplicate removal, or population estimator"
   },
-  "predictors": {
-    "formation_timestamp": "The actual UTC completion time of the complete four-response formation set, retained separately from the fixed source-data cutoff, individual request start/completion times, source candle timestamps, and later outcome-finalization retrieval time. It must fall within the primary receipt window. Only source data no later than the fixed cutoff may be eligible.",
-    "shared_source_data_cutoff": "Monday 00:00:00 UTC, fixed before any formation request. BTC DVOL, ETH DVOL, BTC perpetual, and ETH perpetual requests must all use it; sequential completion may not create asset-specific information horizons.",
-    "trailing_30_day_realized_volatility": "Annualized percent sample standard deviation of 720 hourly log returns from 721 most recent complete eligible hourly perpetual boundary closes available at the fixed formation cutoff. This pre-formation lookback is permitted future implementation and is not historical primary-observation backfill. Timestamps must be unambiguous, strictly increasing, and exactly one hour apart; otherwise fail closed.",
-    "volatility_index_close": "The close element of the latest complete one-second volatility-index candle eligible at the fixed source cutoff. The source row is retained verbatim. Official documentation does not establish timestamp boundary or completeness semantics, so eligibility is unresolved and V0 remains blocked."
-  },
-  "primary_question": "Does the raw Deribit volatility-index close have lower prospective forecast error than the trailing-30-day-realized-volatility benchmark for future BTC and ETH realized volatility?",
+  "primary_question": "Does a timestamped Deribit DVOL observation produce lower forecast error than trailing Binance Spot realized volatility for future Binance Spot realized volatility?",
   "protocol_id": "qntylab_deribit_dvol_prospective_forecast_v0",
-  "protocol_status": "FROZEN_DESIGN_ONLY_SOURCE_CONTRACT_BLOCKED_NO_CAPTURE_AUTHORIZATION",
-  "research_claim_scope": "FORECAST_INFORMATION_ONLY_NO_TRADING_OR_EDGE_CLAIM",
-  "research_question": {
-    "alternative": "The frozen raw-DVOL forecast meets the predeclared practical pooled-error and asset-direction retention rule against the trailing-realized-volatility benchmark.",
-    "null": "The raw-DVOL forecast does not meet the predeclared practical pooled-error and asset-direction retention rule against the trailing-realized-volatility benchmark."
-  },
+  "protocol_status": "FROZEN_DESIGN_ONLY_SOURCE_CONTRACT_RESOLVED_NO_IMPLEMENTATION_AUTHORIZATION",
+  "research_claim_scope": "PROSPECTIVE_FORECAST_ERROR_ONLY_NO_CAUSALITY_EDGE_OR_TRADING_CLAIM",
   "schedule": {
-    "eligible_observation_time": "Monday 00:00:00 UTC fixed source-data cutoff; proposed receipt window follows",
-    "frequency": "weekly primary observations",
-    "outside_tolerance": "NON_PRIMARY_AND_BLOCKED: outside-window data may not be silently accepted, normalized, or substituted for a primary observation.",
-    "primary_capture_tolerance": "Monday 00:00:00 UTC through Monday 00:10:00 UTC inclusive; each actual request start, completion, and receipt time is distinct and retained",
+    "frequency": "weekly scheduled Mondays",
     "timezone": "UTC"
   },
-  "schema_version": "1.0.0",
-  "source": {
-    "authentication": "Not required for public methods, per official Deribit authentication documentation.",
-    "data_family": "volatility index and perpetual chart candles",
-    "documentation": [
-      {
-        "retrieved_date": "2026-08-03",
-        "url": "https://docs.deribit.com/api-reference/market-data/public-get_volatility_index_data"
+  "schema_version": "1.1.0",
+  "source_architecture": "DERIBIT_DVOL_PLUS_BINANCE_SPOT_KLINES",
+  "source_contract": {
+    "binance_spot_klines": {
+      "authentication": "Public market data: endpoint security type is unspecified and therefore NONE.",
+      "closure_rule": "Accept only a row whose open_time_ms and close_time_ms match the declared UTC hour: close_time_ms = open_time_ms + 3600000 - 1. Retrieval occurs only after that close time. No current or incomplete kline is eligible.",
+      "endpoint": "GET https://api.binance.com/api/v3/klines",
+      "formation_lookback_retrieval": "Allowed only at formation for each asset: one request with interval=1h, startTime=B-721h, endTime=B-1ms, limit=721, where B is Monday 00:00:00 UTC. Require exactly 721 chronological rows and retain raw response bytes. This is not primary-observation backfill.",
+      "outcome_finalization_retrieval": "Allowed only after outcome close for each registered week: one request with interval=1h, startTime=F-169h, endTime=F-1ms, limit=169, where F is the final Monday 01:00:00 UTC boundary. Require exactly 169 chronological rows and retain raw response bytes. This is not primary-observation backfill.",
+      "pagination": "FORBIDDEN AND UNNEEDED: 721 and 169 are each below the documented maximum 1000 rows.",
+      "symbols": {
+        "BTC": "BTCUSDT",
+        "ETH": "ETHUSDT"
       },
-      {
-        "retrieved_date": "2026-08-03",
-        "url": "https://docs.deribit.com/api-reference/market-data/public-get_tradingview_chart_data"
-      },
-      {
-        "retrieved_date": "2026-08-03",
-        "url": "https://docs.deribit.com/articles/authentication"
-      },
-      {
-        "retrieved_date": "2026-08-03",
-        "url": "https://docs.deribit.com/articles/rate-limits"
-      }
-    ],
-    "official_api_methods": {
-      "perpetual_hourly_closes": {
-        "method": "public/get_tradingview_chart_data",
-        "request_parameters": {
-          "end_timestamp": "fixed formation cutoff or fixed outcome cutoff in UNIX epoch milliseconds; request range is eligible only under a later authoritative candle-boundary/completeness contract",
-          "instrument_name": {
-            "BTC": "BTC-PERPETUAL",
-            "ETH": "ETH-PERPETUAL"
-          },
-          "resolution": "60",
-          "start_timestamp": "fixed range start in UNIX epoch milliseconds; formation lookback is allowed only for the current scheduled observation and outcome retrieval is allowed only after its window closes"
-        },
-        "returned_fields_used": [
-          "result.close",
-          "result.status",
-          "result.ticks"
-        ]
-      },
-      "volatility_index": {
-        "method": "public/get_volatility_index_data",
-        "request_parameters": {
-          "currency": [
-            "BTC",
-            "ETH"
-          ],
-          "end_timestamp": "fixed formation cutoff in UNIX epoch milliseconds",
-          "resolution": "1",
-          "start_timestamp": "fixed bounded formation range in UNIX epoch milliseconds; no missed primary observation may be retroactively created"
-        },
-        "returned_fields_used": [
-          "result.continuation",
-          "result.data[][0] timestamp_ms",
-          "result.data[][4] close"
-        ],
-        "returned_row_semantics": "Each documented row is [timestamp_ms, open, high, low, close].",
-        "supported_resolutions": [
-          "1",
-          "60",
-          "3600",
-          "43200",
-          "1D"
-        ]
-      }
+      "used_fields": [
+        "[0] open_time_ms",
+        "[4] close_price",
+        "[6] close_time_ms"
+      ]
     },
-    "request_limit_policy": "The documented volatility-index response may return continuation. The bounded formation and outcome requests must not require pagination; a non-null continuation is source-data invalidity and blocks V0. A public API rate-limit error, including documented too_many_requests, is a transport failure subject only to the fixed bounded retry policy.",
-    "unresolved_official_source_contract_facts": [
-      "whether volatility-index and TradingView candle timestamps identify opens, closes, or another boundary",
-      "whether either response gives an explicit completed-candle indicator or authoritative completeness delay",
-      "DVOL close scale, annualization, and percent-unit conversion",
-      "DVOL economic horizon and whether it is comparable to a seven-day realized-volatility outcome",
-      "maximum result size applicable to the requested bounded ranges"
+    "deribit_dvol": {
+      "authentication": "Public market-data methods require no authentication.",
+      "channel": {
+        "BTC": "deribit_volatility_index.btc_usd",
+        "ETH": "deribit_volatility_index.eth_usd"
+      },
+      "connection": "WebSocket public/subscribe; retain the subscription request and acknowledgement before accepting notifications. public/get_time may be retained solely as a clock-skew diagnostic, never as a substitute for notification source timestamps.",
+      "method": "public/subscribe",
+      "notification_fields": [
+        "data.index_name",
+        "data.timestamp",
+        "data.volatility"
+      ],
+      "timestamp_semantics": "data.timestamp is milliseconds since the Unix epoch; it is the authoritative formation source timestamp.",
+      "unit_and_horizon": "Deribit DVOL is a 30-day forward-looking annualized implied-volatility expectation. Its numeric value is annualized percentage points; raw value 57 corresponds to about 3 percent daily using sqrt(365), so decimal conversion is raw_value / 100."
+    },
+    "documents_retrieved_2026_08_03": [
+      "https://docs.deribit.com/subscriptions/market-data/deribit_volatility_indexindex_name",
+      "https://docs.deribit.com/subscriptions/market-data/deribit_price_indexindex_name",
+      "https://docs.deribit.com/articles/notifications",
+      "https://docs.deribit.com/api-reference/supporting/public-get_time",
+      "https://docs.deribit.com/articles/authentication",
+      "https://insights.deribit.com/industry/demystifying-dvol-futures/",
+      "https://developers.binance.com/en/docs/catalog/core-trading-spot-trading/api/rest-api/market",
+      "https://developers.binance.com/en/docs/products/spot/rest-api"
     ],
-    "venue": "Deribit public market-data API"
+    "rejected_architecture": "DERIBIT_ONLY_PROSPECTIVE_STREAMS: rejected because a 30-day price-stream warm-up plus future stream collection and loss handling would be a larger persistent collector with more operational assumptions than bounded closed klines.",
+    "selected_architecture_reason": "The selected contract has explicit source timestamps for DVOL and explicit closed-kline open/close times for realized volatility, needs no pagination, preserves raw bytes, uses no fitted parameter, and remains experiment-specific."
   },
   "terminal_classifications": {
-    "BLOCKED": "A required observation, provenance check, official source-contract fact, complete outcome, or the finite scheduling requirement cannot be produced under this protocol; no substitute or repair is permitted within V0.",
-    "KILLED": "At the minimum complete sample, the raw-DVOL forecast does not meet the frozen pooled practical-improvement and per-asset-direction retention rule, or a repository-level kill criterion applies.",
-    "RETAIN_FOR_SEPARATELY_REGISTERED_FOLLOWUP": "At the minimum complete sample, the raw-DVOL forecast meets the frozen primary retention rule; this is exploratory retention only and requires a new registered protocol before any further work."
+    "BLOCKED": "A required source, timestamp, raw-byte, integrity, complete outcome, or finite-schedule condition cannot be satisfied without a forbidden substitution or amendment.",
+    "KILLED": "At the minimum complete sample, the DVOL forecast fails the frozen primary retention rule.",
+    "RETAIN_FOR_SEPARATELY_REGISTERED_FOLLOWUP": "At the minimum complete sample, DVOL meets the frozen primary rule. This is exploratory only and authorizes nothing further."
+  },
+  "timing_integrity": {
+    "historical_primary_observation_backfill": false,
+    "outcome_begins_after_formation": "Formation completes no later than Monday 00:10:00 UTC; the first measured outcome return starts Monday 01:00:00 UTC.",
+    "trailing_predictor": {
+      "boundary_closes_required": 721,
+      "cutoff": "Monday 00:00:00 UTC",
+      "return_count": 720
+    }
   }
 }

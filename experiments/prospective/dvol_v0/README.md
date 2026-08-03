@@ -86,5 +86,14 @@ python -m qntylab.prospective_deribit_dvol replay-fixture \
   --deribit-events tests/fixtures/dvol_v0/valid_deribit_session.jsonl \
   --binance-btc-response /tmp/BTCUSDT.json \
   --binance-eth-response /tmp/ETHUSDT.json \
-  --output-root /tmp/dvol-v0-replay
+  --output-root /tmp/dvol-v0-replay \
+  --repository-commit 0123456789abcdef0123456789abcdef01234567
 ```
+
+The replay accepts only byte-exact fixture input. Deribit payloads are represented
+as `payload_base64`, so escaped Unicode, backslashes, embedded newlines, and JSON
+whitespace are not reconstructed from a host JSON string. It has no HTTP adapter,
+WebSocket transport, `requests` import, live command, scheduler, outcome
+retrieval, forecast-error calculation, or QNTY integration. Fixture outputs are
+explicitly non-scientific and cannot be primary observations. Live-source timing,
+notification cadence, clock skew, and Binance response behavior remain untested.

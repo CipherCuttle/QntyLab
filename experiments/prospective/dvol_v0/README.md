@@ -130,5 +130,7 @@ the gated CLI is the only route that owns live adapters and produces a
 `NON_PRIMARY_LIVE_SOURCE_SMOKE` artifact. Offline tests consume inert scripted
 bytes, status codes, headers, errors, and timestamps only; their artifacts are
 explicitly `OFFLINE_TEST_FIXTURE`, with `non_primary_live_smoke=false` and
-`network_contacted=false`. Neither path authorizes a rerun or any additional
-network access.
+`network_contacted=false`. The remaining shared collector and evaluator do not
+receive artifact identity or publish output; dedicated writers hardcode the two
+incompatible artifact identities. Neither path authorizes a rerun or any
+additional network access.

@@ -17,6 +17,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
+from types import MappingProxyType
 from typing import Any, Awaitable, Callable, Mapping
 from urllib.error import HTTPError
 from urllib.parse import urlencode
@@ -44,21 +45,14 @@ class ClockIntegrityError(RuntimeError): pass
 
 
 @dataclass(frozen=True)
-class _ArtifactAuthority:
-    artifact_kind: str
-    execution_mode: str
-    non_primary_live_smoke: bool
-    network_contacted: bool
-
-
-_OFFLINE_AUTHORITY = _ArtifactAuthority("OFFLINE_TEST_FIXTURE", OFFLINE_TEST_FIXTURE, False, False)
-_LIVE_AUTHORITY = _ArtifactAuthority("NON_PRIMARY_LIVE_SOURCE_SMOKE", AUTHORIZED_NON_PRIMARY_LIVE_SMOKE, True, True)
-
-
-@dataclass(frozen=True)
 class ScriptedMessage:
     payload: bytes | None = None
     error: str | None = None
+
+    def __post_init__(self) -> None:
+        if (self.payload is None) == (self.error is None): raise ValueError("SCRIPTED_MESSAGE_REQUIRES_EXACTLY_ONE_OF_PAYLOAD_OR_ERROR")
+        if self.payload is not None and type(self.payload) is not bytes: raise TypeError("SCRIPTED_MESSAGE_PAYLOAD_MUST_BE_BYTES")
+        if self.error not in {None, "TIMEOUT", "BLOCKED", "CONNECTION"}: raise ValueError("UNSUPPORTED_SCRIPTED_MESSAGE_ERROR")
 
 
 @dataclass(frozen=True)
@@ -66,6 +60,10 @@ class OfflineDeribitScript:
     messages: tuple[ScriptedMessage, ...]
     open_error: str | None = None
     close_error: str | None = None
+
+    def __post_init__(self) -> None:
+        if type(self.messages) is not tuple or not all(type(item) is ScriptedMessage for item in self.messages): raise TypeError("SCRIPTED_MESSAGES_MUST_BE_TUPLE")
+        if self.open_error not in {None, "TIMEOUT", "BLOCKED", "CONNECTION"} or self.close_error not in {None, "TIMEOUT", "BLOCKED", "CONNECTION"}: raise ValueError("UNSUPPORTED_SCRIPTED_DERIBIT_ERROR")
 
 
 @dataclass(frozen=True)
@@ -75,11 +73,26 @@ class ScriptedHttpResult:
     body: bytes | None = None
     error: str | None = None
 
+    def __post_init__(self) -> None:
+        if (self.status is None) == (self.error is None): raise ValueError("SCRIPTED_HTTP_REQUIRES_EXACTLY_ONE_OF_RESPONSE_OR_ERROR")
+        if self.error not in {None, "TIMEOUT", "BLOCKED", "CONNECTION"}: raise ValueError("UNSUPPORTED_SCRIPTED_HTTP_ERROR")
+        if self.error is not None:
+            if self.headers is not None or self.body is not None: raise ValueError("SCRIPTED_HTTP_ERROR_HAS_RESPONSE")
+            return
+        if type(self.status) is not int or not 100 <= self.status <= 599: raise ValueError("SCRIPTED_HTTP_STATUS_INVALID")
+        if type(self.body) is not bytes: raise TypeError("SCRIPTED_HTTP_BODY_MUST_BE_BYTES")
+        headers = {} if self.headers is None else dict(self.headers)
+        if any(type(key) is not str or type(value) is not str for key, value in headers.items()): raise TypeError("SCRIPTED_HTTP_HEADERS_MUST_BE_STRING_MAPPING")
+        object.__setattr__(self, "headers", MappingProxyType(dict(sorted(headers.items()))))
+
 
 @dataclass(frozen=True)
 class OfflineBinanceScript:
     btc: ScriptedHttpResult
     eth: ScriptedHttpResult
+
+    def __post_init__(self) -> None:
+        if type(self.btc) is not ScriptedHttpResult or type(self.eth) is not ScriptedHttpResult: raise TypeError("SCRIPTED_BINANCE_RESULTS_REQUIRED")
 
 
 def canonical(value: Any) -> bytes:
@@ -190,22 +203,44 @@ def _publish_no_replace(stage: Path, root: Path) -> None:
         raise OSError(errno, os.strerror(errno))
 
 
-def _write_artifact(root: Path, status: str, reason: str, metadata: Mapping[str, Any], raw_files: Mapping[str, bytes], *, protocol_sha256: str, repository_commit: str, authority: _ArtifactAuthority) -> str:
-    if authority is not _OFFLINE_AUTHORITY and authority is not _LIVE_AUTHORITY: raise SmokeBlocked("INVALID_ARTIFACT_AUTHORITY")
+def _publish_artifact(stage: Path, root: Path) -> None:
+    _publish_no_replace(stage, root)
+
+
+def _write_offline_fixture_artifact(root: Path, status: str, reason: str, metadata: Mapping[str, Any], raw_files: Mapping[str, bytes], *, protocol_sha256: str, repository_commit: str) -> str:
     stage = Path(tempfile.mkdtemp(prefix=f".{root.name}.stage-", dir="/tmp"))
     try:
         for relative, payload in raw_files.items():
             path = stage / relative; path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes(payload)
         for name, value in metadata.items():
             path = stage / name; path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes(canonical(value))
-        flags = {"artifact_kind": authority.artifact_kind, "non_primary_live_smoke": authority.non_primary_live_smoke, "primary_observation": False, "scientific_observation": False, "network_contacted": authority.network_contacted, "execution_mode": authority.execution_mode, "scheduled_collection_authorized": False, "outcome_retrieved": False, "analysis_executed": False, "qnty_authority": False, "trading_authority": False}
+        flags = {"artifact_kind": "OFFLINE_TEST_FIXTURE", "non_primary_live_smoke": False, "primary_observation": False, "scientific_observation": False, "network_contacted": False, "execution_mode": "OFFLINE_TEST_FIXTURE", "scheduled_collection_authorized": False, "outcome_retrieved": False, "analysis_executed": False, "qnty_authority": False, "trading_authority": False}
         summary = dict(flags, protocol_sha256=protocol_sha256, repository_commit=repository_commit, smoke_status=status, reason_code=reason, run_start_utc=metadata["environment.json"]["run_start_utc"], run_end_utc=metadata["environment.json"]["run_end_utc"])
         (stage / "smoke_status.json").write_bytes(canonical(summary)); files = []
         for path in sorted(p for p in stage.rglob("*") if p.is_file()):
             body = path.read_bytes(); files.append({"path": str(path.relative_to(stage)), "bytes": len(body), "sha256": hashlib.sha256(body).hexdigest()})
         manifest = dict(summary, artifact_status="VALID", source_statuses={"deribit": metadata["metadata/deribit-result.json"], "binance": metadata["metadata/binance-results.json"]}, files=files)
         manifest_bytes = canonical(manifest); (stage / "manifest.json").write_bytes(manifest_bytes); (stage / "manifest.sha256").write_text(f"{hashlib.sha256(manifest_bytes).hexdigest()}  manifest.json\n")
-        _publish_no_replace(stage, root); return hashlib.sha256(manifest_bytes).hexdigest()
+        _publish_artifact(stage, root); return hashlib.sha256(manifest_bytes).hexdigest()
+    except BaseException:
+        import shutil; shutil.rmtree(stage, ignore_errors=True); raise
+
+
+def _write_authorized_live_artifact(root: Path, status: str, reason: str, metadata: Mapping[str, Any], raw_files: Mapping[str, bytes], *, protocol_sha256: str, repository_commit: str) -> str:
+    stage = Path(tempfile.mkdtemp(prefix=f".{root.name}.stage-", dir="/tmp"))
+    try:
+        for relative, payload in raw_files.items():
+            path = stage / relative; path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes(payload)
+        for name, value in metadata.items():
+            path = stage / name; path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes(canonical(value))
+        flags = {"artifact_kind": "NON_PRIMARY_LIVE_SOURCE_SMOKE", "non_primary_live_smoke": True, "primary_observation": False, "scientific_observation": False, "network_contacted": True, "execution_mode": "AUTHORIZED_NON_PRIMARY_LIVE_SMOKE", "scheduled_collection_authorized": False, "outcome_retrieved": False, "analysis_executed": False, "qnty_authority": False, "trading_authority": False}
+        summary = dict(flags, protocol_sha256=protocol_sha256, repository_commit=repository_commit, smoke_status=status, reason_code=reason, run_start_utc=metadata["environment.json"]["run_start_utc"], run_end_utc=metadata["environment.json"]["run_end_utc"])
+        (stage / "smoke_status.json").write_bytes(canonical(summary)); files = []
+        for path in sorted(p for p in stage.rglob("*") if p.is_file()):
+            body = path.read_bytes(); files.append({"path": str(path.relative_to(stage)), "bytes": len(body), "sha256": hashlib.sha256(body).hexdigest()})
+        manifest = dict(summary, artifact_status="VALID", source_statuses={"deribit": metadata["metadata/deribit-result.json"], "binance": metadata["metadata/binance-results.json"]}, files=files)
+        manifest_bytes = canonical(manifest); (stage / "manifest.json").write_bytes(manifest_bytes); (stage / "manifest.sha256").write_text(f"{hashlib.sha256(manifest_bytes).hexdigest()}  manifest.json\n")
+        _publish_artifact(stage, root); return hashlib.sha256(manifest_bytes).hexdigest()
     except BaseException:
         import shutil; shutil.rmtree(stage, ignore_errors=True); raise
 
@@ -281,7 +316,7 @@ def _binance_probe(symbol: str, boundary: datetime, http_get: Callable[[str], tu
     return result
 
 
-async def _run_smoke_core(*, protocol: Any, root: Path, commit: str, ws_connect: Callable[...,Awaitable[Any]], http_get: Callable[[str],tuple[int,Mapping[str,str],bytes]], authority: _ArtifactAuthority, now: Callable[[],datetime]=utc_now, mono: Callable[[],int]=time.monotonic_ns) -> dict[str,Any]:
+async def _collect_evidence(*, ws_connect: Callable[...,Awaitable[Any]], http_get: Callable[[str],tuple[int,Mapping[str,str],bytes]], now: Callable[[],datetime]=utc_now, mono: Callable[[],int]=time.monotonic_ns) -> tuple[dict[str, Any], dict[str, Any], dict[str, bytes], list[dict[str, Any]], datetime, int, datetime, int]:
     start,start_mono=now(),mono(); clock=Clock(now,mono,start,start_mono); raw:dict[str,bytes]={}; events:list[dict[str,Any]]=[]
     deribit=await _deribit_probe(ws_connect=ws_connect,raw=raw,events=events,clock=clock,start_mono=start_mono); binance=[]
     if deribit["reason"] != "CLOCK_DISCONTINUITY":
@@ -296,9 +331,11 @@ async def _run_smoke_core(*, protocol: Any, root: Path, commit: str, ws_connect:
     else: status,reason="NON_PRIMARY_SMOKE_BLOCKED",("CLOCK_DISCONTINUITY" if deribit["reason"]=="CLOCK_DISCONTINUITY" or any(x["reason"]=="CLOCK_DISCONTINUITY" for x in binance) else deribit["reason"] if deribit["status"]=="BLOCKED" else next(x["reason"] for x in binance if x["status"]!="PASS"))
     try: end,end_mono=clock.sample()
     except ClockIntegrityError: end,end_mono=clock.last_utc,clock.last_mono; status,reason="NON_PRIMARY_SMOKE_BLOCKED","CLOCK_DISCONTINUITY"
-    environment={"protocol_sha256":protocol.digest,"repository_commit":commit,"run_start_utc":start.isoformat(),"run_end_utc":end.isoformat(),"run_start_monotonic_ns":start_mono,"run_end_monotonic_ns":end_mono,"deribit_endpoint":DERIBIT_ENDPOINT,"binance_endpoint":BINANCE_KLINES_URL,"execution_mode":authority.execution_mode,"python_version":sys.version,"platform":platform.platform(),"openssl_version":ssl.OPENSSL_VERSION}
-    manifest_sha=_write_artifact(root,status,reason,{"environment.json":environment,"metadata/deribit-events.json":events,"metadata/deribit-result.json":deribit,"metadata/binance-results.json":binance},raw,protocol_sha256=protocol.digest,repository_commit=commit,authority=authority)
-    return {"status":status,"reason":reason,"manifest_sha256":manifest_sha,"deribit":deribit,"binance":binance,"duration_seconds":(end_mono-start_mono)/1e9}
+    return {"status":status,"reason":reason}, {"deribit":deribit,"binance":binance}, raw, events, start, start_mono, end, end_mono
+
+
+def _metadata(*, protocol: Any, commit: str, start: datetime, start_mono: int, end: datetime, end_mono: int, events: list[dict[str, Any]], sources: dict[str, Any]) -> dict[str, Any]:
+    return {"environment.json":{"protocol_sha256":protocol.digest,"repository_commit":commit,"run_start_utc":start.isoformat(),"run_end_utc":end.isoformat(),"run_start_monotonic_ns":start_mono,"run_end_monotonic_ns":end_mono,"deribit_endpoint":DERIBIT_ENDPOINT,"binance_endpoint":BINANCE_KLINES_URL,"python_version":sys.version,"platform":platform.platform(),"openssl_version":ssl.OPENSSL_VERSION},"metadata/deribit-events.json":events,"metadata/deribit-result.json":sources["deribit"],"metadata/binance-results.json":sources["binance"]}
 
 
 def stdlib_http(url: str) -> tuple[int,Mapping[str,str],bytes]:
@@ -344,12 +381,18 @@ def _offline_http_get(script: OfflineBinanceScript, url: str) -> tuple[int, Mapp
 
 async def run_offline_fixture(*, protocol: Any, root: Path, commit: str, deribit_script: OfflineDeribitScript, binance_script: OfflineBinanceScript, now: Callable[[], datetime] = utc_now, mono: Callable[[], int] = time.monotonic_ns) -> dict[str, Any]:
     """Execute inert in-memory fixture data; this API accepts no transport callbacks."""
-    return await _run_smoke_core(protocol=protocol, root=root, commit=commit, ws_connect=lambda *args, **kwargs: _offline_ws_connect(deribit_script, *args, **kwargs), http_get=lambda url: _offline_http_get(binance_script, url), authority=_OFFLINE_AUTHORITY, now=now, mono=mono)
+    result, sources, raw, events, start, start_mono, end, end_mono = await _collect_evidence(ws_connect=lambda *args, **kwargs: _offline_ws_connect(deribit_script, *args, **kwargs), http_get=lambda url: _offline_http_get(binance_script, url), now=now, mono=mono)
+    metadata = _metadata(protocol=protocol, commit=commit, start=start, start_mono=start_mono, end=end, end_mono=end_mono, events=events, sources=sources)
+    manifest_sha = _write_offline_fixture_artifact(root, result["status"], result["reason"], metadata, raw, protocol_sha256=protocol.digest, repository_commit=commit)
+    return dict(result, manifest_sha256=manifest_sha, **sources, duration_seconds=(end_mono-start_mono)/1e9)
 
 
 async def _run_authorized_live_smoke(*, protocol: Any, root: Path, commit: str, now: Callable[[], datetime] = utc_now, mono: Callable[[], int] = time.monotonic_ns) -> dict[str, Any]:
     """The only live path; its adapters and artifact authority are module-owned."""
-    return await _run_smoke_core(protocol=protocol, root=root, commit=commit, ws_connect=live_ws, http_get=stdlib_http, authority=_LIVE_AUTHORITY, now=now, mono=mono)
+    result, sources, raw, events, start, start_mono, end, end_mono = await _collect_evidence(ws_connect=live_ws, http_get=stdlib_http, now=now, mono=mono)
+    metadata = _metadata(protocol=protocol, commit=commit, start=start, start_mono=start_mono, end=end, end_mono=end_mono, events=events, sources=sources)
+    manifest_sha = _write_authorized_live_artifact(root, result["status"], result["reason"], metadata, raw, protocol_sha256=protocol.digest, repository_commit=commit)
+    return dict(result, manifest_sha256=manifest_sha, **sources, duration_seconds=(end_mono-start_mono)/1e9)
 
 def parser()->argparse.ArgumentParser:
     p=argparse.ArgumentParser(); s=p.add_subparsers(dest="command",required=True); r=s.add_parser("run-non-primary-smoke")

@@ -47,8 +47,12 @@ results.
   AUTHORIZED_NON_PRIMARY_LIVE_SMOKE`
 
 The prior generic direct-call API could pair injected transports with a
-caller-supplied fake mode, making `network_contacted=false` untruthful. It has
-been removed. The only live-capable adapters are selected inside the private
-live wrapper reached after public CLI gates. Offline replay consumes frozen
-in-memory scripts only and cannot accept transport callbacks or an authority
-label. The historical artifact and first-smoke receipt are unchanged.
+caller-supplied fake mode, making `network_contacted=false` untruthful. The
+follow-up hostile repair removed the remaining internal core that still accepted
+both injected transports and artifact authority. The only live-capable adapters
+are selected inside the private live wrapper reached after public CLI gates.
+Offline replay consumes frozen in-memory scripts only and cannot accept
+transport callbacks or an authority label. Dedicated live and fixture writers
+hardcode their incompatible identities; scripted messages and HTTP results are
+validated and frozen before execution. The historical artifact and first-smoke
+receipt are unchanged.

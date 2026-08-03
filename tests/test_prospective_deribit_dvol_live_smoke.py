@@ -6,6 +6,7 @@ import inspect
 import json
 import socket
 import subprocess
+from types import SimpleNamespace
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -16,9 +17,9 @@ from qntylab.prospective_deribit_dvol import build_deribit_subscription_request,
 from qntylab.prospective_deribit_dvol_live_smoke import (
     AUTHORIZED_NON_PRIMARY_LIVE_SMOKE, DERIBIT_ENDPOINT, OfflineBinanceScript,
     OfflineDeribitScript, ScriptedHttpResult, ScriptedMessage, SmokeBlocked,
-    _ArtifactAuthority, _LIVE_AUTHORITY, _OFFLINE_AUTHORITY, _run_authorized_live_smoke,
+    _run_authorized_live_smoke,
     classify_deribit, gate, kline_url, parser, run_offline_fixture,
-    _write_artifact, safe_output_root, validate_klines,
+    _write_offline_fixture_artifact, safe_output_root, validate_klines,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -91,15 +92,34 @@ def test_authority_wrappers_have_no_callback_or_mode_bypass():
     assert source.count("live_ws") == 2 and source.count("stdlib_http") == 2
 
 
-def test_live_wrapper_hardcodes_live_authority_without_network(monkeypatch, tmp_path):
+def test_no_callable_mixes_transport_and_artifact_authority():
+    """The former shared core allowed live-capable sentinels plus offline identity."""
+    forbidden = {"authority", "execution_mode", "network_contacted", "artifact_kind"}
+    transports = {"ws_connect", "http_get"}
+    for _name, function in inspect.getmembers(smoke, inspect.isfunction):
+        parameters = set(inspect.signature(function).parameters)
+        assert not (parameters & transports and parameters & forbidden), function.__name__
+    assert not hasattr(smoke, "_run_smoke_core")
+
+
+def test_dedicated_writers_expose_no_identity_selector():
+    for function in (smoke._write_offline_fixture_artifact, smoke._write_authorized_live_artifact):
+        parameters = set(inspect.signature(function).parameters)
+        assert not parameters & {"authority", "artifact_kind", "execution_mode", "network_contacted", "non_primary_live_smoke"}
+    assert "OFFLINE_TEST_FIXTURE" in inspect.getsource(smoke._write_offline_fixture_artifact)
+    assert "NON_PRIMARY_LIVE_SOURCE_SMOKE" in inspect.getsource(smoke._write_authorized_live_artifact)
+
+
+def test_live_wrapper_hardcodes_live_identity_without_network(monkeypatch, tmp_path):
     captured = {}
     async def core(**kwargs):
-        captured.update(kwargs); return {"status": "stub"}
-    monkeypatch.setattr(smoke, "_run_smoke_core", core)
-    result = asyncio.run(_run_authorized_live_smoke(protocol=object(), root=tmp_path / "live", commit=COMMIT))
-    assert result["status"] == "stub" and captured["authority"] is _LIVE_AUTHORITY
+        captured.update(kwargs); return ({"status": "stub", "reason": "stub"}, {"deribit": {}, "binance": {}}, {}, [], datetime(2026, 8, 4, tzinfo=UTC), 1, datetime(2026, 8, 4, tzinfo=UTC), 2)
+    monkeypatch.setattr(smoke, "_collect_evidence", core)
+    monkeypatch.setattr(smoke, "_metadata", lambda **_kwargs: {"environment.json": {"run_start_utc": "x", "run_end_utc": "y"}, "metadata/deribit-result.json": {}, "metadata/binance-results.json": {}})
+    monkeypatch.setattr(smoke, "_write_authorized_live_artifact", lambda *_args, **_kwargs: "manifest")
+    result = asyncio.run(_run_authorized_live_smoke(protocol=SimpleNamespace(digest="protocol"), root=tmp_path / "live", commit=COMMIT))
+    assert result["manifest_sha256"] == "manifest"
     assert captured["ws_connect"] is smoke.live_ws and captured["http_get"] is smoke.stdlib_http
-    assert captured["authority"].network_contacted and captured["authority"].non_primary_live_smoke
 
 
 def test_complete_offline_fixture_truthfulness(tmp_path):
@@ -125,14 +145,33 @@ def test_http_error_and_clock_failure_are_fail_closed(tmp_path):
     assert run(tmp_path / "clock", deribit, binance, times=backwards)["reason"] == "CLOCK_DISCONTINUITY"
 
 
-def test_unknown_authority_and_kind_are_rejected(tmp_path):
+def test_required_offline_fixtures_are_deterministic_and_manifest_complete(tmp_path):
+    ack = ScriptedMessage(json.dumps({"id": 1, "jsonrpc": "2.0", "result": ["deribit_volatility_index.btc_usd", "deribit_volatility_index.eth_usd"]}).encode())
+    complete, binance = complete_script(ack, ScriptedMessage(notice("BTC")), ScriptedMessage(notice("ETH")))
+    assert run(tmp_path / "complete-a", complete, binance)["manifest_sha256"] == run(tmp_path / "complete-b", complete, binance)["manifest_sha256"]
+    partial, binance = complete_script(ack, ScriptedMessage(error="TIMEOUT")); assert run(tmp_path / "partial", partial, binance)["status"] == "NON_PRIMARY_SMOKE_PARTIAL"
+    blocked, binance = complete_script(ScriptedMessage(error="BLOCKED")); assert run(tmp_path / "ack-blocked", blocked, binance)["status"] == "NON_PRIMARY_SMOKE_BLOCKED"
+    connection, binance = complete_script(open_error="CONNECTION"); assert run(tmp_path / "connection-blocked", connection, binance)["deribit"]["reason"] == "DERIBIT_TRANSPORT_RUNTIMEERROR"
+    blocked, malformed = complete_script(ScriptedMessage(error="BLOCKED"), eth=ScriptedHttpResult(200, {}, b"not-json")); assert run(tmp_path / "eth-malformed", blocked, malformed)["binance"][1]["reason"] == "BINANCE_MALFORMED_RESPONSE"
+    artifact = tmp_path / "complete-a" / "smoke"; manifest = json.loads((artifact / "manifest.json").read_text())
+    listed = {entry["path"]: entry for entry in manifest["files"]}
+    actual = {str(path.relative_to(artifact)): path for path in artifact.rglob("*") if path.is_file() and path.name not in {"manifest.json", "manifest.sha256"}}
+    assert set(listed) == set(actual)
+    for relative, path in actual.items():
+        assert listed[relative]["bytes"] == path.stat().st_size
+        assert listed[relative]["sha256"] == hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def test_writers_hardcode_identity_and_scripts_validate_and_freeze(tmp_path):
     metadata = {"environment.json": {"run_start_utc": "x", "run_end_utc": "y"}, "metadata/deribit-result.json": {}, "metadata/binance-results.json": {}}
-    with pytest.raises(SmokeBlocked, match="INVALID_ARTIFACT_AUTHORITY"):
-        _write_artifact(tmp_path / "bad", "x", "x", metadata, {}, protocol_sha256="x", repository_commit=COMMIT, authority=object())
-    with pytest.raises(SmokeBlocked, match="INVALID_ARTIFACT_AUTHORITY"):
-        _write_artifact(tmp_path / "unknown-kind", "x", "x", metadata, {}, protocol_sha256="x", repository_commit=COMMIT, authority=_ArtifactAuthority("UNKNOWN", "UNKNOWN", False, False))
-    assert _OFFLINE_AUTHORITY.artifact_kind == "OFFLINE_TEST_FIXTURE"
-    assert _LIVE_AUTHORITY.execution_mode == AUTHORIZED_NON_PRIMARY_LIVE_SMOKE
+    _write_offline_fixture_artifact(tmp_path / "fixture", "x", "x", metadata, {}, protocol_sha256="x", repository_commit=COMMIT)
+    flags = json.loads((tmp_path / "fixture" / "smoke_status.json").read_text())
+    assert flags["artifact_kind"] == "OFFLINE_TEST_FIXTURE" and not flags["network_contacted"]
+    with pytest.raises(ValueError): ScriptedMessage(b"x", "BLOCKED")
+    with pytest.raises(ValueError): ScriptedHttpResult(200, {}, b"x", "BLOCKED")
+    with pytest.raises(ValueError): ScriptedHttpResult(True, {}, b"x")
+    headers = {"x-test": "before"}; result = ScriptedHttpResult(200, headers, b"x"); headers["x-test"] = "after"
+    assert result.headers == {"x-test": "before"}
 
 
 def test_no_clobber_and_strict_parser(tmp_path):

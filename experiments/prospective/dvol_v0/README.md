@@ -97,3 +97,40 @@ WebSocket transport, `requests` import, live command, scheduler, outcome
 retrieval, forecast-error calculation, or QNTY integration. Fixture outputs are
 explicitly non-scientific and cannot be primary observations. Live-source timing,
 notification cadence, clock skew, and Binance response behavior remain untested.
+
+## Phase 1B non-primary live source smoke
+
+**Current implementation phase:** `NON_PRIMARY_SMOKE_BLOCKED`
+
+An isolated, one-time smoke command is implemented for independent review. Raw
+smoke data stays outside Git under `/tmp`; no primary observation was created,
+no week was added to the 104-week sample, no outcome was retrieved, no realized
+volatility was computed, and no forecast comparison was performed. Scheduled
+collection remains unauthorized and another independent review is required.
+
+## Phase 1B evidence-retention repair
+
+**Repair status:** `PHASE_1B_EVIDENCE_RETENTION_REPAIR_UNDER_REVIEW`
+
+The first smoke remains `NON_PRIMARY_SMOKE_BLOCKED / DERIBIT_ACK_MISMATCH`.
+Its offending acknowledgement payload was not retained, so the exact mismatch
+remains unresolved and the first receipt is unchanged. Future source payloads
+are retained before classification, with strict structural diagnostics; Deribit
+and each Binance source are independently probed. No rerun has occurred, no new
+network access is authorized, and scheduled collection remains unauthorized.
+
+The repaired implementation uses one absolute 90-second post-subscription
+monotonic deadline; retains but does not count pre-acknowledgement notifications;
+stops later probes on clock regression; retains available non-200 Binance bodies;
+binds artifacts directly to protocol, commit, mode, aggregate, and source
+verdicts; and publishes only to a non-existing output root.
+
+The Phase 1B repair also separates transport authority from fixture execution:
+the gated CLI is the only route that owns live adapters and produces a
+`NON_PRIMARY_LIVE_SOURCE_SMOKE` artifact. Offline tests consume inert scripted
+bytes, status codes, headers, errors, and timestamps only; their artifacts are
+explicitly `OFFLINE_TEST_FIXTURE`, with `non_primary_live_smoke=false` and
+`network_contacted=false`. The remaining shared collector and evaluator do not
+receive artifact identity or publish output; dedicated writers hardcode the two
+incompatible artifact identities. Neither path authorizes a rerun or any
+additional network access.

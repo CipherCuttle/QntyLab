@@ -8,8 +8,10 @@
     "ETH"
   ],
   "authority": {
+    "analysis_execution_authorized": false,
     "capture_implementation_authorized": false,
     "historical_backfill_authorized": false,
+    "historical_primary_observation_backfill_authorized": false,
     "live_authorized": false,
     "network_access_authorized": false,
     "paper_authorized": false,
@@ -25,21 +27,23 @@
   "created_date": "2026-08-03",
   "experiment_class": "PROSPECTIVE_PUBLIC_MARKET_OBSERVATION",
   "forecast_comparison": {
-    "dvol_forecast": "The DVOL-based forecast equals the formation-time Deribit volatility-index close as returned, in percent units; it has zero fitted parameters.",
+    "dvol_forecast": "If and only if a separately reviewed official source contract establishes the DVOL close scale and horizon, the DVOL-based forecast is the formation-time volatility-index close converted under that source contract with zero fitted parameters. Until then this forecast is undefined and V0 is non-executable.",
     "forecast_formula_status": "FROZEN_SIMPLE_ZERO_FITTED_PARAMETERS",
     "primary_metric": "absolute_forecast_error_percent_points",
     "primary_metric_definition": "For each complete asset-week and each frozen forecast, absolute forecast error is abs(forecast_percent - realized_volatility_percent). The primary comparison is the equally asset-weighted pooled arithmetic mean of that error across exactly 104 complete BTC weeks and 104 complete ETH weeks.",
-    "retention_rule": "At the minimum sample, retain only if the DVOL-based pooled mean absolute forecast error is strictly lower than the benchmark pooled mean absolute forecast error; otherwise classify KILLED. This comparison does not establish statistical significance, edge, or trading utility."
+    "retention_rule": "At the minimum sample, retain only if the equally asset-weighted pooled DVOL mean absolute error is at least 0.25 percentage points lower than the benchmark and neither asset's DVOL mean absolute error exceeds that asset's benchmark mean absolute error. Otherwise classify KILLED. The 0.25 percentage-point practical margin is a pre-observation exploratory decision threshold, not an uncertainty estimate, significance test, edge claim, or trading-utility finding."
   },
   "minimum_sample_and_stopping": {
     "analysis_before_minimum": "FORBIDDEN",
+    "maximum_scheduled_primary_weeks": 156,
     "minimum_complete_primary_weeks_per_asset": 104,
     "minimum_complete_primary_weeks_total": 208,
-    "upper_review_complete_primary_weeks_per_asset": 156,
-    "upper_review_rule": "At 156 complete primary weeks per asset, stop adding observations and reassess only by terminal classification or a separately registered experiment; V0 may not run indefinitely."
+    "sample_size_rationale": "104 complete paired weeks is a two-calendar-year descriptive observation target, not a power calculation or a basis for confirmatory inference. 156 scheduled weeks is a three-calendar-year finite operational stop that allows predeclared retained skips without indefinite collection.",
+    "upper_review_rule": "Stop after the 156th scheduled Monday. If fewer than 104 complete paired weeks then exist, classify BLOCKED; otherwise the frozen terminal rule applies. No analysis occurs before the 104-complete-week minimum."
   },
   "missing_data_and_invalid_observation_policy": {
-    "action": "A failed primary week is not imputed, substituted, silently discarded, or analyzed. It immediately classifies V0 as BLOCKED; the failed week is retained as an invalid-observation record if a later separately authorized implementation exists.",
+    "action": "A failed primary week is not imputed, substituted, silently discarded, or analyzed. Source-data, provenance, timing, integrity, or outcome failure immediately classifies V0 as BLOCKED. A transport or local operational failure is a retained predeclared skipped scheduled week: it is not an eligible observation and is never replaced or retrospectively backfilled. Collection may proceed only on later scheduled Mondays through the fixed 156-scheduled-week limit.",
+    "bounded_retry_policy": "For a scheduled formation or outcome retrieval, each required logical response may have at most two attempts, both completed within its declared receipt window and both using the already-fixed source-data cutoff. Every request, raw response, and error is retained. A retry may not widen a receipt window, move a cutoff, substitute a later candle, or convert a skipped week into an observation.",
     "fail_closed_conditions": [
       "missing BTC or ETH primary observation",
       "malformed response",
@@ -54,33 +58,35 @@
   },
   "outcome": {
     "annualization": "sqrt(365 * 24), with result expressed as percent",
-    "definition": "Realized volatility over the next complete seven UTC days from hourly log returns of the declared Deribit perpetual close series.",
-    "end": "The outcome ends at 00:00:00 UTC on the Monday seven calendar days after outcome-window start; its ending boundary is excluded.",
+    "definition": "Realized volatility over 168 strictly future hourly intervals from hourly log returns of the declared Deribit perpetual close series; it is not described as seven complete UTC calendar days.",
+    "eligibility_and_retrieval": "The outcome becomes eligible only after its ending boundary. The earliest permissible outcome retrieval is that boundary plus the same documented candle-completeness delay required for a formation candle; because no official completeness delay is documented, no retrieval is authorized. A future outcome retrieval is not historical primary-observation backfill.",
+    "end": "The outcome ends at the boundary 168 hours after outcome-window start; 169 boundary closes are required to form 168 hourly returns.",
     "incomplete_window": "FORBIDDEN",
     "missing_bar_policy": "Any missing, duplicate, non-finite, non-positive, or non-hourly-cadence close invalidates the entire primary observation.",
     "return_sampling_interval": "1 hour",
     "return_transform": "natural logarithm of consecutive declared hourly closes",
-    "start": "The outcome begins at 00:00:00 UTC on the Monday containing the eligible formation capture, inclusive.",
-    "standard_deviation": "sample standard deviation of the 167 hourly log returns formed from 168 complete hourly closes; no population estimator, interpolation, or forward fill is allowed."
+    "standard_deviation": "sample standard deviation of 168 hourly log returns formed from 169 complete boundary closes; no population estimator, interpolation, or forward fill is allowed.",
+    "start": "The outcome begins at the first eligible hourly boundary strictly after formation; no return beginning before formation is included."
   },
   "predictors": {
-    "formation_timestamp": "The actual UTC receipt time of the complete paired raw-response set, which must fall within the primary capture tolerance. Only bytes received no later than that timestamp may be used.",
-    "trailing_30_day_realized_volatility": "Annualized percent sample standard deviation of the 719 hourly log returns from the 720 most recent complete eligible hourly perpetual closes available in the paired formation response. The returned timestamps must be unambiguous, strictly increasing, and exactly one hour apart; otherwise fail closed.",
-    "volatility_index_close": "The close element of the latest complete one-second volatility-index candle returned in the formation response for the asset. The source row is retained verbatim; if its timestamp or completeness cannot be verified from the response and receipt, fail closed."
+    "formation_timestamp": "The actual UTC completion time of the complete four-response formation set, retained separately from the fixed source-data cutoff, individual request start/completion times, source candle timestamps, and later outcome-finalization retrieval time. It must fall within the primary receipt window. Only source data no later than the fixed cutoff may be eligible.",
+    "shared_source_data_cutoff": "Monday 00:00:00 UTC, fixed before any formation request. BTC DVOL, ETH DVOL, BTC perpetual, and ETH perpetual requests must all use it; sequential completion may not create asset-specific information horizons.",
+    "trailing_30_day_realized_volatility": "Annualized percent sample standard deviation of 720 hourly log returns from 721 most recent complete eligible hourly perpetual boundary closes available at the fixed formation cutoff. This pre-formation lookback is permitted future implementation and is not historical primary-observation backfill. Timestamps must be unambiguous, strictly increasing, and exactly one hour apart; otherwise fail closed.",
+    "volatility_index_close": "The close element of the latest complete one-second volatility-index candle eligible at the fixed source cutoff. The source row is retained verbatim. Official documentation does not establish timestamp boundary or completeness semantics, so eligibility is unresolved and V0 remains blocked."
   },
-  "primary_question": "Does the Deribit volatility index contain incremental prospective information about future realized BTC and ETH volatility beyond trailing realized volatility alone?",
+  "primary_question": "Does the raw Deribit volatility-index close have lower prospective forecast error than the trailing-30-day-realized-volatility benchmark for future BTC and ETH realized volatility?",
   "protocol_id": "qntylab_deribit_dvol_prospective_forecast_v0",
-  "protocol_status": "FROZEN_DESIGN_ONLY_NO_CAPTURE_AUTHORIZATION",
+  "protocol_status": "FROZEN_DESIGN_ONLY_SOURCE_CONTRACT_BLOCKED_NO_CAPTURE_AUTHORIZATION",
   "research_claim_scope": "FORECAST_INFORMATION_ONLY_NO_TRADING_OR_EDGE_CLAIM",
   "research_question": {
-    "alternative": "The frozen DVOL-based forecast has lower prospective absolute forecast error than the trailing-realized-volatility benchmark.",
-    "null": "The DVOL-based forecast does not improve absolute seven-day realized-volatility forecast error relative to the trailing-realized-volatility benchmark."
+    "alternative": "The frozen raw-DVOL forecast meets the predeclared practical pooled-error and asset-direction retention rule against the trailing-realized-volatility benchmark.",
+    "null": "The raw-DVOL forecast does not meet the predeclared practical pooled-error and asset-direction retention rule against the trailing-realized-volatility benchmark."
   },
   "schedule": {
-    "eligible_observation_time": "Monday 00:05 UTC",
+    "eligible_observation_time": "Monday 00:00:00 UTC fixed source-data cutoff; proposed receipt window follows",
     "frequency": "weekly primary observations",
     "outside_tolerance": "NON_PRIMARY_AND_BLOCKED: outside-window data may not be silently accepted, normalized, or substituted for a primary observation.",
-    "primary_capture_tolerance": "Monday 00:00:00 UTC through Monday 00:10:00 UTC inclusive",
+    "primary_capture_tolerance": "Monday 00:00:00 UTC through Monday 00:10:00 UTC inclusive; each actual request start, completion, and receipt time is distinct and retained",
     "timezone": "UTC"
   },
   "schema_version": "1.0.0",
@@ -109,13 +115,13 @@
       "perpetual_hourly_closes": {
         "method": "public/get_tradingview_chart_data",
         "request_parameters": {
-          "end_timestamp": "formation-dependent UNIX epoch milliseconds; request exactly the required closed-bar range",
+          "end_timestamp": "fixed formation cutoff or fixed outcome cutoff in UNIX epoch milliseconds; request range is eligible only under a later authoritative candle-boundary/completeness contract",
           "instrument_name": {
             "BTC": "BTC-PERPETUAL",
             "ETH": "ETH-PERPETUAL"
           },
           "resolution": "60",
-          "start_timestamp": "formation-dependent UNIX epoch milliseconds; request exactly the required closed-bar range"
+          "start_timestamp": "fixed range start in UNIX epoch milliseconds; formation lookback is allowed only for the current scheduled observation and outcome retrieval is allowed only after its window closes"
         },
         "returned_fields_used": [
           "result.close",
@@ -130,9 +136,9 @@
             "BTC",
             "ETH"
           ],
-          "end_timestamp": "formation-dependent UNIX epoch milliseconds",
+          "end_timestamp": "fixed formation cutoff in UNIX epoch milliseconds",
           "resolution": "1",
-          "start_timestamp": "formation-dependent UNIX epoch milliseconds; no historical backfill is permitted"
+          "start_timestamp": "fixed bounded formation range in UNIX epoch milliseconds; no missed primary observation may be retroactively created"
         },
         "returned_fields_used": [
           "result.continuation",
@@ -149,12 +155,19 @@
         ]
       }
     },
-    "request_limit_policy": "The documented volatility-index response may return continuation, which must be null for this bounded request; a non-null continuation is invalid rather than paginated. Public API rate-limit errors, including too_many_requests, are invalid observations and are not retried within the primary window.",
+    "request_limit_policy": "The documented volatility-index response may return continuation. The bounded formation and outcome requests must not require pagination; a non-null continuation is source-data invalidity and blocks V0. A public API rate-limit error, including documented too_many_requests, is a transport failure subject only to the fixed bounded retry policy.",
+    "unresolved_official_source_contract_facts": [
+      "whether volatility-index and TradingView candle timestamps identify opens, closes, or another boundary",
+      "whether either response gives an explicit completed-candle indicator or authoritative completeness delay",
+      "DVOL close scale, annualization, and percent-unit conversion",
+      "DVOL economic horizon and whether it is comparable to a seven-day realized-volatility outcome",
+      "maximum result size applicable to the requested bounded ranges"
+    ],
     "venue": "Deribit public market-data API"
   },
   "terminal_classifications": {
-    "BLOCKED": "A required observation, provenance check, source contract, or complete outcome cannot be produced under this protocol; no substitute or repair is permitted within V0.",
-    "KILLED": "At the minimum complete sample, the DVOL-based pooled mean absolute forecast error is not strictly lower than the benchmark's, or a repository-level kill criterion applies.",
-    "RETAIN_FOR_SEPARATELY_REGISTERED_FOLLOWUP": "At the minimum complete sample, the frozen DVOL-based forecast is strictly lower on the frozen primary comparison; this is exploratory retention only and requires a new registered protocol before any further work."
+    "BLOCKED": "A required observation, provenance check, official source-contract fact, complete outcome, or the finite scheduling requirement cannot be produced under this protocol; no substitute or repair is permitted within V0.",
+    "KILLED": "At the minimum complete sample, the raw-DVOL forecast does not meet the frozen pooled practical-improvement and per-asset-direction retention rule, or a repository-level kill criterion applies.",
+    "RETAIN_FOR_SEPARATELY_REGISTERED_FOLLOWUP": "At the minimum complete sample, the raw-DVOL forecast meets the frozen primary retention rule; this is exploratory retention only and requires a new registered protocol before any further work."
   }
 }

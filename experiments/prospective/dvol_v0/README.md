@@ -1,13 +1,14 @@
 # Deribit DVOL prospective forecast V0
 
-**Current phase:** `PHASE_0_PROTOCOL_FROZEN`
+**Current phase:** `PHASE_0_PROTOCOL_FROZEN_SOURCE_CONTRACT_BLOCKED`
 
 ## Purpose and non-claim boundary
 
-This is a probationary prospective forecasting experiment. It asks whether the
-Deribit volatility-index close contains prospective information about the next
-seven complete UTC days of realized BTC and ETH volatility beyond trailing
-30-day realized volatility alone.
+This is a probationary prospective forecast horse race. It asks whether the raw
+Deribit volatility-index close has lower prospective forecast error than the
+trailing-30-day-realized-volatility benchmark for the next 168 complete hourly
+intervals of BTC and ETH realized volatility. It does not test incremental
+information conditional on trailing realized volatility.
 
 It is not a strategy, an edge or profitability claim, a candidate nomination,
 QNTY validation, or paper, shadow, or live authorization.
@@ -33,35 +34,50 @@ Official documentation, retrieved `2026-08-03`:
 - [Rate limits](https://docs.deribit.com/articles/rate-limits)
 
 The volatility-index method documents BTC and ETH currency identifiers,
-millisecond start/end parameters, and resolutions including one second. Its
-candle row is timestamp, open, high, low, close. A non-null continuation or a
-rate-limit error is invalid: V0 will not paginate or retry inside its primary
-window.
+millisecond start/end parameters, resolutions including one second, a row of
+timestamp/open/high/low/close, and continuation. The chart method documents
+`BTC-PERPETUAL` and minute resolution `60`, `result.status`, `result.ticks`,
+and OHLC arrays. Public methods require no authentication; rate limiting can
+return `too_many_requests`.
+
+However, those official pages do not state whether either method's timestamp is
+the opening or closing boundary of a candle, provide a candle-completeness
+indicator, define the DVOL close's unit/annualization, or state its economic
+horizon. These are `UNRESOLVED_OFFICIAL_SOURCE_CONTRACT_FACTS`. Therefore this
+protocol is deliberately non-executable: no Phase 1 authorization, network
+access, capture implementation, observation, outcome retrieval, or analysis is
+permitted until a separately reviewed authoritative source contract resolves
+them.
 
 ## Frozen design
 
 - Assets: `BTC`, `ETH`.
-- Primary observation: every Monday at `00:05 UTC`, only within
-  `00:00:00`–`00:10:00 UTC` inclusive.
+- Proposed primary observation receipt window: Monday `00:00:00`–`00:10:00 UTC`.
+- Proposed common source-data cutoff: Monday `00:00:00 UTC`, fixed before any
+  of the four formation requests; actual request start/completion and receipt
+  times must be retained separately. This is unusable until candle-boundary
+  semantics are resolved.
 - Predictor: the formation-time Deribit volatility-index close.
 - Benchmark: trailing 30-day realized volatility alone.
-- Outcome: annualized realized volatility from hourly perpetual closes over
-  the next complete seven UTC days.
+- Outcome: annualized realized volatility from 168 strictly future hourly
+  perpetual-close intervals, beginning only at the first eligible boundary
+  after formation and ending 168 hours later.
 - Primary comparison: equally asset-weighted pooled mean absolute forecast
   error in percent points. The frozen DVOL forecast is its source close; the
   benchmark forecast is trailing realized volatility. Neither has fitted
   hyperparameters.
-- Minimum: 104 complete primary weeks for each asset (208 asset-weeks total).
-  No primary conclusion is allowed before that. At 156 complete weeks per
-  asset, V0 must stop and be reassessed rather than continuing indefinitely.
+- Minimum: 104 complete primary weeks for each asset (208 asset-weeks total),
+  a transparent two-calendar-year descriptive target rather than a power or
+  significance calculation. No primary conclusion is allowed before that.
+  The 156-scheduled-week upper bound is a three-year operational stop: if the
+  minimum is not reached by then, V0 is `BLOCKED`.
 
 The exact timestamp, return, annualization, missing-bar, raw-byte,
-normalization, amendment, and terminal rules are in
-[`protocol.json`](protocol.json). A week with missing BTC or ETH data,
-malformed/non-finite data, a protocol/hash mismatch, an outside-tolerance
-capture, ambiguous source timing, raw-response loss, normalization/hash
-mismatch, or an incomplete future outcome is not imputed or silently dropped:
-it blocks V0.
+normalization, amendment, retry, and terminal rules are in
+[`protocol.json`](protocol.json). Every scheduled week, attempt, raw response,
+and error must be retained. A transport or local operational failure is a
+predeclared skipped week, never a silently omitted or replacement observation;
+source-data, timing, integrity, or outcome invalidity blocks V0.
 
 Material amendments before the first eligible primary observation require a
 new version and preservation of this protocol. After that observation, changes
@@ -85,12 +101,5 @@ sha256sum -c protocol.sha256
 No capture code exists. No network request was made. No observation was
 recorded. No analysis was executed. No QNTY integration occurred.
 
-The following is proposed future command shape only:
-
-```bash
-python -m qntylab.prospective_deribit_dvol capture-once \
-  --protocol experiments/prospective/dvol_v0/protocol.json \
-  --output-root /home/swirky/DevHub/data/QntyLab/dvol_v0
-```
-
-**NOT IMPLEMENTED OR AUTHORIZED BY THIS PR**
+No command shape is specified because implementation is not authorized and the
+official source-contract gaps remain unresolved.

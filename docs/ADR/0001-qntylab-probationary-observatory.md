@@ -1,6 +1,6 @@
 # ADR 0001: QntyLab Probationary Prospective Observatory
 
-**Status:** `ACCEPTED_FOR_BOUNDED_V0_PROTOCOL_ONLY`
+**Status:** `FROZEN_DESIGN_ONLY_SOURCE_CONTRACT_BLOCKED`
 
 This decision accepts a bounded design-only protocol. It does not authorize capture
 implementation, network access, an observation, analysis, or a strategy test.
@@ -27,15 +27,23 @@ Freeze the following responsibility boundary.
 
 The V0 forecasting question is:
 
-> Does the Deribit volatility index contain incremental prospective information about future realized BTC and ETH volatility beyond trailing realized volatility alone?
+> Does the raw Deribit volatility-index close have lower prospective forecast error than the trailing-realized-volatility benchmark for future BTC and ETH realized volatility?
 
-It is not a trading or profitability hypothesis.
+It is a bounded exploratory forecast horse race, not a test of incremental
+information conditional on realized volatility, and not a trading or
+profitability hypothesis.
 
 For V0, QntyLab may eventually retrieve one declared public source, preserve exact
 raw responses, normalize only declared fields, produce timestamped hash-bound
 observations, calculate the preregistered forecast comparison after the minimum
 prospective sample exists, and terminate as killed, blocked, or retained for a
 separately registered follow-up.
+
+The official Deribit pages reviewed on 2026-08-03 establish request and response
+shapes but do not establish candle-boundary/completeness semantics or the DVOL
+unit and economic horizon required by this protocol. Until an authoritative
+source contract resolves those facts, the protocol remains non-executable and
+cannot be used to authorize Phase 1, network access, capture, or analysis.
 
 V0 forbids: historical strategy tournaments; return optimization; trading signals;
 position generation; PnL or edge ranking; paper/shadow/live execution; QNTY

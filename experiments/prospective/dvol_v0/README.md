@@ -107,3 +107,14 @@ smoke data stays outside Git under `/tmp`; no primary observation was created,
 no week was added to the 104-week sample, no outcome was retrieved, no realized
 volatility was computed, and no forecast comparison was performed. Scheduled
 collection remains unauthorized and another independent review is required.
+
+## Phase 1B evidence-retention repair
+
+**Repair status:** `PHASE_1B_EVIDENCE_RETENTION_REPAIR_UNDER_REVIEW`
+
+The first smoke remains `NON_PRIMARY_SMOKE_BLOCKED / DERIBIT_ACK_MISMATCH`.
+Its offending acknowledgement payload was not retained, so the exact mismatch
+remains unresolved and the first receipt is unchanged. Future source payloads
+are retained before classification, with strict structural diagnostics; Deribit
+and each Binance source are independently probed. No rerun has occurred, no new
+network access is authorized, and scheduled collection remains unauthorized.

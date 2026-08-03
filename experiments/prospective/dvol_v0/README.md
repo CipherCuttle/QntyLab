@@ -124,3 +124,11 @@ monotonic deadline; retains but does not count pre-acknowledgement notifications
 stops later probes on clock regression; retains available non-200 Binance bodies;
 binds artifacts directly to protocol, commit, mode, aggregate, and source
 verdicts; and publishes only to a non-existing output root.
+
+The Phase 1B repair also separates transport authority from fixture execution:
+the gated CLI is the only route that owns live adapters and produces a
+`NON_PRIMARY_LIVE_SOURCE_SMOKE` artifact. Offline tests consume inert scripted
+bytes, status codes, headers, errors, and timestamps only; their artifacts are
+explicitly `OFFLINE_TEST_FIXTURE`, with `non_primary_live_smoke=false` and
+`network_contacted=false`. Neither path authorizes a rerun or any additional
+network access.

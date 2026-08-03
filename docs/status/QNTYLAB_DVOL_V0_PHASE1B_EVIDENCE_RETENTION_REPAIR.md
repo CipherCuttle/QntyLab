@@ -35,3 +35,20 @@ responses retain body evidence; repository identity and mode are fail-closed;
 and publication refuses every existing destination. Manifest and smoke-status
 records directly bind protocol, commit, mode, run bounds, verdict, and source
 results.
+
+## Transport-authority boundary repair
+
+- Repair input head: `8d2cce8542fd319e68b4a60edadac22e603fab36`
+- Network attempts during repair and verification: `0`
+- Offline fixture identity: `OFFLINE_TEST_FIXTURE / false / false /
+  OFFLINE_TEST_FIXTURE` (`artifact_kind / non_primary_live_smoke /
+  network_contacted / execution_mode`)
+- Live-only identity: `NON_PRIMARY_LIVE_SOURCE_SMOKE / true / true /
+  AUTHORIZED_NON_PRIMARY_LIVE_SMOKE`
+
+The prior generic direct-call API could pair injected transports with a
+caller-supplied fake mode, making `network_contacted=false` untruthful. It has
+been removed. The only live-capable adapters are selected inside the private
+live wrapper reached after public CLI gates. Offline replay consumes frozen
+in-memory scripts only and cannot accept transport callbacks or an authority
+label. The historical artifact and first-smoke receipt are unchanged.

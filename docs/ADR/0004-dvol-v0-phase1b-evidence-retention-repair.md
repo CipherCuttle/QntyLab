@@ -27,6 +27,16 @@ fail-closes on repository root, branch, clean worktree, exact commit, and mode.
 Non-200 HTTP responses retain status, selected headers, body bytes, digest, and
 byte count. Publication uses Linux no-replace rename semantics; manifest and
 status bind protocol hash, commit, mode, run bounds, verdict, and source results.
+
+The transport authority boundary is explicit. The public CLI is the sole route
+to the private live wrapper; it alone owns the module-owned WebSocket and HTTP
+adapters, and it hardcodes `AUTHORIZED_NON_PRIMARY_LIVE_SMOKE`,
+`NON_PRIMARY_LIVE_SOURCE_SMOKE`, `non_primary_live_smoke=true`, and
+`network_contacted=true`. Offline tests invoke a separate data-only scripted
+wrapper, which accepts no callback or mode argument and hardcodes
+`OFFLINE_TEST_FIXTURE`, `non_primary_live_smoke=false`, and
+`network_contacted=false`. The shared deterministic core receives authority
+only from these trusted wrappers. Unknown authority profiles are rejected.
 This does not authorize a network call, rerun, scheduled collection, primary
 observation, Phase 0/Phase 1A change, or QNTY work. Another independent hostile
 review is required; a separate ADR is required before exactly one rerun.

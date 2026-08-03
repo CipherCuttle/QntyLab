@@ -32,7 +32,7 @@ PHASE1B_BRANCH = "research/dvol-v0-phase1b-live-smoke"
 ACK = "NON_PRIMARY_LIVE_SMOKE"
 OPEN_TIMEOUT_SECONDS, CLOSE_TIMEOUT_SECONDS, RECEIVE_TIMEOUT_SECONDS = 10, 5, 90
 MAX_MESSAGE_BYTES, MAX_MESSAGES, REQUEST_ID = 1024 * 1024, 999, 1
-FAKE_OFFLINE_TEST, AUTHORIZED_NON_PRIMARY_LIVE_SMOKE = "FAKE_OFFLINE_TEST", "AUTHORIZED_NON_PRIMARY_LIVE_SMOKE"
+OFFLINE_TEST_FIXTURE, AUTHORIZED_NON_PRIMARY_LIVE_SMOKE = "OFFLINE_TEST_FIXTURE", "AUTHORIZED_NON_PRIMARY_LIVE_SMOKE"
 REQUESTED_CHANNELS = [DERIBIT_CHANNELS["BTC"], DERIBIT_CHANNELS["ETH"]]
 _COMMIT = __import__("re").compile(r"[0-9a-f]{40}\Z")
 
@@ -41,6 +41,45 @@ class SmokeBlocked(RuntimeError): pass
 class _DuplicateKey(ValueError): pass
 class _Nonfinite(ValueError): pass
 class ClockIntegrityError(RuntimeError): pass
+
+
+@dataclass(frozen=True)
+class _ArtifactAuthority:
+    artifact_kind: str
+    execution_mode: str
+    non_primary_live_smoke: bool
+    network_contacted: bool
+
+
+_OFFLINE_AUTHORITY = _ArtifactAuthority("OFFLINE_TEST_FIXTURE", OFFLINE_TEST_FIXTURE, False, False)
+_LIVE_AUTHORITY = _ArtifactAuthority("NON_PRIMARY_LIVE_SOURCE_SMOKE", AUTHORIZED_NON_PRIMARY_LIVE_SMOKE, True, True)
+
+
+@dataclass(frozen=True)
+class ScriptedMessage:
+    payload: bytes | None = None
+    error: str | None = None
+
+
+@dataclass(frozen=True)
+class OfflineDeribitScript:
+    messages: tuple[ScriptedMessage, ...]
+    open_error: str | None = None
+    close_error: str | None = None
+
+
+@dataclass(frozen=True)
+class ScriptedHttpResult:
+    status: int | None = None
+    headers: Mapping[str, str] | None = None
+    body: bytes | None = None
+    error: str | None = None
+
+
+@dataclass(frozen=True)
+class OfflineBinanceScript:
+    btc: ScriptedHttpResult
+    eth: ScriptedHttpResult
 
 
 def canonical(value: Any) -> bytes:
@@ -151,15 +190,15 @@ def _publish_no_replace(stage: Path, root: Path) -> None:
         raise OSError(errno, os.strerror(errno))
 
 
-def write_artifact(root: Path, status: str, reason: str, metadata: Mapping[str, Any], raw_files: Mapping[str, bytes], *, protocol_sha256: str, repository_commit: str, execution_mode: str) -> str:
-    if execution_mode not in {FAKE_OFFLINE_TEST, AUTHORIZED_NON_PRIMARY_LIVE_SMOKE}: raise SmokeBlocked("INVALID_EXECUTION_MODE")
+def _write_artifact(root: Path, status: str, reason: str, metadata: Mapping[str, Any], raw_files: Mapping[str, bytes], *, protocol_sha256: str, repository_commit: str, authority: _ArtifactAuthority) -> str:
+    if authority is not _OFFLINE_AUTHORITY and authority is not _LIVE_AUTHORITY: raise SmokeBlocked("INVALID_ARTIFACT_AUTHORITY")
     stage = Path(tempfile.mkdtemp(prefix=f".{root.name}.stage-", dir="/tmp"))
     try:
         for relative, payload in raw_files.items():
             path = stage / relative; path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes(payload)
         for name, value in metadata.items():
             path = stage / name; path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes(canonical(value))
-        flags = {"non_primary_live_smoke": True, "primary_observation": False, "scientific_observation": False, "network_contacted": execution_mode == AUTHORIZED_NON_PRIMARY_LIVE_SMOKE, "execution_mode": execution_mode, "scheduled_collection_authorized": False, "outcome_retrieved": False, "analysis_executed": False, "qnty_authority": False, "trading_authority": False}
+        flags = {"artifact_kind": authority.artifact_kind, "non_primary_live_smoke": authority.non_primary_live_smoke, "primary_observation": False, "scientific_observation": False, "network_contacted": authority.network_contacted, "execution_mode": authority.execution_mode, "scheduled_collection_authorized": False, "outcome_retrieved": False, "analysis_executed": False, "qnty_authority": False, "trading_authority": False}
         summary = dict(flags, protocol_sha256=protocol_sha256, repository_commit=repository_commit, smoke_status=status, reason_code=reason, run_start_utc=metadata["environment.json"]["run_start_utc"], run_end_utc=metadata["environment.json"]["run_end_utc"])
         (stage / "smoke_status.json").write_bytes(canonical(summary)); files = []
         for path in sorted(p for p in stage.rglob("*") if p.is_file()):
@@ -242,8 +281,7 @@ def _binance_probe(symbol: str, boundary: datetime, http_get: Callable[[str], tu
     return result
 
 
-async def run_smoke(*, protocol: Any, root: Path, commit: str, ws_connect: Callable[...,Awaitable[Any]], http_get: Callable[[str],tuple[int,Mapping[str,str],bytes]], now: Callable[[],datetime]=utc_now, mono: Callable[[],int]=time.monotonic_ns, execution_mode: str=FAKE_OFFLINE_TEST) -> dict[str,Any]:
-    if execution_mode not in {FAKE_OFFLINE_TEST,AUTHORIZED_NON_PRIMARY_LIVE_SMOKE}: raise SmokeBlocked("INVALID_EXECUTION_MODE")
+async def _run_smoke_core(*, protocol: Any, root: Path, commit: str, ws_connect: Callable[...,Awaitable[Any]], http_get: Callable[[str],tuple[int,Mapping[str,str],bytes]], authority: _ArtifactAuthority, now: Callable[[],datetime]=utc_now, mono: Callable[[],int]=time.monotonic_ns) -> dict[str,Any]:
     start,start_mono=now(),mono(); clock=Clock(now,mono,start,start_mono); raw:dict[str,bytes]={}; events:list[dict[str,Any]]=[]
     deribit=await _deribit_probe(ws_connect=ws_connect,raw=raw,events=events,clock=clock,start_mono=start_mono); binance=[]
     if deribit["reason"] != "CLOCK_DISCONTINUITY":
@@ -258,8 +296,8 @@ async def run_smoke(*, protocol: Any, root: Path, commit: str, ws_connect: Calla
     else: status,reason="NON_PRIMARY_SMOKE_BLOCKED",("CLOCK_DISCONTINUITY" if deribit["reason"]=="CLOCK_DISCONTINUITY" or any(x["reason"]=="CLOCK_DISCONTINUITY" for x in binance) else deribit["reason"] if deribit["status"]=="BLOCKED" else next(x["reason"] for x in binance if x["status"]!="PASS"))
     try: end,end_mono=clock.sample()
     except ClockIntegrityError: end,end_mono=clock.last_utc,clock.last_mono; status,reason="NON_PRIMARY_SMOKE_BLOCKED","CLOCK_DISCONTINUITY"
-    environment={"protocol_sha256":protocol.digest,"repository_commit":commit,"run_start_utc":start.isoformat(),"run_end_utc":end.isoformat(),"run_start_monotonic_ns":start_mono,"run_end_monotonic_ns":end_mono,"deribit_endpoint":DERIBIT_ENDPOINT,"binance_endpoint":BINANCE_KLINES_URL,"execution_mode":execution_mode,"python_version":sys.version,"platform":platform.platform(),"openssl_version":ssl.OPENSSL_VERSION}
-    manifest_sha=write_artifact(root,status,reason,{"environment.json":environment,"metadata/deribit-events.json":events,"metadata/deribit-result.json":deribit,"metadata/binance-results.json":binance},raw,protocol_sha256=protocol.digest,repository_commit=commit,execution_mode=execution_mode)
+    environment={"protocol_sha256":protocol.digest,"repository_commit":commit,"run_start_utc":start.isoformat(),"run_end_utc":end.isoformat(),"run_start_monotonic_ns":start_mono,"run_end_monotonic_ns":end_mono,"deribit_endpoint":DERIBIT_ENDPOINT,"binance_endpoint":BINANCE_KLINES_URL,"execution_mode":authority.execution_mode,"python_version":sys.version,"platform":platform.platform(),"openssl_version":ssl.OPENSSL_VERSION}
+    manifest_sha=_write_artifact(root,status,reason,{"environment.json":environment,"metadata/deribit-events.json":events,"metadata/deribit-result.json":deribit,"metadata/binance-results.json":binance},raw,protocol_sha256=protocol.digest,repository_commit=commit,authority=authority)
     return {"status":status,"reason":reason,"manifest_sha256":manifest_sha,"deribit":deribit,"binance":binance,"duration_seconds":(end_mono-start_mono)/1e9}
 
 
@@ -274,6 +312,45 @@ async def live_ws(*args:Any,**kwargs:Any)->Any:
     import websockets
     return websockets.connect(*args,**kwargs)
 
+
+class _OfflineWebSocket:
+    def __init__(self, script: OfflineDeribitScript): self._messages = iter(script.messages); self._close_error = script.close_error
+    async def __aenter__(self) -> "_OfflineWebSocket": return self
+    async def __aexit__(self, *_args: Any) -> bool:
+        if self._close_error: raise RuntimeError(self._close_error)
+        return False
+    async def send(self, _message: str) -> None: pass
+    async def recv(self) -> bytes:
+        message = next(self._messages)
+        if message.error == "TIMEOUT": raise asyncio.TimeoutError
+        if message.error: raise RuntimeError(message.error)
+        if message.payload is None: raise RuntimeError("SCRIPTED_MESSAGE_MISSING_PAYLOAD")
+        return message.payload
+
+
+async def _offline_ws_connect(script: OfflineDeribitScript, *_args: Any, **_kwargs: Any) -> _OfflineWebSocket:
+    if script.open_error == "TIMEOUT": raise asyncio.TimeoutError
+    if script.open_error: raise RuntimeError(script.open_error)
+    return _OfflineWebSocket(script)
+
+
+def _offline_http_get(script: OfflineBinanceScript, url: str) -> tuple[int, Mapping[str, str], bytes]:
+    result = script.btc if "BTCUSDT" in url else script.eth if "ETHUSDT" in url else None
+    if result is None: raise RuntimeError("UNSCRIPTED_SYMBOL")
+    if result.error: raise RuntimeError(result.error)
+    if result.status is None or result.body is None: raise RuntimeError("SCRIPTED_HTTP_RESULT_INCOMPLETE")
+    return result.status, result.headers or {}, result.body
+
+
+async def run_offline_fixture(*, protocol: Any, root: Path, commit: str, deribit_script: OfflineDeribitScript, binance_script: OfflineBinanceScript, now: Callable[[], datetime] = utc_now, mono: Callable[[], int] = time.monotonic_ns) -> dict[str, Any]:
+    """Execute inert in-memory fixture data; this API accepts no transport callbacks."""
+    return await _run_smoke_core(protocol=protocol, root=root, commit=commit, ws_connect=lambda *args, **kwargs: _offline_ws_connect(deribit_script, *args, **kwargs), http_get=lambda url: _offline_http_get(binance_script, url), authority=_OFFLINE_AUTHORITY, now=now, mono=mono)
+
+
+async def _run_authorized_live_smoke(*, protocol: Any, root: Path, commit: str, now: Callable[[], datetime] = utc_now, mono: Callable[[], int] = time.monotonic_ns) -> dict[str, Any]:
+    """The only live path; its adapters and artifact authority are module-owned."""
+    return await _run_smoke_core(protocol=protocol, root=root, commit=commit, ws_connect=live_ws, http_get=stdlib_http, authority=_LIVE_AUTHORITY, now=now, mono=mono)
+
 def parser()->argparse.ArgumentParser:
     p=argparse.ArgumentParser(); s=p.add_subparsers(dest="command",required=True); r=s.add_parser("run-non-primary-smoke")
     for name in ("--protocol","--sidecar","--repository-commit","--output-root","--acknowledge-non-primary"): r.add_argument(name,required=True)
@@ -283,6 +360,6 @@ def main(argv:list[str]|None=None)->int:
     args=parser().parse_args(argv)
     if args.acknowledge_non_primary!=ACK: raise SmokeBlocked("ACKNOWLEDGEMENT_REQUIRED")
     repo=Path.cwd().resolve(); protocol=gate(now=utc_now(),root=Path(args.output_root),repository_root=repo,commit=args.repository_commit,protocol_path=Path(args.protocol),sidecar=Path(args.sidecar))
-    result=asyncio.run(run_smoke(protocol=protocol,root=Path(args.output_root),commit=args.repository_commit,ws_connect=live_ws,http_get=stdlib_http,execution_mode=AUTHORIZED_NON_PRIMARY_LIVE_SMOKE)); print(json.dumps({k:result[k] for k in ("status","reason","manifest_sha256","duration_seconds")},sort_keys=True)); return 0 if result["status"]!="NON_PRIMARY_SMOKE_BLOCKED" else 2
+    result=asyncio.run(_run_authorized_live_smoke(protocol=protocol,root=Path(args.output_root),commit=args.repository_commit)); print(json.dumps({k:result[k] for k in ("status","reason","manifest_sha256","duration_seconds")},sort_keys=True)); return 0 if result["status"]!="NON_PRIMARY_SMOKE_BLOCKED" else 2
 
 if __name__=="__main__": main()

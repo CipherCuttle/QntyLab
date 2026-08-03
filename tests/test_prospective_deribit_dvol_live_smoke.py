@@ -12,7 +12,7 @@ import pytest
 from qntylab.prospective_deribit_dvol import build_deribit_subscription_request, load_frozen_protocol
 from qntylab.prospective_deribit_dvol_live_smoke import DERIBIT_ENDPOINT, SmokeBlocked, classify_deribit, gate, kline_url, run_smoke, safe_output_root, validate_klines
 
-ROOT = Path(__file__).resolve().parents[1]; PROTOCOL = ROOT / "experiments/prospective/dvol_v0/protocol.json"; SIDECAR = PROTOCOL.with_name("protocol.sha256"); COMMIT = "a" * 40
+ROOT = Path(__file__).resolve().parents[1]; PROTOCOL = ROOT / "experiments/prospective/dvol_v0/protocol.json"; SIDECAR = PROTOCOL.with_name("protocol.sha256"); COMMIT = __import__("subprocess").check_output(["git", "-C", str(ROOT), "rev-parse", "HEAD"], text=True).strip()
 
 class WS:
     def __init__(self, messages): self.messages = iter(messages); self.sent = []
@@ -47,11 +47,20 @@ def deny_network(monkeypatch):
         return original_socket(family, *args, **kwargs)
     monkeypatch.setattr(socket, "socket", blocked); monkeypatch.setattr(socket, "create_connection", lambda *a, **k: (_ for _ in ()).throw(AssertionError("network attempted in offline test"))); monkeypatch.setattr(socket, "getaddrinfo", lambda *a, **k: (_ for _ in ()).throw(AssertionError("network attempted in offline test")))
 
-def test_gates_and_urls(tmp_path):
+def test_gates_and_urls(tmp_path, monkeypatch):
+    def git(_root, *args):
+        if args == ("rev-parse", "--show-toplevel"): return str(ROOT)
+        if args == ("rev-parse", "HEAD"): return COMMIT
+        if args == ("branch", "--show-current"): return "research/dvol-v0-phase1b-live-smoke"
+        if args == ("status", "--porcelain"): return ""
+        raise AssertionError(args)
+    monkeypatch.setattr("qntylab.prospective_deribit_dvol_live_smoke._git", git)
     with pytest.raises(SmokeBlocked): safe_output_root(ROOT / "bad", ROOT)
     with pytest.raises(SmokeBlocked): safe_output_root(Path("/var/tmp/bad"), ROOT)
     with pytest.raises(SmokeBlocked): gate(now=datetime(2026, 8, 3, 0, 5, tzinfo=UTC), root=Path("/tmp/blocked"), repository_root=ROOT, commit=COMMIT, protocol_path=PROTOCOL, sidecar=SIDECAR)
     assert gate(now=datetime(2026, 8, 4, tzinfo=UTC), root=tmp_path / "new", repository_root=ROOT, commit=COMMIT, protocol_path=PROTOCOL, sidecar=SIDECAR).digest
+    with pytest.raises(SmokeBlocked, match="REPOSITORY_COMMIT_MISMATCH"):
+        gate(now=datetime(2026, 8, 4, tzinfo=UTC), root=tmp_path / "wrong-commit", repository_root=ROOT, commit="a" * 40, protocol_path=PROTOCOL, sidecar=SIDECAR)
     assert build_deribit_subscription_request().startswith(b'{"id":1')
     assert [key for key, _ in kline_url("BTCUSDT", datetime(2026, 8, 4, tzinfo=UTC))[1]] == ["symbol", "interval", "startTime", "endTime", "limit"]
 
@@ -90,9 +99,11 @@ def test_blocked_ack_retained_and_binance_independent(tmp_path):
 def test_binance_failures_do_not_suppress_other_source(tmp_path):
     calls = []
     def http(url):
-        calls.append(url); return (403 if "BTCUSDT" in url else 200), {}, None
+        calls.append(url); return (403 if "BTCUSDT" in url else 200), {"retry-after": "60"}, b"forbidden" if "BTCUSDT" in url else None
     result, artifact, _ = run(tmp_path, [json.dumps({"id":1,"jsonrpc":"2.0","result":["deribit_volatility_index.btc_usd","deribit_volatility_index.eth_usd"]}), notice("BTC"), notice("ETH")], http)
     assert result["status"] == "NON_PRIMARY_SMOKE_BLOCKED" and [row["status"] for row in result["binance"]] == ["BLOCKED", "PASS"] and len(calls) == 2
+    assert (artifact / "raw/binance/BTCUSDT.response").read_bytes() == b"forbidden"
+    assert result["binance"][0]["response_body_sha256"] == hashlib.sha256(b"forbidden").hexdigest()
     assert (artifact / "raw/binance/ETHUSDT.response").exists()
 
 def test_partial_and_connection_block_keep_independent_binance(tmp_path):
@@ -107,3 +118,35 @@ def test_malformed_notification_is_retained(tmp_path):
     bad = b'{"jsonrpc":"2.0","method":"subscription","params":{"channel":"deribit_volatility_index.btc_usd","data":{}}}'
     result, artifact, _ = run(tmp_path, [json.dumps({"id":1,"jsonrpc":"2.0","result":["deribit_volatility_index.btc_usd","deribit_volatility_index.eth_usd"]}), bad])
     assert result["deribit"]["reason"] == "DERIBIT_EXPECTED_CHANNEL_MALFORMED" and (artifact / "raw/deribit/message-000002.payload").read_bytes() == bad
+
+def test_pre_ack_notification_is_retained_but_not_counted(tmp_path):
+    ack = json.dumps({"id":1,"jsonrpc":"2.0","result":["deribit_volatility_index.btc_usd","deribit_volatility_index.eth_usd"]})
+    result, artifact, _ = run(tmp_path, [notice("BTC"), ack, notice("ETH"), asyncio.TimeoutError()])
+    assert result["status"] == "NON_PRIMARY_SMOKE_PARTIAL"
+    events = json.loads((artifact / "metadata/deribit-events.json").read_text())
+    assert events[0]["classification"] == "VALID_BTC_DVOL_NOTIFICATION"
+    assert result["deribit"]["valid_btc_notification_count"] == 0
+
+@pytest.mark.parametrize("value", [0, None, object()])
+def test_invalid_websocket_values_are_retained_and_blocked(tmp_path, value):
+    result, artifact, _ = run(tmp_path, [value])
+    assert result["deribit"]["reason"] == "DERIBIT_INVALID_TRANSPORT_MESSAGE_TYPE"
+    assert (artifact / "raw/deribit/message-000001.payload").exists()
+
+def test_decimal_kline_validation_rejects_nonfinite_and_accepts_extreme_decimal():
+    boundary = datetime(2026, 8, 4, 12, tzinfo=UTC)
+    assert validate_klines(rows(boundary).replace(b'"100.0"', b'"1e-999999"'), boundary) is None
+    assert validate_klines(rows(boundary).replace(b'"100.0"', b'"Infinity"'), boundary) == "BINANCE_CLOSE_NOT_POSITIVE_FINITE"
+
+def test_invalid_execution_mode_is_rejected(tmp_path):
+    protocol = load_frozen_protocol(PROTOCOL, SIDECAR)
+    async def connect(*_args, **_kwargs): return WS([])
+    with pytest.raises(SmokeBlocked, match="INVALID_EXECUTION_MODE"):
+        asyncio.run(run_smoke(protocol=protocol, root=tmp_path / "smoke", commit=COMMIT, ws_connect=connect, http_get=lambda _: (200, {}, b"[]"), execution_mode="typo"))
+
+def test_publication_never_replaces_preexisting_directory(tmp_path):
+    protocol = load_frozen_protocol(PROTOCOL, SIDECAR); target = tmp_path / "occupied"; target.mkdir(); (target / "sentinel").write_text("keep")
+    async def connect(*_args, **_kwargs): return WS([ConnectionError("offline")])
+    with pytest.raises(SmokeBlocked, match="OUTPUT_PUBLICATION_COLLISION"):
+        asyncio.run(run_smoke(protocol=protocol, root=target, commit=COMMIT, ws_connect=connect, http_get=lambda _:(200, {}, rows(datetime(2026,8,4,12,tzinfo=UTC)))))
+    assert (target / "sentinel").read_text() == "keep"

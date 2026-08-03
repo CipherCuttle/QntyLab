@@ -27,3 +27,11 @@ retention of blocked bytes, independent Binance probes, and artifact
 truthfulness. `network_attempts_during_task=0`. This remains non-authority: no
 rerun, network access, scheduled collection, primary observation, analysis, or
 QNTY authority was created.
+
+Independent hostile repair additions: receipt-clock regression globally stops
+later probes; the receive window is a single absolute 90-second post-subscribe
+deadline; pre-acknowledgement notifications are retained but uncounted; non-200
+responses retain body evidence; repository identity and mode are fail-closed;
+and publication refuses every existing destination. Manifest and smoke-status
+records directly bind protocol, commit, mode, run bounds, verdict, and source
+results.

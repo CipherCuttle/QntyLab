@@ -118,3 +118,9 @@ remains unresolved and the first receipt is unchanged. Future source payloads
 are retained before classification, with strict structural diagnostics; Deribit
 and each Binance source are independently probed. No rerun has occurred, no new
 network access is authorized, and scheduled collection remains unauthorized.
+
+The repaired implementation uses one absolute 90-second post-subscription
+monotonic deadline; retains but does not count pre-acknowledgement notifications;
+stops later probes on clock regression; retains available non-200 Binance bodies;
+binds artifacts directly to protocol, commit, mode, aggregate, and source
+verdicts; and publishes only to a non-existing output root.

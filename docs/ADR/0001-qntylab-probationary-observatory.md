@@ -32,6 +32,15 @@ provides UTC one-hour bars with explicit open and close timestamps and a 1,000-r
 limit. Therefore the 721 trailing and 169 outcome close requirements each fit one
 bounded response per asset, with no pagination.
 
+Formation requires both an in-window source timestamp and an in-window UTC
+receipt timestamp; completion is the later accepted receipt, not merely the
+later source time. Binance REST does not supply a closed-candle boolean, so the
+protocol mechanically validates each kline's open/close timestamps and waits a
+frozen 60-second safety delay after the final eligible close. Exact received
+application payload/response bytes, receipt sequencing, sessions, timestamps,
+and request/response metadata are the retained raw evidence boundary; this does
+not overclaim WebSocket-frame or network-packet preservation.
+
 The cross-venue choice is material: Deribit options-implied volatility forecasts
 realized volatility measured from Binance Spot BTCUSDT/ETHUSDT closes. The result
 must never be called generic BTC or ETH realized volatility.

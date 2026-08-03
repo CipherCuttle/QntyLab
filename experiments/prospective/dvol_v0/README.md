@@ -24,20 +24,26 @@ Binance Spot closes. It is not generic “BTC realized volatility.”
 
 ## Frozen timing and metric
 
-For each scheduled Monday, the target is `00:05:00 UTC`; accepted DVOL source
-timestamps are in `[00:05:00.000, 00:10:00.000] UTC`. The formation completion
-is the later accepted BTC/ETH source timestamp. The earliest outcome boundary is
+For each scheduled Monday, the target is `00:05:00 UTC`; an accepted DVOL
+notification must have both source and UTC receipt timestamps in
+`[00:05:00.000, 00:10:00.000] UTC`. The formation completion is the later
+accepted receipt timestamp (source timestamps remain separately retained). The earliest outcome boundary is
 `01:00 UTC`; its first return is `01:00 -> 02:00 UTC`, so it begins strictly after
 formation. The outcome has 169 Binance boundary closes and 168 one-hour log
 returns. The trailing benchmark ends at the closed `00:00 UTC` boundary and has
-721 boundary closes and 720 returns.
+721 boundary closes and 720 returns. Binance REST has no closed-candle boolean:
+eligibility is instead fixed by each tuple's open/close timestamps and a
+60-second post-final-close retrieval safety delay.
 
 DVOL is a 30-day forward-looking annualized implied-volatility expectation in
 percentage points. The outcome and benchmark are annualized realized volatility
 over, respectively, 168 and 720 hourly returns. Numeric units are made comparable
 by annualization and percentage-point conversion, but the 30-day DVOL economic
 horizon and seven-day outcome measurement horizon are not identical. V0 tests
-forecast error only, not unbiasedness.
+forecast error only, not unbiasedness. A complete week is paired: BTC and ETH
+must both succeed for the same scheduled Monday; the primary comparison uses the
+same 104 paired Mondays for both assets. Calculations are unrounded, strict, and
+have no practical margin; any retained result remains exploratory.
 
 ## Source basis (retrieved 2026-08-03)
 

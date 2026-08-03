@@ -100,7 +100,7 @@ notification cadence, clock skew, and Binance response behavior remain untested.
 
 ## Phase 1B non-primary live source smoke
 
-**Current implementation phase:** `PHASE_1B_NON_PRIMARY_LIVE_SMOKE_IMPLEMENTED_NOT_YET_REVIEWED`
+**Current implementation phase:** `NON_PRIMARY_SMOKE_BLOCKED`
 
 An isolated, one-time smoke command is implemented for independent review. Raw
 smoke data stays outside Git under `/tmp`; no primary observation was created,

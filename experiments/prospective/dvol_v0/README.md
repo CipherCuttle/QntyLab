@@ -67,3 +67,24 @@ outcome-finalization retrieval from forbidden primary-observation backfill.
 All exact source, timestamp, raw-byte retention, retry, missing-data, terminal,
 amendment, and authority rules are in [`protocol.json`](protocol.json). Verify it
 with `sha256sum -c protocol.sha256` from this directory.
+
+## Phase 1A offline capture core
+
+**Current implementation phase:** `PHASE_1A_OFFLINE_CAPTURE_CORE_UNDER_REVIEW`
+
+The frozen protocol and hash remain unchanged. An offline fixture replay is
+available; its artifacts are not observations. Live Deribit or Binance access
+remains unauthorized: no scheduled Monday has been captured, outcome retrieval
+and analysis do not exist, and there is no QNTY integration. Live transport
+requires a new reviewed task.
+
+```bash
+python -m qntylab.prospective_deribit_dvol replay-fixture \
+  --protocol experiments/prospective/dvol_v0/protocol.json \
+  --sidecar experiments/prospective/dvol_v0/protocol.sha256 \
+  --scheduled-monday YYYY-MM-DD \
+  --deribit-events tests/fixtures/dvol_v0/valid_deribit_session.jsonl \
+  --binance-btc-response /tmp/BTCUSDT.json \
+  --binance-eth-response /tmp/ETHUSDT.json \
+  --output-root /tmp/dvol-v0-replay
+```

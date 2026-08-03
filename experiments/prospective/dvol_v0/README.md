@@ -67,3 +67,33 @@ outcome-finalization retrieval from forbidden primary-observation backfill.
 All exact source, timestamp, raw-byte retention, retry, missing-data, terminal,
 amendment, and authority rules are in [`protocol.json`](protocol.json). Verify it
 with `sha256sum -c protocol.sha256` from this directory.
+
+## Phase 1A offline capture core
+
+**Current implementation phase:** `PHASE_1A_OFFLINE_CAPTURE_CORE_UNDER_REVIEW`
+
+The frozen protocol and hash remain unchanged. An offline fixture replay is
+available; its artifacts are not observations. Live Deribit or Binance access
+remains unauthorized: no scheduled Monday has been captured, outcome retrieval
+and analysis do not exist, and there is no QNTY integration. Live transport
+requires a new reviewed task.
+
+```bash
+python -m qntylab.prospective_deribit_dvol replay-fixture \
+  --protocol experiments/prospective/dvol_v0/protocol.json \
+  --sidecar experiments/prospective/dvol_v0/protocol.sha256 \
+  --scheduled-monday YYYY-MM-DD \
+  --deribit-events tests/fixtures/dvol_v0/valid_deribit_session.jsonl \
+  --binance-btc-response /tmp/BTCUSDT.json \
+  --binance-eth-response /tmp/ETHUSDT.json \
+  --output-root /tmp/dvol-v0-replay \
+  --repository-commit 0123456789abcdef0123456789abcdef01234567
+```
+
+The replay accepts only byte-exact fixture input. Deribit payloads are represented
+as `payload_base64`, so escaped Unicode, backslashes, embedded newlines, and JSON
+whitespace are not reconstructed from a host JSON string. It has no HTTP adapter,
+WebSocket transport, `requests` import, live command, scheduler, outcome
+retrieval, forecast-error calculation, or QNTY integration. Fixture outputs are
+explicitly non-scientific and cannot be primary observations. Live-source timing,
+notification cadence, clock skew, and Binance response behavior remain untested.

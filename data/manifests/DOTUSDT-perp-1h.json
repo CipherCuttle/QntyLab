@@ -13,14 +13,14 @@
     "2026-06-28T23:00:00+00:00 -> 2026-06-30T00:00:00+00:00 (1 day, 1:00:00)"
   ],
   "market": "USD-M perpetual",
-  "retrieved_at": "2026-08-04T09:43:49.451497Z",
+  "retrieved_at": "2026-08-04T09:44:33.113011Z",
   "rows": 3648,
   "sha256": {
-    "funding": "62598db82df7174da8c5b98042309be3465a2eb17189637b420e243ffe9e3e47",
-    "perp": "2b05c05e13dd59492cc6958875513b4a4f38d26b985dee59e4f0f141c124e451"
+    "funding": "0f459242864156f5ce3c32cef6c176d80875caf30d76690bdcee9753f77edb52",
+    "perp": "43090caa29c97157ad27c03fc961b4d2d8ae8ad7af58f99ad918864908c0d4a8"
   },
   "source": "https://data.binance.vision/data/futures/um/monthly",
   "start": "2026-03-01T00:00:00Z",
-  "symbol": "BTCUSDT",
+  "symbol": "DOTUSDT",
   "timeframe": "1h"
 }

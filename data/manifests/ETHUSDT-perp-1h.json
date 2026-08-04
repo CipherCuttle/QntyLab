@@ -5,25 +5,22 @@
     "premiumIndexKlines",
     "fundingRate"
   ],
-  "end": "2026-06-30T23:00:00Z",
-  "funding_events": 6021,
-  "funding_source": "Binance public-data fundingRate archive",
+  "end": "2026-07-31T23:00:00Z",
+  "funding_end": "2026-07-31T16:00:00Z",
+  "funding_events": 459,
+  "funding_start": "2026-03-01T00:00:00.005000Z",
   "gaps": [
-    "2021-06-30T23:00:00+00:00 -> 2021-07-02T00:00:00+00:00 (1 day, 1:00:00)",
-    "2021-07-23T23:00:00+00:00 -> 2021-07-28T00:00:00+00:00 (4 days, 1:00:00)",
-    "2022-10-01T23:00:00+00:00 -> 2022-10-03T00:00:00+00:00 (1 day, 1:00:00)",
-    "2023-04-08T23:00:00+00:00 -> 2023-04-10T00:00:00+00:00 (1 day, 1:00:00)",
     "2026-06-28T23:00:00+00:00 -> 2026-06-30T00:00:00+00:00 (1 day, 1:00:00)"
   ],
   "market": "USD-M perpetual",
-  "retrieved_at": "2026-07-28T19:59:15.967655Z",
-  "rows": 47976,
+  "retrieved_at": "2026-08-04T09:44:00.381845Z",
+  "rows": 3648,
   "sha256": {
-    "funding": "9cea3d4bb9424a15102d7e8a941d068a835e9c861e4752a044d4e76fb7fc9003",
-    "perp": "fe07af74a6e509eb3471aaf173f9de5ae9b1fa4e34b6596bc4229178a767f087"
+    "funding": "a5e26bce93468fcf4229015266f1a766f68ad2be758ad849d160785f56ad332f",
+    "perp": "39185c4a52c278630823bf974cfef607e19168362c651c90beb6dbadc9fac842"
   },
   "source": "https://data.binance.vision/data/futures/um/monthly",
-  "start": "2021-01-01T00:00:00Z",
+  "start": "2026-03-01T00:00:00Z",
   "symbol": "ETHUSDT",
   "timeframe": "1h"
 }

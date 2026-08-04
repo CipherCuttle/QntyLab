@@ -50,8 +50,10 @@ def build_panel(root):
 
 def evaluate(root):
     stamps, closes, funding=build_panel(root); w1=_weights_v1(closes); w2,_=_weights_v2(closes); results={}
-    for name,w in [('CLEAN_V1',w1),('CLEAN_V2',w2),('FLAT',np.zeros_like(w1)),('REBALANCED_EQUAL_WEIGHT_ALWAYS_LONG',np.full_like(w1,1/9))]:
-        for regime,rate in [('base',0.00075),('stress',0.0015)]: results[f'{name}_{regime}']=run_equity(closes,w,stamps,funding,EVAL['start'],EVAL['end'],rate)
+    for name,w in [('CLEAN_V1',w1),('CLEAN_V2',w2),('FLAT',np.zeros_like(w1)),('STATIC_EQUAL_NOTIONAL_BUY_AND_HOLD',np.full_like(w1,1/9)),('REBALANCED_EQUAL_WEIGHT_ALWAYS_LONG',np.full_like(w1,1/9))]:
+        for regime,rate in [('base',0.00075),('stress',0.0015)]:
+            results[f'{name}_{regime}']=run_equity(closes,w,stamps,funding,EVAL['start'],EVAL['end'],rate)
+            results[f'{name}_{regime}_TAIL']=run_equity(closes,w,stamps,funding,EVAL['tail_start'],EVAL['tail_end'],rate)
     return {'symbols':SYMBOLS,'evaluation':EVAL,'results':results}
 
 if __name__ == '__main__':

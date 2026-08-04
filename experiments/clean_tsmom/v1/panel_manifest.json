@@ -1,0 +1,19 @@
+{
+  "end": "2026-08-01T00:00:00Z",
+  "funding_rows_per_symbol": 459,
+  "premium_index_used": false,
+  "remaining_gaps": [],
+  "rows_per_symbol": 3672,
+  "start": "2026-03-01T00:00:00Z",
+  "symbols": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "XRPUSDT",
+    "LINKUSDT",
+    "DOTUSDT",
+    "BNBUSDT",
+    "ADAUSDT",
+    "SOLUSDT",
+    "AVAXUSDT"
+  ]
+}

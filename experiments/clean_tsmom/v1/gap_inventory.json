@@ -1,0 +1,60 @@
+{
+  "expected_1h_rows": 3672,
+  "remaining_gaps": [],
+  "symbols": {
+    "ADAUSDT": {
+      "actual_rows": 3672,
+      "duplicates": 0,
+      "missing_count": 0,
+      "off_grid": 0
+    },
+    "AVAXUSDT": {
+      "actual_rows": 3672,
+      "duplicates": 0,
+      "missing_count": 0,
+      "off_grid": 0
+    },
+    "BNBUSDT": {
+      "actual_rows": 3672,
+      "duplicates": 0,
+      "missing_count": 0,
+      "off_grid": 0
+    },
+    "BTCUSDT": {
+      "actual_rows": 3672,
+      "duplicates": 0,
+      "missing_count": 0,
+      "off_grid": 0
+    },
+    "DOTUSDT": {
+      "actual_rows": 3672,
+      "duplicates": 0,
+      "missing_count": 0,
+      "off_grid": 0
+    },
+    "ETHUSDT": {
+      "actual_rows": 3672,
+      "duplicates": 0,
+      "missing_count": 0,
+      "off_grid": 0
+    },
+    "LINKUSDT": {
+      "actual_rows": 3672,
+      "duplicates": 0,
+      "missing_count": 0,
+      "off_grid": 0
+    },
+    "SOLUSDT": {
+      "actual_rows": 3672,
+      "duplicates": 0,
+      "missing_count": 0,
+      "off_grid": 0
+    },
+    "XRPUSDT": {
+      "actual_rows": 3672,
+      "duplicates": 0,
+      "missing_count": 0,
+      "off_grid": 0
+    }
+  }
+}

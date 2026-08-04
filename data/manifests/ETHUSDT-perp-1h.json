@@ -1,26 +1,108 @@
 {
-  "complete_archive_months_only": true,
-  "data_type": [
-    "klines",
-    "premiumIndexKlines",
-    "fundingRate"
-  ],
-  "end": "2026-07-31T23:00:00Z",
-  "funding_end": "2026-07-31T16:00:00Z",
-  "funding_events": 459,
-  "funding_start": "2026-03-01T00:00:00.005000Z",
-  "gaps": [
-    "2026-06-28T23:00:00+00:00 -> 2026-06-30T00:00:00+00:00 (1 day, 1:00:00)"
-  ],
-  "market": "USD-M perpetual",
-  "retrieved_at": "2026-08-04T09:44:00.381845Z",
-  "rows": 3648,
-  "sha256": {
-    "funding": "a5e26bce93468fcf4229015266f1a766f68ad2be758ad849d160785f56ad332f",
-    "perp": "39185c4a52c278630823bf974cfef607e19168362c651c90beb6dbadc9fac842"
-  },
-  "source": "https://data.binance.vision/data/futures/um/monthly",
-  "start": "2026-03-01T00:00:00Z",
-  "symbol": "ETHUSDT",
-  "timeframe": "1h"
+  "funding_rows": 459,
+  "funding_sha256": "da0fee327dfdfc3b9586cac199b0889c908b9f269e23e5ec23f04272f3e460bd",
+  "rows": 3672,
+  "sha256": "746e4f1d2a8566b75a73723ea19ac4a71b62ce6ef9d1d30ea2e5c6b06ef0eb29",
+  "sources": [
+    {
+      "byte_count": 39550,
+      "members": [
+        "ETHUSDT-1h-2026-03.csv"
+      ],
+      "row_count": 744,
+      "sha256": "9ec5e28db1e0cf093d5c756b85329b43db730d6f95d6ed142a9717044b1423c2",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/ETHUSDT/1h/ETHUSDT-1h-2026-03.zip"
+    },
+    {
+      "byte_count": 1002,
+      "members": [
+        "ETHUSDT-fundingRate-2026-03.csv"
+      ],
+      "row_count": 93,
+      "sha256": "9f5625846c503a1e94fcdecd2deb37dc8852e341add353fa48c2b9a0cc70df6a",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/ETHUSDT/ETHUSDT-fundingRate-2026-03.zip"
+    },
+    {
+      "byte_count": 37859,
+      "members": [
+        "ETHUSDT-1h-2026-04.csv"
+      ],
+      "row_count": 720,
+      "sha256": "b72f5a102bd468d1e3d0c3b88619f1354a29e81616f9a55935d2e00837958e4b",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/ETHUSDT/1h/ETHUSDT-1h-2026-04.zip"
+    },
+    {
+      "byte_count": 963,
+      "members": [
+        "ETHUSDT-fundingRate-2026-04.csv"
+      ],
+      "row_count": 90,
+      "sha256": "86160f455478a8b262d96d1516f583355e6e0cec7beeb5784e69dda76f599e98",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/ETHUSDT/ETHUSDT-fundingRate-2026-04.zip"
+    },
+    {
+      "byte_count": 38839,
+      "members": [
+        "ETHUSDT-1h-2026-05.csv"
+      ],
+      "row_count": 744,
+      "sha256": "5353c7cd71f610eca5a58824606ba1016efe34ea62fd6e6cd4b7be4b99277915",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/ETHUSDT/1h/ETHUSDT-1h-2026-05.zip"
+    },
+    {
+      "byte_count": 980,
+      "members": [
+        "ETHUSDT-fundingRate-2026-05.csv"
+      ],
+      "row_count": 93,
+      "sha256": "ff926ad3fc48493c26c85af16620b19c695cc1854faa1e7f0ea2ab9fdafc2084",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/ETHUSDT/ETHUSDT-fundingRate-2026-05.zip"
+    },
+    {
+      "byte_count": 38024,
+      "members": [
+        "ETHUSDT-1h-2026-06.csv"
+      ],
+      "row_count": 720,
+      "sha256": "138bcb6c7c8be4c5bdd8048fa417be551fbeffe4024f64e5bef5ed30d3069d8c",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/ETHUSDT/1h/ETHUSDT-1h-2026-06.zip"
+    },
+    {
+      "byte_count": 967,
+      "members": [
+        "ETHUSDT-fundingRate-2026-06.csv"
+      ],
+      "row_count": 90,
+      "sha256": "cc6fb028a811bc423b711f6b89de067bf92a2eda61303e1ce0b219b5d3210e47",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/ETHUSDT/ETHUSDT-fundingRate-2026-06.zip"
+    },
+    {
+      "byte_count": 38922,
+      "members": [
+        "ETHUSDT-1h-2026-07.csv"
+      ],
+      "row_count": 744,
+      "sha256": "2036043c65c50a1d9c817db4c93db0c97366851d7cc972efb8c5e951cb3b5cdd",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/ETHUSDT/1h/ETHUSDT-1h-2026-07.zip"
+    },
+    {
+      "byte_count": 941,
+      "members": [
+        "ETHUSDT-fundingRate-2026-07.csv"
+      ],
+      "row_count": 93,
+      "sha256": "ece7f6c64d0e45fbd64929dec40bae525fe365381046e367de5ca0827bc623d3",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/ETHUSDT/ETHUSDT-fundingRate-2026-07.zip"
+    }
+  ]
 }

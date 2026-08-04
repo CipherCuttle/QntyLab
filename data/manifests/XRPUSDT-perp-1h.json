@@ -1,26 +1,108 @@
 {
-  "complete_archive_months_only": true,
-  "data_type": [
-    "klines",
-    "premiumIndexKlines",
-    "fundingRate"
-  ],
-  "end": "2026-07-31T23:00:00Z",
-  "funding_end": "2026-07-31T16:00:00Z",
-  "funding_events": 459,
-  "funding_start": "2026-03-01T00:00:00.005000Z",
-  "gaps": [
-    "2026-06-28T23:00:00+00:00 -> 2026-06-30T00:00:00+00:00 (1 day, 1:00:00)"
-  ],
-  "market": "USD-M perpetual",
-  "retrieved_at": "2026-08-04T09:44:10.872006Z",
-  "rows": 3648,
-  "sha256": {
-    "funding": "667d362e516f2aa3e43700d79fce3c4a95c4db3498e9ac480f9698e10311ba7f",
-    "perp": "cc5b03f8332e8455274632ad252f39d1d36a91a4e1f43f46562bcfb3f29f461c"
-  },
-  "source": "https://data.binance.vision/data/futures/um/monthly",
-  "start": "2026-03-01T00:00:00Z",
-  "symbol": "XRPUSDT",
-  "timeframe": "1h"
+  "funding_rows": 459,
+  "funding_sha256": "f689e45543a619995dd88217602e997374326188d4cf0d668f4462e4fcc0402f",
+  "rows": 3672,
+  "sha256": "00e325f89345751ed4f6221214bc11b838782c5299c9f22f3676809dd0508960",
+  "sources": [
+    {
+      "byte_count": 36142,
+      "members": [
+        "XRPUSDT-1h-2026-03.csv"
+      ],
+      "row_count": 744,
+      "sha256": "916f1669dd934c78b9d94c655d9fe20e95ab355e11650f2aced3561efde05f1b",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/XRPUSDT/1h/XRPUSDT-1h-2026-03.zip"
+    },
+    {
+      "byte_count": 999,
+      "members": [
+        "XRPUSDT-fundingRate-2026-03.csv"
+      ],
+      "row_count": 93,
+      "sha256": "e3399c2e5fd5c18a2716b26530bcedc7fb9ce8adb2641c0882c8ba6e0a336567",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/XRPUSDT/XRPUSDT-fundingRate-2026-03.zip"
+    },
+    {
+      "byte_count": 34504,
+      "members": [
+        "XRPUSDT-1h-2026-04.csv"
+      ],
+      "row_count": 720,
+      "sha256": "ab93b4954e1b531766ba46e4a079a06f767a40b16cc14a9f8f321ab80af19ae2",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/XRPUSDT/1h/XRPUSDT-1h-2026-04.zip"
+    },
+    {
+      "byte_count": 974,
+      "members": [
+        "XRPUSDT-fundingRate-2026-04.csv"
+      ],
+      "row_count": 90,
+      "sha256": "0e586915d578a977ad69482ddc52c11d9c2c1a767d3865078553b3e91fb7716a",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/XRPUSDT/XRPUSDT-fundingRate-2026-04.zip"
+    },
+    {
+      "byte_count": 35689,
+      "members": [
+        "XRPUSDT-1h-2026-05.csv"
+      ],
+      "row_count": 744,
+      "sha256": "30273c8778fab32eff2cc1343b3f0fd1087005bca859786cffe4fe8169b4cd97",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/XRPUSDT/1h/XRPUSDT-1h-2026-05.zip"
+    },
+    {
+      "byte_count": 1002,
+      "members": [
+        "XRPUSDT-fundingRate-2026-05.csv"
+      ],
+      "row_count": 93,
+      "sha256": "f8c0c09953b112a7f5ac203a826811ead1ac43db8c075b17b2ca69e837828255",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/XRPUSDT/XRPUSDT-fundingRate-2026-05.zip"
+    },
+    {
+      "byte_count": 34886,
+      "members": [
+        "XRPUSDT-1h-2026-06.csv"
+      ],
+      "row_count": 720,
+      "sha256": "f26db58471a44843813bd757923e999a9d8d8b421fabb11292c015993795d2b6",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/XRPUSDT/1h/XRPUSDT-1h-2026-06.zip"
+    },
+    {
+      "byte_count": 962,
+      "members": [
+        "XRPUSDT-fundingRate-2026-06.csv"
+      ],
+      "row_count": 90,
+      "sha256": "f5d1b51767ddc812c4608080adf54cfca0db7cba592d3e62d7416cd358a3ebde",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/XRPUSDT/XRPUSDT-fundingRate-2026-06.zip"
+    },
+    {
+      "byte_count": 35375,
+      "members": [
+        "XRPUSDT-1h-2026-07.csv"
+      ],
+      "row_count": 744,
+      "sha256": "9dbdf2f4b57be325d70455ac36cdf403cf8b90d56688bbe72e930fdf74b832de",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/XRPUSDT/1h/XRPUSDT-1h-2026-07.zip"
+    },
+    {
+      "byte_count": 972,
+      "members": [
+        "XRPUSDT-fundingRate-2026-07.csv"
+      ],
+      "row_count": 93,
+      "sha256": "c705d06f311e974474a74dc2c5f572c9180630930cf2d5dbaf08cfb7f3d1948c",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/XRPUSDT/XRPUSDT-fundingRate-2026-07.zip"
+    }
+  ]
 }

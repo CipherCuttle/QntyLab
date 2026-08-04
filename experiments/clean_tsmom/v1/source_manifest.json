@@ -1,0 +1,81 @@
+{
+  "network_attempts": {
+    "official_archive_file_requests": 90,
+    "official_rest_requests": 0,
+    "total_market_data_network_attempts": 90
+  },
+  "panel": {
+    "ADAUSDT": {
+      "funding_rows": 459,
+      "funding_sha256": "ea45d860fbb4203e791161b46937aa8a462607c5a969650b4fd0111dbf0a4715",
+      "rows": 3672,
+      "sha256": "109ccf881daf15c8be72b2b4e8e19b5dd9de00a5d9f025d0911d2605fa5ceeea"
+    },
+    "AVAXUSDT": {
+      "funding_rows": 459,
+      "funding_sha256": "ad29bb5dcd9f0af07b492e498c868ecbeb2631d604683f0ece83aa73964afb74",
+      "rows": 3672,
+      "sha256": "4b84a3effe01d19ffd36f1a0a57b28f56af0d58e5bf1c0109c5d24db9085d6c7"
+    },
+    "BNBUSDT": {
+      "funding_rows": 459,
+      "funding_sha256": "05ce98553c11c68e36f01c06a6145863e63cc7045e57b004d947683fab9e040e",
+      "rows": 3672,
+      "sha256": "cbf2f59d087991e3b99648576402420e983348d1b3316f39d30f57583e6ec67a"
+    },
+    "BTCUSDT": {
+      "funding_rows": 459,
+      "funding_sha256": "2866c8ba408fd0e441dc3e7b03303ec1cf238bc94ecd543b7640acb9997436fb",
+      "rows": 3672,
+      "sha256": "5fc9b1edbb5eedbc30701f9ca82026456d17ad0dbff818dda82e007800562d3b"
+    },
+    "DOTUSDT": {
+      "funding_rows": 459,
+      "funding_sha256": "6f817156424c06c9a6d339eb3fcfb73bb30ed34b8f950ae03777c96a9bb48bf4",
+      "rows": 3672,
+      "sha256": "6e7a6f0cd7405d5f360befd37ac61a08b45fdfc1241334392cbcdd9c2f4bca9c"
+    },
+    "ETHUSDT": {
+      "funding_rows": 459,
+      "funding_sha256": "da0fee327dfdfc3b9586cac199b0889c908b9f269e23e5ec23f04272f3e460bd",
+      "rows": 3672,
+      "sha256": "746e4f1d2a8566b75a73723ea19ac4a71b62ce6ef9d1d30ea2e5c6b06ef0eb29"
+    },
+    "LINKUSDT": {
+      "funding_rows": 459,
+      "funding_sha256": "47c80026f0e5caf6a1aa0a04a5eb6cb6924ec73b138c0acd85c1638b8021d244",
+      "rows": 3672,
+      "sha256": "bbf2f1711fae5ce5feb5fa35c0516f4c2e50730a6cb2676b243bc8fbe4f4245b"
+    },
+    "SOLUSDT": {
+      "funding_rows": 459,
+      "funding_sha256": "54cdfe07f692183ec5e35e13eadbbe042207c105ba3ab0c592ff8dbd8f29f3c3",
+      "rows": 3672,
+      "sha256": "5902e10bc475d9f4b8bb6932716bc3ccd642e18711bb85473905e2c7a10038b4"
+    },
+    "XRPUSDT": {
+      "funding_rows": 459,
+      "funding_sha256": "f689e45543a619995dd88217602e997374326188d4cf0d668f4462e4fcc0402f",
+      "rows": 3672,
+      "sha256": "00e325f89345751ed4f6221214bc11b838782c5299c9f22f3676809dd0508960"
+    }
+  },
+  "period": {
+    "end": "2026-08-01T00:00:00Z",
+    "start": "2026-03-01T00:00:00Z"
+  },
+  "premium_index_required": false,
+  "schema_version": 1,
+  "source": "Binance USD-M monthly klines and settled fundingRate archives",
+  "symbols": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "XRPUSDT",
+    "LINKUSDT",
+    "DOTUSDT",
+    "BNBUSDT",
+    "ADAUSDT",
+    "SOLUSDT",
+    "AVAXUSDT"
+  ]
+}

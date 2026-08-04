@@ -1,26 +1,108 @@
 {
-  "complete_archive_months_only": true,
-  "data_type": [
-    "klines",
-    "premiumIndexKlines",
-    "fundingRate"
-  ],
-  "end": "2026-07-31T23:00:00Z",
-  "funding_end": "2026-07-31T16:00:00Z",
-  "funding_events": 459,
-  "funding_start": "2026-03-01T00:00:00.005000Z",
-  "gaps": [
-    "2026-06-28T23:00:00+00:00 -> 2026-06-30T00:00:00+00:00 (1 day, 1:00:00)"
-  ],
-  "market": "USD-M perpetual",
-  "retrieved_at": "2026-08-04T09:44:56.060891Z",
-  "rows": 3648,
-  "sha256": {
-    "funding": "fca372408fa08c4d6c02b035216ee042ac6b042c9784569f17c6e6caf1394da8",
-    "perp": "2c532be1ee366ecfba0642e6ba8204a38a7bab17245996f298899ec118ea488b"
-  },
-  "source": "https://data.binance.vision/data/futures/um/monthly",
-  "start": "2026-03-01T00:00:00Z",
-  "symbol": "ADAUSDT",
-  "timeframe": "1h"
+  "funding_rows": 459,
+  "funding_sha256": "ea45d860fbb4203e791161b46937aa8a462607c5a969650b4fd0111dbf0a4715",
+  "rows": 3672,
+  "sha256": "109ccf881daf15c8be72b2b4e8e19b5dd9de00a5d9f025d0911d2605fa5ceeea",
+  "sources": [
+    {
+      "byte_count": 33068,
+      "members": [
+        "ADAUSDT-1h-2026-03.csv"
+      ],
+      "row_count": 744,
+      "sha256": "ff5904ca0403f13d03dd46f2e84992f328f05d1c19b6d35702882981b123fc87",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/ADAUSDT/1h/ADAUSDT-1h-2026-03.zip"
+    },
+    {
+      "byte_count": 974,
+      "members": [
+        "ADAUSDT-fundingRate-2026-03.csv"
+      ],
+      "row_count": 93,
+      "sha256": "5a9a9b2e3b41521ab2cc28ece3ece06d8611f0f033cabaa1ac1f7e678ce23c0e",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/ADAUSDT/ADAUSDT-fundingRate-2026-03.zip"
+    },
+    {
+      "byte_count": 31637,
+      "members": [
+        "ADAUSDT-1h-2026-04.csv"
+      ],
+      "row_count": 720,
+      "sha256": "50f5e57f0a20a83bb49e485afd0bb6725a01ad4bd16e179dc9028ad4ea9ff7de",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/ADAUSDT/1h/ADAUSDT-1h-2026-04.zip"
+    },
+    {
+      "byte_count": 896,
+      "members": [
+        "ADAUSDT-fundingRate-2026-04.csv"
+      ],
+      "row_count": 90,
+      "sha256": "b2769eeed3ad6e22d871c995632110cc568c6a40d1d61be7158cad1fc4d60cf8",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/ADAUSDT/ADAUSDT-fundingRate-2026-04.zip"
+    },
+    {
+      "byte_count": 32532,
+      "members": [
+        "ADAUSDT-1h-2026-05.csv"
+      ],
+      "row_count": 744,
+      "sha256": "946ae68bd3e3e97eaa5a94998b67130aab3bed1c9bcde0444280d6e22c1ad12e",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/ADAUSDT/1h/ADAUSDT-1h-2026-05.zip"
+    },
+    {
+      "byte_count": 941,
+      "members": [
+        "ADAUSDT-fundingRate-2026-05.csv"
+      ],
+      "row_count": 93,
+      "sha256": "6e32d7bbdfaa3a2542fe39f918c1b79fccb01be6ee725775095a93c253778862",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/ADAUSDT/ADAUSDT-fundingRate-2026-05.zip"
+    },
+    {
+      "byte_count": 31999,
+      "members": [
+        "ADAUSDT-1h-2026-06.csv"
+      ],
+      "row_count": 720,
+      "sha256": "d09ab1f1574e388622ac742fae2988e3e0ff7041cf1b1a40835a4e4fa3a76209",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/ADAUSDT/1h/ADAUSDT-1h-2026-06.zip"
+    },
+    {
+      "byte_count": 987,
+      "members": [
+        "ADAUSDT-fundingRate-2026-06.csv"
+      ],
+      "row_count": 90,
+      "sha256": "e41b9ac1f3d6651ff94562de9b3a0297016c6dc2d2def42f6561d963cfdb0fc1",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/ADAUSDT/ADAUSDT-fundingRate-2026-06.zip"
+    },
+    {
+      "byte_count": 32658,
+      "members": [
+        "ADAUSDT-1h-2026-07.csv"
+      ],
+      "row_count": 744,
+      "sha256": "00ed276f06a95b516d80deabf294d9bcb0dc646878454ac70e7840e684b8ffc4",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/ADAUSDT/1h/ADAUSDT-1h-2026-07.zip"
+    },
+    {
+      "byte_count": 897,
+      "members": [
+        "ADAUSDT-fundingRate-2026-07.csv"
+      ],
+      "row_count": 93,
+      "sha256": "b5f0642d725a80e55a4f6588ad2c55529ac22ea21e08022fde0056d39ee7a59c",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/ADAUSDT/ADAUSDT-fundingRate-2026-07.zip"
+    }
+  ]
 }

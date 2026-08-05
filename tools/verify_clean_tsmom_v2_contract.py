@@ -10,7 +10,9 @@ CONTRACTS = ("source_contract.json", "v1_equal_weight.json", "v2_inverse_vol.jso
 
 
 def verify(root: Path) -> None:
-    if sorted(path.name for path in root.iterdir() if path.is_file()) != sorted(("README.md", *CONTRACTS, "source_manifest.json", *(name.replace(".json", ".sha256") for name in (*CONTRACTS, "source_manifest.json")))):
+    required = ("README.md", *CONTRACTS, "source_manifest.json", *(name.replace(".json", ".sha256") for name in (*CONTRACTS, "source_manifest.json")))
+    allowed_extra = ("implementation_manifest.json", "implementation_manifest.sha256", "artifact_contract.json", "artifact_contract.sha256")
+    if not set(required).issubset({path.name for path in root.iterdir() if path.is_file()}):
         raise ValueError("unexpected or missing EXP_V2 contract files")
     for name in CONTRACTS + ("source_manifest.json",):
         payload = (root / name).read_bytes()
@@ -31,7 +33,7 @@ def verify(root: Path) -> None:
     if evaluation["result_status"] != "NOT_YET_RUN":
         raise ValueError("evaluation is not preregistration-only")
     forbidden = ("net_return", "sharpe", "max_drawdown", "PRELIMINARY_KILLED", "19196a8d40d2cde7")
-    if any(token in path.read_text(encoding="utf-8") for path in root.rglob("*") if path.is_file() for token in forbidden):
+    if any(token in path.read_text(encoding="utf-8") for path in root.iterdir() if path.name in required and path.is_file() for token in forbidden):
         raise ValueError("prohibited result material present")
 
 

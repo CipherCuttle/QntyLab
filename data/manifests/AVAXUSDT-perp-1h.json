@@ -1,0 +1,108 @@
+{
+  "funding_rows": 459,
+  "funding_sha256": "ad29bb5dcd9f0af07b492e498c868ecbeb2631d604683f0ece83aa73964afb74",
+  "rows": 3672,
+  "sha256": "4b84a3effe01d19ffd36f1a0a57b28f56af0d58e5bf1c0109c5d24db9085d6c7",
+  "sources": [
+    {
+      "byte_count": 31001,
+      "members": [
+        "AVAXUSDT-1h-2026-03.csv"
+      ],
+      "row_count": 744,
+      "sha256": "dc9c74c842c8dc9d739f689bc1e6c843cfaa10a6aa9b66f7f14ef322e53f6991",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/AVAXUSDT/1h/AVAXUSDT-1h-2026-03.zip"
+    },
+    {
+      "byte_count": 958,
+      "members": [
+        "AVAXUSDT-fundingRate-2026-03.csv"
+      ],
+      "row_count": 93,
+      "sha256": "99d797f431a2c838dab0b0cc994f824d5504fdc23a907bdb091bd35bc5f9622e",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/AVAXUSDT/AVAXUSDT-fundingRate-2026-03.zip"
+    },
+    {
+      "byte_count": 29849,
+      "members": [
+        "AVAXUSDT-1h-2026-04.csv"
+      ],
+      "row_count": 720,
+      "sha256": "330c5145366e46d3ce11c0554e549e250df703be7570184fefd86a4db4ad8eb7",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/AVAXUSDT/1h/AVAXUSDT-1h-2026-04.zip"
+    },
+    {
+      "byte_count": 914,
+      "members": [
+        "AVAXUSDT-fundingRate-2026-04.csv"
+      ],
+      "row_count": 90,
+      "sha256": "65b607cb328fa7fc10ae0989455c5f309fc112eb403e6874b4e005e64af941f0",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/AVAXUSDT/AVAXUSDT-fundingRate-2026-04.zip"
+    },
+    {
+      "byte_count": 30777,
+      "members": [
+        "AVAXUSDT-1h-2026-05.csv"
+      ],
+      "row_count": 744,
+      "sha256": "eff9574f5906bbf0f026c91961f900c36e5379e5918802960aa6386b7946c141",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/AVAXUSDT/1h/AVAXUSDT-1h-2026-05.zip"
+    },
+    {
+      "byte_count": 966,
+      "members": [
+        "AVAXUSDT-fundingRate-2026-05.csv"
+      ],
+      "row_count": 93,
+      "sha256": "13dfb89d73e28b10121be4018fee2f3071bfe3fe8f73faafe813d3684bfb9ccb",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/AVAXUSDT/AVAXUSDT-fundingRate-2026-05.zip"
+    },
+    {
+      "byte_count": 30021,
+      "members": [
+        "AVAXUSDT-1h-2026-06.csv"
+      ],
+      "row_count": 720,
+      "sha256": "d0deb5c979fbc81b7dfdd1b35c0bb5425941b5f7ac270f30baeaa466208e3edc",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/AVAXUSDT/1h/AVAXUSDT-1h-2026-06.zip"
+    },
+    {
+      "byte_count": 974,
+      "members": [
+        "AVAXUSDT-fundingRate-2026-06.csv"
+      ],
+      "row_count": 90,
+      "sha256": "d89f850bc8d231872575402ab9b514ad0f5a3bcffd00510127ecd694b82e5261",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/AVAXUSDT/AVAXUSDT-fundingRate-2026-06.zip"
+    },
+    {
+      "byte_count": 30168,
+      "members": [
+        "AVAXUSDT-1h-2026-07.csv"
+      ],
+      "row_count": 744,
+      "sha256": "4375f0ac4ae192e863fb4722df9afec601409a3fa48e1f7bdcac0419f4159389",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/AVAXUSDT/1h/AVAXUSDT-1h-2026-07.zip"
+    },
+    {
+      "byte_count": 941,
+      "members": [
+        "AVAXUSDT-fundingRate-2026-07.csv"
+      ],
+      "row_count": 93,
+      "sha256": "5bf8c87477bdefc138b26cc29945f4ec64137b8c58e3e4683407aad367874712",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/AVAXUSDT/AVAXUSDT-fundingRate-2026-07.zip"
+    }
+  ]
+}

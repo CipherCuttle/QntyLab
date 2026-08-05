@@ -1,0 +1,108 @@
+{
+  "funding_rows": 459,
+  "funding_sha256": "6f817156424c06c9a6d339eb3fcfb73bb30ed34b8f950ae03777c96a9bb48bf4",
+  "rows": 3672,
+  "sha256": "6e7a6f0cd7405d5f360befd37ac61a08b45fdfc1241334392cbcdd9c2f4bca9c",
+  "sources": [
+    {
+      "byte_count": 31689,
+      "members": [
+        "DOTUSDT-1h-2026-03.csv"
+      ],
+      "row_count": 744,
+      "sha256": "7f3105662156c1aa503fc446f0788b8aea9278302acd74b2f245266365e71d9d",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/DOTUSDT/1h/DOTUSDT-1h-2026-03.zip"
+    },
+    {
+      "byte_count": 994,
+      "members": [
+        "DOTUSDT-fundingRate-2026-03.csv"
+      ],
+      "row_count": 93,
+      "sha256": "a5b46857de6136625de14a043fa442f4c505cc96cc359530ea88a5773be9cdc0",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/DOTUSDT/DOTUSDT-fundingRate-2026-03.zip"
+    },
+    {
+      "byte_count": 30184,
+      "members": [
+        "DOTUSDT-1h-2026-04.csv"
+      ],
+      "row_count": 720,
+      "sha256": "f010c64ddf6d2718dea21588c19f2c99ff485a82f3e477a7acf019e3f72e7a8e",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/DOTUSDT/1h/DOTUSDT-1h-2026-04.zip"
+    },
+    {
+      "byte_count": 987,
+      "members": [
+        "DOTUSDT-fundingRate-2026-04.csv"
+      ],
+      "row_count": 90,
+      "sha256": "f612f76ac842dd3c43d367a651d622ca58eb3682724aca75a72455667aced9e6",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/DOTUSDT/DOTUSDT-fundingRate-2026-04.zip"
+    },
+    {
+      "byte_count": 30887,
+      "members": [
+        "DOTUSDT-1h-2026-05.csv"
+      ],
+      "row_count": 744,
+      "sha256": "f7ae722476e3268156063e84d516992a4db4173a09cd56de979a5cfe1083938e",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/DOTUSDT/1h/DOTUSDT-1h-2026-05.zip"
+    },
+    {
+      "byte_count": 941,
+      "members": [
+        "DOTUSDT-fundingRate-2026-05.csv"
+      ],
+      "row_count": 93,
+      "sha256": "dc9fc57d302d9acc41f87cff869e8fbea9f4902fc5cfbd6678e3a9166a2c5b6f",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/DOTUSDT/DOTUSDT-fundingRate-2026-05.zip"
+    },
+    {
+      "byte_count": 30103,
+      "members": [
+        "DOTUSDT-1h-2026-06.csv"
+      ],
+      "row_count": 720,
+      "sha256": "4b24eb0e18c34cfb5cc89331f34783f555db861040722d519496cb0249205b9c",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/DOTUSDT/1h/DOTUSDT-1h-2026-06.zip"
+    },
+    {
+      "byte_count": 964,
+      "members": [
+        "DOTUSDT-fundingRate-2026-06.csv"
+      ],
+      "row_count": 90,
+      "sha256": "2b7c713c49d79428fd441e80df80f9c3c2daaae4843de43cc89bf40c7ad0a6f1",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/DOTUSDT/DOTUSDT-fundingRate-2026-06.zip"
+    },
+    {
+      "byte_count": 31728,
+      "members": [
+        "DOTUSDT-1h-2026-07.csv"
+      ],
+      "row_count": 744,
+      "sha256": "d5d117fe359e141b178aa98acae39f6380aefcd00af22d5a24f230cda6584b85",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/DOTUSDT/1h/DOTUSDT-1h-2026-07.zip"
+    },
+    {
+      "byte_count": 922,
+      "members": [
+        "DOTUSDT-fundingRate-2026-07.csv"
+      ],
+      "row_count": 93,
+      "sha256": "bb7c31df0e1bb70eebac4675087e80b8bd75f25d4c38469e6523c48c3977b7bf",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/DOTUSDT/DOTUSDT-fundingRate-2026-07.zip"
+    }
+  ]
+}

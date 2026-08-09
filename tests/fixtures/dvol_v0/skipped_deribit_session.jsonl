@@ -1,0 +1,4 @@
+{"attempt":1,"session_id":"session-a","sequence":1,"kind":"CONNECTION_OPEN","receipt_utc":"2026-08-03T00:05:00Z","receipt_monotonic_ns":100}
+{"attempt":1,"session_id":"session-a","sequence":2,"kind":"REQUEST_SENT","receipt_utc":"2026-08-03T00:05:00Z","receipt_monotonic_ns":101,"payload_base64":"eyJpZCI6MSwianNvbnJwYyI6IjIuMCIsIm1ldGhvZCI6InB1YmxpYy9zdWJzY3JpYmUiLCJwYXJhbXMiOnsiY2hhbm5lbHMiOlsiZGVyaWJpdF92b2xhdGlsaXR5X2luZGV4LmJ0Y191c2QiLCJkZXJpYml0X3ZvbGF0aWxpdHlfaW5kZXguZXRoX3VzZCJdfX0="}
+{"attempt":1,"session_id":"session-a","sequence":3,"kind":"TRANSPORT_ERROR","receipt_utc":"2026-08-03T00:05:01Z","receipt_monotonic_ns":102,"error":"recorded disconnect"}
+{"attempt":1,"session_id":"session-a","sequence":4,"kind":"CONNECTION_CLOSED","receipt_utc":"2026-08-03T00:05:02Z","receipt_monotonic_ns":103}

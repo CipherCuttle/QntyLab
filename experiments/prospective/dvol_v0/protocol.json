@@ -1,0 +1,156 @@
+{
+  "amendment_policy": {
+    "after_first_eligible_primary_observation": "Any material change to source identity, timing, symbols, unit conversion, predictors, benchmark, outcome, metric, missing-data rule, or stopping rule creates a new protocol identity; V0 is preserved and never rewritten.",
+    "before_first_eligible_primary_observation": "A material amendment requires a new version, byte preservation of this protocol, and independent review."
+  },
+  "assets": [
+    "BTC",
+    "ETH"
+  ],
+  "authority": {
+    "analysis_execution_authorized": false,
+    "capture_implementation_authorized": false,
+    "historical_backfill_authorized": false,
+    "historical_primary_observation_backfill_authorized": false,
+    "live_authorized": false,
+    "network_access_authorized": false,
+    "paper_authorized": false,
+    "qnty_validation_authorized": false,
+    "shadow_authorized": false,
+    "strategy_generation_authorized": false,
+    "trading_claim_authorized": false
+  },
+  "benchmark": {
+    "definition": "Trailing Binance Spot realized volatility from 720 hourly log returns ending at the last fully closed Monday 00:00 UTC boundary.",
+    "forecast": "The benchmark forecast is the formation-time trailing_30_day_realized_volatility_percent with zero fitted parameters."
+  },
+  "created_date": "2026-08-03",
+  "experiment_class": "PROSPECTIVE_PUBLIC_MARKET_OBSERVATION",
+  "forecast_comparison": {
+    "alternative_hypothesis": "Across the same 104 complete paired scheduled weeks, the frozen DVOL forecast has lower pooled mean absolute error than the frozen trailing-realized-volatility benchmark and neither asset has higher DVOL mean absolute error.",
+    "dvol_forecast": "The DVOL forecast is the accepted Deribit volatility numeric value in annualized percentage points; conversion to decimal for arithmetic is raw_value / 100. It has zero fitted parameters.",
+    "forecast_formula_status": "FROZEN_SIMPLE_ZERO_FITTED_PARAMETERS",
+    "null_hypothesis": "The frozen DVOL forecast does not meet the frozen exploratory retention comparison against the frozen trailing-realized-volatility benchmark on the same complete paired scheduled weeks.",
+    "primary_metric": "absolute_forecast_error_percentage_points",
+    "primary_metric_definition": "For every complete asset-week, error is abs(forecast_percentage_points - outcome_realized_volatility_percentage_points). The sole primary metric is the equally asset-weighted pooled arithmetic mean across exactly 104 complete BTC weeks and the same 104 complete ETH weeks.",
+    "retention_rule": "At the minimum sample, retain only if pooled DVOL mean absolute error is strictly lower than pooled benchmark mean absolute error and neither asset DVOL mean absolute error exceeds its benchmark. Comparison uses unrounded full-precision computed values, strict IEEE-754 numeric less-than / greater-than semantics, and no practical margin; equality is KILLED. Any positive result is exploratory only, not evidence of statistical or economic importance, significance, power, causality, edge, or trading utility."
+  },
+  "formation": {
+    "acceptance_window": "Monday 00:05:00.000 UTC through Monday 00:10:00.000 UTC inclusive",
+    "completion_rule": "The formation completion timestamp is the later accepted UTC receipt timestamp, not a source timestamp. Both accepted values must be the first valid notification for their asset in receipt-sequence order that has both source timestamp and UTC receipt timestamp at or after the target and inside the inclusive acceptance window. Retain both accepted source timestamps separately.",
+    "message_validation_and_selection": "Accept only a JSON-RPC subscription notification whose params.channel exactly matches the asset channel, params.data.index_name exactly matches btc_usd or eth_usd, params.data.timestamp is an integer Unix-millisecond timestamp, and params.data.volatility is finite. Subscription acknowledgements are not notifications and are never data. Retain malformed, wrong-channel, wrong-index, non-finite, duplicate, delayed, and out-of-order payloads with their receipt sequence, but do not accept them. After one valid notification for an asset is accepted, every later otherwise-eligible notification for that asset is retained but is not a second formation value. An accepted asset remains accepted across a later reconnect; BTC and ETH need not share a session, but each accepted record must bind its connection/session identity.",
+    "no_last_known_value_rule": "FORBIDDEN: a pre-target, stale, missing, later out-of-window, receipt-out-of-window, duplicate-as-replacement, or substituted notification is invalid.",
+    "receipt_clock_rule": "Record UTC receipt timestamp from the local UTC clock and local monotonic receipt timestamp for every received payload, plus connection-open and subscription-acknowledgement UTC receipt timestamps. A detected discontinuity or unavailable UTC-to-monotonic receipt mapping is a local_operational_failure; do not infer acceptance from source time alone.",
+    "target": "Monday 00:05:00.000 UTC"
+  },
+  "minimum_sample_and_stopping": {
+    "analysis_before_minimum": "FORBIDDEN",
+    "maximum_scheduled_primary_weeks": 156,
+    "minimum_complete_primary_weeks_per_asset": 104,
+    "minimum_complete_primary_weeks_total": 208,
+    "paired_week_definition": "A complete paired scheduled week is one scheduled Monday for which both BTC and ETH have valid accepted DVOL formations, valid 721-close trailing predictors, and valid completed 169-close outcomes. BTC and ETH observations from different scheduled Mondays may not be combined. The primary metric and each asset comparison use the same 104 paired scheduled Mondays.",
+    "sample_size_rationale": "104 paired weeks is a descriptive two-calendar-year target, not a power or significance calculation. 156 scheduled weeks is a finite three-year stop that permits at most 52 declared skipped scheduled weeks; a 53rd skip leaves fewer than 104 possible complete paired weeks.",
+    "terminal_evaluation_rule": "When the 104th complete paired scheduled week is finalized, apply the terminal retention rule to exactly the first 104 complete paired scheduled weeks in chronological scheduled-Monday order, retain all prior declared skips, and cease V0 collection. No later week may replace, augment, or select among those 104 weeks.",
+    "upper_review_rule": "After scheduled week 156, classify BLOCKED if fewer than 104 complete paired weeks exist; otherwise apply the frozen terminal rule."
+  },
+  "missing_data_and_retry_policy": {
+    "allowed_retry": "The initial connection and subscription are attempt 1. Following a transport failure, at most one reconnect creates attempt 2 and at most one resubscribe is sent on that reconnect; no other connection or subscription attempt is permitted. Each attempted connection/session and request must be retained. Attempts may not alter target, source/receipt timestamp rule, lookback cutoff, or outcome boundaries.",
+    "categories": {
+      "incomplete_outcome": "BLOCKED",
+      "integrity_failure": "BLOCKED",
+      "local_operational_failure": "DECLARED_SKIPPED_WEEK",
+      "missed_formation_observation": "DECLARED_SKIPPED_WEEK",
+      "source_data_invalidity": "BLOCKED",
+      "source_notification_absence": "DECLARED_SKIPPED_WEEK",
+      "transport_failure": "DECLARED_SKIPPED_WEEK"
+    },
+    "maximum_declared_skipped_scheduled_weeks": 52,
+    "record_rule": "Every scheduled Monday produces exactly one retained status record. No status is silently dropped, imputed, replaced, recategorized after an outcome exists, or backfilled. A DECLARED_SKIPPED_WEEK is not an eligible observation. The 53rd declared skipped scheduled week classifies V0 as BLOCKED; collection may otherwise continue only within the 156-week cap."
+  },
+  "outcome": {
+    "annualization": "sqrt(365 * 24); calculate decimal realized volatility then multiply by 100 for percentage points",
+    "boundary_closes_required": 169,
+    "definition": "Binance Spot realized volatility over 168 strictly future one-hour log returns from BTCUSDT or ETHUSDT closed kline close prices.",
+    "end": "The 169th boundary is Monday 01:00:00 UTC seven days after the first outcome boundary; retrieve only after its originating kline has closed plus the frozen 60-second safety delay.",
+    "first_boundary": "Monday 01:00:00 UTC on the formation Monday",
+    "first_return": "Monday 01:00:00 UTC to Monday 02:00:00 UTC",
+    "incomplete_window": "FORBIDDEN",
+    "return_count": 168,
+    "return_transform": "natural logarithm of each consecutive pair of boundary close prices",
+    "standard_deviation": "sample standard deviation of exactly 168 returns; no interpolation, forward fill, duplicate removal, or population estimator"
+  },
+  "primary_question": "Does a timestamped Deribit DVOL observation produce lower forecast error than trailing Binance Spot realized volatility for future Binance Spot realized volatility?",
+  "protocol_id": "qntylab_deribit_dvol_prospective_forecast_v0",
+  "protocol_status": "FROZEN_DESIGN_ONLY_SOURCE_CONTRACT_RESOLVED_NO_IMPLEMENTATION_AUTHORIZATION",
+  "research_claim_scope": "PROSPECTIVE_FORECAST_ERROR_ONLY_NO_CAUSALITY_EDGE_OR_TRADING_CLAIM",
+  "schedule": {
+    "frequency": "weekly scheduled Mondays",
+    "timezone": "UTC"
+  },
+  "schema_version": "1.2.0",
+  "source_architecture": "DERIBIT_DVOL_PLUS_BINANCE_SPOT_KLINES",
+  "source_contract": {
+    "binance_spot_klines": {
+      "authentication": "Public market data: endpoint security type is unspecified and therefore NONE.",
+      "closure_rule": "REST kline tuples do not expose a closed/open boolean. Accept only a row whose open_time_ms and close_time_ms match the declared UTC hour: close_time_ms = open_time_ms + 3600000 - 1, and whose close_time_ms is no later than the frozen eligible cutoff. Retrieval occurs only after the requested final close_time_ms plus the frozen 60-second safety delay. No current or incomplete kline is eligible.",
+      "endpoint": "GET https://api.binance.com/api/v3/klines",
+      "formation_lookback_retrieval": "Allowed only at formation for each asset: one request with symbol, interval=1h, startTime=B-721h, endTime=B-1ms, limit=721, where B is Monday 00:00:00.000 UTC. Require exactly 721 chronological rows with open times B-721h, B-720h, ..., B-1h and close times open_time+3600000-1; their close prices are the 721 boundary-close values conventionally labelled B-720h through B. The eligible cutoff is B-1ms. Retain raw response bytes. This is not primary-observation backfill.",
+      "outcome_finalization_retrieval": "Allowed only after outcome finalization for each registered week: one request with symbol, interval=1h, startTime=F-169h, endTime=F-1ms, limit=169, where F is the final Monday 01:00:00.000 UTC boundary. Require exactly 169 chronological rows with open times F-169h, F-168h, ..., F-1h and close times open_time+3600000-1; their close prices are the 169 boundary-close values conventionally labelled the formation-Monday 01:00 boundary through F. The eligible cutoff is F-1ms and the earliest request time is F+60s. Retain raw response bytes. This is not primary-observation backfill.",
+      "pagination": "FORBIDDEN AND UNNEEDED: 721 and 169 are each below the documented maximum 1000 rows.",
+      "symbols": {
+        "BTC": "BTCUSDT",
+        "ETH": "ETHUSDT"
+      },
+      "used_fields": [
+        "[0] open_time_ms",
+        "[4] close_price",
+        "[6] close_time_ms"
+      ]
+    },
+    "deribit_dvol": {
+      "authentication": "Public market-data methods require no authentication.",
+      "channel": {
+        "BTC": "deribit_volatility_index.btc_usd",
+        "ETH": "deribit_volatility_index.eth_usd"
+      },
+      "connection": "WebSocket public/subscribe; retain connection-open, exact UTF-8 subscription request payload bytes, acknowledgement payload bytes, and their SHA-256 digests before accepting notifications. public/get_time may be retained solely as a clock-skew diagnostic, never as a substitute for notification source or receipt timestamps.",
+      "method": "public/subscribe",
+      "notification_availability": "The source documents updates as they occur but does not guarantee a first notification after subscription, a periodic rate, or a notification inside the five-minute acceptance window. Absence is handled only by the frozen source_notification_absence consequence.",
+      "notification_fields": [
+        "data.index_name",
+        "data.timestamp",
+        "data.volatility"
+      ],
+      "raw_evidence": "For every received text message retain the exact received UTF-8 JSON payload bytes before parsing, SHA-256, ordered receipt sequence, connection/session identity, UTC receipt timestamp, and monotonic receipt timestamp. This does not claim retention of wire-level WebSocket frames or transport decompression bytes. Retain every reconnect, error, close, sent request, and acknowledgement as exact payload bytes when present or as an explicit local operational record when no payload exists.",
+      "timestamp_semantics": "data.timestamp is milliseconds since the Unix epoch; it is the authoritative formation source timestamp but is insufficient without the required in-window UTC receipt timestamp.",
+      "unit_and_horizon": "Deribit DVOL is a 30-day forward-looking annualized implied-volatility expectation. Its numeric value is annualized percentage points; raw value 57 corresponds to about 3 percent daily using sqrt(365), so decimal conversion is raw_value / 100."
+    },
+    "documents_retrieved_2026_08_03": [
+      "https://docs.deribit.com/subscriptions/market-data/deribit_volatility_indexindex_name",
+      "https://docs.deribit.com/subscriptions/market-data/deribit_price_indexindex_name",
+      "https://docs.deribit.com/articles/notifications",
+      "https://docs.deribit.com/api-reference/supporting/public-get_time",
+      "https://docs.deribit.com/articles/authentication",
+      "https://insights.deribit.com/industry/demystifying-dvol-futures/",
+      "https://developers.binance.com/en/docs/catalog/core-trading-spot-trading/api/rest-api/market",
+      "https://developers.binance.com/en/docs/products/spot/rest-api"
+    ],
+    "http_raw_evidence": "For every Binance request retain the exact URL and query parameters, request-start and response-complete UTC and monotonic timestamps, response status, relevant response headers, exact response-body bytes before parsing, SHA-256 of those bytes, and digest of the normalized artifact. HTTP response bytes are not a claim of network-packet preservation.",
+    "rejected_architecture": "DERIBIT_ONLY_PROSPECTIVE_STREAMS: rejected because a 30-day price-stream warm-up plus future stream collection and loss handling would be a larger persistent collector with more operational assumptions than bounded closed klines.",
+    "selected_architecture_reason": "The selected contract has explicit source timestamps for DVOL and explicit closed-kline open/close times for realized volatility, needs no pagination, preserves payload/response bytes at an implementable application boundary, uses no fitted parameter, and remains experiment-specific."
+  },
+  "terminal_classifications": {
+    "BLOCKED": "A required source, timestamp, raw-byte, integrity, complete outcome, or finite-schedule condition cannot be satisfied without a forbidden substitution or amendment.",
+    "KILLED": "At the minimum complete sample, the DVOL forecast fails the frozen primary retention rule.",
+    "RETAIN_FOR_SEPARATELY_REGISTERED_FOLLOWUP": "At the minimum complete sample, DVOL meets the frozen primary rule. This is exploratory only and authorizes nothing further."
+  },
+  "timing_integrity": {
+    "historical_primary_observation_backfill": false,
+    "outcome_begins_after_formation": "Formation completes no later than Monday 00:10:00 UTC; the first measured outcome return starts Monday 01:00:00 UTC.",
+    "trailing_predictor": {
+      "boundary_closes_required": 721,
+      "cutoff": "Monday 00:00:00 UTC",
+      "return_count": 720
+    }
+  }
+}

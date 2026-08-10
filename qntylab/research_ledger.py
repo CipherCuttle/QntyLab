@@ -111,6 +111,38 @@ COMPACT_METRIC_KEYS = {
     "maximum_drawdown",
 }
 
+# Research Factory V2 seams.  These keys are optional so the 378 historical
+# trial events stay valid byte-for-byte; a new trial that declares
+# instrument_contract_id is bound by the V2 trial identity instead of the V1 one.
+TRIAL_OPTIONAL_KEYS = {
+    "instrument_contract_id",
+    "instrument_contract_digest",
+    "funding_treatment",
+    "research_generation",
+    "period_id",
+    "cost_mode",
+    "canonical_family_id",
+    "bar_path_schema_version",
+    "bar_path_sha256",
+    "bar_path_row_count",
+    "bar_path_first_timestamp",
+    "bar_path_last_timestamp",
+    "registered_screen_id",
+    "registered_variant_denominator",
+}
+DECISION_OPTIONAL_KEYS = {
+    "registered_screen_id",
+    "registered_variant_denominator",
+}
+CANDIDATE_OPTIONAL_KEYS = {
+    "registered_screen_id",
+    "registered_variant_denominator",
+}
+
+CORPUS_GENERATION_V1 = "CORPUS_GENERATION_V1_SUMMARY_ONLY"
+CORPUS_GENERATION_V2 = "CORPUS_GENERATION_V2_BAR_PATH"
+RESEARCH_GENERATIONS = {CORPUS_GENERATION_V1, CORPUS_GENERATION_V2}
+
 
 class LedgerError(RuntimeError):
     pass
@@ -207,14 +239,61 @@ def compute_trial_id(**kwargs: Any) -> str:
     return "trial_" + sha256_bytes(canonical_bytes(trial_identity_payload(**kwargs)))[:24]
 
 
+def trial_identity_payload_v2(
+    *,
+    variant_id: str,
+    instrument_contract_id: str,
+    symbol: str,
+    input_sha256: str,
+    evaluation_start: str,
+    evaluation_end: str,
+    fee_bps: float,
+    slippage_bps: float,
+    funding_treatment: str,
+    gap_policy: str,
+    expected_interval: str,
+    instrument_instance_id: str | None = None,
+) -> dict[str, Any]:
+    """V2 evaluation identity.
+
+    Binds the instrument contract and the declared funding treatment in addition
+    to the V1 fields, so the same strategy recipe evaluated on spot and on a
+    perpetual yields two distinct trial IDs while keeping one ``variant_id``.
+    ``instrument_instance_id`` carries exact instrument identity where the
+    source provides it, and is omitted from the payload when unavailable so its
+    absence cannot be confused with a declared null.
+    """
+    payload = {
+        "evaluation_end": evaluation_end,
+        "evaluation_start": evaluation_start,
+        "expected_interval": expected_interval,
+        "fee_bps": float(fee_bps),
+        "funding_treatment": funding_treatment,
+        "gap_policy": gap_policy,
+        "input_sha256": input_sha256,
+        "instrument_contract_id": instrument_contract_id,
+        "slippage_bps": float(slippage_bps),
+        "symbol": symbol,
+        "trial_identity_version": 2,
+        "variant_id": variant_id,
+    }
+    if instrument_instance_id:
+        payload["instrument_instance_id"] = instrument_instance_id
+    return payload
+
+
+def compute_trial_id_v2(**kwargs: Any) -> str:
+    return "trial_" + sha256_bytes(canonical_bytes(trial_identity_payload_v2(**kwargs)))[:24]
+
+
 def trial_stream_path(recorded_at_utc: str, root: Path = RESEARCH_ROOT) -> Path:
     if len(recorded_at_utc) < 4 or not recorded_at_utc[:4].isdigit():
         raise LedgerError("recorded_at_utc must start with a year")
     return root / "trials" / f"{recorded_at_utc[:4]}.jsonl"
 
 
-def _require_keys(event: dict[str, Any], expected: set[str], kind: str) -> None:
-    extra = set(event) - expected
+def _require_keys(event: dict[str, Any], expected: set[str], kind: str, optional: set[str] | None = None) -> None:
+    extra = set(event) - expected - (optional or set())
     missing = expected - set(event)
     if extra:
         raise LedgerError(f"unknown event keys for {kind}: {sorted(extra)}")
@@ -228,10 +307,28 @@ def _require_non_empty_string(event: dict[str, Any], keys: tuple[str, ...]) -> N
             raise LedgerError(f"{key} must be a non-empty string")
 
 
+def _validate_registered_denominator(event: dict[str, Any]) -> None:
+    """Registered-screen multiplicity fields, when a generation freezes them.
+
+    Both fields are declared together or not at all: a denominator without a
+    screen ID is an unattributable number, and a screen ID without a denominator
+    cannot support a multiplicity claim.
+    """
+    screen_id = event.get("registered_screen_id")
+    denominator = event.get("registered_variant_denominator")
+    if screen_id is None and denominator is None:
+        return
+    if not isinstance(screen_id, str) or not screen_id.strip():
+        raise LedgerError("registered_screen_id must be a non-empty string when a denominator is declared")
+    if not isinstance(denominator, int) or isinstance(denominator, bool) or denominator < 1:
+        raise LedgerError("registered_variant_denominator must be a positive integer")
+
+
 def validate_candidate_event(event: dict[str, Any]) -> None:
     event_type = event.get("event_type")
     if event_type == "CANDIDATE_PROPOSED":
-        _require_keys(event, CANDIDATE_PROPOSED_KEYS, event_type)
+        _require_keys(event, CANDIDATE_PROPOSED_KEYS, event_type, optional=CANDIDATE_OPTIONAL_KEYS)
+        _validate_registered_denominator(event)
         _require_non_empty_string(
             event,
             (
@@ -266,7 +363,8 @@ def validate_candidate_event(event: dict[str, Any]) -> None:
 def validate_decision_event(event: dict[str, Any]) -> None:
     if event.get("event_type") != "DECISION_RECORDED":
         raise LedgerError(f"unsupported decision event_type: {event.get('event_type')!r}")
-    _require_keys(event, DECISION_KEYS, "DECISION_RECORDED")
+    _require_keys(event, DECISION_KEYS, "DECISION_RECORDED", optional=DECISION_OPTIONAL_KEYS)
+    _validate_registered_denominator(event)
     _require_non_empty_string(event, ("event_id", "candidate_id", "family_id", "variant_id", "status", "scope", "recorded_at_utc"))
     if event["status"] not in DECISION_STATUSES:
         raise LedgerError(f"unsupported decision status: {event['status']!r}")
@@ -285,7 +383,7 @@ def validate_decision_event(event: dict[str, Any]) -> None:
 def validate_trial_event(event: dict[str, Any]) -> None:
     if event.get("event_type") != "TRIAL_COMPLETED":
         raise LedgerError(f"unsupported trial event_type: {event.get('event_type')!r}")
-    _require_keys(event, TRIAL_KEYS, "TRIAL_COMPLETED")
+    _require_keys(event, TRIAL_KEYS, "TRIAL_COMPLETED", optional=TRIAL_OPTIONAL_KEYS)
     _require_non_empty_string(
         event,
         (
@@ -312,19 +410,94 @@ def validate_trial_event(event: dict[str, Any]) -> None:
         raise LedgerError(f"unsupported research_intent: {event['research_intent']!r}")
     if not isinstance(event["compact_metrics"], dict) or set(event["compact_metrics"]) - COMPACT_METRIC_KEYS:
         raise LedgerError("compact_metrics has unknown keys")
-    expected_trial_id = compute_trial_id(
-        variant_id=event["variant_id"],
-        symbol=event["symbol"],
-        input_sha256=event["input_sha256"],
-        evaluation_start=event["evaluation_start"],
-        evaluation_end=event["evaluation_end"],
-        fee_bps=float(event["fee_bps"]),
-        slippage_bps=float(event["slippage_bps"]),
-        gap_policy=event["gap_policy"],
-        expected_interval=event["expected_interval"],
-    )
+    _validate_trial_v2_fields(event)
+    if "instrument_contract_id" in event:
+        # V2 evaluation identity: instrument contract and funding treatment bind.
+        expected_trial_id = compute_trial_id_v2(
+            variant_id=event["variant_id"],
+            instrument_contract_id=event["instrument_contract_id"],
+            symbol=event["symbol"],
+            input_sha256=event["input_sha256"],
+            evaluation_start=event["evaluation_start"],
+            evaluation_end=event["evaluation_end"],
+            fee_bps=float(event["fee_bps"]),
+            slippage_bps=float(event["slippage_bps"]),
+            funding_treatment=event["funding_treatment"],
+            gap_policy=event["gap_policy"],
+            expected_interval=event["expected_interval"],
+        )
+    else:
+        # V1 historical identity, preserved byte-for-byte.  No historical hash is
+        # ever recomputed under the V2 payload.
+        expected_trial_id = compute_trial_id(
+            variant_id=event["variant_id"],
+            symbol=event["symbol"],
+            input_sha256=event["input_sha256"],
+            evaluation_start=event["evaluation_start"],
+            evaluation_end=event["evaluation_end"],
+            fee_bps=float(event["fee_bps"]),
+            slippage_bps=float(event["slippage_bps"]),
+            gap_policy=event["gap_policy"],
+            expected_interval=event["expected_interval"],
+        )
     if event["trial_id"] != expected_trial_id:
         raise LedgerError(f"trial_id mismatch: {event['event_id']}")
+
+
+def _validate_trial_v2_fields(event: dict[str, Any]) -> None:
+    """Validate the optional V2 seam fields when a trial declares them."""
+    from qntylab import family_ontology, instrument_contract
+
+    has_contract = "instrument_contract_id" in event
+    if not has_contract:
+        # A V1-shaped event must not carry V2 fields that depend on the contract,
+        # otherwise an event could claim bar-path evidence under an undeclared
+        # instrument.
+        stray = sorted(set(event) & (TRIAL_OPTIONAL_KEYS - {"period_id", "cost_mode", "canonical_family_id"}))
+        if stray:
+            raise LedgerError(f"V2 trial fields require instrument_contract_id: {stray}")
+        return
+
+    _require_non_empty_string(event, ("instrument_contract_id", "funding_treatment", "research_generation"))
+    try:
+        expected_digest = instrument_contract.contract_digest(event["instrument_contract_id"])
+    except instrument_contract.InstrumentContractError as exc:
+        raise LedgerError(str(exc)) from exc
+    if event.get("instrument_contract_digest") != expected_digest:
+        raise LedgerError(f"instrument_contract_digest mismatch: {event['event_id']}")
+    if event["funding_treatment"] not in instrument_contract.FUNDING_TREATMENTS:
+        raise LedgerError(f"unknown funding_treatment: {event['funding_treatment']!r}")
+    if event["funding_treatment"] == instrument_contract.TRIAL_BLOCKED_BY_FUNDING_EVIDENCE:
+        raise LedgerError("TRIAL_BLOCKED_BY_FUNDING_EVIDENCE cannot accompany a completed trial")
+    exposure = event.get("compact_metrics", {}).get("exposure_fraction")
+    try:
+        instrument_contract.validate_funding_treatment(
+            instrument_contract_id=event["instrument_contract_id"],
+            funding_treatment=event["funding_treatment"],
+            has_position_exposure=bool(exposure) and float(exposure) > 0.0,
+        )
+    except instrument_contract.InstrumentContractError as exc:
+        raise LedgerError(str(exc)) from exc
+    if event["research_generation"] not in RESEARCH_GENERATIONS:
+        raise LedgerError(f"unsupported research_generation: {event['research_generation']!r}")
+    if "canonical_family_id" in event:
+        try:
+            resolved = family_ontology.resolve_family(event["family_id"])
+        except family_ontology.FamilyOntologyError as exc:
+            raise LedgerError(str(exc)) from exc
+        if event["canonical_family_id"] != resolved:
+            raise LedgerError(f"canonical_family_id does not resolve from family_id: {event['event_id']}")
+    if event["research_generation"] == CORPUS_GENERATION_V2:
+        for key in ("bar_path_sha256", "bar_path_schema_version", "bar_path_row_count"):
+            if not event.get(key):
+                raise LedgerError(f"{CORPUS_GENERATION_V2} requires {key}")
+        if not isinstance(event["bar_path_row_count"], int) or event["bar_path_row_count"] < 1:
+            raise LedgerError("bar_path_row_count must be a positive integer")
+        if event["bar_path_row_count"] != event["compact_metrics"].get("observation_count"):
+            raise LedgerError("bar_path_row_count must equal observation_count")
+    denominator = event.get("registered_variant_denominator")
+    if denominator is not None and (not isinstance(denominator, int) or denominator < 1):
+        raise LedgerError("registered_variant_denominator must be a positive integer when present")
 
 
 def _read_jsonl(path: Path, validator: Any) -> list[dict[str, Any]]:
@@ -562,23 +735,58 @@ def preflight(
         raise LedgerError("latest variant state GRAVEYARDED")
     if status not in RUNNABLE_STATUSES:
         raise LedgerError(f"unsupported variant state {status}")
-    trial_id = compute_trial_id(
-        variant_id=variant_id,
-        symbol=symbol,
-        input_sha256=input_sha256,
-        evaluation_start=config["evaluation_start"],
-        evaluation_end=config["evaluation_end"],
-        fee_bps=float(config["fee_bps"]),
-        slippage_bps=float(config["slippage_bps"]),
-        gap_policy=config["gap_policy"],
-        expected_interval=config["expected_interval"],
-    )
+    instrument_contract_id = config.get("instrument_contract_id")
+    if instrument_contract_id:
+        from qntylab import family_ontology, instrument_contract as contracts
+
+        funding_treatment = config.get("funding_treatment")
+        if not isinstance(funding_treatment, str) or not funding_treatment.strip():
+            raise LedgerError("funding_treatment is required when instrument_contract_id is declared")
+        if funding_treatment == contracts.TRIAL_BLOCKED_BY_FUNDING_EVIDENCE:
+            raise LedgerError("TRIAL_BLOCKED_BY_FUNDING_EVIDENCE: refusing to run a funding-blocked trial")
+        try:
+            contract_digest = contracts.contract_digest(instrument_contract_id)
+        except contracts.InstrumentContractError as exc:
+            raise LedgerError(str(exc)) from exc
+        trial_id = compute_trial_id_v2(
+            variant_id=variant_id,
+            instrument_contract_id=instrument_contract_id,
+            symbol=symbol,
+            input_sha256=input_sha256,
+            evaluation_start=config["evaluation_start"],
+            evaluation_end=config["evaluation_end"],
+            fee_bps=float(config["fee_bps"]),
+            slippage_bps=float(config["slippage_bps"]),
+            funding_treatment=funding_treatment,
+            gap_policy=config["gap_policy"],
+            expected_interval=config["expected_interval"],
+        )
+        canonical_family_id = family_ontology.resolve_family(variant["family_id"])
+    else:
+        funding_treatment = None
+        contract_digest = None
+        canonical_family_id = None
+        trial_id = compute_trial_id(
+            variant_id=variant_id,
+            symbol=symbol,
+            input_sha256=input_sha256,
+            evaluation_start=config["evaluation_start"],
+            evaluation_end=config["evaluation_end"],
+            fee_bps=float(config["fee_bps"]),
+            slippage_bps=float(config["slippage_bps"]),
+            gap_policy=config["gap_policy"],
+            expected_interval=config["expected_interval"],
+        )
     if trial_id in trial_index["trials"] and config.get("research_intent") != "REPLICATION":
         raise LedgerError("exact trial already completed")
     return {
         "candidate_event_id": variant["candidate_event_id"],
         "candidate_id": variant["candidate_id"],
+        "canonical_family_id": canonical_family_id,
         "family_id": variant["family_id"],
+        "funding_treatment": funding_treatment,
+        "instrument_contract_digest": contract_digest,
+        "instrument_contract_id": instrument_contract_id,
         "latest_decision_event_id": variant["latest_decision_event_id"],
         "ledger_sha256_before_run": ledger_sha,
         "research_intent": config.get("research_intent"),
@@ -623,6 +831,14 @@ def build_trial_completed_event(
         "receipt_sha256": receipt_sha256,
         "compact_metrics": compact_metrics(metrics),
     }
+    # V2 seam fields are copied from the receipt only when the receipt natively
+    # declares an instrument contract.  A V1-shaped receipt produces a
+    # V1-shaped event, unchanged.
+    if receipt.get("instrument_contract_id"):
+        for key in sorted(TRIAL_OPTIONAL_KEYS):
+            value = receipt.get(key)
+            if value is not None:
+                event[key] = value
     event["event_id"] = event_id("event_trial", event)
     return event
 

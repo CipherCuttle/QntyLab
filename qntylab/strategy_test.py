@@ -13,9 +13,11 @@ from typing import Any
 
 import numpy as np
 
+from . import bar_path, instrument_contract
 from .backtest import evaluate
 from .data import load
 from .research_ledger import (
+    CORPUS_GENERATION_V2,
     RESEARCH_ROOT,
     RESEARCH_INTENTS,
     LedgerError,
@@ -38,6 +40,10 @@ RELEVANT_SOURCE_PATHS = (
     "qntylab/backtest.py",
     "qntylab/strategies.py",
     "qntylab/data.py",
+    # V2 seams participate in trial semantics, so they bind the source digest.
+    "qntylab/family_ontology.py",
+    "qntylab/instrument_contract.py",
+    "qntylab/bar_path.py",
 )
 BOUNDARY_MODES = {NOT_APPLICABLE, "STRICTLY_BEFORE_BAR_OPEN", "AT_OR_BEFORE_BAR_OPEN"}
 STRATEGIES = {
@@ -76,8 +82,26 @@ CONFIG_KEYS = {
     "research_intent",
     "parameters",
     "normalization_provenance",
+    # Research Factory V2 seams.  A config that declares instrument_contract_id
+    # opts the run into V2 trial identity, native receipt fields and bar-path
+    # emission; a config that omits it behaves exactly as V1 did.
+    "instrument_contract_id",
+    "funding_treatment",
+    "period_id",
+    "cost_mode",
+    "registered_screen_id",
+    "registered_variant_denominator",
 }
-OPTIONAL_CONFIG_KEYS = {"normalization_provenance"}
+OPTIONAL_CONFIG_KEYS = {
+    "normalization_provenance",
+    "instrument_contract_id",
+    "funding_treatment",
+    "period_id",
+    "cost_mode",
+    "registered_screen_id",
+    "registered_variant_denominator",
+}
+V2_REQUIRED_CONFIG_KEYS = ("funding_treatment", "period_id", "cost_mode")
 NORMALIZATION_PROVENANCE_KEYS = {
     "normalization_id",
     "normalization_version",
@@ -259,7 +283,42 @@ def load_config(path: Path, *, input_path: Path | None = None, strategy_id: str 
         raise ValueError("candidate_id must be a non-empty string")
     if config["research_intent"] not in RESEARCH_INTENTS:
         raise ValueError(f"unsupported research_intent: {config['research_intent']!r}")
+    _validate_v2_config(config)
     return config
+
+
+def _validate_v2_config(config: dict[str, Any]) -> None:
+    """Validate the V2 seam block, which is all-or-nothing.
+
+    Semantic receipt fields are required up front rather than parsed back out of
+    directory names later, which is what forced the historical receipts to carry
+    empty ``period`` and ``cost_mode``.
+    """
+    contract_id = config.get("instrument_contract_id")
+    declared = [key for key in V2_REQUIRED_CONFIG_KEYS if config.get(key) is not None]
+    if contract_id is None:
+        if declared:
+            raise ValueError(f"V2 config keys require instrument_contract_id: {sorted(declared)}")
+        if config.get("registered_screen_id") is not None or config.get("registered_variant_denominator") is not None:
+            raise ValueError("registered screen fields require instrument_contract_id")
+        return
+    if not isinstance(contract_id, str) or not contract_id.strip():
+        raise ValueError("instrument_contract_id must be a non-empty string")
+    instrument_contract.contract_payload(contract_id)
+    for key in V2_REQUIRED_CONFIG_KEYS:
+        value = config.get(key)
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError(f"{key} is required and must be a non-empty string when instrument_contract_id is declared")
+    if config["funding_treatment"] not in instrument_contract.FUNDING_TREATMENTS:
+        raise ValueError(f"unknown funding_treatment: {config['funding_treatment']!r}")
+    if config["funding_treatment"] == instrument_contract.TRIAL_BLOCKED_BY_FUNDING_EVIDENCE:
+        raise ValueError("TRIAL_BLOCKED_BY_FUNDING_EVIDENCE: refusing to run a funding-blocked trial")
+    screen_id = config.get("registered_screen_id")
+    denominator = config.get("registered_variant_denominator")
+    if (screen_id is None) != (denominator is None):
+        raise ValueError("registered_screen_id and registered_variant_denominator must be declared together")
+    if denominator is not None and (not isinstance(denominator, int) or isinstance(denominator, bool) or denominator < 1):
+        raise ValueError("registered_variant_denominator must be a positive integer")
 
 
 def _validate_normalization_provenance_shape(provenance: Any) -> None:
@@ -511,6 +570,35 @@ def run_strategy(
     total_cost_bps = float(config["fee_bps"]) + float(config["slippage_bps"])
     metrics = _metrics(close, position, total_cost_bps)
     _validate_finite_metrics(metrics)
+
+    instrument_contract_id = config.get("instrument_contract_id")
+    bar_path_fields: dict[str, Any] = {}
+    if instrument_contract_id:
+        # Perpetual economic boundary: a position-bearing trial on a
+        # funding-bearing instrument must declare an explicit funding treatment.
+        instrument_contract.validate_funding_treatment(
+            instrument_contract_id=instrument_contract_id,
+            funding_treatment=config["funding_treatment"],
+            has_position_exposure=float(metrics["exposure_fraction"]) > 0.0,
+        )
+        if instrument_contract.is_funding_bearing(instrument_contract_id) and (
+            config["funding_treatment"] == instrument_contract.FUNDING_INCLUDED_PROVENANCE_BOUND
+        ):
+            raise ValueError(
+                "FUNDING_INCLUDED_PROVENANCE_BOUND requires a provenance-bound funding series; "
+                "the funding pipeline is out of scope for the V2 seams phase"
+            )
+        evaluation_timestamps = [row["timestamp"] for row in selected_rows[warmup_observations:]]
+        rows_bar_path = bar_path.build_bar_path(
+            timestamps=evaluation_timestamps,
+            close=close,
+            position=position,
+            fee_bps=float(config["fee_bps"]),
+            slippage_bps=float(config["slippage_bps"]),
+        )
+        bar_path.verify_against_metrics(rows_bar_path, metrics)
+        bar_path_fields = bar_path.store(rows_bar_path)
+
     run_id = output.name
     output.mkdir(parents=True, exist_ok=True)
     metrics_path = output / "metrics.json"
@@ -562,6 +650,21 @@ def run_strategy(
     }
     if normalization_provenance is not None:
         receipt["normalization_provenance"] = normalization_provenance
+    if instrument_contract_id:
+        # Seam 5: semantic fields are stored natively, never recovered later by
+        # parsing a directory name.
+        receipt["instrument_contract_id"] = instrument_contract_id
+        receipt["instrument_contract_digest"] = ledger_binding["instrument_contract_digest"]
+        receipt["funding_treatment"] = config["funding_treatment"]
+        receipt["period_id"] = config["period_id"]
+        receipt["cost_mode"] = config["cost_mode"]
+        receipt["period"] = config["period_id"]
+        receipt["canonical_family_id"] = ledger_binding["canonical_family_id"]
+        receipt["research_generation"] = CORPUS_GENERATION_V2
+        receipt.update(bar_path_fields)
+        if config.get("registered_screen_id") is not None:
+            receipt["registered_screen_id"] = config["registered_screen_id"]
+            receipt["registered_variant_denominator"] = config["registered_variant_denominator"]
     receipt_path = output / "run_receipt.json"
     receipt_path.write_bytes(_canonical_bytes(receipt) + b"\n")
     receipt_sha256 = sha256_path(receipt_path)

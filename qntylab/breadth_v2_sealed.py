@@ -121,3 +121,36 @@ def build_contract(*, as_of: datetime | None = None) -> dict[str, Any]:
 
 def serialize_contract(contract: Mapping[str, Any]) -> str:
     return json.dumps(contract, sort_keys=True, indent=2) + "\n"
+
+
+class SealedAdjudicationNotAuthorized(RuntimeError):
+    """Raised when a caller attempts sealed forward evaluation before the
+    frozen minimum horizon has elapsed.
+
+    This is the outcome-peeking gate.  It never inspects, computes, or
+    returns any economic result -- it only answers a yes/no readiness
+    question derived from the frozen ``SEALED_T0`` and
+    ``MINIMUM_COMPLETE_HOURS``.  Any future caller that would execute a
+    Breadth V2 candidate against the sealed forward window (e.g. via
+    ``qntylab.breadth_v2_runner.record_breadth_v2_evaluation``) MUST call
+    :func:`enforce_sealed_adjudication_authorized` first.  This module does
+    not wire the gate into the runner itself -- that wiring is deliberately
+    out of scope for this contract-freezing phase.
+    """
+
+
+def enforce_sealed_adjudication_authorized(as_of: datetime) -> None:
+    """Raise :class:`SealedAdjudicationNotAuthorized` unless the frozen
+    minimum horizon has fully elapsed as of ``as_of``.
+
+    Pure and side-effect-free beyond raising.  Reuses
+    :func:`adjudication_is_authorized`/:func:`complete_hours` exactly; it
+    does not redefine the boundary or the horizon.
+    """
+    if not adjudication_is_authorized(as_of):
+        remaining = MINIMUM_COMPLETE_HOURS - complete_hours(as_of)
+        raise SealedAdjudicationNotAuthorized(
+            "sealed forward adjudication not authorized: "
+            f"{max(0, remaining)} complete hour(s) remaining until "
+            f"{EARLIEST_ELIGIBLE_ADJUDICATION_TIME.isoformat().replace('+00:00', 'Z')}"
+        )

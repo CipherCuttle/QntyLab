@@ -6,8 +6,9 @@ import pytest
 from qntylab.breadth_v2_sealed import (
     EARLIEST_ELIGIBLE_ADJUDICATION_TIME, ELIGIBLE_FAMILIES,
     ELIGIBLE_VARIANT_IDS, EXCLUDED_DEVELOPMENT_FAIL_FAMILIES,
-    MINIMUM_COMPLETE_HOURS, SEALED_T0, adjudication_is_authorized,
-    build_contract, derive_sealed_t0, serialize_contract,
+    MINIMUM_COMPLETE_HOURS, SEALED_T0, SealedAdjudicationNotAuthorized,
+    adjudication_is_authorized, build_contract, derive_sealed_t0,
+    enforce_sealed_adjudication_authorized, serialize_contract,
 )
 
 UTC = timezone.utc
@@ -60,3 +61,22 @@ def test_status_only_uses_clock_and_never_changes_contract_identity():
 def test_canonical_artifact_matches_builder():
     artifact = json.load(open("experiments/results/breadth_v2_sealed_forward_observation_v0.json"))
     assert artifact == build_contract()
+
+
+def test_enforce_gate_blocks_before_horizon_and_never_leaks_an_outcome():
+    with pytest.raises(SealedAdjudicationNotAuthorized) as excinfo:
+        enforce_sealed_adjudication_authorized(EARLIEST_ELIGIBLE_ADJUDICATION_TIME - timedelta(hours=1))
+    message = str(excinfo.value).lower()
+    assert "1 complete hour" in message
+    for leaky_term in ("return", "pnl", "sharpe", "win", "loss", "profit"):
+        assert leaky_term not in message
+
+
+def test_enforce_gate_allows_exactly_at_and_after_maturity():
+    enforce_sealed_adjudication_authorized(EARLIEST_ELIGIBLE_ADJUDICATION_TIME)
+    enforce_sealed_adjudication_authorized(EARLIEST_ELIGIBLE_ADJUDICATION_TIME + timedelta(hours=1))
+
+
+def test_enforce_gate_rejects_naive_datetimes():
+    with pytest.raises(ValueError):
+        enforce_sealed_adjudication_authorized(datetime(2030, 1, 1))

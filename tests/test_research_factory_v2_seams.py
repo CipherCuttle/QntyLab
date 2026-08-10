@@ -144,7 +144,7 @@ def test_f1_every_historical_variant_resolves_to_exactly_one_canonical_family():
         if event["event_type"] != "CANDIDATE_PROPOSED":
             continue
         resolved[event["variant_id"]] = family_ontology.resolve_family(event["family_id"])
-    assert len(resolved) == 19
+    assert len(resolved) == 20
     assert all(isinstance(value, str) and value for value in resolved.values())
 
 
@@ -790,7 +790,7 @@ def test_f17_h007_status_unchanged():
 
 def test_f18_history_streams_are_unchanged_from_the_seam_base():
     """The closure preserves candidate and trial streams and appends one decision."""
-    starting_commit = "1541e3a"
+    starting_commit = "origin/master"
     for path, expected in (
         ("experiments/research/candidates.jsonl", 0),
         ("experiments/research/trials/2026.jsonl", 0),
@@ -811,6 +811,6 @@ def test_f18_history_streams_are_unchanged_from_the_seam_base():
 
 def test_f18_committed_history_still_replays_without_issues():
     history = load_canonical_history(COMMITTED_RESEARCH_ROOT)
-    assert len(history.candidates) == 19
-    assert len(history.decisions) == 23
+    assert len(history.candidates) == 20
+    assert len(history.decisions) == 24
     assert len(history.trials) == 378

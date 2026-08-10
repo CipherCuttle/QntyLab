@@ -1,0 +1,9 @@
+{
+  "contract_version": "BINANCE_USD_M_PERPETUAL_1H_MATERIALIZER_V0",
+  "scope": {"venue": "Binance", "market": "USD-M", "contract": "PERPETUAL", "source_family": "data.binance.vision monthly klines", "interval": "1h"},
+  "output_fields": ["timestamp", "open", "high", "low", "close", "volume"],
+  "authentication": "published .CHECKSUM filename and SHA-256 must both match downloaded ZIP bytes",
+  "duplicate_policy": "fail closed for every duplicate opening timestamp",
+  "gap_policy": "record only; downstream H003 retains REJECT",
+  "lifecycle_policy": "source absence is not a tradability or lifecycle claim"
+}

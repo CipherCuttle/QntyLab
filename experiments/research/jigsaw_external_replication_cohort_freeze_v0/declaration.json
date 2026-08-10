@@ -1,0 +1,87 @@
+{
+  "artifact_type": "JIGSAW_EXTERNAL_REPLICATION_COHORT_DECLARATION",
+  "artifact_version": "v0",
+  "replication_id": "JIGSAW_DRAWDOWN_PIECE_EXTERNAL_REPLICATION_COHORT_V0",
+  "declared_at_utc": "2026-08-10T02:49:19Z",
+  "research_classification": "RETROSPECTIVE_EXTERNAL_ASSET_REPLICATION_DESIGN",
+  "primary_decision": "EXTERNAL_REPLICATION_COHORT_FROZEN",
+  "source_artifacts": [
+    {
+      "path": "docs/forensics/QNTYLAB_LIFECYCLE_OFFICIAL_SOURCE_COVERAGE_V1.md",
+      "commit": "1cfa2d5e35a1aee73a5efa557637dabfdf6d13fc",
+      "sha256": "1780cb646751bb22fd08bace96d76124233d09b155dc7d4a804546103cc05b3b",
+      "role": "frozen Catalog-48 60-target census; title-level exact Binance USD-M perpetual launch metadata"
+    },
+    {
+      "path": "experiments/research/jigsaw_trend_condition_dependence_v0/preregistration.json",
+      "commit": "2320de37661da80b1516c8a898fced4103270251",
+      "sha256": "d37f6343062e9b00030b05601c3a0dc6e04e627aef640dcdd6c4cc753cad538a",
+      "role": "frozen V0 piece contract"
+    },
+    {
+      "path": "experiments/research/jigsaw_trend_condition_dependence_v0/result.json",
+      "commit": "2320de37661da80b1516c8a898fced4103270251",
+      "sha256": "25f5042d50c50ebd96c73e350865e9075240651e824d1bc70608ebb943d89923",
+      "role": "existing earned replication gate only; no replication outcome consulted"
+    }
+  ],
+  "selection_rule": {
+    "candidate_pool": "Previously discovered Catalog-48 official Binance USD-M perpetual records only.",
+    "effective_launch_or_start_not_after": "2024-01-01T00:00:00Z",
+    "identity_requirement": "Exact Binance USD-M PERPETUAL lifecycle episode resolvable from one unambiguous retained Catalog-48 launch record.",
+    "exclude_symbols": ["BTCUSDT", "ETHUSDT", "SOLUSDT"],
+    "canonical_order": ["effective_launch_or_start ASC", "symbol ASC", "instrument_instance_id ASC"],
+    "target_n": 20,
+    "min_acceptable_n": 10,
+    "max_n": 20,
+    "stop_rule": "Take the first 20 qualifying identities. No backfill or substitute after this freeze."
+  },
+  "replication_period": {
+    "start": "2025-01-01T00:00:00Z",
+    "end": "2026-06-30T23:00:00Z"
+  },
+  "selected_instrument_identities": [
+    {"symbol":"BCHUSDT","market":"Binance USD-M","contract_type":"PERPETUAL","instrument_instance_id":"binance|BCHUSDT|perpetual|usd-m|catalog48:360037742632","effective_launch_or_start":"2019-12-19","launch_evidence":{"article_code":"360037742632","release_date":"2019-12-19"},"prior_outcome_exposure":"NO"},
+    {"symbol":"XRPUSDT","market":"Binance USD-M","contract_type":"PERPETUAL","instrument_instance_id":"binance|XRPUSDT|perpetual|usd-m|catalog48:360038497311","effective_launch_or_start":"2020-01-06","launch_evidence":{"article_code":"360038497311","release_date":"2020-01-06"},"prior_outcome_exposure":"NO"},
+    {"symbol":"LTCUSDT","market":"Binance USD-M","contract_type":"PERPETUAL","instrument_instance_id":"binance|LTCUSDT|perpetual|usd-m|catalog48:360038585151","effective_launch_or_start":"2020-01-08","launch_evidence":{"article_code":"360038585151","release_date":"2020-01-08"},"prior_outcome_exposure":"NO"},
+    {"symbol":"TRXUSDT","market":"Binance USD-M","contract_type":"PERPETUAL","instrument_instance_id":"binance|TRXUSDT|perpetual|usd-m|catalog48:360038407872","effective_launch_or_start":"2020-01-14","launch_evidence":{"article_code":"360038407872","release_date":"2020-01-14"},"prior_outcome_exposure":"NO"},
+    {"symbol":"ETCUSDT","market":"Binance USD-M","contract_type":"PERPETUAL","instrument_instance_id":"binance|ETCUSDT|perpetual|usd-m|catalog48:360038833831","effective_launch_or_start":"2020-01-15","launch_evidence":{"article_code":"360038833831","release_date":"2020-01-15"},"prior_outcome_exposure":"NO"},
+    {"symbol":"LINKUSDT","market":"Binance USD-M","contract_type":"PERPETUAL","instrument_instance_id":"binance|LINKUSDT|perpetual|usd-m|catalog48:360038885371","effective_launch_or_start":"2020-01-16","launch_evidence":{"article_code":"360038885371","release_date":"2020-01-16"},"prior_outcome_exposure":"NO"},
+    {"symbol":"XLMUSDT","market":"Binance USD-M","contract_type":"PERPETUAL","instrument_instance_id":"binance|XLMUSDT|perpetual|usd-m|catalog48:360038969011","effective_launch_or_start":"2020-01-19","launch_evidence":{"article_code":"360038969011","release_date":"2020-01-19"},"prior_outcome_exposure":"NO"},
+    {"symbol":"CHZUSDT","market":"Binance USD-M","contract_type":"PERPETUAL","instrument_instance_id":"binance|CHZUSDT|perpetual|usd-m|catalog48:e95ce5d56cfe4ef4acfb02a0769e6fd8","effective_launch_or_start":"2021-01-21","launch_evidence":{"article_code":"e95ce5d56cfe4ef4acfb02a0769e6fd8","release_date":"2021-01-21"},"prior_outcome_exposure":"NO"},
+    {"symbol":"SANDUSDT","market":"Binance USD-M","contract_type":"PERPETUAL","instrument_instance_id":"binance|SANDUSDT|perpetual|usd-m|catalog48:df96728782084fd2ab2ba51b6201b462","effective_launch_or_start":"2021-01-25","launch_evidence":{"article_code":"df96728782084fd2ab2ba51b6201b462","release_date":"2021-01-25"},"prior_outcome_exposure":"NO"},
+    {"symbol":"REEFUSDT","market":"Binance USD-M","contract_type":"PERPETUAL","instrument_instance_id":"binance|REEFUSDT|perpetual|usd-m|catalog48:02895f23b535433e8563175cfb64d1cd","effective_launch_or_start":"2021-02-22","launch_evidence":{"article_code":"02895f23b535433e8563175cfb64d1cd","release_date":"2021-02-22"},"prior_outcome_exposure":"NO"},
+    {"symbol":"CHRUSDT","market":"Binance USD-M","contract_type":"PERPETUAL","instrument_instance_id":"binance|CHRUSDT|perpetual|usd-m|catalog48:86f5ef4c343c4acda8358918e3f77698","effective_launch_or_start":"2021-03-12","launch_evidence":{"article_code":"86f5ef4c343c4acda8358918e3f77698","release_date":"2021-03-12"},"prior_outcome_exposure":"NO"},
+    {"symbol":"ALICEUSDT","market":"Binance USD-M","contract_type":"PERPETUAL","instrument_instance_id":"binance|ALICEUSDT|perpetual|usd-m|catalog48:09e302f8a778456aa42e0df634cc4e8f","effective_launch_or_start":"2021-03-16","launch_evidence":{"article_code":"09e302f8a778456aa42e0df634cc4e8f","release_date":"2021-03-16"},"prior_outcome_exposure":"NO"},
+    {"symbol":"ONEUSDT","market":"Binance USD-M","contract_type":"PERPETUAL","instrument_instance_id":"binance|ONEUSDT|perpetual|usd-m|catalog48:45cb73bba8254e52b9c0d7ad597d0402","effective_launch_or_start":"2021-03-17","launch_evidence":{"article_code":"45cb73bba8254e52b9c0d7ad597d0402","release_date":"2021-03-17"},"prior_outcome_exposure":"NO"},
+    {"symbol":"API3USDT","market":"Binance USD-M","contract_type":"PERPETUAL","instrument_instance_id":"binance|API3USDT|perpetual|usd-m|catalog48:3e091344eaaa4632bbdc1e5ded1237e1","effective_launch_or_start":"2022-02-21","launch_evidence":{"article_code":"3e091344eaaa4632bbdc1e5ded1237e1","release_date":"2022-02-21"},"prior_outcome_exposure":"NO"},
+    {"symbol":"GMTUSDT","market":"Binance USD-M","contract_type":"PERPETUAL","instrument_instance_id":"binance|GMTUSDT|perpetual|usd-m|catalog48:b76223a20c604f718b1e124d1d049d0d","effective_launch_or_start":"2022-03-14","launch_evidence":{"article_code":"b76223a20c604f718b1e124d1d049d0d","release_date":"2022-03-14"},"prior_outcome_exposure":"NO"},
+    {"symbol":"APEUSDT","market":"Binance USD-M","contract_type":"PERPETUAL","instrument_instance_id":"binance|APEUSDT|perpetual|usd-m|catalog48:bb98f3f2625143fc9d5d98c3aae55b1a","effective_launch_or_start":"2022-03-17","launch_evidence":{"article_code":"bb98f3f2625143fc9d5d98c3aae55b1a","release_date":"2022-03-17"},"prior_outcome_exposure":"NO"},
+    {"symbol":"OPUSDT","market":"Binance USD-M","contract_type":"PERPETUAL","instrument_instance_id":"binance|OPUSDT|perpetual|usd-m|catalog48:ce9176af28a148d4993972a1caeffda0","effective_launch_or_start":"2022-06-01","launch_evidence":{"article_code":"ce9176af28a148d4993972a1caeffda0","release_date":"2022-06-01"},"prior_outcome_exposure":"NO"},
+    {"symbol":"INJUSDT","market":"Binance USD-M","contract_type":"PERPETUAL","instrument_instance_id":"binance|INJUSDT|perpetual|usd-m|catalog48:c562f0d46b0e404c89d9eb8e56a70a2c","effective_launch_or_start":"2022-08-16","launch_evidence":{"article_code":"c562f0d46b0e404c89d9eb8e56a70a2c","release_date":"2022-08-16"},"prior_outcome_exposure":"NO"},
+    {"symbol":"LDOUSDT","market":"Binance USD-M","contract_type":"PERPETUAL","instrument_instance_id":"binance|LDOUSDT|perpetual|usd-m|catalog48:d6c6c06ddb074c829d90155b0aba661b","effective_launch_or_start":"2022-09-21","launch_evidence":{"article_code":"d6c6c06ddb074c829d90155b0aba661b","release_date":"2022-09-21"},"prior_outcome_exposure":"NO"},
+    {"symbol":"APTUSDT","market":"Binance USD-M","contract_type":"PERPETUAL","instrument_instance_id":"binance|APTUSDT|perpetual|usd-m|catalog48:f9df5bba5e1c4f1e9289240d0f9344e2","effective_launch_or_start":"2022-10-18","launch_evidence":{"article_code":"f9df5bba5e1c4f1e9289240d0f9344e2","release_date":"2022-10-18"},"prior_outcome_exposure":"NO"}
+  ],
+  "excluded_candidates_encountered_before_freeze": [
+    {"symbol":"ETHUSDT","reason":"DISCOVERY_ASSET_EXCLUDED","launch_evidence":{"article_code":"360036964392","release_date":"2019-11-29"}}
+  ],
+  "piece_contract": {
+    "measurement_strategy":"H003 MA 24/96 LONG_FLAT; existing-qntylab-strategies-v1",
+    "condition":"MARKET_DRAWDOWN_30D = equal-weight BTCUSDT/ETHUSDT/SOLUSDT market index(t) / max(index over prior 720h including t) - 1",
+    "state_reference_panel":["BTCUSDT","ETHUSDT","SOLUSDT"],
+    "state_normalization":"trailing 365 daily observations only; inclusive empirical CDF count(values <= current)/count(values)",
+    "bins":{"LOW":"<=33.3333333333 percentile","MID":">33.3333333333 and <66.6666666667 percentile","HIGH":">=66.6666666667 percentile"},
+    "decision_grid":"daily 00:00 UTC; 24h non-overlapping label",
+    "comparison":"measurement-strategy net utility vs FLAT = 0",
+    "cost_modes":{"BASELINE":{"fee_bps":10.0,"slippage_bps":0.0},"STRESS":{"fee_bps":10.0,"slippage_bps":10.0}},
+    "primary_metrics":["HIGH_MINUS_LOW_MEAN_UTILITY","HIGH_MINUS_LOW_POSITIVE_RATE"]
+  },
+  "cohort_digest_algorithm":"sha256(canonical JSON of selected_instrument_identities)",
+  "cohort_digest":"8a37866705efa5d68d80fb6770db49dbaba84c6e2c4848df6a406b885f0b5c1e",
+  "piece_contract_digest_algorithm":"sha256(canonical JSON of piece_contract)",
+  "piece_contract_digest":"de0cae86adf96a8fedb6b4f9531190265da2bf201e293a342b033fc0a498778a",
+  "prohibited_selection_information":["current listing status","current exchangeInfo membership","2025 or 2026 returns","H003 performance","drawdown-conditioned results","future survival","current symbol existence","future liquidity, volume, market cap, funding, or volatility","future row count, cleanliness, or download success","favourable result"],
+  "missingness_contract":{"invariant":"Cohort membership is distinct from data availability, decision usability, and outcome availability; a selected member is never replaced.","retained_states":["USABLE_REPLICATION_OBSERVATION","INSUFFICIENT_STATE_HISTORY","SOURCE_DATA_MISSING","STATE_INPUT_GAP","MEASUREMENT_STRATEGY_PATH_MISSING","OUTCOME_MISSING","IDENTITY_CONFLICT_AFTER_FREEZE","POST_DELIST_OR_OTHER_DECLARED_UNUSABLE"]},
+  "claim_boundary":"Any later result may state only that the frozen drawdown-condition piece replicated or failed across this declared source-conditioned external cohort. It does not establish an all-Binance, exchange-complete, representative, pristine-OOS, promotion-grade, or universal-market claim.",
+  "next_action":"EXECUTE_FROZEN_DRAWDOWN_PIECE_EXTERNAL_REPLICATION"
+}

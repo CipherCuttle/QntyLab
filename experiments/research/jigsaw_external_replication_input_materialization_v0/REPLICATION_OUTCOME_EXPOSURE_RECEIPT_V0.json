@@ -1,0 +1,30 @@
+{
+  "artifact_type": "REPLICATION_OUTCOME_EXPOSURE_RECEIPT",
+  "artifact_version": "v0",
+  "replication_id": "JIGSAW_DRAWDOWN_PIECE_EXTERNAL_REPLICATION_COHORT_V0",
+  "recorded_at_utc": "2026-08-10T00:00:00Z",
+  "exposure_occurred": "YES",
+  "stage": "after cohort/piece freeze; before admissible-input materialization",
+  "approximate_values_observed": {
+    "stress_high_minus_low_mean_utility": "+0.0115%",
+    "asset_directions": "mixed",
+    "reef_missingness": "severe"
+  },
+  "authority": "NON_AUTHORITATIVE_PREVIEW",
+  "permitted_effect_on_future_design": "NONE",
+  "frozen_declaration": {
+    "path": "experiments/research/jigsaw_external_replication_cohort_freeze_v0/declaration.json",
+    "sha256": "1938b0969804a133e6e142d50483695f18b9db9ea56cd9a24529f7be696b76c3",
+    "cohort_digest": "8a37866705efa5d68d80fb6770db49dbaba84c6e2c4848df6a406b885f0b5c1e",
+    "piece_contract_digest": "de0cae86adf96a8fedb6b4f9531190265da2bf201e293a342b033fc0a498778a"
+  },
+  "prohibitions": [
+    "NO cohort changes",
+    "NO asset substitution",
+    "NO endpoint changes",
+    "NO missingness-rule changes",
+    "NO source selection based on performance",
+    "NO threshold changes",
+    "NO analysis changes"
+  ]
+}

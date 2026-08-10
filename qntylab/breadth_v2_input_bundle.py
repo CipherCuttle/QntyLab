@@ -119,7 +119,7 @@ def _load_price(source: Mapping[str, Any], symbol: str) -> tuple[list[dict[str, 
         raise InputBundleBlocked("BLOCKED_PRICE_COVERAGE", f"price parent SHA mismatch for {symbol}")
     cached = _PRICE_SOURCE_CACHE.get(cache_key)
     if cached is not None:
-        return cached
+        return cached[0], dict(manifest), raw_bytes
     rows = list(csv.DictReader(io.StringIO(raw_bytes.decode("utf-8"))))
     expected = {"timestamp", "open", "high", "low", "close", "volume"}
     if not rows or set(rows[0]) != expected or any(set(row) != expected for row in rows):
@@ -145,7 +145,7 @@ def _load_funding(source: Mapping[str, Any], symbol: str) -> tuple[list[dict[str
         raise InputBundleBlocked("BLOCKED_FUNDING_COVERAGE", f"funding coverage or parent SHA mismatch for {symbol}")
     cached = _FUNDING_SOURCE_CACHE.get(cache_key)
     if cached is not None:
-        return cached
+        return cached[0], dict(manifest), raw_bytes
     events = [json.loads(line) for line in raw_bytes.decode("utf-8").splitlines() if line]
     previous = -1
     seen: set[int] = set()

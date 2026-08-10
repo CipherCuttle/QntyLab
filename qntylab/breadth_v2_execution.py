@@ -3,13 +3,14 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from typing import Callable, Mapping, Sequence
 
 PANEL_SIZE = 20
 TARGET_WEIGHT_BASIS = "PRE_COST_EQUITY"
-SUPPORTED_RATE_TYPES = frozenset({"REALIZED", "realized", "funding"})
+SUPPORTED_RATE_TYPES = frozenset({None, "Regular"})
 SUPPORTED_FAMILIES = frozenset({"TIME_SERIES_MOMENTUM", "MOVING_AVERAGE_TREND", "PRICE_BREAKOUT", "CROSS_SECTIONAL_MOMENTUM", "CROSS_SECTIONAL_REVERSAL", "FUNDING_CARRY", "VOLATILITY_TARGETING"})
 REGISTERED_SCIENTIFIC_CELLS = 3360
 EXECUTION_UNITS = 1992
@@ -20,12 +21,16 @@ class FundingEvent:
     symbol: str
     funding_time: str
     funding_rate: float
-    mark_price: float
-    rate_type: str = "REALIZED"
-    source: str = "synthetic"
-    coverage: str = "COMPLETE"
+    source: str
+    coverage: str
+    mark_price: float | None = None
+    rate_type: str | None = None
 
     def __post_init__(self) -> None:
+        if not math.isfinite(float(self.funding_rate)):
+            raise ValueError("funding_rate must be finite")
+        if self.mark_price is not None and not math.isfinite(float(self.mark_price)):
+            raise ValueError("optional mark_price must be finite when supplied")
         if self.rate_type not in SUPPORTED_RATE_TYPES:
             raise ValueError(f"unsupported funding rate_type: {self.rate_type}")
 
@@ -103,9 +108,10 @@ class PortfolioKernel:
                     contributions[symbol].price_pnl += pnl; equity += pnl; price_pnl += pnl
                 old_prices[symbol] = new_price
             for event in by_time.get(t, []):
-                cashflow = -quantities[event.symbol] * event.mark_price * event.funding_rate
+                held_notional_at_settlement = quantities[event.symbol] * old_prices[event.symbol]
+                cashflow = -held_notional_at_settlement * event.funding_rate
                 contributions[event.symbol].funding_pnl += cashflow; equity += cashflow; funding_pnl += cashflow
-                log.append({"time": t, "kind": "funding", "symbol": event.symbol, "quantity": quantities[event.symbol], "cashflow": cashflow})
+                log.append({"time": t, "kind": "funding", "symbol": event.symbol, "quantity": quantities[event.symbol], "held_notional_at_settlement": held_notional_at_settlement, "cashflow": cashflow})
             targets = dict(target_fn(t, {s: prices[s].closes[t] for s in symbols}, prior_weights, equity))
             pre_cost_equity = equity
             for symbol in symbols:

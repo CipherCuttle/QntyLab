@@ -94,9 +94,10 @@ def test_funding_carry_uses_exact_last_n_events_and_missing_panel_fails_closed()
 
 
 def test_input_bundle_digest_is_causal_and_order_sensitive():
-    kwargs = dict(instrument_contract_id="USD-M-PERP", symbols=["BTC", "ETH"], boundaries=["t0"], decision_clock="v0", assets={"BTC": {"price_content": "a", "price_provenance": "p", "funding_content": "f", "funding_provenance": "q", "coverage": "COMPLETE"}, "ETH": {"price_content": "b", "price_provenance": "p", "funding_content": "f", "funding_provenance": "q", "coverage": "COMPLETE"}})
+    digest = "a" * 64
+    kwargs = dict(instrument_contract_id="BINANCE_USDM_PERPETUAL_USDT_V1", symbols=["BTC", "ETH"], boundaries=["2024-01-01T00:00:00Z"], decision_clock="UTC_HOURLY_CLOSE_FIRST_BOUNDARY_AT_OR_AFTER_EVENT_V0", assets={"BTC": {"price_parent_content": digest, "price_content": digest, "price_provenance": digest, "funding_parent_content": digest, "funding_content": digest, "funding_provenance": digest, "coverage": "COMPLETE"}, "ETH": {"price_parent_content": digest, "price_content": digest, "price_provenance": digest, "funding_parent_content": digest, "funding_content": digest, "funding_provenance": digest, "coverage": "COMPLETE"}})
     first = evaluation_input_bundle_sha256(**kwargs)
-    changed = dict(kwargs, assets={**kwargs["assets"], "BTC": {**kwargs["assets"]["BTC"], "funding_content": "changed"}})
+    changed = dict(kwargs, assets={**kwargs["assets"], "BTC": {**kwargs["assets"]["BTC"], "funding_content": "b" * 64}})
     assert first != evaluation_input_bundle_sha256(**changed)
     assert first != evaluation_input_bundle_sha256(**dict(kwargs, symbols=["ETH", "BTC"]))
 

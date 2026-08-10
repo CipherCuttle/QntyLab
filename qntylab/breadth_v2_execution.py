@@ -4,16 +4,20 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import re
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from typing import Callable, Mapping, Sequence
 
 PANEL_SIZE = 20
+INSTRUMENT_CONTRACT_ID = "BINANCE_USDM_PERPETUAL_USDT_V1"
+DECISION_CLOCK_ID = "UTC_HOURLY_CLOSE_FIRST_BOUNDARY_AT_OR_AFTER_EVENT_V0"
 TARGET_WEIGHT_BASIS = "PRE_COST_EQUITY"
 SUPPORTED_RATE_TYPES = frozenset({None, "Regular"})
 SUPPORTED_FAMILIES = frozenset({"TIME_SERIES_MOMENTUM", "MOVING_AVERAGE_TREND", "PRICE_BREAKOUT", "CROSS_SECTIONAL_MOMENTUM", "CROSS_SECTIONAL_REVERSAL", "FUNDING_CARRY", "VOLATILITY_TARGETING"})
 REGISTERED_SCIENTIFIC_CELLS = 3360
 EXECUTION_UNITS = 1992
+_HEX64 = re.compile(r"^[0-9a-f]{64}$")
 
 
 @dataclass(frozen=True)
@@ -144,6 +148,26 @@ def _sha(payload: object) -> str:
 
 
 def evaluation_input_bundle_sha256(*, instrument_contract_id: str, symbols: Sequence[str], boundaries: Sequence[str], decision_clock: str, assets: Mapping[str, Mapping[str, str]],) -> str:
+    if instrument_contract_id != INSTRUMENT_CONTRACT_ID:
+        raise ValueError("wrong instrument contract")
+    if decision_clock != DECISION_CLOCK_ID or not symbols or len(set(symbols)) != len(symbols):
+        raise ValueError("invalid Breadth V2 decision clock or symbol order")
+    if set(assets) != set(symbols):
+        raise ValueError("assets must exactly match ordered symbols")
+    if not boundaries:
+        raise ValueError("boundaries must not be empty")
+    parsed_boundaries = [datetime.fromisoformat(boundary.replace("Z", "+00:00")) for boundary in boundaries]
+    if any(value.tzinfo is None or value.minute or value.second or value.microsecond for value in parsed_boundaries):
+        raise ValueError("boundaries must be timezone-aware UTC hours")
+    parsed_boundaries = [value.astimezone(timezone.utc) for value in parsed_boundaries]
+    if parsed_boundaries != sorted(parsed_boundaries) or any(current - prior != timedelta(hours=1) for prior, current in zip(parsed_boundaries, parsed_boundaries[1:])):
+        raise ValueError("boundaries must be a complete ordered hourly sequence")
+    required = {"price_parent_content", "price_content", "price_provenance", "funding_parent_content", "funding_content", "funding_provenance", "coverage"}
+    for symbol in symbols:
+        if set(assets[symbol]) != required or assets[symbol]["coverage"] != "COMPLETE":
+            raise ValueError(f"invalid strict asset mapping for {symbol}")
+        if any(not isinstance(assets[symbol][key], str) or not _HEX64.fullmatch(assets[symbol][key]) for key in required - {"coverage"}):
+            raise ValueError(f"invalid asset digest for {symbol}")
     payload = {"contract": "BREADTH_V2_INPUT_BUNDLE_V0", "instrument_contract_id": instrument_contract_id, "symbols": list(symbols), "boundaries": list(boundaries), "decision_clock": decision_clock, "assets": {s: assets[s] for s in symbols}}
     return _sha(payload)
 

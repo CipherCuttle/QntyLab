@@ -70,6 +70,10 @@ class ExecutionResult:
     price_pnl: float
     contributions: dict[str, AssetContribution]
     event_log: list[dict[str, object]] = field(default_factory=list)
+    # Observational-only trace of already-computed boundary state (BREADTH_V2_PATH_V0).
+    # This never feeds back into accounting; it is populated from the exact same
+    # local variables the loop below already computes.
+    boundary_path: list[dict[str, object]] = field(default_factory=list)
 
     @property
     def final_pnl(self) -> float:
@@ -102,22 +106,38 @@ class PortfolioKernel:
                 raise ValueError("funding evidence gap or unknown symbol")
             by_time.setdefault(event.funding_time, []).append(event)
         log: list[dict[str, object]] = []
+        boundary_path: list[dict[str, object]] = []
         prior_weights = {s: 0.0 for s in symbols}
         for t in boundaries:
+            # Observational-only capture: values recorded below are the exact same
+            # local variables the accounting loop already computes; nothing here
+            # feeds back into equity, quantities, or costs.
+            equity_entering_boundary = equity
+            boundary_price_pnl = 0.0
+            boundary_funding_pnl = 0.0
+            asset_price_pnl = {s: 0.0 for s in symbols}
+            asset_funding_pnl = {s: 0.0 for s in symbols}
             # The interval price move and event-time funding both use the position arriving at t.
             for symbol in symbols:
                 new_price = float(prices[symbol].closes[t])
                 if symbol in old_prices:
                     pnl = quantities[symbol] * (new_price - old_prices[symbol])
                     contributions[symbol].price_pnl += pnl; equity += pnl; price_pnl += pnl
+                    asset_price_pnl[symbol] += pnl; boundary_price_pnl += pnl
                 old_prices[symbol] = new_price
             for event in by_time.get(t, []):
                 held_notional_at_settlement = quantities[event.symbol] * old_prices[event.symbol]
                 cashflow = -held_notional_at_settlement * event.funding_rate
                 contributions[event.symbol].funding_pnl += cashflow; equity += cashflow; funding_pnl += cashflow
+                asset_funding_pnl[event.symbol] += cashflow; boundary_funding_pnl += cashflow
                 log.append({"time": t, "kind": "funding", "symbol": event.symbol, "quantity": quantities[event.symbol], "held_notional_at_settlement": held_notional_at_settlement, "cashflow": cashflow})
             targets = dict(target_fn(t, {s: prices[s].closes[t] for s in symbols}, prior_weights, equity))
             pre_cost_equity = equity
+            boundary_turnover = boundary_fee = boundary_slip = 0.0
+            asset_turnover = {s: 0.0 for s in symbols}
+            asset_fee = {s: 0.0 for s in symbols}
+            asset_slip = {s: 0.0 for s in symbols}
+            asset_target_weight = {s: 0.0 for s in symbols}
             for symbol in symbols:
                 target_notional = float(targets.get(symbol, 0.0)) * pre_cost_equity
                 current_notional = quantities[symbol] * old_prices[symbol]
@@ -128,16 +148,48 @@ class PortfolioKernel:
                 contributions[symbol].fee_cost += fee; contributions[symbol].slippage_cost += slip
                 quantities[symbol] = target_notional / old_prices[symbol]
                 prior_weights[symbol] = float(targets.get(symbol, 0.0))
+                boundary_turnover += trade; boundary_fee += fee; boundary_slip += slip
+                asset_turnover[symbol] = trade; asset_fee[symbol] = fee; asset_slip[symbol] = slip
+                asset_target_weight[symbol] = float(targets.get(symbol, 0.0))
             log.append({"time": t, "kind": "rebalance", "target_weight_basis": TARGET_WEIGHT_BASIS, "targets": targets})
+            boundary_path.append({
+                "boundary": t,
+                "equity_entering_boundary": equity_entering_boundary,
+                "price_pnl": boundary_price_pnl,
+                "funding_pnl": boundary_funding_pnl,
+                "pre_cost_equity": pre_cost_equity,
+                "target_weights": dict(asset_target_weight),
+                "turnover": boundary_turnover,
+                "fee_cost": boundary_fee,
+                "slippage_cost": boundary_slip,
+                "equity_after_rebalance": equity,
+                "assets": {
+                    s: {
+                        "price_pnl": asset_price_pnl[s],
+                        "funding_pnl": asset_funding_pnl[s],
+                        "turnover": asset_turnover[s],
+                        "fee_cost": asset_fee[s],
+                        "slippage_cost": asset_slip[s],
+                        "target_weight": asset_target_weight[s],
+                    }
+                    for s in symbols
+                },
+            })
         # Final boundary is already marked and funding-settled; liquidate and charge terminal turnover.
+        terminal_turnover = terminal_fee = terminal_slip = 0.0
         for symbol in symbols:
             trade = abs(quantities[symbol] * old_prices[symbol]); turnover += trade
             fee, slip = trade * self.fee_bps / 10000, trade * self.slippage_bps / 10000
             fees += fee; slippage += slip; equity -= fee + slip
             contributions[symbol].fee_cost += fee; contributions[symbol].slippage_cost += slip
             quantities[symbol] = 0.0
+            terminal_turnover += trade; terminal_fee += fee; terminal_slip += slip
         log.append({"time": boundaries[-1], "kind": "terminal_liquidation"})
-        result = ExecutionResult(equity, self.initial_equity, turnover, fees, slippage, funding_pnl, price_pnl, contributions, log)
+        boundary_path[-1]["terminal_liquidation_turnover"] = terminal_turnover
+        boundary_path[-1]["terminal_fee_cost"] = terminal_fee
+        boundary_path[-1]["terminal_slippage_cost"] = terminal_slip
+        boundary_path[-1]["final_equity"] = equity
+        result = ExecutionResult(equity, self.initial_equity, turnover, fees, slippage, funding_pnl, price_pnl, contributions, log, boundary_path)
         if abs(sum(c.net_contribution for c in contributions.values()) - result.final_pnl) > 1e-9:
             raise AssertionError("asset contributions do not reconcile to portfolio PnL")
         return result

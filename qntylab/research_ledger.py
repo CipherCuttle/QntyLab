@@ -109,6 +109,11 @@ COMPACT_METRIC_KEYS = {
     "excess_return_vs_buy_and_hold",
     "total_cost",
     "maximum_drawdown",
+    # Breadth V2: relative-value/volatility-targeting benchmarks are not
+    # buy-and-hold, so they get their own optional compact keys instead of
+    # forcing FLAT/UNSCALED_MA_24_96 results into buy_and_hold_return.
+    "benchmark_net_return",
+    "excess_return_vs_benchmark",
 }
 
 # Research Factory V2 seams.  These keys are optional so the 378 historical
@@ -129,7 +134,29 @@ TRIAL_OPTIONAL_KEYS = {
     "bar_path_last_timestamp",
     "registered_screen_id",
     "registered_variant_denominator",
+    # Breadth V2 runner/ledger integration seam (append-only, optional for
+    # everything except registered_screen_id == BREADTH_V2_REGISTERED_SCREEN_ID).
+    "breadth_v2_evaluation_id",
+    "evaluation_input_bundle_sha256",
+    "execution_contract_digest",
+    "execution_unit_type",
+    "execution_unit_id",
+    "scientific_cell_count",
+    "cell_semantics",
 }
+
+# The one registered Breadth V2 screen for which the above seam fields are
+# mandatory on a completed trial (see _validate_trial_v2_fields).
+BREADTH_V2_REGISTERED_SCREEN_ID = "QNTYLAB_BREADTH_V2_20260810"
+BREADTH_V2_REQUIRED_TRIAL_KEYS = (
+    "breadth_v2_evaluation_id",
+    "evaluation_input_bundle_sha256",
+    "execution_contract_digest",
+    "execution_unit_type",
+    "execution_unit_id",
+    "scientific_cell_count",
+    "cell_semantics",
+)
 DECISION_OPTIONAL_KEYS = {
     "registered_screen_id",
     "registered_variant_denominator",
@@ -498,6 +525,26 @@ def _validate_trial_v2_fields(event: dict[str, Any]) -> None:
     denominator = event.get("registered_variant_denominator")
     if denominator is not None and (not isinstance(denominator, int) or denominator < 1):
         raise LedgerError("registered_variant_denominator must be a positive integer when present")
+    if event.get("registered_screen_id") == BREADTH_V2_REGISTERED_SCREEN_ID:
+        from qntylab.breadth_v2_execution import breadth_v2_evaluation_id
+
+        missing = [key for key in BREADTH_V2_REQUIRED_TRIAL_KEYS if not event.get(key)]
+        if missing:
+            raise LedgerError(f"{BREADTH_V2_REGISTERED_SCREEN_ID} trial missing required fields: {missing}")
+        expected_evaluation_id = breadth_v2_evaluation_id(
+            registered_screen_id=event["registered_screen_id"],
+            variant_id=event["variant_id"],
+            execution_contract_digest=event["execution_contract_digest"],
+            execution_unit_type=event["execution_unit_type"],
+            evaluation_input_bundle_sha256=event["evaluation_input_bundle_sha256"],
+            period_id=event["period_id"],
+            cost_mode=event["cost_mode"],
+            fee_bps=float(event["fee_bps"]),
+            slippage_bps=float(event["slippage_bps"]),
+            instrument_contract_id=event["instrument_contract_id"],
+        )
+        if event["breadth_v2_evaluation_id"] != expected_evaluation_id:
+            raise LedgerError(f"breadth_v2_evaluation_id does not recompute: {event['event_id']}")
 
 
 def _read_jsonl(path: Path, validator: Any) -> list[dict[str, Any]]:

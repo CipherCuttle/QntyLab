@@ -1,0 +1,37 @@
+{
+  "acquisition_unresolved_count": 0,
+  "blocked_input_records": 248,
+  "blocked_mapped_execution_units": 496,
+  "blocked_mapped_scientific_cells": 1408,
+  "blocking_reason_counts": {
+    "BLOCKED_FUNDING_COVERAGE": 28,
+    "BLOCKED_PRICE_COVERAGE": 220
+  },
+  "campaign_input_universe_sha256": "8fef4c02d113027630072bcbb0802e35ab31be17c835aa2ebdae4261265589fb",
+  "contract": "BREADTH_V2_DEV_INPUT_MATERIALIZATION_V0R1",
+  "correction_reason": "FUNDING_PARENT_OVERREQUEST_AND_CELL_STATUS_ACCOUNTING_CORRECTION",
+  "outcome_guard": {
+    "breadth_v2_candidates": 28,
+    "breadth_v2_trials": 0,
+    "historical_trials": 378,
+    "real_strategy_executions": 0,
+    "real_strategy_outcomes": 0
+  },
+  "persistent_evidence_root": "/home/swirky/DevHub/qntylab-evidence/breadth_v2_dev_inputs_v0",
+  "pre_acquisition_freeze_commit": "2608676b1d353446b00409c63a32b4b6a362c38e",
+  "ready_identity_corrected_count": 748,
+  "ready_input_records": 748,
+  "ready_mapped_execution_units": 1496,
+  "ready_mapped_scientific_cells": 1952,
+  "registered_execution_units": 1992,
+  "registered_input_records": 996,
+  "registered_scientific_cells": 3360,
+  "sealed_t0": "2026-08-10T19:00:00Z",
+  "status_transition_counts": {
+    "BLOCKED_TO_BLOCKED": 248,
+    "BLOCKED_TO_READY": 0,
+    "READY_TO_BLOCKED": 0,
+    "READY_TO_READY": 748
+  },
+  "supersedes_census_sha256": "5c4cff22e43edc14a2b2214fab277f4f2f1f5bfb79f13b389e0a2ebc1e835064"
+}

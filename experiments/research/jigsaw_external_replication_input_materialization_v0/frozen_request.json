@@ -1,0 +1,304 @@
+{
+  "adapter_commit": "2167a3be24b125e47524b4540dcb338b53d30b2a",
+  "adapter_contract_version": "BINANCE_USD_M_PERPETUAL_1H_MATERIALIZER_V0",
+  "adapter_schema_version": "binance-um-monthly-kline-12-v1",
+  "artifact_type": "FROZEN_REPLICATION_INPUT_REQUEST_V0",
+  "checksum_policy": "ZIP plus published .CHECKSUM; exact filename and SHA256 must match",
+  "cohort_digest": "8a37866705efa5d68d80fb6770db49dbaba84c6e2c4848df6a406b885f0b5c1e",
+  "derived_windows": {
+    "END": "2026-06-30T23:00:00Z",
+    "H003_REQUIRED_SOURCE_START": "2024-12-28T00:00:00Z",
+    "STATE_REFERENCE_REQUIRED_SOURCE_START": "2023-12-03T01:00:00Z",
+    "h003_derivation": "slow=96; first raw MA comparison at source index 95; causal shift makes state at index 96",
+    "state_derivation": "365 prior daily 00:00 states; earliest is 2024-01-02T00:00:00Z; each needs a 720h inclusive window beginning 719h earlier"
+  },
+  "gap_policy": "preserve_and_report; no interpolation or forward fill; downstream H003 policy is REJECT",
+  "interval": "1h",
+  "no_backfill_rule": "no request expansion, symbol addition, substitute, or date expansion after digest",
+  "object_order_rule": "state panel BTCUSDT, ETHUSDT, SOLUSDT; then frozen cohort order; calendar month ascending within symbol",
+  "outcome_insensitivity_declaration": "No acquisition selection inspects H003, drawdown state, or replication outcomes.",
+  "piece_contract_digest": "de0cae86adf96a8fedb6b4f9531190265da2bf201e293a342b033fc0a498778a",
+  "replication_id": "JIGSAW_DRAWDOWN_PIECE_EXTERNAL_REPLICATION_COHORT_V0",
+  "replication_member_identities": [
+    {
+      "InstrumentIdentity": {
+        "contract_type": "perpetual",
+        "instrument_instance_id": "binance|BCHUSDT|perpetual|usd-m|catalog48:360037742632",
+        "market": "usd-m",
+        "symbol": "BCHUSDT"
+      },
+      "order": 4,
+      "requested_end": "2026-06-30T23:00:00Z",
+      "requested_start": "2024-12-28T00:00:00Z",
+      "symbol": "BCHUSDT"
+    },
+    {
+      "InstrumentIdentity": {
+        "contract_type": "perpetual",
+        "instrument_instance_id": "binance|XRPUSDT|perpetual|usd-m|catalog48:360038497311",
+        "market": "usd-m",
+        "symbol": "XRPUSDT"
+      },
+      "order": 5,
+      "requested_end": "2026-06-30T23:00:00Z",
+      "requested_start": "2024-12-28T00:00:00Z",
+      "symbol": "XRPUSDT"
+    },
+    {
+      "InstrumentIdentity": {
+        "contract_type": "perpetual",
+        "instrument_instance_id": "binance|LTCUSDT|perpetual|usd-m|catalog48:360038585151",
+        "market": "usd-m",
+        "symbol": "LTCUSDT"
+      },
+      "order": 6,
+      "requested_end": "2026-06-30T23:00:00Z",
+      "requested_start": "2024-12-28T00:00:00Z",
+      "symbol": "LTCUSDT"
+    },
+    {
+      "InstrumentIdentity": {
+        "contract_type": "perpetual",
+        "instrument_instance_id": "binance|TRXUSDT|perpetual|usd-m|catalog48:360038407872",
+        "market": "usd-m",
+        "symbol": "TRXUSDT"
+      },
+      "order": 7,
+      "requested_end": "2026-06-30T23:00:00Z",
+      "requested_start": "2024-12-28T00:00:00Z",
+      "symbol": "TRXUSDT"
+    },
+    {
+      "InstrumentIdentity": {
+        "contract_type": "perpetual",
+        "instrument_instance_id": "binance|ETCUSDT|perpetual|usd-m|catalog48:360038833831",
+        "market": "usd-m",
+        "symbol": "ETCUSDT"
+      },
+      "order": 8,
+      "requested_end": "2026-06-30T23:00:00Z",
+      "requested_start": "2024-12-28T00:00:00Z",
+      "symbol": "ETCUSDT"
+    },
+    {
+      "InstrumentIdentity": {
+        "contract_type": "perpetual",
+        "instrument_instance_id": "binance|LINKUSDT|perpetual|usd-m|catalog48:360038885371",
+        "market": "usd-m",
+        "symbol": "LINKUSDT"
+      },
+      "order": 9,
+      "requested_end": "2026-06-30T23:00:00Z",
+      "requested_start": "2024-12-28T00:00:00Z",
+      "symbol": "LINKUSDT"
+    },
+    {
+      "InstrumentIdentity": {
+        "contract_type": "perpetual",
+        "instrument_instance_id": "binance|XLMUSDT|perpetual|usd-m|catalog48:360038969011",
+        "market": "usd-m",
+        "symbol": "XLMUSDT"
+      },
+      "order": 10,
+      "requested_end": "2026-06-30T23:00:00Z",
+      "requested_start": "2024-12-28T00:00:00Z",
+      "symbol": "XLMUSDT"
+    },
+    {
+      "InstrumentIdentity": {
+        "contract_type": "perpetual",
+        "instrument_instance_id": "binance|CHZUSDT|perpetual|usd-m|catalog48:e95ce5d56cfe4ef4acfb02a0769e6fd8",
+        "market": "usd-m",
+        "symbol": "CHZUSDT"
+      },
+      "order": 11,
+      "requested_end": "2026-06-30T23:00:00Z",
+      "requested_start": "2024-12-28T00:00:00Z",
+      "symbol": "CHZUSDT"
+    },
+    {
+      "InstrumentIdentity": {
+        "contract_type": "perpetual",
+        "instrument_instance_id": "binance|SANDUSDT|perpetual|usd-m|catalog48:df96728782084fd2ab2ba51b6201b462",
+        "market": "usd-m",
+        "symbol": "SANDUSDT"
+      },
+      "order": 12,
+      "requested_end": "2026-06-30T23:00:00Z",
+      "requested_start": "2024-12-28T00:00:00Z",
+      "symbol": "SANDUSDT"
+    },
+    {
+      "InstrumentIdentity": {
+        "contract_type": "perpetual",
+        "instrument_instance_id": "binance|REEFUSDT|perpetual|usd-m|catalog48:02895f23b535433e8563175cfb64d1cd",
+        "market": "usd-m",
+        "symbol": "REEFUSDT"
+      },
+      "order": 13,
+      "requested_end": "2026-06-30T23:00:00Z",
+      "requested_start": "2024-12-28T00:00:00Z",
+      "symbol": "REEFUSDT"
+    },
+    {
+      "InstrumentIdentity": {
+        "contract_type": "perpetual",
+        "instrument_instance_id": "binance|CHRUSDT|perpetual|usd-m|catalog48:86f5ef4c343c4acda8358918e3f77698",
+        "market": "usd-m",
+        "symbol": "CHRUSDT"
+      },
+      "order": 14,
+      "requested_end": "2026-06-30T23:00:00Z",
+      "requested_start": "2024-12-28T00:00:00Z",
+      "symbol": "CHRUSDT"
+    },
+    {
+      "InstrumentIdentity": {
+        "contract_type": "perpetual",
+        "instrument_instance_id": "binance|ALICEUSDT|perpetual|usd-m|catalog48:09e302f8a778456aa42e0df634cc4e8f",
+        "market": "usd-m",
+        "symbol": "ALICEUSDT"
+      },
+      "order": 15,
+      "requested_end": "2026-06-30T23:00:00Z",
+      "requested_start": "2024-12-28T00:00:00Z",
+      "symbol": "ALICEUSDT"
+    },
+    {
+      "InstrumentIdentity": {
+        "contract_type": "perpetual",
+        "instrument_instance_id": "binance|ONEUSDT|perpetual|usd-m|catalog48:45cb73bba8254e52b9c0d7ad597d0402",
+        "market": "usd-m",
+        "symbol": "ONEUSDT"
+      },
+      "order": 16,
+      "requested_end": "2026-06-30T23:00:00Z",
+      "requested_start": "2024-12-28T00:00:00Z",
+      "symbol": "ONEUSDT"
+    },
+    {
+      "InstrumentIdentity": {
+        "contract_type": "perpetual",
+        "instrument_instance_id": "binance|API3USDT|perpetual|usd-m|catalog48:3e091344eaaa4632bbdc1e5ded1237e1",
+        "market": "usd-m",
+        "symbol": "API3USDT"
+      },
+      "order": 17,
+      "requested_end": "2026-06-30T23:00:00Z",
+      "requested_start": "2024-12-28T00:00:00Z",
+      "symbol": "API3USDT"
+    },
+    {
+      "InstrumentIdentity": {
+        "contract_type": "perpetual",
+        "instrument_instance_id": "binance|GMTUSDT|perpetual|usd-m|catalog48:b76223a20c604f718b1e124d1d049d0d",
+        "market": "usd-m",
+        "symbol": "GMTUSDT"
+      },
+      "order": 18,
+      "requested_end": "2026-06-30T23:00:00Z",
+      "requested_start": "2024-12-28T00:00:00Z",
+      "symbol": "GMTUSDT"
+    },
+    {
+      "InstrumentIdentity": {
+        "contract_type": "perpetual",
+        "instrument_instance_id": "binance|APEUSDT|perpetual|usd-m|catalog48:bb98f3f2625143fc9d5d98c3aae55b1a",
+        "market": "usd-m",
+        "symbol": "APEUSDT"
+      },
+      "order": 19,
+      "requested_end": "2026-06-30T23:00:00Z",
+      "requested_start": "2024-12-28T00:00:00Z",
+      "symbol": "APEUSDT"
+    },
+    {
+      "InstrumentIdentity": {
+        "contract_type": "perpetual",
+        "instrument_instance_id": "binance|OPUSDT|perpetual|usd-m|catalog48:ce9176af28a148d4993972a1caeffda0",
+        "market": "usd-m",
+        "symbol": "OPUSDT"
+      },
+      "order": 20,
+      "requested_end": "2026-06-30T23:00:00Z",
+      "requested_start": "2024-12-28T00:00:00Z",
+      "symbol": "OPUSDT"
+    },
+    {
+      "InstrumentIdentity": {
+        "contract_type": "perpetual",
+        "instrument_instance_id": "binance|INJUSDT|perpetual|usd-m|catalog48:c562f0d46b0e404c89d9eb8e56a70a2c",
+        "market": "usd-m",
+        "symbol": "INJUSDT"
+      },
+      "order": 21,
+      "requested_end": "2026-06-30T23:00:00Z",
+      "requested_start": "2024-12-28T00:00:00Z",
+      "symbol": "INJUSDT"
+    },
+    {
+      "InstrumentIdentity": {
+        "contract_type": "perpetual",
+        "instrument_instance_id": "binance|LDOUSDT|perpetual|usd-m|catalog48:d6c6c06ddb074c829d90155b0aba661b",
+        "market": "usd-m",
+        "symbol": "LDOUSDT"
+      },
+      "order": 22,
+      "requested_end": "2026-06-30T23:00:00Z",
+      "requested_start": "2024-12-28T00:00:00Z",
+      "symbol": "LDOUSDT"
+    },
+    {
+      "InstrumentIdentity": {
+        "contract_type": "perpetual",
+        "instrument_instance_id": "binance|APTUSDT|perpetual|usd-m|catalog48:f9df5bba5e1c4f1e9289240d0f9344e2",
+        "market": "usd-m",
+        "symbol": "APTUSDT"
+      },
+      "order": 23,
+      "requested_end": "2026-06-30T23:00:00Z",
+      "requested_start": "2024-12-28T00:00:00Z",
+      "symbol": "APTUSDT"
+    }
+  ],
+  "request_digest": "51f9aba2e9b5e02439e32290349af1cb70a56429db7fa14a9b0852afdf42c8be",
+  "source_family": "Binance USD-M monthly klines archive",
+  "state_reference_identities": [
+    {
+      "InstrumentIdentity": {
+        "contract_type": "perpetual",
+        "instrument_instance_id": "binance|BTCUSDT|perpetual|usd-m|state-reference-v0",
+        "market": "usd-m",
+        "symbol": "BTCUSDT"
+      },
+      "order": 1,
+      "requested_end": "2026-06-30T23:00:00Z",
+      "requested_start": "2023-12-03T01:00:00Z",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "InstrumentIdentity": {
+        "contract_type": "perpetual",
+        "instrument_instance_id": "binance|ETHUSDT|perpetual|usd-m|state-reference-v0",
+        "market": "usd-m",
+        "symbol": "ETHUSDT"
+      },
+      "order": 2,
+      "requested_end": "2026-06-30T23:00:00Z",
+      "requested_start": "2023-12-03T01:00:00Z",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "InstrumentIdentity": {
+        "contract_type": "perpetual",
+        "instrument_instance_id": "binance|SOLUSDT|perpetual|usd-m|state-reference-v0",
+        "market": "usd-m",
+        "symbol": "SOLUSDT"
+      },
+      "order": 3,
+      "requested_end": "2026-06-30T23:00:00Z",
+      "requested_start": "2023-12-03T01:00:00Z",
+      "symbol": "SOLUSDT"
+    }
+  ]
+}

@@ -144,7 +144,7 @@ def test_f1_every_historical_variant_resolves_to_exactly_one_canonical_family():
         if event["event_type"] != "CANDIDATE_PROPOSED":
             continue
         resolved[event["variant_id"]] = family_ontology.resolve_family(event["family_id"])
-    assert len(resolved) == 20
+    assert len(resolved) == 48
     assert all(isinstance(value, str) and value for value in resolved.values())
 
 
@@ -163,7 +163,7 @@ def test_f1_generation_1_h003_24_96_joins_its_real_family():
         for event in by_candidate.values()
         if family_ontology.resolve_family(event["family_id"]) == family_ontology.MOVING_AVERAGE_TREND
     ]
-    assert len(siblings) == 4, "moving-average family has four variants once aliases resolve"
+    assert len(siblings) == 8, "historical and Breadth V2 moving-average variants resolve together"
     raw_only = [event for event in by_candidate.values() if event["family_id"] == "moving_average_trend"]
     assert len(raw_only) == 3, "raw-label query is the one that loses a variant"
 
@@ -184,7 +184,7 @@ def test_f2_ontology_digest_is_stable_and_targets_declared():
     strategy_families = [
         key for key in family_ontology.CANONICAL_FAMILIES if family_ontology.is_strategy_family(key)
     ]
-    assert len(strategy_families) == 6
+    assert len(strategy_families) == 9
 
 
 # --------------------------------------------------------------------------
@@ -789,12 +789,12 @@ def test_f17_h007_status_unchanged():
 
 
 def test_f18_history_streams_are_unchanged_from_the_seam_base():
-    """The closure preserves candidate and trial streams and appends one decision."""
+    """The closure preserves trial history and appends the registered V2 candidates."""
     starting_commit = "origin/master"
     for path, expected in (
-        ("experiments/research/candidates.jsonl", 0),
+        ("experiments/research/candidates.jsonl", 28),
         ("experiments/research/trials/2026.jsonl", 0),
-        ("experiments/research/decisions.jsonl", 1),
+        ("experiments/research/decisions.jsonl", 0),
     ):
         diff = subprocess.run(
             ["git", "diff", starting_commit, "--numstat", "--", path],
@@ -803,14 +803,14 @@ def test_f18_history_streams_are_unchanged_from_the_seam_base():
             text=True,
             check=True,
         ).stdout.strip()
-        if path.endswith("decisions.jsonl"):
-            assert diff.startswith("1\t0\t"), f"{path} must have exactly one appended line"
+        if path.endswith("candidates.jsonl"):
+            assert diff.startswith("28\t0\t"), f"{path} must have exactly 28 appended lines"
         else:
             assert diff == "", f"{path} must be byte-identical to the starting commit"
-        assert expected in {0, 1}
+        assert expected == (28 if path.endswith("candidates.jsonl") else 0)
 
 def test_f18_committed_history_still_replays_without_issues():
     history = load_canonical_history(COMMITTED_RESEARCH_ROOT)
-    assert len(history.candidates) == 20
+    assert len(history.candidates) == 48
     assert len(history.decisions) == 24
     assert len(history.trials) == 378

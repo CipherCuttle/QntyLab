@@ -27,6 +27,10 @@ PRICE_BREAKOUT = "PRICE_BREAKOUT"
 MEAN_REVERSION = "MEAN_REVERSION"
 SHORT_HORIZON_REVERSAL = "SHORT_HORIZON_REVERSAL"
 VOLATILITY_SCALED_TREND = "VOLATILITY_SCALED_TREND"
+# Frozen Breadth V2 families added after the historical corpus.
+CROSS_SECTIONAL_MOMENTUM = "CROSS_SECTIONAL_MOMENTUM"
+CROSS_SECTIONAL_REVERSAL = "CROSS_SECTIONAL_REVERSAL"
+FUNDING_CARRY = "FUNDING_CARRY"
 JIGSAW_CONDITION_DEPENDENCE = "JIGSAW_CONDITION_DEPENDENCE"
 
 
@@ -68,6 +72,21 @@ CANONICAL_FAMILIES: dict[str, dict[str, Any]] = {
         "mechanism": "Moving-average trend sized inversely to realized volatility.",
         "is_strategy_family": True,
     },
+    CROSS_SECTIONAL_MOMENTUM: {
+        "canonical_family_id": CROSS_SECTIONAL_MOMENTUM,
+        "mechanism": "Cross-sectional continuation among a fixed asset panel.",
+        "is_strategy_family": True,
+    },
+    CROSS_SECTIONAL_REVERSAL: {
+        "canonical_family_id": CROSS_SECTIONAL_REVERSAL,
+        "mechanism": "Cross-sectional reversal among a fixed asset panel.",
+        "is_strategy_family": True,
+    },
+    FUNDING_CARRY: {
+        "canonical_family_id": FUNDING_CARRY,
+        "mechanism": "Delta-neutral carry from realized perpetual funding settlements.",
+        "is_strategy_family": True,
+    },
     JIGSAW_CONDITION_DEPENDENCE: {
         "canonical_family_id": JIGSAW_CONDITION_DEPENDENCE,
         "mechanism": "Measurement of state-conditioned utility of a frozen strategy; not a tradable family.",
@@ -102,6 +121,14 @@ FAMILY_ALIASES: dict[str, str] = {
     "FAMILY_VOLATILITY_SCALED_TREND": VOLATILITY_SCALED_TREND,
     "volatility_scaled_trend": VOLATILITY_SCALED_TREND,
     "VOLATILITY_SCALED_TREND": VOLATILITY_SCALED_TREND,
+    "VOLATILITY_TARGETING": VOLATILITY_SCALED_TREND,
+    # Breadth V2 additions
+    "CROSS_SECTIONAL_MOMENTUM": CROSS_SECTIONAL_MOMENTUM,
+    "cross_sectional_momentum": CROSS_SECTIONAL_MOMENTUM,
+    "CROSS_SECTIONAL_REVERSAL": CROSS_SECTIONAL_REVERSAL,
+    "cross_sectional_reversal": CROSS_SECTIONAL_REVERSAL,
+    "FUNDING_CARRY": FUNDING_CARRY,
+    "funding_carry": FUNDING_CARRY,
     # non-strategy measurement family
     "FAMILY_JIGSAW_CONDITION_DEPENDENCE": JIGSAW_CONDITION_DEPENDENCE,
     "jigsaw_condition_dependence": JIGSAW_CONDITION_DEPENDENCE,

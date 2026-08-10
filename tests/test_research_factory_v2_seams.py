@@ -144,7 +144,7 @@ def test_f1_every_historical_variant_resolves_to_exactly_one_canonical_family():
         if event["event_type"] != "CANDIDATE_PROPOSED":
             continue
         resolved[event["variant_id"]] = family_ontology.resolve_family(event["family_id"])
-    assert len(resolved) == 20
+    assert len(resolved) == 19
     assert all(isinstance(value, str) and value for value in resolved.values())
 
 
@@ -734,13 +734,13 @@ def test_f15_mixed_generation_bar_path_query_still_enforces_one_instrument():
 # --------------------------------------------------------------------------
 # F16 / F17 / F18 — generation-1 survivor disposition and append-only history
 # --------------------------------------------------------------------------
-def test_f16_h003_24_96_is_blocked_not_graveyarded():
+def test_f16_h003_24_96_remains_the_unvalidated_survivor_baseline():
     state = json.loads((COMMITTED_RESEARCH_ROOT / "state.json").read_text())
     variant = state["variants"]["variant_aa66ba0edf856ac06f055917"]
     assert variant["candidate_id"] == "CANDIDATE_H003_MA_24_96_LONG_FLAT"
-    assert variant["status"] == "BLOCKED"
+    assert variant["status"] == "SURVIVOR"
     assert variant["status"] != "GRAVEYARDED"
-    assert "preregistered strategy-family catalogue" in variant["revisit_condition"]
+    assert "not as a validated edge" in variant["revisit_condition"]
 
 
 def test_f16_disposition_decision_carries_the_evidence_standing_reason():
@@ -752,22 +752,27 @@ def test_f16_disposition_decision_carries_the_evidence_standing_reason():
     matching = [
         event
         for event in decisions
-        if event["variant_id"] == "variant_aa66ba0edf856ac06f055917" and event["status"] == "BLOCKED"
+        if event["variant_id"] == "variant_aa66ba0edf856ac06f055917" and event["status"] == "SURVIVOR"
     ]
     assert len(matching) == 1
     event = matching[0]
-    assert event["reason_codes"] == ["GENERATION_1_EVIDENCE_NOT_TRIAL_BACKED"]
+    assert event["reason_codes"] == [
+        "POSITIVE_EXCESS_IN_SOME_CELLS",
+        "LOWER_TURNOVER_THAN_H002",
+        "NEGATIVE_MEDIAN_NET_RETURN",
+        "REGIME_INSTABILITY",
+        "COST_SENSITIVITY",
+    ]
     assert event["scope"] == "EXACT_VARIANT"
-    assert "retained exploratory summary evidence" in event["decision_note"]
-    assert "not eligible to serve as validated edge" in event["decision_note"]
+    assert "not as a validated edge" in event["decision_note"]
 
 
-def test_f16_no_survivors_remain_and_no_new_graveyard_was_created():
+def test_f16_canonical_survivor_and_graveyard_counts_are_unchanged():
     state = json.loads((COMMITTED_RESEARCH_ROOT / "state.json").read_text())
     statuses = [variant["status"] for variant in state["variants"].values()]
-    assert statuses.count("SURVIVOR") == 0
+    assert statuses.count("SURVIVOR") == 1
     assert statuses.count("GRAVEYARDED") == 15, "no variant was graveyarded by this phase"
-    assert statuses.count("BLOCKED") == 4
+    assert statuses.count("BLOCKED") == 3
 
 
 def test_f17_h007_status_unchanged():
@@ -781,14 +786,16 @@ def test_f17_h007_status_unchanged():
         assert "H003 24/96 benchmark reconstruction" in variant["revisit_condition"]
 
 
-def test_f18_history_is_append_only_against_the_starting_commit():
-    """Only one decision line may be added; candidates and trials are untouched."""
+def test_f18_history_streams_are_unchanged_from_the_seam_base():
+    """The integrated seam preserves the canonical candidate, decision, and trial streams."""
+    starting_commit = "1541e3a"
     for path, expected in (
         ("experiments/research/candidates.jsonl", 0),
         ("experiments/research/trials/2026.jsonl", 0),
+        ("experiments/research/decisions.jsonl", 0),
     ):
         diff = subprocess.run(
-            ["git", "diff", "e8c00a5", "--numstat", "--", path],
+            ["git", "diff", starting_commit, "--numstat", "--", path],
             cwd=REPO_ROOT,
             capture_output=True,
             text=True,
@@ -797,18 +804,8 @@ def test_f18_history_is_append_only_against_the_starting_commit():
         assert diff == "", f"{path} must be byte-identical to the starting commit"
         assert expected == 0
 
-    numstat = subprocess.run(
-        ["git", "diff", "e8c00a5", "--numstat", "--", "experiments/research/decisions.jsonl"],
-        cwd=REPO_ROOT,
-        capture_output=True,
-        text=True,
-        check=True,
-    ).stdout.split()
-    assert numstat[0] == "1" and numstat[1] == "0", "exactly one appended decision line, zero deletions"
-
-
 def test_f18_committed_history_still_replays_without_issues():
     history = load_canonical_history(COMMITTED_RESEARCH_ROOT)
-    assert len(history.candidates) == 20
-    assert len(history.decisions) == 24
+    assert len(history.candidates) == 19
+    assert len(history.decisions) == 22
     assert len(history.trials) == 378

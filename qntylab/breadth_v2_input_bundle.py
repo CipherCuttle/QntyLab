@@ -24,6 +24,10 @@ PANEL_ORDER = (
     "LDOUSDT", "APTUSDT",
 )
 _ASSET_KEYS = frozenset({"price_parent_content", "price_content", "price_provenance", "funding_parent_content", "funding_content", "funding_provenance", "coverage"})
+_PRICE_SOURCE_CACHE: dict[str, tuple[list[dict[str, str]], dict[str, Any], bytes]] = {}
+_FUNDING_SOURCE_CACHE: dict[str, tuple[list[dict[str, Any]], dict[str, Any], bytes]] = {}
+_PRICE_CLIP_CACHE: dict[tuple[str, str, str], tuple[list[dict[str, str]], bytes, list[str]]] = {}
+_FUNDING_CLIP_CACHE: dict[tuple[str, str, int], tuple[list[dict[str, Any]], bytes, int]] = {}
 
 
 class InputBundleBlocked(ValueError):
@@ -110,8 +114,12 @@ def _load_price(source: Mapping[str, Any], symbol: str) -> tuple[list[dict[str, 
     if not isinstance(manifest, Mapping) or not isinstance(raw, (str, bytes)):
         raise InputBundleBlocked("BLOCKED_PRICE_COVERAGE", f"missing price artifact for {symbol}")
     raw_bytes = raw.encode() if isinstance(raw, str) else bytes(raw)
-    if _sha_bytes(raw_bytes) != manifest.get("normalized_sha256"):
+    cache_key = str(manifest.get("normalized_sha256"))
+    if _sha_bytes(raw_bytes) != cache_key:
         raise InputBundleBlocked("BLOCKED_PRICE_COVERAGE", f"price parent SHA mismatch for {symbol}")
+    cached = _PRICE_SOURCE_CACHE.get(cache_key)
+    if cached is not None:
+        return cached[0], dict(manifest), raw_bytes
     rows = list(csv.DictReader(io.StringIO(raw_bytes.decode("utf-8"))))
     expected = {"timestamp", "open", "high", "low", "close", "volume"}
     if not rows or set(rows[0]) != expected or any(set(row) != expected for row in rows):
@@ -121,7 +129,9 @@ def _load_price(source: Mapping[str, Any], symbol: str) -> tuple[list[dict[str, 
         raise InputBundleBlocked("BLOCKED_PRICE_COVERAGE", f"price timestamps are not unique and ordered for {symbol}")
     if manifest.get("gap_count") != 0:
         raise InputBundleBlocked("BLOCKED_PRICE_COVERAGE", f"price gap for {symbol}")
-    return rows, dict(manifest), raw_bytes
+    result = (rows, dict(manifest), raw_bytes)
+    _PRICE_SOURCE_CACHE[cache_key] = result
+    return result
 
 
 def _load_funding(source: Mapping[str, Any], symbol: str) -> tuple[list[dict[str, Any]], dict[str, Any], bytes]:
@@ -130,8 +140,12 @@ def _load_funding(source: Mapping[str, Any], symbol: str) -> tuple[list[dict[str
     if not isinstance(manifest, Mapping) or not isinstance(raw, (str, bytes)):
         raise InputBundleBlocked("BLOCKED_FUNDING_COVERAGE", f"missing funding artifact for {symbol}")
     raw_bytes = raw.encode() if isinstance(raw, str) else bytes(raw)
-    if _sha_bytes(raw_bytes) != manifest.get("normalized_sha256") or manifest.get("coverage_status") != "COMPLETE":
+    cache_key = str(manifest.get("normalized_sha256"))
+    if _sha_bytes(raw_bytes) != cache_key or manifest.get("coverage_status") != "COMPLETE":
         raise InputBundleBlocked("BLOCKED_FUNDING_COVERAGE", f"funding coverage or parent SHA mismatch for {symbol}")
+    cached = _FUNDING_SOURCE_CACHE.get(cache_key)
+    if cached is not None:
+        return cached[0], dict(manifest), raw_bytes
     events = [json.loads(line) for line in raw_bytes.decode("utf-8").splitlines() if line]
     previous = -1
     seen: set[int] = set()
@@ -140,7 +154,9 @@ def _load_funding(source: Mapping[str, Any], symbol: str) -> tuple[list[dict[str
             raise InputBundleBlocked("BLOCKED_FUNDING_COVERAGE", f"invalid funding source order for {symbol}")
         previous = event["funding_time_ms"]
         seen.add(event["funding_time_ms"])
-    return events, dict(manifest), raw_bytes
+    result = (events, dict(manifest), raw_bytes)
+    _FUNDING_SOURCE_CACHE[cache_key] = result
+    return result
 
 
 def _asset_provenance(kind: str, manifest: Mapping[str, Any]) -> str:
@@ -178,28 +194,42 @@ def build_input_bundle(*, evaluation_start: str | datetime, evaluation_end: str 
         funding_events, funding_manifest, funding_bytes = _load_funding(funding_sources[symbol], symbol)
         source_start = start - timedelta(hours=history["required_price_closes"])
         source_end = end - timedelta(hours=1)
-        selected_prices = [row for row in price_rows if source_start.strftime("%Y-%m-%dT%H:%M:%SZ") <= row["timestamp"] <= _stamp(source_end)]
-        expected = [_stamp(source_start + timedelta(hours=i)) for i in range(int((source_end - source_start).total_seconds() // 3600) + 1)]
-        if [row["timestamp"] for row in selected_prices] != expected:
-            raise InputBundleBlocked("BLOCKED_PRICE_COVERAGE", f"required price clip is incomplete for {symbol}")
-        admitted_price_rows = [{"source_open_time": row["timestamp"], "decision_time": price_admission_boundary(row["timestamp"]), **{key: row[key] for key in ("open", "high", "low", "close", "volume")}} for row in selected_prices]
-        price_content = ("".join(json.dumps(row, sort_keys=True, separators=(",", ":"), ensure_ascii=True) + "\n" for row in admitted_price_rows)).encode()
+        price_key = (str(price_manifest["normalized_sha256"]), _stamp(source_start), _stamp(source_end))
+        cached_price = _PRICE_CLIP_CACHE.get(price_key)
+        if cached_price is None:
+            source_start_stamp, source_end_stamp = _stamp(source_start), _stamp(source_end)
+            selected_prices = [row for row in price_rows if source_start_stamp <= row["timestamp"] <= source_end_stamp]
+            expected = [_stamp(source_start + timedelta(hours=i)) for i in range(int((source_end - source_start).total_seconds() // 3600) + 1)]
+            if [row["timestamp"] for row in selected_prices] != expected:
+                raise InputBundleBlocked("BLOCKED_PRICE_COVERAGE", f"required price clip is incomplete for {symbol}")
+            admitted_price_rows = [{"source_open_time": row["timestamp"], "decision_time": price_admission_boundary(row["timestamp"]), **{key: row[key] for key in ("open", "high", "low", "close", "volume")}} for row in selected_prices]
+            price_content = ("".join(json.dumps(row, sort_keys=True, separators=(",", ":"), ensure_ascii=True) + "\n" for row in admitted_price_rows)).encode()
+            cached_price = (admitted_price_rows, price_content, expected)
+            _PRICE_CLIP_CACHE[price_key] = cached_price
+        admitted_price_rows, price_content, expected = cached_price
         admitted_prices[symbol] = admitted_price_rows
-        admission_rows = []
-        for event in funding_events:
-            admission = funding_admission_boundary(event["funding_time_ms"])
-            if admission <= _stamp(end) and admission >= _stamp(start):
-                admission_rows.append({**event, "admission_boundary": admission})
-        if history["required_funding_signal_events"]:
-            warmup = [{**event, "admission_boundary": funding_admission_boundary(event["funding_time_ms"])} for event in funding_events if funding_admission_boundary(event["funding_time_ms"]) <= _stamp(start)]
-            if len(warmup) < history["required_funding_signal_events"]:
-                raise InputBundleBlocked("BLOCKED_FUNDING_WARMUP", f"insufficient funding warmup for {symbol}")
-            admission_rows = warmup[-history["required_funding_signal_events"]:] + admission_rows
-        union = {(row["funding_time_ms"], row["funding_rate"], row["symbol"]): row for row in admission_rows}
-        admitted_funding[symbol] = sorted(union.values(), key=lambda row: row["funding_time_ms"])
-        funding_content = ("".join(json.dumps(row, sort_keys=True, separators=(",", ":"), ensure_ascii=True) + "\n" for row in admitted_funding[symbol])).encode()
+        funding_key = (str(funding_manifest["normalized_sha256"]), _stamp(start), history["required_funding_signal_events"])
+        cached_funding = _FUNDING_CLIP_CACHE.get(funding_key)
+        if cached_funding is None:
+            admission_rows = []
+            for event in funding_events:
+                admission = funding_admission_boundary(event["funding_time_ms"])
+                if admission <= _stamp(end) and admission >= _stamp(start):
+                    admission_rows.append({**event, "admission_boundary": admission})
+            if history["required_funding_signal_events"]:
+                warmup = [{**event, "admission_boundary": funding_admission_boundary(event["funding_time_ms"])} for event in funding_events if funding_admission_boundary(event["funding_time_ms"]) <= _stamp(start)]
+                if len(warmup) < history["required_funding_signal_events"]:
+                    raise InputBundleBlocked("BLOCKED_FUNDING_WARMUP", f"insufficient funding warmup for {symbol}")
+                admission_rows = warmup[-history["required_funding_signal_events"]:] + admission_rows
+            union = {(row["funding_time_ms"], row["funding_rate"], row["symbol"]): row for row in admission_rows}
+            admitted_funding_rows = sorted(union.values(), key=lambda row: row["funding_time_ms"])
+            funding_content = ("".join(json.dumps(row, sort_keys=True, separators=(",", ":"), ensure_ascii=True) + "\n" for row in admitted_funding_rows)).encode()
+            cached_funding = (admitted_funding_rows, funding_content, len(admission_rows))
+            _FUNDING_CLIP_CACHE[funding_key] = cached_funding
+        admitted_funding_rows, funding_content, admission_count = cached_funding
+        admitted_funding[symbol] = admitted_funding_rows
         assets[symbol] = {"price_parent_content": _sha_bytes(price_bytes), "price_content": _sha_bytes(price_content), "price_provenance": _asset_provenance("price", price_manifest), "funding_parent_content": _sha_bytes(funding_bytes), "funding_content": _sha_bytes(funding_content), "funding_provenance": _asset_provenance("funding", funding_manifest), "coverage": "COMPLETE"}
-        diagnostics["coverage"][symbol] = {"price_source_clip": [expected[0], expected[-1]], "admitted_price_count": len(admitted_price_rows), "admitted_funding_count": len(admission_rows)}
+        diagnostics["coverage"][symbol] = {"price_source_clip": [expected[0], expected[-1]], "admitted_price_count": len(admitted_price_rows), "admitted_funding_count": admission_count}
     payload = {"contract": CONTRACT, "instrument_contract_id": INSTRUMENT_CONTRACT_ID, "symbols": ordered_symbols, "boundaries": boundaries, "decision_clock": DECISION_CLOCK_ID, "assets": assets}
     digest = evaluation_input_bundle_sha256(instrument_contract_id=INSTRUMENT_CONTRACT_ID, symbols=ordered_symbols, boundaries=boundaries, decision_clock=DECISION_CLOCK_ID, assets=assets)
     return {"status": "READY", "evaluation_input_bundle_sha256": digest, "bundle_payload": payload, "admitted_price": admitted_prices, "admitted_funding": admitted_funding, "coverage_diagnostics": diagnostics, "required_history": history}

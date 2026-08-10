@@ -1,0 +1,17 @@
+{
+  "affected_registered_executions": 0,
+  "artifact_type": "BREADTH_V2_POST_OUTCOME_INTEGRITY_REPAIR_V0",
+  "defect": "PROVENANCE_ONLY_SOURCE_CACHE_REUSED_STALE_MANIFEST",
+  "discovered_during": "post_execution_focused_regression_verification",
+  "pre_outcome_freeze_commit": "9037ced834bb16957c31b5c95f3a885220a15471",
+  "reason": "The defect was confined to a provenance-mutation cache test path; all 423 frozen READY bundle identities and all 1496 recorded executions were built from their original authenticated manifests.",
+  "repair_artifact_sha256": "81e9916c40f78682710ee9cf29a0c8ae565b185ba9542c8abda9570dd57d5c94",
+  "repair_commit": "ceaf673e88c460df47eae97b7c64437e3cea9953",
+  "rerun_required": false,
+  "scientific_contract_changed": false,
+  "targeted_checks": [
+    "provenance-only bundle mutation changes evaluation identity",
+    "frozen bundle identity reconciliation remains valid",
+    "decision and hostile-review digests remain unchanged"
+  ]
+}

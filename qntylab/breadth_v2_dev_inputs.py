@@ -18,6 +18,8 @@ from __future__ import annotations
 import hashlib
 import json
 import time
+import gzip
+import pickle
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime, timedelta
@@ -417,7 +419,7 @@ def discover_funding_carry_start(cache: EvidenceCache, session: requests.Session
     return _iso(discovered_start), unresolved
 
 
-def run_dev_input_acquisition(*, evidence_root: str | Path = "/home/swirky/DevHub/qntylab-evidence/breadth_v2_dev_inputs_v0", candidates_path: str = "experiments/research/candidates.jsonl", freeze_commit: str = "2608676b1d353446b00409c63a32b4b6a362c38e", input_keys: Sequence[MarketInputKey] | None = None, session: requests.Session | None = None) -> dict[str, Any]:
+def run_dev_input_acquisition(*, evidence_root: str | Path = "/home/swirky/DevHub/qntylab-evidence/breadth_v2_dev_inputs_v0", candidates_path: str = "experiments/research/candidates.jsonl", freeze_commit: str = "2608676b1d353446b00409c63a32b4b6a362c38e", input_keys: Sequence[MarketInputKey] | None = None, session: requests.Session | None = None, bundle_output_dir: str | Path | None = None) -> dict[str, Any]:
     """Acquire, cache, materialize, and census frozen development inputs only."""
     keys = list(input_keys) if input_keys is not None else enumerate_market_input_plan(candidates_path)
     cache = EvidenceCache(Path(evidence_root))
@@ -483,7 +485,21 @@ def run_dev_input_acquisition(*, evidence_root: str | Path = "/home/swirky/DevHu
                 funding_sources[symbol] = funding_materializations[funding_key]
 
             row_funding_range = (min(funding_starts_used), period_end) if funding_starts_used else (funding_parent_start(key.period_id), period_end)
-            rows.append(materialize_market_input(key, price_sources=price_sources, funding_sources=funding_sources, funding_source_range=row_funding_range, candidates_path=candidates_path))
+            row = materialize_market_input(key, price_sources=price_sources, funding_sources=funding_sources, funding_source_range=row_funding_range, candidates_path=candidates_path)
+            rows.append(row)
+            if bundle_output_dir is not None and row["status"] == "READY":
+                candidate = resolve_candidate(key.variant_id, candidates_path)
+                bundle = build_breadth_v2_input_bundle(
+                    evaluation_start=period_start, evaluation_end=period_end, symbols=symbols,
+                    price_sources=price_sources, funding_sources=funding_sources,
+                    family=key.family_id, parameters=candidate["parameters"],
+                )
+                output_path = Path(bundle_output_dir)
+                output_path.mkdir(parents=True, exist_ok=True)
+                bundle_path = output_path / f"{bundle['evaluation_input_bundle_sha256']}.pkl.gz"
+                if not bundle_path.exists():
+                    payload = pickle.dumps(bundle, protocol=5)
+                    bundle_path.write_bytes(gzip.compress(payload, compresslevel=1, mtime=0))
         if not unresolved:
             break
     if unresolved:

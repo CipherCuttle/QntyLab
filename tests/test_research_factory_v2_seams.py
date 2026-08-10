@@ -734,13 +734,13 @@ def test_f15_mixed_generation_bar_path_query_still_enforces_one_instrument():
 # --------------------------------------------------------------------------
 # F16 / F17 / F18 — generation-1 survivor disposition and append-only history
 # --------------------------------------------------------------------------
-def test_f16_h003_24_96_remains_the_unvalidated_survivor_baseline():
+def test_f16_h003_24_96_is_blocked_without_trial_backed_evidence():
     state = json.loads((COMMITTED_RESEARCH_ROOT / "state.json").read_text())
     variant = state["variants"]["variant_aa66ba0edf856ac06f055917"]
     assert variant["candidate_id"] == "CANDIDATE_H003_MA_24_96_LONG_FLAT"
-    assert variant["status"] == "SURVIVOR"
+    assert variant["status"] == "BLOCKED"
     assert variant["status"] != "GRAVEYARDED"
-    assert "not as a validated edge" in variant["revisit_condition"]
+    assert "future preregistered strategy-family design" in variant["revisit_condition"]
 
 
 def test_f16_disposition_decision_carries_the_evidence_standing_reason():
@@ -749,30 +749,32 @@ def test_f16_disposition_decision_carries_the_evidence_standing_reason():
         for line in (COMMITTED_RESEARCH_ROOT / "decisions.jsonl").read_text().splitlines()
         if line.strip()
     ]
-    matching = [
+    historical = [
         event
         for event in decisions
         if event["variant_id"] == "variant_aa66ba0edf856ac06f055917" and event["status"] == "SURVIVOR"
     ]
+    assert len(historical) == 1
+    matching = [
+        event
+        for event in decisions
+        if event["variant_id"] == "variant_aa66ba0edf856ac06f055917" and event["status"] == "BLOCKED"
+    ]
     assert len(matching) == 1
     event = matching[0]
     assert event["reason_codes"] == [
-        "POSITIVE_EXCESS_IN_SOME_CELLS",
-        "LOWER_TURNOVER_THAN_H002",
-        "NEGATIVE_MEDIAN_NET_RETURN",
-        "REGIME_INSTABILITY",
-        "COST_SENSITIVITY",
+        "GENERATION_1_EVIDENCE_NOT_TRIAL_BACKED",
     ]
     assert event["scope"] == "EXACT_VARIANT"
-    assert "not as a validated edge" in event["decision_note"]
+    assert "may not serve as validated edge evidence" in event["decision_note"]
 
 
 def test_f16_canonical_survivor_and_graveyard_counts_are_unchanged():
     state = json.loads((COMMITTED_RESEARCH_ROOT / "state.json").read_text())
     statuses = [variant["status"] for variant in state["variants"].values()]
-    assert statuses.count("SURVIVOR") == 1
+    assert statuses.count("SURVIVOR") == 0
     assert statuses.count("GRAVEYARDED") == 15, "no variant was graveyarded by this phase"
-    assert statuses.count("BLOCKED") == 3
+    assert statuses.count("BLOCKED") == 4
 
 
 def test_f17_h007_status_unchanged():
@@ -787,12 +789,12 @@ def test_f17_h007_status_unchanged():
 
 
 def test_f18_history_streams_are_unchanged_from_the_seam_base():
-    """The integrated seam preserves the canonical candidate, decision, and trial streams."""
+    """The closure preserves candidate and trial streams and appends one decision."""
     starting_commit = "1541e3a"
     for path, expected in (
         ("experiments/research/candidates.jsonl", 0),
         ("experiments/research/trials/2026.jsonl", 0),
-        ("experiments/research/decisions.jsonl", 0),
+        ("experiments/research/decisions.jsonl", 1),
     ):
         diff = subprocess.run(
             ["git", "diff", starting_commit, "--numstat", "--", path],
@@ -801,11 +803,14 @@ def test_f18_history_streams_are_unchanged_from_the_seam_base():
             text=True,
             check=True,
         ).stdout.strip()
-        assert diff == "", f"{path} must be byte-identical to the starting commit"
-        assert expected == 0
+        if path.endswith("decisions.jsonl"):
+            assert diff.startswith("1\t0\t"), f"{path} must have exactly one appended line"
+        else:
+            assert diff == "", f"{path} must be byte-identical to the starting commit"
+        assert expected in {0, 1}
 
 def test_f18_committed_history_still_replays_without_issues():
     history = load_canonical_history(COMMITTED_RESEARCH_ROOT)
     assert len(history.candidates) == 19
-    assert len(history.decisions) == 22
+    assert len(history.decisions) == 23
     assert len(history.trials) == 378

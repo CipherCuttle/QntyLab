@@ -412,6 +412,7 @@ def _single_asset_cell(symbol: str, candidate_result: Any, benchmark_result: Any
     candidate_net_return = candidate_result.final_pnl / candidate_result.initial_equity
     benchmark_net_return = benchmark_result.final_pnl / benchmark_result.initial_equity
     equity_curve = [row["equity_after_rebalance"] for row in candidate_result.boundary_path]
+    final_equity = candidate_result.boundary_path[-1].get("final_equity") if candidate_result.boundary_path else None
     trade_count = sum(1 for row in candidate_result.boundary_path if row["turnover"] > 0.0)
     exposure_fraction = sum(1 for row in candidate_result.boundary_path if abs(row["target_weights"].get(symbol, 0.0)) > 0.0) / len(candidate_result.boundary_path)
     return {
@@ -423,7 +424,10 @@ def _single_asset_cell(symbol: str, candidate_result: Any, benchmark_result: Any
         "funding_pnl": candidate.funding_pnl,
         "fee_cost": candidate.fee_cost,
         "slippage_cost": candidate.slippage_cost,
-        "maximum_drawdown": _max_drawdown([candidate_result.initial_equity] + equity_curve),
+        "maximum_drawdown": _max_drawdown(
+            [candidate_result.initial_equity] + equity_curve
+            + ([] if final_equity is None or final_equity == equity_curve[-1] else [final_equity])
+        ),
         "turnover": candidate_result.turnover_notional,
         "exposure_fraction": exposure_fraction,
     }
@@ -574,6 +578,9 @@ def prepare_breadth_v2_evaluation(
         cells = _panel_cells(candidate_result, benchmark_result)
         cell_semantics = "PORTFOLIO_ASSET_CONTRIBUTION"
         equity_curve = [candidate_result.initial_equity] + [row["equity_after_rebalance"] for row in candidate_path_rows]
+        final_equity = candidate_path_rows[-1].get("final_equity") if candidate_path_rows else None
+        if final_equity is not None and final_equity != equity_curve[-1]:
+            equity_curve.append(final_equity)
         compact = {
             "observation_count": len(candidate_path_rows),
             "trade_count": sum(1 for row in candidate_path_rows if row["turnover"] > 0.0),

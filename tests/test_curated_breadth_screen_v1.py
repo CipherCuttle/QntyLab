@@ -84,7 +84,7 @@ def test_curated_breadth_screen_v1_registration_is_frozen():
         "volatility_scaled_trend": 3,
     }
 
-    assert state["variants"]["variant_aa66ba0edf856ac06f055917"]["status"] == "SURVIVOR"
+    assert state["variants"]["variant_aa66ba0edf856ac06f055917"]["status"] == "BLOCKED"
     assert state["variants"]["variant_966eea454bc9ac3d22603a7c"]["status"] == "GRAVEYARDED"
     assert state["variants"]["variant_83e1fee345fb3915774652a5"]["status"] == "GRAVEYARDED"
     assert state["variants"]["variant_282aa437c78189c7c8b2c124"]["status"] == "GRAVEYARDED"

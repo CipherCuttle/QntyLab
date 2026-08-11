@@ -144,7 +144,7 @@ def test_f1_every_historical_variant_resolves_to_exactly_one_canonical_family():
         if event["event_type"] != "CANDIDATE_PROPOSED":
             continue
         resolved[event["variant_id"]] = family_ontology.resolve_family(event["family_id"])
-    assert len(resolved) == 48
+    assert len(resolved) == 49
     assert all(isinstance(value, str) and value for value in resolved.values())
 
 

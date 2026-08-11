@@ -1,0 +1,172 @@
+{
+  "experiment_id": "JIGSAW_CROSS_SECTIONAL_DISPERSION_V0",
+  "phase": "JIGSAW_CROSS_SECTIONAL_DISPERSION_PREREGISTRATION_V0",
+  "status": "PREREGISTERED_BEFORE_OFFICIAL_MEASUREMENT",
+  "research_status": "RETROSPECTIVE_EXPLORATORY",
+  "piece_type": "CONDITION_DEPENDENCE",
+  "authority": "NON_AUTHORITATIVE",
+  "promotion_eligible": false,
+  "pit_universe_claim": "NONE",
+  "router_authority": "NONE",
+  "prior_research_exposure": "YES",
+  "canonical_master_at_handoff": "481e0954c5ea0c6c9599076af6a4112d72ed78f4",
+
+  "measurement_process": {
+    "family_id": "CROSS_SECTIONAL_MOMENTUM",
+    "family_status_at_registration": "FAIL",
+    "family_status_source": "experiments/results/breadth_v2_development_v0/BREADTH_V2_DEVELOPMENT_DECISION_V0.json",
+    "reused_as": "FIXED_MEASUREMENT_PROCESS_ONLY",
+    "reopened_for_strategy_advancement": false,
+    "implementation_reference": "qntylab.breadth_v2_strategies.cross_sectional_weights (byte-identical reuse, not reimplemented)",
+    "panel_reference": "qntylab.breadth_v2_runner.FROZEN_PANEL_ORDER",
+    "registered_variants_reference": [
+      "CANDIDATE_BREADTH_V2_CSMOM_24",
+      "CANDIDATE_BREADTH_V2_CSMOM_72",
+      "CANDIDATE_BREADTH_V2_CSMOM_168",
+      "CANDIDATE_BREADTH_V2_CSMOM_336"
+    ]
+  },
+
+  "old_proposition_excluded": "CROSS_SECTIONAL_MOMENTUM has validated excess return or alpha (it does not; Breadth V2 final_frozen_family_status=FAIL).",
+  "new_proposition": "The fixed CROSS_SECTIONAL_MOMENTUM measurement process's daily MEASUREMENT_STRATEGY_UTILITY relative to FLAT may vary by point-in-time CROSS_SECTIONAL_DISPERSION.",
+
+  "variant_treatment": {
+    "design": "FAMILY_FIRST",
+    "reason": "All four already-registered CSMOM lookback coordinates (24/72/168/336h) are preserved and pooled under one predeclared consistency criterion; no coordinate is added, dropped, averaged into a new ensemble, or selected for being best.",
+    "lookbacks_hours": [24, 72, 168, 336],
+    "family_consistency_rule": "At least 3 of 4 registered variants must show a directionally consistent (negative) STRESS HIGH_MINUS_LOW_MEAN_UTILITY contrast for the piece to be a candidate; consistent_count/4 reported regardless of outcome.",
+    "claim_scope_if_family_consistent": "CROSS_SECTIONAL_MOMENTUM family, DEV_2024, frozen 20-asset Breadth V2 panel -- not a claim about any single lookback being best.",
+    "prohibited": [
+      "selecting the historically best lookback",
+      "averaging lookbacks into a new ensemble",
+      "weighting variants using returns",
+      "pruning variants after results",
+      "adding or dropping coordinates"
+    ]
+  },
+
+  "dispersion_recipe": {
+    "feature_id": "CROSS_SECTIONAL_DISPERSION",
+    "feature_version": "v0",
+    "cross_sectional_universe": "Exact frozen Breadth V2 20-asset panel (FROZEN_PANEL_ORDER); no other universe claim.",
+    "asset_eligibility_at_t": "All 20 panel members must have a valid close at t and at t-24h; missing any one blocks the whole daily observation (mirrors CSMOM's own whole-panel missingness rule; no partial-panel computation).",
+    "return_horizon_used_to_construct_dispersion_hours": 24,
+    "return_definition": "simple return, close(t)/close(t-24h) - 1, per panel asset",
+    "dispersion_statistic": "cross-sectional sample standard deviation, ddof=1, of the 20 per-asset 24h returns at t",
+    "lookback_or_smoothing": "none; point-in-time cross-sectional snapshot only",
+    "decision_timestamp": "daily 00:00:00Z",
+    "known_at_semantics": "computed strictly from close(t) and close(t-24h); no bar at or after the decision timestamp is used",
+    "missing_member_semantics": "fail-closed; whole daily observation blocked if any of the 20 panel members is missing or non-finite",
+    "minimum_cross_sectional_breadth": 20,
+    "normalization": "365-day trailing inclusive empirical CDF percentile, reused byte-identically from qntylab.jigsaw_trend_condition_dependence_v0.historical_percentile",
+    "binning": "LOW <= 33.333p, MID, HIGH >= 66.667p; reused byte-identically from qntylab.jigsaw_trend_condition_dependence_v0.state_bin",
+    "ties": "inclusive empirical CDF, count(values <= current)/count(values); identical convention to the reused normalization module",
+    "source_identity": "Frozen Binance USD-M 1h OHLCV panel under the same input contract already qualified for Breadth V2 (BREADTH_V2_INPUT_BUNDLE_V0 price contract)",
+    "formula_digest": "bound to qntylab.jigsaw_cross_sectional_dispersion_v0.contract_digest()",
+    "rejected_alternatives_recorded_not_tested": [
+      "interquartile range of cross-sectional returns (rejected: adds a quantile-selection degree of freedom beyond what literature or existing conventions require)",
+      "mean absolute deviation (rejected: stdev is the more literature-anchored and QntyLab-convention-compatible statistic; MAD adds no PIT or mechanistic advantage here)",
+      "dispersion horizon tied to each CSMOM variant's own lookback, i.e. 4 different dispersion recipes (rejected: violates the single-frozen-recipe requirement and would confound 'is dispersion predictive' with 'does dispersion horizon match strategy horizon')",
+      "value-weighted or liquidity-weighted dispersion (rejected: no liquidity/market-cap contract is frozen for this panel; would silently invent a new weighting assumption)"
+    ]
+  },
+
+  "universe": {
+    "scope": "FROZEN_RESEARCH_PANEL_CONDITION_DEPENDENCE",
+    "pit_universe_claim": "NONE",
+    "note": "Results describe the frozen Breadth V2 20-asset source-conditioned panel only; no claim about the Binance perpetual universe or the broader cryptocurrency market is made."
+  },
+
+  "development_sample": {
+    "primary_window": {"id": "DEV_2024", "start": "2024-01-01T00:00:00Z", "end": "2024-12-31T23:00:00Z"},
+    "reason_only_dev_2024_is_usable": "CROSS_SECTIONAL_MOMENTUM's own Breadth V2 development execution shows 0/8 usable cells in DEV_2022 and 0/8 usable cells in DEV_2025 (whole-panel missing-member blocking), versus 8/8 usable in DEV_2024 (4 variants x 2 cost modes). This experiment's economic sample cannot exceed where the fixed measurement process itself produced usable observations, so it is bound to DEV_2024. This is a discovered constraint, verified from experiments/research/breadth_v2_receipts/*.json, not a choice made to reach a preferred sample.",
+    "warmup": "Observations strictly before DEV_2024 may be used only to construct the 365-day trailing dispersion percentile normalization; they are never labelled as economic decisions. Warm-up panel completeness back to ~2023-01-01 must be verified before execution; if incomplete, the affected early-2024 decisions are blocked (see BLOCKED_BY_PIT_INPUT_SEMANTICS) rather than computed with a partial trailing history.",
+    "calendar_halves_for_temporal_robustness_substitute": {"H1_2024": ["2024-01-01T00:00:00Z", "2024-06-30T23:00:00Z"], "H2_2024": ["2024-07-01T00:00:00Z", "2024-12-31T23:00:00Z"]},
+    "sealed_t0_exclusion": "No observation at or after 2026-08-10T19:00:00Z (SEALED_T0) is used; DEV_2024 ends 2024-12-31T23:00:00Z, well before SEALED_T0, so no proximity risk exists."
+  },
+
+  "decision_grid": {
+    "frequency": "DAILY",
+    "timestamp": "00:00:00Z",
+    "horizon_hours": 24,
+    "non_overlapping": true,
+    "compatibility_note": "CROSS_SECTIONAL_MOMENTUM's native cadence is hourly (target recomputed and portfolio rebalanced bar t -> t+1, per the frozen Breadth V2 execution contract). Rather than inventing a new daily signal, this experiment re-bins the already-realized hourly net-of-cost equity path emitted by the frozen, unmodified CSMOM target-weight process into non-overlapping 24h blocks starting 00:00 UTC, using geometric compounding of the hourly net-of-cost equity ratio within each block (equity(t+24h)/equity(t) - 1), consistent with the existing qntylab.jigsaw_trend_condition_dependence_v0._utility prod(1+r)-1 convention -- not additive summation of hourly returns, which would understate compounding effects and be inconsistent with the already-frozen Jigsaw utility definition. The target-weight computation itself is untouched; only the post-hoc aggregation window and compounding convention for the conditioning statistic are specified. This is the justified, pre-execution-frozen alternative required when native family semantics do not match the daily Jigsaw convention."
+  },
+
+  "label": "MEASUREMENT_STRATEGY_UTILITY",
+  "flat_utility": 0.0,
+  "gated_strategy_utility": "NOT_MEASURED",
+  "gate_transition_costs": "NOT_INTRODUCED",
+
+  "cost_contract": {
+    "modes": {
+      "BASELINE_EXECUTION": {"fee_bps": 10.0, "slippage_bps": 0.0},
+      "STRESS_EXECUTION": {"fee_bps": 10.0, "slippage_bps": 10.0}
+    },
+    "primary_cost_mode": "BASELINE_EXECUTION",
+    "funding": "Realized Binance USD-M funding settlements per the existing Breadth V2 Section 7 contract, referenced not reinvented; missing funding fails closed per the existing rule.",
+    "note": "No new or favorable cost mode is introduced; identical to Breadth V2 Section 7."
+  },
+
+  "primary_hypothesis": {
+    "direction": "ONE_SIDED",
+    "statement": "Higher point-in-time cross-sectional dispersion (24h trailing, 20-asset frozen panel, sample stdev ddof=1) predicts weaker subsequent daily MEASUREMENT_STRATEGY_UTILITY of the frozen CROSS_SECTIONAL_MOMENTUM family (pooled across the 4 registered lookback variants under the family-first consistency rule) relative to FLAT, over the following non-overlapping 24h block, within DEV_2024.",
+    "predicted_sign": "signed HIGH_MINUS_LOW_MEAN_UTILITY < 0 under STRESS cost, for at least 3 of 4 registered variants",
+    "literature_seed_only_not_evidence": "Zhang & Makgolo (2026, SSRN 6648082) report that higher cross-sectional return dispersion coincides with weaker subsequent cross-sectional momentum in cryptocurrency markets; this motivates direction only and is not treated as QntyLab evidence.",
+    "direction_frozen_before_outcomes": true
+  },
+
+  "state_normalization": {
+    "reused_implementation": "qntylab.jigsaw_trend_condition_dependence_v0.historical_percentile / state_bin",
+    "lookback_days": 365,
+    "minimum_history_days": 365,
+    "future_information": "prohibited",
+    "tie_handling": "inclusive empirical CDF: count(values <= current) / count(values), trailing only",
+    "bins": {"LOW": "<=33.3333333333 percentile", "MID": ">33.3333333333 and <66.6666666667 percentile", "HIGH": ">=66.6666666667 percentile"},
+    "binding": "by implementation identity import, not reimplementation; proven in tests/test_jigsaw_cross_sectional_dispersion_v0.py"
+  },
+
+  "multiplicity": {
+    "number_of_primary_state_hypotheses": 1,
+    "primary_comparison": "pooled family-first HIGH_MINUS_LOW_MEAN_UTILITY under STRESS across the 4 registered CSMOM lookback variants, with the 3-of-4 directional-consistency rule",
+    "secondary_or_descriptive_only": [
+      "per-variant HIGH_MINUS_LOW_MEAN_UTILITY (4 variants; descriptive, feeds only the frozen consistency count, never a best-variant claim)",
+      "BASELINE cost mode (STRESS is primary per Breadth V2 convention of reporting stress as the binding cost case)",
+      "H1_2024 / H2_2024 calendar-half contrasts (temporal-stability substitute, weaker evidence, explicitly labelled)",
+      "leave-one-asset-out (20 attacks)",
+      "five-best/five-worst daily-observation removal",
+      "descriptive correlation of CROSS_SECTIONAL_DISPERSION against MARKET_DRAWDOWN_30D / MARKET_RV_7D / MARKET_CORR_7D on the same panel path"
+    ],
+    "no_best_significant_cell_logic": true,
+    "no_post_hoc_threshold_or_horizon_search": true
+  },
+
+  "robustness_contract": {
+    "temporal_stability": "BLOCKED_AT_CROSS_WINDOW_LEVEL: only DEV_2024 has usable CSMOM cells (inherited Breadth V2 constraint, not invented here). Substitute: H1_2024 vs H2_2024 calendar-half sign consistency, frozen before outcomes, explicitly labelled weaker than genuine multi-year replication.",
+    "cost_robustness": "BASELINE vs STRESS sign preservation of the pooled family contrast.",
+    "cross_sectional_concentration_attack": "leave-one-asset-out across all 20 panel members, recomputing both dispersion and the CSMOM ranking with that asset excluded; no single asset may be required for the family-consistent verdict.",
+    "variant_consistency_family_first": "the 3-of-4 directional consistency rule itself is the primary test; also report consistent_count/4 verbatim.",
+    "tail_concentration": "five-best/five-worst daily-observation removal under STRESS, reusing the prior Jigsaw convention.",
+    "missingness_breadth_dependence": "Because eligibility requires the full 20/20 panel by construction, breadth is constant (20/20) at every included decision; this check degenerates to an integrity assertion (zero partial-panel contamination) rather than a graded diagnostic, and is reported as such.",
+    "point_in_time_leakage": "dispersion computed only from close(t) and close(t-24h); normalization percentile uses only trailing values through t; proven by synthetic tests.",
+    "state_distinctness_redundancy": "descriptive-only Pearson/Spearman correlation of CROSS_SECTIONAL_DISPERSION against the three existing Jigsaw states (MARKET_DRAWDOWN_30D, MARKET_RV_7D, MARKET_CORR_7D) computed on the same panel path; DISPERSION_STATE_NOT_DISTINCT_ENOUGH_TO_JUSTIFY_NEW_PIECE if |correlation| >= 0.90 with any one of them.",
+    "dependence_aware_uncertainty": "moving block bootstrap, 7 calendar-day blocks, 1000 resamples, fixed seed 271828; identical convention to the prior Jigsaw piece."
+  },
+
+  "kill_defer_criteria": {
+    "NO_CONDITION_DEPENDENCE_FOUND": "pooled STRESS HIGH_MINUS_LOW_MEAN_UTILITY is not negative, or fewer than 3 of 4 variants are directionally consistent",
+    "CONDITION_DEPENDENCE_VARIANT_CONCENTRATED": "fewer than 3 of 4 registered CSMOM lookback variants show a directionally consistent contrast",
+    "CONDITION_DEPENDENCE_TEMPORALLY_UNSTABLE": "H1_2024 and H2_2024 contrasts have opposite sign under STRESS",
+    "CONDITION_DEPENDENCE_COST_FRAGILE": "BASELINE and STRESS pooled contrasts have opposite sign",
+    "CONDITION_DEPENDENCE_TAIL_CONCENTRATED": "five-best/five-worst removal flips the sign of the pooled STRESS contrast",
+    "CONDITION_DEPENDENCE_BREADTH_OR_MISSINGNESS_DRIVEN": "any partial-panel (< 20/20) observation is found to have contributed to the result (integrity failure)",
+    "DISPERSION_STATE_NOT_DISTINCT_ENOUGH_TO_JUSTIFY_NEW_PIECE": "abs(correlation) >= 0.90 with MARKET_DRAWDOWN_30D, MARKET_RV_7D, or MARKET_CORR_7D",
+    "BLOCKED_BY_PIT_INPUT_SEMANTICS": "warm-up panel completeness insufficient for the 365-day trailing normalization, or any gap-fill/forward-fill is required to compute an observation",
+    "BLOCKED_BY_MEASUREMENT_PROCESS_IDENTITY": "the CSMOM target-weight computation or panel used at execution time does not byte-identically match qntylab.breadth_v2_strategies.cross_sectional_weights / qntylab.breadth_v2_runner.FROZEN_PANEL_ORDER, or this module's contract_digest() does not match the frozen value recorded at freeze time"
+  },
+
+  "possible_future_piece_state": "PREDICTIVE_PIECE_CANDIDATE",
+  "excluded_future_states": ["VALIDATED_PREDICTIVE_PIECE", "ROUTER_FEATURE", "STRATEGY_GATE", "PROMOTION", "QNTY_AUTHORITY", "TRADING_AUTHORITY"],
+
+  "contract_digest_binding": "qntylab.jigsaw_cross_sectional_dispersion_v0.contract_digest()"
+}

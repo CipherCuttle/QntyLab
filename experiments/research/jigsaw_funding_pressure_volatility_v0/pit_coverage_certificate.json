@@ -1,0 +1,77 @@
+{
+  "schema_version": "jigsaw-funding-pressure-pit-coverage-certificate-v0",
+  "phase": "JIGSAW_FUNDING_PRESSURE_VOLATILITY_PIT_COVERAGE_CERTIFICATION_V0",
+  "status": "PASS_PIT_COVERAGE_CERTIFIED",
+  "canonical_preregistration_merge_sha": "98e9dbcbec5dab18f7498cf4c5df77e14a8d5569",
+  "contract_digest": "sha256:749641cbee99bc769a6095e2a5877e4ccf1c46db0a82860885eedc06734cd2d6",
+  "funding_binding": {
+    "materialization_index_digest": "sha256:ceb12a1686f96f328ef54d5bafc184b848fa40ff7a2c71e28dc434a4854486c1",
+    "evidence_set_digest": "sha256:3677e5aeafd17c47e4951b2095d6247c8fb7cd3fb603cc70d5ea5658fd768faa",
+    "exact_panel_count": 20,
+    "valid": true
+  },
+  "source_authority": {
+    "module": "qntylab.binance_um_kline_1h",
+    "source": "Binance USD-M perpetual monthly 1h klines",
+    "endpoint_family": "https://data.binance.vision/data/futures/um/monthly/klines",
+    "interval": "1h",
+    "authentication": "official .CHECKSUM filename and SHA-256 verification",
+    "materializer_contract_version": "BINANCE_USD_M_PERPETUAL_1H_MATERIALIZER_V0",
+    "durable_evidence_root": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0"
+  },
+  "coverage_window": {
+    "required_source_bar_start": "2023-10-19T00:00:00Z",
+    "required_source_bar_end": "2025-06-19T23:00:00Z",
+    "semantics": "For decision t, require source bars t through t+23h, representing 24 completed hourly intervals strictly after t."
+  },
+  "ohlcv_census": [
+    {"symbol":"BCHUSDT","coverage_start":"2023-10-19T00:00:00Z","coverage_end":"2025-06-19T23:00:00Z","normalized_path":"pit_coverage_evidence_v0/raw/BCHUSDT-perp-1h.csv","normalized_sha256":"1ea4cc042115d7d8264b4ec950076e0960e6128d75a663aa1d468f3b1f2540ec","manifest_path":"pit_coverage_evidence_v0/manifests/BCHUSDT-perp-1h-hourly-input-v0.json","manifest_sha256":"9bb72960ca746e3651af54877bb10d986a2e24737a11c6c5ce1daf3986b35c12","provenance_receipt_aggregate_digest":"b2df81bf957b3daa3c782eb28f0ccb3e65f0729f59ddb5f95274546d4395ddcf","status":"PASS"},
+    {"symbol":"XRPUSDT","coverage_start":"2023-10-19T00:00:00Z","coverage_end":"2025-06-19T23:00:00Z","normalized_path":"pit_coverage_evidence_v0/raw/XRPUSDT-perp-1h.csv","normalized_sha256":"af85dde5036bcc00f06f81d9e8e0c60caaf3c0f6aa26cef56459f8bea28b36d4","manifest_path":"pit_coverage_evidence_v0/manifests/XRPUSDT-perp-1h-hourly-input-v0.json","manifest_sha256":"f655098e532cb3d12e04b24127f19d954febbe85ac615f028b3aa4f1bf691a3f","provenance_receipt_aggregate_digest":"72fde66e060c7c93258d1d57d33f25bad7d38256367b86102bbd995b5cbf22d1","status":"PASS"},
+    {"symbol":"LTCUSDT","coverage_start":"2023-10-19T00:00:00Z","coverage_end":"2025-06-19T23:00:00Z","normalized_path":"pit_coverage_evidence_v0/raw/LTCUSDT-perp-1h.csv","normalized_sha256":"5e62d50141a4b93caa614b3a966cc75b6ee300e076773f66481533bded383609","manifest_path":"pit_coverage_evidence_v0/manifests/LTCUSDT-perp-1h-hourly-input-v0.json","manifest_sha256":"58f55e077f310ec9dae33445c05a465e9e371b267055ba682a3410c3f5abdf0f","provenance_receipt_aggregate_digest":"12fb1f29bae63712bf58c2a90cb885bb06028fea7abf2c2e98b3ee35c1721ab5","status":"PASS"},
+    {"symbol":"TRXUSDT","coverage_start":"2023-10-19T00:00:00Z","coverage_end":"2025-06-19T23:00:00Z","normalized_path":"pit_coverage_evidence_v0/raw/TRXUSDT-perp-1h.csv","normalized_sha256":"ffc0a23278e0605573ff3a1e331ecc221b0d9398df3e9a7341a4d7c2a1a522ca","manifest_path":"pit_coverage_evidence_v0/manifests/TRXUSDT-perp-1h-hourly-input-v0.json","manifest_sha256":"7653d4efe8ebe38d7d465724b96a18e5ed20bbcc2fc3811a16af644c65844e2d","provenance_receipt_aggregate_digest":"95e5e8bd399205e9d202fed7f34390c07a21a8aed6b4a82ee40e33594d7144d6","status":"PASS"},
+    {"symbol":"ETCUSDT","coverage_start":"2023-10-19T00:00:00Z","coverage_end":"2025-06-19T23:00:00Z","normalized_path":"pit_coverage_evidence_v0/raw/ETCUSDT-perp-1h.csv","normalized_sha256":"bf2c7ca39beaedb407210c65dd92bdbb4a79628c7c3a1c2658121a8b7fbfb6ed","manifest_path":"pit_coverage_evidence_v0/manifests/ETCUSDT-perp-1h-hourly-input-v0.json","manifest_sha256":"d0c2b905d84e5bfdf97c1bfb00ccb7fb397a50cf52c4c078bb1465b71dcb8527","provenance_receipt_aggregate_digest":"9711c23994ff537be080af0fb061afeb24e48bcf70750f2f3b244e756a5e8922","status":"PASS"},
+    {"symbol":"LINKUSDT","coverage_start":"2023-10-19T00:00:00Z","coverage_end":"2025-06-19T23:00:00Z","normalized_path":"pit_coverage_evidence_v0/raw/LINKUSDT-perp-1h.csv","normalized_sha256":"1c0ab7f0535a625108ec09c6d9bef912e5e6b0111b969eeb9ed16a7f9be5034e","manifest_path":"pit_coverage_evidence_v0/manifests/LINKUSDT-perp-1h-hourly-input-v0.json","manifest_sha256":"2c06fef94ca902a7d581bc5f1148647c8e6d8dbdb930c145329cdedb5bed9f10","provenance_receipt_aggregate_digest":"dd1d96924b082eb756d4dad2f8c4dcb8cdf42f67c507e116c050c1f56c8766ec","status":"PASS"},
+    {"symbol":"XLMUSDT","coverage_start":"2023-10-19T00:00:00Z","coverage_end":"2025-06-19T23:00:00Z","normalized_path":"pit_coverage_evidence_v0/raw/XLMUSDT-perp-1h.csv","normalized_sha256":"fc33f7cd1161d7469c7a51d87bdee6e08fe3a63730d9b4a6a1b654ff320d4845","manifest_path":"pit_coverage_evidence_v0/manifests/XLMUSDT-perp-1h-hourly-input-v0.json","manifest_sha256":"bfaaa7cc45e5828dce76e464b490cc0672182f4ab65d426f70bbfbe633b59690","provenance_receipt_aggregate_digest":"820f980f7e20c28f9805ad43f5b2796568101a2e0e2e9ff117a98824449f9c09","status":"PASS"},
+    {"symbol":"CHZUSDT","coverage_start":"2023-10-19T00:00:00Z","coverage_end":"2025-06-19T23:00:00Z","normalized_path":"pit_coverage_evidence_v0/raw/CHZUSDT-perp-1h.csv","normalized_sha256":"2a39efbc7bab60e50f90ae254e04cf8ea4ab2b306032a15f3d272af1e4e009c0","manifest_path":"pit_coverage_evidence_v0/manifests/CHZUSDT-perp-1h-hourly-input-v0.json","manifest_sha256":"7e7cd5e7d95ab1583d8891713f8cb783af912c89f6aa72e2b485c95baa95fba4","provenance_receipt_aggregate_digest":"c8e666454ecbdb0da892dc072e1506600989fd650729ed9aba58ac1df6760e84","status":"PASS"},
+    {"symbol":"SANDUSDT","coverage_start":"2023-10-19T00:00:00Z","coverage_end":"2025-06-19T23:00:00Z","normalized_path":"pit_coverage_evidence_v0/raw/SANDUSDT-perp-1h.csv","normalized_sha256":"343a482bcad1dd98b4a7dedb10d05f3081216507bb38b66eebbecc2c1e80d07c","manifest_path":"pit_coverage_evidence_v0/manifests/SANDUSDT-perp-1h-hourly-input-v0.json","manifest_sha256":"03b485a7d615cd011dc12c8a0c083379a45802f1a15580405c368c787828e398","provenance_receipt_aggregate_digest":"4e7132fcdff87cf8b3539d13d613463f0c0281a55331a85e88b6b70f3ab7f245","status":"PASS"},
+    {"symbol":"REEFUSDT","coverage_start":"2023-10-19T00:00:00Z","coverage_end":"2025-06-19T23:00:00Z","normalized_path":"pit_coverage_evidence_v0/raw/REEFUSDT-perp-1h.csv","normalized_sha256":"a7aecf5e6156b9a04fe16b6d0923addd20736016776dd17e2398f37682605d9b","manifest_path":"pit_coverage_evidence_v0/manifests/REEFUSDT-perp-1h-hourly-input-v0.json","manifest_sha256":"98889c30c1f718147d7ddd4b6c4e607e085145de8d7ea5b8dafea4a2501a924e","provenance_receipt_aggregate_digest":"2ca14e253c1072168cd4637fb382cc8d96cf222f76e0bb5b2cad11d26dbbdb0f","status":"PASS"},
+    {"symbol":"CHRUSDT","coverage_start":"2023-10-19T00:00:00Z","coverage_end":"2025-06-19T23:00:00Z","normalized_path":"pit_coverage_evidence_v0/raw/CHRUSDT-perp-1h.csv","normalized_sha256":"4128f485437b8bfb60e7f62e9d0ca8ab0808bb5054bf1ac03caa1bb3f3640819","manifest_path":"pit_coverage_evidence_v0/manifests/CHRUSDT-perp-1h-hourly-input-v0.json","manifest_sha256":"d662ffebe45b5f696fac5d8ca2adaa2bf46ceeaa2729c18c336e35579cfdcb6b","provenance_receipt_aggregate_digest":"13050683183d895d6d153f40e3538983891a942f591fef64c1e3f871a472acd2","status":"PASS"},
+    {"symbol":"ALICEUSDT","coverage_start":"2023-10-19T00:00:00Z","coverage_end":"2025-06-19T23:00:00Z","normalized_path":"pit_coverage_evidence_v0/raw/ALICEUSDT-perp-1h.csv","normalized_sha256":"d42f7f2cb2f65e253714aee88e796d9c5e1d4fcf284450fa6b8cf56ece691406","manifest_path":"pit_coverage_evidence_v0/manifests/ALICEUSDT-perp-1h-hourly-input-v0.json","manifest_sha256":"97261d4375e90bf4bacf3dbe8e3b7da148b2e81adb11d98d545be40fc44fd7da","provenance_receipt_aggregate_digest":"6add084660707f6d802e84aa69e5d5859964f385d4b3e5a26e15557731f99527","status":"PASS"},
+    {"symbol":"ONEUSDT","coverage_start":"2023-10-19T00:00:00Z","coverage_end":"2025-06-19T23:00:00Z","normalized_path":"pit_coverage_evidence_v0/raw/ONEUSDT-perp-1h.csv","normalized_sha256":"384b173c0fbd333e52ebee1f8a47c16dbf006d7e89611824024b7cdb1a5f2061","manifest_path":"pit_coverage_evidence_v0/manifests/ONEUSDT-perp-1h-hourly-input-v0.json","manifest_sha256":"3feef8039a06e60f37de1c7f1b463e6a7330a404720e762f422f298e608c5da7","provenance_receipt_aggregate_digest":"0a8ab5f51ec160bb68e0590fe44120e8a0a0afed35f3a59616e6a09ab80c7e77","status":"PASS"},
+    {"symbol":"API3USDT","coverage_start":"2023-10-19T00:00:00Z","coverage_end":"2025-06-19T23:00:00Z","normalized_path":"pit_coverage_evidence_v0/raw/API3USDT-perp-1h.csv","normalized_sha256":"804135c91ec4e8be2521a119ae2f5ec53009dcf854c3d2f2b53c0f7a9dc06400","manifest_path":"pit_coverage_evidence_v0/manifests/API3USDT-perp-1h-hourly-input-v0.json","manifest_sha256":"f613d6a60fcc6660076c8f1de0db1cbfea6d2f51323bedc5955dc510b383be7b","provenance_receipt_aggregate_digest":"4849aad2745aad32742f1a4a30eae73e733a50845fbbc2f9b4536b337cd221b1","status":"PASS"},
+    {"symbol":"GMTUSDT","coverage_start":"2023-10-19T00:00:00Z","coverage_end":"2025-06-19T23:00:00Z","normalized_path":"pit_coverage_evidence_v0/raw/GMTUSDT-perp-1h.csv","normalized_sha256":"da724db34ccf6d513645ea275b91744c2451371c4f3b2a49919ae2b75bf7e7d8","manifest_path":"pit_coverage_evidence_v0/manifests/GMTUSDT-perp-1h-hourly-input-v0.json","manifest_sha256":"23e07f6ae29c4e513b767c106987f0b66f21a10498ec2d9d4d6c97762522090e","provenance_receipt_aggregate_digest":"b3123a0caaf92db80f50b321e68f1ad4a7de9db352f44e30fe67220d0d0021f9","status":"PASS"},
+    {"symbol":"APEUSDT","coverage_start":"2023-10-19T00:00:00Z","coverage_end":"2025-06-19T23:00:00Z","normalized_path":"pit_coverage_evidence_v0/raw/APEUSDT-perp-1h.csv","normalized_sha256":"4d7cf21106a285eeb5188b957b8d2c41a664691e15dc861863e75554b47abee6","manifest_path":"pit_coverage_evidence_v0/manifests/APEUSDT-perp-1h-hourly-input-v0.json","manifest_sha256":"22705b794e95628799cb1198a4a534f7a33107c46b7a730a827caa356a24b2bb","provenance_receipt_aggregate_digest":"259120353b17ff30a7977e2f5b4217374dd5c180dcda4b33ed2bf55cb07143a2","status":"PASS"},
+    {"symbol":"OPUSDT","coverage_start":"2023-10-19T00:00:00Z","coverage_end":"2025-06-19T23:00:00Z","normalized_path":"pit_coverage_evidence_v0/raw/OPUSDT-perp-1h.csv","normalized_sha256":"45b272a192425c0c6025badd520b752ed06e0aa22fc4ce78785179ef56754a1a","manifest_path":"pit_coverage_evidence_v0/manifests/OPUSDT-perp-1h-hourly-input-v0.json","manifest_sha256":"5a96d60ecf2e72ea3b7b89c46e77e2cc7ee0864f1971d8dc4c5d4ebe2f6a8b35","provenance_receipt_aggregate_digest":"355a800753cb761b7a0fe0bd2d8bc011bd1d55940eb39740b627b141541a982c","status":"PASS"},
+    {"symbol":"INJUSDT","coverage_start":"2023-10-19T00:00:00Z","coverage_end":"2025-06-19T23:00:00Z","normalized_path":"pit_coverage_evidence_v0/raw/INJUSDT-perp-1h.csv","normalized_sha256":"a7b27d3917e5851294f4193e31ec2112d04e0e0f8530cbb85f857bdf682afb73","manifest_path":"pit_coverage_evidence_v0/manifests/INJUSDT-perp-1h-hourly-input-v0.json","manifest_sha256":"03463516c728451b3cfabe26c94765880f0133e3c227458b9634fc36a23bfc4b","provenance_receipt_aggregate_digest":"aeb4550058f71b9d79adc869c2acd3418b6630ec47a0d27c34e2834c98bff478","status":"PASS"},
+    {"symbol":"LDOUSDT","coverage_start":"2023-10-19T00:00:00Z","coverage_end":"2025-06-19T23:00:00Z","normalized_path":"pit_coverage_evidence_v0/raw/LDOUSDT-perp-1h.csv","normalized_sha256":"291166ce93714f6ad5bc2c5c2ca3420b6ca5f0dd515cdf999d06cdc71e69dbbf","manifest_path":"pit_coverage_evidence_v0/manifests/LDOUSDT-perp-1h-hourly-input-v0.json","manifest_sha256":"f2d10b0d9178b0bba794585ae6452a0fb2f8f63180cebe1777dd7231c6ee0a3d","provenance_receipt_aggregate_digest":"f82de1fe3a9858f4fa20a10de8c18f3333209de06faa18f4a64372fbc9cb86d7","status":"PASS"},
+    {"symbol":"APTUSDT","coverage_start":"2023-10-19T00:00:00Z","coverage_end":"2025-06-19T23:00:00Z","normalized_path":"pit_coverage_evidence_v0/raw/APTUSDT-perp-1h.csv","normalized_sha256":"3b1d35032d87f607e13a0a75c81a08665be9fafd50ab1d8e5f3908f5e8a3809a","manifest_path":"pit_coverage_evidence_v0/manifests/APTUSDT-perp-1h-hourly-input-v0.json","manifest_sha256":"af816bea1dc7e656b42ff30d22259014567ab8ae315af969305ba6511add0129","provenance_receipt_aggregate_digest":"0646ea227c88debd5d0f401a94bbe4a311dac6a864cf9df4e9e668acd6396e47","status":"PASS"}
+  ],
+  "ohlcv_evidence_set_digest": "sha256:249fcc9e0018770cb0bde80ff3d2a492fc4bf6edc0bb2c9abad2c3d44fe03d82",
+  "pit_eligibility": {
+    "funding_eligible_decisions_total": 610,
+    "ohlcv_complete_decisions_total": 610,
+    "combined_pit_eligible_decisions_total": 610,
+    "first_combined_eligible_decision": "2023-10-19T00:00:00Z",
+    "last_combined_eligible_decision": "2025-06-19T00:00:00Z",
+    "excluded_by_reason": {},
+    "fail_closed_semantics": true
+  },
+  "no_outcome_attestation": {
+    "simple_returns_computed": "NO",
+    "market_returns_computed": "NO",
+    "future_rv_computed": "NO",
+    "funding_to_volatility_contrast_computed": "NO",
+    "primary_statistic_computed": "NO",
+    "economic_outcome_accessed": "NO",
+    "post_sealed_t0_accessed": "NO"
+  },
+  "authority": {"execution_authority":"NONE","outcome_access_authority":"NONE"},
+  "certificate_digest_definition": "SHA-256 of UTF-8 JSON for this complete object excluding pit_coverage_certificate_digest; recursively sorted keys, compact separators (comma, colon), ensure_ascii=true, and no trailing newline.",
+  "digest_repair": {
+    "cause_classification": ["D", "E"],
+    "cause_evidence": "The stored digest is not reproducible from the final certificate payload under the repository's canonical preregistration serialization, and the certificate's parent contract digest had the orchestration transcription error missing 608; the final payload recomputes to the repaired digest below.",
+    "old_stored_digest": "sha256:53d17d03cdd64398b672b36abc98cbbd49830cdb4c4f3b047083a4c5c1e81a81",
+    "failed_recomputation": "sha256:1af3e70358627d0cbcdb7c05ed023992332aa04c6514bc19b4cb0a8c880723ef"
+  },
+  "pit_coverage_certificate_digest": "sha256:76bbf05d1ab253f039bdd565bd19b563d19f4e1117f344ae495cac46bea0ffcc"
+}

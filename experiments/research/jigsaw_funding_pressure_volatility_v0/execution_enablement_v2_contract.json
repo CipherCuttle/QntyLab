@@ -1,0 +1,32 @@
+{
+  "schema_version": "jigsaw-funding-pressure-execution-enablement-v2",
+  "phase_id": "JIGSAW_FUNDING_PRESSURE_VOLATILITY_EXECUTION_ENABLEMENT_V2",
+  "scientific_contract": {
+    "experiment_id": "JIGSAW_FUNDING_PRESSURE_VOLATILITY_PREREGISTRATION_V0",
+    "panel_identity": "canonical preregistration exact ordered 20-member panel",
+    "decision_schedule": "2023-10-19T00:00:00Z..2025-06-19T00:00:00Z inclusive, 610 daily 00:00:00Z decisions",
+    "funding_eligibility": "decision_time-24h < funding_time <= decision_time; latest exact settlement; abs(rate); arithmetic median of ordered positions 10 and 11",
+    "ecdf": "365 prior observations plus current; count(v <= current)/366; exact Fraction comparisons",
+    "ohlcv": "source bar open u maps to logical close endpoint u+1h; 24 close-to-close returns use source opens t-1h through t+23h",
+    "rv24": "Decimal sqrt(mean of 24 squared equal-weight 20-member market returns), zero-mean, unannualized",
+    "primary": "mean(RV24|HIGH)-mean(RV24|LOW); positive iff strictly greater than zero"
+  },
+  "numerical_determinism": {
+    "decimal_sqrt_precision": 50,
+    "decimal_rounding": "ROUND_HALF_EVEN",
+    "purpose": "implementation determinism for unavoidable square root; no scientific degree of freedom"
+  },
+  "identity_binding": {
+    "module_path": "qntylab/jigsaw_funding_pressure_execution_v2.py",
+    "authorization_runtime_receipt_single_identity": true,
+    "candidate_source_bytes_must_equal_runtime": true,
+    "runtime_head_must_equal_authorized_canonical_merge": true,
+    "candidate_must_be_ancestor_of_runtime": true,
+    "required_ancestor_shas": ["98e9dbcbec5dab18f7498cf4c5df77e14a8d5569", "3e54cb86cdc43c76c1cbf72acc4dfebecb6b10fa", "95a4a3659bdcca1df9223f69e06cee50a2b00369", "3685c13eb2c0237e16cab1a33ce8ea024424569b"]
+  },
+  "execution_order": ["BIND", "LOAD_VERIFY_FROZEN_EVIDENCE", "RUNTIME_ATTEST", "AUTHORIZATION_VALIDATE", "RELEASE_IDENTITY_VALIDATE", "REMOTE_CLAIM", "OUTCOME_COMPUTATION", "RECEIPT"],
+  "claim": {"namespace": "refs/qntylab-execution-claims/<authorization_id>", "same_authorization_replay": "fail closed", "ambiguous_transport": "fail closed", "real_claim_created_in_this_phase": false},
+  "receipt_schema": {"provenance_source": "Foundation V0 build_receipt_provenance", "downstream_strategy_authority": "NONE", "downstream_router_authority": "NONE", "downstream_qnty_authority": "NONE"},
+  "no_outcome_attestation": {"real_outcome_computed": false, "real_remote_claim_created": false, "sealed_breadth_accessed": false},
+  "execution_enablement_v2_contract_digest": "sha256:31bd0cd07c10e00a82f759ef9b2fa52bb2fd8be5fed95bc0cffac16035ca4301"
+}

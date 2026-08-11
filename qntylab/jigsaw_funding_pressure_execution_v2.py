@@ -399,14 +399,14 @@ def execute_authorized_frozen_experiment_v2(
     transport: foundation.AtMostOnceClaimTransport,
     computation: Callable[[foundation.VerifiedEvidenceBundle], FrozenExperimentResult] = compute_frozen_experiment,
 ) -> dict[str, object]:
-    """Controlled seam; computation is unreachable until the remote claim succeeds."""
-    bundle = evidence_loader()
+    """Controlled seam; evidence access and computation are unreachable until the remote claim succeeds."""
     runtime = runtime_attestor(authorization)
     validate_v2_authorization(authorization)
     foundation.validate_authorization_against_runtime(authorization.foundation, runtime.foundation)
     outcome = foundation.claim_authorization_once(authorization.foundation.authorization_id, runtime.foundation.runtime_head_sha, transport)
     if outcome is not foundation.ClaimOutcome.CLAIMED:
         raise foundation.AtMostOnceClaimError("authorization is already consumed")
+    bundle = evidence_loader()
     result = computation(bundle)
     receipt = foundation.build_receipt_provenance(authorization=authorization.foundation, attestation=runtime.foundation)
     return {

@@ -24,9 +24,9 @@
     "candidate_must_be_ancestor_of_runtime": true,
     "required_ancestor_shas": ["98e9dbcbec5dab18f7498cf4c5df77e14a8d5569", "3e54cb86cdc43c76c1cbf72acc4dfebecb6b10fa", "95a4a3659bdcca1df9223f69e06cee50a2b00369", "3685c13eb2c0237e16cab1a33ce8ea024424569b"]
   },
-  "execution_order": ["BIND", "LOAD_VERIFY_FROZEN_EVIDENCE", "RUNTIME_ATTEST", "AUTHORIZATION_VALIDATE", "RELEASE_IDENTITY_VALIDATE", "REMOTE_CLAIM", "OUTCOME_COMPUTATION", "RECEIPT"],
+  "execution_order": ["BIND", "RUNTIME_ATTEST", "AUTHORIZATION_VALIDATE", "RELEASE_IDENTITY_VALIDATE", "REMOTE_CLAIM", "LOAD_VERIFY_FROZEN_EVIDENCE", "OUTCOME_COMPUTATION", "RECEIPT"],
   "claim": {"namespace": "refs/qntylab-execution-claims/<authorization_id>", "same_authorization_replay": "fail closed", "ambiguous_transport": "fail closed", "real_claim_created_in_this_phase": false},
   "receipt_schema": {"provenance_source": "Foundation V0 build_receipt_provenance", "downstream_strategy_authority": "NONE", "downstream_router_authority": "NONE", "downstream_qnty_authority": "NONE"},
   "no_outcome_attestation": {"real_outcome_computed": false, "real_remote_claim_created": false, "sealed_breadth_accessed": false},
-  "execution_enablement_v2_contract_digest": "sha256:31bd0cd07c10e00a82f759ef9b2fa52bb2fd8be5fed95bc0cffac16035ca4301"
+  "execution_enablement_v2_contract_digest": "sha256:24052d289bef8a650073dfac3afa6f806655728e92f7f55ed8b31079b41aff73"
 }

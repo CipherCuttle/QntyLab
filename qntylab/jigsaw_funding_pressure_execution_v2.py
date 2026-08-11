@@ -62,6 +62,25 @@ class ReleaseBindingError(V2Error):
     pass
 
 
+def _run_git_bytes(args: list[str], cwd: Path, git_runner=subprocess.run) -> bytes:
+    try:
+        result = git_runner(
+            ["git", *args],
+            cwd=cwd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=False,
+        )
+    except OSError as exc:
+        raise foundation.RuntimeAttestationError(f"git command unavailable: git {' '.join(args)}: {exc}") from exc
+    if result.returncode != 0:
+        stderr = result.stderr.decode("utf-8", errors="replace").strip() if isinstance(result.stderr, bytes) else str(result.stderr or "").strip()
+        raise foundation.RuntimeAttestationError(f"git command failed: git {' '.join(args)}: {stderr}")
+    if not isinstance(result.stdout, bytes):
+        raise foundation.RuntimeAttestationError("git byte command returned non-byte stdout")
+    return result.stdout
+
+
 @contextmanager
 def _v2_decimal_context():
     """Run contract-visible Decimal arithmetic independently of ambient state."""
@@ -359,7 +378,11 @@ def attest_v2_runtime(*, authorization: V2AuthorizationEnvelope, repo_root: Path
     module = foundation.resolve_within_repository(V2_MODULE_PATH, root)
     runtime_bytes = module.read_bytes()
     runtime_digest = hashlib.sha256(runtime_bytes).hexdigest()
-    candidate_bytes = git(["show", f"{authorization.foundation.reviewed_executor_candidate_sha}:{V2_MODULE_PATH}"]).encode("utf-8")
+    candidate_bytes = _run_git_bytes(
+        ["show", f"{authorization.foundation.reviewed_executor_candidate_sha}:{V2_MODULE_PATH}"],
+        root,
+        git_runner,
+    )
     if candidate_bytes != runtime_bytes:
         raise ReleaseBindingError("candidate V2 source bytes differ from runtime source bytes")
     if runtime_digest != authorization.foundation.executor_source_sha256:

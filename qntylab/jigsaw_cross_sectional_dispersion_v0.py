@@ -111,7 +111,21 @@ COST_MODES = {
     "BASELINE_EXECUTION": {"fee_bps": 10.0, "slippage_bps": 0.0},
     "STRESS_EXECUTION": {"fee_bps": 10.0, "slippage_bps": 10.0},
 }
-PRIMARY_COST_MODE = "BASELINE_EXECUTION"
+# STRESS is primary per existing frozen authority, not preference: Breadth V2's
+# own family-advancement rule (Section 8, items 2 and 4) gates on "stressed"
+# benchmark excess/net-return advantage, and the prior Jigsaw piece
+# (jigsaw_trend_condition_dependence_v0.analyze) anchors eligibility on
+# primary[state]["STRESS"][...], checking BASELINE only for same_sign
+# agreement. BASELINE is the secondary cost-robustness check, never primary.
+PRIMARY_COST_MODE = "STRESS_EXECUTION"
+SECONDARY_COST_MODE = "BASELINE_EXECUTION"
+
+# Bound by reference to the exact value already registered for
+# CANDIDATE_BREADTH_V2_CSMOM_24/72/168/336 in experiments/research/candidates.jsonl.
+# CROSS_SECTIONAL_MOMENTUM is Breadth V2 Tier A (OHLCV-only decision input), but
+# the frozen PortfolioKernel still charges/pays realized funding settlements for
+# any open perpetual position regardless of tier; missing funding fails closed.
+FUNDING_BOUNDARY_MODE = "REALIZED_FUNDING_SETTLEMENTS_REQUIRED"
 
 # --- Label ------------------------------------------------------------
 
@@ -175,11 +189,15 @@ def dispersion_percentile_and_bin(trailing_dispersion_values: np.ndarray, index:
 
 
 def family_consistency(per_variant_high_minus_low: Mapping[int, float | None]) -> dict[str, Any]:
-    """Family-first consistency criterion across the 4 registered CSMOM
-    lookback variants. Order-invariant and selection-free: it never returns,
-    ranks, or privileges any single "best" variant, only a symmetric count
-    of directional agreement with the frozen hypothesis sign (negative:
-    higher dispersion -> weaker utility).
+    """The ONE primary family statistic for this experiment (``consistent_count``).
+
+    There is no pooled, averaged, or otherwise scalar-combined economic
+    aggregate across variants anywhere in this module or the preregistration;
+    this function is the entire definition of "family-level result." It is
+    order-invariant and selection-free: it never returns, ranks, or
+    privileges any single "best" variant, only a symmetric count of
+    directional agreement with the frozen hypothesis sign (negative: higher
+    dispersion -> weaker utility).
 
     Returns the count/threshold verdict; callers decide CANDIDATE vs
     CONCENTRATED using ``FAMILY_CONSISTENCY_MINIMUM_VARIANTS`` unchanged.
@@ -229,6 +247,8 @@ def contract_payload() -> dict[str, Any]:
         "normalization_warmup_days": NORMALIZATION_WARMUP_DAYS,
         "cost_modes": COST_MODES,
         "primary_cost_mode": PRIMARY_COST_MODE,
+        "secondary_cost_mode": SECONDARY_COST_MODE,
+        "funding_boundary_mode": FUNDING_BOUNDARY_MODE,
         "label": LABEL,
         "flat_utility": FLAT_UTILITY,
         "gated_strategy_utility": GATED_STRATEGY_UTILITY,

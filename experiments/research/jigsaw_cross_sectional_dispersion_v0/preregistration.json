@@ -24,7 +24,9 @@
       "CANDIDATE_BREADTH_V2_CSMOM_72",
       "CANDIDATE_BREADTH_V2_CSMOM_168",
       "CANDIDATE_BREADTH_V2_CSMOM_336"
-    ]
+    ],
+    "funding_boundary_mode": "REALIZED_FUNDING_SETTLEMENTS_REQUIRED",
+    "funding_boundary_mode_reference": "bound by reference to the exact value already registered for CANDIDATE_BREADTH_V2_CSMOM_24/72/168/336 in experiments/research/candidates.jsonl; not invented for this experiment. CROSS_SECTIONAL_MOMENTUM is Breadth V2 Tier A (OHLCV-only decision input, per experiments/specs/breadth_v2_preregistration.md Section 5), but the frozen PortfolioKernel still charges/pays realized funding settlements for any open perpetual position regardless of tier, per Section 6/7; missing funding fails closed."
   },
 
   "old_proposition_excluded": "CROSS_SECTIONAL_MOMENTUM has validated excess return or alpha (it does not; Breadth V2 final_frozen_family_status=FAIL).",
@@ -32,9 +34,9 @@
 
   "variant_treatment": {
     "design": "FAMILY_FIRST",
-    "reason": "All four already-registered CSMOM lookback coordinates (24/72/168/336h) are preserved and pooled under one predeclared consistency criterion; no coordinate is added, dropped, averaged into a new ensemble, or selected for being best.",
+    "reason": "All four already-registered CSMOM lookback coordinates (24/72/168/336h) are preserved and assessed under one predeclared, count-based consistency criterion; no coordinate is added, dropped, averaged into a new ensemble, or selected for being best.",
     "lookbacks_hours": [24, 72, 168, 336],
-    "family_consistency_rule": "At least 3 of 4 registered variants must show a directionally consistent (negative) STRESS HIGH_MINUS_LOW_MEAN_UTILITY contrast for the piece to be a candidate; consistent_count/4 reported regardless of outcome.",
+    "family_consistency_rule": "At least 3 of 4 registered variants must show a directionally consistent (negative) STRESS HIGH_MINUS_LOW_MEAN_UTILITY contrast for the piece to be a candidate; consistent_count/4 reported regardless of outcome. This is the exact rule computed by qntylab.jigsaw_cross_sectional_dispersion_v0.family_consistency().",
     "claim_scope_if_family_consistent": "CROSS_SECTIONAL_MOMENTUM family, DEV_2024, frozen 20-asset Breadth V2 panel -- not a claim about any single lookback being best.",
     "prohibited": [
       "selecting the historically best lookback",
@@ -43,6 +45,14 @@
       "pruning variants after results",
       "adding or dropping coordinates"
     ]
+  },
+
+  "primary_family_statistic": {
+    "definition": "consistent_count: the count, out of the 4 registered CSMOM lookback variants, whose STRESS HIGH_MINUS_LOW_MEAN_UTILITY contrast has the preregistered negative sign.",
+    "candidate_threshold": ">= 3 of 4",
+    "computation_reference": "qntylab.jigsaw_cross_sectional_dispersion_v0.family_consistency(); no other function computes or may compute a family-level number for this experiment",
+    "per_variant_reporting": "each variant's HIGH_MINUS_LOW_MEAN_UTILITY magnitude is reported individually and descriptively alongside consistent_count; magnitudes are never averaged, weighted, or otherwise combined into a scalar economic aggregate",
+    "no_pooled_scalar": "there is no 'pooled family-first HIGH_MINUS_LOW_MEAN_UTILITY' value anywhere in this experiment; any prior draft language implying one was in error and is corrected by this field. No existing frozen QntyLab authority requires a cross-variant economic average for a measurement-only Jigsaw piece, so none is introduced (minimum-authority solution)."
   },
 
   "dispersion_recipe": {
@@ -80,7 +90,7 @@
   "development_sample": {
     "primary_window": {"id": "DEV_2024", "start": "2024-01-01T00:00:00Z", "end": "2024-12-31T23:00:00Z"},
     "reason_only_dev_2024_is_usable": "CROSS_SECTIONAL_MOMENTUM's own Breadth V2 development execution shows 0/8 usable cells in DEV_2022 and 0/8 usable cells in DEV_2025 (whole-panel missing-member blocking), versus 8/8 usable in DEV_2024 (4 variants x 2 cost modes). This experiment's economic sample cannot exceed where the fixed measurement process itself produced usable observations, so it is bound to DEV_2024. This is a discovered constraint, verified from experiments/research/breadth_v2_receipts/*.json, not a choice made to reach a preferred sample.",
-    "warmup": "Observations strictly before DEV_2024 may be used only to construct the 365-day trailing dispersion percentile normalization; they are never labelled as economic decisions. Warm-up panel completeness back to ~2023-01-01 must be verified before execution; if incomplete, the affected early-2024 decisions are blocked (see BLOCKED_BY_PIT_INPUT_SEMANTICS) rather than computed with a partial trailing history.",
+    "warmup": "Observations strictly before DEV_2024 may be used only to construct the 365-day trailing dispersion percentile normalization; they are never labelled as economic decisions. Warm-up requires only OHLCV (no funding is needed to compute a non-economic percentile seed). Warm-up panel completeness back to ~2023-01-01 must be verified before execution; if incomplete, the affected early-2024 decisions are blocked (see BLOCKED_BY_PIT_INPUT_SEMANTICS) rather than computed with a partial trailing history.",
     "calendar_halves_for_temporal_robustness_substitute": {"H1_2024": ["2024-01-01T00:00:00Z", "2024-06-30T23:00:00Z"], "H2_2024": ["2024-07-01T00:00:00Z", "2024-12-31T23:00:00Z"]},
     "sealed_t0_exclusion": "No observation at or after 2026-08-10T19:00:00Z (SEALED_T0) is used; DEV_2024 ends 2024-12-31T23:00:00Z, well before SEALED_T0, so no proximity risk exists."
   },
@@ -90,7 +100,7 @@
     "timestamp": "00:00:00Z",
     "horizon_hours": 24,
     "non_overlapping": true,
-    "compatibility_note": "CROSS_SECTIONAL_MOMENTUM's native cadence is hourly (target recomputed and portfolio rebalanced bar t -> t+1, per the frozen Breadth V2 execution contract). Rather than inventing a new daily signal, this experiment re-bins the already-realized hourly net-of-cost equity path emitted by the frozen, unmodified CSMOM target-weight process into non-overlapping 24h blocks starting 00:00 UTC, using geometric compounding of the hourly net-of-cost equity ratio within each block (equity(t+24h)/equity(t) - 1), consistent with the existing qntylab.jigsaw_trend_condition_dependence_v0._utility prod(1+r)-1 convention -- not additive summation of hourly returns, which would understate compounding effects and be inconsistent with the already-frozen Jigsaw utility definition. The target-weight computation itself is untouched; only the post-hoc aggregation window and compounding convention for the conditioning statistic are specified. This is the justified, pre-execution-frozen alternative required when native family semantics do not match the daily Jigsaw convention."
+    "compatibility_note": "CROSS_SECTIONAL_MOMENTUM's native cadence is hourly (target recomputed and portfolio rebalanced bar t -> t+1, per the frozen Breadth V2 execution contract). Rather than inventing a new daily signal, this experiment re-bins the already-realized hourly net-of-cost equity path emitted by the frozen, unmodified CSMOM target-weight process into non-overlapping 24h blocks starting 00:00 UTC, using geometric compounding of the hourly net-of-cost equity ratio within each block (equity(t+24h)/equity(t) - 1), consistent with the existing qntylab.jigsaw_trend_condition_dependence_v0._utility prod(1+r)-1 convention -- not additive summation of hourly returns, which would understate compounding effects and be inconsistent with the already-frozen Jigsaw utility definition. The target-weight computation itself is untouched; only the post-hoc aggregation window and compounding convention for the conditioning statistic are specified. This is the justified, pre-execution-frozen alternative required when native family semantics do not match the daily Jigsaw convention. This fix was the subject of the CRITICAL finding in hostile_review.md and was re-verified in targeted_re_review.md."
   },
 
   "label": "MEASUREMENT_STRATEGY_UTILITY",
@@ -103,15 +113,17 @@
       "BASELINE_EXECUTION": {"fee_bps": 10.0, "slippage_bps": 0.0},
       "STRESS_EXECUTION": {"fee_bps": 10.0, "slippage_bps": 10.0}
     },
-    "primary_cost_mode": "BASELINE_EXECUTION",
+    "primary_cost_mode": "STRESS_EXECUTION",
+    "primary_cost_mode_authority": "Determined only from existing frozen authority, never from desired or observed results: (1) Breadth V2 family-level advancement rule (experiments/specs/breadth_v2_preregistration.md Section 8, items 2 and 4) gates on 'stressed benchmark excess' / 'stressed net-return advantage', i.e. STRESS is the binding cost mode. (2) The prior Jigsaw piece (qntylab.jigsaw_trend_condition_dependence_v0.analyze) anchors its eligibility test on `stress = primary[state][\"STRESS\"][...]` and requires BASELINE to merely agree in sign with STRESS (same_sign(baseline)), not the reverse. Both existing authorities treat STRESS as primary and BASELINE as the secondary/consistency check; this experiment follows the same convention.",
+    "secondary_cost_mode": "BASELINE_EXECUTION, used only to check that the STRESS-based consistent_count verdict is not an artifact of stress costs (see robustness_contract.cost_robustness); never used to compute the primary family statistic.",
     "funding": "Realized Binance USD-M funding settlements per the existing Breadth V2 Section 7 contract, referenced not reinvented; missing funding fails closed per the existing rule.",
     "note": "No new or favorable cost mode is introduced; identical to Breadth V2 Section 7."
   },
 
   "primary_hypothesis": {
     "direction": "ONE_SIDED",
-    "statement": "Higher point-in-time cross-sectional dispersion (24h trailing, 20-asset frozen panel, sample stdev ddof=1) predicts weaker subsequent daily MEASUREMENT_STRATEGY_UTILITY of the frozen CROSS_SECTIONAL_MOMENTUM family (pooled across the 4 registered lookback variants under the family-first consistency rule) relative to FLAT, over the following non-overlapping 24h block, within DEV_2024.",
-    "predicted_sign": "signed HIGH_MINUS_LOW_MEAN_UTILITY < 0 under STRESS cost, for at least 3 of 4 registered variants",
+    "statement": "Higher point-in-time cross-sectional dispersion (24h trailing, 20-asset frozen panel, sample stdev ddof=1) predicts weaker subsequent daily MEASUREMENT_STRATEGY_UTILITY of the frozen CROSS_SECTIONAL_MOMENTUM family relative to FLAT, over the following non-overlapping 24h block, within DEV_2024, assessed via the primary_family_statistic (consistent_count, threshold >=3 of 4 registered lookback variants) under the primary STRESS cost mode.",
+    "predicted_sign": "signed HIGH_MINUS_LOW_MEAN_UTILITY < 0 under STRESS cost, for at least 3 of 4 registered variants (consistent_count >= 3)",
     "literature_seed_only_not_evidence": "Zhang & Makgolo (2026, SSRN 6648082) report that higher cross-sectional return dispersion coincides with weaker subsequent cross-sectional momentum in cryptocurrency markets; this motivates direction only and is not treated as QntyLab evidence.",
     "direction_frozen_before_outcomes": true
   },
@@ -128,11 +140,11 @@
 
   "multiplicity": {
     "number_of_primary_state_hypotheses": 1,
-    "primary_comparison": "pooled family-first HIGH_MINUS_LOW_MEAN_UTILITY under STRESS across the 4 registered CSMOM lookback variants, with the 3-of-4 directional-consistency rule",
+    "primary_comparison": "primary_family_statistic (consistent_count) under the primary STRESS cost mode across the 4 registered CSMOM lookback variants, 3-of-4 directional-consistency threshold; no scalar pooled/averaged contrast exists anywhere in this experiment",
     "secondary_or_descriptive_only": [
       "per-variant HIGH_MINUS_LOW_MEAN_UTILITY (4 variants; descriptive, feeds only the frozen consistency count, never a best-variant claim)",
-      "BASELINE cost mode (STRESS is primary per Breadth V2 convention of reporting stress as the binding cost case)",
-      "H1_2024 / H2_2024 calendar-half contrasts (temporal-stability substitute, weaker evidence, explicitly labelled)",
+      "BASELINE cost mode (secondary; used only as the cost-robustness check against the STRESS-based primary verdict, per cost_contract.secondary_cost_mode)",
+      "H1_2024 / H2_2024 calendar-half consistent_count (temporal-stability substitute, weaker evidence, explicitly labelled)",
       "leave-one-asset-out (20 attacks)",
       "five-best/five-worst daily-observation removal",
       "descriptive correlation of CROSS_SECTIONAL_DISPERSION against MARKET_DRAWDOWN_30D / MARKET_RV_7D / MARKET_CORR_7D on the same panel path"
@@ -142,11 +154,11 @@
   },
 
   "robustness_contract": {
-    "temporal_stability": "BLOCKED_AT_CROSS_WINDOW_LEVEL: only DEV_2024 has usable CSMOM cells (inherited Breadth V2 constraint, not invented here). Substitute: H1_2024 vs H2_2024 calendar-half sign consistency, frozen before outcomes, explicitly labelled weaker than genuine multi-year replication.",
-    "cost_robustness": "BASELINE vs STRESS sign preservation of the pooled family contrast.",
-    "cross_sectional_concentration_attack": "leave-one-asset-out across all 20 panel members, recomputing both dispersion and the CSMOM ranking with that asset excluded; no single asset may be required for the family-consistent verdict.",
-    "variant_consistency_family_first": "the 3-of-4 directional consistency rule itself is the primary test; also report consistent_count/4 verbatim.",
-    "tail_concentration": "five-best/five-worst daily-observation removal under STRESS, reusing the prior Jigsaw convention.",
+    "temporal_stability": "BLOCKED_AT_CROSS_WINDOW_LEVEL: only DEV_2024 has usable CSMOM cells (inherited Breadth V2 constraint, not invented here). Substitute: recompute consistent_count separately within H1_2024 and H2_2024 under STRESS; both halves must independently meet consistent_count >= 3 of 4 for temporal robustness to hold. Frozen before outcomes, explicitly labelled weaker than genuine multi-year replication.",
+    "cost_robustness": "Recompute consistent_count under BASELINE using the identical per-variant sign rule; the STRESS-based primary verdict is cost-robust only if the BASELINE consistent_count is also >= 3 of 4. There is no pooled scalar to compare signs of; the comparison is count-to-count, one cost mode at a time.",
+    "cross_sectional_concentration_attack": "leave-one-asset-out across all 20 panel members, recomputing both dispersion and the CSMOM ranking with that asset excluded, then recomputing consistent_count under STRESS; no single asset may be required for the family-consistent (>=3 of 4) verdict.",
+    "variant_consistency_family_first": "the 3-of-4 directional consistency rule (primary_family_statistic) itself is the primary test; also report consistent_count/4 verbatim alongside each variant's individual magnitude.",
+    "tail_concentration": "five-best/five-worst daily-observation removal under STRESS, reusing the prior Jigsaw convention, then recompute consistent_count on the trimmed sample.",
     "missingness_breadth_dependence": "Because eligibility requires the full 20/20 panel by construction, breadth is constant (20/20) at every included decision; this check degenerates to an integrity assertion (zero partial-panel contamination) rather than a graded diagnostic, and is reported as such.",
     "point_in_time_leakage": "dispersion computed only from close(t) and close(t-24h); normalization percentile uses only trailing values through t; proven by synthetic tests.",
     "state_distinctness_redundancy": "descriptive-only Pearson/Spearman correlation of CROSS_SECTIONAL_DISPERSION against the three existing Jigsaw states (MARKET_DRAWDOWN_30D, MARKET_RV_7D, MARKET_CORR_7D) computed on the same panel path; DISPERSION_STATE_NOT_DISTINCT_ENOUGH_TO_JUSTIFY_NEW_PIECE if |correlation| >= 0.90 with any one of them.",
@@ -154,15 +166,15 @@
   },
 
   "kill_defer_criteria": {
-    "NO_CONDITION_DEPENDENCE_FOUND": "pooled STRESS HIGH_MINUS_LOW_MEAN_UTILITY is not negative, or fewer than 3 of 4 variants are directionally consistent",
-    "CONDITION_DEPENDENCE_VARIANT_CONCENTRATED": "fewer than 3 of 4 registered CSMOM lookback variants show a directionally consistent contrast",
-    "CONDITION_DEPENDENCE_TEMPORALLY_UNSTABLE": "H1_2024 and H2_2024 contrasts have opposite sign under STRESS",
-    "CONDITION_DEPENDENCE_COST_FRAGILE": "BASELINE and STRESS pooled contrasts have opposite sign",
-    "CONDITION_DEPENDENCE_TAIL_CONCENTRATED": "five-best/five-worst removal flips the sign of the pooled STRESS contrast",
+    "NO_CONDITION_DEPENDENCE_FOUND": "STRESS consistent_count < 3 of 4 registered variants",
+    "CONDITION_DEPENDENCE_VARIANT_CONCENTRATED": "identical trigger to NO_CONDITION_DEPENDENCE_FOUND (STRESS consistent_count < 3 of 4); named separately only to label the failure mode as variant concentration when reporting, since there is a single primary_family_statistic and no separate family-wide aggregate to fail independently",
+    "CONDITION_DEPENDENCE_TEMPORALLY_UNSTABLE": "H1_2024 consistent_count < 3 of 4 or H2_2024 consistent_count < 3 of 4 under STRESS",
+    "CONDITION_DEPENDENCE_COST_FRAGILE": "STRESS consistent_count >= 3 of 4 but BASELINE consistent_count < 3 of 4 (the verdict does not replicate under the secondary cost mode)",
+    "CONDITION_DEPENDENCE_TAIL_CONCENTRATED": "five-best/five-worst removal causes STRESS consistent_count to drop below 3 of 4",
     "CONDITION_DEPENDENCE_BREADTH_OR_MISSINGNESS_DRIVEN": "any partial-panel (< 20/20) observation is found to have contributed to the result (integrity failure)",
     "DISPERSION_STATE_NOT_DISTINCT_ENOUGH_TO_JUSTIFY_NEW_PIECE": "abs(correlation) >= 0.90 with MARKET_DRAWDOWN_30D, MARKET_RV_7D, or MARKET_CORR_7D",
     "BLOCKED_BY_PIT_INPUT_SEMANTICS": "warm-up panel completeness insufficient for the 365-day trailing normalization, or any gap-fill/forward-fill is required to compute an observation",
-    "BLOCKED_BY_MEASUREMENT_PROCESS_IDENTITY": "the CSMOM target-weight computation or panel used at execution time does not byte-identically match qntylab.breadth_v2_strategies.cross_sectional_weights / qntylab.breadth_v2_runner.FROZEN_PANEL_ORDER, or this module's contract_digest() does not match the frozen value recorded at freeze time"
+    "BLOCKED_BY_MEASUREMENT_PROCESS_IDENTITY": "the CSMOM target-weight computation or panel used at execution time does not byte-identically match qntylab.breadth_v2_strategies.cross_sectional_weights / qntylab.breadth_v2_runner.FROZEN_PANEL_ORDER, the funding_boundary_mode used does not byte-identically match REALIZED_FUNDING_SETTLEMENTS_REQUIRED as registered for CANDIDATE_BREADTH_V2_CSMOM_*, or this module's contract_digest() does not match the frozen value recorded at freeze time"
   },
 
   "possible_future_piece_state": "PREDICTIVE_PIECE_CANDIDATE",

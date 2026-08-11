@@ -108,8 +108,9 @@ verified read-only against the committed Breadth V2 corpus:
 
 ## Variant-selection problem: FAMILY-FIRST chosen over single-frozen-coordinate
 
-FAMILY-FIRST is used (all 4 registered CSMOM lookbacks, pooled under a predeclared 3-of-4 directional
-consistency rule) rather than SINGLE-FROZEN-MEASUREMENT, because:
+FAMILY-FIRST is used (all 4 registered CSMOM lookbacks, assessed under the predeclared 3-of-4
+directional-consistency count, `primary_family_statistic`, with no scalar averaging across variants)
+rather than SINGLE-FROZEN-MEASUREMENT, because:
 - only 4 coordinates exist (not a large search space);
 - all 4 already have usable `DEV_2024` receipts, so nothing needs to be newly computed to include them;
 - a family-level claim is more useful Jigsaw evidence than a single-lookback claim, and the phase
@@ -134,8 +135,8 @@ consistency rule) rather than SINGLE-FROZEN-MEASUREMENT, because:
 1. **Socratic** — Yes, one genuinely new question: does a cross-sectional dispersion state condition
    the already-failed CSMOM family's utility, independent of the three states already tested against a
    different measurement process on a different panel.
-2. **Popperian** — Killed by: pooled STRESS contrast not negative, or <3/4 variants consistent, or
-   sign flip under cost/tail/temporal-half attacks, or |correlation| >= 0.90 with an existing state.
+2. **Popperian** — Killed by: STRESS consistent_count < 3 of 4 variants, or sign flip under
+   cost/tail/temporal-half attacks, or |correlation| >= 0.90 with an existing state.
    Each is frozen in `kill_defer_criteria` before any outcome exists.
 3. **Bayesian** — Prior update: the H003 drawdown piece's own external replication came back
    `EXTERNAL_REPLICATION_MIXED` / `PREDICTIVE_PIECE_REMAINS_WEAK`. That lowers the prior probability
@@ -160,8 +161,9 @@ consistency rule) rather than SINGLE-FROZEN-MEASUREMENT, because:
    already-frozen measurement family (reused, not reimplemented) is the minimum-description experiment
    that can answer the question; no additional state, horizon, or universe was introduced.
 9. **DOE/multiplicity** — All degrees of freedom are frozen and counted in `multiplicity` above:
-   1 primary state hypothesis, 4 pooled (not selected) variants, 1 primary cost mode (STRESS) with
-   BASELINE as secondary, 1 temporal split (H1/H2 2024) as a labelled-weaker substitute.
+   1 primary state hypothesis, 4 variants assessed via consistent_count (not selected, not averaged),
+   1 primary cost mode (STRESS) with BASELINE as secondary, 1 temporal split (H1/H2 2024) as a
+   labelled-weaker substitute.
 10. **Adversarial** — Survivorship: panel membership is frozen by the pre-existing Breadth V2
     source-conditioned freeze, unaffected by this experiment. Tails: five-best/five-worst removal is
     preregistered. Missingness: whole-panel fail-closed by construction, checked as an integrity

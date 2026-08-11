@@ -1,19 +1,25 @@
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 import numpy as np
 import pytest
 
 from qntylab.jigsaw_cross_sectional_dispersion_v0 import (
     DISTINCTNESS_ABS_CORRELATION_KILL_THRESHOLD,
     FAMILY_CONSISTENCY_MINIMUM_VARIANTS,
+    FUNDING_BOUNDARY_MODE,
     MEASUREMENT_VARIANT_LOOKBACKS_HOURS,
     MINIMUM_CROSS_SECTIONAL_BREADTH,
     NUMBER_OF_PRIMARY_STATE_HYPOTHESES,
     PANEL,
     PIT_UNIVERSE_CLAIM,
+    PRIMARY_COST_MODE,
     PROMOTION_ELIGIBLE,
     ROUTER_AUTHORITY,
     SEALED_T0_ISO,
+    SECONDARY_COST_MODE,
     contract_digest,
     contract_payload,
     cross_sectional_dispersion,
@@ -22,6 +28,9 @@ from qntylab.jigsaw_cross_sectional_dispersion_v0 import (
     is_pre_sealed_t0,
 )
 from qntylab.jigsaw_trend_condition_dependence_v0 import NORMALIZATION_DAYS
+
+CANDIDATE_PROPOSAL_PATH = Path("experiments/research/jigsaw_cross_sectional_dispersion_v0/candidate_proposal.json")
+CANDIDATES_LEDGER_PATH = Path("experiments/research/candidates.jsonl")
 
 
 def test_contract_digest_is_deterministic():
@@ -144,3 +153,44 @@ def test_no_outcome_selected_measurement_path():
 
 def test_distinctness_threshold_is_frozen_before_any_outcome():
     assert DISTINCTNESS_ABS_CORRELATION_KILL_THRESHOLD == 0.90
+
+
+def test_primary_cost_mode_matches_frozen_breadth_v2_and_jigsaw_authority():
+    # Breadth V2 Section 8 items 2/4 gate on "stressed" excess/net-return
+    # advantage, and the prior Jigsaw piece anchors eligibility on
+    # primary[state]["STRESS"], checking BASELINE only for sign agreement.
+    # Both existing authorities make STRESS primary, never BASELINE.
+    assert PRIMARY_COST_MODE == "STRESS_EXECUTION"
+    assert SECONDARY_COST_MODE == "BASELINE_EXECUTION"
+    assert contract_payload()["primary_cost_mode"] == "STRESS_EXECUTION"
+    assert contract_payload()["secondary_cost_mode"] == "BASELINE_EXECUTION"
+
+
+def test_funding_boundary_mode_matches_the_registered_csmom_variants():
+    # Bound by reference: the exact value already registered for the four
+    # frozen CANDIDATE_BREADTH_V2_CSMOM_* variants, never invented here.
+    assert FUNDING_BOUNDARY_MODE == "REALIZED_FUNDING_SETTLEMENTS_REQUIRED"
+    assert contract_payload()["funding_boundary_mode"] == FUNDING_BOUNDARY_MODE
+    matched = 0
+    with CANDIDATES_LEDGER_PATH.open(encoding="utf-8") as handle:
+        for line in handle:
+            event = json.loads(line)
+            if event.get("candidate_id", "").startswith("CANDIDATE_BREADTH_V2_CSMOM_"):
+                assert event["funding_boundary_mode"] == FUNDING_BOUNDARY_MODE
+                matched += 1
+    assert matched == 4
+
+
+def test_candidate_proposal_funding_and_input_identity_is_consistent():
+    event = json.loads(CANDIDATE_PROPOSAL_PATH.read_text(encoding="utf-8"))
+    assert event["funding_boundary_mode"] == FUNDING_BOUNDARY_MODE
+    assert event["funding_boundary_mode"] != "NOT_APPLICABLE"
+    assert "funding" in event["required_data"].lower()
+    assert event["required_input_kind"] == "OHLCV_1H_CSV"
+
+
+def test_candidate_proposal_variant_id_is_the_deterministic_ledger_hash():
+    from qntylab.research_ledger import compute_variant_id
+
+    event = json.loads(CANDIDATE_PROPOSAL_PATH.read_text(encoding="utf-8"))
+    assert event["variant_id"] == compute_variant_id(event)

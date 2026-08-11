@@ -42,18 +42,19 @@ economic execution exists.
 - **Router / Qnty authority creep:** no Critical/High finding. `router_authority`, `promotion_eligible`,
   and `pit_universe_claim` are frozen to `"NONE"` / `False` / `"NONE"` and asserted by test; no gate,
   sleeve, or transition-cost claim is introduced anywhere in the module or preregistration.
-- **Multiplicity disclosure:** no Critical/High finding. All degrees of freedom (1 state, 4 pooled
-  variants, 2 cost modes with 1 primary, 1 temporal split) are enumerated in
+- **Multiplicity disclosure:** no Critical/High finding. All degrees of freedom (1 state, 4 variants
+  assessed via `consistent_count`, 2 cost modes with 1 primary, 1 temporal split) are enumerated in
   `preregistration.json.multiplicity`, matching `NUMBER_OF_PRIMARY_STATE_HYPOTHESES = 1` proven by
   test.
 
 ## Targeted re-review
 
-Not required: the two findings above (compounding convention, threshold justification) were both
-documentation/specification fixes made directly in the frozen artifacts before commit; neither
-touched a frozen invariant, contaminated evidence, or created fail-open semantics, so per the phase's
-"medium/low does not restart" rule a full re-review pass was not triggered. A second read confirms
-both fixes are internally consistent with the rest of the preregistration and with the passing test
-suite (`tests/test_jigsaw_cross_sectional_dispersion_v0.py`, 14/14 passed).
+Required and performed separately: the CRITICAL compounding-definition finding above requires
+exactly one targeted re-review under the bounded workflow regardless of the fix's
+documentation/specification nature. See `targeted_re_review.md` for that review, which also covers
+three further contract issues (primary-cost-mode authority, the undefined "pooled" family statistic,
+and the funding/input identity contradiction) surfaced by subsequent direct review evidence and
+repaired in this same preregistration-closure pass.
 
-Outcome: `NO_UNRESOLVED_CRITICAL_OR_HIGH_FINDINGS`.
+Outcome of this hostile-review pass on its own: `NO_UNRESOLVED_CRITICAL_OR_HIGH_FINDINGS` conditional
+on the required targeted re-review passing (it does; see `targeted_re_review.md`).

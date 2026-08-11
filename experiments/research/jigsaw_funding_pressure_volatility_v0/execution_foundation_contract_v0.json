@@ -1,0 +1,191 @@
+{
+  "authorization_envelope_contract": {
+    "authorization_id_pattern": "^jigsaw-funding-pressure-v0-[0-9a-f]{32}$",
+    "envelope_type": "AuthorizationEnvelope",
+    "execution_scope": "ONE_FROZEN_HISTORICAL_RUN",
+    "fresh_authorization_status_required": "AUTHORIZED_UNUSED",
+    "module": "qntylab.jigsaw_funding_pressure_execution_foundation_v0",
+    "no_defaults_for_bound_identity_fields": true,
+    "outcome_access_scope": "FUNDING_PRESSURE_TO_RV24_V0",
+    "validator_entrypoint": "validate_authorization_envelope"
+  },
+  "contract_digest": "sha256:749641cbee99bc769a6095e2a5877e4ccf1c46db0a82860885eedc06734cd2d6",
+  "crash_semantics_contract": {
+    "automatic_retry_transition_exists": false,
+    "consumed_complete_is_terminal": true,
+    "consumed_incomplete_is_terminal": true,
+    "rerun_requires_new_authorization_identity": true,
+    "states": [
+      "AUTHORIZED_UNUSED",
+      "CLAIMED",
+      "CONSUMED_INCOMPLETE",
+      "CONSUMED_COMPLETE"
+    ]
+  },
+  "exact_ordered_panel": [
+    "BCHUSDT",
+    "XRPUSDT",
+    "LTCUSDT",
+    "TRXUSDT",
+    "ETCUSDT",
+    "LINKUSDT",
+    "XLMUSDT",
+    "CHZUSDT",
+    "SANDUSDT",
+    "REEFUSDT",
+    "CHRUSDT",
+    "ALICEUSDT",
+    "ONEUSDT",
+    "API3USDT",
+    "GMTUSDT",
+    "APEUSDT",
+    "OPUSDT",
+    "INJUSDT",
+    "LDOUSDT",
+    "APTUSDT"
+  ],
+  "execution_foundation_contract_digest": "sha256:6304d859aa0a52af624b9f5b9bb7bcd69f0bc939b5fd360e57bd81457cd0b14d",
+  "execution_git_provenance_contract_digest": "sha256:f5ac2b6c5158628a00a659043acc5a7e8c150b670a94693f1f2ede3f7528c7a1",
+  "funding_evidence_set_digest": "sha256:3677e5aeafd17c47e4951b2095d6247c8fb7cd3fb603cc70d5ea5658fd768faa",
+  "funding_history_coverage_digest": "sha256:55500e4af5b7276d8abfb3dfeaa5b351b3ca0d86a2e6501992c5796b1d7455a4",
+  "implementation_identity_contract": {
+    "invariants": [
+      "reviewed_executor_candidate_sha_ancestor_of_canonical_runtime_merge_sha",
+      "runtime_head_sha_equals_canonical_runtime_merge_sha",
+      "runtime_executor_source_sha256_equals_authorized_executor_source_digest"
+    ],
+    "roles": [
+      "reviewed_executor_candidate_sha",
+      "canonical_runtime_merge_sha",
+      "runtime_head_sha",
+      "runtime_executor_source_sha256"
+    ],
+    "roles_are_interchangeable": false
+  },
+  "no_outcome_attestation": {
+    "ECONOMIC_OUTCOME_ACCESSED": false,
+    "POST_SEALED_T0_ACCESSED": false,
+    "REAL_ASSET_RETURNS_COMPUTED": false,
+    "REAL_ECDF_VALUES_COMPUTED": false,
+    "REAL_FUNDING_PRESSURE_VALUES_COMPUTED": false,
+    "REAL_FUNDING_STATE_SERIES_COMPUTED": false,
+    "REAL_FUTURE_RV_COMPUTED": false,
+    "REAL_MARKET_RETURNS_COMPUTED": false,
+    "REAL_PRIMARY_STATISTIC_COMPUTED": false,
+    "REAL_REMOTE_AUTHORIZATION_CLAIM_CREATED": false,
+    "REAL_STATE_LABELS_COMPUTED": false
+  },
+  "ohlcv_v1_evidence_set_digest": "sha256:97760d127e33c51f2ac687f5f8edb92ffa3ac01b1c7c963951872a87ab3b5ae9",
+  "one_shot_authorization_contract": {
+    "atomic_create_if_absent": true,
+    "claim_backend": "REMOTE_AT_MOST_ONCE_CLAIM_V0",
+    "claim_before_outcome_access_required": true,
+    "claim_ref_namespace": "refs/qntylab-execution-claims",
+    "claim_ref_template": "refs/qntylab-execution-claims/<authorization_id>",
+    "conflict_disambiguation_endpoint": "GET /repos/{owner}/{repo}/git/ref/{ref}",
+    "conflict_disambiguation_is_exact_match_only": true,
+    "create_ref_endpoint": "POST /repos/{owner}/{repo}/git/refs",
+    "live_claim_invoked_in_this_phase": false,
+    "network_or_permission_or_malformed_response_fails_closed": true,
+    "order": [
+      "BIND",
+      "RUNTIME_ATTEST",
+      "AUTHORIZATION_VALIDATE",
+      "REMOTE_CLAIM",
+      "OUTCOME_ACCESS"
+    ],
+    "production_transport_class": "qntylab.jigsaw_funding_pressure_execution_foundation_v0.GitHubRestRemoteClaimTransport",
+    "production_transport_implemented": true,
+    "real_remote_claim_created_in_this_phase": false,
+    "same_sha_second_use_is_not_success": true,
+    "second_use_of_same_authorization_fails": true,
+    "token_env_var": "QNTYLAB_GITHUB_TOKEN"
+  },
+  "phase_id": "JIGSAW_FUNDING_PRESSURE_VOLATILITY_EXECUTION_FOUNDATION_HARDENING_V0",
+  "pit_v1_certificate_digest": "sha256:eee5ce2769e49970a7a4e8d4851d7da569abc156d4f183959b416bfb8dbf188b",
+  "pit_v1_merge_sha": "3e54cb86cdc43c76c1cbf72acc4dfebecb6b10fa",
+  "preregistration_merge_sha": "98e9dbcbec5dab18f7498cf4c5df77e14a8d5569",
+  "provenance_baseline_canonical_merge_sha": "da6c3428a0517ae7a140799091098d08f9c2a845",
+  "provenance_baseline_digest": "sha256:bdd177429e01327bfe577027bdaf35c9fe91b9949ec040333f04149b9112388c",
+  "provenance_baseline_reviewed_candidate_sha": "e37cb5036902c17f12a35e061c4795d525a10475",
+  "real_outcome_interlock": {
+    "phase_may_compute_asset_or_market_returns": false,
+    "phase_may_compute_ecdf_or_state_labels": false,
+    "phase_may_compute_funding_pressure": false,
+    "phase_may_compute_rv24_or_primary_statistic": false,
+    "phase_may_verify_hashes_schemas_timestamps_provenance": true
+  },
+  "receipt_provenance_contract": {
+    "digest_definition": "SHA256(canonical JSON excluding receipt_digest)",
+    "digest_rejects_non_finite_values": true,
+    "downstream_authority_fields": [
+      "downstream_strategy_authority",
+      "downstream_router_authority",
+      "downstream_qnty_authority"
+    ],
+    "entrypoint": "build_receipt_provenance",
+    "execution_authority_field_permitted": false,
+    "module": "qntylab.jigsaw_funding_pressure_execution_foundation_v0",
+    "runtime_derived_fields_not_caller_overridable": [
+      "runtime_head_sha",
+      "runtime_executor_source_sha256",
+      "repository_root_identity",
+      "runtime_module_path",
+      "authorization_claim_identity"
+    ],
+    "single_source_identity_required": true
+  },
+  "runtime_attestation_contract": {
+    "entrypoint": "attest_runtime",
+    "fail_closed_on_git_command_unavailable": true,
+    "fail_closed_on_git_metadata_unavailable": true,
+    "git_archive_equivalent_to_checkout": false,
+    "mechanically_derived_fields": [
+      "repository_root",
+      "runtime_head_sha",
+      "runtime_module_path",
+      "runtime_executor_source_sha256",
+      "worktree_clean"
+    ],
+    "module": "qntylab.jigsaw_funding_pressure_execution_foundation_v0",
+    "required_ancestors": [
+      "98e9dbcbec5dab18f7498cf4c5df77e14a8d5569",
+      "3e54cb86cdc43c76c1cbf72acc4dfebecb6b10fa",
+      "da6c3428a0517ae7a140799091098d08f9c2a845"
+    ],
+    "required_checks": [
+      "repository_root_equals_expected",
+      "runtime_head_sha_equals_expected",
+      "worktree_clean_required",
+      "module_path_resolves_inside_repository",
+      "required_ancestors_verified"
+    ]
+  },
+  "schema_version": "jigsaw-funding-pressure-execution-foundation-contract-v0",
+  "verified_evidence_loading_contract": {
+    "caller_arguments_permitted": [],
+    "entrypoint": "load_verified_frozen_evidence",
+    "funding_duplicate_timestamp_handling": "FAIL_CLOSED",
+    "funding_timestamp_cross_consistency_required": true,
+    "funding_timestamp_rounding_permitted": false,
+    "module": "qntylab.jigsaw_funding_pressure_execution_foundation_v0",
+    "ohlcv_caller_supplied_semantic_defaults_permitted": false,
+    "ohlcv_close_semantic": "CLOSE_PRICE_OF_BAR_OPENED_AT_TIMESTAMP",
+    "ohlcv_duplicate_source_open_handling": "FAIL_CLOSED",
+    "ohlcv_logical_endpoint_mapping": "source_open_u_maps_to_logical_close_endpoint_u_plus_1_hour",
+    "ohlcv_source_timestamp_semantic": "SOURCE_BAR_OPEN_TIME",
+    "ordering": [
+      "VERIFY_PROVENANCE_BASELINE",
+      "VERIFY_FILE_BYTES",
+      "VERIFY_SCHEMAS_SOURCE_SEMANTICS",
+      "PARSE",
+      "RETURN_IMMUTABLE_VERIFIED_EVIDENCE_BUNDLE"
+    ],
+    "real_historical_alternate_evidence_root_permitted": false,
+    "returned_types": [
+      "VerifiedFundingEvent",
+      "VerifiedBarOpenClose",
+      "VerifiedEvidenceBundle"
+    ]
+  }
+}

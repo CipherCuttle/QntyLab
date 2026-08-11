@@ -670,8 +670,20 @@ def replay(history: CanonicalHistory, *, verify_evidence: bool = False, root: Pa
         if not variant:
             continue
         if variant["latest_decision_event_id"] != event["previous_decision_event_id"]:
-            issues.append(f"reopen does not target latest decision: {event['event_id']}")
-            continue
+            # Canonical streams are physically separated by event type.  A
+            # valid reopen is therefore replayed after all decision records,
+            # even when a later decision for the reopened variant is already
+            # present.  Accept that chronology explicitly; otherwise the
+            # append-only reopen-then-decide workflow is impossible to replay.
+            later_decision = any(
+                decision["variant_id"] == event["variant_id"]
+                and decision["recorded_at_utc"] > event["recorded_at_utc"]
+                and decision["event_id"] == variant["latest_decision_event_id"]
+                for decision in history.decisions
+            )
+            if not later_decision:
+                issues.append(f"reopen does not target latest decision: {event['event_id']}")
+                continue
         if variant["status"] not in {"GRAVEYARDED", "BLOCKED"}:
             issues.append(f"reopen targets non-terminal status: {event['event_id']}")
             continue

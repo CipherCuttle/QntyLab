@@ -1,0 +1,28 @@
+{
+  "event_id": "event_decision_jigsaw_cross_sectional_dispersion_killed_v0",
+  "event_type": "DECISION_RECORDED",
+  "candidate_id": "CANDIDATE_JIGSAW_CROSS_SECTIONAL_DISPERSION_V0",
+  "family_id": "FAMILY_JIGSAW_CONDITION_DEPENDENCE",
+  "variant_id": "variant_7feb2fddb433f5773bdcb244",
+  "status": "GRAVEYARDED",
+  "scope": "EXACT_VARIANT",
+  "reason_codes": [
+    "NO_CONDITION_DEPENDENCE_FOUND",
+    "PRIMARY_CONSISTENT_COUNT_1_OF_4"
+  ],
+  "decision_note": "The exact frozen JIGSAW_CROSS_SECTIONAL_DISPERSION_V0 execution completed after the PIT warm-up blocker was resolved under the unchanged contract. Only 1 of 4 frozen CSMOM variants had a negative STRESS HIGH_MINUS_LOW_MEAN_UTILITY contrast, below the preregistered 3 of 4 family criterion. The scientific disposition is KILLED. CROSS_SECTIONAL_MOMENTUM remains FAIL and no Router, Qnty, or trading authority is created.",
+  "evidence_paths": [
+    "experiments/research/jigsaw_cross_sectional_dispersion_v0/execution_result.json",
+    "experiments/research/jigsaw_cross_sectional_dispersion_v0/execution_report.md",
+    "experiments/research/jigsaw_cross_sectional_dispersion_v0/hostile_review.md",
+    "experiments/research/jigsaw_cross_sectional_dispersion_v0/reopen_event.json"
+  ],
+  "evidence_sha256": {
+    "experiments/research/jigsaw_cross_sectional_dispersion_v0/execution_result.json": "c84ccc0ed0f3b0a69b0f45240f9f4b6c514952cc3cfd05104823aa027d72b97f",
+    "experiments/research/jigsaw_cross_sectional_dispersion_v0/execution_report.md": "2892a0457b89297e2db81877b3b91bb464a4e51165e4b486bbfdd4720168875f",
+    "experiments/research/jigsaw_cross_sectional_dispersion_v0/hostile_review.md": "d9620ad2bb349cce806a468fff7b3616638bf33cf4dfe6a88d46db41eb564580",
+    "experiments/research/jigsaw_cross_sectional_dispersion_v0/reopen_event.json": "4a84966fac0e50a6330ac814e31426cf5725831c64d299fc4e39a5097a83bee4"
+  },
+  "revisit_condition": "Return to Jigsaw discovery; do not rescue this proposition.",
+  "recorded_at_utc": "2026-08-11T00:31:00Z"
+}

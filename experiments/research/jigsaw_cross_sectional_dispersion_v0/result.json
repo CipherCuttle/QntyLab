@@ -1,0 +1,38 @@
+{
+  "experiment_id": "JIGSAW_CROSS_SECTIONAL_DISPERSION_V0",
+  "phase": "JIGSAW_CROSS_SECTIONAL_DISPERSION_EXECUTION_V0",
+  "research_status": "RETROSPECTIVE_EXPLORATORY",
+  "scientific_disposition": "BLOCKED",
+  "contract_digest": "d2227ac387852a23d5fb2b09d8656ba7678f460cffc2478afaa1ea5b7d882182",
+  "canonical_start_sha": "af3f6ccde3c4401a3e5c1d994b5686c135432d50",
+  "candidate_id": "CANDIDATE_JIGSAW_CROSS_SECTIONAL_DISPERSION_V0",
+  "candidate_status_at_gate": "PROPOSED",
+  "decision_already_recorded_at_gate": false,
+  "development_window": "DEV_2024",
+  "panel_size": 20,
+  "variants": [24, 72, 168, 336],
+  "sealed_t0": "2026-08-10T19:00:00Z",
+  "post_sealed_t0_accessed": false,
+  "input_gate": {
+    "authorized_manifest": "/home/swirky/DevHub/qntylab-evidence/breadth_v2_dev_inputs_v0/manifests/BREADTH_V2_DEV_INPUT_UNIVERSE_V0R1.json",
+    "ready_2024_variant_count": 4,
+    "price_coverage_starts": "2023-12-17T23:00:00Z to 2023-12-30T23:00:00Z depending on CSMOM lookback",
+    "required_pit_warmup_start": "2023-01-01T00:00:00Z or earlier",
+    "required_normalization_days": 365,
+    "funding_coverage": "available for DEV_2024 bundles",
+    "blocked_reason": "BLOCKED_BY_PIT_INPUT_SEMANTICS",
+    "blocked_detail": "The authorized DEV_2024 bundles do not contain the complete pre-2024 price history needed to construct the frozen 365-day trailing PIT dispersion percentile. No gap-fill, forward-fill, alternate source, or weakened warm-up was authorized."
+  },
+  "economic_results": null,
+  "robustness": null,
+  "kill_criteria": {
+    "BLOCKED_BY_PIT_INPUT_SEMANTICS": {
+      "triggered": true,
+      "evidence": "Authorized input manifest price ranges begin in December 2023; frozen percentile requires 365 prior daily dispersion observations before DEV_2024 economic decisions."
+    }
+  },
+  "cross_sectional_momentum_strategy_status": "UNCHANGED_FAIL",
+  "router_authority": "NONE",
+  "qnty_authority": "NONE",
+  "trading_authority": "NONE"
+}

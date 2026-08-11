@@ -1,0 +1,44 @@
+{
+  "accounting_kernel_identity": "BREADTH_V2_PORTFOLIO_KERNEL_V0",
+  "benchmark_contracts": {
+    "MOVING_AVERAGE_TREND": "BUY_AND_HOLD_PRIMARY_CASH_SECONDARY",
+    "PRICE_BREAKOUT": "BUY_AND_HOLD_PRIMARY_CASH_SECONDARY"
+  },
+  "contract_digest": "ce08cebc11e7ea6733b03ddb6ce5376fe47ce92b040e83a369a0b8a448cc335b",
+  "contract_id": "BREADTH_V2_SEALED_FORWARD_OBSERVATION_V0",
+  "contract_version": "V0",
+  "cost_modes": {
+    "BASELINE_EXECUTION": {"fee_bps": 10, "slippage_bps": 0},
+    "STRESS_EXECUTION": {"fee_bps": 10, "slippage_bps": 10}
+  },
+  "development_campaign_commit": "18be3196f41a5ee38404a6aa9644f02af63e9d9c",
+  "development_decision_identity": "5aa5a165239a893c2f6eded9c857a3bb107d7c22a807403758fe942ed43d5adb",
+  "development_manifest_identity": "c28f7a52a233a9fa2c1b45afd970b8e56c667ce1091844535fb0940f482ce452",
+  "earliest_eligible_adjudication_time": "2026-11-08T19:00:00Z",
+  "eligible_families": ["MOVING_AVERAGE_TREND", "PRICE_BREAKOUT"],
+  "eligible_variant_ids": {
+    "MOVING_AVERAGE_TREND": ["variant_d5f7ee106ba428292feacd0b", "variant_2584eb63c90a1aa65da2e006", "variant_83dc90d06ac8234aaacd575b", "variant_104b54d3f448e98b07bb104f"],
+    "PRICE_BREAKOUT": ["variant_ac4a45549606e2d83bad89a9", "variant_057bf9fb96021b54541a31cc", "variant_81f0ae4565fe4e93e8ecfa09", "variant_5910c68e1b751a6d26bda998"]
+  },
+  "excluded_development_fail_families": ["TIME_SERIES_MOMENTUM", "CROSS_SECTIONAL_MOMENTUM", "CROSS_SECTIONAL_REVERSAL", "FUNDING_CARRY", "VOLATILITY_TARGETING"],
+  "historical_holdout_policy": "FORWARD_TIME_ONLY;_2023_AND_HISTORICAL_2026_ARE_NOT_FRESH_HOLDOUTS",
+  "minimum_complete_hours": 2160,
+  "observation_status": "SEALED_OBSERVATION_ACTIVE",
+  "preregistration_commit": "ca0d1c1272e282ee5e1f5fcbc9bc66b2d75eff83",
+  "preregistration_contract_identity": "QNTYLAB_BREADTH_V2_20260810",
+  "retrospective_holdout_prohibited": true,
+  "sealed_adjudication_authorized": false,
+  "SEALED_T0": "2026-08-10T19:00:00Z",
+  "SEALED_T0_derivation_evidence": [
+    {"kind": "preregistration_commit", "timestamp": "2026-08-10T15:22:25Z", "commit": "ca0d1c1272e282ee5e1f5fcbc9bc66b2d75eff83"},
+    {"kind": "execution_contract_merge", "timestamp": "2026-08-10T16:14:36Z", "commit": "7f86d69cb9e47083bf985f741482f5b35d99a70c"},
+    {"kind": "funding_source_materiality_merge", "timestamp": "2026-08-10T17:36:50Z", "commit": "5f353a48832d1f784a3fcd1fbf6a969578b5c39e"},
+    {"kind": "input_bundle_materiality_merge", "timestamp": "2026-08-10T18:12:54Z", "commit": "d4ad8a3e11d4a58f028c51fca89f903d6186e888"}
+  ],
+  "source_contracts": {
+    "funding": "BINANCE_USDM_FUNDING_SETTLEMENT_MATERIALIZER_V0",
+    "input_universe": {"id": "BREADTH_V2_DEV_INPUT_UNIVERSE_V0R1", "sha256": "8fef4c02d113027630072bcbb0802e35ab31be17c835aa2ebdae4261265589fb"},
+    "price": "BINANCE_USDM_PERPETUAL_1H_OHLCV"
+  },
+  "registered_screen_id": "QNTYLAB_BREADTH_V2_20260810"
+}

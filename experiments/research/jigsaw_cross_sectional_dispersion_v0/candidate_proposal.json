@@ -1,0 +1,33 @@
+{
+  "bar_interval": "1h",
+  "benchmark": "FLAT utility exactly zero.",
+  "candidate_id": "CANDIDATE_JIGSAW_CROSS_SECTIONAL_DISPERSION_V0",
+  "decision_time": "Daily 00:00 UTC state known by the decision close (24h trailing return per panel asset, 365-day trailing percentile).",
+  "event_id": "event_proposal_b3090fa3de7c234a705c8e1c",
+  "event_type": "CANDIDATE_PROPOSED",
+  "execution_time": "Experiment-specific deterministic measurement module; no strategy selection.",
+  "failure_condition": "Defer/kill if variant-concentrated, temporally unstable, cost fragile, tail concentrated, breadth/missingness driven, not distinct from existing states, or blocked by PIT/measurement-process identity.",
+  "family_id": "FAMILY_JIGSAW_CONDITION_DEPENDENCE",
+  "funding_boundary_mode": "REALIZED_FUNDING_SETTLEMENTS_REQUIRED",
+  "mechanism": "Fixed, already-FAILED CROSS_SECTIONAL_MOMENTUM measurement process (4 registered lookback variants, family-first consistent_count) conditioned on one new preregistered cross-sectional dispersion state.",
+  "mode": "measurement_only",
+  "objective": "Measure whether the fixed CROSS_SECTIONAL_MOMENTUM family has state-conditioned daily utility relative to FLAT, conditioned on point-in-time cross-sectional return dispersion across the frozen 20-asset Breadth V2 panel.",
+  "origin": "Bounded Jigsaw preregistration; distinct from the historical CROSS_SECTIONAL_MOMENTUM excess-return proposition (which failed) and from JIGSAW_TREND_CONDITION_DEPENDENCE_V0 (different state, process, and panel).",
+  "parameters": {
+    "measurement_process": "CROSS_SECTIONAL_MOMENTUM",
+    "measurement_variant_lookbacks_hours": [24, 72, 168, 336],
+    "dispersion_return_horizon_hours": 24,
+    "dispersion_statistic": "CROSS_SECTIONAL_SAMPLE_STDEV_DDOF1",
+    "panel_size": 20,
+    "development_window": "DEV_2024",
+    "horizon_hours": 24,
+    "state": "CROSS_SECTIONAL_DISPERSION"
+  },
+  "prediction": "Higher point-in-time cross-sectional dispersion predicts weaker subsequent daily CROSS_SECTIONAL_MOMENTUM utility relative to FLAT; any reusable relation must survive family-variant, temporal, cost, and tail attacks.",
+  "recorded_at_utc": "2026-08-11T00:00:00Z",
+  "required_data": "Existing validated Binance USD-M 1h OHLCV for the frozen Breadth V2 20-asset panel (decision input and dispersion feature; DEV_2024 plus pre-2024 warm-up for percentile normalization), plus realized Binance USD-M funding settlement events for DEV_2024 per the existing Breadth V2 CROSS_SECTIONAL_MOMENTUM funding contract (bound by reference, not invented; fail-closed on gaps). Warm-up requires OHLCV only, no funding.",
+  "required_input_kind": "OHLCV_1H_CSV",
+  "strategy_id": "JIGSAW_cross_sectional_dispersion_measurement",
+  "strategy_version": "jigsaw-cross-sectional-dispersion-v0",
+  "variant_id": "variant_7feb2fddb433f5773bdcb244"
+}

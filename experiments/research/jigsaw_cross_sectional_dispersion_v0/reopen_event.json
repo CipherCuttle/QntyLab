@@ -1,0 +1,10 @@
+{
+  "event_type": "CANDIDATE_REOPENED",
+  "candidate_id": "CANDIDATE_JIGSAW_CROSS_SECTIONAL_DISPERSION_V0",
+  "variant_id": "variant_7feb2fddb433f5773bdcb244",
+  "previous_decision_event_id": "event_decision_jigsaw_cross_sectional_dispersion_blocked_v0",
+  "reason": "PIT_WARMUP_BLOCKER_RESOLVED_UNDER_FROZEN_CONTRACT",
+  "material_change": "Durable authenticated 240-object pre-2024 OHLCV warm-up, 20 normalized inputs, manifests, hashes, and provenance receipts are bound at /home/swirky/DevHub/qntylab-evidence/jigsaw_cross_sectional_dispersion_v0_warmup_v0; contract digest remains d2227ac387852a23d5fb2b09d8656ba7678f460cffc2478afaa1ea5b7d882182.",
+  "recorded_at_utc": "2026-08-11T00:30:00Z",
+  "event_id": "event_reopen_jigsaw_cross_sectional_dispersion_warmup_v0"
+}

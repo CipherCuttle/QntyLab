@@ -1,0 +1,14 @@
+{
+  "artifact_type": "BREADTH_V2_TARGETED_HOSTILE_REVIEW_V0",
+  "checks": {
+    "affected_execution_set_empty": true,
+    "frozen_bundle_identities_reconcile": true,
+    "original_decision_digest_recomputes": true,
+    "original_hostile_review_remains_close": true,
+    "repair_changes_no_scientific_rule": true
+  },
+  "repair_artifact_sha256": "81e9916c40f78682710ee9cf29a0c8ae565b185ba9542c8abda9570dd57d5c94",
+  "scope": "targeted_integrity_rereview_of_cache_repair",
+  "targeted_review_sha256": "ac976b22d1c2b3c94dcb305394eea8213760df3b5d01291833baa8997a28c6eb",
+  "verdict": "CLOSE"
+}

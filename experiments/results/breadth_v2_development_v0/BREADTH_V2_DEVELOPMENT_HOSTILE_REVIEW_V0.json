@@ -1,0 +1,22 @@
+{
+  "artifact_type": "BREADTH_V2_DEVELOPMENT_HOSTILE_REVIEW_V0",
+  "checks": {
+    "blocked_observations_not_converted_to_scores": true,
+    "candidate_benchmark_frozen_input_cost_semantics": true,
+    "decision_receipts_recompute_deterministically": true,
+    "exact_registered_descriptors_attempted": true,
+    "fixed_denominators_20_assets_3_windows": true,
+    "identities_and_bundle_shas_match_manifest": true,
+    "no_best_variant_cherry_picking": true,
+    "no_post_boundary_scientific_rule_change": true,
+    "no_ready_results_silently_omitted": true,
+    "no_v0r1_blocked_inputs_executed": true,
+    "paths_receipts_accounting_reconcile": true,
+    "reducer_input_matches_frozen_evidence": true
+  },
+  "manifest_sha256": "c28f7a52a233a9fa2c1b45afd970b8e56c667ce1091844535fb0940f482ce452",
+  "scope": "integrity_only_after_outcome_freeze",
+  "successful_execution_count": 1496,
+  "unexpected_integrity_blocked_count": 0,
+  "verdict": "CLOSE"
+}

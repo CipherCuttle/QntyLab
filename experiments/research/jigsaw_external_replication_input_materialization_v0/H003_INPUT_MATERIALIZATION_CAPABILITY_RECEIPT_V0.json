@@ -1,0 +1,60 @@
+{
+  "artifact_type": "H003_INPUT_MATERIALIZATION_CAPABILITY_RECEIPT",
+  "artifact_version": "v0",
+  "replication_id": "JIGSAW_DRAWDOWN_PIECE_EXTERNAL_REPLICATION_COHORT_V0",
+  "assessment": "BLOCKED_BY_H003_INPUT_MATERIALIZATION_CAPABILITY",
+  "assessment_scope": "source/input evidence only; no H003 execution or outcome calculation occurred",
+  "frozen_inputs": {
+    "cohort_digest": "8a37866705efa5d68d80fb6770db49dbaba84c6e2c4848df6a406b885f0b5c1e",
+    "piece_contract_digest": "de0cae86adf96a8fedb6b4f9531190265da2bf201e293a342b033fc0a498778a",
+    "outcome_period": ["2025-01-01T00:00:00Z", "2026-06-30T23:00:00Z"],
+    "state_reference_panel": ["BTCUSDT", "ETHUSDT", "SOLUSDT"]
+  },
+  "committed_h003_input_contract": {
+    "module": "qntylab.strategy_test",
+    "input_schema": "CSV with timestamp, open, high, low, close, volume; H003 consumes close",
+    "expected_interval": "1h",
+    "gap_policy": "REJECT",
+    "historical_authoritative_path": "Binance Spot public market-data REST, data/raw/<symbol>-1h.csv; in the focused 2023 holdout it required a separately preregistered spot-halt normalization",
+    "incompatibility": "The frozen external replication requires Binance USD-M perpetual inputs, so this spot-only historical authority cannot be reused."
+  },
+  "committed_usdm_archive_components_examined": [
+    {
+      "module": "qntylab.binance_um_archive",
+      "source_family": "Binance USD-M daily trades archive",
+      "capability": "authenticates ZIP bytes with the published .CHECKSUM and emits MarketObservation timestamps",
+      "blocking_reason": "It does not parse or emit OHLC 1h bars and is explicitly an observation adapter, not an H003 OHLC adapter."
+    },
+    {
+      "module": "qntylab.data.fetch_premium_perp",
+      "source_family": "Binance USD-M monthly klines plus premiumIndexKlines archives",
+      "capability": "can write a local *-perp-1h.csv compatible with the general strategy input schema",
+      "blocking_reason": "It does not retain per-source-object raw bytes, object receipts, or .CHECKSUM verification; it joins a second premium source not required by H003; and its month iterator/output lacks a frozen inclusive end-bound filter. It therefore cannot emit the required object-level raw digest, normalized provenance, deterministic exact coverage, and fail-closed materialization receipt."
+    },
+    {
+      "module": "qntylab.archive_index",
+      "source_family": "Binance USD-M monthly kline S3 inventory",
+      "capability": "lists 1d objects for a Sprint-v2 inventory",
+      "blocking_reason": "It inventories 1d keys only and does not acquire, authenticate, normalize, or verify H003 1h OHLC inputs."
+    }
+  ],
+  "materialization": {
+    "performed": false,
+    "reason": "No committed H003-compatible provenance-bound hourly acquisition path exists. Creating or repairing a downloader/normalizer would be a new data architecture prohibited by this phase.",
+    "outcome_inspection": "NONE",
+    "dirty_wip_promoted": false,
+    "dirty_wip_mutated": false
+  },
+  "member_readiness": {
+    "classification": "INPUT_UNAVAILABLE",
+    "symbols": ["BCHUSDT", "XRPUSDT", "LTCUSDT", "TRXUSDT", "ETCUSDT", "LINKUSDT", "XLMUSDT", "CHZUSDT", "SANDUSDT", "REEFUSDT", "CHRUSDT", "ALICEUSDT", "ONEUSDT", "API3USDT", "GMTUSDT", "APEUSDT", "OPUSDT", "INJUSDT", "LDOUSDT", "APTUSDT"],
+    "reason": "Phase-level acquisition capability is unavailable before any source object may be admitted; this is not a source-availability or strategy-outcome finding for any member."
+  },
+  "state_reference_readiness": {
+    "classification": "NOT_MATERIALIZED_CAPABILITY_BLOCKED",
+    "symbols": ["BTCUSDT", "ETHUSDT", "SOLUSDT"],
+    "reason": "No admissible hourly materialization path exists, so state-reference reconstruction was not attempted."
+  },
+  "required_verdict": "BLOCKED_BY_H003_INPUT_MATERIALIZATION_CAPABILITY",
+  "next_action": "CLOSE_EXECUTION_AS_EVIDENCE_BLOCKED"
+}

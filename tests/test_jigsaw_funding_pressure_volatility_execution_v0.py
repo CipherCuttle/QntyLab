@@ -8,7 +8,7 @@ fixtures below are artificial and hand-checkable.
 """
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from fractions import Fraction
 
@@ -285,6 +285,62 @@ def test_rv24_no_annualization_factor_applied():
 
 
 # --------------------------------------------------------------------------
+# compute_forward_rv24 -- canonical timestamp-aware outcome seam (F-01)
+# --------------------------------------------------------------------------
+
+
+def _timestamped_closes(decision: datetime = DECISION) -> dict[str, list[tuple[datetime, float]]]:
+    return {
+        symbol: [(decision + timedelta(hours=i), 100.0 + i) for i in range(25)]
+        for symbol in ex.PANEL
+    }
+
+
+def test_forward_rv24_accepts_exact_t_through_t_plus_24_closes():
+    result = ex.compute_forward_rv24(DECISION, _timestamped_closes())
+    expected_hourly = [(101.0 + i) / (100.0 + i) - 1.0 for i in range(24)]
+    assert result == pytest.approx((sum(r * r for r in expected_hourly) / 24) ** 0.5)
+
+
+@pytest.mark.parametrize("mutation", ["missing", "before", "after", "shifted", "duplicate", "non_hourly", "reordered"])
+def test_forward_rv24_rejects_noncanonical_timestamp_windows(mutation):
+    closes = _timestamped_closes()
+    rows = closes[ex.PANEL[0]]
+    if mutation == "missing":
+        rows.pop(10)
+    elif mutation == "before":
+        rows[0] = (DECISION - timedelta(hours=1), rows[0][1])
+    elif mutation == "after":
+        rows[-1] = (DECISION + timedelta(hours=25), rows[-1][1])
+    elif mutation == "shifted":
+        rows[1] = (DECISION + timedelta(hours=2), rows[1][1])
+    elif mutation == "duplicate":
+        rows[2] = (rows[1][0], rows[2][1])
+    elif mutation == "non_hourly":
+        rows[3] = (DECISION + timedelta(hours=3, minutes=1), rows[3][1])
+    elif mutation == "reordered":
+        rows[4], rows[5] = rows[5], rows[4]
+    with pytest.raises(ValueError):
+        ex.compute_forward_rv24(DECISION, closes)
+
+
+def test_forward_rv24_rejects_wrong_decision_time_and_wrong_panel():
+    with pytest.raises(ValueError):
+        ex.compute_forward_rv24(DECISION + timedelta(hours=1), _timestamped_closes())
+    wrong_panel = _timestamped_closes()
+    wrong_panel["FAKEUSDT"] = wrong_panel.pop(ex.PANEL[0])
+    with pytest.raises(ex.InputBindingError):
+        ex.compute_forward_rv24(DECISION, wrong_panel)
+
+
+def test_forward_rv24_price_shift_cannot_silently_generate_another_window():
+    closes = _timestamped_closes()
+    closes[ex.PANEL[0]] = [(timestamp + timedelta(hours=1), price) for timestamp, price in closes[ex.PANEL[0]]]
+    with pytest.raises(ValueError):
+        ex.compute_forward_rv24(DECISION, closes)
+
+
+# --------------------------------------------------------------------------
 # compute_primary_contrast -- single signed HIGH-minus-LOW contrast
 # --------------------------------------------------------------------------
 
@@ -483,7 +539,7 @@ def test_real_execution_is_refused_even_with_a_plausible_looking_authorization()
         "outcome_access_scope": ex.REQUIRED_OUTCOME_ACCESS_SCOPE,
     }
     with pytest.raises(ex.ExecutionNotAuthorizedError):
-        ex.authorize_execution("REAL_HISTORICAL", fake_authorization)
+        ex.authorize_execution("REAL_HISTORICAL", fake_authorization, actual_execution_implementation_sha="cafebabe" * 5)
 
 
 def test_unknown_execution_mode_rejected():
@@ -491,8 +547,49 @@ def test_unknown_execution_mode_rejected():
         ex.authorize_execution("SOMETHING_ELSE", None)
 
 
-def test_execution_implementation_sha_is_not_frozen_this_phase():
-    assert ex.EXECUTION_IMPLEMENTATION_SHA is None
+def _valid_authorization(implementation_sha: str) -> dict:
+    return {
+        "authorization_id": "AUTH-0001",
+        "experiment_id": ex.EXPERIMENT_ID,
+        "preregistration_merge_sha": ex.PREREGISTRATION_MERGE_SHA,
+        "contract_digest": ex.CONTRACT_DIGEST,
+        "pit_certification_merge_sha": ex.PIT_CERTIFICATION_MERGE_SHA,
+        "pit_certificate_digest": ex.PIT_CERTIFICATE_DIGEST,
+        "execution_implementation_sha": implementation_sha,
+        "funding_evidence_set_digest": ex.FUNDING_EVIDENCE_SET_DIGEST,
+        "ohlcv_evidence_set_digest": ex.OHLCV_EVIDENCE_SET_DIGEST,
+        "execution_scope": ex.REQUIRED_EXECUTION_SCOPE,
+        "outcome_access_scope": ex.REQUIRED_OUTCOME_ACCESS_SCOPE,
+    }
+
+
+def test_real_authorization_requires_runtime_identity_to_match_artifact():
+    sha = "a" * 40
+    ex.authorize_execution("REAL_HISTORICAL", _valid_authorization(sha), actual_execution_implementation_sha=sha)
+
+
+@pytest.mark.parametrize("bad_sha", ["b" * 40, "not-a-sha", "a" * 39])
+def test_real_authorization_rejects_wrong_or_invalid_runtime_identity(bad_sha):
+    with pytest.raises(ex.ExecutionNotAuthorizedError):
+        ex.authorize_execution("REAL_HISTORICAL", _valid_authorization("a" * 40), actual_execution_implementation_sha=bad_sha)
+
+
+def test_real_authorization_rejects_wrong_contract_pit_or_evidence_identity():
+    sha = "a" * 40
+    for field, value in (
+        ("contract_digest", "sha256:" + "0" * 64),
+        ("pit_certificate_digest", "sha256:" + "1" * 64),
+        ("funding_evidence_set_digest", "sha256:" + "2" * 64),
+        ("ohlcv_evidence_set_digest", "sha256:" + "3" * 64),
+    ):
+        authorization = _valid_authorization(sha)
+        authorization[field] = value
+        with pytest.raises(ex.ExecutionNotAuthorizedError):
+            ex.authorize_execution("REAL_HISTORICAL", authorization, actual_execution_implementation_sha=sha)
+
+
+def test_executor_has_no_self_referential_implementation_sha_constant():
+    assert "EXECUTION_IMPLEMENTATION_SHA" not in vars(ex)
 
 
 # --------------------------------------------------------------------------

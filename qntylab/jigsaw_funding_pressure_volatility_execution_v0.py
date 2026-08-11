@@ -60,6 +60,7 @@ evidence to check.
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal, InvalidOperation
@@ -111,14 +112,6 @@ KILL_CONDITIONS = (
     "NO_POSITIVE_HIGH_MINUS_LOW_DIRECTIONAL_CONTRAST",
 )
 PRIMARY_PROPOSITION_SUPPORTED = "PRIMARY_PROPOSITION_SUPPORTED"
-
-# This phase does not freeze/instantiate an execution implementation SHA: it
-# is only known after this candidate is committed. Leaving it unset (rather
-# than guessing the future commit hash) makes the authorization gate below
-# provably unsatisfiable in this phase -- there is no artifact that can
-# authorize a real run yet.
-EXECUTION_IMPLEMENTATION_SHA: str | None = None
-
 
 class InputBindingError(ValueError):
     """Supplied inputs do not bind to the frozen canonical parents; fail closed."""
@@ -304,6 +297,67 @@ def compute_rv24(market_returns_t1_to_t24: Sequence[float | None]) -> float | No
     return mean_sq ** 0.5
 
 
+def compute_forward_rv24(
+    decision_time: datetime,
+    timestamped_closes_by_symbol: Mapping[str, Sequence[tuple[datetime, float | None]]],
+) -> float | None:
+    """Compute the canonical RV24 for exactly the frozen forward window.
+
+    The input is deliberately an ordered sequence of timestamped closes for
+    each exact panel member.  The only accepted shape is
+    ``t, t+1h, ..., t+24h`` where ``t`` is the validated daily decision time.
+    This seam, rather than ``compute_rv24`` directly, is the canonical
+    historical outcome path: it derives the window and all 24 adjacent
+    returns mechanically, so callers cannot substitute an arbitrary return
+    sequence or bridge a temporal gap.
+    """
+    t = validate_decision_time(decision_time)
+    required_timestamps = tuple(t + timedelta(hours=i) for i in range(FORWARD_HOURS + 1))
+    if tuple(timestamped_closes_by_symbol) != PANEL:
+        raise InputBindingError("timestamped close panel does not match the frozen exact ordered 20-member panel")
+
+    market_returns: list[float] = []
+    per_symbol_closes: dict[str, tuple[float, ...]] = {}
+    for symbol in PANEL:
+        rows = timestamped_closes_by_symbol[symbol]
+        if not isinstance(rows, Sequence) or isinstance(rows, (str, bytes)):
+            raise ValueError(f"timestamped closes for {symbol!r} must be an ordered sequence")
+        if len(rows) != len(required_timestamps):
+            raise ValueError(f"timestamped closes for {symbol!r} must contain exactly 25 rows")
+        seen: set[datetime] = set()
+        closes: list[float] = []
+        for index, row in enumerate(rows):
+            if not isinstance(row, (tuple, list)) or len(row) != 2:
+                raise ValueError(f"timestamped close row {index} for {symbol!r} is invalid")
+            raw_timestamp, close = row
+            timestamp = _require_utc(raw_timestamp)
+            if timestamp in seen:
+                raise ValueError(f"duplicate timestamp for {symbol!r}: {timestamp.isoformat()}")
+            seen.add(timestamp)
+            if timestamp != required_timestamps[index]:
+                raise ValueError(
+                    f"timestamped close window for {symbol!r} must be exactly t..t+24 in order; "
+                    f"expected {required_timestamps[index].isoformat()}, got {timestamp.isoformat()}"
+                )
+            if not isinstance(close, (int, float)) or not (close == close) or close in (float("inf"), float("-inf")) or close <= 0:
+                raise ValueError(f"invalid close for {symbol!r} at {timestamp.isoformat()}")
+            closes.append(float(close))
+        if seen != set(required_timestamps):
+            raise ValueError(f"timestamped close window for {symbol!r} does not cover exactly t..t+24")
+        per_symbol_closes[symbol] = tuple(closes)
+
+    for interval in range(FORWARD_HOURS):
+        interval_returns = compute_hourly_asset_returns(
+            {symbol: closes[interval + 1] for symbol, closes in per_symbol_closes.items()},
+            {symbol: closes[interval] for symbol, closes in per_symbol_closes.items()},
+        )
+        market = compute_equal_weight_market_returns([interval_returns])[0]
+        if market is None:
+            return None
+        market_returns.append(market)
+    return compute_rv24(market_returns)
+
+
 # --------------------------------------------------------------------------
 # Primary statistic and (empty) canonical robustness set
 # --------------------------------------------------------------------------
@@ -432,33 +486,36 @@ REQUIRED_EXECUTION_SCOPE = "ONE_FROZEN_HISTORICAL_RUN"
 REQUIRED_OUTCOME_ACCESS_SCOPE = "EXACT_PREREGISTERED_OUTCOMES_ONLY"
 
 
-def authorize_execution(mode: str, authorization: Mapping[str, Any] | None) -> None:
+def authorize_execution(
+    mode: str,
+    authorization: Mapping[str, Any] | None,
+    *,
+    actual_execution_implementation_sha: str | None = None,
+) -> None:
     """Execution authority / outcome access authority gate.
 
     mode == "SYNTHETIC_FIXTURE": always permitted (test/dev only; no
     outcome-producing real data is implied by this mode).
 
     mode == "REAL_HISTORICAL": requires a fully matching authorization
-    artifact. This phase creates no such artifact and does not freeze
-    EXECUTION_IMPLEMENTATION_SHA (module constant is None), so this branch is
-    provably unsatisfiable right now -- any REAL_HISTORICAL request is
-    refused. This preserves execution_authority=NONE and
-    outcome_access_authority=NONE from the canonical parents.
+    artifact and a trusted launcher-supplied identity for the immutable
+    implementation. The executor has no implementation-SHA constant and is
+    therefore unchanged when the final commit SHA is later authorized.
     """
     if mode == "SYNTHETIC_FIXTURE":
         return
     if mode != "REAL_HISTORICAL":
         raise ValueError(f"unknown execution mode: {mode!r}")
-    if EXECUTION_IMPLEMENTATION_SHA is None:
-        raise ExecutionNotAuthorizedError("no EXECUTION_IMPLEMENTATION_SHA has been frozen for this candidate; real execution is refused")
     if authorization is None:
         raise ExecutionNotAuthorizedError("real historical execution requires an execution authorization artifact; none supplied")
+    if not isinstance(actual_execution_implementation_sha, str) or not re.fullmatch(r"[0-9a-f]{40}", actual_execution_implementation_sha):
+        raise ExecutionNotAuthorizedError("real historical execution requires a trusted 40-hex implementation SHA")
     required = {
         "preregistration_merge_sha": PREREGISTRATION_MERGE_SHA,
         "contract_digest": CONTRACT_DIGEST,
         "pit_certification_merge_sha": PIT_CERTIFICATION_MERGE_SHA,
         "pit_certificate_digest": PIT_CERTIFICATE_DIGEST,
-        "execution_implementation_sha": EXECUTION_IMPLEMENTATION_SHA,
+        "execution_implementation_sha": actual_execution_implementation_sha,
         "funding_evidence_set_digest": FUNDING_EVIDENCE_SET_DIGEST,
         "ohlcv_evidence_set_digest": OHLCV_EVIDENCE_SET_DIGEST,
         "execution_scope": REQUIRED_EXECUTION_SCOPE,

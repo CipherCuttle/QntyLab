@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 from datetime import UTC, datetime, timedelta
-from decimal import Decimal
+from decimal import Decimal, ROUND_DOWN, ROUND_UP, getcontext, localcontext
 from fractions import Fraction
 
 import pytest
@@ -56,6 +56,50 @@ def test_funding_fail_closed_for_missing_wrong_symbol_and_duplicate_latest():
 def test_even_20_median_is_deterministic_and_absolute():
     values = {symbol: event(symbol, datetime(2024, 1, 1, tzinfo=UTC), str(index - 10)) for index, symbol in enumerate(v2.PANEL)}
     assert v2.median_abs_funding(values) == Decimal("5")
+
+
+def test_contract_decimal_arithmetic_is_independent_of_ambient_context():
+    original_prec = getcontext().prec
+    original_rounding = getcontext().rounding
+    values = {
+        symbol: event(
+            symbol,
+            datetime(2024, 1, 1, tzinfo=UTC),
+            "0" if index < 9 else "1.7901234" if index == 9 else "1.7901235" if index == 10 else "2",
+        )
+        for index, symbol in enumerate(v2.PANEL)
+    }
+    asset_returns = tuple(
+        {symbol: Decimal("1.234567") if symbol == v2.PANEL[0] else Decimal("0") for symbol in v2.PANEL}
+        for _ in range(24)
+    )
+    primary_rows = (("HIGH", Decimal("1.234567")), ("HIGH", Decimal("2.345678")), ("LOW", Decimal("0.123456")), ("LOW", Decimal("0.234567")))
+
+    def calculate():
+        return (
+            v2.median_abs_funding(values),
+            v2.hourly_asset_returns(
+                [bar("BCHUSDT", datetime(2024, 1, 1, tzinfo=UTC) - timedelta(hours=1) + timedelta(hours=i), str(i + 1)) for i in range(25)],
+                datetime(2024, 1, 1, tzinfo=UTC),
+            )[0],
+            v2.market_returns(asset_returns)[0],
+            v2.rv24(v2.market_returns(asset_returns)),
+            v2.adjudicate_primary(primary_rows)[0],
+        )
+
+    with localcontext() as ambient:
+        ambient.prec = 2
+        ambient.rounding = ROUND_DOWN
+        low_precision = calculate()
+    with localcontext() as ambient:
+        ambient.prec = 7
+        ambient.rounding = ROUND_UP
+        other_precision = calculate()
+
+    assert low_precision == other_precision
+    assert getcontext().prec == original_prec
+    assert getcontext().rounding == original_rounding
+    assert low_precision[0] == Decimal("1.79012345")
 
 
 def test_ecdf_uses_366_inclusive_observations_and_exact_boundaries():

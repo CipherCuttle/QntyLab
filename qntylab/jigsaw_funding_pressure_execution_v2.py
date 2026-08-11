@@ -15,7 +15,8 @@ import subprocess
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
-from decimal import Decimal, InvalidOperation, ROUND_HALF_EVEN, localcontext
+from contextlib import contextmanager
+from decimal import Context, Decimal, InvalidOperation, ROUND_HALF_EVEN, localcontext
 from fractions import Fraction
 from pathlib import Path
 
@@ -33,6 +34,7 @@ FORWARD_HOURS = 24
 HISTORY_OBSERVATIONS = 365
 SQRT_PRECISION = 50
 SQRT_ROUNDING = ROUND_HALF_EVEN
+V2_DECIMAL_CONTEXT = Context(prec=SQRT_PRECISION, rounding=SQRT_ROUNDING)
 V2_CONTRACT_RELATIVE_PATH = "experiments/research/jigsaw_funding_pressure_volatility_v0/execution_enablement_v2_contract.json"
 V2_REQUIRED_ANCESTORS = (
     provenance.PREREG_SHA,
@@ -58,6 +60,13 @@ class ComputationError(V2Error):
 
 class ReleaseBindingError(V2Error):
     pass
+
+
+@contextmanager
+def _v2_decimal_context():
+    """Run contract-visible Decimal arithmetic independently of ambient state."""
+    with localcontext(V2_DECIMAL_CONTEXT):
+        yield
 
 
 def decision_schedule() -> tuple[datetime, ...]:
@@ -98,19 +107,20 @@ def select_latest_eligible_funding(
 def median_abs_funding(events_by_symbol: Mapping[str, foundation.VerifiedFundingEvent]) -> Decimal:
     if tuple(events_by_symbol) != PANEL:
         raise ComputationError("funding input is not the exact ordered 20-member panel")
-    values: list[Decimal] = []
-    for symbol in PANEL:
-        try:
-            event = events_by_symbol[symbol]
-        except KeyError as exc:
-            raise ComputationError(f"missing funding member {symbol}") from exc
-        value = abs(event.funding_rate)
-        if not value.is_finite():
-            raise ComputationError("non-finite funding rate")
-        values.append(value)
-    values.sort()
-    # N=20 is frozen as the arithmetic mean of the two central order statistics.
-    return (values[9] + values[10]) / Decimal(2)
+    with _v2_decimal_context():
+        values: list[Decimal] = []
+        for symbol in PANEL:
+            try:
+                event = events_by_symbol[symbol]
+            except KeyError as exc:
+                raise ComputationError(f"missing funding member {symbol}") from exc
+            value = abs(event.funding_rate)
+            if not value.is_finite():
+                raise ComputationError("non-finite funding rate")
+            values.append(value)
+        values.sort()
+        # N=20 is frozen as the arithmetic mean of the two central order statistics.
+        return (values[9] + values[10]) / Decimal(2)
 
 
 def ecdf_percentile(prior_365: Sequence[Decimal], current: Decimal) -> Fraction:
@@ -152,7 +162,8 @@ def hourly_asset_returns(
         raise ComputationError("missing hourly bar; gap bridging is forbidden") from exc
     if any(not close.is_finite() or close <= 0 for close in closes):
         raise ComputationError("close prices must be finite and positive")
-    return tuple(closes[i + 1] / closes[i] - Decimal(1) for i in range(FORWARD_HOURS))
+    with _v2_decimal_context():
+        return tuple(closes[i + 1] / closes[i] - Decimal(1) for i in range(FORWARD_HOURS))
 
 
 def market_returns(asset_returns_by_symbol: Sequence[Mapping[str, Decimal]]) -> tuple[Decimal, ...]:
@@ -168,7 +179,8 @@ def market_returns(asset_returns_by_symbol: Sequence[Mapping[str, Decimal]]) -> 
             raise ComputationError("missing asset return") from exc
         if any(not value.is_finite() for value in values):
             raise ComputationError("non-finite asset return")
-        result.append(sum(values, Decimal(0)) / Decimal(len(PANEL)))
+        with _v2_decimal_context():
+            result.append(sum(values, Decimal(0)) / Decimal(len(PANEL)))
     return tuple(result)
 
 
@@ -177,10 +189,8 @@ def rv24(market_return_values: Sequence[Decimal]) -> Decimal:
         not value.is_finite() for value in market_return_values
     ):
         raise ComputationError("RV24 requires exactly 24 finite market returns")
-    mean_square = sum((value * value for value in market_return_values), Decimal(0)) / Decimal(FORWARD_HOURS)
-    with localcontext() as context:
-        context.prec = SQRT_PRECISION
-        context.rounding = SQRT_ROUNDING
+    with _v2_decimal_context():
+        mean_square = sum((value * value for value in market_return_values), Decimal(0)) / Decimal(FORWARD_HOURS)
         result = mean_square.sqrt()
     if not result.is_finite():
         raise ComputationError("RV24 square root is non-finite")
@@ -231,7 +241,8 @@ def adjudicate_primary(rows: Sequence[tuple[str, Decimal]]) -> tuple[Decimal | N
     low = [value for state, value in rows if state == "LOW"]
     if not high or not low:
         return None, "BLOCKED_EMPTY_REQUIRED_PRIMARY_BIN"
-    contrast = sum(high, Decimal(0)) / len(high) - sum(low, Decimal(0)) / len(low)
+    with _v2_decimal_context():
+        contrast = sum(high, Decimal(0)) / len(high) - sum(low, Decimal(0)) / len(low)
     return contrast, "POSITIVE_DIRECTIONAL_CONTRAST" if contrast > 0 else "NO_POSITIVE_HIGH_MINUS_LOW_DIRECTIONAL_CONTRAST"
 
 
@@ -266,8 +277,9 @@ def compute_frozen_experiment(bundle: foundation.VerifiedEvidenceBundle) -> Froz
     primary, adjudication = adjudicate_primary([(row.state, row.rv24) for row in rows])
     high = [row.rv24 for row in rows if row.state == "HIGH"]
     low = [row.rv24 for row in rows if row.state == "LOW"]
-    mean_high = sum(high, Decimal(0)) / len(high) if high else None
-    mean_low = sum(low, Decimal(0)) / len(low) if low else None
+    with _v2_decimal_context():
+        mean_high = sum(high, Decimal(0)) / len(high) if high else None
+        mean_low = sum(low, Decimal(0)) / len(low) if low else None
     payload = {
         "experiment_id": EXPERIMENT_ID,
         "schedule_identity": f"{rows[0].timestamp}..{rows[-1].timestamp};00:00:00Z;daily",

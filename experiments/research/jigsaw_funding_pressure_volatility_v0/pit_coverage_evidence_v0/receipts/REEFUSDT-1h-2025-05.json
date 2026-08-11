@@ -1,0 +1,23 @@
+{
+  "InstrumentIdentity": null,
+  "actual_raw_sha256": "730629b92977ced03dfead362fe013097b48d6e4064824964e55ba4d27408e2e",
+  "admitted_bar_count": 744,
+  "archive_filename": "REEFUSDT-1h-2025-05.zip",
+  "archive_member_name": "REEFUSDT-1h-2025-05.csv",
+  "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/REEFUSDT/1h/REEFUSDT-1h-2025-05.zip.CHECKSUM",
+  "first_source_timestamp": "2025-05-01T00:00:00Z",
+  "interval": "1h",
+  "last_source_timestamp": "2025-05-31T23:00:00Z",
+  "month": 5,
+  "published_sha256": "730629b92977ced03dfead362fe013097b48d6e4064824964e55ba4d27408e2e",
+  "raw_row_count": 744,
+  "receipt_digest": "dbae0be729be898e75ab4bc6de0472c7af443566ab41bc7d78cb5c6dcba369dd",
+  "retrieved_at": "2026-08-11T13:56:28.589477Z",
+  "schema_version": "binance-um-monthly-kline-12-v1",
+  "source_family": "data.binance.vision.monthly.klines",
+  "source_key": "data/futures/um/monthly/klines/REEFUSDT/1h/REEFUSDT-1h-2025-05.zip",
+  "status": "MATERIALIZED_VERIFIED",
+  "symbol": "REEFUSDT",
+  "year": 2025,
+  "zip_url": "https://data.binance.vision/data/futures/um/monthly/klines/REEFUSDT/1h/REEFUSDT-1h-2025-05.zip"
+}

@@ -1,0 +1,23 @@
+{
+  "InstrumentIdentity": null,
+  "actual_raw_sha256": "5a92e8b3fd685f4fbded4b517bb9e6a0c8794f9fa39a9033aed40db3fbc6e3f2",
+  "admitted_bar_count": 696,
+  "archive_filename": "API3USDT-1h-2024-02.zip",
+  "archive_member_name": "API3USDT-1h-2024-02.csv",
+  "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/API3USDT/1h/API3USDT-1h-2024-02.zip.CHECKSUM",
+  "first_source_timestamp": "2024-02-01T00:00:00Z",
+  "interval": "1h",
+  "last_source_timestamp": "2024-02-29T23:00:00Z",
+  "month": 2,
+  "published_sha256": "5a92e8b3fd685f4fbded4b517bb9e6a0c8794f9fa39a9033aed40db3fbc6e3f2",
+  "raw_row_count": 696,
+  "receipt_digest": "360b7a3b893e42536731ea9f467fbb3c20d70626b88370dab24a5bf7f66c658f",
+  "retrieved_at": "2026-08-11T13:57:02.867956Z",
+  "schema_version": "binance-um-monthly-kline-12-v1",
+  "source_family": "data.binance.vision.monthly.klines",
+  "source_key": "data/futures/um/monthly/klines/API3USDT/1h/API3USDT-1h-2024-02.zip",
+  "status": "MATERIALIZED_VERIFIED",
+  "symbol": "API3USDT",
+  "year": 2024,
+  "zip_url": "https://data.binance.vision/data/futures/um/monthly/klines/API3USDT/1h/API3USDT-1h-2024-02.zip"
+}

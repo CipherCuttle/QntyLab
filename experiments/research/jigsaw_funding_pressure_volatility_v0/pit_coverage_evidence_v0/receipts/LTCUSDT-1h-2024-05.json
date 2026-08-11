@@ -1,0 +1,23 @@
+{
+  "InstrumentIdentity": null,
+  "actual_raw_sha256": "465d7ea420a2eede39a2fc7113fb1567f3386214a7cc88b62a49ba720b7290a3",
+  "admitted_bar_count": 744,
+  "archive_filename": "LTCUSDT-1h-2024-05.zip",
+  "archive_member_name": "LTCUSDT-1h-2024-05.csv",
+  "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/LTCUSDT/1h/LTCUSDT-1h-2024-05.zip.CHECKSUM",
+  "first_source_timestamp": "2024-05-01T00:00:00Z",
+  "interval": "1h",
+  "last_source_timestamp": "2024-05-31T23:00:00Z",
+  "month": 5,
+  "published_sha256": "465d7ea420a2eede39a2fc7113fb1567f3386214a7cc88b62a49ba720b7290a3",
+  "raw_row_count": 744,
+  "receipt_digest": "0521bbd16d784b34577efc4580e7bcf2a12ce35faca376a2c2a147aed28c6f65",
+  "retrieved_at": "2026-08-11T13:55:51.140599Z",
+  "schema_version": "binance-um-monthly-kline-12-v1",
+  "source_family": "data.binance.vision.monthly.klines",
+  "source_key": "data/futures/um/monthly/klines/LTCUSDT/1h/LTCUSDT-1h-2024-05.zip",
+  "status": "MATERIALIZED_VERIFIED",
+  "symbol": "LTCUSDT",
+  "year": 2024,
+  "zip_url": "https://data.binance.vision/data/futures/um/monthly/klines/LTCUSDT/1h/LTCUSDT-1h-2024-05.zip"
+}

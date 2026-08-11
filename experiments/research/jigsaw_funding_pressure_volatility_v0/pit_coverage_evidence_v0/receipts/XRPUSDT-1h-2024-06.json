@@ -1,0 +1,23 @@
+{
+  "InstrumentIdentity": null,
+  "actual_raw_sha256": "14c80125d770c6a55fa4f16c2bc7c8f41d9b9508ee876de5974560e14095828c",
+  "admitted_bar_count": 720,
+  "archive_filename": "XRPUSDT-1h-2024-06.zip",
+  "archive_member_name": "XRPUSDT-1h-2024-06.csv",
+  "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/XRPUSDT/1h/XRPUSDT-1h-2024-06.zip.CHECKSUM",
+  "first_source_timestamp": "2024-06-01T00:00:00Z",
+  "interval": "1h",
+  "last_source_timestamp": "2024-06-30T23:00:00Z",
+  "month": 6,
+  "published_sha256": "14c80125d770c6a55fa4f16c2bc7c8f41d9b9508ee876de5974560e14095828c",
+  "raw_row_count": 720,
+  "receipt_digest": "28214c87660a9b8d42b46ebfec18372d96a6ccc7c3473d8fc2388aff11d01edc",
+  "retrieved_at": "2026-08-11T13:55:51.139381Z",
+  "schema_version": "binance-um-monthly-kline-12-v1",
+  "source_family": "data.binance.vision.monthly.klines",
+  "source_key": "data/futures/um/monthly/klines/XRPUSDT/1h/XRPUSDT-1h-2024-06.zip",
+  "status": "MATERIALIZED_VERIFIED",
+  "symbol": "XRPUSDT",
+  "year": 2024,
+  "zip_url": "https://data.binance.vision/data/futures/um/monthly/klines/XRPUSDT/1h/XRPUSDT-1h-2024-06.zip"
+}

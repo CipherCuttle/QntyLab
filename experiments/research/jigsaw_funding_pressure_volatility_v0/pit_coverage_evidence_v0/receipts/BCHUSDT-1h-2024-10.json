@@ -1,0 +1,23 @@
+{
+  "InstrumentIdentity": null,
+  "actual_raw_sha256": "7be2ff77ca70b4bba7a935ad224c515b891c715f8f0322b8b7e7116757e3d1dc",
+  "admitted_bar_count": 744,
+  "archive_filename": "BCHUSDT-1h-2024-10.zip",
+  "archive_member_name": "BCHUSDT-1h-2024-10.csv",
+  "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BCHUSDT/1h/BCHUSDT-1h-2024-10.zip.CHECKSUM",
+  "first_source_timestamp": "2024-10-01T00:00:00Z",
+  "interval": "1h",
+  "last_source_timestamp": "2024-10-31T23:00:00Z",
+  "month": 10,
+  "published_sha256": "7be2ff77ca70b4bba7a935ad224c515b891c715f8f0322b8b7e7116757e3d1dc",
+  "raw_row_count": 744,
+  "receipt_digest": "b84dd8d68b0c185ee60174b5ad4d306b2c6dc49537eaff13d55f97a1769b37a8",
+  "retrieved_at": "2026-08-11T13:55:51.139066Z",
+  "schema_version": "binance-um-monthly-kline-12-v1",
+  "source_family": "data.binance.vision.monthly.klines",
+  "source_key": "data/futures/um/monthly/klines/BCHUSDT/1h/BCHUSDT-1h-2024-10.zip",
+  "status": "MATERIALIZED_VERIFIED",
+  "symbol": "BCHUSDT",
+  "year": 2024,
+  "zip_url": "https://data.binance.vision/data/futures/um/monthly/klines/BCHUSDT/1h/BCHUSDT-1h-2024-10.zip"
+}

@@ -1,0 +1,23 @@
+{
+  "InstrumentIdentity": null,
+  "actual_raw_sha256": "0e3b46198f66c8d33822edce80d355e74fc709583de890636328030e80d4fc9e",
+  "admitted_bar_count": 744,
+  "archive_filename": "XLMUSDT-1h-2024-03.zip",
+  "archive_member_name": "XLMUSDT-1h-2024-03.csv",
+  "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/XLMUSDT/1h/XLMUSDT-1h-2024-03.zip.CHECKSUM",
+  "first_source_timestamp": "2024-03-01T00:00:00Z",
+  "interval": "1h",
+  "last_source_timestamp": "2024-03-31T23:00:00Z",
+  "month": 3,
+  "published_sha256": "0e3b46198f66c8d33822edce80d355e74fc709583de890636328030e80d4fc9e",
+  "raw_row_count": 744,
+  "receipt_digest": "f2e6abbb18c9438d1f50f86df6a3745077e3d76b416dd8a6cd74a88446966b9a",
+  "retrieved_at": "2026-08-11T13:56:26.355280Z",
+  "schema_version": "binance-um-monthly-kline-12-v1",
+  "source_family": "data.binance.vision.monthly.klines",
+  "source_key": "data/futures/um/monthly/klines/XLMUSDT/1h/XLMUSDT-1h-2024-03.zip",
+  "status": "MATERIALIZED_VERIFIED",
+  "symbol": "XLMUSDT",
+  "year": 2024,
+  "zip_url": "https://data.binance.vision/data/futures/um/monthly/klines/XLMUSDT/1h/XLMUSDT-1h-2024-03.zip"
+}

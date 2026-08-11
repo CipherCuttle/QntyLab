@@ -1,0 +1,23 @@
+{
+  "InstrumentIdentity": null,
+  "actual_raw_sha256": "1cbe649d0f91846bbcc1f3563f8179bf875e01b8b6b2bb074c3594234b13fc8a",
+  "admitted_bar_count": 744,
+  "archive_filename": "LINKUSDT-1h-2025-03.zip",
+  "archive_member_name": "LINKUSDT-1h-2025-03.csv",
+  "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/LINKUSDT/1h/LINKUSDT-1h-2025-03.zip.CHECKSUM",
+  "first_source_timestamp": "2025-03-01T00:00:00Z",
+  "interval": "1h",
+  "last_source_timestamp": "2025-03-31T23:00:00Z",
+  "month": 3,
+  "published_sha256": "1cbe649d0f91846bbcc1f3563f8179bf875e01b8b6b2bb074c3594234b13fc8a",
+  "raw_row_count": 744,
+  "receipt_digest": "b1d14abb28a8f8cbe951714e48816c9658490c21ac66be177355ddad1bd8d6b5",
+  "retrieved_at": "2026-08-11T13:56:24.543059Z",
+  "schema_version": "binance-um-monthly-kline-12-v1",
+  "source_family": "data.binance.vision.monthly.klines",
+  "source_key": "data/futures/um/monthly/klines/LINKUSDT/1h/LINKUSDT-1h-2025-03.zip",
+  "status": "MATERIALIZED_VERIFIED",
+  "symbol": "LINKUSDT",
+  "year": 2025,
+  "zip_url": "https://data.binance.vision/data/futures/um/monthly/klines/LINKUSDT/1h/LINKUSDT-1h-2025-03.zip"
+}

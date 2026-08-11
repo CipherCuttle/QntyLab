@@ -1,0 +1,23 @@
+{
+  "InstrumentIdentity": null,
+  "actual_raw_sha256": "8a5c2fa9bd981b1f51455b1c4d9ff49c325d5de499c3aded9f0ce6d2ee21e7f3",
+  "admitted_bar_count": 744,
+  "archive_filename": "APEUSDT-1h-2023-12.zip",
+  "archive_member_name": "APEUSDT-1h-2023-12.csv",
+  "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/APEUSDT/1h/APEUSDT-1h-2023-12.zip.CHECKSUM",
+  "first_source_timestamp": "2023-12-01T00:00:00Z",
+  "interval": "1h",
+  "last_source_timestamp": "2023-12-31T23:00:00Z",
+  "month": 12,
+  "published_sha256": "8a5c2fa9bd981b1f51455b1c4d9ff49c325d5de499c3aded9f0ce6d2ee21e7f3",
+  "raw_row_count": 744,
+  "receipt_digest": "f824580a8ed3b83aa214073e37a365fe7260efe172ca8c2cd1bdb02944a67319",
+  "retrieved_at": "2026-08-11T13:57:34.885581Z",
+  "schema_version": "binance-um-monthly-kline-12-v1",
+  "source_family": "data.binance.vision.monthly.klines",
+  "source_key": "data/futures/um/monthly/klines/APEUSDT/1h/APEUSDT-1h-2023-12.zip",
+  "status": "MATERIALIZED_VERIFIED",
+  "symbol": "APEUSDT",
+  "year": 2023,
+  "zip_url": "https://data.binance.vision/data/futures/um/monthly/klines/APEUSDT/1h/APEUSDT-1h-2023-12.zip"
+}

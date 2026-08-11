@@ -1,0 +1,23 @@
+{
+  "InstrumentIdentity": null,
+  "actual_raw_sha256": "b26b985348e31806fbb9ee3b150444246cc36939256b3b445eb8633ab2b8b50c",
+  "admitted_bar_count": 744,
+  "archive_filename": "ONEUSDT-1h-2025-05.zip",
+  "archive_member_name": "ONEUSDT-1h-2025-05.csv",
+  "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/ONEUSDT/1h/ONEUSDT-1h-2025-05.zip.CHECKSUM",
+  "first_source_timestamp": "2025-05-01T00:00:00Z",
+  "interval": "1h",
+  "last_source_timestamp": "2025-05-31T23:00:00Z",
+  "month": 5,
+  "published_sha256": "b26b985348e31806fbb9ee3b150444246cc36939256b3b445eb8633ab2b8b50c",
+  "raw_row_count": 744,
+  "receipt_digest": "73fb43ad00583f5bef8a05cef163656a9f1e87728ab50ceadab09b417e6f6ccb",
+  "retrieved_at": "2026-08-11T13:57:02.225520Z",
+  "schema_version": "binance-um-monthly-kline-12-v1",
+  "source_family": "data.binance.vision.monthly.klines",
+  "source_key": "data/futures/um/monthly/klines/ONEUSDT/1h/ONEUSDT-1h-2025-05.zip",
+  "status": "MATERIALIZED_VERIFIED",
+  "symbol": "ONEUSDT",
+  "year": 2025,
+  "zip_url": "https://data.binance.vision/data/futures/um/monthly/klines/ONEUSDT/1h/ONEUSDT-1h-2025-05.zip"
+}

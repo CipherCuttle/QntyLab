@@ -1,0 +1,23 @@
+{
+  "InstrumentIdentity": null,
+  "actual_raw_sha256": "5d5357e4db2bc115036569a5cd4d18ebb67278c9bd8215cf5dcb6ac85f8a4e47",
+  "admitted_bar_count": 744,
+  "archive_filename": "INJUSDT-1h-2024-10.zip",
+  "archive_member_name": "INJUSDT-1h-2024-10.csv",
+  "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/INJUSDT/1h/INJUSDT-1h-2024-10.zip.CHECKSUM",
+  "first_source_timestamp": "2024-10-01T00:00:00Z",
+  "interval": "1h",
+  "last_source_timestamp": "2024-10-31T23:00:00Z",
+  "month": 10,
+  "published_sha256": "5d5357e4db2bc115036569a5cd4d18ebb67278c9bd8215cf5dcb6ac85f8a4e47",
+  "raw_row_count": 744,
+  "receipt_digest": "6bdb7d7c4f8357a7c2be060b417b7159da8fce2b6548f979957534419eb3ed4a",
+  "retrieved_at": "2026-08-11T13:57:37.903413Z",
+  "schema_version": "binance-um-monthly-kline-12-v1",
+  "source_family": "data.binance.vision.monthly.klines",
+  "source_key": "data/futures/um/monthly/klines/INJUSDT/1h/INJUSDT-1h-2024-10.zip",
+  "status": "MATERIALIZED_VERIFIED",
+  "symbol": "INJUSDT",
+  "year": 2024,
+  "zip_url": "https://data.binance.vision/data/futures/um/monthly/klines/INJUSDT/1h/INJUSDT-1h-2024-10.zip"
+}

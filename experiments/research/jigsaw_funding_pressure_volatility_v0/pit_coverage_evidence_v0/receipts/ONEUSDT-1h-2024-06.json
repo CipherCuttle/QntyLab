@@ -1,0 +1,23 @@
+{
+  "InstrumentIdentity": null,
+  "actual_raw_sha256": "11582ffdd13f299652c710e0de363234323abddf9da705f6a98c1cafa6b99dc5",
+  "admitted_bar_count": 720,
+  "archive_filename": "ONEUSDT-1h-2024-06.zip",
+  "archive_member_name": "ONEUSDT-1h-2024-06.csv",
+  "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/ONEUSDT/1h/ONEUSDT-1h-2024-06.zip.CHECKSUM",
+  "first_source_timestamp": "2024-06-01T00:00:00Z",
+  "interval": "1h",
+  "last_source_timestamp": "2024-06-30T23:00:00Z",
+  "month": 6,
+  "published_sha256": "11582ffdd13f299652c710e0de363234323abddf9da705f6a98c1cafa6b99dc5",
+  "raw_row_count": 720,
+  "receipt_digest": "ae7725e770a4195b2a525747c2ea8041faa015f08438ba5eb87afd5a70c3696e",
+  "retrieved_at": "2026-08-11T13:57:02.225520Z",
+  "schema_version": "binance-um-monthly-kline-12-v1",
+  "source_family": "data.binance.vision.monthly.klines",
+  "source_key": "data/futures/um/monthly/klines/ONEUSDT/1h/ONEUSDT-1h-2024-06.zip",
+  "status": "MATERIALIZED_VERIFIED",
+  "symbol": "ONEUSDT",
+  "year": 2024,
+  "zip_url": "https://data.binance.vision/data/futures/um/monthly/klines/ONEUSDT/1h/ONEUSDT-1h-2024-06.zip"
+}

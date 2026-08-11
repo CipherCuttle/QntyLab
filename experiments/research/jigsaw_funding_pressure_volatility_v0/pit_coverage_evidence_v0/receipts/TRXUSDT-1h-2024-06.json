@@ -1,0 +1,23 @@
+{
+  "InstrumentIdentity": null,
+  "actual_raw_sha256": "f039b7edf3292493c93ecb544d191ea8412eac23fd5b3ca54cc9c838c2fa367d",
+  "admitted_bar_count": 720,
+  "archive_filename": "TRXUSDT-1h-2024-06.zip",
+  "archive_member_name": "TRXUSDT-1h-2024-06.csv",
+  "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/TRXUSDT/1h/TRXUSDT-1h-2024-06.zip.CHECKSUM",
+  "first_source_timestamp": "2024-06-01T00:00:00Z",
+  "interval": "1h",
+  "last_source_timestamp": "2024-06-30T23:00:00Z",
+  "month": 6,
+  "published_sha256": "f039b7edf3292493c93ecb544d191ea8412eac23fd5b3ca54cc9c838c2fa367d",
+  "raw_row_count": 720,
+  "receipt_digest": "e014190a1d7eab07675bbb1825b5647999dd629f6802d5e22ba752c571dedbfa",
+  "retrieved_at": "2026-08-11T13:55:51.141314Z",
+  "schema_version": "binance-um-monthly-kline-12-v1",
+  "source_family": "data.binance.vision.monthly.klines",
+  "source_key": "data/futures/um/monthly/klines/TRXUSDT/1h/TRXUSDT-1h-2024-06.zip",
+  "status": "MATERIALIZED_VERIFIED",
+  "symbol": "TRXUSDT",
+  "year": 2024,
+  "zip_url": "https://data.binance.vision/data/futures/um/monthly/klines/TRXUSDT/1h/TRXUSDT-1h-2024-06.zip"
+}

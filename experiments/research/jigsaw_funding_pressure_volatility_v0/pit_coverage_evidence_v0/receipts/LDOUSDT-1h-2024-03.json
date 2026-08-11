@@ -1,0 +1,23 @@
+{
+  "InstrumentIdentity": null,
+  "actual_raw_sha256": "ecd983ed5effa5c220e66fb7c376c9f5fd5066eefae0b825121baa54e205e902",
+  "admitted_bar_count": 744,
+  "archive_filename": "LDOUSDT-1h-2024-03.zip",
+  "archive_member_name": "LDOUSDT-1h-2024-03.csv",
+  "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/LDOUSDT/1h/LDOUSDT-1h-2024-03.zip.CHECKSUM",
+  "first_source_timestamp": "2024-03-01T00:00:00Z",
+  "interval": "1h",
+  "last_source_timestamp": "2024-03-31T23:00:00Z",
+  "month": 3,
+  "published_sha256": "ecd983ed5effa5c220e66fb7c376c9f5fd5066eefae0b825121baa54e205e902",
+  "raw_row_count": 744,
+  "receipt_digest": "8f5f398f2184b1395592c6420fa8171e1781fda85ee0ab97b302401c0bacae5f",
+  "retrieved_at": "2026-08-11T13:57:39.083606Z",
+  "schema_version": "binance-um-monthly-kline-12-v1",
+  "source_family": "data.binance.vision.monthly.klines",
+  "source_key": "data/futures/um/monthly/klines/LDOUSDT/1h/LDOUSDT-1h-2024-03.zip",
+  "status": "MATERIALIZED_VERIFIED",
+  "symbol": "LDOUSDT",
+  "year": 2024,
+  "zip_url": "https://data.binance.vision/data/futures/um/monthly/klines/LDOUSDT/1h/LDOUSDT-1h-2024-03.zip"
+}

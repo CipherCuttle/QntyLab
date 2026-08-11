@@ -1,0 +1,23 @@
+{
+  "InstrumentIdentity": null,
+  "actual_raw_sha256": "2641d238159bcf593a2999bd48e6fb29ea293585aba9c775f66256b35b01057b",
+  "admitted_bar_count": 744,
+  "archive_filename": "ALICEUSDT-1h-2024-07.zip",
+  "archive_member_name": "ALICEUSDT-1h-2024-07.csv",
+  "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/ALICEUSDT/1h/ALICEUSDT-1h-2024-07.zip.CHECKSUM",
+  "first_source_timestamp": "2024-07-01T00:00:00Z",
+  "interval": "1h",
+  "last_source_timestamp": "2024-07-31T23:00:00Z",
+  "month": 7,
+  "published_sha256": "2641d238159bcf593a2999bd48e6fb29ea293585aba9c775f66256b35b01057b",
+  "raw_row_count": 744,
+  "receipt_digest": "e0577acaf2ef909abbd8afc231fc486dd833bbd37166088690827dd6cd4ccd4a",
+  "retrieved_at": "2026-08-11T13:57:02.095634Z",
+  "schema_version": "binance-um-monthly-kline-12-v1",
+  "source_family": "data.binance.vision.monthly.klines",
+  "source_key": "data/futures/um/monthly/klines/ALICEUSDT/1h/ALICEUSDT-1h-2024-07.zip",
+  "status": "MATERIALIZED_VERIFIED",
+  "symbol": "ALICEUSDT",
+  "year": 2024,
+  "zip_url": "https://data.binance.vision/data/futures/um/monthly/klines/ALICEUSDT/1h/ALICEUSDT-1h-2024-07.zip"
+}

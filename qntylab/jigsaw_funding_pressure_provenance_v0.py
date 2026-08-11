@@ -98,11 +98,26 @@ def verify_self_digest(payload: dict, field: str) -> None:
         raise AssertionError(f"{field}: expected {expected}, got {actual}")
 
 
-def verify_git_ancestry(commit: str) -> None:
-    if not (ROOT / ".git").exists():
-        return
-    for ancestor in (PREREG_SHA, PIT_V1_SHA):
-        result = subprocess.run(["git", "merge-base", "--is-ancestor", ancestor, commit], cwd=ROOT)
+def verify_git_ancestry(
+    commit: str,
+    root: Path = ROOT,
+    ancestors: tuple[str, ...] = (PREREG_SHA, PIT_V1_SHA),
+    git_runner=subprocess.run,
+) -> None:
+    """Fail closed: Git ancestry MUST be authenticated, never silently skipped.
+
+    A worktree checkout has ``.git`` as a *file* pointing at the real gitdir,
+    a regular checkout has it as a directory; ``Path.exists()`` covers both.
+    Anything else (bare tarball, no metadata at all) is not a usable runtime
+    checkout and must not be treated as equivalent to one.
+    """
+    if not (root / ".git").exists():
+        raise AssertionError(f"no usable Git metadata at {root}: refusing to skip ancestry verification")
+    for ancestor in ancestors:
+        try:
+            result = git_runner(["git", "merge-base", "--is-ancestor", ancestor, commit], cwd=root)
+        except OSError as exc:
+            raise AssertionError(f"git command unavailable while verifying ancestor {ancestor}: {exc}") from exc
         if result.returncode:
             raise AssertionError(f"{ancestor} is not an ancestor of {commit}")
 

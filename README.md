@@ -1,8 +1,16 @@
 # QntyLab
 
-**EXPLORATORY ONLY · NON_AUTHORITATIVE · NO SCIENTIFIC VALIDATION · NO HOLDOUT · NO PAPER/LIVE AUTHORITY · NO TRADING EXECUTION**
+**EXPLORATORY ONLY · NON-AUTHORITATIVE · EVIDENCE-PRODUCING · NO DIRECT TRADING/EXECUTION AUTHORITY**
 
-QntyLab is a standalone, public-data strategy scratchpad. It is not part of QNTY and has no connection to QNTY control state, continuity, scientific authorization, holdout, shadow, paper, or live status. It has no broker/exchange execution code and uses no credentials.
+QntyLab is a standalone, public-data exploratory research laboratory. It is
+separate from Qnty, accumulates provenance-linked Jigsaw evidence, and has no
+direct trading or execution authority. Its current global north-star
+architecture is [ADR 0005](docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md);
+that architecture does not authorize implementation of every described layer.
+
+Individual preregistered research contracts may define a sealed holdout,
+temporal evaluation, or prospective shadow boundary when appropriate. Such a
+boundary remains specific to that contract and does not grant Qnty authority.
 
 It downloads public Binance Spot OHLCV into `data/raw/` (ignored by Git), records per-file manifests, and evaluates fixed, pre-registered price-only strategy variants. The engine computes a signal with data through close *t*, applies it from bar *t+1*, and charges costs on absolute position changes. Results are exploratory diagnostics, never trading advice or validation.
 

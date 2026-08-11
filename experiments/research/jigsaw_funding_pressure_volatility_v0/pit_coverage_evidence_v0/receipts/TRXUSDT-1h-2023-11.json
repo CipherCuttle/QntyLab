@@ -1,0 +1,23 @@
+{
+  "InstrumentIdentity": null,
+  "actual_raw_sha256": "bd83150a3b6fcc0cf418af9a9af67540de96f58560796d6066d4384cc3f8b8f2",
+  "admitted_bar_count": 720,
+  "archive_filename": "TRXUSDT-1h-2023-11.zip",
+  "archive_member_name": "TRXUSDT-1h-2023-11.csv",
+  "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/TRXUSDT/1h/TRXUSDT-1h-2023-11.zip.CHECKSUM",
+  "first_source_timestamp": "2023-11-01T00:00:00Z",
+  "interval": "1h",
+  "last_source_timestamp": "2023-11-30T23:00:00Z",
+  "month": 11,
+  "published_sha256": "bd83150a3b6fcc0cf418af9a9af67540de96f58560796d6066d4384cc3f8b8f2",
+  "raw_row_count": 720,
+  "receipt_digest": "75558e71fa2d266b7652ea114d382114889848c43116bb5ec7819122b9aaf176",
+  "retrieved_at": "2026-08-11T13:55:51.141314Z",
+  "schema_version": "binance-um-monthly-kline-12-v1",
+  "source_family": "data.binance.vision.monthly.klines",
+  "source_key": "data/futures/um/monthly/klines/TRXUSDT/1h/TRXUSDT-1h-2023-11.zip",
+  "status": "MATERIALIZED_VERIFIED",
+  "symbol": "TRXUSDT",
+  "year": 2023,
+  "zip_url": "https://data.binance.vision/data/futures/um/monthly/klines/TRXUSDT/1h/TRXUSDT-1h-2023-11.zip"
+}

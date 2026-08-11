@@ -1,0 +1,29 @@
+{
+  "schema_version": "jigsaw-execution-git-provenance-contract-v0",
+  "phase": "JIGSAW_FUNDING_PRESSURE_VOLATILITY_PROVENANCE_BASELINE_V0",
+  "preregistration_merge_sha": "98e9dbcbec5dab18f7498cf4c5df77e14a8d5569",
+  "pit_v1_merge_sha": "3e54cb86cdc43c76c1cbf72acc4dfebecb6b10fa",
+  "reviewed_executor_candidate_sha": null,
+  "canonical_runtime_merge_sha": null,
+  "runtime_head_sha": null,
+  "receipt_execution_sha": null,
+  "future_invariants": {
+    "preregistration_merge_sha_ancestor_of_canonical_runtime_merge_sha": true,
+    "pit_v1_merge_sha_ancestor_of_canonical_runtime_merge_sha": true,
+    "reviewed_executor_candidate_sha_ancestor_of_canonical_runtime_merge_sha": true,
+    "runtime_head_sha_equals_canonical_runtime_merge_sha": true,
+    "receipt_execution_sha_equals_runtime_head_sha": true
+  },
+  "future_runtime_preflight_requirements": [
+    "repository_root_verified",
+    "expected_module_path_verified",
+    "clean_worktree_required",
+    "pinned_ancestors_verified"
+  ],
+  "future_authorization_bindings": [
+    "provenance_baseline_digest",
+    "funding_history_coverage_digest",
+    "execution_git_provenance_contract_digest"
+  ],
+  "execution_git_provenance_contract_digest": "sha256:f5ac2b6c5158628a00a659043acc5a7e8c150b670a94693f1f2ede3f7528c7a1"
+}

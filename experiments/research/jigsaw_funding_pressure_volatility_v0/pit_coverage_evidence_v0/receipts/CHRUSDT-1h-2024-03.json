@@ -1,0 +1,23 @@
+{
+  "InstrumentIdentity": null,
+  "actual_raw_sha256": "a7ec968932251f729689451685d6f8b99597721d5083fcb202c243a2b343b06c",
+  "admitted_bar_count": 744,
+  "archive_filename": "CHRUSDT-1h-2024-03.zip",
+  "archive_member_name": "CHRUSDT-1h-2024-03.csv",
+  "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/CHRUSDT/1h/CHRUSDT-1h-2024-03.zip.CHECKSUM",
+  "first_source_timestamp": "2024-03-01T00:00:00Z",
+  "interval": "1h",
+  "last_source_timestamp": "2024-03-31T23:00:00Z",
+  "month": 3,
+  "published_sha256": "a7ec968932251f729689451685d6f8b99597721d5083fcb202c243a2b343b06c",
+  "raw_row_count": 744,
+  "receipt_digest": "3889745c6cade14a521a32b9d7d6d7af6d8796c60eb0a1bb7bbe8c9298eb3e9f",
+  "retrieved_at": "2026-08-11T13:56:59.436078Z",
+  "schema_version": "binance-um-monthly-kline-12-v1",
+  "source_family": "data.binance.vision.monthly.klines",
+  "source_key": "data/futures/um/monthly/klines/CHRUSDT/1h/CHRUSDT-1h-2024-03.zip",
+  "status": "MATERIALIZED_VERIFIED",
+  "symbol": "CHRUSDT",
+  "year": 2024,
+  "zip_url": "https://data.binance.vision/data/futures/um/monthly/klines/CHRUSDT/1h/CHRUSDT-1h-2024-03.zip"
+}

@@ -1,0 +1,23 @@
+{
+  "InstrumentIdentity": null,
+  "actual_raw_sha256": "6c6b3022e6b29b48fa4d6231d1de7200e86a7542c4bb3cb9bb2e207eba441b12",
+  "admitted_bar_count": 720,
+  "archive_filename": "APTUSDT-1h-2024-06.zip",
+  "archive_member_name": "APTUSDT-1h-2024-06.csv",
+  "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/APTUSDT/1h/APTUSDT-1h-2024-06.zip.CHECKSUM",
+  "first_source_timestamp": "2024-06-01T00:00:00Z",
+  "interval": "1h",
+  "last_source_timestamp": "2024-06-30T23:00:00Z",
+  "month": 6,
+  "published_sha256": "6c6b3022e6b29b48fa4d6231d1de7200e86a7542c4bb3cb9bb2e207eba441b12",
+  "raw_row_count": 720,
+  "receipt_digest": "3c88b4a23cc797775609870f4dbe31d384845b859801e5759980dba61664f94e",
+  "retrieved_at": "2026-08-11T13:57:40.677401Z",
+  "schema_version": "binance-um-monthly-kline-12-v1",
+  "source_family": "data.binance.vision.monthly.klines",
+  "source_key": "data/futures/um/monthly/klines/APTUSDT/1h/APTUSDT-1h-2024-06.zip",
+  "status": "MATERIALIZED_VERIFIED",
+  "symbol": "APTUSDT",
+  "year": 2024,
+  "zip_url": "https://data.binance.vision/data/futures/um/monthly/klines/APTUSDT/1h/APTUSDT-1h-2024-06.zip"
+}

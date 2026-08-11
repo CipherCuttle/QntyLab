@@ -1,0 +1,23 @@
+{
+  "InstrumentIdentity": null,
+  "actual_raw_sha256": "d376f2018ab8c3effe51d5a4b0b7be25600c8a2a5f265fa0129d6a7845cd8021",
+  "admitted_bar_count": 720,
+  "archive_filename": "GMTUSDT-1h-2025-06.zip",
+  "archive_member_name": "GMTUSDT-1h-2025-06.csv",
+  "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/GMTUSDT/1h/GMTUSDT-1h-2025-06.zip.CHECKSUM",
+  "first_source_timestamp": "2025-06-01T00:00:00Z",
+  "interval": "1h",
+  "last_source_timestamp": "2025-06-30T23:00:00Z",
+  "month": 6,
+  "published_sha256": "d376f2018ab8c3effe51d5a4b0b7be25600c8a2a5f265fa0129d6a7845cd8021",
+  "raw_row_count": 720,
+  "receipt_digest": "a68f1a9eca42b45bd6a100d79e77d368fe494f761bfac08fc693b4372ca093b1",
+  "retrieved_at": "2026-08-11T13:57:04.790345Z",
+  "schema_version": "binance-um-monthly-kline-12-v1",
+  "source_family": "data.binance.vision.monthly.klines",
+  "source_key": "data/futures/um/monthly/klines/GMTUSDT/1h/GMTUSDT-1h-2025-06.zip",
+  "status": "MATERIALIZED_VERIFIED",
+  "symbol": "GMTUSDT",
+  "year": 2025,
+  "zip_url": "https://data.binance.vision/data/futures/um/monthly/klines/GMTUSDT/1h/GMTUSDT-1h-2025-06.zip"
+}

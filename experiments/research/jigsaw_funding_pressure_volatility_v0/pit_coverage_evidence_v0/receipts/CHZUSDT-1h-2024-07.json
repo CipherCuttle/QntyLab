@@ -1,0 +1,23 @@
+{
+  "InstrumentIdentity": null,
+  "actual_raw_sha256": "c5363579627a299ed77a54becf327b0a4092b05782972cac2f6884dfac30bed2",
+  "admitted_bar_count": 744,
+  "archive_filename": "CHZUSDT-1h-2024-07.zip",
+  "archive_member_name": "CHZUSDT-1h-2024-07.csv",
+  "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/CHZUSDT/1h/CHZUSDT-1h-2024-07.zip.CHECKSUM",
+  "first_source_timestamp": "2024-07-01T00:00:00Z",
+  "interval": "1h",
+  "last_source_timestamp": "2024-07-31T23:00:00Z",
+  "month": 7,
+  "published_sha256": "c5363579627a299ed77a54becf327b0a4092b05782972cac2f6884dfac30bed2",
+  "raw_row_count": 744,
+  "receipt_digest": "b74406a1be1b956f88b92317a9020e7164175899a194bbeef879736ae0814ff7",
+  "retrieved_at": "2026-08-11T13:56:28.129193Z",
+  "schema_version": "binance-um-monthly-kline-12-v1",
+  "source_family": "data.binance.vision.monthly.klines",
+  "source_key": "data/futures/um/monthly/klines/CHZUSDT/1h/CHZUSDT-1h-2024-07.zip",
+  "status": "MATERIALIZED_VERIFIED",
+  "symbol": "CHZUSDT",
+  "year": 2024,
+  "zip_url": "https://data.binance.vision/data/futures/um/monthly/klines/CHZUSDT/1h/CHZUSDT-1h-2024-07.zip"
+}

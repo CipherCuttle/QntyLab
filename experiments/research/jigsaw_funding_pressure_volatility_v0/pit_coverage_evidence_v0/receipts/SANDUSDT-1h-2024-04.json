@@ -1,0 +1,23 @@
+{
+  "InstrumentIdentity": null,
+  "actual_raw_sha256": "01c77382b878592a383f7e62411f122c676f6efd02c8d93c605985f3c65a788a",
+  "admitted_bar_count": 720,
+  "archive_filename": "SANDUSDT-1h-2024-04.zip",
+  "archive_member_name": "SANDUSDT-1h-2024-04.csv",
+  "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/SANDUSDT/1h/SANDUSDT-1h-2024-04.zip.CHECKSUM",
+  "first_source_timestamp": "2024-04-01T00:00:00Z",
+  "interval": "1h",
+  "last_source_timestamp": "2024-04-30T23:00:00Z",
+  "month": 4,
+  "published_sha256": "01c77382b878592a383f7e62411f122c676f6efd02c8d93c605985f3c65a788a",
+  "raw_row_count": 720,
+  "receipt_digest": "3a6c768cf514a8c6e9c7d4fc30620dcc255507e4fc019b04e2dee71e79372c49",
+  "retrieved_at": "2026-08-11T13:56:28.256084Z",
+  "schema_version": "binance-um-monthly-kline-12-v1",
+  "source_family": "data.binance.vision.monthly.klines",
+  "source_key": "data/futures/um/monthly/klines/SANDUSDT/1h/SANDUSDT-1h-2024-04.zip",
+  "status": "MATERIALIZED_VERIFIED",
+  "symbol": "SANDUSDT",
+  "year": 2024,
+  "zip_url": "https://data.binance.vision/data/futures/um/monthly/klines/SANDUSDT/1h/SANDUSDT-1h-2024-04.zip"
+}

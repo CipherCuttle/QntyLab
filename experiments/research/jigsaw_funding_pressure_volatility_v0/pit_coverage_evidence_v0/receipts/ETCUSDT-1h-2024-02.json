@@ -1,0 +1,23 @@
+{
+  "InstrumentIdentity": null,
+  "actual_raw_sha256": "736bdb2b4558ca22114b9cbca951239c83bdd85d6cd348fbd13f283526f1f385",
+  "admitted_bar_count": 696,
+  "archive_filename": "ETCUSDT-1h-2024-02.zip",
+  "archive_member_name": "ETCUSDT-1h-2024-02.csv",
+  "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/ETCUSDT/1h/ETCUSDT-1h-2024-02.zip.CHECKSUM",
+  "first_source_timestamp": "2024-02-01T00:00:00Z",
+  "interval": "1h",
+  "last_source_timestamp": "2024-02-29T23:00:00Z",
+  "month": 2,
+  "published_sha256": "736bdb2b4558ca22114b9cbca951239c83bdd85d6cd348fbd13f283526f1f385",
+  "raw_row_count": 696,
+  "receipt_digest": "7dbc2296d6820f3e715cb89007908f83466e31948d0308e46d74c3eb67800e8d",
+  "retrieved_at": "2026-08-11T13:55:51.142191Z",
+  "schema_version": "binance-um-monthly-kline-12-v1",
+  "source_family": "data.binance.vision.monthly.klines",
+  "source_key": "data/futures/um/monthly/klines/ETCUSDT/1h/ETCUSDT-1h-2024-02.zip",
+  "status": "MATERIALIZED_VERIFIED",
+  "symbol": "ETCUSDT",
+  "year": 2024,
+  "zip_url": "https://data.binance.vision/data/futures/um/monthly/klines/ETCUSDT/1h/ETCUSDT-1h-2024-02.zip"
+}

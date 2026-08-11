@@ -1,0 +1,23 @@
+{
+  "InstrumentIdentity": null,
+  "actual_raw_sha256": "6c2bb7072a9aac491c3cc5f05806be2fe4b44b184b7f059ef7620f82533636ae",
+  "admitted_bar_count": 744,
+  "archive_filename": "OPUSDT-1h-2025-05.zip",
+  "archive_member_name": "OPUSDT-1h-2025-05.csv",
+  "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/OPUSDT/1h/OPUSDT-1h-2025-05.zip.CHECKSUM",
+  "first_source_timestamp": "2025-05-01T00:00:00Z",
+  "interval": "1h",
+  "last_source_timestamp": "2025-05-31T23:00:00Z",
+  "month": 5,
+  "published_sha256": "6c2bb7072a9aac491c3cc5f05806be2fe4b44b184b7f059ef7620f82533636ae",
+  "raw_row_count": 744,
+  "receipt_digest": "39f91e1d2ba8ed3195a97bc16bfaab1b479825ee37a278bdcde22410b50b985c",
+  "retrieved_at": "2026-08-11T13:57:36.710704Z",
+  "schema_version": "binance-um-monthly-kline-12-v1",
+  "source_family": "data.binance.vision.monthly.klines",
+  "source_key": "data/futures/um/monthly/klines/OPUSDT/1h/OPUSDT-1h-2025-05.zip",
+  "status": "MATERIALIZED_VERIFIED",
+  "symbol": "OPUSDT",
+  "year": 2025,
+  "zip_url": "https://data.binance.vision/data/futures/um/monthly/klines/OPUSDT/1h/OPUSDT-1h-2025-05.zip"
+}

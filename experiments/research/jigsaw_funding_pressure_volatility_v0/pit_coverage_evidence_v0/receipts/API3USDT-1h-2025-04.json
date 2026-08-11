@@ -1,0 +1,23 @@
+{
+  "InstrumentIdentity": null,
+  "actual_raw_sha256": "a731402e19993efeeadd9399c4710b81f4ecad14c12d4ff7bdd9d4c224240d36",
+  "admitted_bar_count": 720,
+  "archive_filename": "API3USDT-1h-2025-04.zip",
+  "archive_member_name": "API3USDT-1h-2025-04.csv",
+  "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/API3USDT/1h/API3USDT-1h-2025-04.zip.CHECKSUM",
+  "first_source_timestamp": "2025-04-01T00:00:00Z",
+  "interval": "1h",
+  "last_source_timestamp": "2025-04-30T23:00:00Z",
+  "month": 4,
+  "published_sha256": "a731402e19993efeeadd9399c4710b81f4ecad14c12d4ff7bdd9d4c224240d36",
+  "raw_row_count": 720,
+  "receipt_digest": "257509c050c5f85bf12d0d9b92166e10f7ff7c69fa3a2f3e2e8e490fa5599787",
+  "retrieved_at": "2026-08-11T13:57:02.867956Z",
+  "schema_version": "binance-um-monthly-kline-12-v1",
+  "source_family": "data.binance.vision.monthly.klines",
+  "source_key": "data/futures/um/monthly/klines/API3USDT/1h/API3USDT-1h-2025-04.zip",
+  "status": "MATERIALIZED_VERIFIED",
+  "symbol": "API3USDT",
+  "year": 2025,
+  "zip_url": "https://data.binance.vision/data/futures/um/monthly/klines/API3USDT/1h/API3USDT-1h-2025-04.zip"
+}

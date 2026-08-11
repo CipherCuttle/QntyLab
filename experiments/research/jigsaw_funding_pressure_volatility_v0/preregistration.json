@@ -1,0 +1,177 @@
+{
+  "experiment_id": "JIGSAW_FUNDING_PRESSURE_VOLATILITY_PREREGISTRATION_V0",
+  "status": "PREREGISTERED_NOT_EXECUTED",
+  "research_status": "DESIGN_ONLY",
+  "authority": "NON_AUTHORITATIVE",
+  "promotion_eligible": false,
+  "router_authority": "NONE",
+  "claim_scope": "A single exploratory predictive-piece test on the frozen 20-member Binance USD-M panel; not a causal, trading, strategy-family, Router, or Qnty claim.",
+  "canonical_master": "16081045175abf30cdf33d983618b2e58cc46b79",
+  "breadth_boundary": "SEALED_OBSERVATION_ACTIVE; SEALED_T0=2026-08-10T19:00:00Z; no protected Breadth forward outcome may be accessed.",
+  "feature": {
+    "feature_id": "FUNDING_PRESSURE",
+    "feature_version": "funding-pressure-pit-panel-median-absolute-latest-settlement-v0",
+    "panel_reference": "QNTYLAB_BREADTH_V2_20260810_FROZEN_PANEL",
+    "panel": [
+      "BCHUSDT",
+      "XRPUSDT",
+      "LTCUSDT",
+      "TRXUSDT",
+      "ETCUSDT",
+      "LINKUSDT",
+      "XLMUSDT",
+      "CHZUSDT",
+      "SANDUSDT",
+      "REEFUSDT",
+      "CHRUSDT",
+      "ALICEUSDT",
+      "ONEUSDT",
+      "API3USDT",
+      "GMTUSDT",
+      "APEUSDT",
+      "OPUSDT",
+      "INJUSDT",
+      "LDOUSDT",
+      "APTUSDT"
+    ],
+    "member_eligibility": "A member contributes exactly when its canonical Binance USD-M materializer has a valid publisher-checksummed archive event, an exact funding_time_ms, a finite canonical funding_rate, and the latest event satisfies decision_time-24h < funding_time <= decision_time. No current-listing substitution.",
+    "settlement_timestamp_semantics": "Use the source funding_time_ms exactly; never round, snap, infer, or replace it with an expected cadence.",
+    "known_at_semantics": "A finalized public settlement event is known at its exact funding_time_ms. At a daily 00:00:00Z decision, use only events with funding_time_ms <= decision_time.",
+    "funding_sign_convention": "Positive funding_rate means longs pay shorts; negative means shorts pay longs. Sign is retained in source data but the frozen pressure transform is absolute magnitude.",
+    "cross_sectional_aggregation": "MEDIAN(abs(latest_known_funding_rate)) across eligible panel members.",
+    "lookback_aggregation_horizon": "Most recent eligible settlement per member, with a maximum 24-hour event age; no multi-event accumulation.",
+    "normalization": {
+      "history_observations": 365,
+      "includes_current_observation": true,
+      "cdf_formula": "CDF365(current) = count(v <= current) / count(v), where v is the 365 prior daily observations plus current",
+      "scale": {
+        "name": "fraction",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "tie_semantics": "inclusive <= ECDF; tied values receive the same percentile"
+    },
+    "state_bins": {
+      "LOW": {
+        "threshold": {
+          "numerator": 1,
+          "denominator": 3
+        },
+        "condition": "percentile <= 1/3",
+        "lower_inclusive": true,
+        "upper_inclusive": true
+      },
+      "MID": {
+        "lower_threshold": {
+          "numerator": 1,
+          "denominator": 3
+        },
+        "upper_threshold": {
+          "numerator": 2,
+          "denominator": 3
+        },
+        "condition": "percentile > 1/3 and percentile < 2/3",
+        "lower_inclusive": false,
+        "upper_inclusive": false
+      },
+      "HIGH": {
+        "threshold": {
+          "numerator": 2,
+          "denominator": 3
+        },
+        "condition": "percentile >= 2/3",
+        "lower_inclusive": true,
+        "upper_inclusive": true
+      }
+    },
+    "missing_member_behavior": "FAIL_CLOSED; any missing, stale, non-finite, or source-unverified member blocks the entire daily state. No partial-panel aggregation, zero-fill, interpolation, or forward-fill.",
+    "minimum_breadth": 20,
+    "source_identity": "BINANCE_USDM_FUNDING_SETTLEMENT_MATERIALIZER_V0; data.binance.vision monthly fundingRate archive is causal source, official fapi fundingRate REST is exact coverage witness; archive/checksum/raw-byte identities must be retained.",
+    "formula": "pressure_t = median_i(abs(rate_i(e_i))), where e_i=max{e: funding_time_i(e) <= t and t-24h < funding_time_i(e)}; percentile_t = count(v <= pressure_t) / count(v) over v = prior 365 daily pressure observations plus pressure_t; state_t = percentile_t.",
+    "formula_digest": "sha256:c0e23ef865e746ec125455d2af4daddbf24b9f4b970809b52f693ccdee9c41f1"
+  },
+  "outcome": {
+    "outcome_id": "FUTURE_MARKET_WIDE_REALIZED_VOLATILITY",
+    "outcome_version": "equal-weight-20-panel-hourly-simple-return-rv-24h-v0",
+    "market_return_definition": "For each completed hourly close interval, compute each panel member's simple close-to-close return; market return is the equal-weight arithmetic mean across all 20 members.",
+    "panel": "The same frozen 20-member panel as FUNDING_PRESSURE; no universe change or current-listing substitution.",
+    "forward_horizon": "Exactly 24 completed hourly intervals after the daily 00:00:00Z decision timestamp.",
+    "realized_volatility_estimator": "sqrt(mean(market_return_{t+1:t+24}^2)); zero mean correction; no annualization.",
+    "minimum_observations": "24 hourly market returns, each with 20/20 valid member closes.",
+    "missingness": "FAIL_CLOSED; any missing/non-finite/non-positive close or incomplete member return blocks the outcome label. No gap bridging.",
+    "timestamp_alignment": "Feature decision uses information through t. Outcome uses closes strictly after t through t+24h; label becomes observable only after t+24h.",
+    "overlap_policy": "Daily 00:00Z decisions and 24-hour labels are non-overlapping; no overlapping forward labels.",
+    "annualization": "None.",
+    "formula": "RV24_t = sqrt((1/24) * sum_{h=1}^{24}(mean_i(close_i[t+h]/close_i[t+h-1]-1))^2).",
+    "formula_digest": "sha256:b551dfade01104c63c5909b8d2b185c9513a4a84845edf534575cfb4818ec3ad"
+  },
+  "primary_proposition": "HIGH FUNDING_PRESSURE predicts HIGHER subsequent 24-hour FUTURE_MARKET_WIDE_REALIZED_VOLATILITY: HIGH minus LOW mean RV24 > 0.",
+  "primary_statistic": "mean(RV24 | HIGH) - mean(RV24 | LOW), one signed contrast only.",
+  "execution_boundary": "No execution, outcome calculation, statistical test, threshold search, robustness search, or protected Breadth access is authorized by this preregistration.",
+  "execution_gate": "BLOCKED_UNTIL_CERTIFIED_20_OF_20_FUNDING_AND_OHLCV_PIT_COVERAGE; THIS COMMIT FREEZES THE CONTRACT ONLY",
+  "kill_conditions": [
+    "KILLED_NO_CLEAN_FUNDING_STATE",
+    "BLOCKED_BY_FUNDING_COVERAGE",
+    "BLOCKED_BY_PIT_ALIGNMENT",
+    "BLOCKED_BY_SEALED_BREADTH_BOUNDARY",
+    "NO_POSITIVE_HIGH_MINUS_LOW_DIRECTIONAL_CONTRAST"
+  ],
+  "excluded": [
+    "signed funding state",
+    "funding mean",
+    "funding dispersion",
+    "funding acceleration",
+    "funding shock",
+    "basis substitution",
+    "strategy family conditioning",
+    "Router feature",
+    "causal claim"
+  ],
+  "literature_adjudication": [
+    {
+      "claim": "Perpetual funding is a periodic transfer intended to keep perpetual and spot prices aligned.",
+      "classification": "SOURCE_SUPPORTED_FACT",
+      "source": "He, Manela, Ross & von Wachter, Fundamentals of Perpetual Futures (2022)."
+    },
+    {
+      "claim": "Funding-rule intervals, caps, clamps, and crisis dynamics can affect funding tails and basis volatility.",
+      "classification": "SOURCE_SUPPORTED_FACT",
+      "source": "Zhang, Funding Rate Mechanism in Perpetual Futures (2026 working paper)."
+    },
+    {
+      "claim": "Absolute perpetual basis has been reported as a forward-volatility predictor in a separate study.",
+      "classification": "SOURCE_SUPPORTED_FACT",
+      "source": "Lim, The Information Content of Perpetual Basis (2026 working paper)."
+    },
+    {
+      "claim": "Funding-rate extremeness is a defensible stress proxy for this design, while direction alone is not mechanically compelled to predict volatility; this is an inference, not a published funding-rate result.",
+      "classification": "INFERENCE",
+      "source": "Mechanism synthesis above; basis is not substituted for funding."
+    },
+    {
+      "claim": "Whether Binance settlement-rate magnitude predicts QntyLab's frozen market-wide RV24 is unresolved until a separately executed experiment.",
+      "classification": "UNRESOLVED",
+      "source": "This preregistration."
+    }
+  ],
+  "authenticated_funding_sample": {
+    "panel_count": 20,
+    "common_start": "2022-10-18T16:00:00Z",
+    "common_end": "2025-06-19T00:00:00.005Z",
+    "first_executable_decision_time": "2023-10-19T00:00:00Z",
+    "last_funding_bounded_decision_time": "2025-06-19T00:00:00Z"
+  },
+  "materialization_binding": {
+    "materialization_index_relative_path": "experiments/research/jigsaw_funding_pressure_volatility_v0/materialization_index.json",
+    "materialization_index_digest": "sha256:ceb12a1686f96f328ef54d5bafc184b848fa40ff7a2c71e28dc434a4854486c1",
+    "evidence_set_digest": "sha256:3677e5aeafd17c47e4951b2095d6247c8fb7cd3fb603cc70d5ea5658fd768faa"
+  },
+  "primary_hypotheses": [
+    "HIGH_MINUS_LOW_MEAN_RV24 > 0"
+  ],
+  "execution_authority": "NONE",
+  "outcome_access_authority": "NONE",
+  "strategy_authority": "NONE",
+  "qnty_authority": "NONE",
+  "contract_digest": "sha256:749641cbee99bc769a6095e2a5877e4ccf1c46db0a82860885eedc06734cd2d6"
+}

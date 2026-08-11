@@ -44,7 +44,7 @@
     "LDOUSDT",
     "APTUSDT"
   ],
-  "execution_foundation_contract_digest": "sha256:e47372f61408d3a0919d64f873afeb03b18e8c62165c67f566c914661ac76bed",
+  "execution_foundation_contract_digest": "sha256:6304d859aa0a52af624b9f5b9bb7bcd69f0bc939b5fd360e57bd81457cd0b14d",
   "execution_git_provenance_contract_digest": "sha256:f5ac2b6c5158628a00a659043acc5a7e8c150b670a94693f1f2ede3f7528c7a1",
   "funding_evidence_set_digest": "sha256:3677e5aeafd17c47e4951b2095d6247c8fb7cd3fb603cc70d5ea5658fd768faa",
   "funding_history_coverage_digest": "sha256:55500e4af5b7276d8abfb3dfeaa5b351b3ca0d86a2e6501992c5796b1d7455a4",
@@ -82,7 +82,10 @@
     "claim_before_outcome_access_required": true,
     "claim_ref_namespace": "refs/qntylab-execution-claims",
     "claim_ref_template": "refs/qntylab-execution-claims/<authorization_id>",
-    "live_transport_wired_in_this_phase": false,
+    "conflict_disambiguation_endpoint": "GET /repos/{owner}/{repo}/git/ref/{ref}",
+    "conflict_disambiguation_is_exact_match_only": true,
+    "create_ref_endpoint": "POST /repos/{owner}/{repo}/git/refs",
+    "live_claim_invoked_in_this_phase": false,
     "network_or_permission_or_malformed_response_fails_closed": true,
     "order": [
       "BIND",
@@ -91,9 +94,12 @@
       "REMOTE_CLAIM",
       "OUTCOME_ACCESS"
     ],
+    "production_transport_class": "qntylab.jigsaw_funding_pressure_execution_foundation_v0.GitHubRestRemoteClaimTransport",
+    "production_transport_implemented": true,
     "real_remote_claim_created_in_this_phase": false,
     "same_sha_second_use_is_not_success": true,
-    "second_use_of_same_authorization_fails": true
+    "second_use_of_same_authorization_fails": true,
+    "token_env_var": "QNTYLAB_GITHUB_TOKEN"
   },
   "phase_id": "JIGSAW_FUNDING_PRESSURE_VOLATILITY_EXECUTION_FOUNDATION_HARDENING_V0",
   "pit_v1_certificate_digest": "sha256:eee5ce2769e49970a7a4e8d4851d7da569abc156d4f183959b416bfb8dbf188b",

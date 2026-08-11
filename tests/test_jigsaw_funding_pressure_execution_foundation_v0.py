@@ -15,6 +15,7 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
+import requests
 
 from qntylab import jigsaw_funding_pressure_execution_foundation_v0 as foundation
 from qntylab import jigsaw_funding_pressure_provenance_v0 as provenance
@@ -600,6 +601,374 @@ def test_claim_malformed_response_fails_closed():
 def test_claim_unrecognized_status_fails_closed():
     with pytest.raises(foundation.AtMostOnceClaimError):
         foundation.claim_authorization_once(VALID_AUTH_ID, "a" * 40, _UnknownStatusTransport())
+
+
+def test_claim_ref_name_is_deterministic():
+    assert foundation.claim_ref_name(VALID_AUTH_ID) == foundation.claim_ref_name(VALID_AUTH_ID)
+
+
+@pytest.mark.parametrize(
+    "hostile_id",
+    [
+        "jigsaw-funding-pressure-v0-" + "a" * 16 + "/" + "a" * 15,  # embedded slash
+        "jigsaw-funding-pressure-v0-" + ".." + "a" * 30,  # traversal
+        "jigsaw-funding-pressure-v0-" + "%2e%2e" + "a" * 26,  # URL-encoded traversal
+        "jigsaw-funding-pressure-v0-" + "a" * 31 + "?",  # query-char
+        "jigsaw-funding-pressure-v0-" + "a" * 31 + "#",  # fragment-char
+        "jigsaw-funding-pressure-v0-" + " " * 32,  # whitespace
+        "JIGSAW-FUNDING-PRESSURE-V0-" + "A" * 32,  # case folding
+    ],
+)
+def test_claim_ref_name_rejects_ref_hostile_authorization_ids(hostile_id):
+    """Section 26: the frozen authorization-ID grammar must not be widened for ref convenience."""
+    with pytest.raises(foundation.AtMostOnceClaimError):
+        foundation.claim_ref_name(hostile_id)
+
+
+# ==========================================================================
+# F-01 REPAIR -- GitHubRestRemoteClaimTransport (Section 23-27) -- HTTP boundary
+# is ALWAYS a fake/scripted session below. No test in this module may ever
+# reach a real socket; see `_no_real_network` autouse fixture (Section 24).
+# ==========================================================================
+
+
+@pytest.fixture(autouse=True)
+def _no_real_network(monkeypatch):
+    """Hard network guard (Section 24): patch requests.Session.request (the
+    shared low-level entrypoint under .get()/.post()) to raise immediately
+    if anything in this test module ever drives a REAL requests.Session.
+    Every GitHubRestRemoteClaimTransport test below instead injects a fake
+    `session` object, so this should never fire -- it exists as a backstop
+    against an accidental live GitHub mutation.
+    """
+
+    def _forbidden(*_args, **_kwargs):
+        raise AssertionError("a test attempted a real network request via requests.Session -- forbidden in this suite")
+
+    monkeypatch.setattr(requests.Session, "request", _forbidden, raising=True)
+
+
+class _FakeResponse:
+    """Stands in for requests.Response: only `.status_code` and `.json()` are used."""
+
+    def __init__(self, status_code: int, json_body=None, *, json_raises: bool = False):
+        self.status_code = status_code
+        self._json_body = json_body
+        self._json_raises = json_raises
+
+    def json(self):
+        if self._json_raises:
+            raise ValueError("Expecting value: line 1 column 1 (char 0)")
+        return self._json_body
+
+
+class _ScriptedSession:
+    """Fake requests.Session: returns pre-scripted responses/exceptions, records every call."""
+
+    def __init__(self, *, post_response=None, post_exception=None, get_response=None, get_exception=None):
+        self._post_response = post_response
+        self._post_exception = post_exception
+        self._get_response = get_response
+        self._get_exception = get_exception
+        self.post_calls: list[dict] = []
+        self.get_calls: list[dict] = []
+
+    def post(self, url, *, json, headers, timeout, allow_redirects):
+        self.post_calls.append({"url": url, "json": json, "headers": headers, "timeout": timeout, "allow_redirects": allow_redirects})
+        if self._post_exception is not None:
+            raise self._post_exception
+        return self._post_response
+
+    def get(self, url, *, headers, timeout, allow_redirects):
+        self.get_calls.append({"url": url, "headers": headers, "timeout": timeout, "allow_redirects": allow_redirects})
+        if self._get_exception is not None:
+            raise self._get_exception
+        return self._get_response
+
+
+_CLAIM_REF = foundation.claim_ref_name(VALID_AUTH_ID)
+_CLAIM_SHA = "b" * 40
+
+
+def _transport(session, **overrides) -> foundation.GitHubRestRemoteClaimTransport:
+    kwargs = {"owner": "acme-org", "repo": "acme-repo", "token": "unit-test-token", "session": session}
+    kwargs.update(overrides)
+    return foundation.GitHubRestRemoteClaimTransport(**kwargs)
+
+
+def _created_body(ref=_CLAIM_REF, sha=_CLAIM_SHA):
+    return {"ref": ref, "object": {"sha": sha, "type": "commit"}}
+
+
+# --- 201 success and malformed-success matrix (Section 23) -----------------
+
+
+def test_transport_201_exact_response_is_created():
+    session = _ScriptedSession(post_response=_FakeResponse(201, _created_body()))
+    result = _transport(session).create_ref(_CLAIM_REF, _CLAIM_SHA)
+    assert result == foundation.ClaimRefResult(status="CREATED")
+    assert session.post_calls[0]["json"] == {"ref": _CLAIM_REF, "sha": _CLAIM_SHA}
+    assert session.post_calls[0]["allow_redirects"] is False
+
+
+def test_transport_201_wrong_ref_fails_closed():
+    session = _ScriptedSession(post_response=_FakeResponse(201, _created_body(ref="refs/qntylab-execution-claims/someone-else")))
+    with pytest.raises(foundation.RemoteClaimResponseError, match="response.ref"):
+        _transport(session).create_ref(_CLAIM_REF, _CLAIM_SHA)
+
+
+def test_transport_201_wrong_sha_fails_closed():
+    session = _ScriptedSession(post_response=_FakeResponse(201, _created_body(sha="c" * 40)))
+    with pytest.raises(foundation.RemoteClaimResponseError, match="response.object.sha"):
+        _transport(session).create_ref(_CLAIM_REF, _CLAIM_SHA)
+
+
+def test_transport_201_missing_object_fails_closed():
+    session = _ScriptedSession(post_response=_FakeResponse(201, {"ref": _CLAIM_REF}))
+    with pytest.raises(foundation.RemoteClaimResponseError, match="object"):
+        _transport(session).create_ref(_CLAIM_REF, _CLAIM_SHA)
+
+
+def test_transport_201_non_commit_object_type_fails_closed():
+    session = _ScriptedSession(post_response=_FakeResponse(201, {"ref": _CLAIM_REF, "object": {"sha": _CLAIM_SHA, "type": "tag"}}))
+    with pytest.raises(foundation.RemoteClaimResponseError, match="object"):
+        _transport(session).create_ref(_CLAIM_REF, _CLAIM_SHA)
+
+
+def test_transport_201_malformed_json_body_fails_closed():
+    session = _ScriptedSession(post_response=_FakeResponse(201, json_raises=True))
+    with pytest.raises(foundation.RemoteClaimResponseError, match="malformed"):
+        _transport(session).create_ref(_CLAIM_REF, _CLAIM_SHA)
+
+
+def test_transport_201_non_object_json_body_fails_closed():
+    session = _ScriptedSession(post_response=_FakeResponse(201, ["not", "an", "object"]))
+    with pytest.raises(foundation.RemoteClaimResponseError, match="non-object"):
+        _transport(session).create_ref(_CLAIM_REF, _CLAIM_SHA)
+
+
+# --- 409/422 exact-ref disambiguation (Section 11/15/23) --------------------
+
+
+@pytest.mark.parametrize("status", [409, 422])
+def test_transport_conflict_confirmed_existing_same_sha_is_already_exists(status):
+    session = _ScriptedSession(
+        post_response=_FakeResponse(status, {"message": "already exists"}),
+        get_response=_FakeResponse(200, {"ref": _CLAIM_REF, "object": {"sha": _CLAIM_SHA, "type": "commit"}}),
+    )
+    result = _transport(session).create_ref(_CLAIM_REF, _CLAIM_SHA)
+    assert result.status == "ALREADY_EXISTS"
+
+
+@pytest.mark.parametrize("status", [409, 422])
+def test_transport_conflict_confirmed_existing_different_sha_is_still_already_exists(status):
+    """Section 10/17: an existing ref pointing elsewhere is STILL a consumed authorization, not a fresh success."""
+    session = _ScriptedSession(
+        post_response=_FakeResponse(status, {"message": "already exists"}),
+        get_response=_FakeResponse(200, {"ref": _CLAIM_REF, "object": {"sha": "d" * 40, "type": "commit"}}),
+    )
+    result = _transport(session).create_ref(_CLAIM_REF, _CLAIM_SHA)
+    assert result.status == "ALREADY_EXISTS"
+
+
+@pytest.mark.parametrize("status", [409, 422])
+def test_transport_conflict_get_404_fails_closed_no_retry(status):
+    session = _ScriptedSession(post_response=_FakeResponse(status, {"message": "conflict"}), get_response=_FakeResponse(404, {"message": "Not Found"}))
+    with pytest.raises(foundation.RemoteClaimResponseError, match="does not exist"):
+        _transport(session).create_ref(_CLAIM_REF, _CLAIM_SHA)
+    assert len(session.post_calls) == 1  # no automatic create retry
+
+
+def test_transport_conflict_get_itself_ambiguous_fails_closed():
+    session = _ScriptedSession(post_response=_FakeResponse(409, {}), get_exception=requests.exceptions.ConnectionError("reset"))
+    with pytest.raises(foundation.RemoteClaimAmbiguousError):
+        _transport(session).create_ref(_CLAIM_REF, _CLAIM_SHA)
+
+
+def test_transport_conflict_get_unexpected_status_fails_closed():
+    session = _ScriptedSession(post_response=_FakeResponse(409, {}), get_response=_FakeResponse(500, {"message": "boom"}))
+    with pytest.raises(foundation.RemoteClaimResponseError):
+        _transport(session).create_ref(_CLAIM_REF, _CLAIM_SHA)
+
+
+def test_transport_conflict_get_wrong_ref_body_fails_closed():
+    session = _ScriptedSession(
+        post_response=_FakeResponse(409, {}),
+        get_response=_FakeResponse(200, {"ref": "refs/qntylab-execution-claims/not-the-same", "object": {"sha": _CLAIM_SHA, "type": "commit"}}),
+    )
+    with pytest.raises(foundation.RemoteClaimResponseError):
+        _transport(session).create_ref(_CLAIM_REF, _CLAIM_SHA)
+
+
+def test_transport_disambiguation_get_uses_exact_singular_endpoint_not_prefix_list():
+    """Section 15: must use `git/ref/<x>` (exact), never `git/refs/<x>` (prefix list)."""
+    session = _ScriptedSession(post_response=_FakeResponse(409, {}), get_response=_FakeResponse(404, {}))
+    with pytest.raises(foundation.RemoteClaimResponseError):
+        _transport(session).create_ref(_CLAIM_REF, _CLAIM_SHA)
+    get_url = session.get_calls[0]["url"]
+    assert "/git/ref/" in get_url
+    assert "/git/refs/" not in get_url
+    assert get_url.endswith(f"qntylab-execution-claims/{VALID_AUTH_ID}")
+
+
+# --- Auth / permissions / rate limit / server errors (Section 14/23) -------
+
+
+@pytest.mark.parametrize("status", [401, 403, 404, 429, 500, 502, 503, 504])
+def test_transport_definite_failure_statuses_fail_closed_no_retry(status):
+    session = _ScriptedSession(post_response=_FakeResponse(status, {"message": "no"}))
+    with pytest.raises(foundation.RemoteClaimResponseError):
+        _transport(session).create_ref(_CLAIM_REF, _CLAIM_SHA)
+    assert len(session.post_calls) == 1  # zero automatic POST retries
+
+
+@pytest.mark.parametrize("status", [200, 202, 204])
+def test_transport_unexpected_2xx_fails_closed(status):
+    session = _ScriptedSession(post_response=_FakeResponse(status, {}))
+    with pytest.raises(foundation.RemoteClaimResponseError):
+        _transport(session).create_ref(_CLAIM_REF, _CLAIM_SHA)
+
+
+@pytest.mark.parametrize("status", [301, 302, 307])
+def test_transport_unexpected_3xx_fails_closed(status):
+    session = _ScriptedSession(post_response=_FakeResponse(status, {}))
+    with pytest.raises(foundation.RemoteClaimResponseError):
+        _transport(session).create_ref(_CLAIM_REF, _CLAIM_SHA)
+
+
+# --- Network ambiguity (Section 12/13/23) -- the most important case -------
+
+
+@pytest.mark.parametrize(
+    "exc",
+    [
+        requests.exceptions.ConnectTimeout("connect timed out"),
+        requests.exceptions.ReadTimeout("read timed out"),
+        requests.exceptions.ConnectionError("connection reset by peer"),
+        requests.exceptions.SSLError("certificate verify failed"),
+    ],
+)
+def test_transport_post_network_ambiguity_fails_closed_no_retry(exc):
+    session = _ScriptedSession(post_exception=exc)
+    with pytest.raises(foundation.RemoteClaimAmbiguousError):
+        _transport(session).create_ref(_CLAIM_REF, _CLAIM_SHA)
+    assert len(session.post_calls) == 1  # zero automatic POST retries
+
+
+def test_transport_ambiguous_failure_never_reaches_claimed_via_claim_authorization_once():
+    """End-to-end through the frozen orchestrator: ambiguity must never become CLAIMED."""
+    session = _ScriptedSession(post_exception=requests.exceptions.ReadTimeout("read timed out"))
+    transport = _transport(session)
+    with pytest.raises(foundation.AtMostOnceClaimError):
+        foundation.claim_authorization_once(VALID_AUTH_ID, _CLAIM_SHA, transport)
+
+
+# --- Same-authorization replay through the frozen state machine (Section 17/23) ---
+
+
+def test_transport_same_sha_replay_via_claim_authorization_once_is_already_consumed_not_claimed():
+    backend_refs: dict[str, str] = {}
+
+    def _post(url, *, json, headers, timeout, allow_redirects):
+        ref, sha = json["ref"], json["sha"]
+        if ref in backend_refs:
+            return _FakeResponse(422, {"message": "Reference already exists"})
+        backend_refs[ref] = sha
+        return _FakeResponse(201, _created_body(ref=ref, sha=sha))
+
+    def _get(url, *, headers, timeout, allow_redirects):
+        segment = url.rsplit("/git/ref/", 1)[1]
+        ref = f"refs/{segment}"
+        if ref in backend_refs:
+            return _FakeResponse(200, {"ref": ref, "object": {"sha": backend_refs[ref], "type": "commit"}})
+        return _FakeResponse(404, {"message": "Not Found"})
+
+    class _StatefulSession:
+        post = staticmethod(_post)
+        get = staticmethod(_get)
+
+    transport = _transport(_StatefulSession())
+    first = foundation.claim_authorization_once(VALID_AUTH_ID, _CLAIM_SHA, transport)
+    second = foundation.claim_authorization_once(VALID_AUTH_ID, _CLAIM_SHA, transport)  # identical sha
+    assert first == foundation.ClaimOutcome.CLAIMED
+    assert second == foundation.ClaimOutcome.ALREADY_CONSUMED
+
+
+# --- Globality: two independent callers contend on one shared backend (Section 17) ---
+
+
+class _InMemoryGitHubRefBackend:
+    """Shared by two independently-constructed transports to model two race participants."""
+
+    def __init__(self):
+        self._refs: dict[str, str] = {}
+
+    def post(self, ref: str, sha: str) -> _FakeResponse:
+        if ref in self._refs:
+            return _FakeResponse(422, {"message": "Reference already exists"})
+        self._refs[ref] = sha
+        return _FakeResponse(201, {"ref": ref, "object": {"sha": sha, "type": "commit"}})
+
+    def get(self, ref: str) -> _FakeResponse:
+        if ref not in self._refs:
+            return _FakeResponse(404, {"message": "Not Found"})
+        return _FakeResponse(200, {"ref": ref, "object": {"sha": self._refs[ref], "type": "commit"}})
+
+
+class _BackendBoundSession:
+    def __init__(self, backend: _InMemoryGitHubRefBackend):
+        self._backend = backend
+
+    def post(self, url, *, json, headers, timeout, allow_redirects):
+        return self._backend.post(json["ref"], json["sha"])
+
+    def get(self, url, *, headers, timeout, allow_redirects):
+        segment = url.rsplit("/git/ref/", 1)[1]
+        return self._backend.get(f"refs/{segment}")
+
+
+def test_transport_two_worktrees_share_one_remote_claim_authority():
+    backend = _InMemoryGitHubRefBackend()
+    transport_a = _transport(_BackendBoundSession(backend))
+    transport_b = _transport(_BackendBoundSession(backend))
+    outcome_a = foundation.claim_authorization_once(VALID_AUTH_ID, _CLAIM_SHA, transport_a)
+    outcome_b = foundation.claim_authorization_once(VALID_AUTH_ID, _CLAIM_SHA, transport_b)  # same sha, different caller
+    assert outcome_a == foundation.ClaimOutcome.CLAIMED
+    assert outcome_b == foundation.ClaimOutcome.ALREADY_CONSUMED
+
+
+# --- Secret handling (Section 7/25) -----------------------------------------
+
+
+@pytest.mark.parametrize("bad_env", [{}, {foundation.GITHUB_CLAIM_TOKEN_ENV_VAR: ""}, {foundation.GITHUB_CLAIM_TOKEN_ENV_VAR: "   "}])
+def test_transport_from_environment_missing_or_blank_token_fails_closed(bad_env):
+    with pytest.raises(foundation.RemoteClaimConfigurationError):
+        foundation.GitHubRestRemoteClaimTransport.from_environment(env=bad_env)
+
+
+@pytest.mark.parametrize("bad_token", ["", "   "])
+def test_transport_init_rejects_blank_token(bad_token):
+    with pytest.raises(foundation.RemoteClaimConfigurationError):
+        foundation.GitHubRestRemoteClaimTransport(owner="acme", repo="repo", token=bad_token, session=_ScriptedSession())
+
+
+def test_transport_exception_text_never_contains_the_token():
+    secret_token = "ghp_SUPERSECRETVALUE0123456789ABCDEF"  # noqa: S105 - synthetic, never a real credential
+    session = _ScriptedSession(post_exception=requests.exceptions.ConnectionError("connection reset by peer"))
+    transport = _transport(session, token=secret_token)
+    with pytest.raises(foundation.RemoteClaimAmbiguousError) as excinfo:
+        transport.create_ref(_CLAIM_REF, _CLAIM_SHA)
+    assert secret_token not in str(excinfo.value)
+    assert secret_token not in repr(excinfo.value)
+    # ... but the request actually was authenticated:
+    assert session.post_calls[0]["headers"]["Authorization"] == f"Bearer {secret_token}"
+
+
+def test_transport_exposes_no_delete_or_update_claim_api():
+    """Section 16: execution claims are append-only; no admin-style method may exist."""
+    forbidden_names = {"delete_ref", "delete_claim", "update_ref", "update_claim", "reset_claim", "reset_ref", "move_ref", "clear_claim", "force_update_ref"}
+    exposed = {name for name in dir(foundation.GitHubRestRemoteClaimTransport) if not name.startswith("__")}
+    assert not (forbidden_names & exposed)
 
 
 # ==========================================================================

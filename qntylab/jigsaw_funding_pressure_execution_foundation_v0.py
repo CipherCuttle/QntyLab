@@ -13,7 +13,13 @@ outcome-blind plumbing a future REAL_HISTORICAL V2 executor will stand on:
       module identity, and required-ancestor coverage;
     - an authorization envelope shape and a pure validator for it;
     - a REMOTE_AT_MOST_ONCE_CLAIM_V0 state machine over an injected
-      transport (no live transport is wired or called in this phase);
+      transport, plus GitHubRestRemoteClaimTransport -- a real production
+      implementation of that transport against GitHub's create-ref REST
+      endpoint. The production transport class exists and is exercised
+      against a mocked HTTP boundary in this phase; it is still never
+      constructed against, or invoked with, the real repository (see
+      NO_OUTCOME_ATTESTATION -- REAL_REMOTE_AUTHORIZATION_CLAIM_CREATED
+      remains False);
     - the crash-safe authorization lifecycle state machine
       (CONSUMED_INCOMPLETE is terminal; no automatic retry exists);
     - a receipt provenance envelope built exclusively from a
@@ -30,8 +36,10 @@ import csv
 import dataclasses
 import hashlib
 import json
+import os
 import re
 import subprocess
+from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
@@ -39,6 +47,9 @@ from enum import Enum
 from pathlib import Path
 from types import MappingProxyType
 from typing import Protocol
+from urllib.parse import quote
+
+import requests
 
 from qntylab import jigsaw_funding_pressure_provenance_v0 as provenance
 
@@ -65,6 +76,20 @@ OHLCV_LOGICAL_ENDPOINT_MAPPING = "source_open_u_maps_to_logical_close_endpoint_u
 
 CLAIM_REF_NAMESPACE = "refs/qntylab-execution-claims"
 AUTHORIZATION_ID_PATTERN = re.compile(r"^jigsaw-funding-pressure-v0-[0-9a-f]{32}$")
+
+# --------------------------------------------------------------------------
+# GitHubRestRemoteClaimTransport configuration (Section 6/7 of the F-01
+# repair). Deterministic, hardcoded like the frozen SHAs above -- not
+# derived from a mutable `git remote -v`, which a compromised runtime
+# could alter. `GITHUB_CLAIM_TOKEN_ENV_VAR` is the ONE supported secret
+# source; there is no other production credential path.
+# --------------------------------------------------------------------------
+
+GITHUB_API_BASE_URL = "https://api.github.com"
+GITHUB_CLAIM_REPO_OWNER = "CipherCuttle"
+GITHUB_CLAIM_REPO_NAME = "QntyLab"
+GITHUB_CLAIM_TOKEN_ENV_VAR = "QNTYLAB_GITHUB_TOKEN"
+_REMOTE_CLAIM_DEFAULT_TIMEOUT_SECONDS = (10, 30)  # (connect, read) -- matches this repo's requests.Session convention
 
 
 class ExecutionFoundationError(Exception):
@@ -658,10 +683,13 @@ class ClaimRefResult:
 class AtMostOnceClaimTransport(Protocol):
     """Injected transport for REMOTE_AT_MOST_ONCE_CLAIM_V0.
 
-    A real implementation would call GitHub's `POST /repos/.../git/refs`,
-    which atomically fails with 422 "Reference already exists" if the ref
-    is already there -- true create-if-absent semantics. This phase wires
-    and calls only fakes/mocks; no live transport is constructed here.
+    GitHubRestRemoteClaimTransport (below) is the real production
+    implementation: it calls GitHub's `POST /repos/{owner}/{repo}/git/refs`,
+    which fails with 409/422 if the ref already exists, and disambiguates
+    those responses with an exact-match GET rather than trusting the status
+    code alone (Section 11/15 of the F-01 repair). It is constructed and
+    exercised only against a mocked HTTP boundary in this phase -- it is
+    never constructed against, or invoked with, the real repository.
     """
 
     def create_ref(self, ref: str, sha: str) -> ClaimRefResult: ...
@@ -689,6 +717,261 @@ def claim_authorization_once(authorization_id: str, sha: str, transport: AtMostO
     if result.status == "CREATED":
         return ClaimOutcome.CLAIMED
     return ClaimOutcome.ALREADY_CONSUMED
+
+
+# ==========================================================================
+# F-01 REPAIR -- production GitHub REST transport for AtMostOnceClaimTransport
+# ==========================================================================
+#
+# Everything above this block (ClaimOutcome, ClaimRefResult,
+# AtMostOnceClaimTransport, claim_ref_name, claim_authorization_once) is
+# FROZEN and untouched. claim_authorization_once already fails closed on
+# ANY exception raised by transport.create_ref() (see its bare `except
+# Exception` above) and already refuses to produce ClaimOutcome.CLAIMED
+# for anything other than a literal ClaimRefResult(status="CREATED").
+#
+# GitHubRestRemoteClaimTransport below relies on exactly that: every
+# ambiguous, malformed, or unauthorized situation is handled by RAISING
+# one of the RemoteClaim*Error classes rather than by inventing a third
+# ClaimRefResult status. No frozen type or function needed to change.
+
+
+class RemoteClaimTransportError(ExecutionFoundationError):
+    """Base class for every GitHubRestRemoteClaimTransport failure.
+
+    Every subclass here is caught by claim_authorization_once's blanket
+    `except Exception` and re-raised as AtMostOnceClaimError -- so raising
+    any of these from create_ref is already sufficient to fail closed.
+    """
+
+
+class RemoteClaimConfigurationError(RemoteClaimTransportError):
+    """Missing/blank secret, or malformed owner/repo. Raised before any HTTP request is made."""
+
+
+class RemoteClaimAmbiguousError(RemoteClaimTransportError):
+    """The mutation's outcome on GitHub is unknown (Section 12/13 of the F-01 repair).
+
+    Raised for every connect timeout, read timeout, connection reset, TLS
+    error, or DNS failure -- whether it happens before or "after" the POST
+    reaches GitHub, since transport timing can never be proven from the
+    client side. No automatic retry is ever attempted from this state.
+    """
+
+
+class RemoteClaimResponseError(RemoteClaimTransportError):
+    """A definite HTTP response was received but it does not license CLAIMED or ALREADY_EXISTS.
+
+    Covers: wrong ref/sha/type on an HTTP 201, a 409/422 whose exact-ref
+    disambiguation GET was not a confirmed existing ref, any of
+    401/403/404/429/5xx, an unexpected 2xx/3xx, or a malformed/non-object
+    JSON body anywhere in the exchange.
+    """
+
+
+def _remote_claim_status_reason(status: int) -> str:
+    if status in (401, 403):
+        return "authentication/authorization failure"
+    if status == 404:
+        return "not found"
+    if status == 429:
+        return "rate limited"
+    if 500 <= status < 600:
+        return "server error"
+    if 300 <= status < 400:
+        return "unexpected redirect"
+    if 200 <= status < 300:
+        return "unexpected success status"
+    return "unrecognized status"
+
+
+def _remote_claim_parse_json_object(response, *, context: str) -> dict:
+    try:
+        body = response.json()
+    except ValueError as exc:
+        raise RemoteClaimResponseError(f"{context}: malformed/non-JSON response body, fail-closed") from exc
+    if not isinstance(body, dict):
+        raise RemoteClaimResponseError(f"{context}: non-object JSON response body, fail-closed")
+    return body
+
+
+class GitHubRestRemoteClaimTransport:
+    """Production AtMostOnceClaimTransport backed by GitHub's real create-ref REST endpoint.
+
+    Implements exactly one mutating call:
+
+        POST {api_base}/repos/{owner}/{repo}/git/refs
+        {"ref": <fully-qualified ref>, "sha": <40-hex commit sha>}
+
+    and, only to disambiguate an inconclusive 409/422, one read call against
+    GitHub's exact-match "get a reference" endpoint (never the prefix-
+    matching "list references" endpoint -- Section 15):
+
+        GET {api_base}/repos/{owner}/{repo}/git/ref/{ref with 'refs/' stripped}
+
+    No delete/update/reset/move claim operation is exposed anywhere on this
+    class (Section 16): execution claims are append-only from QntyLab's
+    perspective. A stale claim ref may only ever be removed by manual
+    GitHub-administrator action outside this codebase, which itself would
+    violate the execution-governance contract.
+
+    This class is constructed and unit-tested against a mocked HTTP
+    boundary in this phase. It is NEVER invoked against the real GitHub
+    repository here: no production caller exists yet, because no V2
+    executor exists yet (Section 18/31 of the F-01 repair).
+    """
+
+    def __init__(
+        self,
+        *,
+        owner: str,
+        repo: str,
+        token: str,
+        session: "requests.Session",
+        api_base: str = GITHUB_API_BASE_URL,
+        timeout: tuple[float, float] = _REMOTE_CLAIM_DEFAULT_TIMEOUT_SECONDS,
+    ) -> None:
+        if not isinstance(owner, str) or not owner:
+            raise RemoteClaimConfigurationError("GitHubRestRemoteClaimTransport requires a non-empty repository owner")
+        if not isinstance(repo, str) or not repo:
+            raise RemoteClaimConfigurationError("GitHubRestRemoteClaimTransport requires a non-empty repository name")
+        if not isinstance(token, str) or not token.strip():
+            raise RemoteClaimConfigurationError(
+                "GitHubRestRemoteClaimTransport requires a non-blank authentication token; "
+                "refusing to construct an unauthenticated production transport"
+            )
+        self._owner = owner
+        self._repo = repo
+        self._token = token
+        self._session = session
+        self._api_base = api_base.rstrip("/")
+        self._timeout = timeout
+
+    @classmethod
+    def from_environment(
+        cls,
+        *,
+        owner: str = GITHUB_CLAIM_REPO_OWNER,
+        repo: str = GITHUB_CLAIM_REPO_NAME,
+        env: Mapping[str, str] | None = None,
+    ) -> "GitHubRestRemoteClaimTransport":
+        """The one supported production secret-resolution path (Section 7).
+
+        Reads the token from `GITHUB_CLAIM_TOKEN_ENV_VAR` only -- there is
+        no fallback to an unauthenticated request and no alternate
+        credential source. A missing, empty, or whitespace-only token
+        fails closed here, before any `requests.Session` is constructed
+        and before any HTTP request is possible.
+        """
+        resolved_env = os.environ if env is None else env
+        token = resolved_env.get(GITHUB_CLAIM_TOKEN_ENV_VAR)
+        if token is None:
+            raise RemoteClaimConfigurationError(
+                f"{GITHUB_CLAIM_TOKEN_ENV_VAR} is not set; refusing to construct an unauthenticated "
+                "production remote-claim transport"
+            )
+        return cls(owner=owner, repo=repo, token=token, session=requests.Session())
+
+    def _headers(self) -> dict[str, str]:
+        return {
+            "Authorization": f"Bearer {self._token}",
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        }
+
+    def create_ref(self, ref: str, sha: str) -> ClaimRefResult:
+        response = self._post_create_ref(ref, sha)
+        return self._classify_create_response(ref, sha, response)
+
+    def _post_create_ref(self, ref: str, sha: str):
+        url = f"{self._api_base}/repos/{self._owner}/{self._repo}/git/refs"
+        try:
+            return self._session.post(
+                url,
+                json={"ref": ref, "sha": sha},
+                headers=self._headers(),
+                timeout=self._timeout,
+                allow_redirects=False,
+            )
+        except requests.exceptions.RequestException as exc:
+            # Section 12/13: every pre-response failure -- connect timeout,
+            # read timeout, reset, TLS error, DNS failure -- is ambiguous.
+            # GitHub may have committed the mutation even though this
+            # client never saw the response. Fail closed; never retry.
+            raise RemoteClaimAmbiguousError(
+                f"POST create-ref for {ref} raised {type(exc).__name__} before a response was received: "
+                "mutation outcome unknown, failing closed, no automatic retry"
+            ) from exc
+
+    def _classify_create_response(self, ref: str, sha: str, response) -> ClaimRefResult:
+        status = response.status_code
+        if status == 201:
+            return self._validate_created_response(ref, sha, response)
+        if status in (409, 422):
+            return self._disambiguate_existing_claim(ref, status)
+        raise RemoteClaimResponseError(
+            f"create-ref for {ref} returned HTTP {status} ({_remote_claim_status_reason(status)}): "
+            "fail-closed, no automatic retry"
+        )
+
+    def _validate_created_response(self, ref: str, sha: str, response) -> ClaimRefResult:
+        body = _remote_claim_parse_json_object(response, context=f"create-ref for {ref} (HTTP 201)")
+        if body.get("ref") != ref:
+            raise RemoteClaimResponseError(
+                f"create-ref for {ref} returned HTTP 201 but response.ref did not match the requested ref: fail-closed"
+            )
+        obj = body.get("object")
+        if not isinstance(obj, dict) or obj.get("type") != "commit":
+            raise RemoteClaimResponseError(
+                f"create-ref for {ref} returned HTTP 201 with a missing or non-commit object field: fail-closed"
+            )
+        if obj.get("sha") != sha:
+            raise RemoteClaimResponseError(
+                f"create-ref for {ref} returned HTTP 201 but response.object.sha did not match the requested sha: "
+                "fail-closed"
+            )
+        return ClaimRefResult(status="CREATED")
+
+    def _disambiguate_existing_claim(self, ref: str, original_status: int) -> ClaimRefResult:
+        """Section 11/15: the ONLY GET this transport ever issues, and it is exact-match only.
+
+        A 409/422 alone never becomes ALREADY_CONSUMED. Only a confirmed,
+        exact-ref GET licenses that classification; a 404, another
+        failure, or an ambiguous GET response all stay fail-closed. An
+        existing ref pointing at the SAME requested sha is still
+        ALREADY_CONSUMED (Section 10/17) -- this method never compares the
+        existing sha to the requested one, so same-sha replay cannot be
+        laundered into success.
+        """
+        segment = quote(ref.removeprefix("refs/"), safe="/")
+        url = f"{self._api_base}/repos/{self._owner}/{self._repo}/git/ref/{segment}"
+        try:
+            response = self._session.get(url, headers=self._headers(), timeout=self._timeout, allow_redirects=False)
+        except requests.exceptions.RequestException as exc:
+            raise RemoteClaimAmbiguousError(
+                f"create-ref for {ref} returned HTTP {original_status} and the exact-ref disambiguation GET "
+                f"itself raised {type(exc).__name__}: fail-closed, no retry"
+            ) from exc
+        if response.status_code == 200:
+            body = _remote_claim_parse_json_object(response, context=f"disambiguation GET for {ref} (HTTP 200)")
+            if body.get("ref") != ref:
+                raise RemoteClaimResponseError(
+                    f"create-ref for {ref} returned HTTP {original_status}; disambiguation GET returned a "
+                    "different ref: fail-closed"
+                )
+            return ClaimRefResult(
+                status="ALREADY_EXISTS",
+                detail=f"exact claim ref confirmed to already exist after HTTP {original_status} on create",
+            )
+        if response.status_code == 404:
+            raise RemoteClaimResponseError(
+                f"create-ref for {ref} returned HTTP {original_status} but the exact claim ref does not exist "
+                "on disambiguation GET: fail-closed, no automatic create retry"
+            )
+        raise RemoteClaimResponseError(
+            f"create-ref for {ref} returned HTTP {original_status}; disambiguation GET returned unexpected "
+            f"HTTP {response.status_code}: fail-closed"
+        )
 
 
 class AuthorizationLifecycleState(str, Enum):

@@ -1,0 +1,353 @@
+{
+  "coverage_purpose": "one required source bar preceding the V0 evidence window",
+  "materializer_contract_version": "BINANCE_USD_M_PERPETUAL_1H_MATERIALIZER_V0",
+  "materializer_implementation_identity": "qntylab.binance_um_kline_1h",
+  "phase": "JIGSAW_FUNDING_PRESSURE_VOLATILITY_PIT_COVERAGE_CERTIFICATION_V1",
+  "receipts": [
+    {
+      "archive_filename": "BCHUSDT-1h-2023-10.zip",
+      "published_sha256": "03fd623612966f6c1015c8206097b5b8dbb81ad080a5b344c8683e196603a8d9",
+      "receipt_digest": "45a11747afa8d8ae84c0df6b302240aa5952ba036af6dd701f8b5e08d776caab",
+      "source_key": "data/futures/um/monthly/klines/BCHUSDT/1h/BCHUSDT-1h-2023-10.zip",
+      "status": "MATERIALIZED_VERIFIED",
+      "symbol": "BCHUSDT"
+    },
+    {
+      "archive_filename": "XRPUSDT-1h-2023-10.zip",
+      "published_sha256": "d58048df81578a59e6feb0506c3de26886fb01f54c6343cb25bce958001bab9c",
+      "receipt_digest": "4c26b51e1a80d95175435d8ec8a69b5d4d2557bc3511a3b24f376c272e6eab2b",
+      "source_key": "data/futures/um/monthly/klines/XRPUSDT/1h/XRPUSDT-1h-2023-10.zip",
+      "status": "MATERIALIZED_VERIFIED",
+      "symbol": "XRPUSDT"
+    },
+    {
+      "archive_filename": "LTCUSDT-1h-2023-10.zip",
+      "published_sha256": "aad8ac31857c9ad45f765b3aeec5ed4321474efcaec73f7f54817e333e6a48e3",
+      "receipt_digest": "cde892a0d2a6f74452cf6c1193303b157ae1da523c6ed3eea5fb8eb0e6c6f999",
+      "source_key": "data/futures/um/monthly/klines/LTCUSDT/1h/LTCUSDT-1h-2023-10.zip",
+      "status": "MATERIALIZED_VERIFIED",
+      "symbol": "LTCUSDT"
+    },
+    {
+      "archive_filename": "TRXUSDT-1h-2023-10.zip",
+      "published_sha256": "627078543e0dcf2124d2f4f7c6eb85dab8af766096de6133be38209073628a42",
+      "receipt_digest": "e9964b72d3f2ac574d6fa619d4ebd47dfd0c2fb866a84e3fc53b4b8c1e388ffc",
+      "source_key": "data/futures/um/monthly/klines/TRXUSDT/1h/TRXUSDT-1h-2023-10.zip",
+      "status": "MATERIALIZED_VERIFIED",
+      "symbol": "TRXUSDT"
+    },
+    {
+      "archive_filename": "ETCUSDT-1h-2023-10.zip",
+      "published_sha256": "98a3d07da484402ddbd6f2f9edf7c14d6e9e970b10875c3535136eb45c5bb9b1",
+      "receipt_digest": "1f97163678fed1225d3a8c70911e9c1a0b2230cc815941f875ae4f0fe0db2bef",
+      "source_key": "data/futures/um/monthly/klines/ETCUSDT/1h/ETCUSDT-1h-2023-10.zip",
+      "status": "MATERIALIZED_VERIFIED",
+      "symbol": "ETCUSDT"
+    },
+    {
+      "archive_filename": "LINKUSDT-1h-2023-10.zip",
+      "published_sha256": "dcbcc11484521f3e0aeeab6868e992ac13e057cb306d7218c6dcd5d702ee17ca",
+      "receipt_digest": "e3c195638d4b3008bc693f0078875462875f30e8e847d705c4a74a2b2692d0ea",
+      "source_key": "data/futures/um/monthly/klines/LINKUSDT/1h/LINKUSDT-1h-2023-10.zip",
+      "status": "MATERIALIZED_VERIFIED",
+      "symbol": "LINKUSDT"
+    },
+    {
+      "archive_filename": "XLMUSDT-1h-2023-10.zip",
+      "published_sha256": "17558ce47c5360d0a9aa0f09b9b204d1974fe9844774f7eb0c804c42ef0144f3",
+      "receipt_digest": "994a06ef0e7d4028bcd8a8fbc73638e570de3cc913f586c1d16b9dc4c2a6e464",
+      "source_key": "data/futures/um/monthly/klines/XLMUSDT/1h/XLMUSDT-1h-2023-10.zip",
+      "status": "MATERIALIZED_VERIFIED",
+      "symbol": "XLMUSDT"
+    },
+    {
+      "archive_filename": "CHZUSDT-1h-2023-10.zip",
+      "published_sha256": "05ba5a4b7e84e3018cd51145d1b8b75b7caf4274bd0fe9f14115f91ba48a0356",
+      "receipt_digest": "76d4fb972a06ed37311893c2b810d9874848db6576bff27bd574a3c7adf8031f",
+      "source_key": "data/futures/um/monthly/klines/CHZUSDT/1h/CHZUSDT-1h-2023-10.zip",
+      "status": "MATERIALIZED_VERIFIED",
+      "symbol": "CHZUSDT"
+    },
+    {
+      "archive_filename": "SANDUSDT-1h-2023-10.zip",
+      "published_sha256": "5e23bbb4070ab549fdedc28404e30c08ab243d6b55968b3a6c13400b026329fd",
+      "receipt_digest": "8c798d8c7eb0cbcf925c96f299bda635afed509479c5f5b56a84eacd740ac0d2",
+      "source_key": "data/futures/um/monthly/klines/SANDUSDT/1h/SANDUSDT-1h-2023-10.zip",
+      "status": "MATERIALIZED_VERIFIED",
+      "symbol": "SANDUSDT"
+    },
+    {
+      "archive_filename": "REEFUSDT-1h-2023-10.zip",
+      "published_sha256": "bcf8ae63cfcc08b5e4d79f6adaabf490b05a24cc8125085c8cf0fdf4f119c2da",
+      "receipt_digest": "966e8e86681bbb80f75e3a83c5acc24c0627a872923226319ea337c9a3505a26",
+      "source_key": "data/futures/um/monthly/klines/REEFUSDT/1h/REEFUSDT-1h-2023-10.zip",
+      "status": "MATERIALIZED_VERIFIED",
+      "symbol": "REEFUSDT"
+    },
+    {
+      "archive_filename": "CHRUSDT-1h-2023-10.zip",
+      "published_sha256": "59c650abf28d22b9f1c4e59920afdd6184f768f61bbf4eb006226f6b927a35ad",
+      "receipt_digest": "9ce9a0a84d81171fca7ee458ea38654499251b7a29ad569b31d859a7b1f4296d",
+      "source_key": "data/futures/um/monthly/klines/CHRUSDT/1h/CHRUSDT-1h-2023-10.zip",
+      "status": "MATERIALIZED_VERIFIED",
+      "symbol": "CHRUSDT"
+    },
+    {
+      "archive_filename": "ALICEUSDT-1h-2023-10.zip",
+      "published_sha256": "247d4f0b82953f0e3161d8999911656c7d707a0d4a686336edaa5622c6ed5c71",
+      "receipt_digest": "081a1bb29c0ca7c2dbd4914e599bf9ec739ca0e7e7a0fae2a468820a367f0b89",
+      "source_key": "data/futures/um/monthly/klines/ALICEUSDT/1h/ALICEUSDT-1h-2023-10.zip",
+      "status": "MATERIALIZED_VERIFIED",
+      "symbol": "ALICEUSDT"
+    },
+    {
+      "archive_filename": "ONEUSDT-1h-2023-10.zip",
+      "published_sha256": "c35184e9795bcf46dddc5862472cc939ed09a62465b53318c70bf1af47edf8c2",
+      "receipt_digest": "6c582c189dc71fce1e69f43052317ca1288f468dfb5e1f93abbfa9a0616521d2",
+      "source_key": "data/futures/um/monthly/klines/ONEUSDT/1h/ONEUSDT-1h-2023-10.zip",
+      "status": "MATERIALIZED_VERIFIED",
+      "symbol": "ONEUSDT"
+    },
+    {
+      "archive_filename": "API3USDT-1h-2023-10.zip",
+      "published_sha256": "ec94c3d3ce218eea0b605d0b3702c717d77e9da471539842644d10f90e9ec03c",
+      "receipt_digest": "6eb99844d55b47a29bec92fc0c9307b76960f5a85b77220781ced3bf8bcb6a5b",
+      "source_key": "data/futures/um/monthly/klines/API3USDT/1h/API3USDT-1h-2023-10.zip",
+      "status": "MATERIALIZED_VERIFIED",
+      "symbol": "API3USDT"
+    },
+    {
+      "archive_filename": "GMTUSDT-1h-2023-10.zip",
+      "published_sha256": "a624f96f851ce2ba7e00bd2720ab10c1fec1d2f52a44d5a1f3f86738e53de1b3",
+      "receipt_digest": "b4309acacac18b22316eaa79c6d1be47984f0b9bc0e741565ffeeee0f3450330",
+      "source_key": "data/futures/um/monthly/klines/GMTUSDT/1h/GMTUSDT-1h-2023-10.zip",
+      "status": "MATERIALIZED_VERIFIED",
+      "symbol": "GMTUSDT"
+    },
+    {
+      "archive_filename": "APEUSDT-1h-2023-10.zip",
+      "published_sha256": "f462636b999614dee38460c5a1b3de9dd271a70fd33459d8cdb8af1fa72be793",
+      "receipt_digest": "7e8455733bb227fe5ae4bd50b8b6a37284a56a233c14a8c4cde4eb08293cd61c",
+      "source_key": "data/futures/um/monthly/klines/APEUSDT/1h/APEUSDT-1h-2023-10.zip",
+      "status": "MATERIALIZED_VERIFIED",
+      "symbol": "APEUSDT"
+    },
+    {
+      "archive_filename": "OPUSDT-1h-2023-10.zip",
+      "published_sha256": "bb8af444c6b1f94f8fdaa01dfcc3d084cdb6b65884da355b11bc31e45aa5d564",
+      "receipt_digest": "9cce88bc60cbf33effffd4435dde85caf533e94fad94f5fafb987f23705bc808",
+      "source_key": "data/futures/um/monthly/klines/OPUSDT/1h/OPUSDT-1h-2023-10.zip",
+      "status": "MATERIALIZED_VERIFIED",
+      "symbol": "OPUSDT"
+    },
+    {
+      "archive_filename": "INJUSDT-1h-2023-10.zip",
+      "published_sha256": "181b8ae0e055718ee2c7effd04b51b86234a276090b3bf5f249e33657c4737af",
+      "receipt_digest": "2afddb80ddac36717b2ae9f9986b70cf434bc58a00d51a3c1973ad149c38e3d4",
+      "source_key": "data/futures/um/monthly/klines/INJUSDT/1h/INJUSDT-1h-2023-10.zip",
+      "status": "MATERIALIZED_VERIFIED",
+      "symbol": "INJUSDT"
+    },
+    {
+      "archive_filename": "LDOUSDT-1h-2023-10.zip",
+      "published_sha256": "e7dd8a7c2081477f9bc8527b2a9a5199f829cc8c12060621a9263cb1316ddd16",
+      "receipt_digest": "2aaa603bfcc1dbb4b07bfa16ec6c47309187e6585cebfc2c55f10139f5ce8e84",
+      "source_key": "data/futures/um/monthly/klines/LDOUSDT/1h/LDOUSDT-1h-2023-10.zip",
+      "status": "MATERIALIZED_VERIFIED",
+      "symbol": "LDOUSDT"
+    },
+    {
+      "archive_filename": "APTUSDT-1h-2023-10.zip",
+      "published_sha256": "23b5e1efc71f123fee0114bf3b1f652419775ca93e18e386d6dd7b91fe2ecdbf",
+      "receipt_digest": "c4b8c48d4de1e93b711a5c960ae145cf8764940de3c63775724a3d5e76ee013c",
+      "source_key": "data/futures/um/monthly/klines/APTUSDT/1h/APTUSDT-1h-2023-10.zip",
+      "status": "MATERIALIZED_VERIFIED",
+      "symbol": "APTUSDT"
+    }
+  ],
+  "retrieval_generation_identity": "jigsaw-pit-coverage-v1-extension",
+  "rows": [
+    {
+      "close": "226.69",
+      "high": "227.74",
+      "low": "226.50",
+      "open": "227.62",
+      "symbol": "BCHUSDT",
+      "timestamp": "2023-10-18T23:00:00Z",
+      "volume": "14835.519"
+    },
+    {
+      "close": "0.4874",
+      "high": "0.4888",
+      "low": "0.4869",
+      "open": "0.4885",
+      "symbol": "XRPUSDT",
+      "timestamp": "2023-10-18T23:00:00Z",
+      "volume": "23446439.9"
+    },
+    {
+      "close": "60.19",
+      "high": "60.67",
+      "low": "60",
+      "open": "60.67",
+      "symbol": "LTCUSDT",
+      "timestamp": "2023-10-18T23:00:00Z",
+      "volume": "202716.273"
+    },
+    {
+      "close": "0.08912",
+      "high": "0.08932",
+      "low": "0.08908",
+      "open": "0.08923",
+      "symbol": "TRXUSDT",
+      "timestamp": "2023-10-18T23:00:00Z",
+      "volume": "13875643"
+    },
+    {
+      "close": "14.800",
+      "high": "14.859",
+      "low": "14.798",
+      "open": "14.851",
+      "symbol": "ETCUSDT",
+      "timestamp": "2023-10-18T23:00:00Z",
+      "volume": "66636.47"
+    },
+    {
+      "close": "7.354",
+      "high": "7.368",
+      "low": "7.351",
+      "open": "7.367",
+      "symbol": "LINKUSDT",
+      "timestamp": "2023-10-18T23:00:00Z",
+      "volume": "443916.10"
+    },
+    {
+      "close": "0.10318",
+      "high": "0.10338",
+      "low": "0.10308",
+      "open": "0.10329",
+      "symbol": "XLMUSDT",
+      "timestamp": "2023-10-18T23:00:00Z",
+      "volume": "8183429"
+    },
+    {
+      "close": "0.05703",
+      "high": "0.05724",
+      "low": "0.05687",
+      "open": "0.05720",
+      "symbol": "CHZUSDT",
+      "timestamp": "2023-10-18T23:00:00Z",
+      "volume": "15118405"
+    },
+    {
+      "close": "0.28280",
+      "high": "0.28370",
+      "low": "0.28270",
+      "open": "0.28340",
+      "symbol": "SANDUSDT",
+      "timestamp": "2023-10-18T23:00:00Z",
+      "volume": "2841358"
+    },
+    {
+      "close": "0.001225",
+      "high": "0.001228",
+      "low": "0.001221",
+      "open": "0.001223",
+      "symbol": "REEFUSDT",
+      "timestamp": "2023-10-18T23:00:00Z",
+      "volume": "122051058"
+    },
+    {
+      "close": "0.0867",
+      "high": "0.0873",
+      "low": "0.0866",
+      "open": "0.0871",
+      "symbol": "CHRUSDT",
+      "timestamp": "2023-10-18T23:00:00Z",
+      "volume": "1726770"
+    },
+    {
+      "close": "0.673",
+      "high": "0.678",
+      "low": "0.673",
+      "open": "0.676",
+      "symbol": "ALICEUSDT",
+      "timestamp": "2023-10-18T23:00:00Z",
+      "volume": "311727.9"
+    },
+    {
+      "close": "0.00881",
+      "high": "0.00887",
+      "low": "0.00880",
+      "open": "0.00887",
+      "symbol": "ONEUSDT",
+      "timestamp": "2023-10-18T23:00:00Z",
+      "volume": "16333368"
+    },
+    {
+      "close": "1.0201",
+      "high": "1.0225",
+      "low": "1.0188",
+      "open": "1.0198",
+      "symbol": "API3USDT",
+      "timestamp": "2023-10-18T23:00:00Z",
+      "volume": "209983.9"
+    },
+    {
+      "close": "0.14310",
+      "high": "0.14360",
+      "low": "0.14290",
+      "open": "0.14330",
+      "symbol": "GMTUSDT",
+      "timestamp": "2023-10-18T23:00:00Z",
+      "volume": "5698321"
+    },
+    {
+      "close": "1.1100",
+      "high": "1.1150",
+      "low": "1.1070",
+      "open": "1.1090",
+      "symbol": "APEUSDT",
+      "timestamp": "2023-10-18T23:00:00Z",
+      "volume": "3584652"
+    },
+    {
+      "close": "1.1865000",
+      "high": "1.1907000",
+      "low": "1.1846000",
+      "open": "1.1904000",
+      "symbol": "OPUSDT",
+      "timestamp": "2023-10-18T23:00:00Z",
+      "volume": "1368609.1"
+    },
+    {
+      "close": "8.110000",
+      "high": "8.123000",
+      "low": "8.069000",
+      "open": "8.116000",
+      "symbol": "INJUSDT",
+      "timestamp": "2023-10-18T23:00:00Z",
+      "volume": "271666.9"
+    },
+    {
+      "close": "1.491100",
+      "high": "1.496500",
+      "low": "1.487400",
+      "open": "1.495600",
+      "symbol": "LDOUSDT",
+      "timestamp": "2023-10-18T23:00:00Z",
+      "volume": "438949"
+    },
+    {
+      "close": "4.93700",
+      "high": "4.94500",
+      "low": "4.92900",
+      "open": "4.93800",
+      "symbol": "APTUSDT",
+      "timestamp": "2023-10-18T23:00:00Z",
+      "volume": "181311.9"
+    }
+  ],
+  "schema_version": "jigsaw-funding-pressure-pit-coverage-extension-v1",
+  "source_semantic": "BAR_OPEN_TIME"
+}

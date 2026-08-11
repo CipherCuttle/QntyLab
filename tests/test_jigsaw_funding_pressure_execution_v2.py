@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import dataclasses
+import hashlib
+import subprocess
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal, ROUND_DOWN, ROUND_UP, getcontext, localcontext
 from fractions import Fraction
@@ -230,3 +232,85 @@ def test_foundation_lifecycle_consumed_states_are_terminal():
     for state in (foundation.AuthorizationLifecycleState.CONSUMED_INCOMPLETE, foundation.AuthorizationLifecycleState.CONSUMED_COMPLETE):
         with pytest.raises(foundation.LifecycleTransitionError):
             foundation.transition_authorization_lifecycle(state, foundation.AuthorizationLifecycleState.AUTHORIZED_UNUSED)
+
+
+class GitBytesRunner:
+    def __init__(self, stdout: object, returncode: int = 0, stderr: object = b""):
+        self.stdout = stdout
+        self.returncode = returncode
+        self.stderr = stderr
+        self.calls: list[dict[str, object]] = []
+
+    def __call__(self, args, **kwargs):
+        self.calls.append({"args": args, **kwargs})
+        return subprocess.CompletedProcess(args, self.returncode, self.stdout, self.stderr)
+
+
+@pytest.mark.parametrize("blob", [b"example\n", b"example\n\n", b"\nexample\n"])
+def test_lossless_git_blob_retrieval_preserves_all_source_bytes(blob, tmp_path):
+    runner = GitBytesRunner(blob)
+    assert v2._run_git_bytes(["show", "candidate:path"], tmp_path, runner) == blob
+    assert runner.calls[0]["text"] is False
+
+
+def test_lossless_git_blob_retrieval_fails_closed_on_git_error(tmp_path):
+    with pytest.raises(foundation.RuntimeAttestationError, match="git command failed"):
+        v2._run_git_bytes(["show", "candidate:path"], tmp_path, GitBytesRunner(b"", returncode=1, stderr=b"missing blob"))
+
+
+def test_lossless_git_blob_retrieval_rejects_text_stdout(tmp_path):
+    with pytest.raises(foundation.RuntimeAttestationError, match="non-byte stdout"):
+        v2._run_git_bytes(["show", "candidate:path"], tmp_path, GitBytesRunner("example\n"))
+
+
+def _attestation_fixture(tmp_path, candidate_bytes, *, authorized_digest=None):
+    module = tmp_path / v2.V2_MODULE_PATH
+    module.parent.mkdir(parents=True)
+    module.write_bytes(candidate_bytes)
+    head = "a" * 40
+    candidate = "b" * 40
+    digest = authorized_digest or hashlib.sha256(candidate_bytes).hexdigest()
+    expected = foundation.canonical_authorization_binding_expectations(executor_source_sha256=digest)
+    envelope = dataclasses.replace(expected, reviewed_executor_candidate_sha=candidate, canonical_runtime_merge_sha=head)
+    authorization = v2.V2AuthorizationEnvelope(envelope, "unused")
+
+    class Runner:
+        def __call__(self, args, **kwargs):
+            command = args[1:]
+            if command == ["rev-parse", "--show-toplevel"]:
+                return subprocess.CompletedProcess(args, 0, str(tmp_path), b"")
+            if command == ["rev-parse", "HEAD"]:
+                return subprocess.CompletedProcess(args, 0, head, b"")
+            if command == ["status", "--porcelain"]:
+                return subprocess.CompletedProcess(args, 0, "", b"")
+            if command == ["show", f"{candidate}:{v2.V2_MODULE_PATH}"]:
+                return subprocess.CompletedProcess(args, 0, candidate_bytes, b"")
+            if command[:2] == ["merge-base", "--is-ancestor"]:
+                return subprocess.CompletedProcess(args, 0, "", "")
+            raise AssertionError(command)
+
+    return authorization, Runner()
+
+
+def test_attestation_exact_source_identity_passes_and_digest_matches(tmp_path, monkeypatch):
+    blob = b"\nexample\n\n"
+    authorization, runner = _attestation_fixture(tmp_path, blob)
+    monkeypatch.setattr(v2.provenance, "verify_git_ancestry", lambda *args, **kwargs: None)
+    result = v2.attest_v2_runtime(authorization=authorization, repo_root=tmp_path, git_runner=runner)
+    assert result.candidate_source_sha256 == hashlib.sha256(blob).hexdigest()
+
+
+def test_attestation_source_mismatch_fails_closed(tmp_path, monkeypatch):
+    authorization, runner = _attestation_fixture(tmp_path, b"candidate\n")
+    (tmp_path / v2.V2_MODULE_PATH).write_bytes(b"runtime\n")
+    monkeypatch.setattr(v2.provenance, "verify_git_ancestry", lambda *args, **kwargs: None)
+    with pytest.raises(v2.ReleaseBindingError, match="source bytes differ"):
+        v2.attest_v2_runtime(authorization=authorization, repo_root=tmp_path, git_runner=runner)
+
+
+def test_attestation_authorized_digest_mismatch_fails_closed(tmp_path, monkeypatch):
+    blob = b"same\n"
+    authorization, runner = _attestation_fixture(tmp_path, blob, authorized_digest="f" * 64)
+    monkeypatch.setattr(v2.provenance, "verify_git_ancestry", lambda *args, **kwargs: None)
+    with pytest.raises(v2.ReleaseBindingError, match="source digest"):
+        v2.attest_v2_runtime(authorization=authorization, repo_root=tmp_path, git_runner=runner)

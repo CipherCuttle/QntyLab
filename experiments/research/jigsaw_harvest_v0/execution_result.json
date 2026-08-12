@@ -1,0 +1,129 @@
+{
+  "schema_version": "jigsaw-frozen-execution-result-v0",
+  "phase": "JIGSAW_HARVEST_V0_FROZEN_RESULT_RECORDING",
+  "status": "RECORDED_IMMUTABLE",
+  "project_id": "JIGSAW_HARVEST_V0",
+  "experiment_id": "JIGSAW_HARVEST_V0_PREREGISTRATION_V0",
+  "preregistration_identity": {
+    "id": "JIGSAW_HARVEST_V0_PREREGISTRATION_V0",
+    "relative_path": "experiments/research/jigsaw_harvest_v0/preregistration.json",
+    "contract_digest": "sha256:499b355ee2b308b4ae01e8c63b44a9a361d44d50fe381080131f41a4851849e3"
+  },
+  "runtime": {
+    "canonical_execution_sha": "a2ece4b94e94e026b14631dcf8f0ef080c1452c6"
+  },
+  "implementation_identities": {
+    "harvest_scientific_implementation_sha": "a1271c3330956e7c6a61a2d6dade71858581b69c",
+    "execution_bridge_sha": "d3a7e2da4cdaedb33c51f21f952f1181954c8650",
+    "implementation_identity": "d3a7e2da4cdaedb33c51f21f952f1181954c8650"
+  },
+  "source_execution_record": {
+    "execution_id": "jigsaw-harvest-v0-a00f3015a58cddc663bcbc0651391b95",
+    "identity": "jigsaw_harvest_v0/jigsaw-harvest-v0-a00f3015a58cddc663bcbc0651391b95.execution.json",
+    "path": "/home/swirky/DevHub/executions/QntyLab/jigsaw_harvest_v0/jigsaw-harvest-v0-a00f3015a58cddc663bcbc0651391b95.execution.json",
+    "sha256": "c6533ed3911bc00e29b153c604113bb6c71119d03d8df3287680e549a42e2fce",
+    "schema_version": "jigsaw-harvest-real-execution-v0"
+  },
+  "snapshot": {
+    "snapshot_id": "rds-v0-c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac",
+    "snapshot_digest": "c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac",
+    "snapshot_reused": true
+  },
+  "execution": {
+    "execution_mode": "REAL_FROZEN_SNAPSHOT",
+    "observation_count": 580,
+    "hac_lag": 5,
+    "familywise_alpha": 0.05,
+    "multiplicity_adjustment": "Holm step-down over the four registered raw two-sided p-values"
+  },
+  "result": {
+    "inner_result_digest": "df362e058f20a79d7ade636c9a37ecd5c5674f8e19f1c6204915c03c6c84f83f",
+    "result_order": [
+      "JH01_RV_PERSISTENCE",
+      "JH02_DISPERSION_TO_RV",
+      "JH03_BREADTH_TO_RETURN",
+      "JH04_DRAWDOWN_TO_RETURN"
+    ],
+    "results": [
+      {
+        "proposition_id": "JH01_RV_PERSISTENCE",
+        "beta": 0.5047974226484947,
+        "hac_standard_error": 0.0400690156731937,
+        "hac_confidence_interval_95": [
+          0.4262635950330641,
+          0.5833312502639253
+        ],
+        "raw_p_value_two_sided": 2.1602157776846238e-36,
+        "holm_adjusted_p_value": 8.640863110738495e-36,
+        "classification": "SUPPORTED_WITHIN_FROZEN_SCOPE"
+      },
+      {
+        "proposition_id": "JH02_DISPERSION_TO_RV",
+        "beta": 0.16046158927398263,
+        "hac_standard_error": 0.06333979405307211,
+        "hac_confidence_interval_95": [
+          0.03631787414177701,
+          0.28460530440618825
+        ],
+        "raw_p_value_two_sided": 0.01129794973383219,
+        "holm_adjusted_p_value": 0.033893849201496566,
+        "classification": "SUPPORTED_WITHIN_FROZEN_SCOPE"
+      },
+      {
+        "proposition_id": "JH03_BREADTH_TO_RETURN",
+        "beta": -7.294932254197117e-05,
+        "hac_standard_error": 0.00453103510880285,
+        "hac_confidence_interval_95": [
+          -0.008953614948482081,
+          0.008807716303398138
+        ],
+        "raw_p_value_two_sided": 0.9871546738566194,
+        "holm_adjusted_p_value": 1.0,
+        "classification": "INCONCLUSIVE"
+      },
+      {
+        "proposition_id": "JH04_DRAWDOWN_TO_RETURN",
+        "beta": 0.00098684696068798,
+        "hac_standard_error": 0.015520696956340764,
+        "hac_confidence_interval_95": [
+          -0.029433160088700352,
+          0.03140685401007631
+        ],
+        "raw_p_value_two_sided": 0.9493025512677574,
+        "holm_adjusted_p_value": 1.0,
+        "classification": "INCONCLUSIVE"
+      }
+    ]
+  },
+  "throughput": {
+    "snapshot_reused": true,
+    "new_data_acquisitions": 0,
+    "new_data_qualification_phases": 0,
+    "data_infrastructure_changes": 0,
+    "propositions_registered": 4,
+    "propositions_executed": 4
+  },
+  "closure": {
+    "project_state": "CLOSED_PASS",
+    "implementation_authorized": false,
+    "closed_pass_meaning": "CLOSED_PASS records that the frozen four-proposition Harvest phase completed exactly as preregistered on the reused immutable snapshot with all four outcomes preserved. It does not mean every hypothesis was supported, and it grants no promotion, implementation, or downstream authority.",
+    "propositions_registered": 4,
+    "propositions_executed": 4,
+    "supported_within_frozen_scope": 2,
+    "not_supported": 0,
+    "inconclusive": 2,
+    "blocked": 0
+  },
+  "real_experiment_recomputed": false,
+  "scientific_authority": "EXPLORATORY_ASSOCIATION_ONLY",
+  "downstream_authorities": {
+    "causal": "NONE",
+    "strategy": "NONE",
+    "router": "NONE",
+    "state_snapshot": "NONE",
+    "qnty": "NONE",
+    "trading": "NONE"
+  },
+  "recording_convention": "Jigsaw execution_result.json plus result.json evidence-piece convention",
+  "record_digest": "sha256:2e7bc2db62f3d91175c6cf735f489bec4d8212207c0cfb64734b01250312c72a"
+}

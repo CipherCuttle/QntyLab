@@ -26,14 +26,16 @@ implementation_authorized = false
 
 [[project]]
 project_id = "JIGSAW_HARVEST_V0"
-state = "ACTIVE"
+state = "CLOSED_PASS"
 authority_level = "FROZEN_PROTOCOL_IMPLEMENTATION_ONLY"
 authoritative_artifacts = [
   "docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md",
   "experiments/research/jigsaw_harvest_v0/preregistration.json",
+  "experiments/research/jigsaw_harvest_v0/execution_result.json",
+  "experiments/research/jigsaw_harvest_v0/result.json",
 ]
-next_action = "Execute exactly the frozen four-proposition Jigsaw Harvest V0 using the canonical preregistration and exact frozen Research Data Spine V0 snapshot; record all four outcomes without result-conditioned implementation changes."
-implementation_authorized = true
+next_action = "Jigsaw Harvest V0 is closed. Preserve its four bounded evidence pieces; no State Snapshot, Router, Qnty, or trading implementation is authorized by this phase."
+implementation_authorized = false
 
 [[project]]
 project_id = "STATE_SNAPSHOT_V0"

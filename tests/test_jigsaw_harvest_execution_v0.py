@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from datetime import UTC, datetime, timedelta
 import json
 from pathlib import Path
@@ -132,6 +133,10 @@ def test_bridge_delegates_verified_transport_and_frozen_statistics(bound_snapsho
     assert receipt["canonical_execution_base"] == bridge.CANONICAL_EXECUTION_BASE
     assert receipt["reviewed_harvest_implementation_sha"] == bridge.REVIEWED_HARVEST_IMPLEMENTATION_SHA
     assert receipt["execution_bridge_sha"] == BRIDGE_SHA
+    assert receipt["implementation_identity"] == BRIDGE_SHA
+    assert receipt["execution_mode"] == "REAL_FROZEN_SNAPSHOT"
+    assert receipt["result_order"] == list(harvest.PROPOSITION_IDS)
+    assert receipt["result_order"] == receipt["ordered_proposition_ids"]
     assert receipt["snapshot_id"] == bound_snapshot["snapshot_id"]
     assert receipt["snapshot_digest"] == bound_snapshot["snapshot_digest"]
     assert receipt["throughput"] == {"snapshot_reused": True, "new_data_acquisitions": 0, "new_data_qualification_phases": 0, "data_infrastructure_changes": 0}
@@ -139,12 +144,26 @@ def test_bridge_delegates_verified_transport_and_frozen_statistics(bound_snapsho
     assert receipt["explicit"] == {"scientific_authority": "EXPLORATORY_ASSOCIATION_ONLY", "router_authority": "NONE", "qnty_authority": "NONE", "trading_authority": "NONE"}
     assert receipt["result_digest"] == harvest.result_digest(receipt)
 
+    preregistration = json.loads(
+        (Path(__file__).parents[1] / "experiments" / "research" / "jigsaw_harvest_v0" / "preregistration.json").read_text()
+    )
+    for field in preregistration["result_schema"]["required_global_fields"]:
+        assert field in receipt
+
 
 def test_receipt_is_deterministic_and_bridge_requires_final_sha(bound_snapshot: dict, monkeypatch: pytest.MonkeyPatch) -> None:
     _patch_design_rows(monkeypatch, {})
     first = bridge.execute_verified_snapshot(snapshot_path=bound_snapshot["snapshot_path"], execution_bridge_sha=BRIDGE_SHA)
     second = bridge.execute_verified_snapshot(snapshot_path=bound_snapshot["snapshot_path"], execution_bridge_sha=BRIDGE_SHA)
     assert first == second
+    for field, replacement in {
+        "implementation_identity": "c" * 40,
+        "execution_mode": "SYNTHETIC",
+        "result_order": list(reversed(harvest.PROPOSITION_IDS)),
+    }.items():
+        mutated = deepcopy(first)
+        mutated[field] = replacement
+        assert harvest.result_digest(mutated) != first["result_digest"]
     with pytest.raises(bridge.ExecutionBridgeError, match="commit SHA"):
         bridge.execute_verified_snapshot(snapshot_path=bound_snapshot["snapshot_path"], execution_bridge_sha="pending")
 

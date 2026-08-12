@@ -121,10 +121,13 @@ def execute_verified_snapshot(*, snapshot_path: Path, execution_bridge_sha: str)
         "canonical_execution_base": CANONICAL_EXECUTION_BASE,
         "reviewed_harvest_implementation_sha": REVIEWED_HARVEST_IMPLEMENTATION_SHA,
         "execution_bridge_sha": bridge_sha,
+        "implementation_identity": bridge_sha,
+        "execution_mode": "REAL_FROZEN_SNAPSHOT",
         "snapshot_id": harvest.EXPECTED_SNAPSHOT_ID,
         "snapshot_digest": harvest.EXPECTED_SNAPSHOT_DIGEST,
         "observation_count": harvest.OBSERVATION_COUNT,
         "hac_lag": harvest.HAC_LAG,
+        "result_order": list(harvest.PROPOSITION_IDS),
         "ordered_proposition_ids": list(harvest.PROPOSITION_IDS),
         "results": results,
         "throughput": {

@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- `JIGSAW_HARVEST_V0` — `ACTIVE`. Implement and verify only the frozen four-proposition Jigsaw Harvest V0 runner; real harvest execution remains separately gated.
+- `JIGSAW_HARVEST_V0` — `ACTIVE`. Execute exactly the frozen four-proposition Jigsaw Harvest V0 using the canonical preregistration and exact frozen Research Data Spine V0 snapshot; record all four outcomes without result-conditioned implementation changes.
 
 ## Queued — not authorized
 

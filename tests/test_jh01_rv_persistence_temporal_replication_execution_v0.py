@@ -1,14 +1,20 @@
 from __future__ import annotations
 
 import ast
+import hashlib
 import inspect
+import json
 import math
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 
 import numpy as np
 import pytest
 
 from qntylab import jh01_rv_persistence_temporal_replication_execution_v0 as execution
+
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def _window_fixture(*, unsafe_prior: bool = False):
@@ -145,3 +151,18 @@ def test_result_digest_is_deterministic_and_classification_is_not_caller_supplie
     payload = {"beta": 0.1, "classification": "INCONCLUSIVE", "execution_result_digest": "ignored"}
     assert execution.digest(payload, omitted_field="execution_result_digest") == execution.digest(dict(payload), omitted_field="execution_result_digest")
     assert "classification" not in inspect.signature(execution.execute_once).parameters
+
+
+def test_interrupted_one_shot_lineage_is_preserved_without_a_result_or_rerun() -> None:
+    artifact_root = ROOT / execution.ARTIFACT_RELATIVE
+    request = json.loads((artifact_root / "execution_request.json").read_text(encoding="utf-8"))
+    started = json.loads((artifact_root / "execution_started.json").read_text(encoding="utf-8"))
+    for artifact, field in ((request, "execution_request_digest"), (started, "execution_started_digest")):
+        encoded = json.dumps({key: value for key, value in artifact.items() if key != field}, sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False).encode("utf-8")
+        assert artifact[field] == hashlib.sha256(encoded).hexdigest()
+    assert request["frozen_execution_implementation_sha"] == "e638dc2e3b044697902230a5c0705fb49de1f21a"
+    assert started["execution_count"] == 1
+    assert not (artifact_root / "execution_result.json").exists()
+    closure = (artifact_root / "execution_interruption.md").read_text(encoding="utf-8")
+    assert "EXECUTION_INTERRUPTED_AFTER_REAL_OUTCOME_ACCESS" in closure
+    assert "no result reconstruction, repair, rerun" in closure

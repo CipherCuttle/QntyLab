@@ -145,16 +145,15 @@ def test_human_context_does_not_claim_no_queued_projects() -> None:
     assert "- None." not in queued_section
 
 
-def test_jh01_temporal_replication_execution_is_the_only_bounded_active_authority() -> None:
+def test_jh01_temporal_replication_execution_is_closed_blocked_after_started_execution() -> None:
     data = project_context.context_data(ROOT)
     _, _, registry = project_context.load_context_sources(ROOT)
-    assert sum(record["state"] == "ACTIVE" for record in registry["project"]) == 1
-    execution = data["active_project"]
-    assert execution is not None
-    assert execution["project_id"] == "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0"
-    assert execution["state"] == "ACTIVE"
-    assert execution["authority_level"] == "FROZEN_REPLICATION_EXECUTION_ONLY"
-    assert execution["implementation_authorized"] is True
+    assert sum(record["state"] == "ACTIVE" for record in registry["project"]) == 0
+    assert data["active_project"] is None
+    execution = next(record for record in registry["project"] if record["project_id"] == "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0")
+    assert execution["state"] == "CLOSED_BLOCKED"
+    assert execution["authority_level"] == "FROZEN_REPLICATION_EXECUTION_INTERRUPTED_NO_RERUN"
+    assert execution["implementation_authorized"] is False
     assert execution["frozen_preregistration_project_id"] == "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_PREREG_V0"
     assert execution["frozen_preregistration_digest"] == "46f923023b4b696307da2b9d6fc4c8db9d04b40b012de35e0bf738cc03c4be57"
     assert execution["frozen_input_qualification_digest"] == "8f82db32ce0f453f6f67e5cd4b421e0848752b7f24a9b39f05ec979fe9382593"
@@ -167,27 +166,22 @@ def test_jh01_temporal_replication_execution_is_the_only_bounded_active_authorit
         "experiments/research/jh01_rv_persistence_temporal_replication_v0/materialization/per_symbol_manifest.json",
         "experiments/research/jh01_rv_persistence_temporal_replication_v0/materialization/snapshot_manifest.json",
         "experiments/research/jh01_rv_persistence_temporal_replication_v0/materialization/input_qualification.json",
+        "experiments/research/jh01_rv_persistence_temporal_replication_v0/hostile_execution_review.md",
+        "experiments/research/jh01_rv_persistence_temporal_replication_v0/execution_request.json",
+        "experiments/research/jh01_rv_persistence_temporal_replication_v0/execution_started.json",
+        "experiments/research/jh01_rv_persistence_temporal_replication_v0/execution_interruption.md",
     }
-    action = data["current_permitted_next_action"].lower()
+    action = execution["next_action"].lower()
     for required_text in (
-        "synthetic fixtures only",
-        "hostile-review and freeze",
-        "before any scientific transformation",
-        "exactly once",
-        "execution-authorization base sha",
-        "frozen executor implementation sha",
-        "no exploratory variants",
-        "input reacquisition",
-        "alternative horizons",
-        "covariates",
-        "hac lags",
-        "holm",
-        "effect-size gates",
-        "pooling, or meta-analysis",
+        "interrupted",
+        "execution_interrupted_after_real_outcome_access",
+        "no repair, rerun",
+        "alternative calculation",
+        "result reconstruction",
         "jigsaw evidence creation",
         "state snapshot",
         "qnty, trading",
-        "post-result implementation repair may not rerun",
+        "superseding git-backed governance",
     ):
         assert required_text in action
 

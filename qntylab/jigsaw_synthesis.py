@@ -181,21 +181,41 @@ def _binding_window(row: dict) -> tuple[datetime, datetime] | None:
     return start, end
 
 
-def _decision_window_relation(a: dict, b: dict) -> str:
+def _decision_window_relation_and_direction(a: dict, b: dict) -> tuple[str, str]:
+    """The single mechanical derivation of how two pieces' frozen decision
+    windows relate in time, consumed by every downstream layer (independence,
+    replication, statement wording). Nothing else re-parses these windows.
+
+    Returns ``(relation, direction)``.
+
+    ``relation`` is unchanged from the pre-existing contract already consumed
+    by ``_independence_status``/``_replication_relation``/tests/
+    ``eligibility.json``: one of ``EXACT``, ``A_CONTAINS_B``, ``B_CONTAINS_A``,
+    ``PARTIAL_OVERLAP``, ``DISJOINT``, ``UNKNOWN``.
+
+    ``direction`` is the additional temporal-ordering fact: ``A_BEFORE_B`` or
+    ``B_BEFORE_A``, established *only* when ``relation == "DISJOINT"`` -- a
+    provably non-overlapping pair has a well-defined earlier/later ordering.
+    For every other relation, including ``UNKNOWN``, ``direction`` is
+    ``NOT_APPLICABLE``: EXACT/overlapping/contained windows do not resolve to
+    a single before/after claim, and unparseable windows resolve neither.
+    Downstream wording must never say "later"/"earlier" from anything but
+    this field (F-02, QNTYLAB_JH01_JIGSAW_EVIDENCE_CLOSURE_REPAIR_V0).
+    """
     wa, wb = _binding_window(a), _binding_window(b)
     if wa is None or wb is None:
-        return "UNKNOWN"
+        return "UNKNOWN", "NOT_APPLICABLE"
     a_start, a_end = wa
     b_start, b_end = wb
     if a_start == b_start and a_end == b_end:
-        return "EXACT"
+        return "EXACT", "NOT_APPLICABLE"
     if a_start <= b_start and a_end >= b_end:
-        return "A_CONTAINS_B"
+        return "A_CONTAINS_B", "NOT_APPLICABLE"
     if b_start <= a_start and b_end >= a_end:
-        return "B_CONTAINS_A"
+        return "B_CONTAINS_A", "NOT_APPLICABLE"
     if a_start <= b_end and b_start <= a_end:
-        return "PARTIAL_OVERLAP"
-    return "DISJOINT"
+        return "PARTIAL_OVERLAP", "NOT_APPLICABLE"
+    return "DISJOINT", ("A_BEFORE_B" if a_end < b_start else "B_BEFORE_A")
 
 
 def _same_data_history(same_snapshot_identity: str, same_source_artifact: str) -> str:
@@ -353,7 +373,7 @@ def _build_pair(row_a: dict, row_b: dict) -> dict[str, Any]:
     same_source_artifact = _same_source_artifact(row_a, row_b)
     same_experiment = _same_experiment(row_a, row_b)
     same_snapshot_identity = _same_snapshot_identity(row_a, row_b)
-    decision_window_relation = _decision_window_relation(row_a, row_b)
+    decision_window_relation, decision_window_direction = _decision_window_relation_and_direction(row_a, row_b)
     same_data_history = _same_data_history(same_snapshot_identity, same_source_artifact)
     same_feature = _same_native_string_field(row_a, row_b, "feature")
     same_outcome = _same_native_string_field(row_a, row_b, "outcome")
@@ -370,6 +390,7 @@ def _build_pair(row_a: dict, row_b: dict) -> dict[str, Any]:
         "same_experiment": same_experiment,
         "same_snapshot_identity": same_snapshot_identity,
         "decision_window_relation": decision_window_relation,
+        "decision_window_direction": decision_window_direction,
         "same_data_history": same_data_history,
         "same_feature": same_feature,
         "same_outcome": same_outcome,
@@ -550,19 +571,37 @@ def _statement_text(pair: dict, row_a: dict, row_b: dict) -> str:
         )
 
     if basis == "TEMPORAL_REPLICATION_CONTEXT_ONLY":
-        replicating_id = a_id if pair["replication_target_relation"] == "A_DECLARES_REPLICATION_OF_B" else b_id
-        target_id = b_id if replicating_id == a_id else a_id
+        replicating_is_a = pair["replication_target_relation"] == "A_DECLARES_REPLICATION_OF_B"
+        replicating_id = a_id if replicating_is_a else b_id
+        target_id = b_id if replicating_is_a else a_id
+        # TEMPORAL_REPLICATION_CONTEXT_ONLY is only reachable when
+        # decision_window_relation == "DISJOINT" (see _allowed_synthesis /
+        # _replication_relation), and _decision_window_relation_and_direction
+        # always resolves a DISJOINT pair's direction to A_BEFORE_B or
+        # B_BEFORE_A -- never NOT_APPLICABLE/UNKNOWN. "later"/"earlier" is
+        # therefore read off that single mechanical derivation, never
+        # inferred from piece names, declaration direction, or which side
+        # made the explicit replication-target declaration (F-02,
+        # QNTYLAB_JH01_JIGSAW_EVIDENCE_CLOSURE_REPAIR_V0).
+        direction = pair["decision_window_direction"]
+        replicating_after_target = (replicating_is_a and direction == "B_BEFORE_A") or (
+            not replicating_is_a and direction == "A_BEFORE_B"
+        )
+        if direction in ("A_BEFORE_B", "B_BEFORE_A"):
+            order_phrase = "a later" if replicating_after_target else "an earlier"
+        else:
+            order_phrase = "a"
         return (
             f"{replicating_id} explicitly declares itself a replication attempt of {target_id}'s "
             "proposition, and the two pieces' decision windows are provably disjoint with neither a "
             "shared explicit snapshot identity nor a shared source artifact established between "
-            "them. This licenses only a temporal-replication context statement: it records that a "
-            "later, temporally separate frozen evaluation of the same intended proposition exists "
-            "and what its native classification was. It does not establish provider, exchange, "
-            "data-generating-process, methodological, implementation, organizational, or causal "
-            "independence between the two pieces, does not establish independent replication, and "
-            "does not combine, average, or otherwise strengthen either piece's native effect "
-            "estimate, classification, or limitations."
+            "them. This licenses only a temporal-replication context statement: it records that "
+            f"{order_phrase} temporally separate frozen evaluation of the same intended proposition "
+            "exists and what its native classification was. It does not establish provider, "
+            "exchange, data-generating-process, methodological, implementation, organizational, or "
+            "causal independence between the two pieces, does not establish independent "
+            "replication, and does not combine, average, or otherwise strengthen either piece's "
+            "native effect estimate, classification, or limitations."
         )
 
     raise JigsawSynthesisError(f"no synthesis statement is licensed for allowed_synthesis={basis!r}")

@@ -220,3 +220,78 @@ change (see `test_closure_c` and the pre-existing `explicit_independent_replicat
 fixtures, which continue to resolve `independence_status` unchanged -- that
 field is still never read for independence, and the new field is a distinct
 name read only for the strictly weaker replication axis).
+
+## `decision_window_direction` — mechanical temporal direction (PR #60 post-review closure repair, F-02)
+
+A post-review Codex finding on PR #60 (candidate `e7bfc49d9bd8452f3802db393567c3ce156f8290`)
+observed that `TEMPORAL_REPLICATION_CONTEXT_ONLY`'s statement text
+unconditionally called the replicating piece's evaluation "later," even
+though `_replication_relation` only checks `decision_window_relation ==
+"DISJOINT"` -- disjointness alone, with no ordering. A future evidence piece
+that explicitly declared a replication target while evaluating an *earlier*
+disjoint historical window would have been mis-described as a later
+evaluation.
+
+The fix keeps `decision_window_relation`'s existing values and every
+consumer of them (`_independence_status`, `_replication_relation`,
+`eligibility.json`'s `pairs_by_decision_window_relation` tally, and the
+pre-existing pinned-`"DISJOINT"` tests) byte-for-byte unchanged, so nothing
+downstream of that axis needed to move. What changed is that the relation is
+now derived by a single function,
+`_decision_window_relation_and_direction`, which also returns a second,
+purely additive fact, `decision_window_direction` -- `A_BEFORE_B` or
+`B_BEFORE_A`, established *only* when the relation is `DISJOINT` (a provably
+non-overlapping pair has a well-defined ordering); every other relation,
+including `UNKNOWN`, gets `NOT_APPLICABLE`. Both facts come from the exact
+same parsed `_binding_window` pair -- there is still only one place that
+parses these windows, so relation and direction can never disagree with each
+other.
+
+`_statement_text`'s `TEMPORAL_REPLICATION_CONTEXT_ONLY` branch now reads
+`decision_window_direction` (never the piece names, and never which side
+made the explicit declaration) to decide whether the replicating piece's
+window falls after or before the target's, and renders "a later temporally
+separate frozen evaluation," "an earlier temporally separate frozen
+evaluation," or, only if direction is somehow not resolvable, the neutral "a
+temporally separate frozen evaluation." For the real JH01 pair,
+`JH01_RV_PERSISTENCE`'s window (`...2025-06-19T00:00:00Z`) ends before
+`JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_V0R1`'s window begins
+(`2025-07-20T00:00:00Z...`), so `decision_window_direction` mechanically
+resolves to `A_BEFORE_B` and the generated statement correctly says "later."
+A reverse-time fixture -- a declaring piece whose window is the earlier of
+the disjoint pair -- resolves to the opposite direction and renders
+"earlier," never "later." `replication_relation`, `allowed_synthesis`, and
+every non-escalation guarantee in this document are unchanged by this fix;
+only the wording's truthfulness about which side is temporally later is
+affected.
+
+## Research-ledger recording (PR #60 post-review closure repair, F-01)
+
+A second post-review Codex finding on the same candidate observed that this
+phase's canonical evidence incorporation was never recorded in the
+append-only research ledger (`experiments/research/candidates.jsonl` /
+`decisions.jsonl`), so a fresh `python -m qntylab.research_ledger context`
+still reported only the graveyarded `CANDIDATE_JIGSAW_HARVEST_V0` family and
+gave no indication that `JH01_RV_PERSISTENCE` now has later temporal
+replication evidence.
+
+The repair appends a `CANDIDATE_PROPOSED` / `DECISION_RECORDED` pair under a
+new, narrower `CANDIDATE_JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_V0R1`
+identity in its own `FAMILY_JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_V0`
+family -- deliberately *not* reusing `FAMILY_JIGSAW_HARVEST_V0` -- because
+that family's own `DECISION_RECORDED` event is `scope=FAMILY` and explicitly
+states it "may not be reopened, extended, or rescued"; a `FAMILY`-scoped
+decision under the same `family_id` would replay against every variant in
+that family (see `replay()`'s `scope == "FAMILY"` fan-out) and require an
+unwanted `CANDIDATE_REOPENED` event just to pass. The new decision is
+`status=GRAVEYARDED`, `scope=EXACT_VARIANT`, mirroring the established
+precedent that `GRAVEYARDED` is this ledger's status for "measurement-complete,
+frozen, no further action authorized" (exactly how `CANDIDATE_JIGSAW_HARVEST_V0`
+itself was closed, including when its own results were positive) -- not
+`SURVIVOR`, which this repair never uses. `evidence_paths`/`evidence_sha256`
+bind, with no recomputation, the exact on-disk bytes of `result.json` and
+the two frozen V0R1 artifacts named in this phase's own project record.
+`revisit_condition` states plainly that any further work requires a new
+preregistration and grants no downstream authority. Neither historical
+Jigsaw Harvest V0 ledger event was modified; both streams remain
+append-only, and `research_ledger rebuild`/`doctor`/`context` all agree.

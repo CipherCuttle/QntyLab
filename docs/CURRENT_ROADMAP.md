@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- None.
+- `JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_PREREG_V0` — `ACTIVE`. Create, validate, independently hostile-review, and freeze only the outcome-blind preregistration for a genuinely new-history temporal empirical replication of JH01_RV_PERSISTENCE. No new market-data access, acquisition, materialization, feature/outcome computation, regression execution, Jigsaw evidence creation, State Snapshot authorization, Router, Qnty, trading, or promotion authority is granted.
 
 ## Queued — not authorized
 

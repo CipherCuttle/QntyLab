@@ -38,6 +38,19 @@ next_action = "Jigsaw Harvest V0 is closed. Preserve its four bounded evidence p
 implementation_authorized = false
 
 [[project]]
+project_id = "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_PREREG_V0"
+state = "ACTIVE"
+authority_level = "PREREGISTRATION_ONLY"
+authoritative_artifacts = [
+  "docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md",
+  "experiments/research/jigsaw_harvest_v0/preregistration.json",
+  "experiments/research/jigsaw_harvest_v0/result.json",
+  "experiments/research/jigsaw_synthesis_eligibility_v0/eligibility.json",
+]
+next_action = "Create, validate, independently hostile-review, and freeze only the outcome-blind preregistration for a genuinely new-history temporal empirical replication of JH01_RV_PERSISTENCE. No new market-data access, acquisition, materialization, feature/outcome computation, regression execution, Jigsaw evidence creation, State Snapshot authorization, Router, Qnty, trading, or promotion authority is granted."
+implementation_authorized = true
+
+[[project]]
 project_id = "STATE_SNAPSHOT_V0"
 state = "PLANNED_NOT_AUTHORIZED"
 authority_level = "PLANNING_ONLY"

@@ -1,0 +1,295 @@
+{
+  "schema_version": "jigsaw-evidence-piece-v0",
+  "phase": "JIGSAW_HARVEST_V0_FROZEN_RESULT_RECORDING",
+  "experiment_id": "JIGSAW_HARVEST_V0_PREREGISTRATION_V0",
+  "project_id": "JIGSAW_HARVEST_V0",
+  "preregistration_id": "JIGSAW_HARVEST_V0_PREREGISTRATION_V0",
+  "authority": "NON_AUTHORITATIVE_EXPLORATORY_ONLY",
+  "research_status": "FROZEN_HISTORICAL_EVIDENCE",
+  "promotion_eligible": false,
+  "piece_count": 4,
+  "piece_order": [
+    "JH01_RV_PERSISTENCE",
+    "JH02_DISPERSION_TO_RV",
+    "JH03_BREADTH_TO_RETURN",
+    "JH04_DRAWDOWN_TO_RETURN"
+  ],
+  "family_summary": {
+    "propositions_registered": 4,
+    "propositions_executed": 4,
+    "supported_within_frozen_scope": 2,
+    "not_supported": 0,
+    "inconclusive": 2,
+    "blocked": 0,
+    "note": "Four distinct bounded evidence pieces are preserved separately. They are not collapsed into a single family verdict, and a supported piece does not promote itself."
+  },
+  "pieces": [
+    {
+      "proposition_id": "JH01_RV_PERSISTENCE",
+      "piece_type": "PREDICTIVE_ASSOCIATION",
+      "feature": "RV24_prior,t",
+      "outcome": "RV24_future,t",
+      "direction": {
+        "preregistered_predicted_beta_sign": "POSITIVE",
+        "observed_beta_sign": "POSITIVE"
+      },
+      "beta": 0.5047974226484947,
+      "hac_standard_error": 0.0400690156731937,
+      "hac_confidence_interval_95": [
+        0.4262635950330641,
+        0.5833312502639253
+      ],
+      "raw_p_value_two_sided": 2.1602157776846238e-36,
+      "holm_adjusted_p_value": 8.640863110738495e-36,
+      "classification": "SUPPORTED_WITHIN_FROZEN_SCOPE",
+      "sample": 580,
+      "hac_lag": 5,
+      "snapshot_binding": {
+        "snapshot_id": "rds-v0-c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac",
+        "snapshot_digest": "c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac",
+        "decision_window": "2023-11-18T00:00:00Z..2025-06-19T00:00:00Z",
+        "panel_symbols": 20,
+        "bar_interval": "1h"
+      },
+      "prior_feature_exposure": "NO",
+      "interpretation": "Within this exact frozen panel, sample, and specification, higher prior 24h aggregate realized volatility was positively associated with higher following-24h aggregate realized volatility.",
+      "evidence_class": "POSITIVE_ASSOCIATION_WITHIN_FROZEN_SCOPE",
+      "does_not_establish": [
+        "causality",
+        "inverse effect",
+        "economic significance",
+        "incremental forecast value beyond any benchmark",
+        "out-of-sample or forward generality",
+        "strategy authority",
+        "router authority",
+        "State Snapshot authority",
+        "Qnty authority",
+        "trading authority",
+        "that volatility causes volatility",
+        "that a stated fraction of volatility persists",
+        "a trading edge",
+        "that RV24 is an authorized State Snapshot feature"
+      ],
+      "limitations": [
+        "One frozen 20-symbol perpetual panel over a single fixed decision window; no other universe, horizon, or bandwidth was estimated.",
+        "Single intercept OLS per proposition with no covariates, transformations, or standardization.",
+        "Inference is HAC(5) two-sided normal approximation at the frozen T=580; no bootstrap or alternative lag was computed.",
+        "No subgroup, sensitivity, or robustness variant exists for this phase.",
+        "Association within the frozen sample only; this is exploratory Jigsaw evidence, not a validated edge."
+      ],
+      "non_escalation": "This piece establishes no causal, inverse-causal, trading, strategy, Router, State Snapshot, Qnty, or promotion authority. It may not be used to activate STATE_SNAPSHOT_V0 or any implementation phase.",
+      "promotion_eligible": false,
+      "authorities": {
+        "causal": "NONE",
+        "strategy": "NONE",
+        "router": "NONE",
+        "state_snapshot": "NONE",
+        "qnty": "NONE",
+        "trading": "NONE"
+      }
+    },
+    {
+      "proposition_id": "JH02_DISPERSION_TO_RV",
+      "piece_type": "PREDICTIVE_ASSOCIATION",
+      "feature": "DISP24_t",
+      "outcome": "RV24_future,t",
+      "direction": {
+        "preregistered_predicted_beta_sign": "POSITIVE",
+        "observed_beta_sign": "POSITIVE"
+      },
+      "beta": 0.16046158927398263,
+      "hac_standard_error": 0.06333979405307211,
+      "hac_confidence_interval_95": [
+        0.03631787414177701,
+        0.28460530440618825
+      ],
+      "raw_p_value_two_sided": 0.01129794973383219,
+      "holm_adjusted_p_value": 0.033893849201496566,
+      "classification": "SUPPORTED_WITHIN_FROZEN_SCOPE",
+      "sample": 580,
+      "hac_lag": 5,
+      "snapshot_binding": {
+        "snapshot_id": "rds-v0-c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac",
+        "snapshot_digest": "c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac",
+        "decision_window": "2023-11-18T00:00:00Z..2025-06-19T00:00:00Z",
+        "panel_symbols": 20,
+        "bar_interval": "1h"
+      },
+      "prior_feature_exposure": "YES",
+      "interpretation": "Within this exact frozen panel, sample, and specification, greater trailing 24h cross-sectional return dispersion was positively associated with higher following-24h aggregate realized volatility.",
+      "evidence_class": "POSITIVE_ASSOCIATION_WITHIN_FROZEN_SCOPE",
+      "does_not_establish": [
+        "causality",
+        "inverse effect",
+        "economic significance",
+        "incremental forecast value beyond any benchmark",
+        "out-of-sample or forward generality",
+        "strategy authority",
+        "router authority",
+        "State Snapshot authority",
+        "Qnty authority",
+        "trading authority",
+        "a rescue or reversal of the earlier cross-sectional dispersion result",
+        "that dispersion is an authorized State Snapshot feature"
+      ],
+      "limitations": [
+        "One frozen 20-symbol perpetual panel over a single fixed decision window; no other universe, horizon, or bandwidth was estimated.",
+        "Single intercept OLS per proposition with no covariates, transformations, or standardization.",
+        "Inference is HAC(5) two-sided normal approximation at the frozen T=580; no bootstrap or alternative lag was computed.",
+        "No subgroup, sensitivity, or robustness variant exists for this phase.",
+        "Association within the frozen sample only; this is exploratory Jigsaw evidence, not a validated edge."
+      ],
+      "non_escalation": "This piece establishes no causal, inverse-causal, trading, strategy, Router, State Snapshot, Qnty, or promotion authority. It may not be used to activate STATE_SNAPSHOT_V0 or any implementation phase.",
+      "promotion_eligible": false,
+      "authorities": {
+        "causal": "NONE",
+        "strategy": "NONE",
+        "router": "NONE",
+        "state_snapshot": "NONE",
+        "qnty": "NONE",
+        "trading": "NONE"
+      },
+      "prior_exposure_context": "Cross-sectional dispersion previously appeared against the different outcome cross-sectional momentum utility. This registered proposition is not pristine first exposure and is not a rescue of that negative result.",
+      "prior_exposure_note": "Cross-sectional dispersion was previously exposed against the different outcome cross-sectional momentum utility. This result is not pristine first exposure, and it does not rescue or reverse that earlier negative result, which used a different outcome."
+    },
+    {
+      "proposition_id": "JH03_BREADTH_TO_RETURN",
+      "piece_type": "PREDICTIVE_ASSOCIATION",
+      "feature": "BREADTH7D_t",
+      "outcome": "R_m,t_to_t_plus_24",
+      "direction": {
+        "preregistered_predicted_beta_sign": "POSITIVE",
+        "observed_beta_sign": "NEGATIVE"
+      },
+      "beta": -7.294932254197117e-05,
+      "hac_standard_error": 0.00453103510880285,
+      "hac_confidence_interval_95": [
+        -0.008953614948482081,
+        0.008807716303398138
+      ],
+      "raw_p_value_two_sided": 0.9871546738566194,
+      "holm_adjusted_p_value": 1.0,
+      "classification": "INCONCLUSIVE",
+      "sample": 580,
+      "hac_lag": 5,
+      "snapshot_binding": {
+        "snapshot_id": "rds-v0-c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac",
+        "snapshot_digest": "c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac",
+        "decision_window": "2023-11-18T00:00:00Z..2025-06-19T00:00:00Z",
+        "panel_symbols": 20,
+        "bar_interval": "1h"
+      },
+      "prior_feature_exposure": "NO",
+      "interpretation": "No support was established for the preregistered positive relation between 7-day breadth and the following 24h aggregate market return. The classification remains INCONCLUSIVE.",
+      "evidence_class": "NO_SUPPORT_ESTABLISHED_FOR_FROZEN_POSITIVE_DIRECTION",
+      "does_not_establish": [
+        "causality",
+        "inverse effect",
+        "economic significance",
+        "incremental forecast value beyond any benchmark",
+        "out-of-sample or forward generality",
+        "strategy authority",
+        "router authority",
+        "State Snapshot authority",
+        "Qnty authority",
+        "trading authority",
+        "that breadth has no predictive value",
+        "absence of an effect"
+      ],
+      "limitations": [
+        "One frozen 20-symbol perpetual panel over a single fixed decision window; no other universe, horizon, or bandwidth was estimated.",
+        "Single intercept OLS per proposition with no covariates, transformations, or standardization.",
+        "Inference is HAC(5) two-sided normal approximation at the frozen T=580; no bootstrap or alternative lag was computed.",
+        "No subgroup, sensitivity, or robustness variant exists for this phase.",
+        "Association within the frozen sample only; this is exploratory Jigsaw evidence, not a validated edge.",
+        "INCONCLUSIVE means the frozen positive direction was not established at this sample and precision; it is not evidence of absence."
+      ],
+      "non_escalation": "This piece establishes no causal, inverse-causal, trading, strategy, Router, State Snapshot, Qnty, or promotion authority. It may not be used to activate STATE_SNAPSHOT_V0 or any implementation phase.",
+      "promotion_eligible": false,
+      "authorities": {
+        "causal": "NONE",
+        "strategy": "NONE",
+        "router": "NONE",
+        "state_snapshot": "NONE",
+        "qnty": "NONE",
+        "trading": "NONE"
+      }
+    },
+    {
+      "proposition_id": "JH04_DRAWDOWN_TO_RETURN",
+      "piece_type": "PREDICTIVE_ASSOCIATION",
+      "feature": "DRAWDOWN_DEPTH30D_t",
+      "outcome": "R_m,t_to_t_plus_24",
+      "direction": {
+        "preregistered_predicted_beta_sign": "POSITIVE",
+        "observed_beta_sign": "POSITIVE"
+      },
+      "beta": 0.00098684696068798,
+      "hac_standard_error": 0.015520696956340764,
+      "hac_confidence_interval_95": [
+        -0.029433160088700352,
+        0.03140685401007631
+      ],
+      "raw_p_value_two_sided": 0.9493025512677574,
+      "holm_adjusted_p_value": 1.0,
+      "classification": "INCONCLUSIVE",
+      "sample": 580,
+      "hac_lag": 5,
+      "snapshot_binding": {
+        "snapshot_id": "rds-v0-c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac",
+        "snapshot_digest": "c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac",
+        "decision_window": "2023-11-18T00:00:00Z..2025-06-19T00:00:00Z",
+        "panel_symbols": 20,
+        "bar_interval": "1h"
+      },
+      "prior_feature_exposure": "NO",
+      "interpretation": "No support was established for the preregistered positive relation between 30-day drawdown depth and the following 24h aggregate market return, registered as a reversal direction. The classification remains INCONCLUSIVE.",
+      "evidence_class": "NO_SUPPORT_ESTABLISHED_FOR_FROZEN_POSITIVE_DIRECTION",
+      "does_not_establish": [
+        "causality",
+        "inverse effect",
+        "economic significance",
+        "incremental forecast value beyond any benchmark",
+        "out-of-sample or forward generality",
+        "strategy authority",
+        "router authority",
+        "State Snapshot authority",
+        "Qnty authority",
+        "trading authority",
+        "that drawdowns do not rebound",
+        "absence of an effect"
+      ],
+      "limitations": [
+        "One frozen 20-symbol perpetual panel over a single fixed decision window; no other universe, horizon, or bandwidth was estimated.",
+        "Single intercept OLS per proposition with no covariates, transformations, or standardization.",
+        "Inference is HAC(5) two-sided normal approximation at the frozen T=580; no bootstrap or alternative lag was computed.",
+        "No subgroup, sensitivity, or robustness variant exists for this phase.",
+        "Association within the frozen sample only; this is exploratory Jigsaw evidence, not a validated edge.",
+        "INCONCLUSIVE means the frozen positive direction was not established at this sample and precision; it is not evidence of absence."
+      ],
+      "non_escalation": "This piece establishes no causal, inverse-causal, trading, strategy, Router, State Snapshot, Qnty, or promotion authority. It may not be used to activate STATE_SNAPSHOT_V0 or any implementation phase.",
+      "promotion_eligible": false,
+      "authorities": {
+        "causal": "NONE",
+        "strategy": "NONE",
+        "router": "NONE",
+        "state_snapshot": "NONE",
+        "qnty": "NONE",
+        "trading": "NONE"
+      }
+    }
+  ],
+  "authorities": {
+    "causal": "NONE",
+    "strategy": "NONE",
+    "router": "NONE",
+    "state_snapshot": "NONE",
+    "qnty": "NONE",
+    "trading": "NONE"
+  },
+  "source_execution_result_relative_path": "experiments/research/jigsaw_harvest_v0/execution_result.json",
+  "source_execution_record_sha256": "c6533ed3911bc00e29b153c604113bb6c71119d03d8df3287680e549a42e2fce",
+  "recording_convention": "Jigsaw execution_result.json plus result.json evidence-piece convention",
+  "real_experiment_recomputed": false,
+  "piece_digest": "sha256:4f361001f5347a52559d9d94405125df4280742f96fe5a8b4083449c87d40903"
+}

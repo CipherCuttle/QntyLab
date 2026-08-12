@@ -145,11 +145,23 @@ def test_human_context_does_not_claim_no_queued_projects() -> None:
     assert "- None." not in queued_section
 
 
-def test_active_harvest_is_the_only_authorized_implementation_phase() -> None:
+def test_closed_harvest_leaves_no_authorized_implementation_phase() -> None:
     data = project_context.context_data(ROOT)
-    assert data["active_project"]["project_id"] == "JIGSAW_HARVEST_V0"
-    assert data["active_project"]["implementation_authorized"] is True
-    assert data["current_permitted_next_action"] == "Execute exactly the frozen four-proposition Jigsaw Harvest V0 using the canonical preregistration and exact frozen Research Data Spine V0 snapshot; record all four outcomes without result-conditioned implementation changes."
+    assert data["active_project"] is None
+    assert data["current_permitted_next_action"] == "No project implementation is currently authorized."
+    harvest = next(record for record in data["superseded_or_stale_planning"] if record["project_id"] == "JIGSAW_HARVEST_V0")
+    assert harvest["state"] == "CLOSED_PASS"
+    assert harvest["next_action"] == "Jigsaw Harvest V0 is closed. Preserve its four bounded evidence pieces; no State Snapshot, Router, Qnty, or trading implementation is authorized by this phase."
+
+
+def test_closed_harvest_does_not_authorize_state_snapshot() -> None:
+    data = project_context.context_data(ROOT)
+    _, _, registry = project_context.load_context_sources(ROOT)
+    projects = {record["project_id"]: record for record in registry["project"]}
+    assert projects["STATE_SNAPSHOT_V0"]["state"] == "PLANNED_NOT_AUTHORIZED"
+    assert projects["STATE_SNAPSHOT_V0"]["implementation_authorized"] is False
+    assert projects["JIGSAW_HARVEST_V0"]["implementation_authorized"] is False
+    assert any(record["project_id"] == "STATE_SNAPSHOT_V0" for record in data["queued_but_unauthorized_projects"])
 
 
 def test_research_ledger_is_the_canonical_research_source() -> None:

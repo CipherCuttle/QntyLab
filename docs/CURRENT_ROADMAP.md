@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- `JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_PREREG_V0` — `ACTIVE`. Create, validate, independently hostile-review, and freeze only the outcome-blind preregistration for a genuinely new-history temporal empirical replication of JH01_RV_PERSISTENCE. No new market-data access, acquisition, materialization, feature/outcome computation, regression execution, Jigsaw evidence creation, State Snapshot authorization, Router, Qnty, trading, or promotion authority is granted.
+- None.
 
 ## Queued — not authorized
 
@@ -19,6 +19,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Closed / stale
 
+- `JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_PREREG_V0` — `CLOSED_PASS`. JH01 temporal-replication preregistration is frozen and closed. No market-data access, acquisition, materialization, feature/outcome computation, regression execution, Jigsaw evidence creation, State Snapshot, Router, Qnty, trading, or promotion authority is granted. Replication input materialization requires a separate Git-backed authorization.
 - `JIGSAW_FUNDING_PRESSURE_VOLATILITY_FROZEN_RESULT_RECORDING_V0` — `CLOSED_NEGATIVE`. No further implementation is authorized by this closed negative result.
 - `JIGSAW_HARVEST_V0` — `CLOSED_PASS`. Jigsaw Harvest V0 is closed. Preserve its four bounded evidence pieces; no State Snapshot, Router, Qnty, or trading implementation is authorized by this phase.
 - `QNTYLAB_PROJECT_CONTEXT_AND_AUTHORITY_REGISTRY_V0` — `CLOSED_PASS`. Project Context and Authority Registry V0 is complete; no further implementation is authorized by this closed phase.

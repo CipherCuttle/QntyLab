@@ -39,16 +39,18 @@ implementation_authorized = false
 
 [[project]]
 project_id = "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_PREREG_V0"
-state = "ACTIVE"
+state = "CLOSED_PASS"
 authority_level = "PREREGISTRATION_ONLY"
 authoritative_artifacts = [
   "docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md",
   "experiments/research/jigsaw_harvest_v0/preregistration.json",
   "experiments/research/jigsaw_harvest_v0/result.json",
   "experiments/research/jigsaw_synthesis_eligibility_v0/eligibility.json",
+  "experiments/research/jh01_rv_persistence_temporal_replication_v0/preregistration.json",
+  "experiments/research/jh01_rv_persistence_temporal_replication_v0/design_note.md",
 ]
-next_action = "Create, validate, independently hostile-review, and freeze only the outcome-blind preregistration for a genuinely new-history temporal empirical replication of JH01_RV_PERSISTENCE. No new market-data access, acquisition, materialization, feature/outcome computation, regression execution, Jigsaw evidence creation, State Snapshot authorization, Router, Qnty, trading, or promotion authority is granted."
-implementation_authorized = true
+next_action = "JH01 temporal-replication preregistration is frozen and closed. No market-data access, acquisition, materialization, feature/outcome computation, regression execution, Jigsaw evidence creation, State Snapshot, Router, Qnty, trading, or promotion authority is granted. Replication input materialization requires a separate Git-backed authorization."
+implementation_authorized = false
 
 [[project]]
 project_id = "STATE_SNAPSHOT_V0"

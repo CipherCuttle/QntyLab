@@ -5567,7 +5567,7 @@
       "required_for_certificate_verification": true
     },
     {
-      "logical_role": "experiment_provenance_metadata",
+      "logical_role": "ohlcv_leading_edge_extension_evidence",
       "relative_path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v1/source_bar_extension.csv",
       "size_bytes": 1419,
       "sha256": "052c69b4b0c06cef5ca76cd657626d21c7280dc064523386fda9aa5d0904b7d7",
@@ -5605,5 +5605,5 @@
   ],
   "outcome_accessed": false,
   "provenance_baseline_digest_definition": "SHA-256 of UTF-8 canonical JSON excluding provenance_baseline_digest; recursively sorted keys, compact separators, ensure_ascii=true, no trailing newline.",
-  "provenance_baseline_digest": "sha256:bdd177429e01327bfe577027bdaf35c9fe91b9949ec040333f04149b9112388c"
+  "provenance_baseline_digest": "sha256:902be2246b64d133e0f22dd71c04eba344d12ead659e5f57c69183ab92f878d9"
 }

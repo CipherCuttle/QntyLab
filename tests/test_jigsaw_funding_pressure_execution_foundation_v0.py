@@ -248,8 +248,10 @@ def test_load_ohlcv_symbol_tampered_bytes_fail_closed(tmp_path):
     dest = tmp_path / entry["relative_path"]
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_bytes((provenance.ROOT / entry["relative_path"]).read_bytes() + b"TAMPERED")
+    coverage = foundation._verify_ohlcv_semantics_are_frozen(baseline)
+    extension_bar = foundation._load_ohlcv_extension_index(baseline, provenance.ROOT, coverage)[symbol]
     with pytest.raises(AssertionError, match="evidence byte mismatch"):
-        foundation._load_ohlcv_symbol(symbol, baseline, tmp_path)
+        foundation._load_ohlcv_symbol(symbol, baseline, tmp_path, extension_bar=extension_bar, coverage=coverage)
 
 
 def test_load_funding_symbol_untracked_replacement_fails(tmp_path):

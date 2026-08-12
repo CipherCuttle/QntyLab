@@ -155,6 +155,7 @@ def test_result_digest_is_deterministic_and_classification_is_not_caller_supplie
 
 def test_v0r1_has_a_distinct_namespace_and_explicit_superseding_provenance() -> None:
     assert execution.ARTIFACT_RELATIVE == Path("experiments/research/jh01_rv_persistence_temporal_replication_v0/v0r1")
+    assert execution.FROZEN_ARTIFACT_RELATIVE == Path("experiments/research/jh01_rv_persistence_temporal_replication_v0")
     assert execution.SUPERSEDES_EXECUTION == "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0"
     assert execution.PRIOR_EXECUTION_STATE == "EXECUTION_INTERRUPTED_AFTER_REAL_OUTCOME_ACCESS"
     assert execution.REPAIR_REASON == "STRICT_ZIP_ADJACENT_PAIR_CARDINALITY_DEFECT"

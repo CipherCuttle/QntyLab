@@ -36,6 +36,7 @@ HAC_LAG = 5
 HAC_CRITICAL_VALUE_95 = 1.959963984540054
 EXPECTED_BARS_PER_SYMBOL = 8785
 ARTIFACT_RELATIVE = Path("experiments/research/jh01_rv_persistence_temporal_replication_v0/v0r1")
+FROZEN_ARTIFACT_RELATIVE = Path("experiments/research/jh01_rv_persistence_temporal_replication_v0")
 RAW_RELATIVE = Path("data/raw/jh01_rv_persistence_temporal_replication_v0")
 MODULE_RELATIVE = Path("qntylab/jh01_rv_persistence_temporal_replication_execution_v0r1.py")
 SUPERSEDES_EXECUTION = "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0"
@@ -302,12 +303,12 @@ def _preflight(root: Path, frozen_implementation_sha: str) -> tuple[dict[str, An
     prereg.validate(preregistration)
     if preregistration.get("preregistration_digest") != PREREGISTRATION_DIGEST:
         raise ExecutionContractError("preregistration digest mismatch")
-    artifact_root = root / ARTIFACT_RELATIVE
-    frozen_request = _load_json(artifact_root / "materialization/materialization_request.json")
-    frozen_receipt = _load_json(artifact_root / "materialization/materialization_receipt.json")
-    qualification = _load_json(artifact_root / "materialization/input_qualification.json")
-    manifest = _load_json(artifact_root / "materialization/per_symbol_manifest.json")
-    snapshot = _load_json(artifact_root / "materialization/snapshot_manifest.json")
+    frozen_artifact_root = root / FROZEN_ARTIFACT_RELATIVE
+    frozen_request = _load_json(frozen_artifact_root / "materialization/materialization_request.json")
+    frozen_receipt = _load_json(frozen_artifact_root / "materialization/materialization_receipt.json")
+    qualification = _load_json(frozen_artifact_root / "materialization/input_qualification.json")
+    manifest = _load_json(frozen_artifact_root / "materialization/per_symbol_manifest.json")
+    snapshot = _load_json(frozen_artifact_root / "materialization/snapshot_manifest.json")
     request_digest = frozen_request.get("request_digest")
     if request_digest != digest(frozen_request, omitted_field="request_digest") or frozen_request.get("replication_preregistration_digest") != PREREGISTRATION_DIGEST or frozen_request.get("expected_bars_per_symbol") != EXPECTED_BARS_PER_SYMBOL:
         raise ExecutionContractError("materialization request integrity mismatch")

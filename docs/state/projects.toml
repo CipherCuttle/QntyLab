@@ -97,8 +97,8 @@ implementation_authorized = false
 
 [[project]]
 project_id = "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0R1"
-state = "ACTIVE"
-authority_level = "SUPERSEDING_POST_START_EXECUTION_REPAIR_ONLY"
+state = "CLOSED_PASS"
+authority_level = "FROZEN_SUPERSEDING_EXECUTION_COMPLETE_NO_RERUN"
 authoritative_artifacts = [
   "docs/state/projects.toml",
   "experiments/research/jh01_rv_persistence_temporal_replication_v0/preregistration.json",
@@ -108,6 +108,11 @@ authoritative_artifacts = [
   "experiments/research/jh01_rv_persistence_temporal_replication_v0/execution_started.json",
   "experiments/research/jh01_rv_persistence_temporal_replication_v0/execution_interruption.md",
   "qntylab/jh01_rv_persistence_temporal_replication_execution_v0.py",
+  "qntylab/jh01_rv_persistence_temporal_replication_execution_v0r1.py",
+  "experiments/research/jh01_rv_persistence_temporal_replication_v0/v0r1/hostile_execution_review.md",
+  "experiments/research/jh01_rv_persistence_temporal_replication_v0/v0r1/execution_request.json",
+  "experiments/research/jh01_rv_persistence_temporal_replication_v0/v0r1/execution_started.json",
+  "experiments/research/jh01_rv_persistence_temporal_replication_v0/v0r1/execution_result.json",
 ]
 supersedes = ["JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0"]
 prior_execution_terminal_state = "EXECUTION_INTERRUPTED_AFTER_REAL_OUTCOME_ACCESS"
@@ -128,14 +133,20 @@ pristine_first_execution = false
 v0r1_executor_must_be_distinct_from_v0 = true
 v0r1_artifact_namespace = "experiments/research/jh01_rv_persistence_temporal_replication_v0/v0r1"
 v0r1_real_execution_count = 1
+frozen_v0r1_execution_implementation_sha = "758e02718ce82bebeae3e63d17ecc6e3d4a9a23a"
+frozen_v0r1_execution_source_blob = "60e0a5d697f61e8bcfe8d6966ee487f88eec7ea0"
+frozen_v0r1_execution_source_sha256 = "95288b511cf9c13d739ee911bf56a71b9e83fd2ede664a96b549a12bf6da9c74"
+frozen_v0r1_result_sha = "939f47d8c24abf5e84a1071550eaab463647182e"
+frozen_v0r1_result_digest = "3dba3a0f0700a768e981dcecfe5793532bcd4bc1db7dc4dbcd9e4806a722c5c1"
+v0r1_classification = "REPLICATED_WITHIN_FROZEN_TEMPORAL_SCOPE"
 input_reacquisition_authorized = false
 jigsaw_evidence_authorized = false
 state_snapshot_authorized = false
 router_authorized = false
 qnty_authorized = false
 trading_authorized = false
-next_action = "Create a superseding V0R1 execution lineage preserving the terminal V0 interruption. The frozen V0 executor is immutable; implement the repair only in a distinct V0R1 executor and distinct V0R1 artifact namespace. Repair only the frozen adjacent-pair strict-zip cardinality defect so 8,785 ordered bar opens yield exactly 8,784 consecutive return pairs. Prove the repaired implementation on synthetic fixtures and an independent statistical oracle, hostile-review and freeze the repaired executor, then re-authenticate the unchanged frozen input and perform exactly one V0R1 real execution under a distinct request/start/result namespace. Preserve explicit post-start-repair provenance. No other scientific change, input reacquisition, Jigsaw evidence creation, State Snapshot, Router, Qnty, trading, or promotion is authorized."
-implementation_authorized = true
+next_action = "JH01 V0R1 temporal-replication execution is frozen and closed with classification REPLICATED_WITHIN_FROZEN_TEMPORAL_SCOPE. The result explicitly preserves its superseding post-start-repair provenance and does not represent a pristine first execution. No further real-sample execution or scientific mutation is authorized. Canonical Jigsaw evidence incorporation and synthesis require separate Git-backed authorization. State Snapshot, Router, Qnty, trading, and promotion remain unauthorized."
+implementation_authorized = false
 
 [[project]]
 project_id = "STATE_SNAPSHOT_V0"

@@ -150,3 +150,73 @@ entirely from `qntylab.jigsaw_index.build_index`), not a source-artifact
 mutator, not State Snapshot/Router/Qnty/trading/promotion authority. See
 `eligibility.json`'s `global_constraints` block, which states all of those
 as `NONE` explicitly.
+
+## `replication_relation` — orthogonal to `independence_status` (JH01 V0R1 incorporation)
+
+Phase: `JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_JIGSAW_EVIDENCE_IMPLEMENTATION_V0`,
+authorized by the prior governance-only phase
+`JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_JIGSAW_EVIDENCE_AUTHORIZATION_V0`.
+Adds the canonical evidence piece `JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_V0R1`
+(`experiments/research/jh01_rv_persistence_temporal_replication_v0/result.json`,
+schema `jigsaw-evidence-piece-v0`, unchanged from V0), representing the frozen
+V0R1 temporal replication of `JH01_RV_PERSISTENCE` bound to both its execution
+result digest and its mandatory provenance-correction digest.
+
+**TEMPORALLY DISJOINT REPLICATION IS NOT INDEPENDENT REPLICATION.** The prior
+section already explains why `INDEPENDENT_REPLICATION_EXPLICITLY_ESTABLISHED`
+is intentionally unreachable on the `independence_status` axis, and a closure
+hostile-review finding (`hostile_review.md`) already fixed a fail-open bug
+where a bare `explicit_independent_replication_of` declaration could win over
+demonstrated shared frozen history. JH01 V0R1 needed a real, source-declared
+replication relationship represented *without* reopening either of those
+protections or forcing temporal-only evidence through the independence axis
+they protect. The chosen design adds a third, fully orthogonal categorical
+field, `replication_relation`, rather than overloading `independence_status`:
+
+* `_explicit_replication_target` reads a new native field,
+  `replication_of_piece_identity` -- deliberately a different field name and
+  a strictly narrower claim than `explicit_independent_replication_of`. It
+  states only "this piece is a replication attempt of that piece's
+  proposition," never independence.
+* `_replication_target_relation(a, b)` matches that declaration against the
+  other piece's actual indexed `piece_identity` (never a name/string guess).
+* `_replication_relation(...)` combines that match with facts already
+  computed for `independence_status` -- shared frozen history is checked
+  first, unconditionally, exactly as it is for `independence_status` itself,
+  so a declared target that in fact shares the exact snapshot or source
+  artifact still resolves to same-history territory, never to a "temporal
+  replication." Only `DISJOINT` decision windows with no shared history reach
+  `TEMPORAL_REPLICATION_EXPLICITLY_ESTABLISHED`.
+* `replication_relation` is computed independently of and never assigned to
+  `independence_status`; `global_constraints.independent_replication_established`
+  is derived purely from `independence_status` and is untouched by this axis.
+  For the real JH01 pair, `independence_status` stays
+  `INDEPENDENCE_NOT_ESTABLISHED` (same as any other disjoint-window,
+  no-shared-snapshot pair) while `replication_relation` is simultaneously
+  `TEMPORAL_REPLICATION_EXPLICITLY_ESTABLISHED` -- both true at once, on
+  purpose.
+
+`_allowed_synthesis` gains one narrow branch:
+`TEMPORAL_REPLICATION_CONTEXT_ONLY`, reached only when
+`replication_relation == TEMPORAL_REPLICATION_EXPLICITLY_ESTABLISHED` *and*
+`claim_relation` is `IDENTICAL_CLAIM` or `RELATED_DISTINCT_CLAIM` (mirroring
+the existing `JOINT_CONTEXT_ONLY` gate). Its templated statement
+(`_statement_text`) records only the mechanical facts -- disjoint windows, no
+shared snapshot/source, explicit declared target, each piece's own native
+classification -- and explicitly disclaims provider, exchange,
+data-generating-process, methodological, implementation, organizational, and
+causal independence, plus incremental/out-of-time forecast value, in its
+`prohibited_inferences`. No global flag such as `temporal_replication_established`
+was added (Section 8 of the phase brief): `summary.pairs_by_replication_relation`
+is the only new aggregate, a deterministic non-authoritative tally in the same
+style as the existing `pairs_by_independence_status`/`pairs_by_claim_relation`
+tallies, and the pairwise `replication_relation` field itself is what actually
+carries the truth for any consumer.
+
+The same code is unchanged for any future piece: nothing here inspects a
+`piece_identity` string, and a piece with no `replication_of_piece_identity`
+field resolves to `NO_EXPLICIT_REPLICATION_TARGET` exactly as before this
+change (see `test_closure_c` and the pre-existing `explicit_independent_replication_of`
+fixtures, which continue to resolve `independence_status` unchanged -- that
+field is still never read for independence, and the new field is a distinct
+name read only for the strictly weaker replication axis).

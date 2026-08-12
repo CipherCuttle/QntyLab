@@ -212,6 +212,54 @@ implementation_authorized = false
 next_action = "This phase authorizes exactly one later, separately Git-backed bounded implementation phase to incorporate the frozen JH01_RV_PERSISTENCE V0R1 temporal replication into canonical Jigsaw evidence and synthesis metadata. This governance phase itself creates no Jigsaw evidence, performs no Jigsaw index mutation, and performs no synthesis mutation; independent_replication_established remains NO and unchanged. The later implementation MUST consume the frozen V0R1 execution result digest together with the mandatory provenance correction digest and MUST NOT treat the malformed prior digest embedded in the frozen result as authoritative. It MUST NOT assert V0R1 was a pristine first execution, MUST preserve the post-start-repair qualification, MUST NOT silently promote temporal sample separation into provider, exchange, data-generating-process, methodological, causal, or independent-replication status, and MUST inspect the existing Jigsaw evidence schema and synthesis ontology to choose the narrowest truthful representation rather than a preordained label. No scientific rerun, recomputation, or input reacquisition is authorized by this phase. The original JH01_RV_PERSISTENCE discovery piece remains immutable. No State Snapshot, Router, Qnty, trading, or promotion authority is granted by this phase or transferred to the later implementation phase. Any Jigsaw evidence, Jigsaw index, or synthesis mutation requires that separate Git-backed implementation authorization to be requested and created before it may proceed."
 
 [[project]]
+project_id = "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_JIGSAW_EVIDENCE_IMPLEMENTATION_V0"
+state = "CLOSED_PASS"
+authority_level = "FROZEN_BOUNDED_JIGSAW_EVIDENCE_IMPLEMENTATION_ONLY"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/jh01_rv_persistence_temporal_replication_v0/result.json",
+  "experiments/research/jigsaw_index.json",
+  "experiments/research/jigsaw_synthesis_eligibility_v0/eligibility.json",
+  "experiments/research/jigsaw_synthesis_eligibility_v0/design_note.md",
+  "qntylab/jigsaw_synthesis.py",
+  "tests/test_jigsaw_index_v0.py",
+  "tests/test_jigsaw_synthesis_v0.py",
+]
+governing_authorization_project_id = "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_JIGSAW_EVIDENCE_AUTHORIZATION_V0"
+source_piece_id = "JH01_RV_PERSISTENCE"
+frozen_v0r1_project_id = "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0R1"
+new_evidence_piece_identity = "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_V0R1"
+new_evidence_piece_relative_path = "experiments/research/jh01_rv_persistence_temporal_replication_v0/result.json"
+new_evidence_piece_schema_version = "jigsaw-evidence-piece-v0"
+new_schema_version_introduced = false
+frozen_v0r1_result_digest_bound = "3dba3a0f0700a768e981dcecfe5793532bcd4bc1db7dc4dbcd9e4806a722c5c1"
+frozen_v0r1_provenance_correction_digest_bound = "c396b6cc53d92a87c7dfa45920c05a772bb447c1f98de5bdbbae065e255b7154"
+canonical_corrected_prior_v0_execution_started_digest_bound = "9c8b00ad68c1e1ba389512c94a4c145264844a4e24fae75c038fcc9e0144f285"
+post_start_repair_preserved = true
+pristine_first_execution = false
+claim_relation_for_jh01_pair = "IDENTICAL_CLAIM"
+decision_window_relation_for_jh01_pair = "DISJOINT"
+independence_status_for_jh01_pair = "INDEPENDENCE_NOT_ESTABLISHED"
+replication_relation_for_jh01_pair = "TEMPORAL_REPLICATION_EXPLICITLY_ESTABLISHED"
+allowed_synthesis_for_jh01_pair = "TEMPORAL_REPLICATION_CONTEXT_ONLY"
+independent_replication_established_after_this_phase = "NO"
+original_jh01_discovery_piece_mutated = false
+jigsaw_harvest_v0_result_mutated = false
+v0r1_execution_artifacts_mutated = false
+scientific_execution_performed = false
+real_data_execution_performed = false
+input_reacquisition_performed = false
+new_scientific_computation_performed = false
+state_snapshot_authorized = false
+router_authorized = false
+qnty_authorized = false
+trading_authorized = false
+promotion_authorized = false
+next_action = "JH01 temporal-replication evidence is canonically incorporated into Jigsaw as a separate linked evidence piece (JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_V0R1), bound to both the frozen V0R1 execution result digest and its mandatory provenance correction digest, with post_start_repair=true and pristine_first_execution=false preserved. Jigsaw synthesis gained one orthogonal generic dimension, replication_relation, distinct from independence_status: the JH01 discovery/replication pair is TEMPORAL_REPLICATION_EXPLICITLY_ESTABLISHED on that axis while remaining INDEPENDENCE_NOT_ESTABLISHED on the independence axis, and independent_replication_established stays NO globally. No scientific rerun, recomputation, or input reacquisition occurred; the original JH01_RV_PERSISTENCE discovery piece and all V0/V0R1 execution artifacts are byte-unchanged. No State Snapshot, Router, Qnty, trading, or promotion authority is granted by this phase. The next information-bearing phase, if pursued, is JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_PREREG_V0, which requires its own separate Git-backed authorization."
+implementation_authorized = false
+
+[[project]]
 project_id = "STATE_SNAPSHOT_V0"
 state = "PLANNED_NOT_AUTHORIZED"
 authority_level = "PLANNING_ONLY"

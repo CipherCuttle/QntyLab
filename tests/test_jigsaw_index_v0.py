@@ -101,9 +101,46 @@ def test_a_complete_current_census_matches_frozen_known_sources():
     assert relative_paths == {
         "experiments/research/jigsaw_harvest_v0/result.json",
         "experiments/research/jigsaw_funding_pressure_volatility_v0/result.json",
+        "experiments/research/jh01_rv_persistence_temporal_replication_v0/result.json",
     }
-    assert index["summary"]["total_sources"] == 2
-    assert index["summary"]["total_pieces"] == 5
+    assert index["summary"]["total_sources"] == 3
+    assert index["summary"]["total_pieces"] == 6
+
+
+# ---------------------------------------------------------------------------
+# B2. JH01 V0R1 temporal replication piece (single-result shape)
+# ---------------------------------------------------------------------------
+
+
+def test_b2_jh01_v0r1_replication_piece_discoverable_and_bound():
+    index = build_index(RESEARCH_ROOT)
+    row = get_piece(index, "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_V0R1")
+    assert row is not None
+    assert row["provenance"]["source_shape"] == "SINGLE_PIECE_OBJECT"
+    fields = row["native_scientific_fields"]
+    assert fields["piece_type"] == "PREDICTIVE_ASSOCIATION"
+    assert fields["classification"] == "REPLICATED_WITHIN_FROZEN_TEMPORAL_SCOPE"
+    payload = row["native_payload"]
+    assert payload["source_piece_id"] == "JH01_RV_PERSISTENCE"
+    assert payload["replication_of_piece_identity"] == "JH01_RV_PERSISTENCE"
+    assert payload["feature"] == "RV24_prior,t"
+    assert payload["outcome"] == "RV24_future,t"
+    # Result and correction digests bound together, exactly as frozen by V0R1
+    # and its mandatory provenance correction -- never recomputed here.
+    provenance = payload["provenance"]
+    assert provenance["source_execution_result_digest"] == "3dba3a0f0700a768e981dcecfe5793532bcd4bc1db7dc4dbcd9e4806a722c5c1"
+    assert provenance["provenance_correction_digest"] == "c396b6cc53d92a87c7dfa45920c05a772bb447c1f98de5bdbbae065e255b7154"
+    assert provenance["canonical_corrected_prior_v0_execution_started_digest"] == (
+        "9c8b00ad68c1e1ba389512c94a4c145264844a4e24fae75c038fcc9e0144f285"
+    )
+    assert provenance["malformed_historical_digest_is_authoritative"] is False
+    assert provenance["result_and_correction_must_be_consumed_together"] is True
+    assert provenance["post_start_repair"] is True
+    assert provenance["pristine_first_execution"] is False
+    # The original JH01 discovery piece is untouched by this addition.
+    original = get_piece(index, "JH01_RV_PERSISTENCE")
+    assert original["native_scientific_fields"]["classification"] == "SUPPORTED_WITHIN_FROZEN_SCOPE"
+    assert original["native_payload"]["beta"] == 0.5047974226484947
 
 
 # ---------------------------------------------------------------------------
@@ -339,6 +376,10 @@ def test_l_source_artifacts_are_byte_unchanged_by_index_generation():
         RESEARCH_ROOT / "jigsaw_funding_pressure_volatility_v0" / "result.json",
         RESEARCH_ROOT / "jigsaw_funding_pressure_volatility_v0" / "execution_result.json",
         RESEARCH_ROOT / "jigsaw_funding_pressure_volatility_v0" / "preregistration.json",
+        RESEARCH_ROOT / "jh01_rv_persistence_temporal_replication_v0" / "result.json",
+        RESEARCH_ROOT / "jh01_rv_persistence_temporal_replication_v0" / "v0r1" / "execution_result.json",
+        RESEARCH_ROOT / "jh01_rv_persistence_temporal_replication_v0" / "v0r1" / "provenance_correction.json",
+        RESEARCH_ROOT / "jh01_rv_persistence_temporal_replication_v0" / "preregistration.json",
         RESEARCH_ROOT / "corpus_index.json",
         RESEARCH_ROOT / "candidates.jsonl",
         RESEARCH_ROOT / "decisions.jsonl",

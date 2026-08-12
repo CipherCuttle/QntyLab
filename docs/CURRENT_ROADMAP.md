@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- None.
+- `JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_INPUT_MATERIALIZATION_V0` — `ACTIVE`. Acquire or materialize only the exact frozen 20-symbol, 1h input history required by JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_PREREG_V0; authenticate source objects, verify exact temporal coverage and hourly continuity, preserve source bytes/provenance, establish a new immutable replication-input snapshot identity, and determine INPUT_READY or BLOCKED_BY_INPUT_CONTRACT. Raw-input integrity checks are authorized. Scientific feature/outcome computation, returns, RV24, regression, replication classification, Jigsaw evidence, State Snapshot, Router, Qnty, trading, promotion, and replication execution remain unauthorized.
 
 ## Queued — not authorized
 

@@ -284,4 +284,82 @@ def test_research_ledger_is_the_canonical_research_source() -> None:
 def test_project_context_introduces_no_qnty_or_trading_authority() -> None:
     data = project_context.context_data(ROOT)
     assert "Qnty authority" not in data["current_permitted_next_action"]
+
+
+def test_jh01_jigsaw_evidence_authorization_v0_is_governance_only_and_binds_v0r1_identities() -> None:
+    data = project_context.context_data(ROOT)
+    _, _, registry = project_context.load_context_sources(ROOT)
+    projects = {record["project_id"]: record for record in registry["project"]}
+
+    authorization = projects["JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_JIGSAW_EVIDENCE_AUTHORIZATION_V0"]
+    v0r1 = projects["JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0R1"]
+
+    # (1) the project is represented correctly in canonical project state.
+    assert authorization["state"] == "CLOSED_PASS"
+    assert authorization["authority_level"] == "GOVERNANCE_AUTHORIZATION_ONLY"
+    assert authorization["phase_type"] == "GOVERNANCE_ONLY"
+    assert authorization["source_piece_id"] == "JH01_RV_PERSISTENCE"
+    assert authorization["frozen_v0r1_project_id"] == "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0R1"
+    assert not any(record["project_id"] == authorization["project_id"] for record in data["queued_but_unauthorized_projects"])
+    assert any(record["project_id"] == authorization["project_id"] for record in data["superseded_or_stale_planning"])
+
+    # (2)+(3) the phase grants no execution, mutation, or downstream authority whatsoever.
+    for field in (
+        "scientific_execution_authorized",
+        "real_data_execution_authorized",
+        "input_reacquisition_authorized",
+        "frozen_result_mutation_authorized",
+        "jigsaw_evidence_mutation_authorized",
+        "jigsaw_index_mutation_authorized",
+        "synthesis_mutation_authorized",
+        "pristine_first_execution_assertion_authorized",
+        "independent_replication_established_change_authorized_this_phase",
+        "original_jh01_discovery_piece_mutation_authorized",
+    ):
+        assert authorization[field] is False, field
+    assert authorization["implementation_authorized"] is False
+
+    # (4)+(5) the exact frozen V0R1 result and provenance-correction digests are bound, and match
+    # the identities already recorded against the closed V0R1 execution project itself.
+    assert authorization["frozen_v0r1_result_digest"] == "3dba3a0f0700a768e981dcecfe5793532bcd4bc1db7dc4dbcd9e4806a722c5c1"
+    assert authorization["frozen_v0r1_result_digest"] == v0r1["frozen_v0r1_result_digest"]
+    assert authorization["frozen_v0r1_provenance_correction_digest"] == "c396b6cc53d92a87c7dfa45920c05a772bb447c1f98de5bdbbae065e255b7154"
+    assert authorization["frozen_v0r1_provenance_correction_digest"] == v0r1["frozen_v0r1_provenance_correction_digest"]
+    assert authorization["canonical_corrected_v0_execution_started_digest"] == "9c8b00ad68c1e1ba389512c94a4c145264844a4e24fae75c038fcc9e0144f285"
+    assert authorization["canonical_corrected_v0_execution_started_digest"] == v0r1["prior_execution_started_digest"]
+
+    # (6) the later implementation must consume both digests together, never the malformed one alone.
+    assert authorization["result_and_correction_must_be_consumed_together"] is True
+    assert "must consume the frozen v0r1 execution result digest together with" in authorization["next_action"].lower()
+    assert "malformed prior digest embedded in the frozen result as authoritative" in authorization["next_action"].lower()
+
+    # (7) pristine-first execution can never be asserted downstream.
+    assert authorization["post_start_repair_qualification_must_be_preserved"] is True
+    assert "must not assert v0r1 was a pristine first execution" in authorization["next_action"].lower()
+    assert "must preserve the post-start-repair qualification" in authorization["next_action"].lower()
+
+    # (8) downstream State Snapshot / Router / Qnty / trading / promotion authority remains absent.
+    for field in ("state_snapshot_authorized", "router_authorized", "qnty_authorized", "trading_authorized", "promotion_authorized"):
+        assert authorization[field] is False, field
+    assert "no state snapshot, router, qnty, trading, or promotion authority is granted" in authorization["next_action"].lower()
+
+    # (9) the current Jigsaw evidence/index/synthesis artifacts are untouched by this phase, and the
+    # recorded independent_replication_established snapshot matches the live synthesis file exactly
+    # so this governance record cannot silently drift from the artifact it describes.
+    assert "experiments/research/jigsaw_index.json" not in authorization["authoritative_artifacts"]
+    assert "experiments/research/jigsaw_synthesis_eligibility_v0/eligibility.json" not in authorization["authoritative_artifacts"]
+    eligibility = json.loads((ROOT / "experiments/research/jigsaw_synthesis_eligibility_v0/eligibility.json").read_text(encoding="utf-8"))
+    assert eligibility["global_constraints"]["independent_replication_established"] == "NO"
+    assert authorization["independent_replication_established_current_value"] == "NO"
+    assert "independent_replication_established remains no and unchanged" in authorization["next_action"].lower()
+
+    # (10) project-context/state invariants remain valid: registry validation and the doctor pass clean.
+    assert data["authority_conflicts_or_warnings"] == []
+    assert sum(record["state"] == "ACTIVE" for record in registry["project"]) == 0
+    for forbidden_text in (
+        "narrowest truthful representation",
+        "no scientific rerun, recomputation, or input reacquisition is authorized",
+        "original jh01_rv_persistence discovery piece remains immutable",
+    ):
+        assert forbidden_text in authorization["next_action"].lower()
     assert all(item["project_id"] != "QNTY_HANDOFF" or "No implementation is authorized" in item["next_action"] for item in data["queued_but_unauthorized_projects"])

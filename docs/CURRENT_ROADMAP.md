@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- `RESEARCH_DATA_SPINE_V0` — `ACTIVE`. Implement only the frozen OHLCV snapshot and verified reader V0.
+- None.
 
 ## Queued — not authorized
 
@@ -22,3 +22,4 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 - `JIGSAW_FUNDING_PRESSURE_VOLATILITY_FROZEN_RESULT_RECORDING_V0` — `CLOSED_NEGATIVE`. No further implementation is authorized by this closed negative result.
 - `QNTYLAB_PROJECT_CONTEXT_AND_AUTHORITY_REGISTRY_V0` — `CLOSED_PASS`. Project Context and Authority Registry V0 is complete; no further implementation is authorized by this closed phase.
+- `RESEARCH_DATA_SPINE_V0` — `CLOSED_PASS`. Data Spine V0 is closed. No further implementation is authorized by this project.

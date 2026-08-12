@@ -145,29 +145,27 @@ def test_human_context_does_not_claim_no_queued_projects() -> None:
     assert "- None." not in queued_section
 
 
-def test_jh01_temporal_replication_input_materialization_is_the_only_active_authority() -> None:
+def test_jh01_temporal_replication_input_materialization_is_closed_without_execution_authority() -> None:
     data = project_context.context_data(ROOT)
-    expected_next_action = (
-        "Acquire or materialize only the exact frozen 20-symbol, 1h input history required by "
-        "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_PREREG_V0; authenticate source objects, verify exact temporal coverage and "
-        "hourly continuity, preserve source bytes/provenance, establish a new immutable replication-input snapshot identity, and "
-        "determine INPUT_READY or BLOCKED_BY_INPUT_CONTRACT. Raw-input integrity checks are authorized. Scientific feature/outcome "
-        "computation, returns, RV24, regression, replication classification, Jigsaw evidence, State Snapshot, Router, Qnty, trading, "
-        "promotion, and replication execution remain unauthorized."
-    )
-    assert data["active_project"] is not None
-    assert data["active_project"]["project_id"] == "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_INPUT_MATERIALIZATION_V0"
-    assert data["active_project"]["state"] == "ACTIVE"
-    assert data["active_project"]["authority_level"] == "INPUT_MATERIALIZATION_ONLY"
-    assert data["active_project"]["implementation_authorized"] is True
-    assert data["active_project"]["frozen_preregistration_project_id"] == "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_PREREG_V0"
-    assert data["active_project"]["frozen_preregistration_digest"] == "46f923023b4b696307da2b9d6fc4c8db9d04b40b012de35e0bf738cc03c4be57"
-    assert "c59fe389e0fe05ae22120f59396c8c13a77110178ae06c634940a3be7bfb2d30" not in str(data["active_project"])
-    assert data["current_permitted_next_action"] == expected_next_action
+    assert data["active_project"] is None
+    assert data["current_permitted_next_action"] == "No project implementation is currently authorized."
     _, _, registry = project_context.load_context_sources(ROOT)
-    assert sum(record["state"] == "ACTIVE" for record in registry["project"]) == 1
-    for prohibited in ("returns", "RV24", "regression", "replication classification", "Jigsaw evidence", "State Snapshot", "replication execution"):
-        assert prohibited in data["current_permitted_next_action"]
+    assert sum(record["state"] == "ACTIVE" for record in registry["project"]) == 0
+    materialization = next(record for record in registry["project"] if record["project_id"] == "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_INPUT_MATERIALIZATION_V0")
+    assert materialization["state"] == "CLOSED_PASS"
+    assert materialization["authority_level"] == "INPUT_MATERIALIZATION_ONLY"
+    assert materialization["implementation_authorized"] is False
+    assert materialization["frozen_preregistration_digest"] == "46f923023b4b696307da2b9d6fc4c8db9d04b40b012de35e0bf738cc03c4be57"
+    assert "scientific replication execution remains unauthorized" in materialization["next_action"].lower()
+    assert set(materialization["authoritative_artifacts"]) == {
+        "experiments/research/jh01_rv_persistence_temporal_replication_v0/preregistration.json",
+        "experiments/research/jh01_rv_persistence_temporal_replication_v0/materialization/materialization_request.json",
+        "experiments/research/jh01_rv_persistence_temporal_replication_v0/materialization/materialization_receipt.json",
+        "experiments/research/jh01_rv_persistence_temporal_replication_v0/materialization/per_symbol_manifest.json",
+        "experiments/research/jh01_rv_persistence_temporal_replication_v0/materialization/snapshot_manifest.json",
+        "experiments/research/jh01_rv_persistence_temporal_replication_v0/materialization/input_qualification.json",
+        "experiments/research/jh01_rv_persistence_temporal_replication_v0/materialization/hostile_materialization_review.md",
+    }
     preregistration = next(record for record in data["superseded_or_stale_planning"] if record["project_id"] == "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_PREREG_V0")
     preregistration_registry = next(record for record in registry["project"] if record["project_id"] == "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_PREREG_V0")
     assert preregistration["state"] == "CLOSED_PASS"

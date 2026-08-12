@@ -1,0 +1,125 @@
+{
+  "schema_version": "qntylab-jh01-temporal-empirical-replication-preregistration-v0",
+  "experiment_id": "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_PREREG_V0",
+  "status": "NOT_EXECUTED",
+  "research_status": "PREREGISTERED_MATERIALIZATION_NOT_AUTHORIZED",
+  "outcome_blindness": {
+    "post_discovery_market_outcomes_read": false,
+    "replication_market_data_accessed": false,
+    "replication_features_computed": false,
+    "replication_outcomes_computed": false,
+    "replication_regression_run": false,
+    "scientific_result_exists": false
+  },
+  "source_binding": {
+    "source_project_id": "JIGSAW_HARVEST_V0",
+    "source_experiment_id": "JIGSAW_HARVEST_V0_PREREGISTRATION_V0",
+    "source_piece_id": "JH01_RV_PERSISTENCE",
+    "source_preregistration_digest": "499b355ee2b308b4ae01e8c63b44a9a361d44d50fe381080131f41a4851849e3",
+    "source_snapshot_id": "rds-v0-c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac",
+    "source_snapshot_digest": "c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac",
+    "canonical_source_artifacts": {
+      "experiments/research/jigsaw_harvest_v0/preregistration.json": "23cd3f17c5080a0a966aa18b4b4bf620a054afe20329e51936ddc5d402a30a97",
+      "experiments/research/jigsaw_harvest_v0/execution_result.json": "1629023a461e26133f6fe2b009a6bb9f67256ed4f6e68f8eef68c448bf32644c",
+      "experiments/research/jigsaw_harvest_v0/result.json": "ac40ee2c07da363cf7c53b6f4839469aca8a6d2398d672bd283a1815433390b7"
+    },
+    "jigsaw_source_identity": {
+      "jigsaw_index_path": "experiments/research/jigsaw_index.json",
+      "jigsaw_index_sha256": "b229b55862fa06445daba5b4ad2a65a72a57a44e3fefef879867b7be29cf46d9",
+      "jigsaw_synthesis_eligibility_path": "experiments/research/jigsaw_synthesis_eligibility_v0/eligibility.json",
+      "jigsaw_synthesis_eligibility_sha256": "451417fd48168b08fef3d609d97244f40540c57e1c8d34ef7a8def5d9b7e57cd"
+    }
+  },
+  "replication_type": "TEMPORAL_EMPIRICAL_REPLICATION",
+  "replication_definition": "Same JH01 proposition, measurement semantics, ordered panel, decision convention, and estimator family on a genuinely new temporal sample disjoint from the discovery evaluation history; not a same-history reproduction, implementation reproduction, sensitivity analysis, survivor-panel analysis, or pooled extension.",
+  "ordered_universe": [
+    "ALICEUSDT", "APEUSDT", "API3USDT", "APTUSDT", "BCHUSDT", "CHRUSDT", "CHZUSDT", "ETCUSDT", "GMTUSDT", "INJUSDT",
+    "LDOUSDT", "LINKUSDT", "LTCUSDT", "ONEUSDT", "OPUSDT", "REEFUSDT", "SANDUSDT", "TRXUSDT", "XLMUSDT", "XRPUSDT"
+  ],
+  "universe_count": 20,
+  "universe_digest": "e6d1447ff2be57f81eaf943b62218ce9a7b9a6f5bf2d25f9be255cb3f2040cd8",
+  "decision_schedule": {
+    "frequency": "P1D",
+    "decision_time": "00:00:00Z",
+    "first_decision": "2025-07-20T00:00:00Z",
+    "last_decision": "2026-07-19T00:00:00Z",
+    "decision_count": 365,
+    "calendar_rule": "Fixed inclusive daily calendar window selected ex ante; it may not be moved, shortened, or otherwise changed after availability or outcome inspection."
+  },
+  "required_raw_coverage": {
+    "bar_interval": "1h",
+    "bar_time_semantics": "A bar is identified by open time and closes one hour later. C_i,h is the close of the 1h bar ending at close boundary h.",
+    "first_bar_open": "2025-07-18T23:00:00Z",
+    "last_bar_open": "2026-07-19T23:00:00Z",
+    "derivation": "The first feature return is r_m at close boundary t-23h and requires its preceding close, hence the 2025-07-18T23:00:00Z opening bar. The final outcome return ends at the close boundary t+24h, hence the 2026-07-19T23:00:00Z opening bar."
+  },
+  "measurement": {
+    "return_semantics": "r_i,h = log(C_i,h / C_i,h-1), with finite strictly positive closes required for every exact panel member.",
+    "market_return": "r_m,h = (1/20) * sum_i r_i,h over the exact ordered 20-symbol panel; no capitalization, volume, availability, or survivor weighting.",
+    "feature": "RV24_prior,t = sqrt(sum_{h=t-23}^{t} r_m,h^2).",
+    "outcome": "RV24_future,t = sqrt(sum_{h=t+1}^{t+24} r_m,h^2).",
+    "realized_measure": "REALIZED_VOLATILITY, not realized variance.",
+    "prohibited_drift": ["simple returns", "standardization", "transformations", "alternative horizons", "covariates", "subgroup hunting"]
+  },
+  "inference": {
+    "hypothesis_count": 1,
+    "model": "RV24_future,t = alpha + beta * RV24_prior,t + epsilon_t",
+    "estimator": "OLS_WITH_INTERCEPT",
+    "predicted_beta_sign": "POSITIVE",
+    "observation_count": 365,
+    "hac_covariance": "BARTLETT_NEWEY_WEST",
+    "hac_bandwidth_formula": "floor(4 * (T / 100)^(2/9))",
+    "hac_lag": 5,
+    "confidence_interval": "95% HAC confidence interval",
+    "p_value": "raw two-sided",
+    "holm_adjustment": "NOT_USED",
+    "effect_size_ratio_threshold": "NOT_USED",
+    "pooling_or_meta_analysis": "PROHIBITED"
+  },
+  "classification": {
+    "REPLICATED_WITHIN_FROZEN_TEMPORAL_SCOPE": "Execution complete, beta > 0, 95% HAC CI entirely > 0, and raw two-sided p <= 0.05.",
+    "OPPOSITE_DIRECTION_WITHIN_FROZEN_TEMPORAL_SCOPE": "Execution complete, beta < 0, 95% HAC CI entirely < 0, and raw two-sided p <= 0.05.",
+    "INCONCLUSIVE": "Execution complete and neither completed-execution condition applies.",
+    "BLOCKED_BY_INPUT_CONTRACT": "Any frozen provenance, universe, coverage, continuity, bar-time, decision-schedule, safe-known-after, outcome-boundary, finite-value, or identity contract fails."
+  },
+  "independence_contract": {
+    "discovery_first_decision": "2023-11-18T00:00:00Z",
+    "discovery_last_decision": "2025-06-19T00:00:00Z",
+    "discovery_last_future_outcome_close_boundary": "2025-06-20T00:00:00Z",
+    "replication_decision_dates_overlap_discovery": false,
+    "replication_outcome_dates_overlap_discovery": false,
+    "required_later_proof": [
+      "Replication decision dates do not overlap discovery decisions.",
+      "Replication outcome dates do not overlap discovery outcomes.",
+      "Replication evaluation market history does not reuse discovery evaluation history.",
+      "A new materialized snapshot has a distinct immutable identity and digest and does not alias the source snapshot.",
+      "The exact new-history coverage contract is authenticated."
+    ],
+    "permitted_future_claim_if_proved": "INDEPENDENT TEMPORAL SAMPLE",
+    "prohibited_claims": ["independent exchange", "independent provider", "independent data-generating process", "independent market"],
+    "self_declaration_sufficient_for_independence": false,
+    "same_history_reproduction_counts_as_replication": false
+  },
+  "panel_failure_semantics": "If any exact panel member cannot satisfy the frozen window, classify BLOCKED_BY_INPUT_CONTRACT. Do not drop, replace, reweight, shorten, move, or otherwise repair the panel/window.",
+  "kill_conditions": [
+    "SOURCE_JH01_IDENTITY_MISMATCH", "SOURCE_PREREGISTRATION_DIGEST_MISMATCH", "SOURCE_SNAPSHOT_IDENTITY_MISMATCH", "REPLICATION_WINDOW_MISMATCH", "REPLICATION_OVERLAPS_DISCOVERY_HISTORY", "UNIVERSE_MISMATCH", "SYMBOL_SUBSTITUTION_ATTEMPT", "SURVIVOR_REWEIGHTING_ATTEMPT", "REQUIRED_COVERAGE_MISMATCH", "COVERAGE_GAP", "HOURLY_CONTINUITY_FAILURE", "BAR_TIME_SEMANTIC_MISMATCH", "SAFE_KNOWN_AFTER_VIOLATION", "OUTCOME_LEAKAGE", "DECISION_SCHEDULE_MISMATCH", "T_NOT_365", "RETURN_SEMANTIC_DRIFT", "FEATURE_RECIPE_DRIFT", "OUTCOME_RECIPE_DRIFT", "HAC_LAG_MISMATCH", "NONFINITE_PRICE_OR_DERIVED_VALUE", "OUTCOME_ACCESSED_BEFORE_FREEZE", "UNAUTHORIZED_MATERIALIZATION", "UNAUTHORIZED_EXECUTION", "POST_FREEZE_SCIENTIFIC_MUTATION"
+  ],
+  "post_freeze_amendments": {
+    "before_outcome_access": "A material scientific correction requires explicit superseding preregistration lineage.",
+    "after_outcome_access": "Do not mutate this confirmatory contract in place; a redesign is a new experiment or generation.",
+    "outcome_conditioned_amendment": "PROHIBITED"
+  },
+  "jigsaw_index_eligibility": "NOT_A_JIGSAW_EVIDENCE_PIECE; this preregistration is not eligible for index discovery or self-ingestion.",
+  "authority": {
+    "materialization_authority": "NONE",
+    "execution_authority": "NONE",
+    "causal_authority": "NONE",
+    "strategy_authority": "NONE",
+    "router_authority": "NONE",
+    "state_snapshot_authority": "NONE",
+    "qnty_authority": "NONE",
+    "trading_authority": "NONE",
+    "promotion_authority": "NONE"
+  },
+  "preregistration_digest": "46f923023b4b696307da2b9d6fc4c8db9d04b40b012de35e0bf738cc03c4be57"
+}

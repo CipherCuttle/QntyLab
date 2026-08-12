@@ -1,0 +1,16 @@
+schema_version = 1
+repository_id = "QntyLab"
+
+[bootstrap]
+context_command = "python -m qntylab.project_context"
+research_context_command = "python -m qntylab.research_ledger context"
+
+[authority]
+global_architecture_registry = "docs/ADR/registry.toml"
+project_registry = "docs/state/projects.toml"
+current_roadmap = "docs/CURRENT_ROADMAP.md"
+research_ledger_root = "experiments/research"
+
+[data]
+registry_status = "NOT_ESTABLISHED"
+future_registry = "data/registry.toml"

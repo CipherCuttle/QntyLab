@@ -366,21 +366,45 @@ def _statement_text(pair: dict, row_a: dict, row_b: dict) -> str:
         if pair["same_snapshot_identity"] == "YES" and snap_a:
             basis_bits.append(f"snapshot {snap_a!r}")
         basis_clause = " and ".join(basis_bits) if basis_bits else "the same frozen decision window"
-        if pair["same_outcome"] == "YES":
+        # Branch on claim_relation itself (already correctly derived by
+        # _claim_relation) rather than re-deriving from same_feature/
+        # same_outcome here -- re-deriving invited two bugs a hostile review
+        # caught: (a) an IDENTICAL_CLAIM pair (same_feature AND same_outcome
+        # both YES) fell into the "different features" branch below just
+        # because same_outcome was checked first, and (b)
+        # CLAIM_RELATION_NOT_ESTABLISHED pairs fell into the same "different"
+        # wording as a genuine DIFFERENT_CLAIM, laundering NOT_ESTABLISHED
+        # into a confident negative in reader-facing prose even though the
+        # structured claim_relation field stayed conservative.
+        if pair["claim_relation"] == "IDENTICAL_CLAIM":
             outcome_clause = (
-                "Both propositions use the same explicit outcome definition but test different "
-                "features, so their native verdicts remain separately reported and are not combined "
-                "into a shared effect size."
+                "Both propositions test the same explicit feature against the same explicit "
+                "outcome definition, so their native verdicts remain separately reported and are "
+                "not combined into a shared effect size."
             )
-        elif pair["same_feature"] == "YES":
+        elif pair["claim_relation"] == "RELATED_DISTINCT_CLAIM":
+            if pair["same_outcome"] == "YES":
+                outcome_clause = (
+                    "Both propositions use the same explicit outcome definition but test different "
+                    "features, so their native verdicts remain separately reported and are not "
+                    "combined into a shared effect size."
+                )
+            else:
+                outcome_clause = (
+                    "Both propositions test the same explicit feature against different outcome "
+                    "definitions, so their native verdicts remain separately reported."
+                )
+        elif pair["claim_relation"] == "DIFFERENT_CLAIM":
             outcome_clause = (
-                "Both propositions test the same explicit feature against different outcome "
-                "definitions, so their native verdicts remain separately reported."
+                "The propositions concern different features and different outcome definitions "
+                "within that shared frozen context, so no combined input-output relationship is "
+                "licensed."
             )
-        else:
+        else:  # CLAIM_RELATION_NOT_ESTABLISHED
             outcome_clause = (
-                "The propositions concern different features and/or outcome definitions within "
-                "that shared frozen context, so no combined input-output relationship is licensed."
+                "Whether the propositions concern the same or different features and outcome "
+                "definitions is not established from the indexed fields alone, so no combined "
+                "input-output relationship is licensed."
             )
         return (
             f"{a_id} and {b_id} are distinct preregistered propositions from {context}, evaluated "

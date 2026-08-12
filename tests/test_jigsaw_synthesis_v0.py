@@ -510,6 +510,128 @@ def test_committed_artifact_matches_fresh_rebuild():
 
 
 # ---------------------------------------------------------------------------
+# Statement-text consistency with claim_relation (hostile-review repair).
+#
+# A hostile review of the frozen candidate found that _statement_text's
+# SAME_HISTORY_MULTI_PROPOSITION_CONTEXT branch re-derived its wording from
+# raw same_feature/same_outcome instead of the already-correct claim_relation
+# field, producing two bugs: (1) an IDENTICAL_CLAIM pair could be described
+# as testing "different features", and (2) a CLAIM_RELATION_NOT_ESTABLISHED
+# pair could be described with confident "different" language, laundering
+# NOT_ESTABLISHED into a negative in reader-facing prose. Both are fixed by
+# branching on claim_relation directly; these tests reproduce the exact
+# scenarios and pin the fix.
+# ---------------------------------------------------------------------------
+
+
+def test_identical_claim_statement_never_claims_different_features(tmp_path):
+    document = {
+        "schema_version": "jigsaw-evidence-piece-v0",
+        "experiment_id": "FIXTURE_IDENTICAL_V0",
+        "research_status": "FROZEN_HISTORICAL_EVIDENCE",
+        "authority": "NON_AUTHORITATIVE_EXPLORATORY_ONLY",
+        "piece_count": 2,
+        "piece_order": ["ID_A", "ID_B"],
+        "pieces": [
+            {
+                "proposition_id": "ID_A",
+                "piece_type": "PREDICTIVE_ASSOCIATION",
+                "classification": "SUPPORTED_WITHIN_FROZEN_SCOPE",
+                "feature": "SAME_FEATURE",
+                "outcome": "SAME_OUTCOME",
+                "snapshot_binding": {
+                    "snapshot_id": "fixture-snap-identical",
+                    "decision_window": "2024-01-01T00:00:00Z..2024-02-01T00:00:00Z",
+                    "panel_symbols": 3,
+                },
+                "prior_feature_exposure": "NO",
+                "promotion_eligible": False,
+            },
+            {
+                "proposition_id": "ID_B",
+                "piece_type": "PREDICTIVE_ASSOCIATION",
+                "classification": "SUPPORTED_WITHIN_FROZEN_SCOPE",
+                "feature": "SAME_FEATURE",
+                "outcome": "SAME_OUTCOME",
+                "snapshot_binding": {
+                    "snapshot_id": "fixture-snap-identical",
+                    "decision_window": "2024-01-01T00:00:00Z..2024-02-01T00:00:00Z",
+                    "panel_symbols": 3,
+                },
+                "prior_feature_exposure": "NO",
+                "promotion_eligible": False,
+            },
+        ],
+    }
+    _write(tmp_path, "fixture_identical", document)
+    synthesis = build_synthesis(tmp_path)
+    pair = get_pair(synthesis, "ID_A", "ID_B")
+    assert pair["same_feature"] == "YES"
+    assert pair["same_outcome"] == "YES"
+    assert pair["claim_relation"] == "IDENTICAL_CLAIM"
+    assert pair["allowed_synthesis"] == "SAME_HISTORY_MULTI_PROPOSITION_CONTEXT"
+    statement = next(s for s in synthesis["synthesis_statements"] if set(s["supporting_piece_ids"]) == {"ID_A", "ID_B"})
+    assert "different features" not in statement["statement"]
+    assert "same explicit feature against the same explicit outcome" in statement["statement"]
+
+
+def test_claim_relation_not_established_statement_never_asserts_confident_difference(tmp_path):
+    document = {
+        "schema_version": "jigsaw-evidence-piece-v0",
+        "experiment_id": "FIXTURE_UNESTABLISHED_V0",
+        "research_status": "FROZEN_HISTORICAL_EVIDENCE",
+        "authority": "NON_AUTHORITATIVE_EXPLORATORY_ONLY",
+        "piece_count": 2,
+        "piece_order": ["NE_A", "NE_B"],
+        "pieces": [
+            {
+                "proposition_id": "NE_A",
+                "piece_type": "PREDICTIVE_ASSOCIATION",
+                "classification": "SUPPORTED_WITHIN_FROZEN_SCOPE",
+                "feature": "SOME_FEATURE",
+                "outcome": "SOME_OUTCOME",
+                "snapshot_binding": {
+                    "snapshot_id": "fixture-snap-unestablished",
+                    "decision_window": "2024-01-01T00:00:00Z..2024-02-01T00:00:00Z",
+                    "panel_symbols": 3,
+                },
+                "prior_feature_exposure": "NO",
+                "promotion_eligible": False,
+            },
+            {
+                # Deliberately no "feature"/"outcome" fields -- mirrors the
+                # real funding-pressure piece's CONDITION_EFFECT shape.
+                "proposition_id": "NE_B",
+                "piece_type": "CONDITION_EFFECT",
+                "primary": {"decision": "NOT_SUPPORTED_UNDER_FROZEN_SPECIFICATION"},
+                "snapshot_binding": {
+                    "snapshot_id": "fixture-snap-unestablished",
+                    "decision_window": "2024-01-01T00:00:00Z..2024-02-01T00:00:00Z",
+                    "panel_symbols": 3,
+                },
+                "prior_feature_exposure": "UNKNOWN",
+                "promotion_eligible": False,
+            },
+        ],
+    }
+    _write(tmp_path, "fixture_unestablished", document)
+    synthesis = build_synthesis(tmp_path)
+    pair = get_pair(synthesis, "NE_A", "NE_B")
+    assert pair["same_feature"] == "NOT_ESTABLISHED"
+    assert pair["same_outcome"] == "NOT_ESTABLISHED"
+    assert pair["claim_relation"] == "CLAIM_RELATION_NOT_ESTABLISHED"
+    # Same source artifact (and same explicit snapshot_id) still makes this
+    # SHARED_FROZEN_HISTORY -- independence_status is about the data/history
+    # binding, not about whether claim_relation is comparable.
+    assert pair["independence_status"] == "SHARED_FROZEN_HISTORY"
+    assert pair["allowed_synthesis"] == "SAME_HISTORY_MULTI_PROPOSITION_CONTEXT"
+    statement = next(s for s in synthesis["synthesis_statements"] if set(s["supporting_piece_ids"]) == {"NE_A", "NE_B"})
+    lowered = statement["statement"].lower()
+    assert "different features and different outcome" not in lowered
+    assert "not established" in lowered
+
+
+# ---------------------------------------------------------------------------
 # JOINT_CONTEXT_ONLY path (not reached by real current data; exercised via
 # a synthetic fixture so the code path is proven, not merely dead).
 # ---------------------------------------------------------------------------

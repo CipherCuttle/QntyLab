@@ -1,0 +1,55 @@
+{
+  "schema_version": "jigsaw-evidence-piece-v0",
+  "phase": "JIGSAW_FUNDING_PRESSURE_VOLATILITY_FROZEN_RESULT_RECORDING_V0",
+  "experiment_id": "JIGSAW_FUNDING_PRESSURE_VOLATILITY_V0",
+  "preregistration_id": "JIGSAW_FUNDING_PRESSURE_VOLATILITY_PREREGISTRATION_V0",
+  "piece_type": "CONDITION_EFFECT",
+  "authority": "NON_AUTHORITATIVE",
+  "research_status": "FROZEN_HISTORICAL_EVIDENCE",
+  "promotion_eligible": false,
+  "primary": {
+    "proposition": "mean(RV24 | HIGH funding pressure) - mean(RV24 | LOW funding pressure) > 0",
+    "decision": "NOT_SUPPORTED_UNDER_FROZEN_SPECIFICATION",
+    "adjudication": "NO_POSITIVE_HIGH_MINUS_LOW_DIRECTIONAL_CONTRAST",
+    "observed_contrast": "-0.0002003650803348647161725358990165653289511751324777"
+  },
+  "bound": {
+    "panel_symbols": 20,
+    "daily_decisions": 610,
+    "funding_pressure_state": "frozen funding-pressure ECDF",
+    "outcome": "frozen RV24 definition",
+    "decision_window": "2023-10-19T00:00:00Z..2025-06-19T00:00:00Z"
+  },
+  "interpretation": "The frozen positive-direction proposition was not supported. Within the exact frozen sample and specification, HIGH funding-pressure states did not have greater mean future RV24 than LOW states. The observed HIGH-minus-LOW contrast was negative.",
+  "evidence_class": "NEGATIVE_OR_NULL_FOR_FROZEN_POSITIVE_DIRECTION",
+  "does_not_establish": [
+    "inverse effect",
+    "causality",
+    "statistical significance",
+    "economic significance",
+    "incremental forecast value",
+    "strategy authority",
+    "router authority",
+    "Qnty authority"
+  ],
+  "limitations": [
+    "The preregistration contains no significance threshold.",
+    "The preregistration contains no confidence-interval threshold.",
+    "The preregistration contains no economic effect-size hurdle.",
+    "The preregistration contains no incremental forecasting benchmark.",
+    "The preregistration contains no HAR-RV or lagged-RV comparison.",
+    "This is a directional falsification / negative Jigsaw observation for this exact proposition, not a general theorem about funding and volatility."
+  ],
+  "follow_up": {
+    "status": "UNTESTED_FOLLOW_UP",
+    "question": "Does funding pressure provide incremental or stable forecasting information for future volatility beyond lagged realized volatility / HAR-RV-type benchmarks?"
+  },
+  "authorities": {
+    "strategy": "NONE",
+    "router": "NONE",
+    "qnty": "NONE"
+  },
+  "source_execution_result_relative_path": "experiments/research/jigsaw_funding_pressure_volatility_v0/execution_result.json",
+  "recording_convention": "Jigsaw execution_result.json plus result.json evidence-piece convention",
+  "piece_digest": "sha256:02685001f3c4c111fdd6693b158663c02b59f1584f7717e0ef63a9e131770d67"
+}

@@ -1,0 +1,44 @@
+{
+  "schema_version": "jigsaw-frozen-execution-result-v0",
+  "phase": "JIGSAW_FUNDING_PRESSURE_VOLATILITY_FROZEN_RESULT_RECORDING_V0",
+  "status": "RECORDED_IMMUTABLE",
+  "experiment_id": "JIGSAW_FUNDING_PRESSURE_VOLATILITY_V0",
+  "preregistration_identity": {
+    "id": "JIGSAW_FUNDING_PRESSURE_VOLATILITY_PREREGISTRATION_V0",
+    "relative_path": "experiments/research/jigsaw_funding_pressure_volatility_v0/preregistration.json",
+    "contract_digest": "sha256:749641cbee99bc769a6095e2a5877e4ccf1c46db0a82860885eedc06734cd2d6"
+  },
+  "runtime": {
+    "canonical_runtime_merge_sha": "2608f5691934c0ca7983473972882ad6641ff3b5"
+  },
+  "authorization": {
+    "authorization_id": "jigsaw-funding-pressure-v0-eea070f7fde033112ea94c277c5e9f91",
+    "terminal_state": "CONSUMED_COMPLETE",
+    "claim_ref": "refs/qntylab-execution-claims/jigsaw-funding-pressure-v0-eea070f7fde033112ea94c277c5e9f91",
+    "claim_sha": "2608f5691934c0ca7983473972882ad6641ff3b5"
+  },
+  "source_execution_record": {
+    "identity": "jigsaw_funding_pressure_volatility_v0/jigsaw-funding-pressure-v0-eea070f7fde033112ea94c277c5e9f91.execution.json",
+    "path": "/home/swirky/DevHub/executions/QntyLab/jigsaw_funding_pressure_volatility_v0/jigsaw-funding-pressure-v0-eea070f7fde033112ea94c277c5e9f91.execution.json",
+    "sha256": "e979a3b5e9e4adb85c11b2d04d9ced24729109ae9d3f7e400bd1c9602509fbf6"
+  },
+  "result": {
+    "result_digest": "sha256:e2ae81260557f64c4c4db4104004a949c358f007c1a0c2594a97ca78fba8824a",
+    "provenance_digest": "sha256:991a18c7d0778427823408c846cc23dc84676cb1c7ebbf1a5a46d98d265b7f51",
+    "primary_statistic": "-0.0002003650803348647161725358990165653289511751324777",
+    "adjudication": "NO_POSITIVE_HIGH_MINUS_LOW_DIRECTIONAL_CONTRAST"
+  },
+  "downstream_authorities": {
+    "strategy": "NONE",
+    "router": "NONE",
+    "qnty": "NONE"
+  },
+  "historical_failed_authorization": {
+    "authorization_id": "jigsaw-funding-pressure-v0-21299530daeea57ba2d1d2a900f5547c",
+    "terminal_state": "CONSUMED_INCOMPLETE",
+    "preserved_as_distinct_lineage": true
+  },
+  "real_experiment_recomputed": false,
+  "executor_changed": false,
+  "record_digest": "sha256:2c82fe6273f5ea25a943882949b7c69e97d00d655b99b20d7b109790922b6751"
+}

@@ -1,9 +1,5 @@
 # JH01 V0R1 pre-outcome hostile execution review
 
-Review target: `0a8fcbd23f720491507ac7da9eb1621b73f6b4aa`  
-Reviewed executor: `qntylab/jh01_rv_persistence_temporal_replication_execution_v0r1.py`  
-Review scope: pre-outcome source, test, artifact-namespace, and Git-identity review only.
-
 ## Outcome-blind attestation
 
 - `REAL_V0R1_RETURNS_COMPUTED = NO`
@@ -13,32 +9,46 @@ Review scope: pre-outcome source, test, artifact-namespace, and Git-identity rev
 - `REAL_V0R1_P_VALUE_KNOWN = NO`
 - `REAL_V0R1_CLASSIFICATION_KNOWN = NO`
 
-## Hostile checks
+## Initial hostile review
+
+Review target: `0a8fcbd23f720491507ac7da9eb1621b73f6b4aa`  
+Scope: pre-outcome source, test, artifact-namespace, and Git-identity review only.
+
+The review confirmed V0 immutability, the exact `opens[:-1]` repair, full synthetic cardinality proof, unchanged OLS/Bartlett-HAC(5)/classification semantics, no network path, and explicit V0 superseding provenance.  It identified one High finding before real execution: `_preflight` had inherited `ARTIFACT_RELATIVE`, causing it to seek immutable materialization artifacts under the new V0R1 output namespace instead of the frozen V0 parent namespace.
+
+- Critical: 0
+- High: 1 — frozen-input namespace resolution
+- Medium: 0
+- Low: 0
+- C/H repair required: yes
+
+## Authorized C/H repair
+
+Commit `758e02718ce82bebeae3e63d17ecc6e3d4a9a23a` adds only `FROZEN_ARTIFACT_RELATIVE` and directs the unchanged preflight checks to the V0 parent artifact root.  It does not change raw-input identity, returns, RV windows, estimator, HAC, classification, or execution one-shot semantics.  The targeted test reran all 18 V0R1 tests, including the full 20 × 8,785 synthetic production-builder pass.
+
+## Targeted re-review
+
+Review target: `758e02718ce82bebeae3e63d17ecc6e3d4a9a23a`  
+Scope: the single frozen-input namespace repair and its interaction with V0/V0R1 isolation.
 
 | Attack | Evidence | Finding |
 | --- | --- | --- |
-| V0 mutated or reconstructed | V0 is byte-identical from `e638dc2…` through the authorized base; its blob is `3fdafbf…` and SHA-256 remains `9841c14…`. | PASS |
-| Repair broader than adjacency | Full zero-context diff census classifies every changed production line as identity, namespace, mandatory superseding provenance/artifact accounting, or the one authorized pair-loop line. | PASS |
-| 8785→8784 pair semantics wrong, skipped, or duplicated | The full synthetic 20 × 8785 panel drove the production builder through 8,784 market-return calls; focused strict-zip test confirms first `opens[0] → opens[1]` and last `opens[8783] → opens[8784]` once each. | PASS |
-| Return boundary, bar-open/close, feature/future leakage | Unchanged V0 validation and synthetic tests enforce close boundary, 24-return prior/future windows, and no overlap. | PASS |
-| OLS/HAC/classification drift | Unchanged estimator/classifier passes the independent NumPy Bartlett/HAC(5) oracle and positive/negative/inconclusive classifications. | PASS |
-| Input identity weakening or network path | Existing hash/schema/timestamp preflight is unchanged; static source audit found no acquisition or network dependency. | PASS |
-| Namespace collision, V0 sentinel overwrite, or multiple run path | V0R1 uses the distinct `.../v0r1` namespace, has no start/result artifact before review, and preserves exclusive creation/refusal semantics. | PASS |
-| Provenance falsehood | Request/result bind V0 supersession, interruption state, prior request/start digests, repair reason/scope, `pristine_first_execution=false`, and `post_start_repair=true`. | PASS |
-
-## Finding summary
+| V0 mutation or reconstruction | V0 is byte-identical from `e638dc2…` through the authorized base; its blob is `3fdafbf…` and SHA-256 remains `9841c14…`. | PASS |
+| Broadened scientific repair | The repair is six path-reference substitutions plus one namespace constant; pair-loop and all statistical code are unchanged. | PASS |
+| Frozen input weakened or V0R1 output collision | Preflight now reads only immutable V0 materialization artifacts; request/start/result remain exclusively under `.../v0r1`. | PASS |
+| First/last pair, leakage, HAC, or classification drift | The targeted suite passed the focused strict-zip test, full 175,700-bar builder test, and independent NumPy HAC oracle. | PASS |
+| Network, multiple run, or provenance bypass | Static audit and exclusive artifact creation/refusal semantics remain unchanged. | PASS |
 
 - Critical: 0
 - High: 0
 - Medium: 0
 - Low: 0
-- C/H repair required: no
-- Targeted re-review: not required
+- Additional re-review: not permitted or required
 
 ## Freeze record
 
-- `FROZEN_V0R1_EXECUTION_IMPLEMENTATION_SHA = 0a8fcbd23f720491507ac7da9eb1621b73f6b4aa`
-- Implementation Git blob: `2aaa514ca2a821442d5de5baac2ba520b15b5b28`
-- Implementation SHA-256: `9df4b41f36c53a457016f3a6e9c271caf09671c973bb67dd84e8e37dff3837b6`
+- `FROZEN_V0R1_EXECUTION_IMPLEMENTATION_SHA = 758e02718ce82bebeae3e63d17ecc6e3d4a9a23a`
+- Implementation Git blob: `60e0a5d697f61e8bcfe8d6966ee487f88eec7ea0`
+- Implementation SHA-256: `95288b511cf9c13d739ee911bf56a71b9e83fd2ede664a96b549a12bf6da9c74`
 
-The frozen executor must remain byte-identical to this review target before the one authorized real execution.
+The executor must remain byte-identical to this final freeze target before the one authorized real execution.

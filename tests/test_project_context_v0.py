@@ -145,10 +145,11 @@ def test_human_context_does_not_claim_no_queued_projects() -> None:
     assert "- None." not in queued_section
 
 
-def test_completed_phase_leaves_no_active_project_and_no_further_action() -> None:
+def test_active_harvest_is_the_only_authorized_implementation_phase() -> None:
     data = project_context.context_data(ROOT)
-    assert data["active_project"] is None
-    assert data["current_permitted_next_action"] == "No project implementation is currently authorized."
+    assert data["active_project"]["project_id"] == "JIGSAW_HARVEST_V0"
+    assert data["active_project"]["implementation_authorized"] is True
+    assert data["current_permitted_next_action"] == "Implement and verify only the frozen four-proposition Jigsaw Harvest V0 runner; real harvest execution remains separately gated."
 
 
 def test_research_ledger_is_the_canonical_research_source() -> None:

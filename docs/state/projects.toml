@@ -151,6 +151,67 @@ next_action = "JH01 V0R1 temporal-replication execution is frozen and closed wit
 implementation_authorized = false
 
 [[project]]
+project_id = "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_JIGSAW_EVIDENCE_AUTHORIZATION_V0"
+state = "CLOSED_PASS"
+authority_level = "GOVERNANCE_AUTHORIZATION_ONLY"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md",
+  "experiments/research/jh01_rv_persistence_temporal_replication_v0/v0r1/execution_result.json",
+  "experiments/research/jh01_rv_persistence_temporal_replication_v0/v0r1/provenance_correction.json",
+]
+phase_type = "GOVERNANCE_ONLY"
+source_piece_id = "JH01_RV_PERSISTENCE"
+frozen_v0r1_project_id = "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0R1"
+frozen_v0r1_result_digest = "3dba3a0f0700a768e981dcecfe5793532bcd4bc1db7dc4dbcd9e4806a722c5c1"
+frozen_v0r1_provenance_correction_digest = "c396b6cc53d92a87c7dfa45920c05a772bb447c1f98de5bdbbae065e255b7154"
+canonical_corrected_v0_execution_started_digest = "9c8b00ad68c1e1ba389512c94a4c145264844a4e24fae75c038fcc9e0144f285"
+result_and_correction_must_be_consumed_together = true
+pristine_first_execution_assertion_authorized = false
+post_start_repair_qualification_must_be_preserved = true
+independent_replication_established_current_value = "NO"
+independent_replication_established_change_authorized_this_phase = false
+original_jh01_discovery_piece_mutation_authorized = false
+scientific_execution_authorized = false
+real_data_execution_authorized = false
+input_reacquisition_authorized = false
+frozen_result_mutation_authorized = false
+jigsaw_evidence_mutation_authorized = false
+jigsaw_index_mutation_authorized = false
+synthesis_mutation_authorized = false
+state_snapshot_authorized = false
+router_authorized = false
+qnty_authorized = false
+trading_authorized = false
+promotion_authorized = false
+later_implementation_may_read = [
+  "original JH01_RV_PERSISTENCE discovery evidence",
+  "V0/V0R1 provenance required to interpret the replication",
+  "the exact frozen V0R1 execution_result.json",
+  "the exact V0R1 provenance_correction.json",
+  "the current Jigsaw evidence schemas",
+  "the current jigsaw_index mechanics",
+  "the current synthesis eligibility ontology and contracts",
+]
+later_implementation_may_write_if_justified = [
+  "one bounded canonical representation of the replication evidence",
+  "a deterministic Jigsaw index rebuild or update",
+  "a deterministic synthesis eligibility update",
+  "project, roadmap, and test state necessary for that implementation",
+]
+later_implementation_must_resolve = [
+  "EVIDENCE_IDENTITY: represent replication as a separate linked evidence piece, an additive replication record consumed by synthesis, or another existing repository-native bounded representation, preferring existing semantics and never mutating the historical JH01_RV_PERSISTENCE discovery record",
+  "SCIENTIFIC_CLAIM: state the exact proposition V0R1 replicated and constrain the evidence representation to that proposition only",
+  "INDEPENDENCE_SEMANTICS: distinguish temporal sample separation from provider, exchange, data-generating-process, methodological, implementation, and causal independence, and determine which if any is actually supported by repository definitions and the frozen evidence",
+  "PROVENANCE_QUALIFICATION: represent post_start_repair=true and pristine_first_execution=false so downstream synthesis cannot treat V0R1 as a pristine one-shot replication",
+  "CORRECTION_BINDING: prove the canonical replication evidence consumed both frozen_v0r1_result_digest and frozen_v0r1_provenance_correction_digest rather than trusting the malformed historical digest embedded inside the frozen result",
+  "SYNTHESIS_EFFECT: determine which exact synthesis field(s), if any, should change, and do not change independent_replication_established unless repository semantics and evidence actually justify it",
+]
+implementation_authorized = false
+next_action = "This phase authorizes exactly one later, separately Git-backed bounded implementation phase to incorporate the frozen JH01_RV_PERSISTENCE V0R1 temporal replication into canonical Jigsaw evidence and synthesis metadata. This governance phase itself creates no Jigsaw evidence, performs no Jigsaw index mutation, and performs no synthesis mutation; independent_replication_established remains NO and unchanged. The later implementation MUST consume the frozen V0R1 execution result digest together with the mandatory provenance correction digest and MUST NOT treat the malformed prior digest embedded in the frozen result as authoritative. It MUST NOT assert V0R1 was a pristine first execution, MUST preserve the post-start-repair qualification, MUST NOT silently promote temporal sample separation into provider, exchange, data-generating-process, methodological, causal, or independent-replication status, and MUST inspect the existing Jigsaw evidence schema and synthesis ontology to choose the narrowest truthful representation rather than a preordained label. No scientific rerun, recomputation, or input reacquisition is authorized by this phase. The original JH01_RV_PERSISTENCE discovery piece remains immutable. No State Snapshot, Router, Qnty, trading, or promotion authority is granted by this phase or transferred to the later implementation phase. Any Jigsaw evidence, Jigsaw index, or synthesis mutation requires that separate Git-backed implementation authorization to be requested and created before it may proceed."
+
+[[project]]
 project_id = "STATE_SNAPSHOT_V0"
 state = "PLANNED_NOT_AUTHORIZED"
 authority_level = "PLANNING_ONLY"

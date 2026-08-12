@@ -1,0 +1,36 @@
+schema_version = 1
+
+[[adr]]
+adr_id = "ADR-0001"
+path = "docs/ADR/0001-qntylab-probationary-observatory.md"
+status = "CURRENT_PROJECT_SPECIFIC"
+authority_scope = "DVOL_V0_PROJECT_ARCHITECTURE"
+
+[[adr]]
+adr_id = "ADR-0002"
+path = "docs/ADR/0002-dvol-v0-phase1a-offline-capture-core.md"
+status = "HISTORICAL"
+authority_scope = "DVOL_V0_COMPLETED_PHASE_RECORD"
+
+[[adr]]
+adr_id = "ADR-0003"
+path = "docs/ADR/0003-dvol-v0-phase1b-non-primary-live-smoke.md"
+status = "HISTORICAL"
+authority_scope = "DVOL_V0_COMPLETED_PHASE_RECORD"
+
+[[adr]]
+adr_id = "ADR-0004"
+path = "docs/ADR/0004-dvol-v0-phase1b-evidence-retention-repair.md"
+status = "HISTORICAL"
+authority_scope = "DVOL_V0_COMPLETED_PHASE_RECORD"
+
+[[adr]]
+adr_id = "ADR-0005"
+path = "docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md"
+status = "CURRENT_GLOBAL"
+authority_scope = "GLOBAL_ARCHITECTURE"
+
+[[supersession]]
+superseded_adr_id = "ADR-0001"
+superseding_adr_id = "ADR-0005"
+scope = "CONFLICTING_GLOBAL_ROLE_LANGUAGE"

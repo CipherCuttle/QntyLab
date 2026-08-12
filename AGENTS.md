@@ -1,4 +1,11 @@
-Before planning any QntyLab strategy, hypothesis, backtest, batch, parameter, result-analysis, or candidate-selection task, run:
+Before planning or modifying QntyLab:
+
+1. Inspect and reconcile the local Git state.
+2. Run `python -m qntylab.project_context` and obey its authority map.
+3. Treat a canonical authority conflict as `SOURCE_CONFLICT` and stop.
+4. Chat, GPT memory, handoff prose, and README prose cannot override canonical Git.
+
+For strategy research, hypothesis, backtest, batch, parameter, result-analysis, or candidate-selection work, also run:
 
 ```bash
 python -m qntylab.research_ledger context

@@ -1,0 +1,107 @@
+schema_version = 1
+
+[[project]]
+project_id = "QNTYLAB_PROJECT_CONTEXT_AND_AUTHORITY_REGISTRY_V0"
+state = "CLOSED_PASS"
+authority_level = "PROJECT_CONTEXT_IMPLEMENTATION"
+authoritative_artifacts = [
+  "qntylab.toml",
+  "docs/ADR/registry.toml",
+  "docs/state/projects.toml",
+  "qntylab/project_context.py",
+]
+next_action = "Project Context and Authority Registry V0 is complete; no further implementation is authorized by this closed phase."
+implementation_authorized = false
+
+[[project]]
+project_id = "RESEARCH_DATA_SPINE_V0"
+state = "PLANNED_NOT_AUTHORIZED"
+authority_level = "PLANNING_ONLY"
+authoritative_artifacts = ["docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md"]
+next_action = "No implementation is authorized; require separate Git-backed authorization."
+implementation_authorized = false
+
+[[project]]
+project_id = "JIGSAW_HARVEST_V0"
+state = "PLANNED_NOT_AUTHORIZED"
+authority_level = "PLANNING_ONLY"
+authoritative_artifacts = ["docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md"]
+next_action = "No implementation is authorized; require separate Git-backed authorization."
+implementation_authorized = false
+
+[[project]]
+project_id = "STATE_SNAPSHOT_V0"
+state = "PLANNED_NOT_AUTHORIZED"
+authority_level = "PLANNING_ONLY"
+authoritative_artifacts = ["docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md"]
+next_action = "No implementation is authorized; require separate Git-backed authorization."
+implementation_authorized = false
+
+[[project]]
+project_id = "REACTIVE_JIGSAW_V0"
+state = "PLANNED_NOT_AUTHORIZED"
+authority_level = "PLANNING_ONLY"
+authoritative_artifacts = ["docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md"]
+next_action = "No implementation is authorized; require separate Git-backed authorization."
+implementation_authorized = false
+
+[[project]]
+project_id = "STATE_TRANSITION_CHANGE_POINT_WORK"
+display_name = "STATE_TRANSITION / CHANGE_POINT WORK"
+state = "PLANNED_NOT_AUTHORIZED"
+authority_level = "PLANNING_ONLY"
+authoritative_artifacts = ["docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md"]
+next_action = "No implementation is authorized; require separate Git-backed authorization."
+implementation_authorized = false
+
+[[project]]
+project_id = "ROUTER_DATASET_CONTRACT"
+state = "PLANNED_NOT_AUTHORIZED"
+authority_level = "PLANNING_ONLY"
+authoritative_artifacts = ["docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md"]
+next_action = "No implementation is authorized; require separate Git-backed authorization."
+implementation_authorized = false
+
+[[project]]
+project_id = "ROUTER_FIXTURE_V0"
+state = "PLANNED_NOT_AUTHORIZED"
+authority_level = "PLANNING_ONLY"
+authoritative_artifacts = ["docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md"]
+next_action = "No implementation is authorized; require separate Git-backed authorization."
+implementation_authorized = false
+
+[[project]]
+project_id = "SEALED_TEMPORAL_EVALUATION"
+state = "PLANNED_NOT_AUTHORIZED"
+authority_level = "PLANNING_ONLY"
+authoritative_artifacts = ["docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md"]
+next_action = "No implementation is authorized; require separate Git-backed authorization."
+implementation_authorized = false
+
+[[project]]
+project_id = "PROSPECTIVE_SHADOW"
+state = "PLANNED_NOT_AUTHORIZED"
+authority_level = "PLANNING_ONLY"
+authoritative_artifacts = ["docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md"]
+next_action = "No implementation is authorized; require separate Git-backed authorization."
+implementation_authorized = false
+
+[[project]]
+project_id = "QNTY_HANDOFF"
+state = "PLANNED_NOT_AUTHORIZED"
+authority_level = "PLANNING_ONLY"
+authoritative_artifacts = ["docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md"]
+next_action = "No implementation is authorized unless downstream evidence separately earns it."
+implementation_authorized = false
+
+[[project]]
+project_id = "JIGSAW_FUNDING_PRESSURE_VOLATILITY_FROZEN_RESULT_RECORDING_V0"
+state = "CLOSED_NEGATIVE"
+authority_level = "IMMUTABLE_HISTORICAL_RESULT"
+authoritative_artifacts = [
+  "experiments/research/jigsaw_funding_pressure_volatility_v0/preregistration.json",
+  "experiments/research/jigsaw_funding_pressure_volatility_v0/execution_result.json",
+  "experiments/research/jigsaw_funding_pressure_volatility_v0/result.json",
+]
+next_action = "No further implementation is authorized by this closed negative result."
+implementation_authorized = false

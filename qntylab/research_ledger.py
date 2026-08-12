@@ -25,6 +25,12 @@ REQUIRED_INPUT_KIND = "OHLCV_1H_CSV"
 RESEARCH_INTENTS = {"SCREEN", "FOLLOW_UP", "REPLICATION"}
 DECISION_STATUSES = {"FOLLOW_UP", "SURVIVOR", "GRAVEYARDED", "BLOCKED"}
 RUNNABLE_STATUSES = {"PROPOSED", "SCREENING", "FOLLOW_UP", "SURVIVOR"}
+# Decision statuses that end a variant's/family's current research generation.
+# A terminal decision may only be replaced by a later DECISION_RECORDED if an
+# explicit CANDIDATE_REOPENED event names that exact decision afterward (F-01,
+# QNTYLAB_TERMINAL_DECISION_INTEGRITY_V0). Matches the existing reopen-target
+# check in replay(): only these statuses are reopenable.
+TERMINAL_DECISION_STATUSES = {"GRAVEYARDED", "BLOCKED"}
 SCOPES = {"EXACT_VARIANT", "FAMILY"}
 
 CANDIDATE_PROPOSED_KEYS = {
@@ -601,12 +607,36 @@ def load_canonical_history(root: Path = RESEARCH_ROOT) -> CanonicalHistory:
     )
 
 
+def _reopen_authorizes_replacement(
+    reopens: list[dict[str, Any]],
+    *,
+    candidate_id: str,
+    previous_decision_event_id: str,
+    previous_decision_recorded_at_utc: str,
+) -> bool:
+    """Whether some CANDIDATE_REOPENED event legitimately reopens the exact
+    terminal decision a later DECISION_RECORDED would otherwise silently
+    replace (F-01, QNTYLAB_TERMINAL_DECISION_INTEGRITY_V0).
+
+    A reopen authorizes replacement only when it names the same candidate and
+    the exact previous decision event, and was itself recorded after that
+    decision -- a reopen cannot retroactively license a decision it precedes.
+    """
+    return any(
+        reopen["candidate_id"] == candidate_id
+        and reopen["previous_decision_event_id"] == previous_decision_event_id
+        and reopen["recorded_at_utc"] > previous_decision_recorded_at_utc
+        for reopen in reopens
+    )
+
+
 def replay(history: CanonicalHistory, *, verify_evidence: bool = False, root: Path = RESEARCH_ROOT) -> tuple[dict[str, Any], dict[str, Any], list[str]]:
     issues: list[str] = []
     seen_events: set[str] = set()
     candidate_ids: set[str] = set()
     proposals: dict[str, dict[str, Any]] = {}
     reopen_by_decision: set[str] = set()
+    reopens_by_variant: dict[str, list[dict[str, Any]]] = {}
     variants: dict[str, dict[str, Any]] = {}
     trial_index = {"schema_version": INDEX_SCHEMA_VERSION, "trials": {}}
 
@@ -634,6 +664,9 @@ def replay(history: CanonicalHistory, *, verify_evidence: bool = False, root: Pa
             if not proposal or proposal["candidate_id"] != event["candidate_id"]:
                 issues.append(f"reopen before matching proposal: {event['event_id']}")
             reopen_by_decision.add(event["previous_decision_event_id"])
+            reopens_by_variant.setdefault(event["variant_id"], []).append(event)
+
+    decisions_by_event_id = {event["event_id"]: event for event in history.decisions}
 
     for event in history.decisions:
         if event["event_id"] in seen_events:
@@ -659,9 +692,25 @@ def replay(history: CanonicalHistory, *, verify_evidence: bool = False, root: Pa
         if event["scope"] == "FAMILY":
             target_variants = [variant_id for variant_id, proposal_event in proposals.items() if proposal_event["family_id"] == event["family_id"]]
         for variant_id in sorted(target_variants):
-            variants[variant_id]["status"] = event["status"]
-            variants[variant_id]["latest_decision_event_id"] = event["event_id"]
-            variants[variant_id]["revisit_condition"] = event["revisit_condition"]
+            variant = variants[variant_id]
+            if variant["status"] in TERMINAL_DECISION_STATUSES:
+                prior_decision_event_id = variant["latest_decision_event_id"]
+                prior_decision = decisions_by_event_id.get(prior_decision_event_id)
+                authorized = prior_decision is not None and _reopen_authorizes_replacement(
+                    reopens_by_variant.get(variant_id, []),
+                    candidate_id=variant["candidate_id"],
+                    previous_decision_event_id=prior_decision_event_id,
+                    previous_decision_recorded_at_utc=prior_decision["recorded_at_utc"],
+                )
+                if not authorized:
+                    issues.append(
+                        f"terminal decision replaced without explicit CANDIDATE_REOPENED: {event['event_id']} "
+                        f"variant {variant_id} previous_decision_event_id {prior_decision_event_id}"
+                    )
+                    continue
+            variant["status"] = event["status"]
+            variant["latest_decision_event_id"] = event["event_id"]
+            variant["revisit_condition"] = event["revisit_condition"]
 
     for event in history.candidates:
         if event["event_type"] != "CANDIDATE_REOPENED":
@@ -684,7 +733,7 @@ def replay(history: CanonicalHistory, *, verify_evidence: bool = False, root: Pa
             if not later_decision:
                 issues.append(f"reopen does not target latest decision: {event['event_id']}")
                 continue
-        if variant["status"] not in {"GRAVEYARDED", "BLOCKED"}:
+        if variant["status"] not in TERMINAL_DECISION_STATUSES:
             issues.append(f"reopen targets non-terminal status: {event['event_id']}")
             continue
         variant["status"] = "PROPOSED"

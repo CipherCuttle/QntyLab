@@ -41,7 +41,7 @@ import re
 import subprocess
 from collections.abc import Mapping
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from enum import Enum
 from pathlib import Path
@@ -73,6 +73,15 @@ AUTHORIZATION_STATUS_AUTHORIZED_UNUSED = "AUTHORIZED_UNUSED"
 OHLCV_SOURCE_TIMESTAMP_SEMANTIC = "SOURCE_BAR_OPEN_TIME"
 OHLCV_CLOSE_SEMANTIC = "CLOSE_PRICE_OF_BAR_OPENED_AT_TIMESTAMP"
 OHLCV_LOGICAL_ENDPOINT_MAPPING = "source_open_u_maps_to_logical_close_endpoint_u_plus_1_hour"
+
+# The two evidence roles the OHLCV execution series is assembled from. The V0
+# normalized role already existed; the leading-edge extension role is the
+# narrow, explicit selector this repair introduces so that the already-certified
+# PIT V1 source bar can be byte-verified and consumed as executable evidence
+# instead of being indistinguishable from generic experiment metadata. There is
+# no third role and no generic composition mechanism: exactly these two.
+OHLCV_NORMALIZED_ROLE = "ohlcv_normalized_evidence"
+OHLCV_LEADING_EDGE_EXTENSION_ROLE = "ohlcv_leading_edge_extension_evidence"
 
 CLAIM_REF_NAMESPACE = "refs/qntylab-execution-claims"
 AUTHORIZATION_ID_PATTERN = re.compile(r"^jigsaw-funding-pressure-v0-[0-9a-f]{32}$")
@@ -271,7 +280,7 @@ def _ohlcv_raw_evidence_entry(symbol: str, baseline: dict) -> dict:
     matches = [
         entry
         for entry in baseline["evidence_files"]
-        if entry["logical_role"] == "ohlcv_normalized_evidence" and entry["relative_path"] == relative_path
+        if entry["logical_role"] == OHLCV_NORMALIZED_ROLE and entry["relative_path"] == relative_path
     ]
     if len(matches) != 1:
         raise EvidenceValidationError(
@@ -279,6 +288,27 @@ def _ohlcv_raw_evidence_entry(symbol: str, baseline: dict) -> dict:
             f"at {relative_path!r}, found {len(matches)}"
         )
     return matches[0]
+
+
+def _ohlcv_extension_evidence_entry(baseline: dict, coverage: FrozenOhlcvCoverage) -> dict:
+    """Select the ONE canonical leading-edge extension artifact (Section 9).
+
+    Selection is by explicit role, and the selected path must additionally match
+    the path the PIT V1 certificate itself binds -- so neither the baseline nor
+    the certificate can unilaterally redirect execution at a different file.
+    """
+    matches = [entry for entry in baseline["evidence_files"] if entry["logical_role"] == OHLCV_LEADING_EDGE_EXTENSION_ROLE]
+    if len(matches) != 1:
+        raise EvidenceValidationError(
+            f"expected exactly one {OHLCV_LEADING_EDGE_EXTENSION_ROLE} entry in provenance baseline, found {len(matches)}"
+        )
+    entry = matches[0]
+    if entry["relative_path"] != coverage.extension_relative_path:
+        raise EvidenceValidationError(
+            f"leading-edge extension evidence path {entry['relative_path']!r} does not match the path bound by the "
+            f"PIT V1 certificate ({coverage.extension_relative_path!r})"
+        )
+    return entry
 
 
 def parse_funding_row(row: dict, *, symbol: str) -> VerifiedFundingEvent:
@@ -405,7 +435,28 @@ def validate_bar_series(bars: list[VerifiedBarOpenClose], *, symbol: str) -> tup
     return tuple(bars)
 
 
-def _verify_ohlcv_semantics_are_frozen(baseline: dict) -> None:
+@dataclass(frozen=True, slots=True)
+class FrozenOhlcvCoverage:
+    """The exact OHLCV coverage every assembled symbol series must satisfy.
+
+    Every field is derived from the already-frozen PIT V1 certificate (Section
+    8) rather than restated as a magic string here, and never from caller input.
+    """
+
+    first_source_open: str
+    last_source_open: str
+    rows_per_symbol: int
+    extension_relative_path: str
+
+
+def _single(values: set, *, what: str):
+    if len(values) != 1:
+        raise EvidenceValidationError(f"PIT V1 certificate does not bind a single {what}: {sorted(values)!r}")
+    return next(iter(values))
+
+
+def _verify_ohlcv_semantics_are_frozen(baseline: dict) -> FrozenOhlcvCoverage:
+    """Verify frozen OHLCV semantics and derive the exact required coverage."""
     certificate = provenance._load("pit_coverage_certificate_v1.json")
     if certificate["source_timestamp_semantic"] != "BAR_OPEN_TIME":
         raise EvidenceValidationError("PIT V1 certificate source_timestamp_semantic drifted from BAR_OPEN_TIME")
@@ -413,6 +464,102 @@ def _verify_ohlcv_semantics_are_frozen(baseline: dict) -> None:
         raise EvidenceValidationError("PIT V1 certificate close_value_semantic drifted from the frozen loader semantic")
     if certificate["ohlcv_evidence_set_digest_v1"] != baseline["ohlcv_v1_evidence_set_digest"]:
         raise EvidenceValidationError("PIT V1 certificate ohlcv_evidence_set_digest_v1 does not match provenance baseline")
+
+    census = certificate["ohlcv_census"]
+    if [row["symbol"] for row in census] != list(provenance.PANEL):
+        raise EvidenceValidationError("PIT V1 certificate ohlcv_census does not cover the exact frozen panel in order")
+
+    first = certificate["first_required_source_bar"]
+    last = certificate["last_required_source_bar"]
+    if _single({row["source_bar_open_start"] for row in census}, what="source_bar_open_start") != first:
+        raise EvidenceValidationError("PIT V1 census source_bar_open_start disagrees with first_required_source_bar")
+    if _single({row["source_bar_open_end"] for row in census}, what="source_bar_open_end") != last:
+        raise EvidenceValidationError("PIT V1 census source_bar_open_end disagrees with last_required_source_bar")
+
+    rows_per_symbol = _single({row["rows_per_symbol"] for row in census}, what="rows_per_symbol")
+    if not isinstance(rows_per_symbol, int) or isinstance(rows_per_symbol, bool) or rows_per_symbol < 2:
+        raise EvidenceValidationError(f"PIT V1 certificate rows_per_symbol is not a usable row count: {rows_per_symbol!r}")
+
+    extension_source = _single({row["v1_extension_row_source"] for row in census}, what="v1_extension_row_source")
+    experiment_prefix = provenance.EXPERIMENT.resolve().relative_to(provenance.ROOT.resolve())
+    return FrozenOhlcvCoverage(
+        first_source_open=first,
+        last_source_open=last,
+        rows_per_symbol=rows_per_symbol,
+        extension_relative_path=str(experiment_prefix / extension_source),
+    )
+
+
+def _index_extension_rows(rows: list[dict], coverage: FrozenOhlcvCoverage) -> dict[str, VerifiedBarOpenClose]:
+    """Exactly one leading-edge bar per frozen symbol, at exactly the required hour.
+
+    Fails closed on a duplicated symbol, an off-panel symbol, a wrong timestamp,
+    a malformed row, or any symbol left without its extension bar.
+    """
+    by_symbol: dict[str, VerifiedBarOpenClose] = {}
+    panel = set(provenance.PANEL)
+    for lineno, row in enumerate(rows, start=2):  # start=2: line 1 is the CSV header
+        symbol = row.get("symbol")
+        if symbol not in panel:
+            raise EvidenceValidationError(
+                f"leading-edge extension line {lineno}: symbol {symbol!r} is not in the frozen panel"
+            )
+        if symbol in by_symbol:
+            raise EvidenceValidationError(
+                f"leading-edge extension line {lineno}: duplicate extension row for {symbol}; exactly one is required"
+            )
+        if row.get("timestamp") != coverage.first_source_open:
+            raise EvidenceValidationError(
+                f"leading-edge extension line {lineno}: {symbol} timestamp {row.get('timestamp')!r} is not the "
+                f"required leading source-open {coverage.first_source_open!r}"
+            )
+        by_symbol[symbol] = parse_ohlcv_row(row, symbol=symbol)
+
+    missing = [symbol for symbol in provenance.PANEL if symbol not in by_symbol]
+    if missing:
+        raise EvidenceValidationError(f"leading-edge extension evidence is missing required rows for: {missing}")
+    return by_symbol
+
+
+def _load_ohlcv_extension_index(baseline: dict, root: Path, coverage: FrozenOhlcvCoverage) -> dict[str, VerifiedBarOpenClose]:
+    entry = _ohlcv_extension_evidence_entry(baseline, coverage)
+    provenance.verify_evidence_entry(entry, root=root)  # byte-verify BEFORE parsing
+    resolved = resolve_within_repository(entry["relative_path"], root)
+    with resolved.open("r", encoding="utf-8", newline="") as fh:
+        rows = list(csv.DictReader(fh))
+    return _index_extension_rows(rows, coverage)
+
+
+def _validate_exact_ohlcv_coverage(
+    bars: tuple[VerifiedBarOpenClose, ...], *, symbol: str, coverage: FrozenOhlcvCoverage
+) -> None:
+    """Make the original leading-edge failure unreachable before any science.
+
+    Boundaries come from the frozen PIT V1 certificate via `coverage`, never
+    from caller input. Duplicates are already rejected by validate_bar_series.
+    """
+    if len(bars) != coverage.rows_per_symbol:
+        raise EvidenceValidationError(
+            f"{symbol}: assembled OHLCV series has {len(bars)} rows, required exactly {coverage.rows_per_symbol}"
+        )
+    if bars[0].source_open_time != coverage.first_source_open:
+        raise EvidenceValidationError(
+            f"{symbol}: first source open is {bars[0].source_open_time!r}, required exactly {coverage.first_source_open!r}"
+        )
+    if bars[-1].source_open_time != coverage.last_source_open:
+        raise EvidenceValidationError(
+            f"{symbol}: last source open is {bars[-1].source_open_time!r}, required exactly {coverage.last_source_open!r}"
+        )
+    one_hour = timedelta(hours=1)
+    previous: datetime | None = None
+    for bar in bars:
+        current = datetime.fromisoformat(bar.source_open_time[:-1] + "+00:00")
+        if previous is not None and current - previous != one_hour:
+            raise EvidenceValidationError(
+                f"{symbol}: interior hourly gap before {bar.source_open_time}; adjacent source opens must differ "
+                f"by exactly one hour"
+            )
+        previous = current
 
 
 def _load_funding_symbol(symbol: str, baseline: dict, root: Path) -> tuple[VerifiedFundingEvent, ...]:
@@ -431,15 +578,34 @@ def _load_funding_symbol(symbol: str, baseline: dict, root: Path) -> tuple[Verif
     return validate_funding_series(events, symbol=symbol)
 
 
-def _load_ohlcv_symbol(symbol: str, baseline: dict, root: Path) -> tuple[VerifiedBarOpenClose, ...]:
+def _load_ohlcv_symbol(
+    symbol: str,
+    baseline: dict,
+    root: Path,
+    *,
+    extension_bar: VerifiedBarOpenClose,
+    coverage: FrozenOhlcvCoverage,
+) -> tuple[VerifiedBarOpenClose, ...]:
+    """Assemble one symbol's execution series from the already-certified evidence.
+
+    1 verified V1 leading row + the verified V0 rows, in source-open order. Both
+    components are byte-verified through provenance before they are parsed, and
+    the assembled series must satisfy the frozen coverage exactly.
+    """
+    if extension_bar.symbol != symbol:
+        raise EvidenceValidationError(
+            f"{symbol}: leading-edge extension bar carries symbol {extension_bar.symbol!r}"
+        )
     entry = _ohlcv_raw_evidence_entry(symbol, baseline)
     provenance.verify_evidence_entry(entry, root=root)
     resolved = resolve_within_repository(entry["relative_path"], root)
-    bars: list[VerifiedBarOpenClose] = []
+    bars: list[VerifiedBarOpenClose] = [extension_bar]
     with resolved.open("r", encoding="utf-8", newline="") as fh:
         for row in csv.DictReader(fh):
             bars.append(parse_ohlcv_row(row, symbol=symbol))
-    return validate_bar_series(bars, symbol=symbol)
+    verified = validate_bar_series(bars, symbol=symbol)
+    _validate_exact_ohlcv_coverage(verified, symbol=symbol, coverage=coverage)
+    return verified
 
 
 def load_verified_frozen_evidence() -> VerifiedEvidenceBundle:
@@ -458,13 +624,16 @@ def load_verified_frozen_evidence() -> VerifiedEvidenceBundle:
 
     root = provenance.ROOT
     baseline = provenance._load("provenance_baseline_v0.json")
-    _verify_ohlcv_semantics_are_frozen(baseline)
+    coverage = _verify_ohlcv_semantics_are_frozen(baseline)
+    extension_index = _load_ohlcv_extension_index(baseline, root, coverage)
 
     funding_by_symbol: dict[str, tuple[VerifiedFundingEvent, ...]] = {}
     bars_by_symbol: dict[str, tuple[VerifiedBarOpenClose, ...]] = {}
     for symbol in provenance.PANEL:
         funding_by_symbol[symbol] = _load_funding_symbol(symbol, baseline, root)
-        bars_by_symbol[symbol] = _load_ohlcv_symbol(symbol, baseline, root)
+        bars_by_symbol[symbol] = _load_ohlcv_symbol(
+            symbol, baseline, root, extension_bar=extension_index[symbol], coverage=coverage
+        )
 
     return VerifiedEvidenceBundle(
         exact_panel=tuple(provenance.PANEL),

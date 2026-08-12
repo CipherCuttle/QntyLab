@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "project_id": "JIGSAW_HARVEST_V0",
+  "experiment_id": "JIGSAW_HARVEST_V0_PREREGISTRATION_V0",
+  "status": "NOT_EXECUTED",
+  "research_status": "PREREGISTERED_IMPLEMENTATION_PENDING",
+  "preregistration_digest": "499b355ee2b308b4ae01e8c63b44a9a361d44d50fe381080131f41a4851849e3",
+  "snapshot": {
+    "snapshot_id": "rds-v0-c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac",
+    "snapshot_digest": "c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac",
+    "relation": "market_bars",
+    "bar_open_identity": "SOURCE_BAR_OPEN_TIME",
+    "bar_close_time": "bar_open_time + PT1H",
+    "safe_known_after": ">= bar_close_time"
+  },
+  "universe": ["ALICEUSDT", "APEUSDT", "API3USDT", "APTUSDT", "BCHUSDT", "CHRUSDT", "CHZUSDT", "ETCUSDT", "GMTUSDT", "INJUSDT", "LDOUSDT", "LINKUSDT", "LTCUSDT", "ONEUSDT", "OPUSDT", "REEFUSDT", "SANDUSDT", "TRXUSDT", "XLMUSDT", "XRPUSDT"],
+  "common_schedule": {
+    "frequency": "P1D",
+    "decision_time": "00:00:00Z",
+    "coverage_first_bar_open": "2023-10-18T23:00:00Z",
+    "coverage_last_bar_open": "2025-06-19T23:00:00Z",
+    "first_close_boundary": "2023-10-19T00:00:00Z",
+    "longest_feature_lookback_hours": 720,
+    "future_outcome_hours": 24,
+    "first_decision": "2023-11-18T00:00:00Z",
+    "last_decision": "2025-06-19T00:00:00Z",
+    "observation_count": 580,
+    "feature_boundary": "All feature inputs have bar_close_time <= t and safe_known_after <= t.",
+    "outcome_boundary": "The first outcome return is r_m,t+1, formed from the bar opened at t and closed at t+1; outcomes use no input through t."
+  },
+  "mathematical_recipes": {
+    "hourly_asset_return": "r_i,h = log(C_i,h / C_i,h-1), where C_i,h is the close of the one-hour bar ending at hourly close boundary h.",
+    "hourly_market_return": "r_m,h = (1/20) * sum_i r_i,h over the exact ordered 20-symbol universe; no capitalization, volume, or survivorship weighting.",
+    "daily_market_return": "R_m,t_to_t_plus_24 = sum_{h=t+1}^{t+24} r_m,h.",
+    "market_rv24": {
+      "feature": "RV24_prior,t = sqrt(sum_{h=t-23}^{t} r_m,h^2).",
+      "outcome": "RV24_future,t = sqrt(sum_{h=t+1}^{t+24} r_m,h^2).",
+      "quantity": "realized volatility, not realized variance"
+    },
+    "cross_sectional_dispersion": "R_i,24,t = sum_{h=t-23}^{t} r_i,h; mean_24,t = (1/20) * sum_i R_i,24,t; DISP24_t = sqrt((1/19) * sum_i (R_i,24,t - mean_24,t)^2). The denominator is 19 (sample standard deviation, ddof=1).",
+    "breadth": "R_i,7d,t = sum_{h=t-167}^{t} r_i,h; BREADTH7D_t = count_i(R_i,7d,t > 0) / 20. Exactly-zero returns are not positive and contribute zero to the count.",
+    "market_index_and_drawdown": "Let s0 = 2023-10-19T00:00:00Z and INDEX_s0 = 1. For any hourly close boundary t > s0, INDEX_t = exp(sum_{h=s0+1h}^{t} r_m,h). PEAK30D_t = max_{u in [t-720h,t]} INDEX_u, inclusive of both endpoints. DRAWDOWN_DEPTH30D_t = 1 - INDEX_t / PEAK30D_t. It is zero at a rolling peak and increases with drawdown depth."
+  },
+  "propositions": [
+    {"proposition_id": "JH01_RV_PERSISTENCE", "feature": "RV24_prior,t", "outcome": "RV24_future,t", "feature_window_hours": 24, "outcome_window_hours": 24, "predicted_beta_sign": "POSITIVE", "prior_feature_exposure": "NO"},
+    {"proposition_id": "JH02_DISPERSION_TO_RV", "feature": "DISP24_t", "outcome": "RV24_future,t", "feature_window_hours": 24, "outcome_window_hours": 24, "predicted_beta_sign": "POSITIVE", "prior_feature_exposure": "YES", "prior_exposure_context": "Cross-sectional dispersion previously appeared against the different outcome cross-sectional momentum utility. This registered proposition is not pristine first exposure and is not a rescue of that negative result."},
+    {"proposition_id": "JH03_BREADTH_TO_RETURN", "feature": "BREADTH7D_t", "outcome": "R_m,t_to_t_plus_24", "feature_window_hours": 168, "outcome_window_hours": 24, "predicted_beta_sign": "POSITIVE", "prior_feature_exposure": "NO"},
+    {"proposition_id": "JH04_DRAWDOWN_TO_RETURN", "feature": "DRAWDOWN_DEPTH30D_t", "outcome": "R_m,t_to_t_plus_24", "feature_window_hours": 720, "outcome_window_hours": 24, "predicted_beta_sign": "POSITIVE", "prior_feature_exposure": "NO", "interpretation_if_supported": "Exploratory association with subsequent reversal only; not a causal rebound or strategy claim."}
+  ],
+  "estimator": {
+    "model": "Separate OLS with intercept: Y_t = alpha + beta * X_t + epsilon_t for each proposition; no covariates, transformations, standardization, alternative windows, or subgroups.",
+    "observation_rule": "All 580 common dates are required. Any coverage, ordering, continuity, finite-value, safe-known-after, snapshot identity, or universe failure blocks the entire harvest; no proposition-specific row dropping.",
+    "hac": {
+      "covariance": "Bartlett/Newey-West HAC",
+      "bandwidth_formula": "L(T) = floor(4 * (T / 100)^(2/9))",
+      "frozen_T": 580,
+      "derived_primary_hac_lag": 5,
+      "rule": "HAC(5) is fixed for the inclusive 580-date schedule. A missing observation blocks execution; inference is never recomputed at another T or lag.",
+      "p_value": "two-sided normal approximation from beta / HAC_SE",
+      "confidence_interval": "beta plus or minus 1.959963984540054 times HAC_SE"
+    }
+  },
+  "multiplicity": {
+    "family": ["JH01_RV_PERSISTENCE", "JH02_DISPERSION_TO_RV", "JH03_BREADTH_TO_RETURN", "JH04_DRAWDOWN_TO_RETURN"],
+    "familywise_alpha": 0.05,
+    "adjustment": "Holm step-down on the four raw two-sided p-values, with ties ordered by proposition_id.",
+    "required_reporting": ["beta", "hac_standard_error", "hac_confidence_interval_95", "raw_p_value_two_sided", "holm_adjusted_p_value", "classification"]
+  },
+  "classification": {
+    "SUPPORTED_WITHIN_FROZEN_SCOPE": "Execution complete; beta has the preregistered direction; the 95% HAC interval excludes zero in that direction; and Holm-adjusted p <= 0.05.",
+    "NOT_SUPPORTED": "Execution complete and the 95% HAC interval excludes zero entirely in the opposite direction.",
+    "INCONCLUSIVE": "Execution complete and neither other completed-execution rule applies.",
+    "BLOCKED_BY_INPUT_CONTRACT": "Any frozen snapshot, universe, timing, coverage, integrity, or common-sample contract failure.",
+    "non_escalation": "A result establishes no causal, inverse-causal, trading, strategy, Router, State Snapshot, Qnty, or promotion authority."
+  },
+  "result_schema": {
+    "ordered_proposition_results": "One result in preregistered order for every proposition, including negative and inconclusive results.",
+    "required_global_fields": ["experiment_id", "preregistration_digest", "snapshot_id", "snapshot_digest", "implementation_identity", "execution_mode", "result_order", "results", "authority"],
+    "authority": "NON_AUTHORITATIVE_EXPLORATORY_ONLY"
+  },
+  "pre_execution_correction": {"previous_count": 579, "corrected_count": 580, "reason": "Inclusive daily schedule from 2023-11-18T00:00:00Z through 2025-06-19T00:00:00Z contains 580 decision points.", "endpoints_changed": false, "hypotheses_changed": false, "scientific_results_seen": false, "supersedes_activation_commit": "66aee2f5b7dfb665a70915aaaac9c7ea9ce0ec34"},
+  "kill_and_block_conditions": ["SNAPSHOT_ID_OR_DIGEST_MISMATCH", "UNIVERSE_MISMATCH", "COVERAGE_OR_GAP_FAILURE", "SAFE_KNOWN_AFTER_OR_OUTCOME_LEAKAGE", "COMMON_SCHEDULE_MISMATCH", "NONFINITE_PRICE_OR_RESULT", "UNAUTHORIZED_REAL_EXECUTION", "RESULT_OMISSION_OR_REORDERING", "UNREGISTERED_PROPOSITION_OR_RESCUE"],
+  "prohibitions": ["No real execution in this implementation phase.", "No fifth proposition.", "No alternative horizon, universe, feature, outcome, subgroup, sensitivity lag, bootstrap inference, data acquisition, or data qualification.", "No result fields other than this explicit NOT_EXECUTED status exist in this preregistration."],
+  "authority": {"scientific": "NONE_PENDING_SEPARATE_EXECUTION", "causal": "NONE", "trading": "NONE", "strategy": "NONE", "router": "NONE", "state_snapshot": "NONE", "qnty": "NONE"}
+}

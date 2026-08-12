@@ -13,8 +13,10 @@ from qntylab.research_ledger import (
     context_text,
     doctor,
     event_id,
+    load_canonical_history,
     preflight,
     rebuild,
+    replay,
     trial_stream_path,
 )
 
@@ -90,6 +92,22 @@ def decision(prop, status="SURVIVOR", **overrides):
     }
     event.update(overrides)
     event["event_id"] = event.get("event_id") or event_id("event_decision", event)
+    return event
+
+
+def reopen_event(prop, previous_decision_event_id, **overrides):
+    event = {
+        "event_id": "",
+        "event_type": "CANDIDATE_REOPENED",
+        "candidate_id": prop["candidate_id"],
+        "variant_id": prop["variant_id"],
+        "previous_decision_event_id": previous_decision_event_id,
+        "reason": "Concrete material change justifying this reopen.",
+        "material_change": "New evidence changed the frozen contract inputs.",
+        "recorded_at_utc": "2026-08-02T03:00:00Z",
+    }
+    event.update(overrides)
+    event["event_id"] = event.get("event_id") or event_id("event_reopen", event)
     return event
 
 
@@ -438,3 +456,159 @@ def test_large_history_keeps_context_compact_and_duplicate_lookup_indexed(tmp_pa
     monkeypatch.setattr("qntylab.research_ledger.load_canonical_history", no_scan)
     with pytest.raises(LedgerError, match="exact trial already completed"):
         preflight(config=config, symbol=trials[0]["symbol"], input_sha256="input", root=root)
+
+
+# --- F-01: a terminal decision may not be replaced without an explicit,
+# exact CANDIDATE_REOPENED (QNTYLAB_TERMINAL_DECISION_INTEGRITY_V0). ---------
+
+
+def test_first_decision_on_fresh_variant_is_accepted(tmp_path):
+    prop = proposal()
+    d1 = decision(prop, "GRAVEYARDED", recorded_at_utc="2026-08-02T00:00:00Z")
+    root = write_canonical_only(tmp_path, [prop], [d1])
+
+    state, _, issues = replay(load_canonical_history(root), root=root)
+
+    assert issues == []
+    assert state["variants"][prop["variant_id"]]["status"] == "GRAVEYARDED"
+    assert state["variants"][prop["variant_id"]]["latest_decision_event_id"] == d1["event_id"]
+
+
+def test_second_terminal_decision_without_reopen_is_rejected(tmp_path):
+    prop = proposal()
+    d1 = decision(prop, "GRAVEYARDED", recorded_at_utc="2026-08-02T00:00:00Z", decision_note="first terminal")
+    d2 = decision(prop, "SURVIVOR", recorded_at_utc="2026-08-02T01:00:00Z", decision_note="silent replacement attempt")
+    root = write_canonical_only(tmp_path, [prop], [d1, d2])
+
+    history = load_canonical_history(root)
+    state, _, issues = replay(history, root=root)
+
+    assert any("terminal decision replaced without explicit CANDIDATE_REOPENED" in issue for issue in issues)
+    # Derived state reflects only the latest *legitimately* closed generation;
+    # the silent second decision never takes effect.
+    assert state["variants"][prop["variant_id"]]["status"] == "GRAVEYARDED"
+    assert state["variants"][prop["variant_id"]]["latest_decision_event_id"] == d1["event_id"]
+    # Nothing is dropped from canonical history itself -- both decisions are
+    # still present, byte-for-byte, in the immutable stream.
+    assert d1 in history.decisions
+    assert d2 in history.decisions
+    with pytest.raises(LedgerError, match="terminal decision replaced"):
+        rebuild(root)
+
+
+def test_reopen_with_unrelated_candidate_does_not_authorize_replacement(tmp_path):
+    prop = proposal()
+    d1 = decision(prop, "GRAVEYARDED", recorded_at_utc="2026-08-02T00:00:00Z")
+    d2 = decision(prop, "SURVIVOR", recorded_at_utc="2026-08-02T02:00:00Z")
+    unrelated_candidate_reopen = reopen_event(
+        prop,
+        d1["event_id"],
+        candidate_id="CANDIDATE_UNRELATED",
+        recorded_at_utc="2026-08-02T01:00:00Z",
+    )
+    root = write_canonical_only(tmp_path, [prop, unrelated_candidate_reopen], [d1, d2])
+
+    state, _, issues = replay(load_canonical_history(root), root=root)
+
+    assert any("terminal decision replaced without explicit CANDIDATE_REOPENED" in issue for issue in issues)
+    # d2 (SURVIVOR) never takes effect -- the mismatched-candidate reopen does
+    # not authorize it.
+    assert state["variants"][prop["variant_id"]]["status"] != "SURVIVOR"
+    assert state["variants"][prop["variant_id"]]["latest_decision_event_id"] != d2["event_id"]
+
+
+def test_reopen_declared_under_wrong_variant_does_not_authorize_replacement(tmp_path):
+    prop = proposal()
+    sibling = proposal(cfg(candidate_id="SIBLING", parameters={"fast": 3, "slow": 6, "mode": "long_flat"}))
+    d1 = decision(prop, "GRAVEYARDED", recorded_at_utc="2026-08-02T00:00:00Z")
+    d2 = decision(prop, "SURVIVOR", recorded_at_utc="2026-08-02T02:00:00Z")
+    # Well-formed reopen (names a real candidate/variant pair) but declared
+    # for the sibling variant, while naming prop's terminal decision.
+    misdirected_reopen = reopen_event(sibling, d1["event_id"], recorded_at_utc="2026-08-02T01:00:00Z")
+    root = write_canonical_only(tmp_path, [prop, sibling, misdirected_reopen], [d1, d2])
+
+    state, _, issues = replay(load_canonical_history(root), root=root)
+
+    assert any("terminal decision replaced without explicit CANDIDATE_REOPENED" in issue for issue in issues)
+    assert state["variants"][prop["variant_id"]]["status"] == "GRAVEYARDED"
+
+
+def test_reopen_with_wrong_previous_decision_event_id_does_not_authorize_replacement(tmp_path):
+    prop = proposal()
+    d1 = decision(prop, "GRAVEYARDED", recorded_at_utc="2026-08-02T00:00:00Z")
+    d2 = decision(prop, "SURVIVOR", recorded_at_utc="2026-08-02T02:00:00Z")
+    stale_reopen = reopen_event(prop, "event_decision_does_not_exist", recorded_at_utc="2026-08-02T01:00:00Z")
+    root = write_canonical_only(tmp_path, [prop, stale_reopen], [d1, d2])
+
+    state, _, issues = replay(load_canonical_history(root), root=root)
+
+    assert any("terminal decision replaced without explicit CANDIDATE_REOPENED" in issue for issue in issues)
+    assert state["variants"][prop["variant_id"]]["status"] == "GRAVEYARDED"
+
+
+def test_reopen_recorded_before_the_terminal_decision_does_not_authorize_replacement(tmp_path):
+    prop = proposal()
+    d1 = decision(prop, "GRAVEYARDED", recorded_at_utc="2026-08-02T02:00:00Z")
+    d2 = decision(prop, "SURVIVOR", recorded_at_utc="2026-08-02T03:00:00Z")
+    # Recorded before d1 -- a reopen cannot retroactively license a decision
+    # it precedes.
+    early_reopen = reopen_event(prop, d1["event_id"], recorded_at_utc="2026-08-02T01:00:00Z")
+    root = write_canonical_only(tmp_path, [prop, early_reopen], [d1, d2])
+
+    state, _, issues = replay(load_canonical_history(root), root=root)
+
+    assert any("terminal decision replaced without explicit CANDIDATE_REOPENED" in issue for issue in issues)
+    # d2 (SURVIVOR) never takes effect -- a reopen recorded before the
+    # decision it names cannot retroactively license replacing it.
+    assert state["variants"][prop["variant_id"]]["status"] != "SURVIVOR"
+    assert state["variants"][prop["variant_id"]]["latest_decision_event_id"] != d2["event_id"]
+
+
+def test_correct_reopen_then_decision_is_accepted_and_a_third_decision_needs_a_new_reopen(tmp_path):
+    prop = proposal()
+    d1 = decision(prop, "GRAVEYARDED", recorded_at_utc="2026-08-02T00:00:00Z", decision_note="first terminal")
+    r1 = reopen_event(prop, d1["event_id"], recorded_at_utc="2026-08-02T01:00:00Z")
+    d2 = decision(prop, "BLOCKED", recorded_at_utc="2026-08-02T02:00:00Z", decision_note="second terminal, legitimately reopened")
+
+    # Exact terminal decision -> exact CANDIDATE_REOPENED -> new decision:
+    # accepted (no rejection issue for d2).  The reopen also lets the
+    # variant's later, pre-existing reopen-replay pass settle back to
+    # PROPOSED -- confirmed against the one real reopen lineage in the
+    # canonical ledger (CANDIDATE_JIGSAW_CROSS_SECTIONAL_DISPERSION_V0), which
+    # ends the same way. That downstream behavior predates and is unrelated
+    # to this guard; it is asserted here only so a regression there is caught.
+    root = write_canonical_only(tmp_path / "second", [prop, r1], [d1, d2])
+    history = load_canonical_history(root)
+    state, _, issues = replay(history, root=root)
+    assert issues == []
+    assert state["variants"][prop["variant_id"]]["status"] == "PROPOSED"
+    assert state["variants"][prop["variant_id"]]["latest_decision_event_id"] is None
+    rebuild(root)
+    assert doctor(root) == []
+
+    # The same reopen does not carry forward: it named d1, not d2, so a third
+    # decision without a *new* reopen is again rejected -- d3 never takes
+    # effect.
+    d3 = decision(prop, "SURVIVOR", recorded_at_utc="2026-08-02T04:00:00Z", decision_note="unauthorized third decision")
+    root3 = write_canonical_only(tmp_path / "third", [prop, r1], [d1, d2, d3])
+    state3, _, issues3 = replay(load_canonical_history(root3), root=root3)
+    assert any("terminal decision replaced without explicit CANDIDATE_REOPENED" in issue for issue in issues3)
+    assert state3["variants"][prop["variant_id"]]["status"] != "SURVIVOR"
+    assert state3["variants"][prop["variant_id"]]["latest_decision_event_id"] != d3["event_id"]
+
+
+def test_append_canonical_event_rejects_silent_terminal_decision_overwrite(tmp_path):
+    prop = proposal()
+    d1 = decision(prop, "GRAVEYARDED", recorded_at_utc="2026-08-02T00:00:00Z")
+    root = write_root(tmp_path, [prop], [d1])
+    state_before = (root / "state.json").read_bytes()
+
+    d2 = decision(prop, "SURVIVOR", recorded_at_utc="2026-08-02T01:00:00Z", decision_note="silent replacement via CLI append")
+    with pytest.raises(LedgerError, match="terminal decision replaced"):
+        append_canonical_event(d2, root)
+
+    # The event lands in the immutable stream, but the illegitimate decision
+    # never takes effect: state.json is left exactly as it was rather than
+    # silently reflecting the unauthorized decision.
+    assert d2["event_id"] in (root / "decisions.jsonl").read_text(encoding="utf-8")
+    assert (root / "state.json").read_bytes() == state_before

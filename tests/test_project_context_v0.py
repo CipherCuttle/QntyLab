@@ -211,6 +211,7 @@ def test_jh01_temporal_replication_v0_and_v0r1_are_closed_with_their_distinct_li
     assert v0r1["frozen_v0r1_execution_implementation_sha"] == "758e02718ce82bebeae3e63d17ecc6e3d4a9a23a"
     assert v0r1["frozen_v0r1_result_sha"] == "939f47d8c24abf5e84a1071550eaab463647182e"
     assert v0r1["frozen_v0r1_result_digest"] == "3dba3a0f0700a768e981dcecfe5793532bcd4bc1db7dc4dbcd9e4806a722c5c1"
+    assert v0r1["frozen_v0r1_provenance_correction_digest"] == "c396b6cc53d92a87c7dfa45920c05a772bb447c1f98de5bdbbae065e255b7154"
     assert v0r1["v0r1_classification"] == "REPLICATED_WITHIN_FROZEN_TEMPORAL_SCOPE"
     for field in (
         "input_reacquisition_authorized",
@@ -229,6 +230,8 @@ def test_jh01_temporal_replication_v0_and_v0r1_are_closed_with_their_distinct_li
         "router",
         "qnty, trading",
         "post-start-repair provenance",
+        "must consume the v0r1 provenance correction",
+        "must not treat the truncated prior_execution_started_digest as authoritative",
     ):
         assert forbidden_text in v0r1["next_action"].lower()
 

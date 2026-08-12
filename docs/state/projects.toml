@@ -113,6 +113,7 @@ authoritative_artifacts = [
   "experiments/research/jh01_rv_persistence_temporal_replication_v0/v0r1/execution_request.json",
   "experiments/research/jh01_rv_persistence_temporal_replication_v0/v0r1/execution_started.json",
   "experiments/research/jh01_rv_persistence_temporal_replication_v0/v0r1/execution_result.json",
+  "experiments/research/jh01_rv_persistence_temporal_replication_v0/v0r1/provenance_correction.json",
 ]
 supersedes = ["JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0"]
 prior_execution_terminal_state = "EXECUTION_INTERRUPTED_AFTER_REAL_OUTCOME_ACCESS"
@@ -138,6 +139,7 @@ frozen_v0r1_execution_source_blob = "60e0a5d697f61e8bcfe8d6966ee487f88eec7ea0"
 frozen_v0r1_execution_source_sha256 = "95288b511cf9c13d739ee911bf56a71b9e83fd2ede664a96b549a12bf6da9c74"
 frozen_v0r1_result_sha = "939f47d8c24abf5e84a1071550eaab463647182e"
 frozen_v0r1_result_digest = "3dba3a0f0700a768e981dcecfe5793532bcd4bc1db7dc4dbcd9e4806a722c5c1"
+frozen_v0r1_provenance_correction_digest = "c396b6cc53d92a87c7dfa45920c05a772bb447c1f98de5bdbbae065e255b7154"
 v0r1_classification = "REPLICATED_WITHIN_FROZEN_TEMPORAL_SCOPE"
 input_reacquisition_authorized = false
 jigsaw_evidence_authorized = false
@@ -145,7 +147,7 @@ state_snapshot_authorized = false
 router_authorized = false
 qnty_authorized = false
 trading_authorized = false
-next_action = "JH01 V0R1 temporal-replication execution is frozen and closed with classification REPLICATED_WITHIN_FROZEN_TEMPORAL_SCOPE. The result explicitly preserves its superseding post-start-repair provenance and does not represent a pristine first execution. No further real-sample execution or scientific mutation is authorized. Canonical Jigsaw evidence incorporation and synthesis require separate Git-backed authorization. State Snapshot, Router, Qnty, trading, and promotion remain unauthorized."
+next_action = "JH01 V0R1 temporal-replication execution is frozen and closed with classification REPLICATED_WITHIN_FROZEN_TEMPORAL_SCOPE. The result explicitly preserves its superseding post-start-repair provenance and does not represent a pristine first execution. No further real-sample execution or scientific mutation is authorized. Any later Jigsaw evidence incorporation or synthesis MUST consume the V0R1 provenance correction together with the frozen execution result and MUST NOT treat the truncated prior_execution_started_digest as authoritative. Canonical Jigsaw evidence incorporation and synthesis require separate Git-backed authorization. State Snapshot, Router, Qnty, trading, and promotion remain unauthorized."
 implementation_authorized = false
 
 [[project]]

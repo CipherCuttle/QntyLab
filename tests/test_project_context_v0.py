@@ -145,11 +145,11 @@ def test_human_context_does_not_claim_no_queued_projects() -> None:
     assert "- None." not in queued_section
 
 
-def test_jh01_temporal_replication_v0_is_closed_and_v0r1_is_the_only_repair_specific_active_project() -> None:
+def test_jh01_temporal_replication_v0_and_v0r1_are_closed_with_their_distinct_lineages_preserved() -> None:
     data = project_context.context_data(ROOT)
     _, _, registry = project_context.load_context_sources(ROOT)
-    assert sum(record["state"] == "ACTIVE" for record in registry["project"]) == 1
-    assert data["active_project"]["project_id"] == "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0R1"
+    assert sum(record["state"] == "ACTIVE" for record in registry["project"]) == 0
+    assert data["active_project"] is None
     execution = next(record for record in registry["project"] if record["project_id"] == "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0")
     assert execution["state"] == "CLOSED_BLOCKED"
     assert execution["authority_level"] == "FROZEN_REPLICATION_EXECUTION_INTERRUPTED_NO_RERUN"
@@ -186,10 +186,10 @@ def test_jh01_temporal_replication_v0_is_closed_and_v0r1_is_the_only_repair_spec
     ):
         assert required_text in action
 
-    v0r1 = data["active_project"]
-    assert v0r1["state"] == "ACTIVE"
-    assert v0r1["authority_level"] == "SUPERSEDING_POST_START_EXECUTION_REPAIR_ONLY"
-    assert v0r1["implementation_authorized"] is True
+    v0r1 = next(record for record in registry["project"] if record["project_id"] == "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0R1")
+    assert v0r1["state"] == "CLOSED_PASS"
+    assert v0r1["authority_level"] == "FROZEN_SUPERSEDING_EXECUTION_COMPLETE_NO_RERUN"
+    assert v0r1["implementation_authorized"] is False
     assert v0r1["supersedes"] == [execution["project_id"]]
     assert v0r1["prior_execution_terminal_state"] == "EXECUTION_INTERRUPTED_AFTER_REAL_OUTCOME_ACCESS"
     assert v0r1["prior_frozen_execution_implementation_sha"] == "e638dc2e3b044697902230a5c0705fb49de1f21a"
@@ -208,6 +208,11 @@ def test_jh01_temporal_replication_v0_is_closed_and_v0r1_is_the_only_repair_spec
     assert v0r1["v0r1_executor_must_be_distinct_from_v0"] is True
     assert v0r1["v0r1_artifact_namespace"] == "experiments/research/jh01_rv_persistence_temporal_replication_v0/v0r1"
     assert v0r1["v0r1_real_execution_count"] == 1
+    assert v0r1["frozen_v0r1_execution_implementation_sha"] == "758e02718ce82bebeae3e63d17ecc6e3d4a9a23a"
+    assert v0r1["frozen_v0r1_result_sha"] == "939f47d8c24abf5e84a1071550eaab463647182e"
+    assert v0r1["frozen_v0r1_result_digest"] == "3dba3a0f0700a768e981dcecfe5793532bcd4bc1db7dc4dbcd9e4806a722c5c1"
+    assert v0r1["frozen_v0r1_provenance_correction_digest"] == "c396b6cc53d92a87c7dfa45920c05a772bb447c1f98de5bdbbae065e255b7154"
+    assert v0r1["v0r1_classification"] == "REPLICATED_WITHIN_FROZEN_TEMPORAL_SCOPE"
     for field in (
         "input_reacquisition_authorized",
         "jigsaw_evidence_authorized",
@@ -218,15 +223,15 @@ def test_jh01_temporal_replication_v0_is_closed_and_v0r1_is_the_only_repair_spec
     ):
         assert v0r1[field] is False
     for forbidden_text in (
-        "other scientific change",
-        "input reacquisition",
-        "jigsaw evidence creation",
+        "no further real-sample execution",
+        "no further real-sample execution or scientific mutation",
+        "jigsaw evidence incorporation",
         "state snapshot",
         "router",
         "qnty, trading",
-        "frozen v0 executor is immutable",
-        "distinct v0r1 executor",
-        "distinct v0r1 artifact namespace",
+        "post-start-repair provenance",
+        "must consume the v0r1 provenance correction",
+        "must not treat the truncated prior_execution_started_digest as authoritative",
     ):
         assert forbidden_text in v0r1["next_action"].lower()
 

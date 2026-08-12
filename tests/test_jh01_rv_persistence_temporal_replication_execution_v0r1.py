@@ -162,8 +162,17 @@ def test_v0r1_has_a_distinct_namespace_and_explicit_superseding_provenance() -> 
     assert execution.REPAIR_SCOPE == "ADJACENT_PAIR_ITERATION_ONLY"
     assert execution.PRISTINE_FIRST_EXECUTION is False
     assert execution.POST_START_REPAIR is True
-    assert not (ROOT / execution.ARTIFACT_RELATIVE / "execution_started.json").exists()
-    assert not (ROOT / execution.ARTIFACT_RELATIVE / "execution_result.json").exists()
+    artifact_root = ROOT / execution.ARTIFACT_RELATIVE
+    request = json.loads((artifact_root / "execution_request.json").read_text(encoding="utf-8"))
+    started = json.loads((artifact_root / "execution_started.json").read_text(encoding="utf-8"))
+    result = json.loads((artifact_root / "execution_result.json").read_text(encoding="utf-8"))
+    for artifact, field in ((request, "execution_request_digest"), (started, "execution_started_digest"), (result, "execution_result_digest")):
+        encoded = json.dumps({key: value for key, value in artifact.items() if key != field}, sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False).encode("utf-8")
+        assert artifact[field] == hashlib.sha256(encoded).hexdigest()
+    assert started["execution_count"] == result["v0r1_execution_count"] == 1
+    assert result["classification"] == "REPLICATED_WITHIN_FROZEN_TEMPORAL_SCOPE"
+    assert result["post_start_repair"] is True
+    assert result["pristine_first_execution"] is False
 
 
 def _full_cardinality_synthetic_panel() -> dict[str, tuple[execution.BarClose, ...]]:

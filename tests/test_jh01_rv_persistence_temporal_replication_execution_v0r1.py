@@ -183,14 +183,21 @@ def _full_cardinality_synthetic_panel() -> dict[str, tuple[execution.BarClose, .
 def test_full_cardinality_synthetic_panel_executes_the_production_builder(monkeypatch: pytest.MonkeyPatch) -> None:
     panel = _full_cardinality_synthetic_panel()
     calls = 0
+    window_lengths: list[int] = []
     original_market_return = execution.market_hourly_return
+    original_market_rv24 = execution.market_rv24
 
     def count_market_return(asset_returns: dict[str, float]) -> float:
         nonlocal calls
         calls += 1
         return original_market_return(asset_returns)
 
+    def count_rv24(hourly_market_returns: list[float]) -> float:
+        window_lengths.append(len(hourly_market_returns))
+        return original_market_rv24(hourly_market_returns)
+
     monkeypatch.setattr(execution, "market_hourly_return", count_market_return)
+    monkeypatch.setattr(execution, "market_rv24", count_rv24)
     rows = execution.build_design_rows(panel)
     opens = tuple(datetime.fromisoformat(stamp.replace("Z", "+00:00")) for stamp in execution.expected_timestamps())
     assert len(panel) == 20
@@ -198,17 +205,12 @@ def test_full_cardinality_synthetic_panel_executes_the_production_builder(monkey
     assert sum(len(rows_for_symbol) for rows_for_symbol in panel.values()) == 175700
     assert calls == 8784
     assert len(rows) == 365
+    assert len(window_lengths) == 730
+    assert set(window_lengths) == {24}
     assert rows[0].decision_time == datetime(2025, 7, 20, tzinfo=UTC)
     assert rows[-1].decision_time == datetime(2026, 7, 19, tzinfo=UTC)
-    prior, future = execution.rv24_windows_at_decision(
-        decision=rows[0].decision_time,
-        market_returns={boundary: 0.01 for boundary in [rows[0].decision_time - timedelta(hours=index) for index in range(23, -1, -1)] + [rows[0].decision_time + timedelta(hours=index) for index in range(1, 25)]},
-        bars=execution._validate_panel(panel),
-    )
-    assert len(prior) == len(future) == 24
-    assert not set(prior) & set(future)
     assert (opens[0], opens[1]) == (datetime(2025, 7, 18, 23, tzinfo=UTC), datetime(2025, 7, 19, 0, tzinfo=UTC))
-    assert (opens[8783], opens[8784]) == (datetime(2026, 7, 19, 6, tzinfo=UTC), datetime(2026, 7, 19, 7, tzinfo=UTC))
+    assert (opens[8783], opens[8784]) == (datetime(2026, 7, 19, 22, tzinfo=UTC), datetime(2026, 7, 19, 23, tzinfo=UTC))
 
 
 def test_exact_strict_zip_defect_and_repaired_pair_semantics() -> None:

@@ -4,6 +4,7 @@ __pycache__/
 data/raw/*.csv
 data/raw/*.zip
 data/raw/jigsaw_external_replication_v0/
+data/raw/jh01_rv_persistence_temporal_replication_v0/
 data/archive/
 .r1_input_cache/
 experiments/research/breadth_v2_paths/

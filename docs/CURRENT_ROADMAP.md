@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- None.
+- `RESEARCH_DATA_SPINE_V0` — `ACTIVE`. Implement only the frozen OHLCV snapshot and verified reader V0.
 
 ## Queued — not authorized
 
@@ -12,7 +12,6 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 - `PROSPECTIVE_SHADOW` — `PLANNED_NOT_AUTHORIZED`. No implementation is authorized; require separate Git-backed authorization.
 - `QNTY_HANDOFF` — `PLANNED_NOT_AUTHORIZED`. No implementation is authorized unless downstream evidence separately earns it.
 - `REACTIVE_JIGSAW_V0` — `PLANNED_NOT_AUTHORIZED`. No implementation is authorized; require separate Git-backed authorization.
-- `RESEARCH_DATA_SPINE_V0` — `PLANNED_NOT_AUTHORIZED`. No implementation is authorized; require separate Git-backed authorization.
 - `ROUTER_DATASET_CONTRACT` — `PLANNED_NOT_AUTHORIZED`. No implementation is authorized; require separate Git-backed authorization.
 - `ROUTER_FIXTURE_V0` — `PLANNED_NOT_AUTHORIZED`. No implementation is authorized; require separate Git-backed authorization.
 - `SEALED_TEMPORAL_EVALUATION` — `PLANNED_NOT_AUTHORIZED`. No implementation is authorized; require separate Git-backed authorization.

@@ -15,11 +15,11 @@ implementation_authorized = false
 
 [[project]]
 project_id = "RESEARCH_DATA_SPINE_V0"
-state = "PLANNED_NOT_AUTHORIZED"
-authority_level = "PLANNING_ONLY"
-authoritative_artifacts = ["docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md"]
-next_action = "No implementation is authorized; require separate Git-backed authorization."
-implementation_authorized = false
+state = "ACTIVE"
+authority_level = "FROZEN_IMPLEMENTATION_ONLY"
+authoritative_artifacts = ["docs/forensics/RESEARCH_DATA_SPINE_V0_CONTRACT.md"]
+next_action = "Implement only the frozen OHLCV snapshot and verified reader V0."
+implementation_authorized = true
 
 [[project]]
 project_id = "JIGSAW_HARVEST_V0"

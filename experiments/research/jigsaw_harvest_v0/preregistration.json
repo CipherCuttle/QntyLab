@@ -4,7 +4,7 @@
   "experiment_id": "JIGSAW_HARVEST_V0_PREREGISTRATION_V0",
   "status": "NOT_EXECUTED",
   "research_status": "PREREGISTERED_IMPLEMENTATION_PENDING",
-  "preregistration_digest": "af0f501d48e30567f0f88fb552d1910e35b17ec6636a2841d9be4a441959f405",
+  "preregistration_digest": "499b355ee2b308b4ae01e8c63b44a9a361d44d50fe381080131f41a4851849e3",
   "snapshot": {
     "snapshot_id": "rds-v0-c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac",
     "snapshot_digest": "c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac",
@@ -24,7 +24,7 @@
     "future_outcome_hours": 24,
     "first_decision": "2023-11-18T00:00:00Z",
     "last_decision": "2025-06-19T00:00:00Z",
-    "observation_count": 579,
+    "observation_count": 580,
     "feature_boundary": "All feature inputs have bar_close_time <= t and safe_known_after <= t.",
     "outcome_boundary": "The first outcome return is r_m,t+1, formed from the bar opened at t and closed at t+1; outcomes use no input through t."
   },
@@ -49,13 +49,13 @@
   ],
   "estimator": {
     "model": "Separate OLS with intercept: Y_t = alpha + beta * X_t + epsilon_t for each proposition; no covariates, transformations, standardization, alternative windows, or subgroups.",
-    "observation_rule": "All 579 common dates are required. Any coverage, ordering, continuity, finite-value, safe-known-after, snapshot identity, or universe failure blocks the entire harvest; no proposition-specific row dropping.",
+    "observation_rule": "All 580 common dates are required. Any coverage, ordering, continuity, finite-value, safe-known-after, snapshot identity, or universe failure blocks the entire harvest; no proposition-specific row dropping.",
     "hac": {
       "covariance": "Bartlett/Newey-West HAC",
       "bandwidth_formula": "L(T) = floor(4 * (T / 100)^(2/9))",
-      "frozen_T": 579,
+      "frozen_T": 580,
       "derived_primary_hac_lag": 5,
-      "rule": "HAC(5) is fixed. A missing observation blocks execution; inference is never recomputed at another T or lag.",
+      "rule": "HAC(5) is fixed for the inclusive 580-date schedule. A missing observation blocks execution; inference is never recomputed at another T or lag.",
       "p_value": "two-sided normal approximation from beta / HAC_SE",
       "confidence_interval": "beta plus or minus 1.959963984540054 times HAC_SE"
     }
@@ -78,6 +78,7 @@
     "required_global_fields": ["experiment_id", "preregistration_digest", "snapshot_id", "snapshot_digest", "implementation_identity", "execution_mode", "result_order", "results", "authority"],
     "authority": "NON_AUTHORITATIVE_EXPLORATORY_ONLY"
   },
+  "pre_execution_correction": {"previous_count": 579, "corrected_count": 580, "reason": "Inclusive daily schedule from 2023-11-18T00:00:00Z through 2025-06-19T00:00:00Z contains 580 decision points.", "endpoints_changed": false, "hypotheses_changed": false, "scientific_results_seen": false, "supersedes_activation_commit": "66aee2f5b7dfb665a70915aaaac9c7ea9ce0ec34"},
   "kill_and_block_conditions": ["SNAPSHOT_ID_OR_DIGEST_MISMATCH", "UNIVERSE_MISMATCH", "COVERAGE_OR_GAP_FAILURE", "SAFE_KNOWN_AFTER_OR_OUTCOME_LEAKAGE", "COMMON_SCHEDULE_MISMATCH", "NONFINITE_PRICE_OR_RESULT", "UNAUTHORIZED_REAL_EXECUTION", "RESULT_OMISSION_OR_REORDERING", "UNREGISTERED_PROPOSITION_OR_RESCUE"],
   "prohibitions": ["No real execution in this implementation phase.", "No fifth proposition.", "No alternative horizon, universe, feature, outcome, subgroup, sensitivity lag, bootstrap inference, data acquisition, or data qualification.", "No result fields other than this explicit NOT_EXECUTED status exist in this preregistration."],
   "authority": {"scientific": "NONE_PENDING_SEPARATE_EXECUTION", "causal": "NONE", "trading": "NONE", "strategy": "NONE", "router": "NONE", "state_snapshot": "NONE", "qnty": "NONE"}

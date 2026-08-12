@@ -54,18 +54,21 @@ implementation_authorized = false
 
 [[project]]
 project_id = "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_INPUT_MATERIALIZATION_V0"
-state = "ACTIVE"
+state = "CLOSED_PASS"
 authority_level = "INPUT_MATERIALIZATION_ONLY"
 authoritative_artifacts = [
-  "docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md",
   "experiments/research/jh01_rv_persistence_temporal_replication_v0/preregistration.json",
-  "experiments/research/jh01_rv_persistence_temporal_replication_v0/design_note.md",
-  "qntylab/jh01_rv_persistence_temporal_replication_prereg_v0.py",
+  "experiments/research/jh01_rv_persistence_temporal_replication_v0/materialization/materialization_request.json",
+  "experiments/research/jh01_rv_persistence_temporal_replication_v0/materialization/materialization_receipt.json",
+  "experiments/research/jh01_rv_persistence_temporal_replication_v0/materialization/per_symbol_manifest.json",
+  "experiments/research/jh01_rv_persistence_temporal_replication_v0/materialization/snapshot_manifest.json",
+  "experiments/research/jh01_rv_persistence_temporal_replication_v0/materialization/input_qualification.json",
+  "experiments/research/jh01_rv_persistence_temporal_replication_v0/materialization/hostile_materialization_review.md",
 ]
 frozen_preregistration_project_id = "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_PREREG_V0"
 frozen_preregistration_digest = "46f923023b4b696307da2b9d6fc4c8db9d04b40b012de35e0bf738cc03c4be57"
-next_action = "Acquire or materialize only the exact frozen 20-symbol, 1h input history required by JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_PREREG_V0; authenticate source objects, verify exact temporal coverage and hourly continuity, preserve source bytes/provenance, establish a new immutable replication-input snapshot identity, and determine INPUT_READY or BLOCKED_BY_INPUT_CONTRACT. Raw-input integrity checks are authorized. Scientific feature/outcome computation, returns, RV24, regression, replication classification, Jigsaw evidence, State Snapshot, Router, Qnty, trading, promotion, and replication execution remain unauthorized."
-implementation_authorized = true
+next_action = "JH01 temporal-replication input materialization and qualification is closed with INPUT_READY. The frozen input snapshot is authenticated and qualified. Scientific replication execution remains unauthorized and requires a separate Git-backed authorization."
+implementation_authorized = false
 
 [[project]]
 project_id = "STATE_SNAPSHOT_V0"

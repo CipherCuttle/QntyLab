@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- `JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_INPUT_MATERIALIZATION_V0` — `ACTIVE`. Acquire or materialize only the exact frozen 20-symbol, 1h input history required by JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_PREREG_V0; authenticate source objects, verify exact temporal coverage and hourly continuity, preserve source bytes/provenance, establish a new immutable replication-input snapshot identity, and determine INPUT_READY or BLOCKED_BY_INPUT_CONTRACT. Raw-input integrity checks are authorized. Scientific feature/outcome computation, returns, RV24, regression, replication classification, Jigsaw evidence, State Snapshot, Router, Qnty, trading, promotion, and replication execution remain unauthorized.
+- None.
 
 ## Queued — not authorized
 
@@ -19,6 +19,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Closed / stale
 
+- `JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_INPUT_MATERIALIZATION_V0` — `CLOSED_PASS`. JH01 temporal-replication input materialization and qualification is closed with INPUT_READY. The frozen input snapshot is authenticated and qualified. Scientific replication execution remains unauthorized and requires a separate Git-backed authorization.
 - `JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_PREREG_V0` — `CLOSED_PASS`. JH01 temporal-replication preregistration is frozen and closed. No market-data access, acquisition, materialization, feature/outcome computation, regression execution, Jigsaw evidence creation, State Snapshot, Router, Qnty, trading, or promotion authority is granted. Replication input materialization requires a separate Git-backed authorization.
 - `JIGSAW_FUNDING_PRESSURE_VOLATILITY_FROZEN_RESULT_RECORDING_V0` — `CLOSED_NEGATIVE`. No further implementation is authorized by this closed negative result.
 - `JIGSAW_HARVEST_V0` — `CLOSED_PASS`. Jigsaw Harvest V0 is closed. Preserve its four bounded evidence pieces; no State Snapshot, Router, Qnty, or trading implementation is authorized by this phase.

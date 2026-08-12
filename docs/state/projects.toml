@@ -26,11 +26,14 @@ implementation_authorized = false
 
 [[project]]
 project_id = "JIGSAW_HARVEST_V0"
-state = "PLANNED_NOT_AUTHORIZED"
-authority_level = "PLANNING_ONLY"
-authoritative_artifacts = ["docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md"]
-next_action = "No implementation is authorized; require separate Git-backed authorization."
-implementation_authorized = false
+state = "ACTIVE"
+authority_level = "FROZEN_PROTOCOL_IMPLEMENTATION_ONLY"
+authoritative_artifacts = [
+  "docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md",
+  "experiments/research/jigsaw_harvest_v0/preregistration.json",
+]
+next_action = "Implement and verify only the frozen four-proposition Jigsaw Harvest V0 runner; real harvest execution remains separately gated."
+implementation_authorized = true
 
 [[project]]
 project_id = "STATE_SNAPSHOT_V0"

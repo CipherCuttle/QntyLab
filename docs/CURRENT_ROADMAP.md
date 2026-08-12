@@ -4,11 +4,10 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- None.
+- `JIGSAW_HARVEST_V0` — `ACTIVE`. Implement and verify only the frozen four-proposition Jigsaw Harvest V0 runner; real harvest execution remains separately gated.
 
 ## Queued — not authorized
 
-- `JIGSAW_HARVEST_V0` — `PLANNED_NOT_AUTHORIZED`. No implementation is authorized; require separate Git-backed authorization.
 - `PROSPECTIVE_SHADOW` — `PLANNED_NOT_AUTHORIZED`. No implementation is authorized; require separate Git-backed authorization.
 - `QNTY_HANDOFF` — `PLANNED_NOT_AUTHORIZED`. No implementation is authorized unless downstream evidence separately earns it.
 - `REACTIVE_JIGSAW_V0` — `PLANNED_NOT_AUTHORIZED`. No implementation is authorized; require separate Git-backed authorization.

@@ -1,0 +1,2 @@
+# Frozen V0 materialization and verified local Parquet reader.
+polars==1.32.3

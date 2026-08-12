@@ -149,7 +149,7 @@ def test_active_harvest_is_the_only_authorized_implementation_phase() -> None:
     data = project_context.context_data(ROOT)
     assert data["active_project"]["project_id"] == "JIGSAW_HARVEST_V0"
     assert data["active_project"]["implementation_authorized"] is True
-    assert data["current_permitted_next_action"] == "Implement and verify only the frozen four-proposition Jigsaw Harvest V0 runner; real harvest execution remains separately gated."
+    assert data["current_permitted_next_action"] == "Execute exactly the frozen four-proposition Jigsaw Harvest V0 using the canonical preregistration and exact frozen Research Data Spine V0 snapshot; record all four outcomes without result-conditioned implementation changes."
 
 
 def test_research_ledger_is_the_canonical_research_source() -> None:

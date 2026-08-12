@@ -72,8 +72,8 @@ implementation_authorized = false
 
 [[project]]
 project_id = "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0"
-state = "ACTIVE"
-authority_level = "FROZEN_REPLICATION_EXECUTION_ONLY"
+state = "CLOSED_BLOCKED"
+authority_level = "FROZEN_REPLICATION_EXECUTION_INTERRUPTED_NO_RERUN"
 authoritative_artifacts = [
   "experiments/research/jh01_rv_persistence_temporal_replication_v0/preregistration.json",
   "experiments/research/jh01_rv_persistence_temporal_replication_v0/materialization/materialization_request.json",
@@ -81,14 +81,18 @@ authoritative_artifacts = [
   "experiments/research/jh01_rv_persistence_temporal_replication_v0/materialization/per_symbol_manifest.json",
   "experiments/research/jh01_rv_persistence_temporal_replication_v0/materialization/snapshot_manifest.json",
   "experiments/research/jh01_rv_persistence_temporal_replication_v0/materialization/input_qualification.json",
+  "experiments/research/jh01_rv_persistence_temporal_replication_v0/hostile_execution_review.md",
+  "experiments/research/jh01_rv_persistence_temporal_replication_v0/execution_request.json",
+  "experiments/research/jh01_rv_persistence_temporal_replication_v0/execution_started.json",
+  "experiments/research/jh01_rv_persistence_temporal_replication_v0/execution_interruption.md",
 ]
 frozen_preregistration_project_id = "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_PREREG_V0"
 frozen_preregistration_digest = "46f923023b4b696307da2b9d6fc4c8db9d04b40b012de35e0bf738cc03c4be57"
 frozen_input_qualification_digest = "8f82db32ce0f453f6f67e5cd4b421e0848752b7f24a9b39f05ec979fe9382593"
 frozen_replication_input_snapshot_id = "jh01-rv-temporal-input-v0-ce0e0d1945eb5d6096cc8c24933e0ec19bb8a882c4cce526cb01ff4487b11efa"
 frozen_replication_input_snapshot_digest = "ce0e0d1945eb5d6096cc8c24933e0ec19bb8a882c4cce526cb01ff4487b11efa"
-next_action = "Implement and validate the exact frozen JH01 temporal-replication executor against synthetic fixtures only; independently hostile-review and freeze its implementation before any scientific transformation of the real replication sample. After the implementation is frozen, authenticate the already materialized snapshot and execute the preregistered 365-observation RV24_future ~ RV24_prior OLS-with-intercept specification exactly once using Bartlett/Newey-West HAC lag 5, raw two-sided p-value, and the frozen classification rules. The immutable result must bind the canonical execution-authorization base SHA and frozen executor implementation SHA; no caller-supplied identity may disagree. Do not use alternative horizons, covariates, subgroups, alternate standard-error estimators or HAC lags, Holm or other multiplicity corrections, effect-size gates, pooling, or meta-analysis. Record the immutable replication result and self-close execution authority. No exploratory variants, input reacquisition, Jigsaw evidence creation, synthesis, State Snapshot, Router, Qnty, trading, or promotion are authorized. A post-result implementation repair may not rerun the real sample without explicit superseding governance."
-implementation_authorized = true
+next_action = "JH01 temporal-replication execution was interrupted after the immutable one-shot start sentinel was created and before a valid execution result was written. The sentinel is preserved as EXECUTION_INTERRUPTED_AFTER_REAL_OUTCOME_ACCESS. No repair, rerun, alternative calculation, result reconstruction, Jigsaw evidence creation, State Snapshot, Router, Qnty, trading, or promotion is authorized. Any further action requires explicit superseding Git-backed governance."
+implementation_authorized = false
 
 [[project]]
 project_id = "STATE_SNAPSHOT_V0"

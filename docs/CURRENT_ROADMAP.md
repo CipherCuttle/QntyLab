@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- `JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0` — `ACTIVE`. Implement and validate the exact frozen JH01 temporal-replication executor against synthetic fixtures only; independently hostile-review and freeze its implementation before any scientific transformation of the real replication sample. After the implementation is frozen, authenticate the already materialized snapshot and execute the preregistered 365-observation RV24_future ~ RV24_prior OLS-with-intercept specification exactly once using Bartlett/Newey-West HAC lag 5, raw two-sided p-value, and the frozen classification rules. The immutable result must bind the canonical execution-authorization base SHA and frozen executor implementation SHA; no caller-supplied identity may disagree. Do not use alternative horizons, covariates, subgroups, alternate standard-error estimators or HAC lags, Holm or other multiplicity corrections, effect-size gates, pooling, or meta-analysis. Record the immutable replication result and self-close execution authority. No exploratory variants, input reacquisition, Jigsaw evidence creation, synthesis, State Snapshot, Router, Qnty, trading, or promotion are authorized. A post-result implementation repair may not rerun the real sample without explicit superseding governance.
+- None.
 
 ## Queued — not authorized
 
@@ -19,6 +19,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Closed / stale
 
+- `JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0` — `CLOSED_BLOCKED`. JH01 temporal-replication execution was interrupted after the immutable one-shot start sentinel was created and before a valid execution result was written. The sentinel is preserved as EXECUTION_INTERRUPTED_AFTER_REAL_OUTCOME_ACCESS. No repair, rerun, alternative calculation, result reconstruction, Jigsaw evidence creation, State Snapshot, Router, Qnty, trading, or promotion is authorized. Any further action requires explicit superseding Git-backed governance.
 - `JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_INPUT_MATERIALIZATION_V0` — `CLOSED_PASS`. JH01 temporal-replication input materialization and qualification is closed with INPUT_READY. The frozen input snapshot is authenticated and qualified. Scientific replication execution remains unauthorized and requires a separate Git-backed authorization.
 - `JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_PREREG_V0` — `CLOSED_PASS`. JH01 temporal-replication preregistration is frozen and closed. No market-data access, acquisition, materialization, feature/outcome computation, regression execution, Jigsaw evidence creation, State Snapshot, Router, Qnty, trading, or promotion authority is granted. Replication input materialization requires a separate Git-backed authorization.
 - `JIGSAW_FUNDING_PRESSURE_VOLATILITY_FROZEN_RESULT_RECORDING_V0` — `CLOSED_NEGATIVE`. No further implementation is authorized by this closed negative result.

@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import dataclasses
 import hashlib
+import json
 import subprocess
+import types
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal, ROUND_DOWN, ROUND_UP, getcontext, localcontext
 from fractions import Fraction
@@ -176,11 +178,34 @@ class FakeTransport:
         return foundation.ClaimRefResult(self.status)
 
 
-def test_claim_happens_before_computation_and_replay_never_computes(monkeypatch):
-    calls: list[str] = []
-    monkeypatch.setattr(v2, "validate_v2_authorization", lambda envelope: calls.append("bind"))
+class RaisingTransport:
+    """Simulates a network/permission/malformed-response transport failure."""
+
+    def create_ref(self, ref: str, sha: str) -> foundation.ClaimRefResult:
+        raise RuntimeError("simulated transport failure")
+
+
+class StatefulOnceTransport:
+    """Returns CREATED exactly once per ref, ALREADY_EXISTS on every later call.
+
+    Models the real at-most-once claim ref: no code path in this module
+    ever deletes/resets a claim, so a second attempt against the same
+    authorization always observes the prior claim (Section 9/CB-01 #9).
+    """
+
+    def __init__(self) -> None:
+        self._claimed_refs: set[str] = set()
+
+    def create_ref(self, ref: str, sha: str) -> foundation.ClaimRefResult:
+        if ref in self._claimed_refs:
+            return foundation.ClaimRefResult("ALREADY_EXISTS")
+        self._claimed_refs.add(ref)
+        return foundation.ClaimRefResult("CREATED")
+
+
+def _v2_seam_authorization() -> v2.V2AuthorizationEnvelope:
     expected = foundation.canonical_authorization_binding_expectations(executor_source_sha256="b" * 64)
-    auth = v2.V2AuthorizationEnvelope(
+    return v2.V2AuthorizationEnvelope(
         foundation.AuthorizationEnvelope(
             authorization_id="jigsaw-funding-pressure-v0-" + "a" * 32,
             experiment_id=expected.experiment_id,
@@ -202,30 +227,211 @@ def test_claim_happens_before_computation_and_replay_never_computes(monkeypatch)
         ),
         v2.v2_contract_digest(),
     )
-    runtime = v2.V2RuntimeAttestation(foundation.RuntimeAttestation("/repo", "a" * 40, "/repo/qntylab/jigsaw_funding_pressure_execution_v2.py", "b" * 64, True, ()), "b" * 64)
-    monkeypatch.setattr(v2.foundation, "validate_authorization_against_runtime", lambda authorization, attestation: calls.append("release"))
+
+
+def _v2_seam_runtime() -> v2.V2RuntimeAttestation:
+    return v2.V2RuntimeAttestation(
+        foundation.RuntimeAttestation(
+            "/repo", "a" * 40, "/repo/qntylab/jigsaw_funding_pressure_execution_v2.py", "b" * 64, True, ()
+        ),
+        "b" * 64,
+    )
+
+
+def _v2_seam_fixture(monkeypatch, calls: list[str], *, auth_validate_ok: bool = True, attest_ok: bool = True):
+    """Wires ATTEST/AUTH_VALIDATE/RELEASE_VALIDATE spies that record into `calls`."""
+    auth = _v2_seam_authorization()
+    runtime = _v2_seam_runtime()
+
+    if auth_validate_ok:
+        monkeypatch.setattr(v2, "validate_v2_authorization", lambda envelope: calls.append("AUTH_VALIDATE"))
+    else:
+        def failing_auth_validate(envelope):
+            calls.append("AUTH_VALIDATE")
+            raise foundation.AuthorizationValidationError("simulated authorization validation failure")
+
+        monkeypatch.setattr(v2, "validate_v2_authorization", failing_auth_validate)
+
+    monkeypatch.setattr(
+        v2.foundation,
+        "validate_authorization_against_runtime",
+        lambda authorization, attestation: calls.append("RELEASE_VALIDATE"),
+    )
+
     def attest(envelope):
-        calls.append("attest")
+        calls.append("ATTEST")
+        if not attest_ok:
+            raise foundation.RuntimeAttestationError("simulated runtime attestation failure")
         return runtime
+
     def load():
-        calls.append("load")
+        calls.append("LOAD")
         return object()
+
     def compute(bundle):
-        calls.append("compute")
+        calls.append("COMPUTE")
         return object()
+
+    return auth, attest, load, compute
+
+
+def test_a_successful_run_order_is_attest_then_claim_then_load_then_compute(monkeypatch):
+    calls: list[str] = []
+    auth, attest, load, _compute = _v2_seam_fixture(monkeypatch, calls)
+
+    def compute(bundle):
+        calls.append("COMPUTE")
+        return types.SimpleNamespace(result_digest="sha256:" + "0" * 64, primary_contrast=None, adjudication="X")
+
+    outcome = v2.execute_authorized_frozen_experiment_v2(
+        authorization=auth,
+        evidence_loader=load,
+        runtime_attestor=attest,
+        transport=FakeTransport("CREATED"),
+        computation=compute,
+    )
+    assert outcome["completion_state"] == foundation.AuthorizationLifecycleState.CONSUMED_COMPLETE.value
+    # RELEASE_VALIDATE appears twice: once in the CB-01 seam itself, and
+    # once more inside build_receipt_provenance's own cross-check -- both
+    # calls land after CLAIM (there is no spy hook directly on CLAIM, so B
+    # through E establish that claim gating separately) and, critically,
+    # LOAD/COMPUTE only ever happen after every validation step.
+    assert calls == ["ATTEST", "AUTH_VALIDATE", "RELEASE_VALIDATE", "LOAD", "COMPUTE", "RELEASE_VALIDATE"]
+
+
+def test_b_replay_claim_blocks_evidence_load_and_computation(monkeypatch):
+    calls: list[str] = []
+    auth, attest, load, compute = _v2_seam_fixture(monkeypatch, calls)
+    transport = StatefulOnceTransport()
+    # Pre-consume the ref so this call observes ALREADY_EXISTS, as a genuine replay would.
+    transport.create_ref(foundation.claim_ref_name(auth.foundation.authorization_id), "a" * 40)
+
     with pytest.raises(foundation.AtMostOnceClaimError):
         v2.execute_authorized_frozen_experiment_v2(
             authorization=auth, evidence_loader=load, runtime_attestor=attest,
-            transport=FakeTransport("ALREADY_EXISTS"), computation=compute,
+            transport=transport, computation=compute,
         )
-    assert "compute" not in calls
+    assert calls == ["ATTEST", "AUTH_VALIDATE", "RELEASE_VALIDATE"]
+    assert "LOAD" not in calls
+    assert "COMPUTE" not in calls
+
+
+def test_c_claim_transport_failure_blocks_evidence_load_and_computation(monkeypatch):
+    calls: list[str] = []
+    auth, attest, load, compute = _v2_seam_fixture(monkeypatch, calls)
+
+    with pytest.raises(foundation.AtMostOnceClaimError):
+        v2.execute_authorized_frozen_experiment_v2(
+            authorization=auth, evidence_loader=load, runtime_attestor=attest,
+            transport=RaisingTransport(), computation=compute,
+        )
+    assert calls == ["ATTEST", "AUTH_VALIDATE", "RELEASE_VALIDATE"]
+    assert "LOAD" not in calls
+    assert "COMPUTE" not in calls
+
+
+def test_d_authorization_validation_failure_blocks_claim_load_and_computation(monkeypatch):
+    calls: list[str] = []
+    auth, attest, load, compute = _v2_seam_fixture(monkeypatch, calls, auth_validate_ok=False)
+
+    with pytest.raises(foundation.AuthorizationValidationError):
+        v2.execute_authorized_frozen_experiment_v2(
+            authorization=auth, evidence_loader=load, runtime_attestor=attest,
+            transport=FakeTransport("CREATED"), computation=compute,
+        )
+    assert calls == ["ATTEST", "AUTH_VALIDATE"]
+    assert "RELEASE_VALIDATE" not in calls
+    assert "LOAD" not in calls
+    assert "COMPUTE" not in calls
+
+
+def test_e_runtime_attestation_failure_blocks_claim_load_and_computation(monkeypatch):
+    calls: list[str] = []
+    auth, attest, load, compute = _v2_seam_fixture(monkeypatch, calls, attest_ok=False)
+
+    with pytest.raises(foundation.RuntimeAttestationError):
+        v2.execute_authorized_frozen_experiment_v2(
+            authorization=auth, evidence_loader=load, runtime_attestor=attest,
+            transport=FakeTransport("CREATED"), computation=compute,
+        )
+    assert calls == ["ATTEST"]
+    assert "AUTH_VALIDATE" not in calls
+    assert "LOAD" not in calls
+    assert "COMPUTE" not in calls
+
+
+def test_f_post_claim_loader_failure_has_no_automatic_retry(monkeypatch):
+    calls: list[str] = []
+    auth, attest, _load, compute = _v2_seam_fixture(monkeypatch, calls)
+    transport = StatefulOnceTransport()
+
+    def failing_load():
+        calls.append("LOAD")
+        raise foundation.EvidenceValidationError("simulated loader failure")
+
+    with pytest.raises(foundation.EvidenceValidationError):
+        v2.execute_authorized_frozen_experiment_v2(
+            authorization=auth, evidence_loader=failing_load, runtime_attestor=attest,
+            transport=transport, computation=compute,
+        )
+    assert calls == ["ATTEST", "AUTH_VALIDATE", "RELEASE_VALIDATE", "LOAD"]
+    assert "COMPUTE" not in calls
+    assert calls.count("LOAD") == 1
+
+    # No automatic retry: a second attempt against the same authorization
+    # observes the already-consumed claim and must not touch evidence again.
+    calls.clear()
+    with pytest.raises(foundation.AtMostOnceClaimError):
+        v2.execute_authorized_frozen_experiment_v2(
+            authorization=auth, evidence_loader=failing_load, runtime_attestor=attest,
+            transport=transport, computation=compute,
+        )
+    assert "LOAD" not in calls
+    assert "COMPUTE" not in calls
+
+
+def test_g_post_claim_computation_failure_has_no_automatic_retry(monkeypatch):
+    calls: list[str] = []
+    auth, attest, load, _compute = _v2_seam_fixture(monkeypatch, calls)
+    transport = StatefulOnceTransport()
+
+    def failing_compute(bundle):
+        calls.append("COMPUTE")
+        raise v2.ComputationError("simulated computation failure")
+
+    with pytest.raises(v2.ComputationError):
+        v2.execute_authorized_frozen_experiment_v2(
+            authorization=auth, evidence_loader=load, runtime_attestor=attest,
+            transport=transport, computation=failing_compute,
+        )
+    assert calls == ["ATTEST", "AUTH_VALIDATE", "RELEASE_VALIDATE", "LOAD", "COMPUTE"]
+    assert calls.count("LOAD") == 1
+    assert calls.count("COMPUTE") == 1
+
+    # No automatic retry: a second attempt observes the already-consumed
+    # claim and must not re-load evidence or recompute.
     calls.clear()
     with pytest.raises(foundation.AtMostOnceClaimError):
         v2.execute_authorized_frozen_experiment_v2(
             authorization=auth, evidence_loader=load, runtime_attestor=attest,
-            transport=FakeTransport("ALREADY_EXISTS"), computation=compute,
+            transport=transport, computation=failing_compute,
         )
-    assert "compute" not in calls
+    assert "LOAD" not in calls
+    assert "COMPUTE" not in calls
+
+
+def test_v2_contract_execution_order_places_claim_before_evidence_load():
+    """Section 15: pins the control-contract's declared order against drift.
+
+    This is a static, deterministic assertion on the frozen contract
+    artifact; test_a_successful_run_order_is_attest_then_claim_then_load_then_compute
+    pins the equivalent security-relevant order in the implementation
+    itself, so the two cannot silently diverge again the way CB-01 did.
+    """
+    path = foundation.resolve_within_repository(v2.V2_CONTRACT_RELATIVE_PATH, v2.provenance.ROOT)
+    contract = json.loads(path.read_text(encoding="utf-8"))
+    order = contract["execution_order"]
+    assert order.index("REMOTE_CLAIM") < order.index("LOAD_VERIFY_FROZEN_EVIDENCE")
 
 
 def test_foundation_lifecycle_consumed_states_are_terminal():

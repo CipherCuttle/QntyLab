@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- None.
+- `JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0R1` — `ACTIVE`. Create a superseding V0R1 execution lineage preserving the terminal V0 interruption. The frozen V0 executor is immutable; implement the repair only in a distinct V0R1 executor and distinct V0R1 artifact namespace. Repair only the frozen adjacent-pair strict-zip cardinality defect so 8,785 ordered bar opens yield exactly 8,784 consecutive return pairs. Prove the repaired implementation on synthetic fixtures and an independent statistical oracle, hostile-review and freeze the repaired executor, then re-authenticate the unchanged frozen input and perform exactly one V0R1 real execution under a distinct request/start/result namespace. Preserve explicit post-start-repair provenance. No other scientific change, input reacquisition, Jigsaw evidence creation, State Snapshot, Router, Qnty, trading, or promotion is authorized.
 
 ## Queued — not authorized
 

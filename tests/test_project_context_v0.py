@@ -145,15 +145,16 @@ def test_human_context_does_not_claim_no_queued_projects() -> None:
     assert "- None." not in queued_section
 
 
-def test_jh01_temporal_replication_execution_is_closed_blocked_after_started_execution() -> None:
+def test_jh01_temporal_replication_v0_is_closed_and_v0r1_is_the_only_repair_specific_active_project() -> None:
     data = project_context.context_data(ROOT)
     _, _, registry = project_context.load_context_sources(ROOT)
-    assert sum(record["state"] == "ACTIVE" for record in registry["project"]) == 0
-    assert data["active_project"] is None
+    assert sum(record["state"] == "ACTIVE" for record in registry["project"]) == 1
+    assert data["active_project"]["project_id"] == "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0R1"
     execution = next(record for record in registry["project"] if record["project_id"] == "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0")
     assert execution["state"] == "CLOSED_BLOCKED"
     assert execution["authority_level"] == "FROZEN_REPLICATION_EXECUTION_INTERRUPTED_NO_RERUN"
     assert execution["implementation_authorized"] is False
+    assert execution["superseded_by"] == ["JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0R1"]
     assert execution["frozen_preregistration_project_id"] == "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_PREREG_V0"
     assert execution["frozen_preregistration_digest"] == "46f923023b4b696307da2b9d6fc4c8db9d04b40b012de35e0bf738cc03c4be57"
     assert execution["frozen_input_qualification_digest"] == "8f82db32ce0f453f6f67e5cd4b421e0848752b7f24a9b39f05ec979fe9382593"
@@ -184,6 +185,50 @@ def test_jh01_temporal_replication_execution_is_closed_blocked_after_started_exe
         "superseding git-backed governance",
     ):
         assert required_text in action
+
+    v0r1 = data["active_project"]
+    assert v0r1["state"] == "ACTIVE"
+    assert v0r1["authority_level"] == "SUPERSEDING_POST_START_EXECUTION_REPAIR_ONLY"
+    assert v0r1["implementation_authorized"] is True
+    assert v0r1["supersedes"] == [execution["project_id"]]
+    assert v0r1["prior_execution_terminal_state"] == "EXECUTION_INTERRUPTED_AFTER_REAL_OUTCOME_ACCESS"
+    assert v0r1["prior_frozen_execution_implementation_sha"] == "e638dc2e3b044697902230a5c0705fb49de1f21a"
+    assert v0r1["prior_frozen_execution_source_path"] == "qntylab/jh01_rv_persistence_temporal_replication_execution_v0.py"
+    assert v0r1["prior_frozen_execution_source_immutable"] is True
+    assert v0r1["prior_execution_request_digest"] == "19d2e0827a76f37176e71b36a56d635c8f9ed1970f47664e1effd13a6d2327ec"
+    assert v0r1["prior_execution_started_digest"] == "9c8b00ad68c1e1ba389512c94a4c145264844a4e24fae75c038fcc9e0144f285"
+    assert v0r1["frozen_preregistration_digest"] == execution["frozen_preregistration_digest"]
+    assert v0r1["frozen_input_qualification_digest"] == execution["frozen_input_qualification_digest"]
+    assert v0r1["frozen_replication_input_snapshot_id"] == execution["frozen_replication_input_snapshot_id"]
+    assert v0r1["frozen_replication_input_snapshot_digest"] == execution["frozen_replication_input_snapshot_digest"]
+    assert v0r1["repair_reason"] == "STRICT_ZIP_ADJACENT_PAIR_CARDINALITY_DEFECT"
+    assert v0r1["repair_scope"] == "ADJACENT_PAIR_ITERATION_ONLY"
+    assert v0r1["post_start_repair"] is True
+    assert v0r1["pristine_first_execution"] is False
+    assert v0r1["v0r1_executor_must_be_distinct_from_v0"] is True
+    assert v0r1["v0r1_artifact_namespace"] == "experiments/research/jh01_rv_persistence_temporal_replication_v0/v0r1"
+    assert v0r1["v0r1_real_execution_count"] == 1
+    for field in (
+        "input_reacquisition_authorized",
+        "jigsaw_evidence_authorized",
+        "state_snapshot_authorized",
+        "router_authorized",
+        "qnty_authorized",
+        "trading_authorized",
+    ):
+        assert v0r1[field] is False
+    for forbidden_text in (
+        "other scientific change",
+        "input reacquisition",
+        "jigsaw evidence creation",
+        "state snapshot",
+        "router",
+        "qnty, trading",
+        "frozen v0 executor is immutable",
+        "distinct v0r1 executor",
+        "distinct v0r1 artifact namespace",
+    ):
+        assert forbidden_text in v0r1["next_action"].lower()
 
     materialization = next(record for record in registry["project"] if record["project_id"] == "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_INPUT_MATERIALIZATION_V0")
     assert materialization["state"] == "CLOSED_PASS"

@@ -91,8 +91,51 @@ frozen_preregistration_digest = "46f923023b4b696307da2b9d6fc4c8db9d04b40b012de35
 frozen_input_qualification_digest = "8f82db32ce0f453f6f67e5cd4b421e0848752b7f24a9b39f05ec979fe9382593"
 frozen_replication_input_snapshot_id = "jh01-rv-temporal-input-v0-ce0e0d1945eb5d6096cc8c24933e0ec19bb8a882c4cce526cb01ff4487b11efa"
 frozen_replication_input_snapshot_digest = "ce0e0d1945eb5d6096cc8c24933e0ec19bb8a882c4cce526cb01ff4487b11efa"
+superseded_by = ["JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0R1"]
 next_action = "JH01 temporal-replication execution was interrupted after the immutable one-shot start sentinel was created and before a valid execution result was written. The sentinel is preserved as EXECUTION_INTERRUPTED_AFTER_REAL_OUTCOME_ACCESS. No repair, rerun, alternative calculation, result reconstruction, Jigsaw evidence creation, State Snapshot, Router, Qnty, trading, or promotion is authorized. Any further action requires explicit superseding Git-backed governance."
 implementation_authorized = false
+
+[[project]]
+project_id = "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0R1"
+state = "ACTIVE"
+authority_level = "SUPERSEDING_POST_START_EXECUTION_REPAIR_ONLY"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "experiments/research/jh01_rv_persistence_temporal_replication_v0/preregistration.json",
+  "experiments/research/jh01_rv_persistence_temporal_replication_v0/materialization/input_qualification.json",
+  "experiments/research/jh01_rv_persistence_temporal_replication_v0/materialization/snapshot_manifest.json",
+  "experiments/research/jh01_rv_persistence_temporal_replication_v0/execution_request.json",
+  "experiments/research/jh01_rv_persistence_temporal_replication_v0/execution_started.json",
+  "experiments/research/jh01_rv_persistence_temporal_replication_v0/execution_interruption.md",
+  "qntylab/jh01_rv_persistence_temporal_replication_execution_v0.py",
+]
+supersedes = ["JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0"]
+prior_execution_terminal_state = "EXECUTION_INTERRUPTED_AFTER_REAL_OUTCOME_ACCESS"
+prior_frozen_execution_implementation_sha = "e638dc2e3b044697902230a5c0705fb49de1f21a"
+prior_frozen_execution_source_path = "qntylab/jh01_rv_persistence_temporal_replication_execution_v0.py"
+prior_frozen_execution_source_immutable = true
+prior_execution_request_digest = "19d2e0827a76f37176e71b36a56d635c8f9ed1970f47664e1effd13a6d2327ec"
+prior_execution_started_digest = "9c8b00ad68c1e1ba389512c94a4c145264844a4e24fae75c038fcc9e0144f285"
+frozen_preregistration_project_id = "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_PREREG_V0"
+frozen_preregistration_digest = "46f923023b4b696307da2b9d6fc4c8db9d04b40b012de35e0bf738cc03c4be57"
+frozen_input_qualification_digest = "8f82db32ce0f453f6f67e5cd4b421e0848752b7f24a9b39f05ec979fe9382593"
+frozen_replication_input_snapshot_id = "jh01-rv-temporal-input-v0-ce0e0d1945eb5d6096cc8c24933e0ec19bb8a882c4cce526cb01ff4487b11efa"
+frozen_replication_input_snapshot_digest = "ce0e0d1945eb5d6096cc8c24933e0ec19bb8a882c4cce526cb01ff4487b11efa"
+repair_reason = "STRICT_ZIP_ADJACENT_PAIR_CARDINALITY_DEFECT"
+repair_scope = "ADJACENT_PAIR_ITERATION_ONLY"
+post_start_repair = true
+pristine_first_execution = false
+v0r1_executor_must_be_distinct_from_v0 = true
+v0r1_artifact_namespace = "experiments/research/jh01_rv_persistence_temporal_replication_v0/v0r1"
+v0r1_real_execution_count = 1
+input_reacquisition_authorized = false
+jigsaw_evidence_authorized = false
+state_snapshot_authorized = false
+router_authorized = false
+qnty_authorized = false
+trading_authorized = false
+next_action = "Create a superseding V0R1 execution lineage preserving the terminal V0 interruption. The frozen V0 executor is immutable; implement the repair only in a distinct V0R1 executor and distinct V0R1 artifact namespace. Repair only the frozen adjacent-pair strict-zip cardinality defect so 8,785 ordered bar opens yield exactly 8,784 consecutive return pairs. Prove the repaired implementation on synthetic fixtures and an independent statistical oracle, hostile-review and freeze the repaired executor, then re-authenticate the unchanged frozen input and perform exactly one V0R1 real execution under a distinct request/start/result namespace. Preserve explicit post-start-repair provenance. No other scientific change, input reacquisition, Jigsaw evidence creation, State Snapshot, Router, Qnty, trading, or promotion is authorized."
+implementation_authorized = true
 
 [[project]]
 project_id = "STATE_SNAPSHOT_V0"

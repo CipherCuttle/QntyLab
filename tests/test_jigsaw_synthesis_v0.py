@@ -632,6 +632,188 @@ def test_claim_relation_not_established_statement_never_asserts_confident_differ
 
 
 # ---------------------------------------------------------------------------
+# Post-review closure repair: shared history must dominate any self-declared
+# replication relationship; a bare declaration must never establish
+# empirical independence. A closure-gate hostile finding showed that an
+# earlier revision checked explicit_independent_replication_of *before* the
+# shared-history test, so a piece could declare replication of another piece
+# while still demonstrably sharing that piece's exact frozen snapshot or
+# source artifact, and the declaration would win. See design_note.md and
+# hostile_review.md for the full finding and repair rationale.
+# ---------------------------------------------------------------------------
+
+
+def _declared_replication_piece(proposition_id, target_id, snapshot_binding, **extra):
+    piece = {
+        "proposition_id": proposition_id,
+        "piece_type": "PREDICTIVE_ASSOCIATION",
+        "classification": "SUPPORTED_WITHIN_FROZEN_SCOPE",
+        "feature": f"FEATURE_{proposition_id}",
+        "outcome": f"OUTCOME_{proposition_id}",
+        "snapshot_binding": snapshot_binding,
+        "prior_feature_exposure": "NO",
+        "promotion_eligible": False,
+        "explicit_independent_replication_of": target_id,
+    }
+    piece.update(extra)
+    return piece
+
+
+def test_closure_a_declared_replication_with_exact_snapshot_match_stays_shared_history(tmp_path):
+    snapshot = {
+        "snapshot_id": "fixture-snap-closure-a",
+        "decision_window": "2024-01-01T00:00:00Z..2024-02-01T00:00:00Z",
+        "panel_symbols": 3,
+    }
+    document = {
+        "schema_version": "jigsaw-evidence-piece-v0",
+        "experiment_id": "FIXTURE_CLOSURE_A_V0",
+        "research_status": "FROZEN_HISTORICAL_EVIDENCE",
+        "authority": "NON_AUTHORITATIVE_EXPLORATORY_ONLY",
+        "piece_count": 2,
+        "piece_order": ["CLOSURE_A", "CLOSURE_B"],
+        "pieces": [
+            _declared_replication_piece("CLOSURE_A", "CLOSURE_B", snapshot),
+            _declared_replication_piece("CLOSURE_B", "CLOSURE_A", snapshot),
+        ],
+    }
+    _write(tmp_path, "fixture_closure_a", document)
+    synthesis = build_synthesis(tmp_path)
+    pair = get_pair(synthesis, "CLOSURE_A", "CLOSURE_B")
+    assert pair["same_snapshot_identity"] == "YES"
+    assert pair["independence_status"] == "SHARED_FROZEN_HISTORY"
+    assert pair["independence_status"] != "INDEPENDENT_REPLICATION_EXPLICITLY_ESTABLISHED"
+    assert pair["allowed_synthesis"] != "INDEPENDENT_CONFIRMATION_ELIGIBLE"
+    assert pair["allowed_synthesis"] == "SAME_HISTORY_MULTI_PROPOSITION_CONTEXT"
+
+
+def test_closure_b_declared_replication_with_same_source_artifact_stays_shared_history(tmp_path):
+    # Distinct snapshot_ids (so same_snapshot_identity == NO) but the same
+    # source artifact -- same_source_artifact == YES must still dominate.
+    document = {
+        "schema_version": "jigsaw-evidence-piece-v0",
+        "experiment_id": "FIXTURE_CLOSURE_B_V0",
+        "research_status": "FROZEN_HISTORICAL_EVIDENCE",
+        "authority": "NON_AUTHORITATIVE_EXPLORATORY_ONLY",
+        "piece_count": 2,
+        "piece_order": ["CLOSURE_C", "CLOSURE_D"],
+        "pieces": [
+            _declared_replication_piece(
+                "CLOSURE_C",
+                "CLOSURE_D",
+                {"snapshot_id": "fixture-snap-closure-b1", "decision_window": "2024-01-01T00:00:00Z..2024-02-01T00:00:00Z", "panel_symbols": 3},
+            ),
+            _declared_replication_piece(
+                "CLOSURE_D",
+                "CLOSURE_C",
+                {"snapshot_id": "fixture-snap-closure-b2", "decision_window": "2024-01-01T00:00:00Z..2024-02-01T00:00:00Z", "panel_symbols": 3},
+            ),
+        ],
+    }
+    _write(tmp_path, "fixture_closure_b", document)
+    synthesis = build_synthesis(tmp_path)
+    pair = get_pair(synthesis, "CLOSURE_C", "CLOSURE_D")
+    assert pair["same_source_artifact"] == "YES"
+    assert pair["same_snapshot_identity"] == "NO"
+    assert pair["independence_status"] == "SHARED_FROZEN_HISTORY"
+    assert pair["allowed_synthesis"] == "SAME_HISTORY_MULTI_PROPOSITION_CONTEXT"
+
+
+def test_closure_c_declared_replication_without_shared_history_never_grants_independent_confirmation(tmp_path):
+    # Two different source artifacts, two different explicit snapshot IDs,
+    # disjoint decision windows -- no shared-history evidence at all. A bare
+    # declaration alone must not manufacture empirical independence.
+    _write(
+        tmp_path,
+        "fixture_closure_c1",
+        {
+            "schema_version": "jigsaw-evidence-piece-v0",
+            "experiment_id": "FIXTURE_CLOSURE_C1_V0",
+            "piece_type": "PREDICTIVE_ASSOCIATION",
+            "research_status": "FROZEN_HISTORICAL_EVIDENCE",
+            "authority": "NON_AUTHORITATIVE",
+            "promotion_eligible": False,
+            "feature": "FEATURE_CLOSURE_E",
+            "outcome": "OUTCOME_CLOSURE_E",
+            "snapshot_binding": {
+                "snapshot_id": "fixture-snap-closure-c1",
+                "decision_window": "2024-01-01T00:00:00Z..2024-02-01T00:00:00Z",
+                "panel_symbols": 3,
+            },
+            "prior_feature_exposure": "NO",
+            "explicit_independent_replication_of": "CLOSURE_F",
+        },
+        filename="result.json",
+    )
+    _write(
+        tmp_path,
+        "fixture_closure_c2",
+        {
+            "schema_version": "jigsaw-evidence-piece-v0",
+            "experiment_id": "FIXTURE_CLOSURE_C2_V0",
+            "piece_type": "PREDICTIVE_ASSOCIATION",
+            "research_status": "FROZEN_HISTORICAL_EVIDENCE",
+            "authority": "NON_AUTHORITATIVE",
+            "promotion_eligible": False,
+            "feature": "FEATURE_CLOSURE_E",
+            "outcome": "OUTCOME_CLOSURE_E",
+            "snapshot_binding": {
+                "snapshot_id": "fixture-snap-closure-c2",
+                "decision_window": "2025-06-01T00:00:00Z..2025-07-01T00:00:00Z",
+                "panel_symbols": 3,
+            },
+            "prior_feature_exposure": "NO",
+            "explicit_independent_replication_of": "CLOSURE_E",
+        },
+        filename="result.json",
+    )
+    # These are SINGLE_PIECE_OBJECT sources; piece_identity == experiment_id.
+    document_e = json.loads((tmp_path / "fixture_closure_c1" / "result.json").read_text())
+    document_e["experiment_id"] = "CLOSURE_E"
+    (tmp_path / "fixture_closure_c1" / "result.json").write_text(json.dumps(document_e), encoding="utf-8")
+    document_f = json.loads((tmp_path / "fixture_closure_c2" / "result.json").read_text())
+    document_f["experiment_id"] = "CLOSURE_F"
+    (tmp_path / "fixture_closure_c2" / "result.json").write_text(json.dumps(document_f), encoding="utf-8")
+
+    synthesis = build_synthesis(tmp_path)
+    pair = get_pair(synthesis, "CLOSURE_E", "CLOSURE_F")
+    assert pair["same_source_artifact"] == "NO"
+    assert pair["same_snapshot_identity"] == "NO"
+    assert pair["decision_window_relation"] == "DISJOINT"
+    assert pair["independence_status"] == "INDEPENDENCE_NOT_ESTABLISHED"
+    assert pair["independence_status"] != "INDEPENDENT_REPLICATION_EXPLICITLY_ESTABLISHED"
+    assert pair["allowed_synthesis"] == "SEPARATE_ONLY"
+    assert pair["allowed_synthesis"] != "INDEPENDENT_CONFIRMATION_ELIGIBLE"
+
+
+def test_closure_d_current_real_artifact_semantics_unchanged():
+    synthesis = build_synthesis(RESEARCH_ROOT)
+    assert synthesis["global_constraints"]["independent_replication_established"] == "NO"
+    harvest_pairs = [
+        p for p in synthesis["pair_relationships"] if p["piece_a"] in HARVEST_PIECE_IDS and p["piece_b"] in HARVEST_PIECE_IDS
+    ]
+    assert len(harvest_pairs) == 6
+    assert all(p["independence_status"] == "SHARED_FROZEN_HISTORY" for p in harvest_pairs)
+    funding_pairs = [p for p in synthesis["pair_relationships"] if FUNDING_PRESSURE_ID in (p["piece_a"], p["piece_b"])]
+    assert len(funding_pairs) == 4
+    assert all(p["allowed_synthesis"] == "SEPARATE_ONLY" for p in funding_pairs)
+    assert not any(p["independence_status"] == "INDEPENDENT_REPLICATION_EXPLICITLY_ESTABLISHED" for p in synthesis["pair_relationships"])
+
+
+def test_closure_e_existing_gates_still_pass():
+    # Non-escalation, determinism, source immutability, and staleness gates
+    # (tests J, K, L, M/N, O, P above) are exercised by their own dedicated
+    # tests already run in this same module; this is a lightweight
+    # cross-check that the closure repair did not disturb them.
+    assert doctor(RESEARCH_ROOT) == []
+    first = build_synthesis(RESEARCH_ROOT)
+    second = build_synthesis(RESEARCH_ROOT)
+    assert canonical_bytes(first) == canonical_bytes(second)
+    committed = load_synthesis(RESEARCH_ROOT)
+    assert committed == first
+
+
+# ---------------------------------------------------------------------------
 # JOINT_CONTEXT_ONLY path (not reached by real current data; exercised via
 # a synthetic fixture so the code path is proven, not merely dead).
 # ---------------------------------------------------------------------------

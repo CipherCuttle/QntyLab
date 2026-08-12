@@ -19,7 +19,7 @@ the raw preregistrations and confirmed correct.
 
 ## Findings
 
-```
+```text
 CRITICAL = 0, none found
 HIGH = 2
 MEDIUM = 0, none found
@@ -102,3 +102,55 @@ the fix is small (~30 lines), mechanically verified by two new adversarial
 tests reproducing the exact reported scenarios, confirmed by rerunning the
 full test suite and all doctor commands, and does not touch any other part
 of the module's derivation logic, source data, or the F-02 index.
+
+## Post-review closure repair (candidate `994f128` → new candidate)
+
+A closure-gate verification pass, run separately after CI on PR #50 went
+green, found one additional **HIGH** fail-open defect not caught by the
+first hostile review: `_independence_status` checked
+`explicit_independent_replication` (a piece self-declaring
+`explicit_independent_replication_of=<other piece id>`) *before* the
+shared-frozen-history test (`same_snapshot_identity == YES` or
+`same_source_artifact == YES`). A future piece could therefore declare
+itself an independent replication of another piece while still
+demonstrably sharing that piece's exact frozen snapshot, and the bare
+declaration would win over the provenance fact — violating the phase's
+core invariant that independence is established by provenance, not
+assertion.
+
+Not reached by the real 5-piece/10-pair census (no current piece carries
+`explicit_independent_replication_of`), but real and reproducible, and
+exactly the "false independence" / "prior-exposure-style laundering"
+failure class Section 29 names as CRITICAL/HIGH focus — a self-declared
+claim overriding a mechanically-verifiable provenance fact.
+
+**Repair**: `_independence_status` now checks shared history first,
+unconditionally, before anything else. `INDEPENDENT_REPLICATION_EXPLICITLY_ESTABLISHED`
+is no longer derived from a bare declaration at all — no currently-indexed
+field positively establishes empirical data independence (only
+presence/absence of a matching `snapshot_id`, which at best proves
+non-identity, never independence), and the phase contract forbids inventing
+a new field merely to make the state reachable. The status therefore
+becomes intentionally unreachable in V0; the `_explicit_independent_replication`
+helper and its dead call site were removed rather than left as inert dead
+code implying it still mattered. See `design_note.md` for the full
+rationale.
+
+Five targeted regression tests were added
+(`test_closure_a_declared_replication_with_exact_snapshot_match_stays_shared_history`,
+`test_closure_b_declared_replication_with_same_source_artifact_stays_shared_history`,
+`test_closure_c_declared_replication_without_shared_history_never_grants_independent_confirmation`,
+`test_closure_d_current_real_artifact_semantics_unchanged`,
+`test_closure_e_existing_gates_still_pass`), reproducing exactly the
+declared-replication-plus-shared-history scenario and confirming the real
+artifact's digest and every existing non-escalation/determinism/staleness
+gate are unaffected. Rebuilt `eligibility.json` is **byte-identical** to
+the pre-repair artifact (digest `e3a2044e38f99457a78fcdd758e6816404cd9aa02746a787fe7c1344874b2e38`
+unchanged) — this repair only closes a latent path unreachable by any
+current piece; the real 5-piece census never exercised the bug.
+
+Full suite after this repair: 353 passed (`-k jigsaw`, same two pre-existing
+unrelated `polars` errors excluded). All doctors (`jigsaw_synthesis`,
+`jigsaw_index`, `research_ledger`, `project_context --strict`,
+`project_context render --check`) pass. No further broad review performed,
+per the closure instruction to repair exactly this defect and stop.

@@ -100,14 +100,28 @@ contract targets. It carries no scientific content and is not re-derived.
 | NOT_ESTABLISHED | * | CLAIM_RELATION_NOT_ESTABLISHED |
 | * | NOT_ESTABLISHED | CLAIM_RELATION_NOT_ESTABLISHED |
 
-`independence_status`: `INDEPENDENT_REPLICATION_EXPLICITLY_ESTABLISHED` only
-if a piece explicitly declares itself a replication of the other by stable
-identity (no current piece does; dead code today, kept so a future piece
-could earn it without a code change). Else `SHARED_FROZEN_HISTORY` if
-`same_snapshot_identity == YES` or `same_source_artifact == YES`. Else
-`OVERLAPPING_HISTORY_INDEPENDENCE_NOT_ESTABLISHED` if the decision windows
-are known to relate (`EXACT`/`A_CONTAINS_B`/`B_CONTAINS_A`/`PARTIAL_OVERLAP`).
-Else `INDEPENDENCE_NOT_ESTABLISHED`.
+`independence_status`: `SHARED_FROZEN_HISTORY` if `same_snapshot_identity ==
+YES` or `same_source_artifact == YES` — checked *first*, unconditionally, so
+it dominates everything else. Else `OVERLAPPING_HISTORY_INDEPENDENCE_NOT_ESTABLISHED`
+if the decision windows are known to relate
+(`EXACT`/`A_CONTAINS_B`/`B_CONTAINS_A`/`PARTIAL_OVERLAP`). Else
+`INDEPENDENCE_NOT_ESTABLISHED`.
+
+`INDEPENDENT_REPLICATION_EXPLICITLY_ESTABLISHED` is intentionally
+**unreachable** from current indexed provenance, on purpose, not by
+oversight. An earlier revision derived it from a self-declared
+`explicit_independent_replication_of` field, checked *before* the
+shared-history test — a post-review closure pass (see `hostile_review.md`)
+found this fail-open: a piece could declare replication of another piece
+while still demonstrably sharing that piece's exact frozen snapshot, and the
+declaration would win. Declaration states *intended target identity*, not
+*empirical data independence*, and `JIGSAW_INDEX_V0` currently exposes no
+field that positively establishes independent data/history — only
+presence/absence of a matching `snapshot_id`, which at best proves
+non-identity, never independence. Per the phase contract this module does
+not invent a new provenance field merely to make the state reachable, so it
+is acceptable — and correct — for it to remain permanently unreachable in
+V0 rather than derived from a bare self-assertion.
 
 `allowed_synthesis(independence_status, claim_relation)`:
 

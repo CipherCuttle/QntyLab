@@ -187,29 +187,33 @@ def _same_native_string_field(a: dict, b: dict, field: str) -> str:
     return "YES" if va == vb else "NO"
 
 
-def _explicit_independent_replication(a: dict, b: dict) -> bool:
-    """True only if a piece explicitly declares itself an independent
-    replication of the other by stable piece identity. No canonical piece in
-    the current census carries this field, so this is currently dead code on
-    real data; it exists so a future piece could genuinely earn
-    INDEPENDENT_REPLICATION_EXPLICITLY_ESTABLISHED without a code change,
-    rather than this module inventing that status from circumstantial facts.
-    """
-    for x, y in ((a, b), (b, a)):
-        claim = _native_field(x, "explicit_independent_replication_of")
-        if isinstance(claim, str) and claim == y["piece_identity"]:
-            return True
-    return False
-
-
 def _independence_status(
     same_snapshot_identity: str,
     same_source_artifact: str,
     decision_window_relation: str,
-    explicit_independent_replication: bool,
 ) -> str:
-    if explicit_independent_replication:
-        return "INDEPENDENT_REPLICATION_EXPLICITLY_ESTABLISHED"
+    """Independence is established by provenance, not by assertion.
+
+    Shared frozen history is a pure provenance fact -- identical explicit
+    snapshot identity or literally the same source artifact -- and is
+    checked first, unconditionally. It dominates everything else: a piece
+    cannot declare its way out of demonstrably sharing the same frozen
+    snapshot or source artifact it shares.
+
+    INDEPENDENT_REPLICATION_EXPLICITLY_ESTABLISHED is intentionally
+    unreachable from current indexed provenance. A piece could in principle
+    self-declare an intended replication relationship (e.g. an
+    `explicit_independent_replication_of` field naming another piece), but
+    that states *intended target identity*, not *empirical data
+    independence* -- and JIGSAW_INDEX_V0 currently exposes no field that
+    positively establishes independent data/history (only presence/absence
+    of a matching snapshot_id, which at best proves non-identity, never
+    independence). Per the phase contract, this module does not invent a new
+    provenance field merely to make that state reachable, and does not treat
+    a bare declaration as sufficient on its own -- so this status stays
+    unreachable in V0 rather than being derived from circumstantial or
+    self-asserted facts. See design_note.md.
+    """
     if same_snapshot_identity == "YES" or same_source_artifact == "YES":
         return "SHARED_FROZEN_HISTORY"
     if decision_window_relation in ("EXACT", "A_CONTAINS_B", "B_CONTAINS_A", "PARTIAL_OVERLAP"):
@@ -251,10 +255,7 @@ def _build_pair(row_a: dict, row_b: dict) -> dict[str, Any]:
     same_data_history = _same_data_history(same_snapshot_identity, same_source_artifact)
     same_feature = _same_native_string_field(row_a, row_b, "feature")
     same_outcome = _same_native_string_field(row_a, row_b, "outcome")
-    explicit_repl = _explicit_independent_replication(row_a, row_b)
-    independence_status = _independence_status(
-        same_snapshot_identity, same_source_artifact, decision_window_relation, explicit_repl
-    )
+    independence_status = _independence_status(same_snapshot_identity, same_source_artifact, decision_window_relation)
     claim_relation = _claim_relation(same_feature, same_outcome)
     allowed_synthesis = _allowed_synthesis(independence_status, claim_relation)
     return {

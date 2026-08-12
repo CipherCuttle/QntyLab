@@ -18,7 +18,6 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
-from . import jh01_rv_persistence_temporal_replication_input_materialization_v0 as materialization
 from . import jh01_rv_persistence_temporal_replication_prereg_v0 as prereg
 
 
@@ -35,6 +34,7 @@ LAST_DECISION = prereg.LAST_DECISION
 OBSERVATION_COUNT = 365
 HAC_LAG = 5
 HAC_CRITICAL_VALUE_95 = 1.959963984540054
+EXPECTED_BARS_PER_SYMBOL = 8785
 ARTIFACT_RELATIVE = Path("experiments/research/jh01_rv_persistence_temporal_replication_v0")
 RAW_RELATIVE = Path("data/raw/jh01_rv_persistence_temporal_replication_v0")
 MODULE_RELATIVE = Path("qntylab/jh01_rv_persistence_temporal_replication_execution_v0.py")
@@ -97,6 +97,14 @@ def canonical_schedule() -> tuple[datetime, ...]:
     return schedule
 
 
+def expected_timestamps() -> tuple[str, ...]:
+    first, last = _utc(prereg.REQUIRED_FIRST_BAR_OPEN), _utc(prereg.REQUIRED_LAST_BAR_OPEN)
+    result = tuple(_stamp(first + timedelta(hours=index)) for index in range(EXPECTED_BARS_PER_SYMBOL))
+    if _utc(result[-1]) != last:
+        raise AssertionError("frozen raw coverage cardinality drift")
+    return result
+
+
 def asset_log_return(previous_close: float, current_close: float) -> float:
     if not all(isinstance(item, (int, float)) and math.isfinite(item) and item > 0 for item in (previous_close, current_close)):
         raise ExecutionContractError("positive finite closes required")
@@ -121,7 +129,7 @@ def market_rv24(hourly_market_returns: Sequence[float]) -> float:
 def _validate_panel(bars_by_symbol: Mapping[str, Sequence[BarClose]]) -> dict[str, dict[datetime, BarClose]]:
     if tuple(bars_by_symbol) != UNIVERSE:
         raise ExecutionContractError("exact ordered 20-symbol panel required")
-    expected = tuple(materialization.expected_timestamps())
+    expected = expected_timestamps()
     result: dict[str, dict[datetime, BarClose]] = {}
     for symbol in UNIVERSE:
         rows = bars_by_symbol[symbol]
@@ -166,7 +174,7 @@ def rv24_windows_at_decision(*, decision: datetime, market_returns: Mapping[date
 def build_design_rows(bars_by_symbol: Mapping[str, Sequence[BarClose]]) -> tuple[DesignRow, ...]:
     """Build exact JH01 rows from a validated (usually synthetic) bar panel."""
     bars = _validate_panel(bars_by_symbol)
-    opens = tuple(_utc(materialization.expected_timestamps()[0]) + timedelta(hours=index) for index in range(8785))
+    opens = tuple(_utc(expected_timestamps()[0]) + timedelta(hours=index) for index in range(EXPECTED_BARS_PER_SYMBOL))
     market_returns: dict[datetime, float] = {}
     for previous_open, current_open in zip(opens, opens[1:], strict=True):
         boundary = current_open + timedelta(hours=1)
@@ -270,8 +278,7 @@ def _verify_implementation_identity(root: Path, frozen_implementation_sha: str) 
     if len(frozen_implementation_sha) != 40 or any(character not in "0123456789abcdef" for character in frozen_implementation_sha):
         raise ExecutionContractError("frozen implementation SHA must be lowercase 40-character Git SHA")
     actual_head = _run_git(root, "rev-parse", "HEAD")
-    if _run_git(root, "merge-base", "--is-ancestor", EXECUTION_AUTHORIZATION_BASE_SHA, actual_head) is not None:
-        pass
+    _run_git(root, "merge-base", "--is-ancestor", EXECUTION_AUTHORIZATION_BASE_SHA, actual_head)
     if subprocess.run(["git", "merge-base", "--is-ancestor", frozen_implementation_sha, actual_head], cwd=root).returncode:
         raise ExecutionContractError("frozen implementation is not an ancestor of actual execution HEAD")
     current_bytes = (root / MODULE_RELATIVE).read_bytes()
@@ -287,13 +294,22 @@ def _preflight(root: Path, frozen_implementation_sha: str) -> tuple[dict[str, An
     if preregistration.get("preregistration_digest") != PREREGISTRATION_DIGEST:
         raise ExecutionContractError("preregistration digest mismatch")
     artifact_root = root / ARTIFACT_RELATIVE
+    frozen_request = _load_json(artifact_root / "materialization/materialization_request.json")
+    frozen_receipt = _load_json(artifact_root / "materialization/materialization_receipt.json")
     qualification = _load_json(artifact_root / "materialization/input_qualification.json")
     manifest = _load_json(artifact_root / "materialization/per_symbol_manifest.json")
     snapshot = _load_json(artifact_root / "materialization/snapshot_manifest.json")
-    if qualification.get("input_qualification_digest") != INPUT_QUALIFICATION_DIGEST or qualification.get("qualification_status") != "INPUT_READY" or qualification.get("input_ready") is not True:
+    request_digest = frozen_request.get("request_digest")
+    if request_digest != digest(frozen_request, omitted_field="request_digest") or frozen_request.get("replication_preregistration_digest") != PREREGISTRATION_DIGEST or frozen_request.get("expected_bars_per_symbol") != EXPECTED_BARS_PER_SYMBOL:
+        raise ExecutionContractError("materialization request integrity mismatch")
+    if frozen_receipt.get("request_digest") != request_digest or frozen_receipt.get("materialization_receipt_digest") != digest(frozen_receipt, omitted_field="materialization_receipt_digest"):
+        raise ExecutionContractError("materialization receipt integrity mismatch")
+    if qualification.get("input_qualification_digest") != INPUT_QUALIFICATION_DIGEST or qualification.get("input_qualification_digest") != digest(qualification, omitted_field="input_qualification_digest") or qualification.get("qualification_status") != "INPUT_READY" or qualification.get("input_ready") is not True:
         raise ExecutionContractError("input qualification contract mismatch")
-    if snapshot.get("snapshot_id") != SNAPSHOT_ID or snapshot.get("snapshot_digest") != SNAPSHOT_DIGEST:
+    if snapshot.get("snapshot_id") != SNAPSHOT_ID or snapshot.get("snapshot_digest") != SNAPSHOT_DIGEST or snapshot.get("snapshot_digest") != hashlib.sha256(canonical_bytes(snapshot.get("identity_semantics"))).hexdigest():
         raise ExecutionContractError("snapshot identity mismatch")
+    if manifest.get("request_digest") != request_digest or manifest.get("per_symbol") != qualification.get("per_symbol"):
+        raise ExecutionContractError("per-symbol manifest does not match qualified frozen input")
     if tuple(qualification.get("ordered_universe", ())) != UNIVERSE or qualification.get("universe_digest") != UNIVERSE_DIGEST or tuple(record.get("symbol") for record in manifest.get("per_symbol", ())) != UNIVERSE:
         raise ExecutionContractError("ordered universe mismatch")
     expected_records = {record["symbol"]: record for record in manifest["per_symbol"]}

@@ -145,10 +145,20 @@ def test_human_context_does_not_claim_no_queued_projects() -> None:
     assert "- None." not in queued_section
 
 
-def test_closed_harvest_leaves_no_authorized_implementation_phase() -> None:
+def test_jh01_temporal_replication_preregistration_is_the_only_authorized_phase() -> None:
     data = project_context.context_data(ROOT)
-    assert data["active_project"] is None
-    assert data["current_permitted_next_action"] == "No project implementation is currently authorized."
+    expected_next_action = (
+        "Create, validate, independently hostile-review, and freeze only the outcome-blind preregistration for a genuinely "
+        "new-history temporal empirical replication of JH01_RV_PERSISTENCE. No new market-data access, acquisition, "
+        "materialization, feature/outcome computation, regression execution, Jigsaw evidence creation, State Snapshot "
+        "authorization, Router, Qnty, trading, or promotion authority is granted."
+    )
+    assert data["active_project"]["project_id"] == "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_PREREG_V0"
+    assert data["active_project"]["authority_level"] == "PREREGISTRATION_ONLY"
+    assert data["active_project"]["implementation_authorized"] is True
+    assert data["current_permitted_next_action"] == expected_next_action
+    _, _, registry = project_context.load_context_sources(ROOT)
+    assert sum(record["state"] == "ACTIVE" for record in registry["project"]) == 1
     harvest = next(record for record in data["superseded_or_stale_planning"] if record["project_id"] == "JIGSAW_HARVEST_V0")
     assert harvest["state"] == "CLOSED_PASS"
     assert harvest["next_action"] == "Jigsaw Harvest V0 is closed. Preserve its four bounded evidence pieces; no State Snapshot, Router, Qnty, or trading implementation is authorized by this phase."

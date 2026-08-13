@@ -1,6 +1,39 @@
 schema_version = 1
 
 [[project]]
+project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R2_CLOSE_BOUNDARY_SOURCE_CONTRACT_REPAIR_V0"
+state = "CLOSED_PASS"
+authority_level = "SOURCE_CONTRACT_FEASIBILITY_ONLY"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/preregistration.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/candidate_census.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/jfp03_design_repair_v0r1.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r2_input_snapshot.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r2_input_qualification.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r2_repaired_source_materialization_receipt.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r2_repaired_source_manifest.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r2_hostile_review.md",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r2_targeted_re_review.md",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/close_boundary_repair_v0/close_boundary_source_contract_repair.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/close_boundary_repair_v0/prefix_source_contract.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/close_boundary_repair_v0/hostile_review.md",
+]
+phase_type = "SOURCE_CONTRACT_FEASIBILITY_REPAIR_ONLY"
+bound_design_digest = "a52d4999038e0be814ee8770322303fce84bed9ec8941b812748a18867633736"
+boundary_mismatch_confirmed = true
+historical_v0r2_immutable = true
+prefix_source_contract_frozen = true
+prefix_materialized = false
+materialization_authorized = false
+scientific_execution_authorized = false
+scientific_execution_performed = false
+qnty_agent_eval = "NO_MATCH"
+downstream_authority = "NONE"
+implementation_authorized = false
+next_action = "The V0R2 historical materialization remains immutable but is not eligible for JFP03 scientific execution. A one-row additive V0R3 prefix source contract is frozen; separate Git-backed materialization authorization is required, and scientific execution remains unauthorized."
+
+[[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_REPAIRED_SOURCE_MATERIALIZATION_V0"
 state = "CLOSED_PASS"
 authority_level = "INPUT_MATERIALIZATION_ONLY"

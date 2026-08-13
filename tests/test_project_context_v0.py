@@ -180,8 +180,8 @@ def test_human_context_does_not_claim_no_queued_projects() -> None:
 def test_jh01_temporal_replication_v0_and_v0r1_are_closed_with_their_distinct_lineages_preserved() -> None:
     data = project_context.context_data(ROOT)
     _, _, registry = project_context.load_context_sources(ROOT)
-    assert sum(record["state"] == "ACTIVE" for record in registry["project"]) == 1
-    assert data["active_project"]["project_id"] == "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_INPUT_MATERIALIZATION_V0"
+    assert sum(record["state"] == "ACTIVE" for record in registry["project"]) == 0
+    assert data["active_project"] is None
     execution = next(record for record in registry["project"] if record["project_id"] == "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0")
     assert execution["state"] == "CLOSED_BLOCKED"
     assert execution["authority_level"] == "FROZEN_REPLICATION_EXECUTION_INTERRUPTED_NO_RERUN"
@@ -387,8 +387,8 @@ def test_jh01_jigsaw_evidence_authorization_v0_is_governance_only_and_binds_v0r1
 
     # (10) project-context/state invariants remain valid: registry validation and the doctor pass clean.
     assert data["authority_conflicts_or_warnings"] == []
-    assert sum(record["state"] == "ACTIVE" for record in registry["project"]) == 1
-    assert data["active_project"]["project_id"] == "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_INPUT_MATERIALIZATION_V0"
+    assert sum(record["state"] == "ACTIVE" for record in registry["project"]) == 0
+    assert data["active_project"] is None
     for forbidden_text in (
         "narrowest truthful representation",
         "no scientific rerun, recomputation, or input reacquisition is authorized",

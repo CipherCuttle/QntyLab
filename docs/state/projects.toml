@@ -1,6 +1,53 @@
 schema_version = 1
 
 [[project]]
+project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R3_PREFIX_MATERIALIZATION_AUTHORIZATION_V0"
+display_name = "JFP03 V0R3 prefix materialization authorization"
+state = "CLOSED_PASS"
+authority_level = "PREFIX_MATERIALIZATION_AUTHORIZATION_ONLY"
+phase_type = "GOVERNANCE_ONLY"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/preregistration.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/candidate_census.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/jfp03_design_repair_v0r1.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r2_input_snapshot.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r2_input_qualification.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r2_repaired_source_materialization_receipt.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r2_repaired_source_manifest.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/close_boundary_repair_v0/close_boundary_source_contract_repair.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/close_boundary_repair_v0/prefix_source_contract.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r3_prefix_materialization_authorization.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r3_prefix_materialization_hostile_review.md",
+]
+bound_close_boundary_repair_project = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R2_CLOSE_BOUNDARY_SOURCE_CONTRACT_REPAIR_V0"
+bound_prefix_contract = true
+bound_design_digest = "a52d4999038e0be814ee8770322303fce84bed9ec8941b812748a18867633736"
+prefix_materialization_authorized = true
+prefix_materialization_runs_allowed = 1
+prefix_materialization_performed = false
+authorized_runs_consumed = 0
+consumption_guard_required = true
+scientific_execution_authorized = false
+scientific_execution_performed = false
+historical_execution_authorized = false
+feature_computation_authorized = false
+target_computation_authorized = false
+regression_authorized = false
+hac_authorized = false
+p_values_authorized = false
+jigsaw_evidence_authorized = false
+state_snapshot_authorized = false
+forecaster_authorized = false
+router_authorized = false
+qnty_authorized = false
+trading_authorized = false
+promotion_authorized = false
+capital_authority = "NONE"
+implementation_authorized = false
+next_action = "Exactly one future V0R3 prefix materialization run is authorized under the frozen one-row contract; no prefix materialization or scientific execution occurred in this governance phase."
+
+[[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R2_CLOSE_BOUNDARY_SOURCE_CONTRACT_REPAIR_V0"
 state = "CLOSED_PASS"
 authority_level = "SOURCE_CONTRACT_FEASIBILITY_ONLY"

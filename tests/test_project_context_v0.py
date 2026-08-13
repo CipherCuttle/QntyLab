@@ -180,8 +180,10 @@ def test_human_context_does_not_claim_no_queued_projects() -> None:
 def test_jh01_temporal_replication_v0_and_v0r1_are_closed_with_their_distinct_lineages_preserved() -> None:
     data = project_context.context_data(ROOT)
     _, _, registry = project_context.load_context_sources(ROOT)
-    assert sum(record["state"] == "ACTIVE" for record in registry["project"]) == 0
-    assert data["active_project"] is None
+    # JH01 temporal replication is fully closed; the sole ACTIVE project is the separately
+    # governed JFP historical execution authorization, not any JH01 lineage record.
+    assert sum(record["state"] == "ACTIVE" for record in registry["project"]) == 1
+    assert data["active_project"]["project_id"] == "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_HISTORICAL_EXECUTION_V0"
     execution = next(record for record in registry["project"] if record["project_id"] == "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0")
     assert execution["state"] == "CLOSED_BLOCKED"
     assert execution["authority_level"] == "FROZEN_REPLICATION_EXECUTION_INTERRUPTED_NO_RERUN"
@@ -296,6 +298,95 @@ def test_jh01_temporal_replication_v0_and_v0r1_are_closed_with_their_distinct_li
     assert harvest["next_action"] == "Jigsaw Harvest V0 is closed. Preserve its four bounded evidence pieces; no State Snapshot, Router, Qnty, or trading implementation is authorized by this phase."
 
 
+def test_jfp_historical_execution_v0_authorizes_only_jfp03_with_frozen_holm_family() -> None:
+    data = project_context.context_data(ROOT)
+    _, _, registry = project_context.load_context_sources(ROOT)
+    projects = {record["project_id"]: record for record in registry["project"]}
+
+    # exactly one ACTIVE project and it is the JFP historical execution project.
+    assert sum(record["state"] == "ACTIVE" for record in registry["project"]) == 1
+    assert data["active_project"]["project_id"] == "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_HISTORICAL_EXECUTION_V0"
+    execution = projects["JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_HISTORICAL_EXECUTION_V0"]
+    assert execution["state"] == "ACTIVE"
+    assert execution["authority_level"] == "FROZEN_HISTORICAL_EXECUTION_ONLY"
+    assert execution["implementation_authorized"] is True
+
+    # frozen digests bind byte-for-byte to the already-closed prereg/census/materialization phases.
+    prereg = projects["JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_PREREG_V0"]
+    materialization = projects["JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_INPUT_MATERIALIZATION_V0"]
+    assert materialization["state"] == "CLOSED_PASS"
+    assert prereg["state"] == "CLOSED_PASS"
+    assert execution["frozen_preregistration_digest"] == "9e9236b34b131c13cebfb0b8043ef59043b2928fa6fcd88dd7b10909d9e8ccfe"
+    assert execution["frozen_preregistration_digest"] == materialization["frozen_preregistration_digest"]
+    assert execution["frozen_candidate_census_digest"] == "d718dc1c60ceccdbd7a836a1e07b911a51511456289c09d7ff9b8c6af452df94"
+    assert execution["frozen_materialization_request_digest"] == materialization["frozen_materialization_request_digest"] == "97026d1a2fadfde7babf7f0c6c7802db6cbc8e92aa55c3b8a7e3d23d1e8456dc"
+    assert execution["frozen_input_qualification_digest"] == materialization["frozen_input_qualification_digest"] == "472ef1da4ab7ab2fe5f98aa85fa1c24b666d40bea5aae6b390bcf0627ed60727"
+    assert execution["frozen_input_snapshot_id"] == materialization["frozen_input_snapshot_id"] == "jfp-input-v0-9dab9e5f71242116206b30ea61d3b217e760dd43d176022d80c4a43c7153712f"
+    assert execution["frozen_input_snapshot_digest"] == materialization["frozen_input_snapshot_digest"] == "9dab9e5f71242116206b30ea61d3b217e760dd43d176022d80c4a43c7153712f"
+    assert execution["frozen_materialization_dispositions"] == materialization["state_dispositions"] == "JFP01=BLOCKED_CANDIDATE,JFP02=BLOCKED_CANDIDATE,JFP03=READY"
+
+    # materialization artifacts are unchanged: JFP03 is READY with exactly 60 authenticated objects,
+    # and JFP01/JFP02 remain candidate-local BLOCKED_CANDIDATE with no scientific outcome access.
+    qualification = json.loads((ROOT / "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/input_qualification.json").read_text(encoding="utf-8"))
+    assert qualification["input_qualification_digest"] == execution["frozen_input_qualification_digest"]
+    assert qualification["execution_authorized"] is False
+    by_candidate = {row["candidate_id"]: row for row in qualification["ordered_candidates"]}
+    assert by_candidate["JFP01"]["disposition"] == "BLOCKED_CANDIDATE"
+    assert by_candidate["JFP02"]["disposition"] == "BLOCKED_CANDIDATE"
+    assert by_candidate["JFP03"]["disposition"] == "READY"
+    assert by_candidate["JFP03"]["authenticated_object_count"] == 60
+    assert execution["jfp03_ready_authenticated_object_count"] == 60
+
+    # execution authority is JFP03-only; JFP01/JFP02 execution is explicitly denied.
+    assert execution["execution_candidate_ids"] == ["JFP03"]
+    assert execution["jfp01_execution_authorized"] is False
+    assert execution["jfp02_execution_authorized"] is False
+    assert execution["jfp03_execution_authorized"] is True
+
+    # the frozen three-hypothesis Holm family cannot be shrunk, and blocked candidates
+    # never receive a fabricated raw p-value.
+    assert execution["holm_family_size"] == 3
+    assert execution["jfp03_raw_alpha_threshold"] == "0.05/3"
+    assert execution["jfp03_holm_rule"] == "holm_adjusted_p_JFP03 = min(1.0, 3.0 * raw_p_JFP03)"
+    assert "raw_p_value = null" in execution["blocked_candidate_multiplicity_semantics"]
+    assert "must never be recorded as raw p = 1" in execution["blocked_candidate_multiplicity_semantics"]
+
+    # one-shot execution semantics: executor must freeze before real access, at most one real
+    # execution is allowed, and a post-access rerun requires superseding governance.
+    assert execution["input_reacquisition_authorized"] is False
+    assert execution["real_execution_count_allowed"] == 1
+    assert execution["executor_freeze_required_before_real_access"] is True
+    assert execution["post_access_rerun_authorized"] is False
+    assert "superseding git-backed governance" in execution["next_action"].lower()
+    assert "family from 3 to 1" in execution["next_action"].lower()
+
+    # every downstream authority remains false/NONE for this governance-only phase.
+    for field in (
+        "jigsaw_evidence_authorized",
+        "jigsaw_index_mutation_authorized",
+        "synthesis_mutation_authorized",
+        "prospective_deployment_authorized",
+        "state_snapshot_authorized",
+        "forecaster_authorized",
+        "router_authorized",
+        "qnty_authorized",
+        "shadow_deployment_authorized",
+        "paper_trading_authorized",
+        "trading_authorized",
+        "promotion_authorized",
+    ):
+        assert execution[field] is False, field
+    assert execution["capital_authority"] == "NONE"
+
+    # the frozen preregistration and candidate census remain byte-unchanged.
+    census = json.loads((ROOT / "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/candidate_census.json").read_text(encoding="utf-8"))
+    assert census["candidate_census_digest"] == execution["frozen_candidate_census_digest"]
+    assert census["candidate_ids"] == ["JFP01", "JFP02", "JFP03"]
+
+    # registry invariants remain valid.
+    assert data["authority_conflicts_or_warnings"] == []
+
+
 def test_closed_harvest_does_not_authorize_state_snapshot() -> None:
     data = project_context.context_data(ROOT)
     _, _, registry = project_context.load_context_sources(ROOT)
@@ -387,8 +478,10 @@ def test_jh01_jigsaw_evidence_authorization_v0_is_governance_only_and_binds_v0r1
 
     # (10) project-context/state invariants remain valid: registry validation and the doctor pass clean.
     assert data["authority_conflicts_or_warnings"] == []
-    assert sum(record["state"] == "ACTIVE" for record in registry["project"]) == 0
-    assert data["active_project"] is None
+    # This JH01 governance phase is closed; the sole ACTIVE project is the separately governed
+    # JFP historical execution authorization, not this phase or any JH01 lineage record.
+    assert sum(record["state"] == "ACTIVE" for record in registry["project"]) == 1
+    assert data["active_project"]["project_id"] == "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_HISTORICAL_EXECUTION_V0"
     for forbidden_text in (
         "narrowest truthful representation",
         "no scientific rerun, recomputation, or input reacquisition is authorized",

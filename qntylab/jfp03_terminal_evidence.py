@@ -11,10 +11,11 @@ import csv
 import hashlib
 import io
 import json
+import math
 import zipfile
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 from .research_ledger import canonical_bytes
 
@@ -109,6 +110,17 @@ def _time(ms: int) -> str:
     return datetime.fromtimestamp(ms / 1000, UTC).isoformat().replace("+00:00", "Z")
 
 
+def _denominator_violation(total_raw: Any, taker_raw: Any) -> bool:
+    """Mirror the frozen AFI input order without computing AFI itself."""
+    try:
+        total, taker = float(total_raw), float(taker_raw)
+    except (TypeError, ValueError) as exc:
+        raise SourceProofError("AFI inputs must be finite") from exc
+    if not math.isfinite(total) or not math.isfinite(taker):
+        raise SourceProofError("AFI inputs must be finite")
+    return total <= 0
+
+
 def census(root: Path, *, source_root: Path) -> dict[str, Any]:
     """Authenticate all V0R3 objects and census each exact AFI decision row."""
     verified = _verify_metadata(root)
@@ -128,9 +140,12 @@ def census(root: Path, *, source_root: Path) -> dict[str, Any]:
     if len(schedule) != OBSERVATION_COUNT: raise SourceProofError("frozen decision schedule drift")
     violations = []
     for boundary in schedule:
-        try: row, identity, digest = by_boundary[boundary]; total = float(row[7]); taker = float(row[10])
-        except (KeyError, TypeError, ValueError, IndexError) as exc: raise SourceProofError("required AFI row unavailable or malformed") from exc
-        if not total > 0:
+        try:
+            row, identity, digest = by_boundary[boundary]
+            denominator_violation = _denominator_violation(row[7], row[10])
+        except (KeyError, IndexError) as exc:
+            raise SourceProofError("required AFI row unavailable or malformed") from exc
+        if denominator_violation:
             violations.append({"decision_time": _time(boundary), "close_boundary_ms": boundary, "source_role": identity["source_role"], "source_object_digest": digest, "source_member": (identity.get("archive_member_names") or [None])[0], "total_quote_volume_raw": row[7], "taker_buy_quote_volume_raw": row[10]})
     violations.sort(key=lambda v: (v["close_boundary_ms"], v["source_object_digest"]))
     proof = {"schema_version": "jfp03-afi-source-proof-v0", "frozen_observation_domain": "every canonical JFP03 decision boundary from 2020-01-01T00:00:00Z through 2024-12-31T23:00:00Z inclusive at 1h", "required_afi_rows_inspected": len(schedule), "source_object_count_authenticated": len(verified["objects"]), "source_manifest_digest": verified["manifest_digest"], "snapshot_digest": SNAPSHOT_DIGEST, "qualification_digest": QUALIFICATION_DIGEST, "terminal_result_digest": RESULT_DIGEST, "denominator_validity_condition": "total_quote_volume > 0", "violations": violations, "violation_count": len(violations), "source_reacquisition": False}

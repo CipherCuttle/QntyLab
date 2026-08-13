@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from qntylab.jfp03_terminal_evidence import SourceProofError, census
+from qntylab.jfp03_terminal_evidence import SourceProofError, _denominator_violation, census
 
 
 ROOT = Path(__file__).parents[1]
@@ -28,3 +28,29 @@ def test_missing_source_object_fails_closed(tmp_path):
 def test_source_algorithm_has_no_expected_historical_row_literal():
     implementation = (ROOT / "qntylab/jfp03_terminal_evidence.py").read_text(encoding="utf-8")
     assert "2024-10-28" not in implementation
+
+
+@pytest.mark.parametrize(
+    ("total", "expected"),
+    [("1", False), ("0", True), ("-1", True)],
+)
+def test_denominator_contract_for_finite_totals(total, expected):
+    assert _denominator_violation(total, "0") is expected
+
+
+@pytest.mark.parametrize(
+    ("total", "taker"),
+    [
+        ("nan", "0"),
+        ("inf", "0"),
+        ("-inf", "0"),
+        ("1", "nan"),
+        ("1", "inf"),
+        ("1", "-inf"),
+        ("not-a-number", "0"),
+        ("1", "not-a-number"),
+    ],
+)
+def test_nonfinite_or_malformed_afi_input_fails_closed(total, taker):
+    with pytest.raises(SourceProofError, match="AFI inputs must be finite"):
+        _denominator_violation(total, taker)

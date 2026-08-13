@@ -55,7 +55,7 @@ def receipt_is_valid(receipt: Mapping[str, Any], origin: datetime) -> bool:
         persisted = parse_time(str(receipt["persistence_time"]))
     except (KeyError, TypeError, ValueError):
         return False
-    return persisted < origin + FORECAST_HORIZON
+    return origin <= persisted < origin + FORECAST_HORIZON
 
 
 def assess(freeze_time: str, receipts: Iterable[Mapping[str, Any]]) -> dict[str, Any]:

@@ -51,10 +51,18 @@ def test_elapsed_origin_without_receipt_blocks() -> None:
     assert result["materialization_authorized"] is False
 
 
-def test_valid_immutable_receipt_before_target_is_accepted() -> None:
+def test_persistence_window_accepts_only_origin_through_pre_target() -> None:
     origin = "2026-07-20T00:00:00Z"
-    result = gate.assess("2026-07-21T00:00:00Z", (receipt(origin, persistence_time="2026-07-20T23:59:59Z"),))
-    assert result["prospective_integrity"] == "ESTABLISHED"
+    for time in ("2026-07-20T00:00:00Z", "2026-07-20T00:00:01Z", "2026-07-20T23:59:59Z"):
+        result = gate.assess("2026-07-21T00:00:00Z", (receipt(origin, persistence_time=time),))
+        assert result["prospective_integrity"] == "ESTABLISHED"
+
+
+def test_pre_origin_persistence_is_rejected_even_before_target() -> None:
+    origin = "2026-07-20T00:00:00Z"
+    for time in ("2026-07-19T23:59:59Z", "2026-07-01T00:00:00Z"):
+        result = gate.assess("2026-07-21T00:00:00Z", (receipt(origin, persistence_time=time),))
+        assert result["materialization_authorized"] is False
 
 
 def test_receipt_at_or_after_target_is_rejected() -> None:
@@ -83,7 +91,7 @@ def test_wrong_candidate_or_origin_is_rejected() -> None:
 
 def test_partial_coverage_and_one_missing_of_twenty_four_block() -> None:
     elapsed = gate.assess("2026-08-13T00:13:11Z", ())["pre_freeze_origins"]
-    receipts = tuple(receipt(origin, persistence_time="2026-07-20T00:00:00Z") for origin in elapsed[:-1])
+    receipts = tuple(receipt(origin, persistence_time=origin) for origin in elapsed[:-1])
     result = gate.assess("2026-08-13T00:13:11Z", receipts)
     assert result["missing_pre_target_forecast_origins"] == (elapsed[-1],)
     assert result["materialization_authorized"] is False

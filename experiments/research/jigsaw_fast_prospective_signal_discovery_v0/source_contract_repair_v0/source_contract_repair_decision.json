@@ -1,0 +1,20 @@
+{
+  "artifact_type": "JFP03_V0R1_SOURCE_CONTRACT_REPAIR_DECISION",
+  "project_id": "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_SOURCE_CONTRACT_REPAIR_V0",
+  "decision": "SOURCE_CONTRACT_REPAIR = PASS",
+  "basis": "The exact first-party USD-M REST kline fallback provides the missing 2019-12-02..2019-12-31 1h warm-up with documented Binance kline semantics and a deterministic pre-outcome response-identity rule.",
+  "source_precedence_frozen": true,
+  "original_60_mutated": false,
+  "original_blocked_history_mutated": false,
+  "scientific_execution_occurred": false,
+  "materialization_authorized": false,
+  "historical_execution_authorized": false,
+  "jigsaw_evidence_created": false,
+  "qnty_touched": false,
+  "qnty_agent_eval_compatibility_check": "NO_MATCH",
+  "qnty_agent_eval_authority_used": false,
+  "next_phase": "A separate Git-backed materialization authorization is required; this PASS does not make inputs ready or authorize JFP03 execution.",
+  "hostile_review_count": 1,
+  "critical_count": 0,
+  "high_count": 0
+}

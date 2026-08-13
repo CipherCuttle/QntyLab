@@ -586,3 +586,62 @@ def test_jh01_jigsaw_evidence_authorization_v0_is_governance_only_and_binds_v0r1
     ):
         assert forbidden_text in authorization["next_action"].lower()
     assert all(item["project_id"] != "QNTY_HANDOFF" or "No implementation is authorized" in item["next_action"] for item in data["queued_but_unauthorized_projects"])
+
+
+def test_jfp03_terminal_evidence_extraction_authorization_is_governance_only_and_fail_closed() -> None:
+    data = project_context.context_data(ROOT)
+    _, _, registry = project_context.load_context_sources(ROOT)
+    projects = {record["project_id"]: record for record in registry["project"]}
+
+    authorization = projects["JIGSAW_TERMINAL_RESEARCH_EVIDENCE_EXTRACTION_AUTHORIZATION_V0"]
+    predecessor = projects[authorization["predecessor_project_id"]]
+
+    assert authorization["state"] == "CLOSED_PASS"
+    assert authorization["authority_level"] == "GOVERNANCE_AUTHORIZATION_ONLY"
+    assert authorization["phase_type"] == "GOVERNANCE_ONLY"
+    assert authorization["implementation_authorized"] is False
+    assert data["active_project"] is None
+    assert not any(record["project_id"] == authorization["project_id"] for record in data["queued_but_unauthorized_projects"])
+
+    assert authorization["terminal_result_path"] == predecessor["result_path"]
+    assert authorization["terminal_result_digest"] == predecessor["result_digest"]
+    assert authorization["terminal_claim_digest"] == predecessor["claim_digest"]
+    assert authorization["terminal_classification"] == predecessor["terminal_classification"] == "BLOCKED_CANDIDATE"
+    assert authorization["frozen_snapshot_id"] == predecessor["bound_snapshot_id"]
+    assert authorization["frozen_snapshot_digest"] == predecessor["bound_snapshot_digest"]
+    assert authorization["frozen_qualification_digest"] == predecessor["bound_qualification_digest"]
+    assert authorization["integrity_failure"] == predecessor["integrity_failure"]
+    assert authorization["scientific_values_are_null"] is True
+
+    for field in (
+        "scientific_execution_authorized",
+        "replay_authorized",
+        "rerun_authorized",
+        "rescue_run_authorized",
+        "input_reacquisition_authorized",
+        "frozen_result_mutation_authorized",
+        "jigsaw_evidence_mutation_authorized",
+        "jigsaw_index_mutation_authorized",
+        "synthesis_mutation_authorized",
+        "state_snapshot_authorized",
+        "forecaster_authorized",
+        "router_authorized",
+        "qnty_authorized",
+        "paper_trading_authorized",
+        "trading_authorized",
+        "promotion_authorized",
+    ):
+        assert authorization[field] is False, field
+    assert authorization["capital_authority"] == authorization["downstream_authority"] == "NONE"
+
+    action = authorization["next_action"].lower()
+    for required_text in (
+        "exactly one later, separately git-backed bounded implementation phase",
+        "independently re-establish the exact afi denominator failure from authenticated frozen source bytes",
+        "existing jigsaw-evidence-piece-v0 schema without changing jigsaw_index.py",
+        "stop and report the invariant that fails",
+        "must never be laundered into negative scientific evidence",
+        "does not authorize a second failure-mode piece",
+        "must not pre-authorize a schema change",
+    ):
+        assert required_text in action

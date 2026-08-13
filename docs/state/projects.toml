@@ -1,6 +1,70 @@
 schema_version = 1
 
 [[project]]
+project_id = "JIGSAW_TERMINAL_RESEARCH_EVIDENCE_EXTRACTION_AUTHORIZATION_V0"
+display_name = "JFP03 blocked-terminal Jigsaw evidence extraction authorization"
+state = "CLOSED_PASS"
+authority_level = "GOVERNANCE_AUTHORIZATION_ONLY"
+phase_type = "GOVERNANCE_ONLY"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/execution/v0r1/historical_scientific_execution_result.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r3_source_manifest.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r3_input_snapshot.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r3_input_qualification.json",
+]
+predecessor_project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_HISTORICAL_SCIENTIFIC_EXECUTION_V0"
+terminal_result_path = "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/execution/v0r1/historical_scientific_execution_result.json"
+terminal_result_digest = "aa42724ef37466babaf7fb81a44524fe9568d8679d0a2cf967ee9faaf9ae6dbb"
+terminal_claim_digest = "c2a0135a320c26e293d86d9ccbbf80553ee5f863be05d7184fab5074ad84038a"
+terminal_classification = "BLOCKED_CANDIDATE"
+frozen_snapshot_id = "jfp-input-v0r3-24311649d541c28d068addc2fc76121d614a11f0f191581c7dd988ba0b99c69f"
+frozen_snapshot_digest = "24311649d541c28d068addc2fc76121d614a11f0f191581c7dd988ba0b99c69f"
+frozen_qualification_digest = "420b0a4a84a57814d13393eb008affc05eb81223e06a9cf4a86c7772bc8bef5d"
+integrity_failure = "AFI total quote-volume denominator must be positive"
+scientific_values_are_null = true
+scientific_execution_authorized = false
+replay_authorized = false
+rerun_authorized = false
+rescue_run_authorized = false
+input_reacquisition_authorized = false
+frozen_result_mutation_authorized = false
+jigsaw_evidence_mutation_authorized = false
+jigsaw_index_mutation_authorized = false
+synthesis_mutation_authorized = false
+state_snapshot_authorized = false
+forecaster_authorized = false
+router_authorized = false
+qnty_authorized = false
+paper_trading_authorized = false
+trading_authorized = false
+promotion_authorized = false
+capital_authority = "NONE"
+downstream_authority = "NONE"
+later_implementation_may_read = [
+  "the immutable JFP03 terminal result and execution/claim provenance necessary to authenticate it",
+  "the immutable V0R3 source manifest, input snapshot, and input qualification",
+  "authenticated frozen source bytes already present under the frozen snapshot",
+  "current jigsaw-evidence-piece-v0 schema examples and qntylab/evidence_claim_split.py",
+  "qntylab/jigsaw_index.py and qntylab/jigsaw_synthesis.py only to understand deterministic derived-state obligations",
+]
+later_implementation_may_write_if_supported = [
+  "exactly one bounded canonical Jigsaw evidence representation of the established JFP03 feature/applicability failure",
+  "a deterministic Jigsaw index rebuild required by existing repository mechanics",
+  "a deterministic synthesis artifact rebuild required merely to keep derived state current",
+  "project, roadmap, and focused test state necessary for that bounded implementation",
+]
+later_implementation_must_resolve = [
+  "SOURCE_PROOF: independently re-establish from authenticated frozen source bytes the exact fact responsible for the terminal AFI denominator failure; if this cannot be established exactly, stop without manufacturing Jigsaw evidence",
+  "EXISTING_SCHEMA_FIT: determine whether the narrow applicability/failure proposition fits jigsaw-evidence-piece-v0 without changing jigsaw_index.py; if not, stop and report the representational invariant rather than extending the schema",
+  "NON_ESCALATION: preserve BLOCKED_CANDIDATE as a narrow applicability/computability fact within the exact frozen sample, never as a claim about AFI predictive value, gamma, sign, magnitude, significance, economics, causality, trading, or live policy",
+  "AUTHORITY: any later piece remains promotion_eligible=false with causal, strategy, router, state_snapshot, qnty, and trading authority all NONE",
+]
+implementation_authorized = false
+next_action = "This governance phase authorizes exactly one later, separately Git-backed bounded implementation phase. This phase itself creates no Jigsaw evidence, performs no Jigsaw index or synthesis mutation, and does not modify the JFP03 result, executor, preregistration, design, source objects, V0R3 snapshot, qualification, State Snapshot, Forecaster, Router, Qnty, trading, promotion, or capital authority. Before any later evidence write, the implementation MUST independently re-establish the exact AFI denominator failure from authenticated frozen source bytes; chat or handoff assertions, including any source-row timestamp, are not authority. It MUST first prove truthful fit in the existing jigsaw-evidence-piece-v0 schema without changing jigsaw_index.py, or stop and report the invariant that fails. The only permissible evidence proposition is the narrow established applicability/computability fact within the exact frozen JFP03 sample; BLOCKED_CANDIDATE must never be laundered into negative scientific evidence or any claim about AFI predictive value, gamma, statistical or economic significance, causality, strategy, trading, or live feature policy. No scientific execution, re-execution, replay, rescue, input reacquisition, frozen-result or frozen-snapshot mutation, or scientific reinterpretation is authorized. Any later evidence must remain promotion_eligible=false with causal, strategy, Router, State Snapshot, Qnty, and trading authority NONE. Engineering validation-order knowledge is not scientific evidence and does not authorize a second failure-mode piece. The later phase may write at most one existing-schema-compatible evidence representation, plus deterministic index and synthesis rebuilds only if existing mechanics require them; it must not pre-authorize a schema change."
+
+[[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_HISTORICAL_SCIENTIFIC_EXECUTION_V0"
 display_name = "JFP03 V0R1 one-shot historical scientific execution"
 state = "CLOSED_BLOCKED"

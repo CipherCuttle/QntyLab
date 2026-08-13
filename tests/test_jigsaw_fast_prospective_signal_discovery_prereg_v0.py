@@ -66,8 +66,12 @@ def test_input_materialization_authorization_is_exact_and_non_escalating():
     preregistration = load_json("preregistration.json")
     census = load_json("candidate_census.json")
 
-    assert len(active) == 0
-    assert data["active_project"] is None
+    # Input materialization is closed; the sole ACTIVE project is the separately governed
+    # JFP historical execution authorization, not this closed materialization phase.
+    assert len(active) == 1
+    assert active[0]["project_id"] == "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_HISTORICAL_EXECUTION_V0"
+    assert data["active_project"]["project_id"] == "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_HISTORICAL_EXECUTION_V0"
+    assert authorization["state"] == "CLOSED_PASS"
     assert authorization["authority_level"] == "INPUT_MATERIALIZATION_ONLY"
     assert authorization["phase_type"] == "GOVERNANCE_ONLY"
     assert authorization["implementation_authorized"] is False

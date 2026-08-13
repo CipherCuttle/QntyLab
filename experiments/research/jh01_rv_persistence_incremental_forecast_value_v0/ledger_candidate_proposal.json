@@ -1,0 +1,32 @@
+{
+  "event_type": "CANDIDATE_PROPOSED",
+  "candidate_id": "CANDIDATE_JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_V0",
+  "family_id": "FAMILY_JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_V0",
+  "variant_id": "variant_7ae666268986548df0cac7c2",
+  "strategy_id": "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE",
+  "strategy_version": "V0",
+  "objective": "Freeze a single outcome-unseen test of whether fitted JH01 RV24 persistence materially improves 24-hour realized-volatility forecasts over literal naive persistence.",
+  "origin": "Git-backed JH01 discovery and temporal-replication evidence; this is a new forecast-value preregistration, not a replication or strategy trial.",
+  "mechanism": "One expanding-window fitted one-lag RV24 forecast against frozen simple benchmarks, with no model, horizon, loss, panel, or subgroup search.",
+  "prediction": "C_JH01 may earn the stated narrow classification only by clearing every preregistered MSE, materiality, and adjusted-MSPE gate; all outcomes are retained.",
+  "required_data": "A separately authorized, outcome-unseen prospective exact 20-symbol 1h OHLCV input ending after the fixed 2027-07-19 test window; no input is acquired by this phase.",
+  "decision_time": "P1D at 00:00:00Z after all feature bars are safe-known; target begins one hour later.",
+  "execution_time": "No execution is authorized. A separately Git-backed prospective input/materialization and evaluator authorization is required after this preregistration.",
+  "benchmark": "Primary B1 literal naive persistence; B0 historical mean and B3 1/7/30 HAR-RV-style are fixed secondary reports; B2 is redundant with C_JH01.",
+  "parameters": {
+    "phase": "PREREGISTRATION_ONLY",
+    "preregistration_digest": "324279bf493db3862be875e4aca13d78b4feb2cc5f4b11ad39aecb2a4fac3686",
+    "source_piece_identity": "JH01_RV_PERSISTENCE",
+    "target": "RV24_FUTURE_UNTRANSFORMED_24H",
+    "candidate": "FITTED_ONE_LAG_RV24_OLS_EXPANDING",
+    "primary_benchmark": "NAIVE_PERSISTENCE",
+    "prospective_window": "2026-07-20T00:00:00Z..2027-07-19T00:00:00Z",
+    "execution_authorized": false
+  },
+  "mode": "measurement_only_preregistration",
+  "bar_interval": "1h",
+  "required_input_kind": "UNACQUIRED_PROSPECTIVE_OHLCV_1H",
+  "funding_boundary_mode": "NOT_APPLICABLE",
+  "failure_condition": "If the primary gates fail, preserve JH01 persistence evidence but classify no incremental forecast value found; do not rescue using another transform, horizon, metric, panel, baseline, or window.",
+  "recorded_at_utc": "2026-08-13T00:00:00Z"
+}

@@ -1,6 +1,35 @@
 schema_version = 1
 
 [[project]]
+project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_REPAIRED_SOURCE_MATERIALIZATION_V0"
+state = "CLOSED_PASS"
+authority_level = "INPUT_MATERIALIZATION_ONLY"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r1_repaired_source_materialization_authorization.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r2_repaired_source_manifest.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r2_input_snapshot.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r2_input_qualification.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r2_repaired_source_materialization_receipt.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r2_hostile_review.md",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r2_targeted_re_review.md",
+]
+phase_type = "INPUT_MATERIALIZATION_ONLY"
+bound_authorization_project = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_REPAIRED_SOURCE_MATERIALIZATION_AUTHORIZATION_V0"
+bound_design_digest = "a52d4999038e0be814ee8770322303fce84bed9ec8941b812748a18867633736"
+authorized_run_count = 1
+authorized_runs_consumed = 1
+materialization_performed = true
+input_qualification = "READY"
+scientific_execution_authorized = false
+scientific_execution_performed = false
+historical_execution_authorized = false
+qnty_authorized = false
+downstream_authority = "NONE"
+implementation_authorized = false
+next_action = "Input snapshot is READY and frozen; JFP03 scientific execution remains unauthorized and requires separate Git-backed authorization."
+
+[[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_REPAIRED_SOURCE_MATERIALIZATION_AUTHORIZATION_V0"
 state = "CLOSED_PASS"
 authority_level = "REPAIRED_SOURCE_MATERIALIZATION_AUTHORIZATION_ONLY"

@@ -11,11 +11,13 @@ from qntylab import jh01_v1_prospective_recorder_implementation_v0 as recorder
 
 ROOT = Path(__file__).resolve().parents[1]
 RESULT = ROOT / "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/prospective_recorder_and_input_materialization_implementation_v0.json"
+GO = Path("/tmp/qntylab-go-toolchain/go/bin/go")
+QUALIFICATION_ORIGIN = recorder.FIRST_LIVE_ORIGIN + timedelta(hours=1)
 PANEL = json.loads((ROOT / "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/preregistration.json").read_text())["frozen_target"]["ordered_20_symbol_panel"]
 
 
 def fixture_bars() -> tuple[recorder.Bar, ...]:
-    start, end = datetime(2025, 8, 15, tzinfo=UTC), datetime(2026, 9, 15, tzinfo=UTC)
+    start, end = datetime(2025, 8, 15, tzinfo=UTC), datetime(2026, 9, 15, 1, tzinfo=UTC)
     values = []
     hours = int((end - start).total_seconds() // 3600)
     for offset in range(hours + 1):
@@ -31,7 +33,7 @@ def bars() -> tuple[recorder.Bar, ...]: return fixture_bars()
 
 
 def test_frozen_fixture_recorder_implements_source_range_models_and_artifact(bars):
-    artifact = recorder.build_forecast_artifact(ROOT, bars, origin=recorder.FIRST_LIVE_ORIGIN, qualification_mode=True)
+    artifact = recorder.build_forecast_artifact(ROOT, bars, origin=QUALIFICATION_ORIGIN, qualification_mode=True)
     assert artifact["first_required_source_close"] == "2025-08-15T00:00:00Z"
     assert artifact["training_origin_count"] == 365
     assert artifact["training_first_origin"] == "2025-09-14T00:00:00Z"
@@ -43,12 +45,12 @@ def test_frozen_fixture_recorder_implements_source_range_models_and_artifact(bar
 
 
 def test_determinism_activation_and_origin_recovery(bars):
-    first = recorder.build_forecast_artifact(ROOT, bars, origin=recorder.FIRST_LIVE_ORIGIN, qualification_mode=True)
-    second = recorder.build_forecast_artifact(ROOT, bars, origin=recorder.FIRST_LIVE_ORIGIN, qualification_mode=True)
+    first = recorder.build_forecast_artifact(ROOT, bars, origin=QUALIFICATION_ORIGIN, qualification_mode=True)
+    second = recorder.build_forecast_artifact(ROOT, bars, origin=QUALIFICATION_ORIGIN, qualification_mode=True)
     assert recorder.canonical_bytes(first) == recorder.canonical_bytes(second)
     with pytest.raises(recorder.RecorderBlocked, match="REAL_V1_ACTIVATION_REQUIRED"):
-        recorder.build_forecast_artifact(ROOT, bars, origin=recorder.FIRST_LIVE_ORIGIN, qualification_mode=False)
-    existing = {"origin_identity": recorder.origin_identity(recorder.FIRST_LIVE_ORIGIN), "artifact_digest": first["forecast_artifact_canonical_digest"]}
+        recorder.build_forecast_artifact(ROOT, bars, origin=recorder.FIRST_LIVE_ORIGIN, qualification_mode=True)
+    existing = {"origin_identity": recorder.origin_identity(QUALIFICATION_ORIGIN), "artifact_digest": first["forecast_artifact_canonical_digest"]}
     assert recorder.recover_publication(existing, first) == "IDEMPOTENT_AUTHORITATIVE_RECOVERY"
     with pytest.raises(recorder.RecorderBlocked, match="different digest"):
         recorder.recover_publication({**existing, "artifact_digest": "0" * 64}, first)
@@ -63,16 +65,25 @@ def test_source_negative_matrix_fails_closed(bars, mutation):
     elif mutation == "open": changed[0] = recorder.Bar(changed[0].symbol, changed[0].logical_close, changed[0].close, changed[0].raw_row, False)
     elif mutation == "wrong_symbol": changed[0] = recorder.Bar("WRONG", changed[0].logical_close, changed[0].close, changed[0].raw_row)
     else: changed[0] = recorder.Bar(changed[0].symbol, changed[0].logical_close, changed[0].close, (0, *changed[0].raw_row[1:]))
-    with pytest.raises(recorder.RecorderBlocked): recorder.build_forecast_artifact(ROOT, changed, origin=recorder.FIRST_LIVE_ORIGIN, qualification_mode=True)
+    with pytest.raises(recorder.RecorderBlocked): recorder.build_forecast_artifact(ROOT, changed, origin=QUALIFICATION_ORIGIN, qualification_mode=True)
 
 
 def test_retention_package_is_complete_and_tamper_fails(bars, tmp_path):
-    forecast = recorder.build_forecast_artifact(ROOT, bars, origin=recorder.FIRST_LIVE_ORIGIN, qualification_mode=True)
+    forecast = recorder.build_forecast_artifact(ROOT, bars, origin=QUALIFICATION_ORIGIN, qualification_mode=True)
     manifest = recorder.retention_package(tmp_path, forecast=forecast, release_metadata={"informational": True}, bundle=b"fixture-bundle", trusted_root=b"fixture-root\n")
     assert set(manifest["files"]) == {"forecast.json", "release_metadata.json", "release_attestation.sigstore.json", "trusted_root.jsonl"}
     recorder.verify_retention_package(tmp_path)
     (tmp_path / "forecast.json").write_bytes(b"{}")
     with pytest.raises(recorder.RecorderBlocked): recorder.verify_retention_package(tmp_path)
+
+
+def test_qualified_v0r3_offline_verifier_runs_with_no_network():
+    recorder.offline_reverify_v0r3_qualified_package(ROOT, go_binary=GO)
+
+
+def test_direct_source_seam_rejects_reordered_frozen_panel(bars):
+    with pytest.raises(recorder.RecorderBlocked, match="wrong ordered panel"):
+        recorder.source_manifest(bars, panel=list(reversed(PANEL)), origin=QUALIFICATION_ORIGIN, first_required_close=datetime(2025, 8, 15, tzinfo=UTC))
 
 
 def test_qualification_receipt_preserves_frozen_inputs_and_blocks_real_v1():

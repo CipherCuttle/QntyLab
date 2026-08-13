@@ -13,7 +13,10 @@ from hashlib import sha256
 import inspect
 import json
 import math
+import os
 from pathlib import Path
+import subprocess
+import tempfile
 from typing import Any, Mapping, Sequence
 
 from . import jh01_rv_persistence_incremental_forecast_value_prereg_v1 as prereg
@@ -108,7 +111,7 @@ class Bar:
 
 
 def validate_bars(bars: Sequence[Bar], *, panel: Sequence[str], origin: datetime, first_required_close: datetime) -> tuple[Bar, ...]:
-    if tuple(panel) != tuple(panel) or len(panel) != 20 or len(set(panel)) != 20:
+    if tuple(panel) != tuple(_frozen_panel()) or len(panel) != 20 or len(set(panel)) != 20:
         raise RecorderBlocked("wrong ordered panel")
     seen: set[tuple[str, datetime]] = set()
     by_symbol: dict[str, list[Bar]] = {symbol: [] for symbol in panel}
@@ -148,6 +151,10 @@ def source_manifest(bars: Sequence[Bar], *, panel: Sequence[str], origin: dateti
     return {**value, "source_data_manifest_sha256": digest(value)}
 
 
+def _frozen_panel() -> tuple[str, ...]:
+    return ("ALICEUSDT", "APEUSDT", "API3USDT", "APTUSDT", "BCHUSDT", "CHRUSDT", "CHZUSDT", "ETCUSDT", "GMTUSDT", "INJUSDT", "LDOUSDT", "LINKUSDT", "LTCUSDT", "ONEUSDT", "OPUSDT", "REEFUSDT", "SANDUSDT", "TRXUSDT", "XLMUSDT", "XRPUSDT")
+
+
 def _prices(bars: Sequence[Bar], panel: Sequence[str]) -> dict[str, dict[datetime, float]]:
     result = {symbol: {} for symbol in panel}
     for bar in bars:
@@ -173,8 +180,6 @@ def rv24_future(prices: Mapping[str, Mapping[datetime, float]], panel: Sequence[
 
 
 def eligible_training_origins(origin: datetime) -> tuple[datetime, ...]:
-    if origin not in required_origins():
-        raise RecorderBlocked("origin outside frozen schedule")
     latest = origin - timedelta(days=2)  # o + 24h < t; equality at t is excluded.
     values = tuple(FIRST_LIVE_ORIGIN - timedelta(days=366) + timedelta(days=index) for index in range((latest - (FIRST_LIVE_ORIGIN - timedelta(days=366))).days + 1))
     if any(item + timedelta(hours=24) >= origin for item in values):
@@ -222,9 +227,11 @@ def compute_models(bars: Sequence[Bar], *, panel: Sequence[str], origin: datetim
     return {"C_JH01": {"alpha": c_alpha, "beta": c_beta, "raw_forecast": c_raw, "floored_forecast": max(0.0, c_raw)}, "B0": {"forecast": max(0.0, sum(target.values()) / len(target))}, "B1": {"forecast": prior[origin]}, "B3": {"alpha": b3_alpha, "daily_coefficient": b3_coefficients[0], "weekly_coefficient": b3_coefficients[1], "monthly_coefficient": b3_coefficients[2], "raw_forecast": b3_raw, "floored_forecast": max(0.0, b3_raw)}, "training_origin_count": len(training), "training_first_origin": _stamp(training[0]), "training_last_origin": _stamp(training[-1])}
 
 
-def build_forecast_artifact(root: Path, bars: Sequence[Bar], *, origin: datetime, qualification_mode: bool, real_v1_activation_authorized: bool = False) -> dict[str, Any]:
-    if not qualification_mode and not real_v1_activation_authorized:
+def build_forecast_artifact(root: Path, bars: Sequence[Bar], *, origin: datetime, qualification_mode: bool) -> dict[str, Any]:
+    if origin in required_origins():
         raise RecorderBlocked("REAL_V1_ACTIVATION_REQUIRED")
+    if not qualification_mode:
+        raise RecorderBlocked("QUALIFICATION_FIXTURE_MODE_REQUIRED")
     contract = frozen_contract(root); preregistration = contract["preregistration"]; repair = contract["repair"]
     panel = preregistration["frozen_target"]["ordered_20_symbol_panel"]
     first_required = _utc(repair["repair"]["repaired_first_required_source_close"])
@@ -244,6 +251,7 @@ def recover_publication(existing: Mapping[str, str] | None, artifact: Mapping[st
 
 
 def retention_package(path: Path, *, forecast: Mapping[str, Any], release_metadata: Mapping[str, Any], bundle: bytes, trusted_root: bytes) -> dict[str, Any]:
+    """Create a package; this does not itself assert Sigstore verification."""
     path.mkdir(parents=True, exist_ok=True)
     files = {"forecast.json": canonical_bytes(forecast), "release_metadata.json": canonical_bytes(release_metadata), "release_attestation.sigstore.json": bundle, "trusted_root.jsonl": trusted_root}
     for name, content in files.items(): (path / name).write_bytes(content)
@@ -253,8 +261,28 @@ def retention_package(path: Path, *, forecast: Mapping[str, Any], release_metada
 
 
 def verify_retention_package(path: Path) -> None:
+    """Verify package integrity only; timing/attestation authority is V0R3."""
     manifest = json.loads((path / "retention_manifest.json").read_text())
     expected = {name: sha256((path / name).read_bytes()).hexdigest() for name in manifest["files"]}
     if expected != manifest["files"]: raise RecorderBlocked("retention package digest mismatch")
     forecast = json.loads((path / "forecast.json").read_text())
     if forecast.get("forecast_artifact_canonical_digest") != digest({key: value for key, value in forecast.items() if key != "forecast_artifact_canonical_digest"}): raise RecorderBlocked("forecast artifact digest mismatch")
+
+
+def offline_reverify_v0r3_qualified_package(root: Path, *, go_binary: Path) -> None:
+    """Reuse the qualified V0R3 Sigstore policy under hard network isolation.
+
+    The V0R3 verifier is intentionally frozen to its retained release evidence;
+    this integration qualification proves the real verifier path without
+    claiming that arbitrary fixture bundles are cryptographically verified.
+    """
+    qualified = root / "qualifications/jh01_v0r3"
+    with tempfile.TemporaryDirectory(prefix="qntylab-jh01-v0r3-") as temporary:
+        executable = Path(temporary) / "verify-v0r3"
+        build = subprocess.run([str(go_binary), "build", "-o", str(executable), "."], cwd=qualified, capture_output=True, text=True, env={**os.environ, "GOPROXY": "off"})
+        if build.returncode:
+            raise RecorderBlocked("V0R3 verifier build failed")
+        retained = qualified / "retention"
+        run = subprocess.run(["bwrap", "--unshare-net", "--ro-bind", "/", "/", "--dev", "/dev", "--proc", "/proc", "--", str(executable), str(retained / "forecast.json"), str(retained / "trusted_root.jsonl"), str(retained / "release_attestation.sigstore.json")], capture_output=True, text=True)
+        if run.returncode:
+            raise RecorderBlocked("V0R3 offline Sigstore policy rejected retained package")

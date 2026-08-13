@@ -24,7 +24,7 @@ def _tracked_root(tmp_path: Path) -> Path:
     return root
 
 
-def _adr_registry(*, second_global: bool = False, path: str = "docs/ADR/one.md", supersession: list[dict[str, str]] | None = None) -> dict:
+def _adr_registry(*, second_global: bool = False, companions: int = 0, path: str = "docs/ADR/one.md", supersession: list[dict[str, str]] | None = None) -> dict:
     return {
         "schema_version": 1,
         "adr": [
@@ -33,10 +33,11 @@ def _adr_registry(*, second_global: bool = False, path: str = "docs/ADR/one.md",
                 "adr_id": "ADR-0002",
                 "path": "docs/ADR/two.md",
                 "status": "CURRENT_GLOBAL",
-                "authority_scope": "GLOBAL",
+                "authority_scope": "GLOBAL_ARCHITECTURE",
             },
         ]
-        + ([{"adr_id": "ADR-0003", "path": "docs/ADR/one.md", "status": "CURRENT_GLOBAL", "authority_scope": "GLOBAL"}] if second_global else []),
+        + ([{"adr_id": "ADR-0003", "path": "docs/ADR/one.md", "status": "CURRENT_GLOBAL", "authority_scope": "GLOBAL_ARCHITECTURE"}] if second_global else [])
+        + [{"adr_id": f"ADR-COMPANION-{index}", "path": "docs/ADR/one.md", "status": "CURRENT_GLOBAL_COMPANION", "authority_scope": "GLOBAL_RESEARCH_DESIGN_PHILOSOPHY"} for index in range(companions)],
         "supersession": supersession or [],
     }
 
@@ -61,6 +62,26 @@ def test_exactly_one_current_global_adr_passes(tmp_path: Path) -> None:
 def test_duplicate_current_global_fails(tmp_path: Path) -> None:
     with pytest.raises(project_context.ProjectContextError, match="exactly one CURRENT_GLOBAL"):
         project_context.validate_adr_registry(_tracked_root(tmp_path), _adr_registry(second_global=True))
+
+
+def test_zero_current_global_fails_even_with_companion(tmp_path: Path) -> None:
+    registry = _adr_registry(companions=1)
+    registry["adr"][1]["status"] = "CURRENT_GLOBAL_COMPANION"
+    with pytest.raises(project_context.ProjectContextError, match="exactly one CURRENT_GLOBAL"):
+        project_context.validate_adr_registry(_tracked_root(tmp_path), registry)
+
+
+def test_one_global_and_multiple_companions_pass(tmp_path: Path) -> None:
+    adrs = project_context.validate_adr_registry(_tracked_root(tmp_path), _adr_registry(companions=2))
+    assert adrs["ADR-0002"]["status"] == "CURRENT_GLOBAL"
+    assert [record["adr_id"] for record in adrs.values() if record["status"] == "CURRENT_GLOBAL_COMPANION"] == ["ADR-COMPANION-0", "ADR-COMPANION-1"]
+
+
+def test_companion_cannot_claim_architecture_scope(tmp_path: Path) -> None:
+    registry = _adr_registry(companions=1)
+    registry["adr"][-1]["authority_scope"] = "GLOBAL_ARCHITECTURE"
+    with pytest.raises(project_context.ProjectContextError, match="COMPANION.*GLOBAL_ARCHITECTURE"):
+        project_context.validate_adr_registry(_tracked_root(tmp_path), registry)
 
 
 def test_broken_and_escaping_adr_paths_fail(tmp_path: Path) -> None:
@@ -137,6 +158,17 @@ def test_json_is_byte_stable_for_identical_state() -> None:
     second = subprocess.run(command, cwd=ROOT, check=True, capture_output=True).stdout
     assert first == second
     assert json.loads(first)["current_global_adr"]["adr_id"] == "ADR-0005"
+    assert [item["adr_id"] for item in json.loads(first)["current_global_companions"]] == ["ADR-0006"]
+
+
+def test_canonical_companion_is_current_but_not_architecture_authority() -> None:
+    data = project_context.context_data(ROOT)
+    assert data["current_global_adr"]["adr_id"] == "ADR-0005"
+    assert data["current_global_companions"] == [{
+        "adr_id": "ADR-0006",
+        "path": "docs/ADR/0006-qntylab-research-design-philosophy.md",
+        "authority_scope": "GLOBAL_RESEARCH_DESIGN_PHILOSOPHY",
+    }]
 
 
 def test_human_context_does_not_claim_no_queued_projects() -> None:

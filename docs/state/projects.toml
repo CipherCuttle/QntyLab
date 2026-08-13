@@ -1178,6 +1178,40 @@ implementation_authorized = false
 next_action = "CLOSED_PASS: this governance-only repair supersedes only the historical derived first-required-bar boundary for later recorder/source implementation. It grants no new implementation, collection, evaluation, Jigsaw, State Snapshot, Router, Qnty, trading, or promotion authority; the V0R3 one-later-phase authorization remains unconsumed."
 
 [[project]]
+project_id = "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_V1_PROSPECTIVE_RECORDER_AND_INPUT_MATERIALIZATION_IMPLEMENTATION_V0"
+display_name = "JH01 V1 prospective recorder and input materialization implementation V0"
+state = "CLOSED_PASS"
+authority_level = "PROSPECTIVE_RECORDER_IMPLEMENTATION_QUALIFIED_PENDING_SEPARATE_REAL_V1_ACTIVATION_AUTHORIZATION"
+phase_type = "IMPLEMENTATION_QUALIFICATION"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/prospective_recorder_and_input_materialization_implementation_v0.json",
+  "qntylab/jh01_v1_prospective_recorder_implementation_v0.py",
+  "tests/test_jh01_v1_prospective_recorder_implementation_v0.py",
+]
+predecessor_project_id = "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_V1_GITHUB_RELEASE_ATTESTATION_OFFLINE_POLICY_QUALIFICATION_V0R3"
+frozen_preregistration_digest = "bdb85130cae75e9f156db9aa1fd955d7f565a3714ae091871d5ac4447c1ec27b"
+corrected_first_required_source_close = "2025-08-15T00:00:00Z"
+recorder_implementation_qualified = true
+v0r3_implementation_authorization_consumed = true
+real_v1_collection_authorized = false
+market_data_acquired = false
+held_out_outcomes_accessed = false
+forecast_execution_performed = false
+scientific_evaluation_performed = false
+interim_metrics_computed = false
+jigsaw_mutated = false
+state_snapshot_authorized = false
+router_authorized = false
+qnty_authorized = false
+trading_authorized = false
+promotion_authorized = false
+ledger_changed = false
+implementation_authorized = false
+next_action = "CLOSED_PASS: the single V0R3-authorized fixture-only recorder implementation/qualification phase is consumed and qualified. A separate Git-backed operational readiness/real-V1 activation authorization is required before any real collection or forecast; no scientific evaluation, Jigsaw, State Snapshot, Router, Qnty, trading, or promotion authority exists."
+
+[[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_PREREG_V0"
 state = "CLOSED_PASS"
 authority_level = "OUTCOME_BLIND_PREREGISTRATION_ONLY"

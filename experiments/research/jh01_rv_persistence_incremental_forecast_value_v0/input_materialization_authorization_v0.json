@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "project_id": "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_INPUT_MATERIALIZATION_AUTHORIZATION_V0",
+  "state": "CLOSED_BLOCKED",
+  "authority_level": "GOVERNANCE_AUTHORIZATION_BLOCKED_BY_PROSPECTIVE_INTEGRITY",
+  "phase_type": "GOVERNANCE_ONLY",
+  "frozen_preregistration": {
+    "project_id": "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_PREREG_V0",
+    "path": "experiments/research/jh01_rv_persistence_incremental_forecast_value_v0/preregistration.json",
+    "sha256": "20bd204a0a78ef5810e7350e055d7ebb4e1368381ac65fda7acf4476a6068d1b",
+    "preregistration_digest": "324279bf493db3862be875e4aca13d78b4feb2cc5f4b11ad39aecb2a4fac3686",
+    "design_note_sha256": "5c8da3d4f8d3c43ef65699b98ed3e163df3993f2dd39df5bf1fc4f4ac0506b4b"
+  },
+  "git_freeze": {
+    "earliest_exact_prereg_commit": "b5b0914bd4313f70d82c6eb4cf899efc4f75bd03",
+    "earliest_exact_prereg_commit_time_utc": "2026-08-13T00:13:11Z",
+    "canonical_prereg_merge_commit": "b4c26975d1b5ed0a66d526ed7397812c2eab4e85",
+    "canonical_prereg_merge_time_utc": "2026-08-13T00:24:21Z",
+    "earlier_exact_git_backed_protocol_found": false
+  },
+  "frozen_schedule": {
+    "first_decision": "2026-07-20T00:00:00Z",
+    "last_decision": "2027-07-19T00:00:00Z",
+    "required_valid_origins": 365,
+    "decision_frequency": "P1D_AT_00:00:00Z",
+    "forecast_horizon_hours": 24,
+    "evaluation_start_rule": "FIXED_FIRST_LISTED_ORIGIN_NO_SKIP_SUBSTITUTE_OR_LATER_START",
+    "evaluation_end_rule": "EXACTLY_365_VALID_DAILY_ORIGINS_ANY_MISSING_ORIGIN_BLOCKS_EVALUATION"
+  },
+  "pre_freeze_origin_census": {
+    "target_availability_rule": "origin plus the exact frozen 24-hour RV24_future information set",
+    "count": 24,
+    "origins": ["2026-07-20T00:00:00Z", "2026-07-21T00:00:00Z", "2026-07-22T00:00:00Z", "2026-07-23T00:00:00Z", "2026-07-24T00:00:00Z", "2026-07-25T00:00:00Z", "2026-07-26T00:00:00Z", "2026-07-27T00:00:00Z", "2026-07-28T00:00:00Z", "2026-07-29T00:00:00Z", "2026-07-30T00:00:00Z", "2026-07-31T00:00:00Z", "2026-08-01T00:00:00Z", "2026-08-02T00:00:00Z", "2026-08-03T00:00:00Z", "2026-08-04T00:00:00Z", "2026-08-05T00:00:00Z", "2026-08-06T00:00:00Z", "2026-08-07T00:00:00Z", "2026-08-08T00:00:00Z", "2026-08-09T00:00:00Z", "2026-08-10T00:00:00Z", "2026-08-11T00:00:00Z", "2026-08-12T00:00:00Z"],
+    "target_availability_times": ["2026-07-21T00:00:00Z", "2026-07-22T00:00:00Z", "2026-07-23T00:00:00Z", "2026-07-24T00:00:00Z", "2026-07-25T00:00:00Z", "2026-07-26T00:00:00Z", "2026-07-27T00:00:00Z", "2026-07-28T00:00:00Z", "2026-07-29T00:00:00Z", "2026-07-30T00:00:00Z", "2026-07-31T00:00:00Z", "2026-08-01T00:00:00Z", "2026-08-02T00:00:00Z", "2026-08-03T00:00:00Z", "2026-08-04T00:00:00Z", "2026-08-05T00:00:00Z", "2026-08-06T00:00:00Z", "2026-08-07T00:00:00Z", "2026-08-08T00:00:00Z", "2026-08-09T00:00:00Z", "2026-08-10T00:00:00Z", "2026-08-11T00:00:00Z", "2026-08-12T00:00:00Z", "2026-08-13T00:00:00Z"]
+  },
+  "pre_target_forecast_persistence_search": {
+    "proof_required": true,
+    "searched": ["canonical Git history", "reachable remote refs", "repository-tracked receipts and claims", "project authority artifacts", "research-ledger evidence references"],
+    "valid_receipts_found": 0,
+    "missing_origins": ["2026-07-20T00:00:00Z", "2026-07-21T00:00:00Z", "2026-07-22T00:00:00Z", "2026-07-23T00:00:00Z", "2026-07-24T00:00:00Z", "2026-07-25T00:00:00Z", "2026-07-26T00:00:00Z", "2026-07-27T00:00:00Z", "2026-07-28T00:00:00Z", "2026-07-29T00:00:00Z", "2026-07-30T00:00:00Z", "2026-07-31T00:00:00Z", "2026-08-01T00:00:00Z", "2026-08-02T00:00:00Z", "2026-08-03T00:00:00Z", "2026-08-04T00:00:00Z", "2026-08-05T00:00:00Z", "2026-08-06T00:00:00Z", "2026-08-07T00:00:00Z", "2026-08-08T00:00:00Z", "2026-08-09T00:00:00Z", "2026-08-10T00:00:00Z", "2026-08-11T00:00:00Z", "2026-08-12T00:00:00Z"],
+    "rejected_as_insufficient": ["filesystem_mtime", "uncommitted_file", "chat_or_handoff_assertion", "retroactive_forecast", "model_code_existence", "reproduction_today"]
+  },
+  "prospective_integrity": "FAILED_FROZEN_START_ALREADY_ELAPSED_WITHOUT_PERSISTED_FORECAST",
+  "reason": "FROZEN_FIRST_ORIGIN_PRECEDES_PREREG_FREEZE_AND_REQUIRED_PRE_TARGET_FORECAST_PERSISTENCE_NOT_PROVEN",
+  "materialization_authorized": false,
+  "implementation_authorized": false,
+  "scientific_execution_authorized": false,
+  "market_data_acquired": false,
+  "held_out_market_data_accessed": false,
+  "held_out_outcomes_accessed": false,
+  "forecast_evaluation_performed": false,
+  "jigsaw_mutated": false,
+  "state_snapshot_authorized": false,
+  "router_authorized": false,
+  "qnty_authorized": false,
+  "trading_authorized": false,
+  "promotion_authorized": false,
+  "ledger_update": "NOT_APPLICABLE_EXISTING_EXACT_VARIANT_IS_TERMINALLY_BLOCKED_AND_LEDGER_FORBIDS_REPLACEMENT_WITHOUT_REOPEN",
+  "next_action": "A new separately preregistered JH01 incremental forecast-value experiment may be considered with a genuinely future first origin, but requires a new bounded outcome-blind preregistration phase. V0 remains immutable and terminally blocked by prospective timing integrity. No result from V0 exists; JH01 discovery and temporal-replication evidence remain unchanged."
+}

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import subprocess
 import sys
 from pathlib import Path
@@ -388,12 +389,13 @@ def test_jfp_historical_execution_v0_authorizes_only_jfp03_with_frozen_holm_fami
     assert data["authority_conflicts_or_warnings"] == []
 
 
-def test_jfp03_v0r1_scientific_execution_authorization_is_one_shot_and_non_escalating() -> None:
+def test_jfp03_v0r1_scientific_execution_is_consumed_blocked_and_non_escalating() -> None:
     data = project_context.context_data(ROOT)
     _, _, registry = project_context.load_context_sources(ROOT)
     projects = {record["project_id"]: record for record in registry["project"]}
     project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_HISTORICAL_SCIENTIFIC_EXECUTION_AUTHORIZATION_V0"
     authorization = projects[project_id]
+    execution = projects["JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_HISTORICAL_SCIENTIFIC_EXECUTION_V0"]
 
     assert authorization["state"] == "CLOSED_PASS"
     assert authorization["phase_type"] == "GOVERNANCE_ONLY"
@@ -408,10 +410,14 @@ def test_jfp03_v0r1_scientific_execution_authorization_is_one_shot_and_non_escal
     assert authorization["first_har720_complete"] is True
     assert authorization["last_target_24h_complete"] is True
 
-    assert authorization["historical_scientific_execution_authorized"] is True
+    assert authorization["historical_scientific_execution_authorized"] is False
     assert authorization["historical_scientific_execution_runs_allowed"] == 1
-    assert authorization["historical_scientific_execution_runs_consumed"] == 0
-    assert authorization["historical_scientific_execution_performed"] is False
+    assert authorization["historical_scientific_execution_runs_consumed"] == 1
+    assert authorization["historical_scientific_execution_performed"] is True
+    assert authorization["claim_digest"] == "c2a0135a320c26e293d86d9ccbbf80553ee5f863be05d7184fab5074ad84038a"
+    assert authorization["result_digest"] == "aa42724ef37466babaf7fb81a44524fe9568d8679d0a2cf967ee9faaf9ae6dbb"
+    assert authorization["terminal_classification"] == "BLOCKED_CANDIDATE"
+    assert authorization["rerun_authorized"] is False
     assert authorization["input_reacquisition_authorized"] is False
     assert authorization["network_access_authorized"] is False
     assert authorization["bound_runtime_identity_digest"] == "35e70c8893e018c32f925734b666a1ba6abbac9d5942298de533d66ce1c22d60"
@@ -420,13 +426,12 @@ def test_jfp03_v0r1_scientific_execution_authorization_is_one_shot_and_non_escal
     assert authorization["bound_git_common_dir_device"] == 66307
     assert authorization["bound_git_common_dir_inode"] == 7740500
     assert authorization["claim_path_relative_to_git_common_dir"] == "qntylab-claims/jfp03-v0r1-historical-scientific-execution-v0.json"
-    assert authorization["scientific_feature_computation_authorized"] is True
-    assert authorization["scientific_target_computation_authorized"] is True
-    assert authorization["regression_authorized"] is True
-    assert authorization["hac_authorized"] is True
-    assert authorization["p_values_authorized"] is True
-
     for field in (
+        "scientific_feature_computation_authorized",
+        "scientific_target_computation_authorized",
+        "regression_authorized",
+        "hac_authorized",
+        "p_values_authorized",
         "real_afi_computed",
         "real_har_computed",
         "real_target_computed",
@@ -448,6 +453,33 @@ def test_jfp03_v0r1_scientific_execution_authorization_is_one_shot_and_non_escal
     assert authorization["capital_authority"] == "NONE"
     assert authorization["downstream_authority"] == "NONE"
     assert authorization["implementation_authorized"] is False
+
+    result_path = ROOT / authorization["result_path"]
+    result = json.loads(result_path.read_text(encoding="utf-8"))
+    canonical_result = json.dumps(
+        {key: value for key, value in result.items() if key != "result_digest"},
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=True,
+        allow_nan=False,
+    ).encode("utf-8")
+    assert hashlib.sha256(canonical_result).hexdigest() == authorization["result_digest"]
+    assert result["terminal_classification"] == execution["terminal_classification"] == "BLOCKED_CANDIDATE"
+    assert result["integrity_failure"] == execution["integrity_failure"]
+    assert result["expected_observation_count"] == execution["expected_observation_count"] == 43848
+    assert result["actual_observation_count"] is None
+    assert execution["actual_observation_count"] == "NULL_IN_BLOCKED_RESULT"
+    assert execution["historical_scientific_execution_runs_allowed"] == 1
+    assert execution["historical_scientific_execution_runs_consumed"] == 1
+    assert execution["historical_scientific_execution_performed"] is True
+    assert execution["scientific_values_are_null"] is True
+    assert execution["result_immutable"] is True
+    assert execution["replay_authorized"] is False
+    assert execution["rerun_authorized"] is False
+    assert execution["rescue_run_authorized"] is False
+    assert execution["downstream_authority"] == "NONE"
+    assert execution["capital_authority"] == "NONE"
+    assert execution["implementation_authorized"] is False
     assert data["active_project"] is None
     assert data["authority_conflicts_or_warnings"] == []
 

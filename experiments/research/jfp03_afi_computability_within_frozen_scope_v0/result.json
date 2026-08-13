@@ -1,0 +1,21 @@
+{
+  "schema_version": "jigsaw-evidence-piece-v0",
+  "phase": "JIGSAW_TERMINAL_RESEARCH_EVIDENCE_EXTRACTION_IMPLEMENTATION_V0",
+  "experiment_id": "JFP03_AFI_COMPUTABILITY_WITHIN_FROZEN_SCOPE",
+  "project_id": "JIGSAW_TERMINAL_RESEARCH_EVIDENCE_EXTRACTION_IMPLEMENTATION_V0",
+  "piece_type": "FEATURE_APPLICABILITY",
+  "authority": "NON_AUTHORITATIVE_EXPLORATORY_ONLY",
+  "research_status": "FROZEN_HISTORICAL_EVIDENCE",
+  "promotion_eligible": false,
+  "feature": "AFI_t",
+  "feature_semantics": "abs(2*(taker_buy_quote_volume_t/total_quote_volume_t)-1)",
+  "classification": "COMPUTABILITY_FAILURE_ESTABLISHED_WITHIN_FROZEN_SCOPE",
+  "evidence_class": "COMPUTABILITY_FAILURE_ESTABLISHED_WITHIN_FROZEN_SCOPE",
+  "snapshot_binding": {"snapshot_id": "jfp-input-v0r3-24311649d541c28d068addc2fc76121d614a11f0f191581c7dd988ba0b99c69f", "snapshot_digest": "24311649d541c28d068addc2fc76121d614a11f0f191581c7dd988ba0b99c69f", "qualification_digest": "420b0a4a84a57814d13393eb008affc05eb81223e06a9cf4a86c7772bc8bef5d", "design_digest": "a52d4999038e0be814ee8770322303fce84bed9ec8941b812748a18867633736", "decision_window": "2020-01-01T00:00:00Z..2024-12-31T23:00:00Z", "panel_symbols": 1, "instrument": "BINANCE_USD_M_BTCUSDT_PERPETUAL", "bar_interval": "1h"},
+  "interpretation": "Within the exact frozen JFP03 BTCUSDT USD-M perpetual 1h historical sample and frozen AFI definition, AFI could not be computed for every required observation because authenticated required rows did not satisfy total_quote_volume > 0.",
+  "does_not_establish": ["AFI predicts volatility", "AFI does not predict volatility", "AFI has predictive value", "AFI has no predictive value", "gamma sign, magnitude, or zero", "statistical or economic significance", "causal effect or lack of causal effect", "Binance data error, exchange malfunction, or illiquidity interpretation", "general, universal, or live AFI availability", "strategy, Router, State Snapshot, Qnty, paper-trading, trading, live abstention, feature-availability-policy, or promotion authority"],
+  "limitations": ["One immutable frozen BTCUSDT USD-M perpetual 1h historical sample only.", "This is a raw denominator-computability fact; it does not identify a cause for the raw condition."],
+  "authorities": {"causal": "NONE", "strategy": "NONE", "router": "NONE", "state_snapshot": "NONE", "qnty": "NONE", "trading": "NONE"},
+  "provenance": {"governing_authorization_project_id": "JIGSAW_TERMINAL_RESEARCH_EVIDENCE_EXTRACTION_AUTHORIZATION_V0", "predecessor_project_id": "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_HISTORICAL_SCIENTIFIC_EXECUTION_V0", "terminal_result_relative_path": "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/execution/v0r1/historical_scientific_execution_result.json", "terminal_result_digest": "aa42724ef37466babaf7fb81a44524fe9568d8679d0a2cf967ee9faaf9ae6dbb", "terminal_claim_digest": "c2a0135a320c26e293d86d9ccbbf80553ee5f863be05d7184fab5074ad84038a", "source_proof_relative_path": "experiments/research/jfp03_afi_computability_within_frozen_scope_v0/source_proof.json", "source_proof_digest": "423273b6608e207156c3fef880d8be01033ecc5e9cb9d2d1e5e835b73e879a5c", "source_manifest_digest": "b253ee51394ef90553b6d0e11195b7b5bed069a3b9a5dd1097515a7cb8637c15", "source_object_count_authenticated": 63, "source_reacquisition": false, "scientific_execution_performed": false, "scientific_values_created": false, "source_experiment_terminal_state": "BLOCKED_CANDIDATE"},
+  "piece_digest": "sha256:57db5e4c6f155261f3957dec34aa942c732258b8363f1268246de3262c8d7a32"
+}

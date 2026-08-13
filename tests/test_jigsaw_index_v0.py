@@ -102,9 +102,10 @@ def test_a_complete_current_census_matches_frozen_known_sources():
         "experiments/research/jigsaw_harvest_v0/result.json",
         "experiments/research/jigsaw_funding_pressure_volatility_v0/result.json",
         "experiments/research/jh01_rv_persistence_temporal_replication_v0/result.json",
+        "experiments/research/jfp03_afi_computability_within_frozen_scope_v0/result.json",
     }
-    assert index["summary"]["total_sources"] == 3
-    assert index["summary"]["total_pieces"] == 6
+    assert index["summary"]["total_sources"] == 4
+    assert index["summary"]["total_pieces"] == 7
 
 
 # ---------------------------------------------------------------------------

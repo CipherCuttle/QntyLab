@@ -26,7 +26,8 @@ HARVEST_PIECE_IDS = {
 }
 FUNDING_PRESSURE_ID = "JIGSAW_FUNDING_PRESSURE_VOLATILITY_V0"
 JH01_V0R1_REPLICATION_ID = "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_V0R1"
-ALL_PIECE_IDS = HARVEST_PIECE_IDS | {FUNDING_PRESSURE_ID, JH01_V0R1_REPLICATION_ID}
+JFP03_AFI_COMPUTABILITY_ID = "JFP03_AFI_COMPUTABILITY_WITHIN_FROZEN_SCOPE"
+ALL_PIECE_IDS = HARVEST_PIECE_IDS | {FUNDING_PRESSURE_ID, JH01_V0R1_REPLICATION_ID, JFP03_AFI_COMPUTABILITY_ID}
 
 
 # ---------------------------------------------------------------------------
@@ -109,7 +110,7 @@ def test_a_every_canonical_piece_appears_exactly_once_in_inventory():
     synthesis = build_synthesis(RESEARCH_ROOT)
     identities = [row["piece_identity"] for row in synthesis["piece_inventory"]]
     assert set(identities) == ALL_PIECE_IDS
-    assert len(identities) == len(set(identities)) == 6
+    assert len(identities) == len(set(identities)) == 7
 
 
 # ---------------------------------------------------------------------------
@@ -120,13 +121,13 @@ def test_a_every_canonical_piece_appears_exactly_once_in_inventory():
 def test_b_every_unordered_pair_appears_exactly_once():
     synthesis = build_synthesis(RESEARCH_ROOT)
     pairs = synthesis["pair_relationships"]
-    assert len(pairs) == 15  # 6 choose 2
+    assert len(pairs) == 21  # 7 choose 2
     seen = set()
     for pair in pairs:
         key = frozenset((pair["piece_a"], pair["piece_b"]))
         assert key not in seen, f"duplicate/reversed pair: {pair['pair_id']}"
         seen.add(key)
-    assert len(seen) == 15
+    assert len(seen) == 21
 
 
 # ---------------------------------------------------------------------------
@@ -799,7 +800,7 @@ def test_closure_d_current_real_artifact_semantics_unchanged():
     assert len(harvest_pairs) == 6
     assert all(p["independence_status"] == "SHARED_FROZEN_HISTORY" for p in harvest_pairs)
     funding_pairs = [p for p in synthesis["pair_relationships"] if FUNDING_PRESSURE_ID in (p["piece_a"], p["piece_b"])]
-    assert len(funding_pairs) == 5
+    assert len(funding_pairs) == 6
     assert all(p["allowed_synthesis"] == "SEPARATE_ONLY" for p in funding_pairs)
     assert not any(p["independence_status"] == "INDEPENDENT_REPLICATION_EXPLICITLY_ESTABLISHED" for p in synthesis["pair_relationships"])
 
@@ -1258,7 +1259,7 @@ def test_cli_doctor_and_summary_and_pair_against_real_repo(capsys):
 
     main(["summary"])
     summary = json.loads(capsys.readouterr().out)
-    assert summary["total_pairs"] == 15
+    assert summary["total_pairs"] == 21
 
     main(["pair", "JH01_RV_PERSISTENCE", "JH02_DISPERSION_TO_RV"])
     pair = json.loads(capsys.readouterr().out)

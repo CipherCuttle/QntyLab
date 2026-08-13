@@ -1,6 +1,43 @@
 schema_version = 1
 
 [[project]]
+project_id = "JIGSAW_TERMINAL_RESEARCH_EVIDENCE_EXTRACTION_IMPLEMENTATION_V0"
+state = "CLOSED_PASS"
+authority_level = "FROZEN_BOUNDED_JIGSAW_EVIDENCE_IMPLEMENTATION_ONLY"
+phase_type = "EVIDENCE_INCORPORATION_ONLY"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "qntylab/jfp03_terminal_evidence.py",
+  "experiments/research/jfp03_afi_computability_within_frozen_scope_v0/source_proof.json",
+  "experiments/research/jfp03_afi_computability_within_frozen_scope_v0/result.json",
+  "experiments/research/jigsaw_index.json",
+  "experiments/research/jigsaw_synthesis_eligibility_v0/eligibility.json",
+  "tests/test_jfp03_terminal_evidence.py",
+]
+governing_authorization_project_id = "JIGSAW_TERMINAL_RESEARCH_EVIDENCE_EXTRACTION_AUTHORIZATION_V0"
+predecessor_project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_HISTORICAL_SCIENTIFIC_EXECUTION_V0"
+terminal_result_digest = "aa42724ef37466babaf7fb81a44524fe9568d8679d0a2cf967ee9faaf9ae6dbb"
+terminal_claim_digest = "c2a0135a320c26e293d86d9ccbbf80553ee5f863be05d7184fab5074ad84038a"
+frozen_snapshot_id = "jfp-input-v0r3-24311649d541c28d068addc2fc76121d614a11f0f191581c7dd988ba0b99c69f"
+frozen_snapshot_digest = "24311649d541c28d068addc2fc76121d614a11f0f191581c7dd988ba0b99c69f"
+frozen_qualification_digest = "420b0a4a84a57814d13393eb008affc05eb81223e06a9cf4a86c7772bc8bef5d"
+frozen_design_digest = "a52d4999038e0be814ee8770322303fce84bed9ec8941b812748a18867633736"
+evidence_piece_identity = "JFP03_AFI_COMPUTABILITY_WITHIN_FROZEN_SCOPE"
+evidence_piece_relative_path = "experiments/research/jfp03_afi_computability_within_frozen_scope_v0/result.json"
+evidence_piece_schema_version = "jigsaw-evidence-piece-v0"
+source_proof_relative_path = "experiments/research/jfp03_afi_computability_within_frozen_scope_v0/source_proof.json"
+source_proof = "ESTABLISHED"
+denominator_violation_count = 1
+jfp03_artifacts_changed = false
+scientific_execution_performed = false
+source_reacquisition_performed = false
+downstream_authority = "NONE"
+promotion_eligible = false
+implementation_authorized = false
+next_action = "One authenticated source-proof census established one AFI positive-denominator violation across all 43,848 required frozen JFP03 decision rows. One non-authoritative FEATURE_APPLICABILITY evidence piece was added under the existing jigsaw-evidence-piece-v0 schema; no JFP03 result, source, executor, scientific value, source reacquisition, downstream authority, or promotion was created. No later downstream project is authorized."
+
+[[project]]
 project_id = "JIGSAW_TERMINAL_RESEARCH_EVIDENCE_EXTRACTION_AUTHORIZATION_V0"
 display_name = "JFP03 blocked-terminal Jigsaw evidence extraction authorization"
 state = "CLOSED_PASS"

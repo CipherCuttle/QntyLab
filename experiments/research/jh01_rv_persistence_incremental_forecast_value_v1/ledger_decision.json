@@ -1,0 +1,14 @@
+{
+  "event_type": "DECISION_RECORDED",
+  "candidate_id": "CANDIDATE_JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_V1",
+  "family_id": "FAMILY_JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_V1",
+  "variant_id": "variant_b293b3e7e95d55a5808a5e8b",
+  "status": "BLOCKED",
+  "scope": "EXACT_VARIANT",
+  "reason_codes": ["V1_PROTOCOL_FROZEN", "NOT_EXECUTED", "PROSPECTIVE_RECORDER_REQUIRES_SEPARATE_GOVERNANCE", "NO_OUTCOME_ACCESS", "NO_EXECUTION_AUTHORITY"],
+  "decision_note": "V1 is a new outcome-blind preregistration with unchanged science and a future 365-origin schedule. It creates no scientific result and is blocked pending a separately authorized sealed prospective recorder; V0 remains terminally blocked and unchanged.",
+  "evidence_paths": ["experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/preregistration.json", "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/ledger_candidate_proposal.json"],
+  "evidence_sha256": {"experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/preregistration.json": "4990688b640ad34f6f022431766bdd9539f75c9fb8bb278bdf9ae3637db09a0a", "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/ledger_candidate_proposal.json": "48354981f1f365a66d0a070ae5a757433d9f24196ec31420907b1837959ab287"},
+  "revisit_condition": "Only a separate Git-backed governance phase may assess and authorize a sealed prospective recorder before the fixed first origin. This V1 preregistration must not be changed to move the date, shorten the lead time, alter scientific specification, or create a result.",
+  "recorded_at_utc": "2026-08-13T00:00:00Z"
+}

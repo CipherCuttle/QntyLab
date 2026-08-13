@@ -1,0 +1,23 @@
+{
+  "event_type": "CANDIDATE_PROPOSED",
+  "candidate_id": "CANDIDATE_JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_V1",
+  "family_id": "FAMILY_JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_V1",
+  "variant_id": "variant_b293b3e7e95d55a5808a5e8b",
+  "strategy_id": "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE",
+  "strategy_version": "V1",
+  "objective": "Freeze a genuinely prospective, outcome-unseen V1 test of the unchanged JH01 incremental forecast-value question.",
+  "origin": "New V1 identity after terminal V0 timing-integrity closure; V0 is neither reopened nor rerun.",
+  "mechanism": "Unchanged expanding-window C_JH01 versus B1 protocol, with a new future calendar and sub-hour forecast-persistence boundary.",
+  "prediction": "Any later result must satisfy the unchanged frozen MSE, materiality, and Clark-West-style HAC gates.",
+  "required_data": "No data is authorized in this preregistration phase; a later sealed prospective recorder requires separate governance.",
+  "decision_time": "2026-09-15T00:00:00Z",
+  "execution_time": "NOT_AUTHORIZED",
+  "benchmark": "B1_NAIVE_PERSISTENCE",
+  "parameters": {"candidate_model": "C_JH01", "first_decision": "2026-09-15T00:00:00Z", "last_decision": "2027-09-14T00:00:00Z", "forecast_horizon_hours": 24, "primary_benchmark": "B1_NAIVE_PERSISTENCE", "primary_loss": "MSE_ON_UNTRANSFORMED_RV24", "prospective_persistence_window": "t <= persistence_time < t+1h"},
+  "mode": "OUTCOME_BLIND_PREREGISTRATION_ONLY",
+  "bar_interval": "1h",
+  "required_input_kind": "OHLCV_1H_CSV",
+  "funding_boundary_mode": "NOT_APPLICABLE_OUTCOME_BLIND_PROTOCOL_ONLY",
+  "failure_condition": "Any timing, persistence, source-cutoff, missing-origin, interim-evaluation, or post-freeze specification integrity failure blocks the exact V1 variant.",
+  "recorded_at_utc": "2026-08-13T00:00:00Z"
+}

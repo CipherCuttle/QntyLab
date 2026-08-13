@@ -10,15 +10,27 @@ scoring, ranking, or aggregating evidence strength.
 
 For every unordered pair of indexed pieces it records only mechanically or
 source-supported facts -- shared source artifact, shared explicit snapshot
-identity, decision-window relation, shared explicit feature/outcome fields --
-and derives two small categorical classifications from those facts alone:
+identity, decision-window relation, shared explicit feature/outcome fields,
+an explicit source-declared replication target -- and derives three small
+categorical classifications from those facts alone:
 
 * ``claim_relation`` -- whether the two native propositions are the same,
   related, different, or too structurally incomparable to say.
 * ``independence_status`` -- whether the two pieces share frozen history,
   merely overlap in time with no dataset identity established, or neither.
+  This axis never becomes "independent" from temporal separation alone; see
+  ``_independence_status`` and design_note.md.
+* ``replication_relation`` -- orthogonal to ``independence_status`` by
+  construction: whether one piece explicitly names the other as its
+  replication target *and* the two are provably temporally disjoint with no
+  shared frozen history. TEMPORALLY DISJOINT REPLICATION IS NOT INDEPENDENT
+  REPLICATION -- a pair can be simultaneously
+  ``TEMPORAL_REPLICATION_EXPLICITLY_ESTABLISHED`` and
+  ``INDEPENDENCE_NOT_ESTABLISHED`` at the same time, and routinely is. This
+  axis never sets, reads, or otherwise influences ``independence_status`` or
+  ``global_constraints.independent_replication_established``.
 
-A small deterministic table then derives ``allowed_synthesis`` from those two
+A small deterministic table then derives ``allowed_synthesis`` from those
 classifications. Nothing here infers dataset identity from matching
 cardinality, matching symbol counts, or similarly-named fields (see
 ``qntylab.jigsaw_index``'s own doc for the same discipline on the discovery
@@ -75,8 +87,30 @@ _INDEPENDENCE_STATUSES = frozenset(
         "INDEPENDENT_REPLICATION_EXPLICITLY_ESTABLISHED",
     }
 )
+# `replication_relation` is deliberately orthogonal to `independence_status`
+# (see module docstring and design_note.md). Temporally disjoint replication
+# is not independent replication: a piece can explicitly declare itself a
+# replication attempt of another piece and be provably evaluated over a
+# disjoint later decision window with no shared frozen snapshot or source
+# artifact, while every independence axis (provider, exchange,
+# data-generating-process, methodological, implementation, causal) stays
+# NOT_ESTABLISHED. This dimension never feeds `independence_status` or
+# `global_constraints.independent_replication_established`.
+_REPLICATION_RELATIONS = frozenset(
+    {
+        "TEMPORAL_REPLICATION_EXPLICITLY_ESTABLISHED",
+        "REPLICATION_TARGET_DECLARED_RELATION_NOT_ESTABLISHED",
+        "NO_EXPLICIT_REPLICATION_TARGET",
+    }
+)
 _SYNTHESIS_ELIGIBILITIES = frozenset(
-    {"SEPARATE_ONLY", "JOINT_CONTEXT_ONLY", "SAME_HISTORY_MULTI_PROPOSITION_CONTEXT", "INDEPENDENT_CONFIRMATION_ELIGIBLE"}
+    {
+        "SEPARATE_ONLY",
+        "JOINT_CONTEXT_ONLY",
+        "SAME_HISTORY_MULTI_PROPOSITION_CONTEXT",
+        "INDEPENDENT_CONFIRMATION_ELIGIBLE",
+        "TEMPORAL_REPLICATION_CONTEXT_ONLY",
+    }
 )
 
 _PROHIBITED_INFERENCES = (
@@ -86,6 +120,8 @@ _PROHIBITED_INFERENCES = (
     "State Snapshot feature eligibility",
     "causal, trading, or strategy interpretation",
     "an aggregate claim stronger than either native source result",
+    "provider, exchange, data-generating-process, methodological, implementation, or causal independence",
+    "incremental or out-of-time forecast value",
 )
 
 
@@ -145,21 +181,41 @@ def _binding_window(row: dict) -> tuple[datetime, datetime] | None:
     return start, end
 
 
-def _decision_window_relation(a: dict, b: dict) -> str:
+def _decision_window_relation_and_direction(a: dict, b: dict) -> tuple[str, str]:
+    """The single mechanical derivation of how two pieces' frozen decision
+    windows relate in time, consumed by every downstream layer (independence,
+    replication, statement wording). Nothing else re-parses these windows.
+
+    Returns ``(relation, direction)``.
+
+    ``relation`` is unchanged from the pre-existing contract already consumed
+    by ``_independence_status``/``_replication_relation``/tests/
+    ``eligibility.json``: one of ``EXACT``, ``A_CONTAINS_B``, ``B_CONTAINS_A``,
+    ``PARTIAL_OVERLAP``, ``DISJOINT``, ``UNKNOWN``.
+
+    ``direction`` is the additional temporal-ordering fact: ``A_BEFORE_B`` or
+    ``B_BEFORE_A``, established *only* when ``relation == "DISJOINT"`` -- a
+    provably non-overlapping pair has a well-defined earlier/later ordering.
+    For every other relation, including ``UNKNOWN``, ``direction`` is
+    ``NOT_APPLICABLE``: EXACT/overlapping/contained windows do not resolve to
+    a single before/after claim, and unparseable windows resolve neither.
+    Downstream wording must never say "later"/"earlier" from anything but
+    this field (F-02, QNTYLAB_JH01_JIGSAW_EVIDENCE_CLOSURE_REPAIR_V0).
+    """
     wa, wb = _binding_window(a), _binding_window(b)
     if wa is None or wb is None:
-        return "UNKNOWN"
+        return "UNKNOWN", "NOT_APPLICABLE"
     a_start, a_end = wa
     b_start, b_end = wb
     if a_start == b_start and a_end == b_end:
-        return "EXACT"
+        return "EXACT", "NOT_APPLICABLE"
     if a_start <= b_start and a_end >= b_end:
-        return "A_CONTAINS_B"
+        return "A_CONTAINS_B", "NOT_APPLICABLE"
     if b_start <= a_start and b_end >= a_end:
-        return "B_CONTAINS_A"
+        return "B_CONTAINS_A", "NOT_APPLICABLE"
     if a_start <= b_end and b_start <= a_end:
-        return "PARTIAL_OVERLAP"
-    return "DISJOINT"
+        return "PARTIAL_OVERLAP", "NOT_APPLICABLE"
+    return "DISJOINT", ("A_BEFORE_B" if a_end < b_start else "B_BEFORE_A")
 
 
 def _same_data_history(same_snapshot_identity: str, same_source_artifact: str) -> str:
@@ -221,6 +277,67 @@ def _independence_status(
     return "INDEPENDENCE_NOT_ESTABLISHED"
 
 
+def _explicit_replication_target(row: dict) -> str | None:
+    """A piece's own explicit, source-native claim about which other piece it
+    is a replication attempt of, read verbatim from its native payload.
+
+    This states *intended target identity*, exactly as
+    ``explicit_independent_replication_of`` did in an earlier revision (see
+    design_note.md) -- it is never on its own treated as empirical
+    independence, and it never feeds ``independence_status``. It feeds only
+    the separate, strictly weaker ``replication_relation`` axis below, which
+    a fixed decision table further gates on mechanical shared-history and
+    temporal facts before it can read as anything but a bare declaration.
+    """
+    value = _native_field(row, "replication_of_piece_identity")
+    return value if isinstance(value, str) else None
+
+
+def _replication_target_relation(row_a: dict, row_b: dict) -> str:
+    """Whether either piece explicitly names the other as its replication
+    target, by exact stable piece_identity match. Never inferred from name
+    similarity, shared feature/outcome text, or timing -- only an explicit
+    field naming an identity already present in the index."""
+    target_a = _explicit_replication_target(row_a)
+    if target_a is not None and target_a == row_b["piece_identity"]:
+        return "A_DECLARES_REPLICATION_OF_B"
+    target_b = _explicit_replication_target(row_b)
+    if target_b is not None and target_b == row_a["piece_identity"]:
+        return "B_DECLARES_REPLICATION_OF_A"
+    return "NONE"
+
+
+def _replication_relation(
+    replication_target_relation: str,
+    independence_status: str,
+    decision_window_relation: str,
+) -> str:
+    """Mechanically combine the explicit declaration with temporal facts
+    already derived for this pair (never re-reads raw fields itself).
+
+    Shared frozen history is checked first, unconditionally, exactly as
+    ``_independence_status`` checks it first for its own axis: a piece
+    cannot declare its way out of demonstrably sharing the exact frozen
+    snapshot or source artifact of the piece it names as a replication
+    target -- that is same-history multi-proposition context, not a
+    temporally disjoint replication, regardless of the declaration. Only a
+    provably ``DISJOINT`` decision-window relation combined with a
+    non-shared-history declared target reaches
+    ``TEMPORAL_REPLICATION_EXPLICITLY_ESTABLISHED``. This never sets or
+    reads ``independence_status`` and is never itself read by
+    ``_independence_status`` -- the two axes stay decision-theoretically
+    independent so that establishing one can never silently establish or
+    strengthen the other.
+    """
+    if replication_target_relation == "NONE":
+        return "NO_EXPLICIT_REPLICATION_TARGET"
+    if independence_status == "SHARED_FROZEN_HISTORY":
+        return "REPLICATION_TARGET_DECLARED_RELATION_NOT_ESTABLISHED"
+    if decision_window_relation == "DISJOINT":
+        return "TEMPORAL_REPLICATION_EXPLICITLY_ESTABLISHED"
+    return "REPLICATION_TARGET_DECLARED_RELATION_NOT_ESTABLISHED"
+
+
 def _claim_relation(same_feature: str, same_outcome: str) -> str:
     if same_feature == "NOT_ESTABLISHED" or same_outcome == "NOT_ESTABLISHED":
         return "CLAIM_RELATION_NOT_ESTABLISHED"
@@ -231,7 +348,7 @@ def _claim_relation(same_feature: str, same_outcome: str) -> str:
     return "DIFFERENT_CLAIM"
 
 
-def _allowed_synthesis(independence_status: str, claim_relation: str) -> str:
+def _allowed_synthesis(independence_status: str, claim_relation: str, replication_relation: str) -> str:
     if independence_status == "INDEPENDENT_REPLICATION_EXPLICITLY_ESTABLISHED" and claim_relation in (
         "IDENTICAL_CLAIM",
         "RELATED_DISTINCT_CLAIM",
@@ -239,6 +356,11 @@ def _allowed_synthesis(independence_status: str, claim_relation: str) -> str:
         return "INDEPENDENT_CONFIRMATION_ELIGIBLE"
     if independence_status == "SHARED_FROZEN_HISTORY":
         return "SAME_HISTORY_MULTI_PROPOSITION_CONTEXT"
+    if replication_relation == "TEMPORAL_REPLICATION_EXPLICITLY_ESTABLISHED" and claim_relation in (
+        "IDENTICAL_CLAIM",
+        "RELATED_DISTINCT_CLAIM",
+    ):
+        return "TEMPORAL_REPLICATION_CONTEXT_ONLY"
     if independence_status == "OVERLAPPING_HISTORY_INDEPENDENCE_NOT_ESTABLISHED" and claim_relation in (
         "IDENTICAL_CLAIM",
         "RELATED_DISTINCT_CLAIM",
@@ -251,13 +373,15 @@ def _build_pair(row_a: dict, row_b: dict) -> dict[str, Any]:
     same_source_artifact = _same_source_artifact(row_a, row_b)
     same_experiment = _same_experiment(row_a, row_b)
     same_snapshot_identity = _same_snapshot_identity(row_a, row_b)
-    decision_window_relation = _decision_window_relation(row_a, row_b)
+    decision_window_relation, decision_window_direction = _decision_window_relation_and_direction(row_a, row_b)
     same_data_history = _same_data_history(same_snapshot_identity, same_source_artifact)
     same_feature = _same_native_string_field(row_a, row_b, "feature")
     same_outcome = _same_native_string_field(row_a, row_b, "outcome")
     independence_status = _independence_status(same_snapshot_identity, same_source_artifact, decision_window_relation)
     claim_relation = _claim_relation(same_feature, same_outcome)
-    allowed_synthesis = _allowed_synthesis(independence_status, claim_relation)
+    replication_target_relation = _replication_target_relation(row_a, row_b)
+    replication_relation = _replication_relation(replication_target_relation, independence_status, decision_window_relation)
+    allowed_synthesis = _allowed_synthesis(independence_status, claim_relation, replication_relation)
     return {
         "pair_id": f"{row_a['piece_identity']}::{row_b['piece_identity']}",
         "piece_a": row_a["piece_identity"],
@@ -266,6 +390,7 @@ def _build_pair(row_a: dict, row_b: dict) -> dict[str, Any]:
         "same_experiment": same_experiment,
         "same_snapshot_identity": same_snapshot_identity,
         "decision_window_relation": decision_window_relation,
+        "decision_window_direction": decision_window_direction,
         "same_data_history": same_data_history,
         "same_feature": same_feature,
         "same_outcome": same_outcome,
@@ -275,6 +400,8 @@ def _build_pair(row_a: dict, row_b: dict) -> dict[str, Any]:
         },
         "claim_relation": claim_relation,
         "independence_status": independence_status,
+        "replication_target_relation": replication_target_relation,
+        "replication_relation": replication_relation,
         "allowed_synthesis": allowed_synthesis,
     }
 
@@ -341,6 +468,8 @@ def _relationship_basis(pair: dict) -> str:
         parts.append("SAME_SOURCE_ARTIFACT")
     if pair["same_snapshot_identity"] == "YES":
         parts.append("SAME_SNAPSHOT_ID")
+    if pair["replication_relation"] == "TEMPORAL_REPLICATION_EXPLICITLY_ESTABLISHED":
+        parts.append("EXPLICIT_REPLICATION_TARGET")
     if not parts:
         parts.append(f"DECISION_WINDOW_{pair['decision_window_relation']}")
     return "+".join(parts)
@@ -441,6 +570,40 @@ def _statement_text(pair: dict, row_a: dict, row_b: dict) -> str:
             "own native scope, direction, and limitations."
         )
 
+    if basis == "TEMPORAL_REPLICATION_CONTEXT_ONLY":
+        replicating_is_a = pair["replication_target_relation"] == "A_DECLARES_REPLICATION_OF_B"
+        replicating_id = a_id if replicating_is_a else b_id
+        target_id = b_id if replicating_is_a else a_id
+        # TEMPORAL_REPLICATION_CONTEXT_ONLY is only reachable when
+        # decision_window_relation == "DISJOINT" (see _allowed_synthesis /
+        # _replication_relation), and _decision_window_relation_and_direction
+        # always resolves a DISJOINT pair's direction to A_BEFORE_B or
+        # B_BEFORE_A -- never NOT_APPLICABLE/UNKNOWN. "later"/"earlier" is
+        # therefore read off that single mechanical derivation, never
+        # inferred from piece names, declaration direction, or which side
+        # made the explicit replication-target declaration (F-02,
+        # QNTYLAB_JH01_JIGSAW_EVIDENCE_CLOSURE_REPAIR_V0).
+        direction = pair["decision_window_direction"]
+        replicating_after_target = (replicating_is_a and direction == "B_BEFORE_A") or (
+            not replicating_is_a and direction == "A_BEFORE_B"
+        )
+        if direction in ("A_BEFORE_B", "B_BEFORE_A"):
+            order_phrase = "a later" if replicating_after_target else "an earlier"
+        else:
+            order_phrase = "a"
+        return (
+            f"{replicating_id} explicitly declares itself a replication attempt of {target_id}'s "
+            "proposition, and the two pieces' decision windows are provably disjoint with neither a "
+            "shared explicit snapshot identity nor a shared source artifact established between "
+            "them. This licenses only a temporal-replication context statement: it records that "
+            f"{order_phrase} temporally separate frozen evaluation of the same intended proposition "
+            "exists and what its native classification was. It does not establish provider, "
+            "exchange, data-generating-process, methodological, implementation, organizational, or "
+            "causal independence between the two pieces, does not establish independent "
+            "replication, and does not combine, average, or otherwise strengthen either piece's "
+            "native effect estimate, classification, or limitations."
+        )
+
     raise JigsawSynthesisError(f"no synthesis statement is licensed for allowed_synthesis={basis!r}")
 
 
@@ -453,6 +616,7 @@ def _build_statement(pair: dict, row_a: dict, row_b: dict) -> dict[str, Any]:
         "relationship_basis": _relationship_basis(pair),
         "claim_relation": pair["claim_relation"],
         "independence_status": pair["independence_status"],
+        "replication_relation": pair["replication_relation"],
         "synthesis_eligibility": pair["allowed_synthesis"],
         "native_source_verdicts": {
             pair["piece_a"]: _native_source_verdict(row_a),
@@ -480,6 +644,7 @@ def _summarize(pairs: list[dict], statements: list[dict]) -> dict[str, Any]:
         "total_pairs": len(pairs),
         "pairs_by_independence_status": _tally([p["independence_status"] for p in pairs]),
         "pairs_by_claim_relation": _tally([p["claim_relation"] for p in pairs]),
+        "pairs_by_replication_relation": _tally([p["replication_relation"] for p in pairs]),
         "pairs_by_allowed_synthesis": _tally([p["allowed_synthesis"] for p in pairs]),
         "total_synthesis_statements": len(statements),
     }

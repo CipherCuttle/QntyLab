@@ -150,3 +150,148 @@ entirely from `qntylab.jigsaw_index.build_index`), not a source-artifact
 mutator, not State Snapshot/Router/Qnty/trading/promotion authority. See
 `eligibility.json`'s `global_constraints` block, which states all of those
 as `NONE` explicitly.
+
+## `replication_relation` — orthogonal to `independence_status` (JH01 V0R1 incorporation)
+
+Phase: `JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_JIGSAW_EVIDENCE_IMPLEMENTATION_V0`,
+authorized by the prior governance-only phase
+`JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_JIGSAW_EVIDENCE_AUTHORIZATION_V0`.
+Adds the canonical evidence piece `JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_V0R1`
+(`experiments/research/jh01_rv_persistence_temporal_replication_v0/result.json`,
+schema `jigsaw-evidence-piece-v0`, unchanged from V0), representing the frozen
+V0R1 temporal replication of `JH01_RV_PERSISTENCE` bound to both its execution
+result digest and its mandatory provenance-correction digest.
+
+**TEMPORALLY DISJOINT REPLICATION IS NOT INDEPENDENT REPLICATION.** The prior
+section already explains why `INDEPENDENT_REPLICATION_EXPLICITLY_ESTABLISHED`
+is intentionally unreachable on the `independence_status` axis, and a closure
+hostile-review finding (`hostile_review.md`) already fixed a fail-open bug
+where a bare `explicit_independent_replication_of` declaration could win over
+demonstrated shared frozen history. JH01 V0R1 needed a real, source-declared
+replication relationship represented *without* reopening either of those
+protections or forcing temporal-only evidence through the independence axis
+they protect. The chosen design adds a third, fully orthogonal categorical
+field, `replication_relation`, rather than overloading `independence_status`:
+
+* `_explicit_replication_target` reads a new native field,
+  `replication_of_piece_identity` -- deliberately a different field name and
+  a strictly narrower claim than `explicit_independent_replication_of`. It
+  states only "this piece is a replication attempt of that piece's
+  proposition," never independence.
+* `_replication_target_relation(a, b)` matches that declaration against the
+  other piece's actual indexed `piece_identity` (never a name/string guess).
+* `_replication_relation(...)` combines that match with facts already
+  computed for `independence_status` -- shared frozen history is checked
+  first, unconditionally, exactly as it is for `independence_status` itself,
+  so a declared target that in fact shares the exact snapshot or source
+  artifact still resolves to same-history territory, never to a "temporal
+  replication." Only `DISJOINT` decision windows with no shared history reach
+  `TEMPORAL_REPLICATION_EXPLICITLY_ESTABLISHED`.
+* `replication_relation` is computed independently of and never assigned to
+  `independence_status`; `global_constraints.independent_replication_established`
+  is derived purely from `independence_status` and is untouched by this axis.
+  For the real JH01 pair, `independence_status` stays
+  `INDEPENDENCE_NOT_ESTABLISHED` (same as any other disjoint-window,
+  no-shared-snapshot pair) while `replication_relation` is simultaneously
+  `TEMPORAL_REPLICATION_EXPLICITLY_ESTABLISHED` -- both true at once, on
+  purpose.
+
+`_allowed_synthesis` gains one narrow branch:
+`TEMPORAL_REPLICATION_CONTEXT_ONLY`, reached only when
+`replication_relation == TEMPORAL_REPLICATION_EXPLICITLY_ESTABLISHED` *and*
+`claim_relation` is `IDENTICAL_CLAIM` or `RELATED_DISTINCT_CLAIM` (mirroring
+the existing `JOINT_CONTEXT_ONLY` gate). Its templated statement
+(`_statement_text`) records only the mechanical facts -- disjoint windows, no
+shared snapshot/source, explicit declared target, each piece's own native
+classification -- and explicitly disclaims provider, exchange,
+data-generating-process, methodological, implementation, organizational, and
+causal independence, plus incremental/out-of-time forecast value, in its
+`prohibited_inferences`. No global flag such as `temporal_replication_established`
+was added (Section 8 of the phase brief): `summary.pairs_by_replication_relation`
+is the only new aggregate, a deterministic non-authoritative tally in the same
+style as the existing `pairs_by_independence_status`/`pairs_by_claim_relation`
+tallies, and the pairwise `replication_relation` field itself is what actually
+carries the truth for any consumer.
+
+The same code is unchanged for any future piece: nothing here inspects a
+`piece_identity` string, and a piece with no `replication_of_piece_identity`
+field resolves to `NO_EXPLICIT_REPLICATION_TARGET` exactly as before this
+change (see `test_closure_c` and the pre-existing `explicit_independent_replication_of`
+fixtures, which continue to resolve `independence_status` unchanged -- that
+field is still never read for independence, and the new field is a distinct
+name read only for the strictly weaker replication axis).
+
+## `decision_window_direction` — mechanical temporal direction (PR #60 post-review closure repair, F-02)
+
+A post-review Codex finding on PR #60 (candidate `e7bfc49d9bd8452f3802db393567c3ce156f8290`)
+observed that `TEMPORAL_REPLICATION_CONTEXT_ONLY`'s statement text
+unconditionally called the replicating piece's evaluation "later," even
+though `_replication_relation` only checks `decision_window_relation ==
+"DISJOINT"` -- disjointness alone, with no ordering. A future evidence piece
+that explicitly declared a replication target while evaluating an *earlier*
+disjoint historical window would have been mis-described as a later
+evaluation.
+
+The fix keeps `decision_window_relation`'s existing values and every
+consumer of them (`_independence_status`, `_replication_relation`,
+`eligibility.json`'s `pairs_by_decision_window_relation` tally, and the
+pre-existing pinned-`"DISJOINT"` tests) byte-for-byte unchanged, so nothing
+downstream of that axis needed to move. What changed is that the relation is
+now derived by a single function,
+`_decision_window_relation_and_direction`, which also returns a second,
+purely additive fact, `decision_window_direction` -- `A_BEFORE_B` or
+`B_BEFORE_A`, established *only* when the relation is `DISJOINT` (a provably
+non-overlapping pair has a well-defined ordering); every other relation,
+including `UNKNOWN`, gets `NOT_APPLICABLE`. Both facts come from the exact
+same parsed `_binding_window` pair -- there is still only one place that
+parses these windows, so relation and direction can never disagree with each
+other.
+
+`_statement_text`'s `TEMPORAL_REPLICATION_CONTEXT_ONLY` branch now reads
+`decision_window_direction` (never the piece names, and never which side
+made the explicit declaration) to decide whether the replicating piece's
+window falls after or before the target's, and renders "a later temporally
+separate frozen evaluation," "an earlier temporally separate frozen
+evaluation," or, only if direction is somehow not resolvable, the neutral "a
+temporally separate frozen evaluation." For the real JH01 pair,
+`JH01_RV_PERSISTENCE`'s window (`...2025-06-19T00:00:00Z`) ends before
+`JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_V0R1`'s window begins
+(`2025-07-20T00:00:00Z...`), so `decision_window_direction` mechanically
+resolves to `A_BEFORE_B` and the generated statement correctly says "later."
+A reverse-time fixture -- a declaring piece whose window is the earlier of
+the disjoint pair -- resolves to the opposite direction and renders
+"earlier," never "later." `replication_relation`, `allowed_synthesis`, and
+every non-escalation guarantee in this document are unchanged by this fix;
+only the wording's truthfulness about which side is temporally later is
+affected.
+
+## Research-ledger recording (PR #60 post-review closure repair, F-01)
+
+A second post-review Codex finding on the same candidate observed that this
+phase's canonical evidence incorporation was never recorded in the
+append-only research ledger (`experiments/research/candidates.jsonl` /
+`decisions.jsonl`), so a fresh `python -m qntylab.research_ledger context`
+still reported only the graveyarded `CANDIDATE_JIGSAW_HARVEST_V0` family and
+gave no indication that `JH01_RV_PERSISTENCE` now has later temporal
+replication evidence.
+
+The repair appends a `CANDIDATE_PROPOSED` / `DECISION_RECORDED` pair under a
+new, narrower `CANDIDATE_JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_V0R1`
+identity in its own `FAMILY_JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_V0`
+family -- deliberately *not* reusing `FAMILY_JIGSAW_HARVEST_V0` -- because
+that family's own `DECISION_RECORDED` event is `scope=FAMILY` and explicitly
+states it "may not be reopened, extended, or rescued"; a `FAMILY`-scoped
+decision under the same `family_id` would replay against every variant in
+that family (see `replay()`'s `scope == "FAMILY"` fan-out) and require an
+unwanted `CANDIDATE_REOPENED` event just to pass. The new decision is
+`status=GRAVEYARDED`, `scope=EXACT_VARIANT`, mirroring the established
+precedent that `GRAVEYARDED` is this ledger's status for "measurement-complete,
+frozen, no further action authorized" (exactly how `CANDIDATE_JIGSAW_HARVEST_V0`
+itself was closed, including when its own results were positive) -- not
+`SURVIVOR`, which this repair never uses. `evidence_paths`/`evidence_sha256`
+bind, with no recomputation, the exact on-disk bytes of `result.json` and
+the two frozen V0R1 artifacts named in this phase's own project record.
+`revisit_condition` states plainly that any further work requires a new
+preregistration and grants no downstream authority. Neither historical
+Jigsaw Harvest V0 ledger event was modified; both streams remain
+append-only, and `research_ledger rebuild`/`doctor`/`context` all agree.

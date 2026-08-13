@@ -25,7 +25,8 @@ HARVEST_PIECE_IDS = {
     "JH04_DRAWDOWN_TO_RETURN",
 }
 FUNDING_PRESSURE_ID = "JIGSAW_FUNDING_PRESSURE_VOLATILITY_V0"
-ALL_PIECE_IDS = HARVEST_PIECE_IDS | {FUNDING_PRESSURE_ID}
+JH01_V0R1_REPLICATION_ID = "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_V0R1"
+ALL_PIECE_IDS = HARVEST_PIECE_IDS | {FUNDING_PRESSURE_ID, JH01_V0R1_REPLICATION_ID}
 
 
 # ---------------------------------------------------------------------------
@@ -108,7 +109,7 @@ def test_a_every_canonical_piece_appears_exactly_once_in_inventory():
     synthesis = build_synthesis(RESEARCH_ROOT)
     identities = [row["piece_identity"] for row in synthesis["piece_inventory"]]
     assert set(identities) == ALL_PIECE_IDS
-    assert len(identities) == len(set(identities)) == 5
+    assert len(identities) == len(set(identities)) == 6
 
 
 # ---------------------------------------------------------------------------
@@ -119,13 +120,13 @@ def test_a_every_canonical_piece_appears_exactly_once_in_inventory():
 def test_b_every_unordered_pair_appears_exactly_once():
     synthesis = build_synthesis(RESEARCH_ROOT)
     pairs = synthesis["pair_relationships"]
-    assert len(pairs) == 10  # 5 choose 2
+    assert len(pairs) == 15  # 6 choose 2
     seen = set()
     for pair in pairs:
         key = frozenset((pair["piece_a"], pair["piece_b"]))
         assert key not in seen, f"duplicate/reversed pair: {pair['pair_id']}"
         seen.add(key)
-    assert len(seen) == 10
+    assert len(seen) == 15
 
 
 # ---------------------------------------------------------------------------
@@ -328,12 +329,15 @@ def test_k_no_scoring_or_vote_counting_fields_anywhere():
             "same_experiment",
             "same_snapshot_identity",
             "decision_window_relation",
+            "decision_window_direction",
             "same_data_history",
             "same_feature",
             "same_outcome",
             "prior_exposure_relation",
             "claim_relation",
             "independence_status",
+            "replication_target_relation",
+            "replication_relation",
             "allowed_synthesis",
         }
 
@@ -795,7 +799,7 @@ def test_closure_d_current_real_artifact_semantics_unchanged():
     assert len(harvest_pairs) == 6
     assert all(p["independence_status"] == "SHARED_FROZEN_HISTORY" for p in harvest_pairs)
     funding_pairs = [p for p in synthesis["pair_relationships"] if FUNDING_PRESSURE_ID in (p["piece_a"], p["piece_b"])]
-    assert len(funding_pairs) == 4
+    assert len(funding_pairs) == 5
     assert all(p["allowed_synthesis"] == "SEPARATE_ONLY" for p in funding_pairs)
     assert not any(p["independence_status"] == "INDEPENDENT_REPLICATION_EXPLICITLY_ESTABLISHED" for p in synthesis["pair_relationships"])
 
@@ -869,6 +873,380 @@ def test_joint_context_only_reachable_for_overlapping_related_distinct_claim(tmp
 
 
 # ---------------------------------------------------------------------------
+# JH01 V0R1 temporal replication (JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_JIGSAW_EVIDENCE_IMPLEMENTATION_V0).
+#
+# TEMPORALLY DISJOINT REPLICATION != INDEPENDENT REPLICATION. These tests pin
+# the real-data pair's exact mechanical resolution and then hostile-review
+# the generic replication_relation machinery against synthetic fixtures, the
+# same way test_closure_a/b/c above hostile-reviewed independence_status.
+# ---------------------------------------------------------------------------
+
+
+def test_jh01_v0r1_real_pair_is_temporal_replication_not_independence(tmp_path=None):
+    synthesis = build_synthesis(RESEARCH_ROOT)
+    pair = get_pair(synthesis, "JH01_RV_PERSISTENCE", JH01_V0R1_REPLICATION_ID)
+    assert pair is not None
+    assert pair["claim_relation"] == "IDENTICAL_CLAIM"
+    assert pair["decision_window_relation"] == "DISJOINT"
+    # F-02 (PR #60 post-review closure repair): JH01_RV_PERSISTENCE's window
+    # (...2025-06-19) ends before JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_
+    # V0R1's window begins (2025-07-20...), so direction must mechanically
+    # resolve to A_BEFORE_B -- the replication really is later, not merely
+    # asserted to be.
+    assert pair["decision_window_direction"] == "A_BEFORE_B"
+    assert pair["same_snapshot_identity"] == "NO"
+    assert pair["same_source_artifact"] == "NO"
+    # The two axes disagree on purpose: temporally disjoint replication is
+    # explicitly established while independence stays not established.
+    assert pair["replication_relation"] == "TEMPORAL_REPLICATION_EXPLICITLY_ESTABLISHED"
+    assert pair["independence_status"] == "INDEPENDENCE_NOT_ESTABLISHED"
+    assert pair["independence_status"] != "INDEPENDENT_REPLICATION_EXPLICITLY_ESTABLISHED"
+    assert pair["allowed_synthesis"] == "TEMPORAL_REPLICATION_CONTEXT_ONLY"
+    assert pair["allowed_synthesis"] != "INDEPENDENT_CONFIRMATION_ELIGIBLE"
+
+
+def test_jh01_v0r1_real_pair_statement_says_later_because_direction_is_mechanically_later():
+    # F-02: the statement must say "later" only because decision_window_direction
+    # mechanically establishes it, never merely because the replicating piece
+    # declared itself a replication of the target.
+    synthesis = build_synthesis(RESEARCH_ROOT)
+    statement = next(
+        s for s in synthesis["synthesis_statements"] if set(s["supporting_piece_ids"]) == {"JH01_RV_PERSISTENCE", JH01_V0R1_REPLICATION_ID}
+    )
+    assert "a later temporally separate frozen evaluation" in statement["statement"]
+    assert "an earlier" not in statement["statement"]
+
+
+def test_jh01_v0r1_does_not_flip_global_independent_replication_flag():
+    synthesis = build_synthesis(RESEARCH_ROOT)
+    assert synthesis["global_constraints"]["independent_replication_established"] == "NO"
+    assert not any(
+        p["independence_status"] == "INDEPENDENT_REPLICATION_EXPLICITLY_ESTABLISHED" for p in synthesis["pair_relationships"]
+    )
+    assert synthesis["summary"]["pairs_by_replication_relation"]["TEMPORAL_REPLICATION_EXPLICITLY_ESTABLISHED"] == 1
+
+
+def test_jh01_v0r1_statement_disclaims_independence_and_forecast_value():
+    synthesis = build_synthesis(RESEARCH_ROOT)
+    statement = next(
+        s for s in synthesis["synthesis_statements"] if set(s["supporting_piece_ids"]) == {"JH01_RV_PERSISTENCE", JH01_V0R1_REPLICATION_ID}
+    )
+    lowered = statement["statement"].lower()
+    for banned in ("independent confirmation", "novel alpha", "trading edge", "economic significance"):
+        assert banned not in lowered
+    # The statement only ever mentions "independent replication" to disclaim
+    # it, never to assert it.
+    assert "does not establish independent replication" in lowered
+    assert "provider" in lowered
+    blob = " ".join(statement["prohibited_inferences"]).lower()
+    assert "provider" in blob and "causal" in blob
+    assert "incremental" in blob or "out-of-time forecast value" in blob
+
+
+def test_jh01_v0r1_original_discovery_piece_untouched_by_addition():
+    synthesis = build_synthesis(RESEARCH_ROOT)
+    row = next(r for r in synthesis["piece_inventory"] if r["piece_identity"] == "JH01_RV_PERSISTENCE")
+    assert row["native_scientific_fields"]["classification"] == "SUPPORTED_WITHIN_FROZEN_SCOPE"
+    assert row["frozen_binding"]["decision_window"] == "2023-11-18T00:00:00Z..2025-06-19T00:00:00Z"
+
+
+# --- Hostile-review-style fixtures for the new replication_relation axis --
+
+
+def _replication_piece(experiment_id, snapshot_binding, replication_of=None, **extra):
+    document = {
+        "schema_version": "jigsaw-evidence-piece-v0",
+        "experiment_id": experiment_id,
+        "research_status": "FROZEN_HISTORICAL_EVIDENCE",
+        "authority": "NON_AUTHORITATIVE_EXPLORATORY_ONLY",
+        "piece_type": "PREDICTIVE_ASSOCIATION",
+        "promotion_eligible": False,
+        "feature": "RV24_prior,t",
+        "outcome": "RV24_future,t",
+        "snapshot_binding": snapshot_binding,
+        "prior_feature_exposure": "NO",
+    }
+    if replication_of is not None:
+        document["replication_of_piece_identity"] = replication_of
+    document.update(extra)
+    return document
+
+
+def test_replication_a_shared_history_dominates_a_declared_replication_target(tmp_path):
+    # Both pieces share the exact same explicit snapshot_id: a declared
+    # replication target must not escape SHARED_FROZEN_HISTORY into a
+    # "temporal replication" reading -- shared history is checked first,
+    # unconditionally, exactly as it is for independence_status.
+    snapshot = {"snapshot_id": "fixture-snap-repl-a", "decision_window": "2024-01-01T00:00:00Z..2024-02-01T00:00:00Z", "panel_symbols": 3}
+    _write(tmp_path, "fixture_repl_a1", _replication_piece("REPL_A_TARGET", snapshot), filename="result.json")
+    _write(tmp_path, "fixture_repl_a2", _replication_piece("REPL_A_SOURCE", snapshot, replication_of="REPL_A_TARGET"), filename="result.json")
+    synthesis = build_synthesis(tmp_path)
+    pair = get_pair(synthesis, "REPL_A_TARGET", "REPL_A_SOURCE")
+    assert pair["independence_status"] == "SHARED_FROZEN_HISTORY"
+    assert pair["replication_target_relation"] in ("A_DECLARES_REPLICATION_OF_B", "B_DECLARES_REPLICATION_OF_A")
+    assert pair["replication_relation"] == "REPLICATION_TARGET_DECLARED_RELATION_NOT_ESTABLISHED"
+    assert pair["allowed_synthesis"] == "SAME_HISTORY_MULTI_PROPOSITION_CONTEXT"
+    assert pair["allowed_synthesis"] != "TEMPORAL_REPLICATION_CONTEXT_ONLY"
+
+
+def test_replication_b_disjoint_declared_target_reaches_temporal_replication_but_not_independence(tmp_path):
+    _write(
+        tmp_path,
+        "fixture_repl_b1",
+        _replication_piece("REPL_B_TARGET", {"snapshot_id": "fixture-snap-repl-b1", "decision_window": "2024-01-01T00:00:00Z..2024-02-01T00:00:00Z", "panel_symbols": 3}),
+        filename="result.json",
+    )
+    _write(
+        tmp_path,
+        "fixture_repl_b2",
+        _replication_piece(
+            "REPL_B_SOURCE",
+            {"snapshot_id": "fixture-snap-repl-b2", "decision_window": "2025-01-01T00:00:00Z..2025-02-01T00:00:00Z", "panel_symbols": 3},
+            replication_of="REPL_B_TARGET",
+        ),
+        filename="result.json",
+    )
+    synthesis = build_synthesis(tmp_path)
+    pair = get_pair(synthesis, "REPL_B_TARGET", "REPL_B_SOURCE")
+    assert pair["decision_window_relation"] == "DISJOINT"
+    assert pair["replication_relation"] == "TEMPORAL_REPLICATION_EXPLICITLY_ESTABLISHED"
+    assert pair["independence_status"] == "INDEPENDENCE_NOT_ESTABLISHED"
+    assert pair["independence_status"] != "INDEPENDENT_REPLICATION_EXPLICITLY_ESTABLISHED"
+    assert pair["allowed_synthesis"] == "TEMPORAL_REPLICATION_CONTEXT_ONLY"
+    assert synthesis["global_constraints"]["independent_replication_established"] == "NO"
+
+
+def test_replication_c_no_declaration_stays_no_explicit_target_even_when_disjoint(tmp_path):
+    # A random disjoint experiment must not read as a replication of another
+    # piece merely because it shares feature/outcome text and a disjoint
+    # window -- only an explicit, matching declaration counts.
+    _write(
+        tmp_path,
+        "fixture_repl_c1",
+        _replication_piece("REPL_C_TARGET", {"snapshot_id": "fixture-snap-repl-c1", "decision_window": "2024-01-01T00:00:00Z..2024-02-01T00:00:00Z", "panel_symbols": 3}),
+        filename="result.json",
+    )
+    _write(
+        tmp_path,
+        "fixture_repl_c2",
+        _replication_piece("REPL_C_OTHER", {"snapshot_id": "fixture-snap-repl-c2", "decision_window": "2025-01-01T00:00:00Z..2025-02-01T00:00:00Z", "panel_symbols": 3}),
+        filename="result.json",
+    )
+    synthesis = build_synthesis(tmp_path)
+    pair = get_pair(synthesis, "REPL_C_TARGET", "REPL_C_OTHER")
+    assert pair["claim_relation"] == "IDENTICAL_CLAIM"
+    assert pair["decision_window_relation"] == "DISJOINT"
+    assert pair["replication_target_relation"] == "NONE"
+    assert pair["replication_relation"] == "NO_EXPLICIT_REPLICATION_TARGET"
+    assert pair["allowed_synthesis"] == "SEPARATE_ONLY"
+
+
+def test_replication_d_declared_target_naming_a_nonexistent_piece_never_matches(tmp_path):
+    _write(
+        tmp_path,
+        "fixture_repl_d1",
+        _replication_piece(
+            "REPL_D_SOURCE",
+            {"snapshot_id": "fixture-snap-repl-d1", "decision_window": "2025-01-01T00:00:00Z..2025-02-01T00:00:00Z", "panel_symbols": 3},
+            replication_of="NOT_AN_INDEXED_PIECE",
+        ),
+        filename="result.json",
+    )
+    _write(
+        tmp_path,
+        "fixture_repl_d2",
+        _replication_piece("REPL_D_OTHER", {"snapshot_id": "fixture-snap-repl-d2", "decision_window": "2024-01-01T00:00:00Z..2024-02-01T00:00:00Z", "panel_symbols": 3}),
+        filename="result.json",
+    )
+    synthesis = build_synthesis(tmp_path)
+    pair = get_pair(synthesis, "REPL_D_SOURCE", "REPL_D_OTHER")
+    assert pair["replication_target_relation"] == "NONE"
+    assert pair["replication_relation"] == "NO_EXPLICIT_REPLICATION_TARGET"
+
+
+def test_replication_e_mismatched_claim_blocks_the_statement_even_with_declared_target(tmp_path):
+    # A declared, temporally disjoint replication target whose feature/outcome
+    # do not actually match must not produce a TEMPORAL_REPLICATION_CONTEXT_ONLY
+    # statement -- allowed_synthesis still requires claim_relation compatibility.
+    _write(
+        tmp_path,
+        "fixture_repl_e1",
+        {
+            "schema_version": "jigsaw-evidence-piece-v0",
+            "experiment_id": "REPL_E_TARGET",
+            "research_status": "FROZEN_HISTORICAL_EVIDENCE",
+            "authority": "NON_AUTHORITATIVE_EXPLORATORY_ONLY",
+            "piece_type": "PREDICTIVE_ASSOCIATION",
+            "promotion_eligible": False,
+            "feature": "FEATURE_ONE",
+            "outcome": "OUTCOME_ONE",
+            "snapshot_binding": {"snapshot_id": "fixture-snap-repl-e1", "decision_window": "2024-01-01T00:00:00Z..2024-02-01T00:00:00Z", "panel_symbols": 3},
+            "prior_feature_exposure": "NO",
+        },
+        filename="result.json",
+    )
+    _write(
+        tmp_path,
+        "fixture_repl_e2",
+        {
+            "schema_version": "jigsaw-evidence-piece-v0",
+            "experiment_id": "REPL_E_SOURCE",
+            "research_status": "FROZEN_HISTORICAL_EVIDENCE",
+            "authority": "NON_AUTHORITATIVE_EXPLORATORY_ONLY",
+            "piece_type": "PREDICTIVE_ASSOCIATION",
+            "promotion_eligible": False,
+            "feature": "FEATURE_TWO_UNRELATED",
+            "outcome": "OUTCOME_TWO_UNRELATED",
+            "snapshot_binding": {"snapshot_id": "fixture-snap-repl-e2", "decision_window": "2025-01-01T00:00:00Z..2025-02-01T00:00:00Z", "panel_symbols": 3},
+            "prior_feature_exposure": "NO",
+            "replication_of_piece_identity": "REPL_E_TARGET",
+        },
+        filename="result.json",
+    )
+    synthesis = build_synthesis(tmp_path)
+    pair = get_pair(synthesis, "REPL_E_TARGET", "REPL_E_SOURCE")
+    assert pair["replication_relation"] == "TEMPORAL_REPLICATION_EXPLICITLY_ESTABLISHED"
+    assert pair["claim_relation"] == "DIFFERENT_CLAIM"
+    assert pair["allowed_synthesis"] == "SEPARATE_ONLY"
+    assert not any(
+        set(s["supporting_piece_ids"]) == {"REPL_E_TARGET", "REPL_E_SOURCE"} for s in synthesis["synthesis_statements"]
+    )
+
+
+def test_replication_f_legacy_independent_declaration_field_still_never_read_for_replication(tmp_path):
+    # The pre-existing explicit_independent_replication_of field (see
+    # test_closure_a/b/c above) must not be silently aliased into the new
+    # replication_of_piece_identity mechanism either.
+    snapshot_a = {"snapshot_id": "fixture-snap-repl-f1", "decision_window": "2024-01-01T00:00:00Z..2024-02-01T00:00:00Z", "panel_symbols": 3}
+    snapshot_b = {"snapshot_id": "fixture-snap-repl-f2", "decision_window": "2025-01-01T00:00:00Z..2025-02-01T00:00:00Z", "panel_symbols": 3}
+    _write(
+        tmp_path,
+        "fixture_repl_f1",
+        _replication_piece("REPL_F_TARGET", snapshot_a, explicit_independent_replication_of="REPL_F_SOURCE"),
+        filename="result.json",
+    )
+    _write(
+        tmp_path,
+        "fixture_repl_f2",
+        _replication_piece("REPL_F_SOURCE", snapshot_b, explicit_independent_replication_of="REPL_F_TARGET"),
+        filename="result.json",
+    )
+    synthesis = build_synthesis(tmp_path)
+    pair = get_pair(synthesis, "REPL_F_TARGET", "REPL_F_SOURCE")
+    assert pair["replication_target_relation"] == "NONE"
+    assert pair["replication_relation"] == "NO_EXPLICIT_REPLICATION_TARGET"
+    assert pair["independence_status"] == "INDEPENDENCE_NOT_ESTABLISHED"
+
+
+# ---------------------------------------------------------------------------
+# F-02 (PR #60 post-review closure repair): decision_window_direction is
+# derived mechanically from the parsed windows, never from piece names or
+# which side made the explicit replication declaration.
+# ---------------------------------------------------------------------------
+
+
+def test_replication_g_reverse_time_declaration_is_never_worded_as_later(tmp_path):
+    # The *declaring* piece's window is the earlier of the disjoint pair.
+    # A naive implementation that assumes the declaring piece is always
+    # "later" would mis-describe this as a later evaluation; the statement
+    # must say "earlier" instead, read off the mechanical direction only.
+    _write(
+        tmp_path,
+        "fixture_repl_g_target",
+        _replication_piece("REPL_G_TARGET", {"snapshot_id": "fixture-snap-repl-g-target", "decision_window": "2025-01-01T00:00:00Z..2025-02-01T00:00:00Z", "panel_symbols": 3}),
+        filename="result.json",
+    )
+    _write(
+        tmp_path,
+        "fixture_repl_g_source",
+        _replication_piece(
+            "REPL_G_SOURCE",
+            {"snapshot_id": "fixture-snap-repl-g-source", "decision_window": "2023-01-01T00:00:00Z..2023-02-01T00:00:00Z", "panel_symbols": 3},
+            replication_of="REPL_G_TARGET",
+        ),
+        filename="result.json",
+    )
+    synthesis = build_synthesis(tmp_path)
+    pair = get_pair(synthesis, "REPL_G_TARGET", "REPL_G_SOURCE")
+    assert pair["decision_window_relation"] == "DISJOINT"
+    assert pair["replication_relation"] == "TEMPORAL_REPLICATION_EXPLICITLY_ESTABLISHED"
+    # REPL_G_SOURCE (the declaring piece) is piece_a or piece_b depending on
+    # sort order, but its window is strictly earlier than REPL_G_TARGET's
+    # regardless -- assert on the resolved direction relative to piece_a/b,
+    # not on which side declared.
+    a_id, b_id = pair["piece_a"], pair["piece_b"]
+    source_is_a = a_id == "REPL_G_SOURCE"
+    expected_direction = "A_BEFORE_B" if source_is_a else "B_BEFORE_A"
+    assert pair["decision_window_direction"] == expected_direction
+    statement = next(
+        s for s in synthesis["synthesis_statements"] if set(s["supporting_piece_ids"]) == {"REPL_G_TARGET", "REPL_G_SOURCE"}
+    )
+    assert "an earlier temporally separate frozen evaluation" in statement["statement"]
+    assert "a later" not in statement["statement"]
+
+
+def test_replication_h_overlapping_windows_with_declared_target_never_reach_temporal_replication(tmp_path):
+    # F-02 forensic check: an explicit replication_of_piece_identity
+    # declaration must not, by itself, manufacture
+    # TEMPORAL_REPLICATION_EXPLICITLY_ESTABLISHED when the two pieces'
+    # decision windows actually overlap -- only a provably DISJOINT relation
+    # may reach it.
+    _write(
+        tmp_path,
+        "fixture_repl_h_target",
+        _replication_piece("REPL_H_TARGET", {"snapshot_id": "fixture-snap-repl-h-target", "decision_window": "2024-01-01T00:00:00Z..2024-06-01T00:00:00Z", "panel_symbols": 3}),
+        filename="result.json",
+    )
+    _write(
+        tmp_path,
+        "fixture_repl_h_source",
+        _replication_piece(
+            "REPL_H_SOURCE",
+            {"snapshot_id": "fixture-snap-repl-h-source", "decision_window": "2024-03-01T00:00:00Z..2024-09-01T00:00:00Z", "panel_symbols": 3},
+            replication_of="REPL_H_TARGET",
+        ),
+        filename="result.json",
+    )
+    synthesis = build_synthesis(tmp_path)
+    pair = get_pair(synthesis, "REPL_H_TARGET", "REPL_H_SOURCE")
+    assert pair["decision_window_relation"] == "PARTIAL_OVERLAP"
+    assert pair["decision_window_direction"] == "NOT_APPLICABLE"
+    assert pair["replication_relation"] == "REPLICATION_TARGET_DECLARED_RELATION_NOT_ESTABLISHED"
+    assert pair["allowed_synthesis"] != "TEMPORAL_REPLICATION_CONTEXT_ONLY"
+
+
+@pytest.mark.parametrize(
+    ("window_a", "window_b", "expected_relation"),
+    [
+        ("2024-01-01T00:00:00Z..2024-02-01T00:00:00Z", "2024-01-01T00:00:00Z..2024-02-01T00:00:00Z", "EXACT"),
+        ("2024-01-01T00:00:00Z..2024-06-01T00:00:00Z", "2024-02-01T00:00:00Z..2024-03-01T00:00:00Z", "A_CONTAINS_B"),
+        ("2024-02-01T00:00:00Z..2024-03-01T00:00:00Z", "2024-01-01T00:00:00Z..2024-06-01T00:00:00Z", "B_CONTAINS_A"),
+    ],
+)
+def test_replication_i_non_disjoint_relations_never_get_a_direction(tmp_path, window_a, window_b, expected_relation):
+    # decision_window_direction is only ever meaningful for a provably
+    # DISJOINT pair; every other relation must resolve to NOT_APPLICABLE so
+    # nothing downstream can accidentally read "before"/"after" out of an
+    # EXACT, contained, or overlapping pair.
+    _write(
+        tmp_path,
+        "fixture_repl_i_a",
+        _replication_piece("REPL_I_A", {"snapshot_id": "fixture-snap-repl-i-a", "decision_window": window_a, "panel_symbols": 3}),
+        filename="result.json",
+    )
+    _write(
+        tmp_path,
+        "fixture_repl_i_b",
+        _replication_piece("REPL_I_B", {"snapshot_id": "fixture-snap-repl-i-b", "decision_window": window_b, "panel_symbols": 3}),
+        filename="result.json",
+    )
+    synthesis = build_synthesis(tmp_path)
+    pair = get_pair(synthesis, "REPL_I_A", "REPL_I_B")
+    assert pair["decision_window_relation"] == expected_relation
+    assert pair["decision_window_direction"] == "NOT_APPLICABLE"
+
+
+# ---------------------------------------------------------------------------
 # CLI smoke coverage
 # ---------------------------------------------------------------------------
 
@@ -880,7 +1258,7 @@ def test_cli_doctor_and_summary_and_pair_against_real_repo(capsys):
 
     main(["summary"])
     summary = json.loads(capsys.readouterr().out)
-    assert summary["total_pairs"] == 10
+    assert summary["total_pairs"] == 15
 
     main(["pair", "JH01_RV_PERSISTENCE", "JH02_DISPERSION_TO_RV"])
     pair = json.loads(capsys.readouterr().out)

@@ -61,6 +61,6 @@
     "promotion_authorized": false,
     "ledger_changed": false
   },
-  "qnty_agent_eval": "PENDING_FINAL_TARGET_SHA_COMPATIBILITY_LOOKUP",
+  "qnty_agent_eval": "NO_MATCH",
   "next_action": "A separate, Git-backed real-V1 readiness and activation authorization must verify operational readiness before 2026-09-08T00:00:00Z. This qualified implementation cannot collect or forecast a real V1 origin without that explicit authority."
 }

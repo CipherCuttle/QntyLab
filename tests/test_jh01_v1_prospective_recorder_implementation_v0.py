@@ -94,5 +94,6 @@ def test_qualification_receipt_preserves_frozen_inputs_and_blocks_real_v1():
     assert result["frozen_inputs"]["first_required_source_close"] == "2025-08-15T00:00:00Z"
     assert result["frozen_inputs"]["obsolete_historical_boundary_consumed"] is False
     assert result["qualification"]["synthetic_live_canary_used"] is False
+    assert result["state"] != "CLOSED_PASS" or result["qnty_agent_eval"] == "NO_MATCH"
     assert result["authority"]["v0r3_implementation_authorization_consumed"] is True
     assert not any(value for key, value in result["authority"].items() if key not in {"recorder_implementation_qualified", "v0r3_implementation_authorization_consumed"})

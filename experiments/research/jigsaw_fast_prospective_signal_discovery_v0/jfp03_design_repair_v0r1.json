@@ -1,0 +1,141 @@
+{
+  "artifact_type": "JFP03_HAR_BASELINE_DESIGN_REPAIR_V0R1",
+  "repair_id": "JFP03_HAR_BASELINE_DESIGN_REPAIR_V0R1",
+  "phase_id": "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_HISTORICAL_EXECUTION_V0",
+  "candidate_id": "JFP03",
+  "supersedes_execution_project": "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_HISTORICAL_EXECUTION_V0",
+  "prior_terminal_reason": "FROZEN_DESIGN_UNDERSPECIFIED_BEFORE_REAL_ACCESS",
+  "prior_real_execution_count": 0,
+  "prior_execution_started": false,
+  "prior_real_sample_scientific_access": false,
+  "scientific_features_computed": false,
+  "scientific_outcomes_computed": false,
+  "repair_scope": "JFP03 HAR baseline aggregation and timing/boundary semantics only",
+  "unchanged_frozen_fields": [
+    "AFI_t = abs(2 * taker_buy_quote_volume_t / total_quote_volume_t - 1)",
+    "BTCUSDT USD-M perpetual hourly klines",
+    "2020-01-01T00:00:00Z..2024-12-31T23:00:00Z inclusive hourly decision schedule",
+    "RV24_future_t = sqrt(sum(j=1..24, r_(t+j)^2))",
+    "OLS with intercept and incremental AFI coefficient gamma",
+    "Bartlett/Newey-West HAC lag 24",
+    "partial_R2 >= 0.001",
+    "Holm family size 3 and JFP03 raw alpha 0.05/3",
+    "JFP01 and JFP02 remain BLOCKED_CANDIDATE with null scientific values"
+  ],
+  "plausible_interpretations_considered": [
+    {
+      "id": "CONTIGUOUS_HORIZON_RV",
+      "definition": "sqrt(sum of squared hourly log returns across each exact prior h-hour window)",
+      "assessment": "Uses the same realized-volatility object and units as the frozen future target; directly honors the frozen 1/24/168/720-hour cardinalities and requires no unregistered daily resampling. It includes completed hour t and is backward-looking only."
+    },
+    {
+      "id": "AVERAGED_BASE_PERIOD_REALIZED_MEASURE",
+      "definition": "Average a base-period realized measure over the prior h hourly periods",
+      "assessment": "HAR literature commonly averages lower-frequency realized-volatility components, but the frozen contract supplies hourly data and an hourly-contiguous future RV target. Averaging hourly RVs would change the scale and aggregation object; averaging squared returns would produce variance units and require an unregistered square-root convention."
+    },
+    {
+      "id": "LOG_RV_OR_VARIANCE_HAR",
+      "definition": "Use log realized volatility or realized variance as baseline regressors",
+      "assessment": "Materially changes the frozen benchmark metric and introduces a transform not specified by the census; not selected."
+    }
+  ],
+  "selected_har_construction": "CONTIGUOUS_HORIZON_RV",
+  "scientific_rationale": "The selected construction is the smallest deterministic completion of the frozen phrase 'prior 1-hour, 24-hour, 168-hour, and 720-hour realized-volatility aggregates'. It preserves volatility units and the square-root-of-squared-log-return object used by the frozen future target, while avoiding an unregistered resampling or transform. The choice is outcome blind and is not asserted to be uniquely correct in general.",
+  "primary_literature_used": [
+    {
+      "citation": "Corsi (2009), A Simple Approximate Long-Memory Model of Realized Volatility, Journal of Financial Econometrics 7(2), 174-196",
+      "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1365738",
+      "relevance": "HAR-RV uses realized-volatility components at heterogeneous horizons."
+    },
+    {
+      "citation": "Andersen, Bollerslev, Diebold and Labys (2003), Modeling and Forecasting Realized Volatility, Econometrica 71(2), 579-625",
+      "url": "https://doi.org/10.1111/1468-0262.00418",
+      "relevance": "Realized volatility is constructed from sums of squared high-frequency returns and used for volatility modeling/forecasting."
+    }
+  ],
+  "hourly_return": {
+    "notation": "r_u = ln(C_u / C_(u-1))",
+    "timestamp_definition": "u is a UTC hourly close boundary; C_u is the close of the completed kline [u-1h,u].",
+    "units": "dimensionless log return",
+    "validity": "C_(u-1) and C_u must be finite and strictly positive; otherwise the candidate fails closed."
+  },
+  "har_components": {
+    "HAR_1H_t": {
+      "formula": "sqrt(sum(j=0..0, r_(t-j)^2))",
+      "return_indices": "r_t",
+      "first_included_close": "C_(t-1h)",
+      "last_included_close": "C_t",
+      "return_count": 1,
+      "boundaries": "(t-1h,t], includes hour t, maximum timestamp t",
+      "normalization": "none",
+      "square_root": true,
+      "units": "dimensionless volatility"
+    },
+    "HAR_24H_t": {
+      "formula": "sqrt(sum(j=0..23, r_(t-j)^2))",
+      "return_indices": "r_(t-23h)..r_t",
+      "first_included_close": "C_(t-24h)",
+      "last_included_close": "C_t",
+      "return_count": 24,
+      "boundaries": "(t-24h,t], includes hour t, maximum timestamp t",
+      "normalization": "none",
+      "square_root": true,
+      "units": "dimensionless volatility"
+    },
+    "HAR_168H_t": {
+      "formula": "sqrt(sum(j=0..167, r_(t-j)^2))",
+      "return_indices": "r_(t-167h)..r_t",
+      "first_included_close": "C_(t-168h)",
+      "last_included_close": "C_t",
+      "return_count": 168,
+      "boundaries": "(t-168h,t], includes hour t, maximum timestamp t",
+      "normalization": "none",
+      "square_root": true,
+      "units": "dimensionless volatility"
+    },
+    "HAR_720H_t": {
+      "formula": "sqrt(sum(j=0..719, r_(t-j)^2))",
+      "return_indices": "r_(t-719h)..r_t",
+      "first_included_close": "C_(t-720h)",
+      "last_included_close": "C_t",
+      "return_count": 720,
+      "boundaries": "(t-720h,t], includes hour t, maximum timestamp t",
+      "normalization": "none",
+      "square_root": true,
+      "units": "dimensionless volatility"
+    }
+  },
+  "future_target": {
+    "formula": "RV24_future_t = sqrt(sum(j=1..24, r_(t+j)^2))",
+    "return_indices": "r_(t+1h)..r_(t+24h)",
+    "close_boundaries": "(t,t+24h]",
+    "return_count": 24,
+    "maximum_timestamp": "t+24h"
+  },
+  "leakage_proof": {
+    "maximum_baseline_timestamp_used": "t",
+    "baseline_future_disjoint": true,
+    "proof": "Every baseline return ends at a close boundary no later than t; the target starts with r_(t+1h), so no baseline return is in the future target and no target return is in a baseline term.",
+    "synthetic_example": "For t=2020-01-02T00:00:00Z, HAR_1H ends with C_t and uses (t-1h,t]; HAR_24H begins at C_(t-24h) and ends at C_t; RV24_future begins with (t,t+1h] and ends at (t+23h,t+24h]."
+  },
+  "materialization_compatibility": {
+    "existing_snapshot_compatible": false,
+    "input_reacquisition_required": true,
+    "input_reacquisition_authorized": false,
+    "frozen_input_qualification_digest": "472ef1da4ab7ab2fe5f98aa85fa1c24b666d40bea5aae6b390bcf0627ed60727",
+    "frozen_input_snapshot_id": "jfp-input-v0-9dab9e5f71242116206b30ea61d3b217e760dd43d176022d80c4a43c7153712f",
+    "frozen_input_snapshot_digest": "9dab9e5f71242116206b30ea61d3b217e760dd43d176022d80c4a43c7153712f",
+    "authenticated_jfp03_object_count": 60,
+    "structural_reason": "Manifest metadata shows the first JFP03 raw timestamp is 2020-01-01T00:00:00Z and the last is 2024-12-31T23:00:00Z. The first scheduled decision t=2020-01-01T00:00:00Z requires C_(t-720h)=2019-12-02T00:00:00Z for HAR_720H_t, which is absent. The last scheduled decision t=2024-12-31T23:00:00Z requires future closes through t+24h=2025-01-01T23:00:00Z, which are also absent. The 60-object snapshot therefore lacks both required support regions.",
+    "additional_structural_requirement": "At least contiguous BTCUSDT USD-M 1h source coverage sufficient to provide all closes from C_(2020-01-01T00:00:00Z-720h) through C_(2024-12-31T23:00:00Z+24h), with the same checksum, schema, timestamp, and continuity contract."
+  },
+  "execution_authorization": {
+    "v0r1_project_created": false,
+    "reason": "DESIGN_REPAIR_REQUIRES_NEW_INPUT_MATERIALIZATION",
+    "real_execution_count_allowed": 0,
+    "executor_freeze_required_before_real_access": true,
+    "post_access_rerun_authorized": false,
+    "all_downstream_authority": "NONE"
+  },
+  "design_digest": "a52d4999038e0be814ee8770322303fce84bed9ec8941b812748a18867633736"
+}

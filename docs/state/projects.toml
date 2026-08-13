@@ -462,8 +462,8 @@ implementation_authorized = false
 
 [[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_HISTORICAL_EXECUTION_V0"
-state = "ACTIVE"
-authority_level = "FROZEN_HISTORICAL_EXECUTION_ONLY"
+state = "CLOSED_BLOCKED"
+authority_level = "FROZEN_DESIGN_UNDERSPECIFIED_BEFORE_REAL_ACCESS"
 authoritative_artifacts = [
   "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/preregistration.json",
   "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/candidate_census.json",
@@ -473,6 +473,8 @@ authoritative_artifacts = [
   "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/per_source_manifest.json",
   "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/snapshot_manifest.json",
   "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/input_qualification.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/jfp03_design_repair_v0r1.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/jfp03_design_repair_v0r1_hostile_review.md",
   "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/hostile_materialization_review.md",
 ]
 frozen_preregistration_project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_PREREG_V0"
@@ -485,16 +487,22 @@ frozen_input_snapshot_id = "jfp-input-v0-9dab9e5f71242116206b30ea61d3b217e760dd4
 frozen_input_snapshot_digest = "9dab9e5f71242116206b30ea61d3b217e760dd43d176022d80c4a43c7153712f"
 frozen_materialization_dispositions = "JFP01=BLOCKED_CANDIDATE,JFP02=BLOCKED_CANDIDATE,JFP03=READY"
 execution_candidate_ids = ["JFP03"]
+terminal_reason = "FROZEN_DESIGN_UNDERSPECIFIED_BEFORE_REAL_ACCESS"
+real_execution_count = 0
+execution_started = false
+real_sample_scientific_access = false
+scientific_result_exists = false
+superseded_by = []
 jfp01_execution_authorized = false
 jfp02_execution_authorized = false
-jfp03_execution_authorized = true
+jfp03_execution_authorized = false
 jfp03_ready_authenticated_object_count = 60
 holm_family_size = 3
 jfp03_raw_alpha_threshold = "0.05/3"
 jfp03_holm_rule = "holm_adjusted_p_JFP03 = min(1.0, 3.0 * raw_p_JFP03)"
 blocked_candidate_multiplicity_semantics = "BLOCKED_NON_REJECTION: JFP01 and JFP02 raw_p_value = null; they are not scientifically observed p-values and must never be recorded as raw p = 1."
 input_reacquisition_authorized = false
-real_execution_count_allowed = 1
+real_execution_count_allowed = 0
 executor_freeze_required_before_real_access = true
 post_access_rerun_authorized = false
 jigsaw_evidence_authorized = false
@@ -510,5 +518,5 @@ paper_trading_authorized = false
 trading_authorized = false
 promotion_authorized = false
 capital_authority = "NONE"
-next_action = "Implement the exact frozen JFP03 executor against synthetic fixtures only, hostile-review it, and freeze its implementation identity (source path, Git commit SHA, and source digest bound to this authorization's base SHA and to the frozen preregistration, candidate census, and input qualification digests) before any real scientific transformation; no caller-supplied implementation identity may disagree with actual Git/source identity. Only then authenticate the already frozen JFP03 snapshot (snapshot id jfp-input-v0-9dab9e5f71242116206b30ea61d3b217e760dd43d176022d80c4a43c7153712f, digest 9dab9e5f71242116206b30ea61d3b217e760dd43d176022d80c4a43c7153712f, 60 authenticated READY objects) and execute the canonical JFP03 specification from the frozen candidate census exactly once: incremental OLS coefficient on AFI against the frozen HAR-style baseline, Newey-West Bartlett HAC with fixed lag 24 hourly observations, expected direction POSITIVE, materiality partial_R2 >= 0.001. JFP01 and JFP02 remain scientifically unexecuted BLOCKED_CANDIDATE entries in the original three-candidate order with raw_p_value = null, holm_adjusted_p_value = null, effect = null, and materiality = null; never represent them as raw p = 1. Preserve the original three-hypothesis Holm multiplicity family (FAMILY_SIZE = 3) and apply the conservative JFP03 gate raw_p_JFP03 <= 0.05 / 3, holm_adjusted_p_JFP03 = min(1.0, 3.0 * raw_p_JFP03); no reduction of the family from 3 to 1 is authorized. JFP01 and JFP02 are terminal BLOCKED_CANDIDATE dispositions for this V0 execution: no input reacquisition, no replacement source, no delayed JFP01 execution, and no JFP02 repair/rescue inside this same V0; if a required source later becomes available, studying it requires a separately versioned, explicitly Git-backed follow-up contract that must not silently mutate this V0's history. The real JFP03 execution allowance is exactly one; a durable execution-start sentinel must be written before or atomically with first real outcome access, and once consumed a crash or post-result bug fix does not authorize rerunning the real sample without explicit superseding Git-backed governance. No alternative horizon, feature, benchmark, HAC lag/SE estimator, materiality rule, sample, or row-dropping rescue is authorized; the frozen candidate census is the sole scientific source of truth. No input reacquisition, Jigsaw evidence creation, Jigsaw index mutation, synthesis mutation, prospective deployment, State Snapshot, Router, Qnty, trading, promotion, or capital authority is granted by this phase."
-implementation_authorized = true
+implementation_authorized = false
+next_action = "V0 is closed blocked because the frozen JFP03 HAR baseline was underspecified before real access. The additive V0R1 design repair is deterministic but the existing snapshot lacks the required 720-hour warm-up beginning 2019-12-02T00:00:00Z and the final 24-hour future tail through 2025-01-01T23:00:00Z. A separately authorized input-materialization phase is required; no executor, real execution, input reacquisition, rerun, or downstream authority is authorized."

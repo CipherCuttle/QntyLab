@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- None.
+- `JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_INPUT_MATERIALIZATION_V0` — `ACTIVE`. Materialize and authenticate only the exact frozen first-party inputs required by the JFP01/JFP02/JFP03 preregistration. No scientific feature/outcome computation or historical execution is authorized.
 
 ## Queued — not authorized
 

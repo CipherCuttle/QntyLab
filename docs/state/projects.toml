@@ -402,15 +402,21 @@ capital_authority = "NONE"
 
 [[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_INPUT_MATERIALIZATION_V0"
-state = "ACTIVE"
+state = "CLOSED_PASS"
 authority_level = "INPUT_MATERIALIZATION_ONLY"
 authoritative_artifacts = [
   "docs/state/projects.toml",
   "docs/CURRENT_ROADMAP.md",
   "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/preregistration.json",
   "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/candidate_census.json",
-  "qntylab/jigsaw_fast_prospective_signal_discovery_prereg_v0.py",
-  "tests/test_jigsaw_fast_prospective_signal_discovery_prereg_v0.py",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/materialization_request.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/materialization_receipt.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/per_source_manifest.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/candidate_input_manifest.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/snapshot_manifest.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/input_qualification.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/hostile_materialization_review.md",
+  "qntylab/jigsaw_fast_prospective_signal_discovery_input_materialization_v0.py",
 ]
 phase_type = "GOVERNANCE_ONLY"
 frozen_preregistration_project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_PREREG_V0"
@@ -433,7 +439,7 @@ authorized_operations = [
   "inspect raw schemas, timestamp units, coverage, archive identities, gaps, duplicates, and raw-invalid values",
   "construct immutable raw-input manifests and candidate-local READY/BLOCKED qualifications",
 ]
-input_materialization_authorized = true
+input_materialization_authorized = false
 scientific_feature_computation_authorized = false
 scientific_outcome_computation_authorized = false
 historical_execution_authorized = false
@@ -445,5 +451,11 @@ qnty_authorized = false
 trading_authorized = false
 promotion_authorized = false
 capital_authority = "NONE"
-next_action = "Materialize and authenticate only the exact frozen first-party inputs required by the JFP01/JFP02/JFP03 preregistration. No scientific feature/outcome computation or historical execution is authorized."
-implementation_authorized = true
+frozen_materialization_request_digest = "97026d1a2fadfde7babf7f0c6c7802db6cbc8e92aa55c3b8a7e3d23d1e8456dc"
+frozen_input_qualification_digest = "472ef1da4ab7ab2fe5f98aa85fa1c24b666d40bea5aae6b390bcf0627ed60727"
+frozen_input_snapshot_id = "jfp-input-v0-9dab9e5f71242116206b30ea61d3b217e760dd43d176022d80c4a43c7153712f"
+frozen_input_snapshot_digest = "9dab9e5f71242116206b30ea61d3b217e760dd43d176022d80c4a43c7153712f"
+state_dispositions = "JFP01=BLOCKED_CANDIDATE,JFP02=BLOCKED_CANDIDATE,JFP03=READY"
+input_reacquisition_authorized = false
+next_action = "Input materialization is frozen and closed. Only READY candidates possess authenticated frozen input snapshots. No scientific feature/outcome computation or historical execution is authorized; historical scientific execution requires a separate Git-backed execution authorization."
+implementation_authorized = false

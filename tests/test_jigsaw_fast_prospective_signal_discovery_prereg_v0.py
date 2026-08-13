@@ -66,12 +66,15 @@ def test_input_materialization_authorization_is_exact_and_non_escalating():
     preregistration = load_json("preregistration.json")
     census = load_json("candidate_census.json")
 
-    assert len(active) == 1
-    assert data["active_project"]["project_id"] == authorization["project_id"]
+    assert len(active) == 0
+    assert data["active_project"] is None
     assert authorization["authority_level"] == "INPUT_MATERIALIZATION_ONLY"
     assert authorization["phase_type"] == "GOVERNANCE_ONLY"
-    assert authorization["implementation_authorized"] is True
-    assert authorization["input_materialization_authorized"] is True
+    assert authorization["implementation_authorized"] is False
+    assert authorization["input_materialization_authorized"] is False
+    assert authorization["state"] == "CLOSED_PASS"
+    assert authorization["input_reacquisition_authorized"] is False
+    assert authorization["state_dispositions"] == "JFP01=BLOCKED_CANDIDATE,JFP02=BLOCKED_CANDIDATE,JFP03=READY"
     assert authorization["frozen_preregistration_project_id"] == "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_PREREG_V0"
     assert authorization["frozen_preregistration_digest"] == preregistration["preregistration_digest"]
     assert authorization["frozen_candidate_census_digest"] == census["candidate_census_digest"]

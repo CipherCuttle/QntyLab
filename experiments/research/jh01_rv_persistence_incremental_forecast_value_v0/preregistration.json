@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "project_id": "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_PREREG_V0",
+  "experiment_id": "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_PREREG_V0",
+  "phase": "PREREGISTRATION_ONLY",
+  "status": "NOT_EXECUTED",
+  "implementation_execution_authorized": false,
+  "preregistration_digest": "324279bf493db3862be875e4aca13d78b4feb2cc5f4b11ad39aecb2a4fac3686",
+  "scientific_question": "Does the faithful fitted JH01 RV24 persistence model provide materially better outcome-unseen 24-hour realized-volatility forecasts than literal naive persistence, with fixed simple benchmarks reported without rescue authority?",
+  "source_binding": {
+    "discovery_piece_identity": "JH01_RV_PERSISTENCE",
+    "temporal_replication_piece_identity": "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_V0R1",
+    "immutable_artifacts": {
+      "experiments/research/jigsaw_harvest_v0/preregistration.json": "23cd3f17c5080a0a966aa18b4b4bf620a054afe20329e51936ddc5d402a30a97",
+      "experiments/research/jigsaw_harvest_v0/result.json": "ac40ee2c07da363cf7c53b6f4839469aca8a6d2398d672bd283a1815433390b7",
+      "experiments/research/jh01_rv_persistence_temporal_replication_v0/v0r1/execution_result.json": "00c18ed0097587ef8db0e9b5e4003546c862f6001986fe9d54952734aa6f5872",
+      "experiments/research/jh01_rv_persistence_temporal_replication_v0/v0r1/provenance_correction.json": "9c98ab16b52aef31f4cd3c939eb24c7d4ed211d954db6936e64fc97b45fb3ac1",
+      "experiments/research/jh01_rv_persistence_temporal_replication_v0/result.json": "e2be973dc5741cfb05768753a664a44194650f0758984cc7ca0caecf9532f7f8",
+      "experiments/research/jigsaw_synthesis_eligibility_v0/eligibility.json": "5db7143ddee7340c13c147965a12386e0af1afbbe654b2e907b735bd5cb94a7c"
+    },
+    "jigsaw_synthesis": {
+      "replication_relation": "TEMPORAL_REPLICATION_EXPLICITLY_ESTABLISHED",
+      "independence_status": "INDEPENDENCE_NOT_ESTABLISHED",
+      "independent_replication_established": false,
+      "allowed_synthesis": "TEMPORAL_REPLICATION_CONTEXT_ONLY"
+    }
+  },
+  "frozen_target": {
+    "return_construction": "r_i,h = log(C_i,h / C_i,h-1), at hourly close boundary h; r_m,h is the equal-weighted mean across the exact ordered 20-symbol panel.",
+    "rv24_prior_definition": "RV24_prior,t = sqrt(sum_{h=t-23}^{t} r_m,h^2).",
+    "rv24_future_definition": "RV24_future,t = sqrt(sum_{h=t+1}^{t+24} r_m,h^2).",
+    "realized_measure": "REALIZED_VOLATILITY_NOT_VARIANCE",
+    "decision_time": "00:00:00Z",
+    "safe_known_after": "Every feature return has bar_close_time <= t; the target's first return begins after t.",
+    "forecast_horizon_hours": 24,
+    "target_transformation": "NONE_UNTRANSFORMED_RV24",
+    "annualization": "NONE",
+    "panel_aggregation": "EQUAL_WEIGHTED_20_SYMBOL_MARKET_RETURN_THEN_RV",
+    "missing_data_policy": "BLOCKED_NO_IMPUTATION_OR_ROW_DROPPING",
+    "observation_overlap": "NON_OVERLAPPING_DAILY_OUTCOMES"
+  },
+  "model_set": {
+    "candidate": {
+      "model_id": "C_JH01",
+      "formula": "RV24_future,t = alpha_t + beta_t * RV24_prior,t + epsilon_t",
+      "information_set": "RV24_prior,t and only historical target/feature pairs known before t",
+      "fitted_parameters": ["alpha_t", "beta_t"],
+      "estimation": "OLS_WITH_INTERCEPT_AT_EACH_REFIT"
+    },
+    "B0": {"model_id": "B0_HISTORICAL_MEAN", "formula": "expanding-history mean of prior realized RV24_future values", "status": "RETAINED"},
+    "B1": {"model_id": "B1_NAIVE_PERSISTENCE", "formula": "forecast RV24_future,t = RV24_prior,t", "status": "RETAINED"},
+    "B2": {"model_id": "B2_ONE_LAG_AR", "formula": "same intercept-and-slope one-lag RV24 regression as C_JH01", "status": "REDUNDANT_WITH_CANDIDATE", "reason": "Identical information set, target, functional form, and fitted parameters; excluded from comparisons."},
+    "B3": {"model_id": "B3_HAR_RV_STYLE", "formula": "alpha + b_d*RV24_prior,t + b_w*mean(RV24_prior,t..t-6) + b_m*mean(RV24_prior,t..t-29)", "status": "RETAINED_SECONDARY_ONLY", "windows": [1, 7, 30], "estimation": "OLS_WITH_INTERCEPT_AT_EACH_REFIT"},
+    "primary_benchmark": "B1_NAIVE_PERSISTENCE",
+    "model_equivalence_verdict": "C_JH01 is distinct from B0, B1, and B3, but mathematically identical to B2."
+  },
+  "evaluation_design": {
+    "training_policy": "EXPANDING_WINDOW",
+    "training_history_end": "2026-07-19T00:00:00Z",
+    "minimum_training_origins": 365,
+    "refit_policy": "REFIT_EVERY_DAILY_FORECAST_ORIGIN_USING_ONLY_COMPLETED_TARGETS_STRICTLY_BEFORE_T",
+    "normalization": "NONE; no scaler is fitted",
+    "forecast_bounds": "NONNEGATIVE_FLOOR_ZERO_APPLIED_IDENTICALLY_TO_ALL_FITTED_MODELS_AFTER_FORECASTING",
+    "prospective_holdout": {
+      "status": "REQUIRED_OUTCOME_UNSEEN_POST_PREREGISTRATION_ACQUISITION",
+      "first_decision": "2026-07-20T00:00:00Z",
+      "last_decision": "2027-07-19T00:00:00Z",
+      "required_valid_origins": 365,
+      "maximum_valid_origins": 365,
+      "decision_frequency": "P1D_AT_00:00:00Z",
+      "data_exists_claim": "NOT_ASSESSED",
+      "outcomes_observed_by_this_phase": false,
+      "data_acquired_by_this_phase": false,
+      "evaluation_start_rule": "The fixed first listed origin; no skipped, substituted, or later start is permitted.",
+      "evaluation_end_rule": "The fixed last listed origin after exactly 365 valid daily origins; any missing origin blocks evaluation."
+    },
+    "point_in_time_controls": ["feature bars close no later than t", "training targets end strictly before t", "forecast is persisted before target availability", "no full-sample fitting or scaling", "no duplicate origins", "no missing-value imputation"]
+  },
+  "loss_and_testing": {
+    "primary_loss": "MSE_ON_UNTRANSFORMED_RV24",
+    "secondary_losses": ["MAE_ON_UNTRANSFORMED_RV24"],
+    "excluded_loss": "QLIKE_EXCLUDED_BECAUSE_TARGET_IS_VOLATILITY_NOT_VARIANCE",
+    "primary_comparison": "C_JH01_VS_B1_NAIVE_PERSISTENCE",
+    "primary_test": {"method": "CLARK_WEST_STYLE_ADJUSTED_MSPE_ONE_SIDED_HAC", "alternative": "C_JH01_LOWER_LOSS_THAN_B1", "alpha": 0.05, "hac": "BARTLETT_NEWEY_WEST_AUTOMATIC_BANDWIDTH_ON_DAILY_LOSS_DIFFERENTIALS"},
+    "nested_model_handling": "C_JH01 is the fitted flexible extension of fixed B1, so the primary test uses the preregistered Clark-West-style adjusted MSPE differential. B3 nests C_JH01 and is reported descriptively only; no invalid unadjusted nested-model p-value will be used as a rescue.",
+    "serial_correlation_handling": "Daily targets do not overlap, but loss differentials may remain dependent; HAC is therefore mandatory.",
+    "materiality_gate": {"definition": "relative MSE reduction = (MSE_B1 - MSE_C_JH01) / MSE_B1", "minimum_relative_mse_reduction": 0.05, "rationale": "A fixed decision threshold to exclude trivially small improvements; it is a governance threshold, not a universal economic constant."}
+  },
+  "classification": {
+    "INCREMENTAL_FORECAST_VALUE_SUPPORTED_WITHIN_FROZEN_SCOPE": "C_JH01 has lower primary MSE, relative reduction >= 0.05, and one-sided adjusted-MSPE HAC p <= 0.05.",
+    "NO_INCREMENTAL_FORECAST_VALUE_FOUND": "A valid evaluation fails any primary direction, 5% materiality, or statistical-evidence gate.",
+    "INCONCLUSIVE": "A valid evaluation cannot be classified by the frozen primary gates because the prespecified test is computationally indeterminate without an integrity failure.",
+    "BLOCKED": "A source, data, timing, point-in-time, or contract integrity gate fails before a valid evaluation.",
+    "primary_kill_condition": "Failure to materially improve outcome-unseen primary performance versus B1 retains prior persistence evidence but ends this JH01 representation as an incremental forecasting primitive; no rescue analysis may reverse it."
+  },
+  "search_accounting": {
+    "models_considered": ["B0 historical mean", "B1 naive persistence", "B2 one-lag AR", "B3 HAR-RV-style", "C_JH01 fitted one-lag RV"],
+    "models_removed": ["B2 one-lag AR: redundant with C_JH01"],
+    "horizons_considered": [24],
+    "losses_considered": ["MSE", "MAE", "QLIKE"],
+    "losses_selected": ["MSE primary", "MAE secondary"],
+    "window_policies_considered": ["expanding", "rolling"],
+    "window_policy_selected": "expanding",
+    "multiplicity_policy": "One primary comparison and one primary loss. B0/B3 and MAE are secondary descriptive reports only and cannot rescue failure; no model sweep, horizon sweep, subgroup, asset, transform, or baseline substitution is allowed."
+  },
+  "prohibited_rescues": ["new horizon", "new transform", "new loss", "new subgroup or asset panel", "alternative benchmark hierarchy", "rolling window", "hyperparameter search", "additional features", "alternative primary comparison"],
+  "kill_conditions": ["SOURCE_BINDING_MISMATCH", "OUTCOME_UNSEEN_CLAIM_UNPROVEN", "PRE_FREEZE_OUTCOME_ACCESS", "UNAUTHORIZED_DATA_ACQUISITION", "TRAINING_TEST_OVERLAP", "FUTURE_BAR_USED_AT_FORECAST_ORIGIN", "NON_POINT_IN_TIME_NORMALIZATION", "REFIT_USES_HELD_OUT_OUTCOME", "DUPLICATE_OR_REORDERED_FORECAST_ORIGIN", "MISSING_OBSERVATION", "BENCHMARK_INFORMATION_SET_MISMATCH", "PROTOCOL_DIGEST_MISMATCH", "UNAUTHORIZED_EXECUTION", "POST_FREEZE_MODEL_OR_METRIC_MUTATION"],
+  "outcome_blindness": {"new_market_data_acquired": false, "new_held_out_outcomes_accessed": false, "forecast_evaluation_executed": false, "new_jh01_regression_executed": false, "result_artifact_created": false, "jigsaw_mutated": false},
+  "authority": {"state_snapshot_authorized": false, "router_authorized": false, "qnty_authorized": false, "trading_authorized": false, "promotion_authorized": false, "causal_authority": false}
+}

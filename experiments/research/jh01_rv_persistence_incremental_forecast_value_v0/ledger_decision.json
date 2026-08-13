@@ -1,0 +1,17 @@
+{
+  "event_type": "DECISION_RECORDED",
+  "candidate_id": "CANDIDATE_JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_V0",
+  "family_id": "FAMILY_JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_V0",
+  "variant_id": "variant_7ae666268986548df0cac7c2",
+  "status": "BLOCKED",
+  "scope": "EXACT_VARIANT",
+  "reason_codes": ["PREREGISTRATION_FROZEN", "PROSPECTIVE_HOLDOUT_UNMATERIALIZED", "NO_OUTCOME_ACCESS", "NO_EXECUTION_AUTHORITY"],
+  "decision_note": "The JH01 incremental forecast-value contract is frozen at preregistration digest 324279bf493db3862be875e4aca13d78b4feb2cc5f4b11ad39aecb2a4fac3686. It binds the original JH01 evidence, the V0R1 temporal replication result, mandatory provenance correction, canonical Jigsaw evidence, and synthesis state. It fixes C_JH01 versus B1 naive persistence as the only primary MSE comparison, 5% materiality gate, Clark-West-style adjusted MSPE HAC test, 24-hour horizon, expanding refits, and a 365-origin outcome-unseen prospective window 2026-07-20T00:00:00Z..2027-07-19T00:00:00Z. No new market data, held-out outcome, forecast evaluation, JH01 regression, Jigsaw mutation, or downstream authority was accessed or created. The candidate is BLOCKED only pending separately authorized prospective input/materialization and forecast-evaluator work; this is not a scientific result.",
+  "evidence_paths": ["experiments/research/jh01_rv_persistence_incremental_forecast_value_v0/preregistration.json", "experiments/research/jh01_rv_persistence_incremental_forecast_value_v0/design_note.md"],
+  "evidence_sha256": {
+    "experiments/research/jh01_rv_persistence_incremental_forecast_value_v0/preregistration.json": "20bd204a0a78ef5810e7350e055d7ebb4e1368381ac65fda7acf4476a6068d1b",
+    "experiments/research/jh01_rv_persistence_incremental_forecast_value_v0/design_note.md": "5c8da3d4f8d3c43ef65699b98ed3e163df3993f2dd39df5bf1fc4f4ac0506b4b"
+  },
+  "revisit_condition": "A separately Git-backed prospective input/materialization authorization must prove outcome-unseen integrity before any evaluator implementation or scientific execution. This frozen preregistration may not be modified, reopened, or rescued to change models, metrics, horizons, panels, windows, or benchmarks; no result here authorizes State Snapshot, Router, Qnty, trading, or promotion implementation.",
+  "recorded_at_utc": "2026-08-13T00:00:01Z"
+}

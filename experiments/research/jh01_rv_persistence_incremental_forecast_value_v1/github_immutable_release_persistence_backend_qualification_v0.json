@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "project_id": "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_V1_GITHUB_IMMUTABLE_RELEASE_PERSISTENCE_BACKEND_QUALIFICATION_V0",
+  "state": "CLOSED_BLOCKED",
+  "authority_level": "PERSISTENCE_BACKEND_QUALIFICATION_BLOCKED_NEEDS_IMMUTABLE_RELEASE_ENABLEMENT",
+  "phase_type": "PERSISTENCE_BACKEND_QUALIFICATION_ONLY",
+  "block_reason": "BLOCKED_NEEDS_IMMUTABLE_RELEASE_ENABLEMENT",
+  "canonical_remote_base": "a55307d52716354b9a92270c3b1e05c9fc46b667",
+  "canonical_merge_parents": ["c32afe563c6093775cc0195e3c57ac192345b549", "a82dd27a09820d07f61512663b1279edfee43304"],
+  "predecessor": {
+    "project_id": "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_V1_PROSPECTIVE_RECORDER_AND_INPUT_MATERIALIZATION_AUTHORIZATION_V0",
+    "state": "CLOSED_BLOCKED",
+    "block_reason": "AUTHORITATIVE_PERSISTENCE_BACKEND_UNQUALIFIED",
+    "reopened": false
+  },
+  "frozen_v1_authority": {
+    "path": "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/preregistration.json",
+    "preregistration_digest": "bdb85130cae75e9f156db9aa1fd955d7f565a3714ae091871d5ac4447c1ec27b",
+    "bytes_sha256": "4990688b640ad34f6f022431766bdd9539f75c9fb8bb278bdf9ae3637db09a0a",
+    "first_origin": "2026-09-15T00:00:00Z",
+    "last_origin": "2027-09-14T00:00:00Z",
+    "required_origin_count": 365,
+    "persistence_rule": "t <= AUTHORITATIVE_PERSISTENCE_TIME < t + 1 hour",
+    "source_rule": "MAX_INPUT_BAR_CLOSE <= t",
+    "readiness_deadline": "2026-09-08T00:00:00Z"
+  },
+  "official_github_contract": {
+    "documentation_checked_utc": "2026-08-13T20:29:42Z",
+    "api_version": "2026-03-10",
+    "immutable_releases_doc": "https://docs.github.com/en/enterprise-cloud@latest/code-security/concepts/supply-chain-security/immutable-releases",
+    "releases_rest_doc": "https://docs.github.com/en/rest/releases/releases?apiVersion=2026-03-10",
+    "release_verify_doc": "https://cli.github.com/manual/gh_release_verify",
+    "release_verify_asset_doc": "https://cli.github.com/manual/gh_release_verify-asset",
+    "documented_semantics": {
+      "draft_then_assets_then_publish": true,
+      "published_release_locks_associated_tag": true,
+      "published_release_locks_assets": true,
+      "automatic_release_attestation_binds_tag_commit_and_assets": true,
+      "deleted_immutable_tag_name_cannot_be_reused": true,
+      "create_release_request_has_no_published_at_parameter": true,
+      "release_get_exposes_id_tag_immutable_created_at_published_at_assets_and_asset_digest": true,
+      "gh_release_verify_and_verify_asset_exist": true
+    }
+  },
+  "repository_setting_check": {
+    "endpoint": "GET /repos/CipherCuttle/QntyLab/immutable-releases",
+    "api_version": "2026-03-10",
+    "http_status": 200,
+    "response": {"enabled": false, "enforced_by_owner": false},
+    "immutable_releases_enabled": false,
+    "repository_policy_changed": false
+  },
+  "qualification_execution": {
+    "stop_gate": "Immutable Releases must be enabled before any qualification release is created.",
+    "qualification_tag": null,
+    "qualification_release_id": null,
+    "qualification_only": true,
+    "real_v1_forecast_created": false,
+    "synthetic_artifact_created": false,
+    "release_created": false,
+    "reason_not_run": "Repository-level immutable releases were disabled; phase contract forbids release creation before enablement proof and does not authorize enabling the repository-wide policy."
+  },
+  "property_results": {
+    "IMMUTABLE_RELEASES_ENABLED": "NO",
+    "SERVER_OBSERVED_PUBLISHED_AT": "UNPROVEN",
+    "CALLER_CAN_BACKDATE_PUBLISHED_AT": "UNPROVEN_FOR_THIS_REPOSITORY",
+    "IMMUTABLE_FLAG_PROVEN": "UNPROVEN",
+    "ASSET_MUTATION_REJECTED": "UNPROVEN",
+    "ASSET_DELETE_REJECTED": "UNPROVEN",
+    "TAG_MOVE_REJECTED": "UNPROVEN",
+    "RELEASE_ATTESTATION_VERIFIED": "UNPROVEN",
+    "ASSET_IDENTITY_VERIFIED": "UNPROVEN",
+    "DETERMINISTIC_LOOKUP": "UNPROVEN",
+    "READ_AFTER_UNKNOWN_WRITE_SUPPORTED": "UNPROVEN",
+    "SAME_TAG_COMPETING_RELEASE_REJECTED": "UNPROVEN",
+    "AUTHENTICATABLE_LATER": "UNPROVEN",
+    "RETENTION_TRUST_MODEL_ACCEPTABLE": "UNPROVEN"
+  },
+  "retention_and_threat_model": {
+    "content_immutability": "DOCUMENTED_CONDITIONALLY_ON_ENABLED_IMMUTABLE_RELEASE",
+    "existence_retention": "UNPROVEN_FOR_THIS_REPOSITORY",
+    "administrator_can_delete_release_or_repository": "NOT_DISPROVEN_BY_THIS_PHASE",
+    "tag_name_reuse_after_immutable_release_deletion": "DOCUMENTED_AS_PROHIBITED",
+    "trusted_boundary_if_later_qualified": "GitHub's server-observed immutable-release publication, retained GitHub release/attestation service, and repository operations retaining the release through collection and evaluation; not GitHub infrastructure compromise or destructive repository deletion.",
+    "backup_or_archive_requirement": "A later PASS requires an explicit retained-release monitoring and independently retrievable archive/attestation plan for the full V1 horizon."
+  },
+  "rate_limit_assessment": "Official release creation documentation warns that creating content too quickly may trigger secondary rate limits. One release per day (365 over approximately one year) is operationally plausible but not guaranteed; no load test was performed.",
+  "outcome_blindness": {
+    "market_data_accessed": false,
+    "held_out_outcomes_accessed": false,
+    "real_forecast_executed": false,
+    "scientific_evaluation_performed": false,
+    "jigsaw_mutated": false,
+    "ledger_changed": false
+  },
+  "authority": {
+    "future_bounded_implementation_authorized": false,
+    "implementation_authorized": false,
+    "state_snapshot_authorized": false,
+    "router_authorized": false,
+    "qnty_authorized": false,
+    "trading_authorized": false,
+    "promotion_authorized": false
+  },
+  "next_action": "A separately authorized repository-policy action may enable GitHub Immutable Releases. After read-back proves enabled, a new Git-backed qualification phase must create exactly one synthetic non-scientific draft-to-asset-to-publish release and prove all required live properties. No recorder implementation or real V1 collection is authorized by this artifact."
+}

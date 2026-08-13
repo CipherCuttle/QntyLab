@@ -376,3 +376,26 @@ trading_authorized = false
 promotion_authorized = false
 next_action = "JH01 incremental forecast-value preregistration is frozen outcome-blind and closed. The exact candidate is blocked pending separately Git-backed prospective input/materialization authorization proving outcome-unseen integrity; no evaluator execution, Jigsaw mutation, State Snapshot, Router, Qnty, trading, or promotion authority is granted."
 implementation_authorized = false
+
+[[project]]
+project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_PREREG_V0"
+state = "ACTIVE"
+authority_level = "OUTCOME_BLIND_PREREGISTRATION_ONLY"
+authoritative_artifacts = [
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/candidate_census.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/preregistration.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/design_note.md",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/hostile_review.md",
+  "qntylab/jigsaw_fast_prospective_signal_discovery_prereg_v0.py",
+  "tests/test_jigsaw_fast_prospective_signal_discovery_prereg_v0.py",
+]
+next_action = "Freeze this preregistration only. A separate Git-backed phase is required for input materialization; historical execution, prospective observation, Qnty, State Snapshot, Router, trading, and capital remain unauthorized."
+implementation_authorized = true
+input_materialization_authorized = false
+historical_execution_authorized = false
+prospective_deployment_authorized = false
+qnty_authorized = false
+state_snapshot_authorized = false
+router_authorized = false
+trading_authorized = false
+capital_authority = "NONE"

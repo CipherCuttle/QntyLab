@@ -1,0 +1,68 @@
+{
+  "schema_version": "qntylab-jigsaw-fast-prospective-signal-discovery-preregistration-v0",
+  "phase_id": "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_PREREG_V0",
+  "experiment_id": "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_V0",
+  "status": "NOT_EXECUTED",
+  "research_status": "PREREGISTERED_DESIGN_ONLY_INPUT_MATERIALIZATION_NOT_AUTHORIZED",
+  "candidate_census_path": "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/candidate_census.json",
+  "candidate_census_digest": "1ef66b1155e75db080726d8ecec8049284e0f9d5395a7ca79c2f12c0b1da5459",
+  "candidate_ids": ["JFP01", "JFP02", "JFP03"],
+  "candidate_count": 3,
+  "outcome_blindness": {
+    "market_data_accessed": false,
+    "candidate_outcomes_opened": false,
+    "features_computed": false,
+    "outcomes_computed": false,
+    "historical_execution_performed": false,
+    "scientific_result_exists": false
+  },
+  "historical_contract": {
+    "execution_mode": "ONE_SHOT_ALL_THREE_CANDIDATES_AGAINST_FROZEN_INPUT_ARTIFACTS",
+    "window": "2020-01-01T00:00:00Z..2024-12-31T23:00:00Z",
+    "calendar": "Fixed inclusive UTC schedule; no moving, shortening, or extending after data availability.",
+    "common_sample_rule": "A common integrity failure blocks the campaign; candidates may not receive candidate-specific row dropping or repaired windows.",
+    "terminal_classifications": ["DISCOVERY_SUPPORTED_WITHIN_FROZEN_SCOPE", "NO_DISCOVERY_SUPPORT_FOUND", "BLOCKED_INTEGRITY"],
+    "shadow_observation_eligible": "TRUE only as a separate governance flag after a deterministic historical admission gate; at most two candidates, zero permitted.",
+    "ranking": "No leaderboard or ranking is produced for survival selection. Results are reported in preregistered candidate order."
+  },
+  "statistics": {
+    "familywise_alpha": 0.05,
+    "adjustment": "Holm step-down across exactly three raw two-sided p-values, ties ordered by candidate_id.",
+    "directionality": "Each candidate is gated on its preregistered direction; opposite-sign evidence is not a success.",
+    "materiality": "Each candidate's own frozen materiality rule must pass in addition to the adjusted inference gate.",
+    "minimum_observations": "At least 90% of the fixed candidate schedule must be present, but any missingness still classifies BLOCKED_INTEGRITY rather than permitting row dropping; the 90% field is a documentation sanity bound, not a permission to execute incomplete input.",
+    "stochasticity": "No bootstrap or stochastic procedure is used; no seed exists.",
+    "descriptive_diagnostics": ["coverage", "missingness", "integrity counts", "effect estimates", "HAC standard error", "raw and Holm p-values", "materiality diagnostic"]
+  },
+  "prospective_observation_contract_v0": {
+    "artifact_identity": "PROSPECTIVE_OBSERVATION_CONTRACT_V0",
+    "required_bindings": ["candidate_id", "exact preregistration digest", "exact formula", "required source fields", "SAFE-KNOWN-AFTER", "universe", "horizon", "schedule", "prediction/event identity", "implementation identity", "maturity rule", "missing-event semantics", "stop conditions"],
+    "prequential_rules": ["persist feature/event/prediction receipt before outcome is known", "formulas/horizons/universe immutable", "no performance-driven early declaration", "no replacement candidate", "no feature/horizon/parameter tuning", "integrity failure may stop", "scientific evaluation only at frozen maturity"],
+    "operational_visibility": "Health, last event, missingness, uptime, clock drift, contract digest, and integrity state may be shown; rolling p-values, Sharpe, win rate, cumulative alpha, and candidate ranking must not drive mid-run decisions.",
+    "authority": {
+      "scientific_status": "DISCOVERY_ONLY",
+      "shadow_observation_eligible": false,
+      "real_orders_authorized": false,
+      "capital_authority": "NONE",
+      "router_authorized": false,
+      "state_snapshot_authorized": false,
+      "qnty_authorized": false,
+      "trading_authorized": false
+    }
+  },
+  "evidence_non_escalation": ["predictive association is not causality", "premium compression is not a funding trade", "volatility predictability is not a directional return edge", "historical discovery is not prospective confirmation", "prospective confirmation is not economic value", "economic value is not capital authority"],
+  "prohibitions": ["no market-data materialization in this phase", "no historical execution", "no strategy_test", "no backtest", "no live shadow deployment", "no paper trading", "no Qnty changes", "no State Snapshot", "no Router", "no trading", "no capital", "no fourth candidate", "no rescue or optional stopping"],
+  "authority": {
+    "input_materialization_authorized": false,
+    "historical_execution_authorized": false,
+    "prospective_deployment_authorized": false,
+    "qnty_mutation_authorized": false,
+    "state_snapshot_authorized": false,
+    "router_authorized": false,
+    "shadow_deployment_authorized": false,
+    "trading_authorized": false,
+    "capital_authority": "NONE"
+  },
+  "qnty_agent_eval": "N/A",
+  "preregistration_digest": "9c8d52bc0d6b933951450c1402e3dc899029ad2c67e17ef58c70ac45c3a62cfe"
+}

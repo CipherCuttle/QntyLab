@@ -1,0 +1,102 @@
+{
+  "artifact_type": "JFP03_V0R1_REPAIRED_SOURCE_MATERIALIZATION_AUTHORIZATION",
+  "schema_version": "jfp03-v0r1-repaired-source-materialization-authorization-v1",
+  "project_id": "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_REPAIRED_SOURCE_MATERIALIZATION_AUTHORIZATION_V0",
+  "phase_type": "GOVERNANCE_ONLY",
+  "authority_level": "REPAIRED_SOURCE_MATERIALIZATION_ONLY",
+  "authorization_scope": "Authorize exactly one later repaired-source input-materialization run; this artifact performs no acquisition and grants no scientific or downstream authority.",
+  "bound_design_digest": "a52d4999038e0be814ee8770322303fce84bed9ec8941b812748a18867633736",
+  "bound_design": {
+    "scientific_window": "2020-01-01T00:00:00Z..2024-12-31T23:00:00Z",
+    "required_raw_support": "2019-12-02T00:00:00Z..2025-01-01T23:00:00Z",
+    "instrument": "Binance USD-M BTCUSDT",
+    "interval": "1h",
+    "har_windows_hours": [1, 24, 168, 720],
+    "target_horizon_hours": 24,
+    "holm_family_size": 3
+  },
+  "bound_source_contract_repair_project": "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_SOURCE_CONTRACT_REPAIR_V0",
+  "bound_source_contract_repair_decision": "SOURCE_CONTRACT_REPAIR = PASS",
+  "source_selection_precedence": [
+    "Use the exact authenticated canonical monthly object only when both the exact object and matching Binance CHECKSUM are available.",
+    "Otherwise use the authenticated exact-range Binance USD-M REST response under the frozen request contract.",
+    "Otherwise BLOCKED. No daily archive, third-party, vendor, synthetic, or other fallback is admissible."
+  ],
+  "monthly_source": {
+    "object_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1h/BTCUSDT-1h-2019-12.zip",
+    "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1h/BTCUSDT-1h-2019-12.zip.CHECKSUM",
+    "authentication": "Exact object and matching official SHA-256 CHECKSUM are both required; missing checksum, mismatch, or malformed content is BLOCKED."
+  },
+  "rest_fallback": {
+    "endpoint": "https://fapi.binance.com/fapi/v1/klines",
+    "query": {
+      "symbol": "BTCUSDT",
+      "interval": "1h",
+      "startTime": 1575244800000,
+      "endTime": 1577836799999,
+      "limit": 1000
+    },
+    "canonical_query_string": "symbol=BTCUSDT&interval=1h&startTime=1575244800000&endTime=1577836799999&limit=1000",
+    "expected_invariants": {
+      "row_count": 720,
+      "first_open_time_ms": 1575244800000,
+      "last_open_time_ms": 1577833200000,
+      "hourly_delta_ms": 3600000,
+      "close_time_rule": "close_time_ms = open_time_ms + 3599999",
+      "field_count": 12,
+      "field_schema": ["open_time", "open", "high", "low", "close", "volume", "close_time", "quote_asset_volume", "number_of_trades", "taker_buy_base_asset_volume", "taker_buy_quote_asset_volume", "ignore"]
+    },
+    "authentication": "Require HTTP success, expected response type, all invariants, and SHA-256 of the exact authoritative response bytes acquired by the future run.",
+    "historical_feasibility_response_sha256": "ef2d114a512d1d2905ccd335b3a53d9601b59b2877d31af3dd2dd7dc3fe0c70a",
+    "historical_repeat_feasibility_response_sha256": "ef2d114a512d1d2905ccd335b3a53d9601b59b2877d31af3dd2dd7dc3fe0c70a",
+    "future_materialization_response_sha256_required": true,
+    "feasibility_hash_is_authoritative_materialization_hash": false
+  },
+  "reuse_contract": {
+    "original_authenticated_objects": 60,
+    "original_snapshot_reuse_required": true,
+    "original_snapshot_reacquisition_authorized": false,
+    "existing_2025_01_sha256": "9ebc05c9b3d5ab3591edf65bc5c7e5dbc2f96c1efc4adc4ea198c651a99a41b1",
+    "existing_2025_01_expected_rows": 744,
+    "existing_2025_01_reuse_required": true,
+    "existing_2025_01_reacquisition_authorized": false,
+    "composed_source_object_count": 62
+  },
+  "future_state_machine": [
+    "VERIFY_BOUND_ARTIFACTS",
+    "REUSE_ORIGINAL_60",
+    "REUSE_EXISTING_2025_01",
+    "SELECT_MONTHLY_THEN_REST_UNDER_FROZEN_PRECEDENCE",
+    "AUTHENTICATE_AND_VALIDATE_ONE_NEW_2019_12_WARMUP_SOURCE",
+    "COMPOSE_ONE_NEW_ADDITIVE_IMMUTABLE_SNAPSHOT",
+    "QUALIFY_READY_OR_BLOCKED",
+    "STOP_WITHOUT_SCIENTIFIC_EXECUTION"
+  ],
+  "terminal_classification": ["READY", "BLOCKED"],
+  "fail_closed_conditions": ["missing monthly checksum", "checksum mismatch", "malformed source", "REST HTTP or response-type failure", "row count not equal to 720", "duplicate or missing timestamps", "timestamp boundary mismatch", "non-hourly spacing", "close-time mismatch", "field count/schema mismatch", "unexpected symbol or product semantics", "pagination required", "bounds changed or exceeded", "non-deterministic precedence", "existing authenticated identity not proven", "source substitution requested", "scientific-design change requested"],
+  "prohibitions": {
+    "materialization_performed_in_this_phase": false,
+    "scientific_execution_authorized": false,
+    "scientific_execution_performed": false,
+    "scientific_computation": false,
+    "historical_jfp03_execution": false,
+    "jigsaw_evidence": false,
+    "qnty": false,
+    "downstream_authority": "NONE"
+  },
+  "evidence_non_escalation": ["SOURCE_CONTRACT_PASS_IS_NOT_MATERIALIZATION_PASS", "AUTHORIZATION_IS_NOT_EXECUTION", "READY_IS_NOT_SCIENTIFIC_EXECUTION_AUTHORIZATION", "SCIENTIFIC_SUPPORT_IS_NOT_PROMOTION_OR_TRADING_AUTHORITY"],
+  "authorization": {
+    "exactly_one_future_materialization_run": true,
+    "source_contract_repair_reopened": false,
+    "closed_history_mutated": false,
+    "materialization_performed": false,
+    "scientific_execution_authorized": false,
+    "downstream_authority": "NONE"
+  },
+  "hostile_review_required": true,
+  "hostile_review_count": 1,
+  "critical_count": 0,
+  "high_count": 0,
+  "qnty_agent_eval": "NO_MATCH",
+  "merge_authority": "EXPLICIT_MERGE_AUTHORITY_REQUIRED"
+}

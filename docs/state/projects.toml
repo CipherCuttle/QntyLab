@@ -1,6 +1,40 @@
 schema_version = 1
 
 [[project]]
+project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_REPAIRED_SOURCE_MATERIALIZATION_AUTHORIZATION_V0"
+state = "CLOSED_PASS"
+authority_level = "REPAIRED_SOURCE_MATERIALIZATION_AUTHORIZATION_ONLY"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r1_repaired_source_materialization_authorization.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r1_repaired_source_materialization_hostile_review.md",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/jfp03_design_repair_v0r1.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/source_contract_repair_v0/source_contract_repair_preregistration.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/source_contract_repair_v0/source_candidate_census.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/source_contract_repair_v0/source_equivalence_analysis.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/source_contract_repair_v0/source_contract_repair_decision.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/source_contract_repair_v0/hostile_review.md",
+]
+phase_type = "GOVERNANCE_ONLY"
+bound_design_digest = "a52d4999038e0be814ee8770322303fce84bed9ec8941b812748a18867633736"
+bound_source_contract_repair_project = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_SOURCE_CONTRACT_REPAIR_V0"
+source_contract_repair_reopened = false
+materialization_authorized = true
+materialization_run_count_allowed = 1
+materialization_performed = false
+scientific_execution_authorized = false
+scientific_execution_performed = false
+input_reacquisition_authorized = false
+original_authenticated_object_count = 60
+existing_2025_01_reuse_required = true
+existing_2025_01_reacquisition_authorized = false
+source_substitution_authorized = false
+downstream_authority = "NONE"
+qnty_authorized = false
+implementation_authorized = false
+next_action = "Exactly one future repaired-source materialization run is authorized by the frozen contract; no materialization or JFP03 scientific execution is authorized in this governance phase."
+
+[[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_SOURCE_CONTRACT_REPAIR_V0"
 state = "CLOSED_PASS"
 authority_level = "SOURCE_CONTRACT_FEASIBILITY_ONLY"

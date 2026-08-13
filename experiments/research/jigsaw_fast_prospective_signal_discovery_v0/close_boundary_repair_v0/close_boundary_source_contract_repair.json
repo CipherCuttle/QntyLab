@@ -1,0 +1,58 @@
+{
+  "artifact_type": "JFP03_V0R2_CLOSE_BOUNDARY_SOURCE_CONTRACT_REPAIR",
+  "project_id": "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R2_CLOSE_BOUNDARY_SOURCE_CONTRACT_REPAIR_V0",
+  "state": "CLOSED_PASS",
+  "bound_design_digest": "a52d4999038e0be814ee8770322303fce84bed9ec8941b812748a18867633736",
+  "boundary_mismatch_confirmed": true,
+  "design_changed": false,
+  "design_close_boundary_semantics": "u is an hourly UTC close boundary; C_u is the close of the completed kline [u-1h,u].",
+  "first_frozen_decision": "2020-01-01T00:00:00Z",
+  "first_required_close": "2019-12-02T00:00:00Z",
+  "v0r2_first_open": "2019-12-02T00:00:00Z",
+  "v0r2_first_logical_close": "2019-12-02T01:00:00Z",
+  "missing_prefix_open": "2019-12-01T23:00:00Z",
+  "missing_prefix_logical_close": "2019-12-02T00:00:00Z",
+  "first_har720_complete_in_v0r2": false,
+  "v0r2_scientific_execution_eligible": false,
+  "historical_v0r2": {
+    "snapshot_id": "jfp-input-v0r2-0d28756edca8e24060f32a217362cb886c8b5eebd506293c32058cd59a617852",
+    "snapshot_digest": "0d28756edca8e24060f32a217362cb886c8b5eebd506293c32058cd59a617852",
+    "qualification_digest": "bf5b474d371f931f02f18a3c7faac75f08eadac4b7f8b3e7cd2ec913cefc715f",
+    "materialization_receipt_digest": "8fffad3a525623ccd0bd2bcd698403575eda573706b0213d16fd108f37b9601d",
+    "mutated": false,
+    "ready_history_rewritten": false,
+    "scientific_execution_authorized": false
+  },
+  "boundary_proof": {
+    "v0r2_first_open_ms": 1575244800000,
+    "v0r2_first_logical_close_ms": 1575248400000,
+    "first_required_close_ms": 1575244800000,
+    "missing_prefix_open_ms": 1575241200000,
+    "missing_prefix_close_ms": 1575244799999,
+    "missing_prefix_logical_close_ms": 1575244800000,
+    "v0r2_rows": 720,
+    "har720_required_returns": 720,
+    "har720_required_close_observations": 721
+  },
+  "source_reuse": {
+    "existing_v0r2_rest_response_sha256": "ef2d114a512d1d2905ccd335b3a53d9601b59b2877d31af3dd2dd7dc3fe0c70a",
+    "existing_v0r2_reacquired": false,
+    "original_60_reacquired": false,
+    "2025_01_reacquired": false
+  },
+  "prefix_contract_path": "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/close_boundary_repair_v0/prefix_source_contract.json",
+  "prefix_feasibility": {
+    "http_status": 200,
+    "rows": 1,
+    "response_sha256": "d8f1b085643cf14025cf611e9c96c4742d0ec3b3a6fdbba88c6bc71eb3f711ed",
+    "materialized": false
+  },
+  "scientific_computation": false,
+  "scientific_execution_authorized": false,
+  "downstream_authority": "NONE",
+  "hostile_review_count": 1,
+  "critical_count": 0,
+  "high_count": 0,
+  "qnty_agent_eval": "NO_MATCH",
+  "verdict": "PASS_CLOSE_BOUNDARY_SOURCE_CONTRACT_REPAIR"
+}

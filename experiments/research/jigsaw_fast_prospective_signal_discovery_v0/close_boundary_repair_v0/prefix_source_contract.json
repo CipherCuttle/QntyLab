@@ -1,0 +1,43 @@
+{
+  "artifact_type": "JFP03_V0R3_ADDITIVE_PREFIX_SOURCE_CONTRACT",
+  "project_id": "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R2_CLOSE_BOUNDARY_SOURCE_CONTRACT_REPAIR_V0",
+  "status": "FROZEN_FEASIBLE_NOT_MATERIALIZED",
+  "source": {
+    "endpoint": "https://fapi.binance.com/fapi/v1/klines",
+    "canonical_query": "symbol=BTCUSDT&interval=1h&startTime=1575241200000&endTime=1575244799999&limit=1",
+    "product": "Binance USD-M BTCUSDT",
+    "interval": "1h"
+  },
+  "expected": {
+    "row_count": 1,
+    "open_time_ms": 1575241200000,
+    "close_time_ms": 1575244799999,
+    "logical_close_boundary_ms": 1575244800000,
+    "field_count": 12
+  },
+  "feasibility_probe": {
+    "http_status": 200,
+    "response_sha256": "d8f1b085643cf14025cf611e9c96c4742d0ec3b3a6fdbba88c6bc71eb3f711ed",
+    "returned_rows": 1,
+    "returned_open_time_ms": 1575241200000,
+    "returned_close_time_ms": 1575244799999,
+    "returned_field_count": 12,
+    "materialized": false
+  },
+  "later_composition": {
+    "original_authenticated_objects": 60,
+    "existing_2025_01_object_reused": true,
+    "existing_720_row_rest_object_reused": true,
+    "new_prefix_rest_object": 1,
+    "total_immutable_source_objects": 63,
+    "logical_warmup_rows": 721,
+    "open_time_interval": "2019-12-01T23:00:00Z..2019-12-31T23:00:00Z",
+    "logical_close_boundary_interval": "2019-12-02T00:00:00Z..2020-01-01T00:00:00Z",
+    "source_provenance_preserved": true
+  },
+  "authority": {
+    "materialization_authorized": false,
+    "scientific_execution_authorized": false,
+    "downstream_authority": "NONE"
+  }
+}

@@ -69,6 +69,7 @@ def test_repair_artifact_matches_code_and_preserves_frozen_predecessors() -> Non
 
 def test_repair_has_no_scientific_or_implementation_authority() -> None:
     value = json.loads(ARTIFACT.read_text())
+    assert value["state"] != "CLOSED_PASS" or value["qnty_agent_eval"] == "NO_MATCH"
     assert not any(value["outcome_blindness"].values())
     assert not any(value["authority"].values())
     assert value["ledger_changed"] is False

@@ -76,6 +76,6 @@
     "scientific_evaluation_performed": false
   },
   "ledger_changed": false,
-  "qnty_agent_eval": "PENDING_FINAL_TARGET_SHA_COMPATIBILITY_LOOKUP",
+  "qnty_agent_eval": "NO_MATCH",
   "next_action": "The corrected derived source range must be consumed by the already-authorized single later bounded recorder implementation/qualification phase using synthetic or frozen historical fixtures only; this repair grants no new implementation authority."
 }

@@ -399,3 +399,51 @@ state_snapshot_authorized = false
 router_authorized = false
 trading_authorized = false
 capital_authority = "NONE"
+
+[[project]]
+project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_INPUT_MATERIALIZATION_V0"
+state = "ACTIVE"
+authority_level = "INPUT_MATERIALIZATION_ONLY"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/preregistration.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/candidate_census.json",
+  "qntylab/jigsaw_fast_prospective_signal_discovery_prereg_v0.py",
+  "tests/test_jigsaw_fast_prospective_signal_discovery_prereg_v0.py",
+]
+phase_type = "GOVERNANCE_ONLY"
+frozen_preregistration_project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_PREREG_V0"
+frozen_preregistration_path = "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/preregistration.json"
+frozen_preregistration_digest = "9e9236b34b131c13cebfb0b8043ef59043b2928fa6fcd88dd7b10909d9e8ccfe"
+frozen_candidate_census_path = "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/candidate_census.json"
+frozen_candidate_census_digest = "d718dc1c60ceccdbd7a836a1e07b911a51511456289c09d7ff9b8c6af452df94"
+frozen_candidate_ids = ["JFP01", "JFP02", "JFP03"]
+frozen_candidate_order = "JFP01,JFP02,JFP03"
+source_contract_binding = "The exact first-party source contracts and candidate windows are those in the frozen candidate census; no source substitution or contract widening is authorized."
+canonical_source_identity_requirements = [
+  "first-party Binance USD-M source objects only",
+  "canonical archive/object/path identity must be recorded",
+  "official checksum sidecars must be recorded where available",
+  "retrieval metadata, archive member identity, schema, timestamp unit, coverage, and local SHA-256 must be recorded",
+  "same URL does not imply same evidence identity when an archive can be replaced",
+]
+authorized_operations = [
+  "acquire and authenticate exact frozen first-party raw inputs",
+  "inspect raw schemas, timestamp units, coverage, archive identities, gaps, duplicates, and raw-invalid values",
+  "construct immutable raw-input manifests and candidate-local READY/BLOCKED qualifications",
+]
+input_materialization_authorized = true
+scientific_feature_computation_authorized = false
+scientific_outcome_computation_authorized = false
+historical_execution_authorized = false
+jigsaw_evidence_authorized = false
+prospective_deployment_authorized = false
+state_snapshot_authorized = false
+router_authorized = false
+qnty_authorized = false
+trading_authorized = false
+promotion_authorized = false
+capital_authority = "NONE"
+next_action = "Materialize and authenticate only the exact frozen first-party inputs required by the JFP01/JFP02/JFP03 preregistration. No scientific feature/outcome computation or historical execution is authorized."
+implementation_authorized = true

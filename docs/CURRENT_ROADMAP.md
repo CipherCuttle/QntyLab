@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- `JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_INPUT_MATERIALIZATION` — `ACTIVE`. Acquire and authenticate only the two supplemental BTCUSDT USD-M 1h monthly kline objects in the bound census; structurally validate them; create additive manifests and one new immutable V0R1 snapshot; qualify JFP03 V0R1 READY or BLOCKED. Do not compute science or execute.
+- None.
 
 ## Queued — not authorized
 
@@ -28,6 +28,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 - `JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_PREREG_V0` — `CLOSED_PASS`. JH01 temporal-replication preregistration is frozen and closed. No market-data access, acquisition, materialization, feature/outcome computation, regression execution, Jigsaw evidence creation, State Snapshot, Router, Qnty, trading, or promotion authority is granted. Replication input materialization requires a separate Git-backed authorization.
 - `JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_HISTORICAL_EXECUTION_V0` — `CLOSED_BLOCKED`. V0 is closed blocked because the frozen JFP03 HAR baseline was underspecified before real access. The additive V0R1 design repair is deterministic but the existing snapshot lacks the required 720-hour warm-up beginning 2019-12-02T00:00:00Z and the final 24-hour future tail through 2025-01-01T23:00:00Z. A separately authorized input-materialization phase is required; no executor, real execution, input reacquisition, rerun, or downstream authority is authorized.
 - `JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_INPUT_MATERIALIZATION_V0` — `CLOSED_PASS`. Input materialization is frozen and closed. Only READY candidates possess authenticated frozen input snapshots. No scientific feature/outcome computation or historical execution is authorized; historical scientific execution requires a separate Git-backed execution authorization.
+- `JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_INPUT_MATERIALIZATION` — `CLOSED_BLOCKED`. Materialization authority is closed BLOCKED because Binance did not publish the authorized 2019-12 monthly archive. Historical execution remains unauthorized; any continuation requires a separate Git-backed authorization after the frozen source contract is repaired.
 - `JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_PREREG_V0` — `CLOSED_PASS`. Preregistration is frozen and closed. Input materialization requires a separate Git-backed authorization. Historical execution, prospective deployment, Qnty, State Snapshot, Router, trading, promotion, and capital remain unauthorized.
 - `JIGSAW_FUNDING_PRESSURE_VOLATILITY_FROZEN_RESULT_RECORDING_V0` — `CLOSED_NEGATIVE`. No further implementation is authorized by this closed negative result.
 - `JIGSAW_HARVEST_V0` — `CLOSED_PASS`. Jigsaw Harvest V0 is closed. Preserve its four bounded evidence pieces; no State Snapshot, Router, Qnty, or trading implementation is authorized by this phase.

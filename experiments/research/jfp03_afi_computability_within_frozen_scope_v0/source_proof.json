@@ -1,0 +1,17 @@
+{
+  "denominator_validity_condition": "total_quote_volume > 0",
+  "frozen_observation_domain": "every canonical JFP03 decision boundary from 2020-01-01T00:00:00Z through 2024-12-31T23:00:00Z inclusive at 1h",
+  "proof_digest": "423273b6608e207156c3fef880d8be01033ecc5e9cb9d2d1e5e835b73e879a5c",
+  "qualification_digest": "420b0a4a84a57814d13393eb008affc05eb81223e06a9cf4a86c7772bc8bef5d",
+  "required_afi_rows_inspected": 43848,
+  "schema_version": "jfp03-afi-source-proof-v0",
+  "snapshot_digest": "24311649d541c28d068addc2fc76121d614a11f0f191581c7dd988ba0b99c69f",
+  "source_manifest_digest": "b253ee51394ef90553b6d0e11195b7b5bed069a3b9a5dd1097515a7cb8637c15",
+  "source_object_count_authenticated": 63,
+  "source_reacquisition": false,
+  "terminal_result_digest": "aa42724ef37466babaf7fb81a44524fe9568d8679d0a2cf967ee9faaf9ae6dbb",
+  "violation_count": 1,
+  "violations": [
+    {"close_boundary_ms": 1730149200000, "decision_time": "2024-10-28T21:00:00Z", "source_member": "BTCUSDT-1h-2024-10.csv", "source_object_digest": "e3dcb9fe9d70fea19dfbdc5294044da69b9061c6f7411e99468825fac1ce8d61", "source_role": "ORIGINAL_MONTHLY_OBJECT", "taker_buy_quote_volume_raw": "0", "total_quote_volume_raw": "0"}
+  ]
+}

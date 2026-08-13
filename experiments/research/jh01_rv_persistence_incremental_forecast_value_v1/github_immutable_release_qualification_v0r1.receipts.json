@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "project_id": "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_V1_GITHUB_IMMUTABLE_RELEASE_PERSISTENCE_BACKEND_QUALIFICATION_V0R1",
+  "redaction_policy": "No authorization headers, tokens, or environment values are retained.",
+  "api_version": "2026-03-10",
+  "repository_setting": {
+    "before": {"command": "gh api -i GET /repos/CipherCuttle/QntyLab/immutable-releases", "http_status": 200, "response": {"enabled": false, "enforced_by_owner": false}, "observed_utc": "2026-08-13T20:53:32Z"},
+    "enablement": {"command": "gh api -i --method PUT /repos/CipherCuttle/QntyLab/immutable-releases", "http_status": 204, "observed_utc": "2026-08-13T20:53:46Z"},
+    "readback": {"command": "gh api -i GET /repos/CipherCuttle/QntyLab/immutable-releases", "http_status": 200, "response": {"enabled": true, "enforced_by_owner": false}, "observed_utc": "2026-08-13T20:53:46Z"}
+  },
+  "published_release": {"get_by_tag": {"http_status": 200, "release_id": 370208366, "tag": "qntylab-jh01-v1-persistence-qualification-v0r1-7ad471c", "target_commit": "7ad471c82c9fa6aef0432f6999e0fce0649d2c55", "immutable": true, "published_at": "2026-08-13T20:55:02Z", "asset": {"id": 513499466, "name": "github_immutable_release_qualification_v0r1.synthetic.json", "digest": "sha256:191dfe3693a1e10f6efa8a385ca4c86953798d7e27a6f8e0c08dcbefc99ee4a7"}}},
+  "bounded_rejection_probes": {
+    "asset_overwrite": {"command": "gh release upload <tag> <same-asset> --clobber", "exit_code": 1, "http_status": 422, "message": "Cannot delete asset from an immutable release"},
+    "asset_delete": {"command": "gh api --method DELETE /repos/CipherCuttle/QntyLab/releases/assets/513499466", "exit_code": 1, "http_status": 422, "message": "Cannot delete asset from an immutable release"},
+    "tag_move": {"command": "git push --force origin a55307d52716354b9a92270c3b1e05c9fc46b667:refs/tags/<tag>", "exit_code": 1, "remote_message": "GH013: Cannot update this protected ref."},
+    "same_tag_competing_publication": {"command": "gh release create <tag> --target a55307d52716354b9a92270c3b1e05c9fc46b667", "exit_code": 1, "http_status": 422, "message": "Release.tag_name already exists; tag_name was used by an immutable release"}
+  },
+  "verification": {
+    "release": {"command": "gh release verify <tag> --repo CipherCuttle/QntyLab", "exit_code": 0, "bound_tag": "qntylab-jh01-v1-persistence-qualification-v0r1-7ad471c", "bound_commit": "7ad471c82c9fa6aef0432f6999e0fce0649d2c55", "bound_asset_digest": "sha256:191dfe3693a1e10f6efa8a385ca4c86953798d7e27a6f8e0c08dcbefc99ee4a7"},
+    "asset": {"command": "gh release verify-asset <tag> <same-asset> --repo CipherCuttle/QntyLab", "exit_code": 0, "verified_asset_digest": "sha256:191dfe3693a1e10f6efa8a385ca4c86953798d7e27a6f8e0c08dcbefc99ee4a7"},
+    "downloaded_bundle": {"command": "gh attestation download <same-asset> --repo CipherCuttle/QntyLab", "exit_code": 0, "bundle_sha256": "c06ec4b206bfac13a6212b5befc68cee494d007885c5f4aeaae824e82cc86fc6"},
+    "offline_bundle": {"command": "gh attestation verify <same-asset> --repo CipherCuttle/QntyLab --predicate-type https://in-toto.io/attestation/release/v0.2 --bundle <downloaded-bundle>", "exit_code": 1, "message": "verifying with issuer GitHub, Inc."}
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "project_id": "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_V1_GITHUB_IMMUTABLE_RELEASE_PERSISTENCE_BACKEND_QUALIFICATION_V0R1",
+  "state": "CLOSED_BLOCKED",
+  "authority_level": "PERSISTENCE_BACKEND_QUALIFICATION_BLOCKED_BY_UNVERIFIABLE_OFFLINE_RELEASE_ATTESTATION_ARCHIVE",
+  "phase_type": "PERSISTENCE_BACKEND_QUALIFICATION_ONLY",
+  "block_reason": "RELEASE_ATTESTATION_OFFLINE_ARCHIVAL_NOT_VERIFIABLE_WITH_CURRENT_OFFICIAL_GITHUB_CLI",
+  "canonical_remote_base": "7ad471c82c9fa6aef0432f6999e0fce0649d2c55",
+  "predecessors": {
+    "prospective_recorder_authorization_v0": {"project_id": "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_V1_PROSPECTIVE_RECORDER_AND_INPUT_MATERIALIZATION_AUTHORIZATION_V0", "state": "CLOSED_BLOCKED", "block_reason": "AUTHORITATIVE_PERSISTENCE_BACKEND_UNQUALIFIED", "reopened": false},
+    "immutable_release_qualification_v0": {"project_id": "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_V1_GITHUB_IMMUTABLE_RELEASE_PERSISTENCE_BACKEND_QUALIFICATION_V0", "state": "CLOSED_BLOCKED", "block_reason": "BLOCKED_NEEDS_IMMUTABLE_RELEASE_ENABLEMENT", "reopened": false}
+  },
+  "frozen_v1_authority": {
+    "path": "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/preregistration.json",
+    "preregistration_digest": "bdb85130cae75e9f156db9aa1fd955d7f565a3714ae091871d5ac4447c1ec27b",
+    "bytes_sha256": "4990688b640ad34f6f022431766bdd9539f75c9fb8bb278bdf9ae3637db09a0a",
+    "first_origin": "2026-09-15T00:00:00Z",
+    "last_origin": "2027-09-14T00:00:00Z",
+    "required_origin_count": 365,
+    "persistence_rule": "t <= AUTHORITATIVE_PERSISTENCE_TIME < t + 1 hour",
+    "source_rule": "MAX_INPUT_BAR_CLOSE <= t",
+    "readiness_deadline": "2026-09-08T00:00:00Z"
+  },
+  "official_github_contract": {
+    "documentation_checked_utc": "2026-08-13T20:53:32Z",
+    "api_version": "2026-03-10",
+    "immutable_releases_doc": "https://docs.github.com/en/code-security/concepts/supply-chain-security/immutable-releases",
+    "releases_rest_doc": "https://docs.github.com/en/rest/releases/releases?apiVersion=latest",
+    "rate_limits_doc": "https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api",
+    "documented_semantics": {"draft_then_assets_then_publish": true, "published_release_locks_associated_tag": true, "published_release_locks_assets": true, "automatic_release_attestation_binds_tag_commit_and_assets": true, "deleted_immutable_tag_name_cannot_be_reused": true, "create_release_request_has_no_published_at_parameter": true, "release_get_exposes_published_at_immutable_and_asset_digest": true}
+  },
+  "repository_setting": {"endpoint": "GET /repos/CipherCuttle/QntyLab/immutable-releases", "before": {"http_status": 200, "enabled": false, "enforced_by_owner": false}, "policy_change_required": true, "enablement": {"method": "PUT", "http_status": 204, "performed": true}, "after": {"http_status": 200, "enabled": true, "enforced_by_owner": false}, "readback": "PASS"},
+  "synthetic_qualification": {
+    "tag": "qntylab-jh01-v1-persistence-qualification-v0r1-7ad471c",
+    "release_id": 370208366,
+    "release_url": "https://github.com/CipherCuttle/QntyLab/releases/tag/qntylab-jh01-v1-persistence-qualification-v0r1-7ad471c",
+    "target_commit": "7ad471c82c9fa6aef0432f6999e0fce0649d2c55",
+    "artifact_path": "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/github_immutable_release_qualification_v0r1.synthetic.json",
+    "canonicalization": "UTF-8 JSON, recursively sorted keys, compact separators, trailing LF",
+    "local_artifact_sha256": "191dfe3693a1e10f6efa8a385ca4c86953798d7e27a6f8e0c08dcbefc99ee4a7",
+    "remote_asset_digest": "sha256:191dfe3693a1e10f6efa8a385ca4c86953798d7e27a6f8e0c08dcbefc99ee4a7",
+    "qualification_only": true,
+    "real_v1_forecast": false,
+    "scientific_evidence": false,
+    "research_result": false,
+    "promotion_eligible": false
+  },
+  "qualification_receipts_path": "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/github_immutable_release_qualification_v0r1.receipts.json",
+  "publication_time_evidence": {"client_request_start_utc": "2026-08-13T20:55:01Z", "github_published_at": "2026-08-13T20:55:02Z", "client_response_received_utc": "2026-08-13T20:55:02Z", "subsequent_get_published_at": "2026-08-13T20:55:02Z", "server_observed_published_at": true, "caller_can_backdate_published_at": false, "caller_timestamp_authority_rejected": true, "local_git_timestamp_authority_rejected": true},
+  "live_property_results": {
+    "immutable_flag": true,
+    "asset_identity_verified": true,
+    "release_attestation_present": true,
+    "release_attestation_verified": true,
+    "release_asset_verified": true,
+    "asset_mutation_rejected": {"http_status": 422, "reason": "Cannot delete asset from an immutable release"},
+    "asset_delete_rejected": {"http_status": 422, "reason": "Cannot delete asset from an immutable release"},
+    "tag_move_rejected": true,
+    "get_by_tag_supported": true,
+    "unknown_write_simulation": "publish response deliberately discarded; one GET-by-tag recovered immutable flag, digest, target commit, and GitHub published_at without a second release",
+    "read_after_unknown_write_supported": true,
+    "same_tag_competing_release_rejected": {"http_status": 422, "reason": "tag_name was used by an immutable release"},
+    "same_digest_retry_semantics": "idempotent GET-by-tag recovery only",
+    "different_digest_semantics": "BLOCKED_AMBIGUOUS_FORECAST_IDENTITY",
+    "latest_wins": false,
+    "backfill": false
+  },
+  "retention_and_attestation": {
+    "admin_can_delete_release": "YES_IN_PRINCIPLE; not tested destructively",
+    "tag_name_reuse_after_deletion": "DOCUMENTED_PROHIBITED",
+    "attestation_downloaded": true,
+    "downloaded_bundle_sha256": "c06ec4b206bfac13a6212b5befc68cee494d007885c5f4aeaae824e82cc86fc6",
+    "release_verify_live": "PASS",
+    "offline_bundle_verify_with_current_official_cli": "FAIL: gh attestation verify does not accept the GitHub release-attestation issuer/predicate for offline verification",
+    "authenticatable_later": false,
+    "retention_trust_model": "A retained immutable release has verified content identity now, but this phase could not prove that an independently archived release-attestation bundle remains officially verifiable after release disappearance.",
+    "retention_horizon_acceptable": false
+  },
+  "rate_limit_assessment": "Official documentation states 5,000 authenticated REST requests/hour and content-generation secondary limits of 80/minute and 500/hour. One daily release is operationally plausible; no load test was performed.",
+  "outcome_blindness": {"market_data_accessed": false, "held_out_outcomes_accessed": false, "real_forecast_executed": false, "scientific_evaluation_performed": false, "scientific_result_artifact_created": false, "jigsaw_mutated": false, "ledger_changed": false},
+  "authority": {"future_bounded_implementation_authorized": false, "implementation_authorized": false, "state_snapshot_authorized": false, "router_authorized": false, "qnty_authorized": false, "trading_authorized": false, "promotion_authorized": false},
+  "next_action": "CLOSED_BLOCKED: do not implement the recorder. A future separately authorized phase may only revisit the exact offline release-attestation archival verification gap; it must not reopen V0 or V0R1, alter the frozen V1 scientific contract, or pivot to another backend."
+}

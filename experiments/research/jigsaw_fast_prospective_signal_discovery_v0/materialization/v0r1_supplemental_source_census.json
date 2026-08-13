@@ -1,0 +1,88 @@
+{
+  "artifact_type": "JFP03_V0R1_SUPPLEMENTAL_SOURCE_OBJECT_CENSUS",
+  "schema_version": "jfp03-v0r1-materialization-census-v1",
+  "candidate_id": "JFP03",
+  "source_contract": {
+    "provider": "Binance",
+    "market": "USD-M",
+    "symbol": "BTCUSDT",
+    "interval": "1h",
+    "archive_type": "monthly_kline_zip",
+    "archive_path_template": "data/futures/um/monthly/klines/BTCUSDT/1h/BTCUSDT-1h-{YYYY-MM}.zip",
+    "checksum_sidecar_template": "data/futures/um/monthly/klines/BTCUSDT/1h/BTCUSDT-1h-{YYYY-MM}.zip.CHECKSUM",
+    "canonical_base_url": "https://data.binance.vision",
+    "period_enumeration_rule": "Enumerate every UTC calendar month intersecting the closed required close interval; classify already authenticated periods as REUSE and all other required periods as NEW."
+  },
+  "frozen_bindings": {
+    "preregistration_project_id": "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_PREREG_V0",
+    "preregistration_digest": "9e9236b34b131c13cebfb0b8043ef59043b2928fa6fcd88dd7b10909d9e8ccfe",
+    "candidate_census_digest": "d718dc1c60ceccdbd7a836a1e07b911a51511456289c09d7ff9b8c6af452df94",
+    "design_repair_id": "JFP03_HAR_BASELINE_DESIGN_REPAIR_V0R1",
+    "design_digest": "a52d4999038e0be814ee8770322303fce84bed9ec8941b812748a18867633736",
+    "original_materialization_request_digest": "97026d1a2fadfde7babf7f0c6c7802db6cbc8e92aa55c3b8a7e3d23d1e8456dc",
+    "original_input_qualification_digest": "472ef1da4ab7ab2fe5f98aa85fa1c24b666d40bea5aae6b390bcf0627ed60727",
+    "original_snapshot_id": "jfp-input-v0-9dab9e5f71242116206b30ea61d3b217e760dd43d176022d80c4a43c7153712f",
+    "original_snapshot_digest": "9dab9e5f71242116206b30ea61d3b217e760dd43d176022d80c4a43c7153712f",
+    "original_authenticated_object_count": 60,
+    "original_manifest_path": "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/per_source_manifest.json"
+  },
+  "required_support_interval": {
+    "earliest_required_close": "2019-12-02T00:00:00Z",
+    "latest_required_close": "2025-01-01T23:00:00Z",
+    "derivation": "The first scheduled decision is 2020-01-01T00:00:00Z and HAR_720H_t requires C_(t-720h). The last scheduled decision is 2024-12-31T23:00:00Z and RV24_future_t requires C_(t+24h). Close boundaries are inclusive.",
+    "market_values_inspected": false,
+    "scientific_computation_performed": false
+  },
+  "object_classifications": {
+    "reuse_existing_authenticated": {
+      "count": 60,
+      "classification": "REUSE_EXISTING_AUTHENTICATED",
+      "identity_source": "The exact 60 byte/checksum identities are read from the bound original manifest; no reacquisition is permitted.",
+      "calendar_periods": [
+        "2020-01","2020-02","2020-03","2020-04","2020-05","2020-06","2020-07","2020-08","2020-09","2020-10","2020-11","2020-12",
+        "2021-01","2021-02","2021-03","2021-04","2021-05","2021-06","2021-07","2021-08","2021-09","2021-10","2021-11","2021-12",
+        "2022-01","2022-02","2022-03","2022-04","2022-05","2022-06","2022-07","2022-08","2022-09","2022-10","2022-11","2022-12",
+        "2023-01","2023-02","2023-03","2023-04","2023-05","2023-06","2023-07","2023-08","2023-09","2023-10","2023-11","2023-12",
+        "2024-01","2024-02","2024-03","2024-04","2024-05","2024-06","2024-07","2024-08","2024-09","2024-10","2024-11","2024-12"
+      ]
+    },
+    "new_supplemental_objects": [
+      {
+        "classification": "NEW_SUPPLEMENTAL_OBJECT_REQUIRED",
+        "candidate": "JFP03",
+        "symbol": "BTCUSDT",
+        "interval": "1h",
+        "archive_type": "monthly_kline_zip",
+        "calendar_period": "2019-12",
+        "canonical_path": "data/futures/um/monthly/klines/BTCUSDT/1h/BTCUSDT-1h-2019-12.zip",
+        "canonical_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1h/BTCUSDT-1h-2019-12.zip",
+        "checksum_sidecar_identity": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1h/BTCUSDT-1h-2019-12.zip.CHECKSUM",
+        "purpose": "WARMUP",
+        "required_because": "Contains the earliest required close C_(2019-12-02T00:00:00Z)."
+      },
+      {
+        "classification": "NEW_SUPPLEMENTAL_OBJECT_REQUIRED",
+        "candidate": "JFP03",
+        "symbol": "BTCUSDT",
+        "interval": "1h",
+        "archive_type": "monthly_kline_zip",
+        "calendar_period": "2025-01",
+        "canonical_path": "data/futures/um/monthly/klines/BTCUSDT/1h/BTCUSDT-1h-2025-01.zip",
+        "canonical_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1h/BTCUSDT-1h-2025-01.zip",
+        "checksum_sidecar_identity": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1h/BTCUSDT-1h-2025-01.zip.CHECKSUM",
+        "purpose": "FUTURE_TAIL",
+        "required_because": "Contains the latest required close C_(2025-01-01T23:00:00Z)."
+      }
+    ]
+  },
+  "census_result": {
+    "existing_objects_to_reacquire": 0,
+    "new_supplemental_object_count": 2,
+    "composed_object_count": 62,
+    "source_substitution_permitted": false,
+    "wider_history_permitted": false,
+    "daily_or_api_fallback_permitted": false,
+    "monthly_convention_confirmed_for_december_2019_and_january_2025": true
+  },
+  "census_digest": "d9bea065498eed7df1651edd1f696b3ad9f0be3dbb9df415a3d4122f3419bd2a"
+}

@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- None.
+- `JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_INPUT_MATERIALIZATION` — `ACTIVE`. Acquire and authenticate only the two supplemental BTCUSDT USD-M 1h monthly kline objects in the bound census; structurally validate them; create additive manifests and one new immutable V0R1 snapshot; qualify JFP03 V0R1 READY or BLOCKED. Do not compute science or execute.
 
 ## Queued — not authorized
 

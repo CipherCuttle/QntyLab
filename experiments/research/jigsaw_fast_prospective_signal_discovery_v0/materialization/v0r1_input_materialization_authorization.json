@@ -1,0 +1,21 @@
+{
+  "artifact_type": "JFP03_V0R1_INPUT_MATERIALIZATION_AUTHORIZATION",
+  "schema_version": "jfp03-v0r1-input-materialization-authorization-v1",
+  "project_id": "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_INPUT_MATERIALIZATION",
+  "phase_type": "GOVERNANCE_ONLY",
+  "authority_level": "INPUT_MATERIALIZATION_ONLY",
+  "active_project_is_sole_active": true,
+  "bound_design_digest": "a52d4999038e0be814ee8770322303fce84bed9ec8941b812748a18867633736",
+  "bound_original_snapshot_id": "jfp-input-v0-9dab9e5f71242116206b30ea61d3b217e760dd43d176022d80c4a43c7153712f",
+  "bound_original_snapshot_digest": "9dab9e5f71242116206b30ea61d3b217e760dd43d176022d80c4a43c7153712f",
+  "bound_original_authenticated_object_count": 60,
+  "bound_supplemental_census_path": "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r1_supplemental_source_census.json",
+  "authorized_operations": ["acquire exactly the two supplemental source objects in the bound census", "authenticate official checksum sidecars and local SHA256 digests", "structurally validate schema, timestamps, continuity, and exact support coverage", "create additive supplemental manifests", "construct one new immutable V0R1 snapshot as original 60 identities plus authenticated supplemental identities", "qualify JFP03 V0R1 as READY or BLOCKED"],
+  "composition_rule": "The original snapshot is immutable. The later V0R1 snapshot identity must be a deterministic composition of the unchanged original 60 authenticated byte identities and the newly authenticated supplemental identities, and later execution may consume only that new snapshot.",
+  "prohibitions": {"input_reacquisition_of_existing_60": false, "scientific_feature_computation": false, "scientific_outcome_computation": false, "historical_execution": false, "executor_implementation": false, "jfp01_execution": false, "jfp02_execution": false, "jigsaw": false, "state_snapshot": false, "forecaster": false, "router": false, "qnty": false, "trading": false, "promotion": false, "capital": "NONE", "downstream_authority": "NONE"},
+  "review_requirement": "One independent hostile governance review is required. Repair only Critical/High findings; perform one targeted re-review only if such repairs occur.",
+  "source_authority": "Canonical Git and the frozen Binance USD-M BTCUSDT 1h monthly kline contract; no source substitution or fallback is allowed.",
+  "execution_count_allowed": 0,
+  "ready_definition": "READY only after both exact supplemental objects authenticate and the additive immutable V0R1 snapshot passes structural validation; otherwise BLOCKED.",
+  "authorization_digest": "8c215362436d4fdcae9f1ac074e6a9b9593f92fc99682be534424b2a836d819f"
+}

@@ -23,10 +23,29 @@ def test_execution_and_authority_are_closed():
     assert prereg["authority"]["qnty_mutation_authorized"] is False
     assert prereg["authority"]["capital_authority"] == "NONE"
     assert prereg["historical_contract"]["shadow_observation_eligible"].startswith("TRUE only")
+    assert prereg["historical_contract"]["terminal_classifications"] == [
+        "DISCOVERY_SUPPORTED_WITHIN_FROZEN_SCOPE",
+        "NO_DISCOVERY_SUPPORT_FOUND",
+        "BLOCKED_GLOBAL",
+        "BLOCKED_CANDIDATE",
+    ]
+    assert "JFP01, JFP02, JFP03" in prereg["historical_contract"]["result_semantics"]
 
 
 def test_prohibited_classes_and_no_rescue_are_explicit():
     census = load_json("candidate_census.json")
     assert len(census["candidates"]) == 3
-    assert {"open interest", "liquidation flow", "order-book depth", "ML"} <= set(census["prohibited_candidate_classes"])
+    assert {"open interest", "liquidation flow", "order-book depth", "ML", "volume-surprise multiplication"} <= set(census["prohibited_candidate_classes"])
     assert all("No " in c["no_rescue_rule"] for c in census["candidates"])
+
+
+def test_jfp01_boundary_incremental_design_and_jfp03_afi():
+    census = load_json("candidate_census.json")
+    jfp01, _, jfp03 = census["candidates"]
+    assert "[t,t+10s)" in jfp01["feature"]
+    assert "[t-10s,t)" in jfp01["generic_flow_control"]
+    assert "beta_boundary" in jfp01["primary_metric_statistic"]
+    assert "2024-11-01T00:00:00Z" in jfp01["historical_discovery_window"]
+    assert "AFI_t = abs(2 * BUY_SHARE_t - 1)" in jfp03["feature"]
+    assert "* log" not in jfp03["feature"]
+    assert "forecast" not in jfp03["materiality_rule"]

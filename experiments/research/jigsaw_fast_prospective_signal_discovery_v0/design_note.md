@@ -27,6 +27,19 @@ hourly kline quote volume and taker-buy quote volume, and tests incremental
 information beyond a fixed HAR-style volatility baseline. None uses L2,
 liquidations, open interest, ML, opaque toxicity, or optimization.
 
+JFP01 now tests a synchronized-boundary contribution rather than generic
+order-flow predictability: its only primary feature is volume-normalized
+aggressive imbalance in `[t,t+10s)`, and its only control is the same measure
+in `[t-10s,t)`. The paper's documented sample is January 1, 2021 through
+October 31, 2024, so JFP01's valid-origin window begins November 1, 2024 and
+is a non-overlapping literature-seeded temporal extension, not an independent
+replication.
+
+JFP03 uses only `BUY_SHARE = taker_buy_quote_volume / total_quote_volume` and
+`AFI = abs(2*BUY_SHARE - 1)`. Volume surprise is excluded from V0. The
+incremental test is against the fixed HAR-style baseline; no auxiliary
+forecast comparison is a support gate.
+
 The three primary tests share one Holm family. HAC lags are fixed from the
 registered observation cadence and outcome overlap; they are not selected from
 the data. Materiality thresholds are decision hurdles, not literature-derived
@@ -43,6 +56,10 @@ authorize any observer integration, and the prospective contract's authority
 flags remain non-capital and discovery-only.
 
 ## Strict stop
+
+Global blocks stop the campaign. Candidate-local source, coverage, schema,
+timestamp, gap, or finite-value failures remain visible as `BLOCKED_CANDIDATE`
+in the ordered three-candidate result and do not invalidate other candidates.
 
 This document and its JSON artifacts do not contain market observations,
 candidate outcomes, computed features, regressions, or execution receipts.

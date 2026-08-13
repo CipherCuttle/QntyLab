@@ -44,8 +44,21 @@ def validate() -> None:
         assert required <= candidate.keys(), candidate["candidate_id"]
         assert candidate["safe_known_after"].startswith("SAFE-KNOWN-AFTER")
         assert candidate["no_rescue_rule"]
+    jfp01 = census["candidates"][0]
+    assert "[t,t+10s)" in jfp01["feature"]
+    assert "generic_flow_control" in jfp01
+    assert "[t-10s,t)" in jfp01["generic_flow_control"]
+    assert "beta_boundary" in jfp01["primary_metric_statistic"]
+    assert "2024-11-01T00:00:00Z" in jfp01["historical_discovery_window"]
+    assert "2026-07-31T23:45:00Z" in jfp01["historical_discovery_window"]
+    jfp03 = census["candidates"][2]
+    assert "AFI_t" in jfp03["feature"]
+    assert "BUY_SHARE_t" in jfp03["feature"]
+    assert "* log" not in jfp03["feature"]
+    assert "forecast" not in jfp03["materiality_rule"]
     assert "open interest" in census["prohibited_candidate_classes"]
     assert "ML" in census["prohibited_candidate_classes"]
+    assert "volume-surprise multiplication" in census["prohibited_candidate_classes"]
     assert prereg["outcome_blindness"] == {
         "market_data_accessed": False,
         "candidate_outcomes_opened": False,
@@ -59,6 +72,9 @@ def validate() -> None:
     assert authority["capital_authority"] == "NONE"
     assert prereg["prospective_observation_contract_v0"]["authority"]["scientific_status"] == "DISCOVERY_ONLY"
     assert prereg["prospective_observation_contract_v0"]["authority"]["capital_authority"] == "NONE"
+    assert prereg["historical_contract"]["terminal_classifications"][-1] == "BLOCKED_CANDIDATE"
+    assert "candidate-local" in prereg["historical_contract"]["common_sample_rule"]
+    assert "exactly three ordered candidate results" in prereg["historical_contract"]["result_semantics"]
 
 
 if __name__ == "__main__":

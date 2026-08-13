@@ -379,7 +379,7 @@ implementation_authorized = false
 
 [[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_PREREG_V0"
-state = "ACTIVE"
+state = "CLOSED_PASS"
 authority_level = "OUTCOME_BLIND_PREREGISTRATION_ONLY"
 authoritative_artifacts = [
   "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/candidate_census.json",
@@ -389,8 +389,8 @@ authoritative_artifacts = [
   "qntylab/jigsaw_fast_prospective_signal_discovery_prereg_v0.py",
   "tests/test_jigsaw_fast_prospective_signal_discovery_prereg_v0.py",
 ]
-next_action = "Freeze this preregistration only. A separate Git-backed phase is required for input materialization; historical execution, prospective observation, Qnty, State Snapshot, Router, trading, and capital remain unauthorized."
-implementation_authorized = true
+next_action = "Preregistration is frozen and closed. Input materialization requires a separate Git-backed authorization. Historical execution, prospective deployment, Qnty, State Snapshot, Router, trading, promotion, and capital remain unauthorized."
+implementation_authorized = false
 input_materialization_authorized = false
 historical_execution_authorized = false
 prospective_deployment_authorized = false

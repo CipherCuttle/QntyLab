@@ -5,7 +5,7 @@
   "status": "NOT_EXECUTED",
   "research_status": "PREREGISTERED_DESIGN_ONLY_INPUT_MATERIALIZATION_NOT_AUTHORIZED",
   "candidate_census_path": "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/candidate_census.json",
-  "candidate_census_digest": "1ef66b1155e75db080726d8ecec8049284e0f9d5395a7ca79c2f12c0b1da5459",
+  "candidate_census_digest": "d718dc1c60ceccdbd7a836a1e07b911a51511456289c09d7ff9b8c6af452df94",
   "candidate_ids": ["JFP01", "JFP02", "JFP03"],
   "candidate_count": 3,
   "outcome_blindness": {
@@ -18,10 +18,13 @@
   },
   "historical_contract": {
     "execution_mode": "ONE_SHOT_ALL_THREE_CANDIDATES_AGAINST_FROZEN_INPUT_ARTIFACTS",
-    "window": "2020-01-01T00:00:00Z..2024-12-31T23:00:00Z",
+    "window": "Candidate-specific fixed windows are bound in the census; JFP01 valid origins are 2024-11-01T00:00:00Z..2026-07-31T23:45:00Z, JFP02/JFP03 remain 2020-01-01T00:00:00Z..2024-12-31T23:00:00Z.",
     "calendar": "Fixed inclusive UTC schedule; no moving, shortening, or extending after data availability.",
-    "common_sample_rule": "A common integrity failure blocks the campaign; candidates may not receive candidate-specific row dropping or repaired windows.",
-    "terminal_classifications": ["DISCOVERY_SUPPORTED_WITHIN_FROZEN_SCOPE", "NO_DISCOVERY_SUPPORT_FOUND", "BLOCKED_INTEGRITY"],
+    "global_block_rules": ["preregistration or census digest mismatch", "unauthorized market-outcome access", "candidate denominator mutation", "fourth candidate", "execution before authority", "formula mutation after freeze", "result omission or reordering", "authority escalation"],
+    "candidate_local_block_rules": ["candidate-specific source failure", "candidate-specific coverage or timestamp failure", "candidate-specific gap or nonfinite value", "candidate-specific schema failure"],
+    "common_sample_rule": "No candidate-specific row dropping, repaired window, or replacement is permitted. A global block stops the campaign; a candidate-local block remains in ordered output as BLOCKED and does not invalidate otherwise valid candidates.",
+    "terminal_classifications": ["DISCOVERY_SUPPORTED_WITHIN_FROZEN_SCOPE", "NO_DISCOVERY_SUPPORT_FOUND", "BLOCKED_GLOBAL", "BLOCKED_CANDIDATE"],
+    "result_semantics": "Every completed or blocked run emits exactly three ordered candidate results: JFP01, JFP02, JFP03. A global block emits BLOCKED_GLOBAL for the campaign; a candidate-local block emits BLOCKED_CANDIDATE for that candidate while the other candidates retain their own valid terminal classifications.",
     "shadow_observation_eligible": "TRUE only as a separate governance flag after a deterministic historical admission gate; at most two candidates, zero permitted.",
     "ranking": "No leaderboard or ranking is produced for survival selection. Results are reported in preregistered candidate order."
   },
@@ -64,5 +67,5 @@
     "capital_authority": "NONE"
   },
   "qnty_agent_eval": "N/A",
-  "preregistration_digest": "9c8d52bc0d6b933951450c1402e3dc899029ad2c67e17ef58c70ac45c3a62cfe"
+  "preregistration_digest": "9e9236b34b131c13cebfb0b8043ef59043b2928fa6fcd88dd7b10909d9e8ccfe"
 }

@@ -39,7 +39,7 @@ def test_exact_v0r1_census_and_immutable_bindings() -> None:
     assert census["census_digest"] == digest_without(census, "census_digest")
 
 
-def test_authorization_is_materialization_only_and_sole_active_project() -> None:
+def test_authorization_is_materialization_only_and_closes_without_execution() -> None:
     auth = json.loads(AUTH.read_text())
     assert auth["authorization_digest"] == digest_without(auth, "authorization_digest")
     assert auth["bound_design_digest"] == "a52d4999038e0be814ee8770322303fce84bed9ec8941b812748a18867633736"
@@ -47,9 +47,10 @@ def test_authorization_is_materialization_only_and_sole_active_project() -> None
     assert auth["prohibitions"]["input_reacquisition_of_existing_60"] is False
     assert all(value is False for key, value in auth["prohibitions"].items() if key not in {"capital", "downstream_authority"})
     _, _, registry = project_context.load_context_sources(ROOT)
-    active = [row for row in registry["project"] if row["state"] == "ACTIVE"]
-    assert [row["project_id"] for row in active] == [auth["project_id"]]
-    assert active[0]["authority_level"] == "INPUT_MATERIALIZATION_ONLY"
-    assert active[0]["historical_execution_authorized"] is False
-    assert active[0]["jigsaw_authorized"] is False
-    assert active[0]["capital_authority"] == "NONE"
+    project = next(row for row in registry["project"] if row["project_id"] == auth["project_id"])
+    assert project["state"] == "CLOSED_BLOCKED"
+    assert project["authority_level"] == "INPUT_MATERIALIZATION_ONLY"
+    assert project["implementation_authorized"] is False
+    assert project["historical_execution_authorized"] is False
+    assert project["jigsaw_authorized"] is False
+    assert project["capital_authority"] == "NONE"

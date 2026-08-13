@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "project_id": "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_V1_BOOTSTRAP_SOURCE_RANGE_CONTRACT_REPAIR_V0",
+  "state": "CLOSED_PASS",
+  "phase_type": "GOVERNANCE_ONLY",
+  "authority_level": "BOOTSTRAP_SOURCE_RANGE_DERIVED_CONTRACT_REPAIRED_FOR_LATER_RECORDER_IMPLEMENTATION",
+  "canonical_remote_base": "f9eb24ef29412abc103a3758bba014b5474fbe2e",
+  "frozen_preregistration": {
+    "path": "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/preregistration.json",
+    "digest": "bdb85130cae75e9f156db9aa1fd955d7f565a3714ae091871d5ac4447c1ec27b",
+    "bytes_sha256": "4990688b640ad34f6f022431766bdd9539f75c9fb8bb278bdf9ae3637db09a0a",
+    "unchanged": true
+  },
+  "historical_predecessor": {
+    "project_id": "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_V1_PROSPECTIVE_RECORDER_AND_INPUT_MATERIALIZATION_AUTHORIZATION_V0",
+    "reviewed_sha": "a82dd27a09820d07f61512663b1279edfee43304",
+    "merge_sha": "a55307d52716354b9a92270c3b1e05c9fc46b667",
+    "state": "CLOSED_BLOCKED",
+    "historical_first_required_bar_close": "2025-09-11T19:00:00Z",
+    "historical_artifact_modified": false
+  },
+  "mechanical_inputs": {
+    "first_live_origin": "2026-09-15T00:00:00Z",
+    "forecast_horizon_hours": 24,
+    "required_initial_training_origins": 365,
+    "strict_completion_operator": "o + 24h < T",
+    "b3_longest_lag_days": 29,
+    "rv24_return_count": 24,
+    "prior_close_dependency": "r_m,h requires C[h-1]"
+  },
+  "mechanical_derivation": {
+    "latest_eligible_training_origin": "2026-09-13T00:00:00Z",
+    "first_training_origin": "2025-09-14T00:00:00Z",
+    "training_origin_count": 365,
+    "b3_rv24_observation_count": 30,
+    "earliest_b3_rv24_timestamp": "2025-08-16T00:00:00Z",
+    "earliest_required_hourly_return_close": "2025-08-15T01:00:00Z",
+    "earliest_required_source_close": "2025-08-15T00:00:00Z",
+    "latest_completed_training_target_source_close": "2026-09-14T00:00:00Z",
+    "logical_close_semantics": "UTC logical close boundary; provider raw close timestamps are not reinterpreted by this repair."
+  },
+  "repair": {
+    "old_first_required_bar_close": "2025-09-11T19:00:00Z",
+    "repaired_first_required_bar_close": "2025-08-15T00:00:00Z",
+    "repaired_first_required_source_close": "2025-08-15T00:00:00Z",
+    "delta_seconds": 2401200,
+    "delta_human": "27 days 19 hours",
+    "reason": "The historical derived boundary omitted B3's inclusive t..t-29 RV24_prior dependency and the preceding close required for its earliest hourly return."
+  },
+  "supersession": {
+    "frozen_v1_scientific_preregistration_repaired": false,
+    "historical_artifact_rewritten": false,
+    "superseded_assertion_only": "first_required_bar_close = 2025-09-11T19:00:00Z",
+    "authoritative_later_recorder_input": "first_required_source_close = 2025-08-15T00:00:00Z",
+    "other_historical_later_implementation_rules_remain_in_force": true
+  },
+  "authority": {
+    "scientific_contract_changed": false,
+    "preregistration_changed": false,
+    "recorder_implementation_performed": false,
+    "recorder_authorization_consumed": false,
+    "market_data_authorized": false,
+    "real_v1_collection_authorized": false,
+    "scientific_evaluation_authorized": false,
+    "jigsaw_mutated": false,
+    "state_snapshot_authorized": false,
+    "router_authorized": false,
+    "qnty_authorized": false,
+    "trading_authorized": false,
+    "promotion_authorized": false
+  },
+  "outcome_blindness": {
+    "market_data_accessed": false,
+    "held_out_outcomes_accessed": false,
+    "forecast_execution_performed": false,
+    "scientific_evaluation_performed": false
+  },
+  "ledger_changed": false,
+  "qnty_agent_eval": "PENDING_FINAL_TARGET_SHA_COMPATIBILITY_LOOKUP",
+  "next_action": "The corrected derived source range must be consumed by the already-authorized single later bounded recorder implementation/qualification phase using synthetic or frozen historical fixtures only; this repair grants no new implementation authority."
+}

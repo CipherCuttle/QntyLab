@@ -1,0 +1,41 @@
+{
+  "artifact_type": "JFP03_V0R1_SOURCE_CANDIDATE_CENSUS",
+  "project_id": "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_SOURCE_CONTRACT_REPAIR_V0",
+  "probed_at_utc": "2026-08-13",
+  "candidates": [
+    {
+      "source_mechanism": "Binance Data Vision monthly USD-M 1h kline archive",
+      "first_party": "YES",
+      "available_for_required_period": "NO",
+      "identity": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1h/BTCUSDT-1h-2019-12.zip",
+      "checksum": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1h/BTCUSDT-1h-2019-12.zip.CHECKSUM",
+      "probe": "HTTP 404 for object and checksum",
+      "verdict": "INADMISSIBLE_FOR_THIS_REQUIRED_PERIOD"
+    },
+    {
+      "source_mechanism": "Binance Data Vision daily USD-M 1h kline archives",
+      "first_party": "YES",
+      "available_for_required_period": "NO",
+      "identity": "https://data.binance.vision/data/futures/um/daily/klines/BTCUSDT/1h/BTCUSDT-1h-2019-12-02.zip",
+      "probe": "2019-12-02 object and checksum HTTP 404; 2019-12-31 object and checksum HTTP 200",
+      "raw_schema": "Not independently admissible because exact required coverage is absent",
+      "verdict": "INADMISSIBLE_FOR_THIS_REQUIRED_PERIOD"
+    },
+    {
+      "source_mechanism": "Binance USD-M public REST klines endpoint",
+      "first_party": "YES",
+      "available_for_required_period": "YES",
+      "identity": "https://fapi.binance.com/fapi/v1/klines",
+      "request": "symbol=BTCUSDT&interval=1h&startTime=1575244800000&endTime=1577836799999&limit=1000",
+      "raw_schema": "12-field Binance kline arrays: open time, OHLC, volume, close time, quote volume, trades, taker-buy base volume, taker-buy quote volume, ignore",
+      "coverage_probe": "720 rows; first open 1575244800000; last open 1577833200000",
+      "timestamp_probe": "contiguous 3600000 ms opens; close_time=open_time+3599999 for every row",
+      "response_sha256": "ef2d114a512d1d2905ccd335b3a53d9601b59b2877d31af3dd2dd7dc3fe0c70a",
+      "repeat_response_sha256": "ef2d114a512d1d2905ccd335b3a53d9601b59b2877d31af3dd2dd7dc3fe0c70a",
+      "verdict": "ADMISSIBLE_FALLBACK_CANDIDATE"
+    }
+  ],
+  "scientific_values_inspected": false,
+  "scientific_computation_performed": false,
+  "outcome_dependent_selection": false
+}

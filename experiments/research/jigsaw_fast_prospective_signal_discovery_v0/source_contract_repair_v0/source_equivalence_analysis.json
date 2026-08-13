@@ -1,0 +1,23 @@
+{
+  "artifact_type": "JFP03_V0R1_SOURCE_EQUIVALENCE_ANALYSIS",
+  "project_id": "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_SOURCE_CONTRACT_REPAIR_V0",
+  "proposition": "The repaired fallback supplies the exact raw USD-M BTCUSDT 1h kline proposition required by frozen JFP03 V0R1.",
+  "tests": {
+    "SOURCE_EXISTS": "PASS: endpoint returned the exact bounded interval",
+    "SOURCE_IS_FIRST_PARTY": "PASS: Binance-owned futures endpoint and Binance-owned archive documentation",
+    "SOURCE_IDENTITY_IS_AUTHENTICATABLE": "PASS: frozen URL, query, retrieval date, and response SHA-256 are required",
+    "SOURCE_SEMANTICS_MATCH_FROZEN_MONTHLY_KLINE_PROPOSITION": "PASS: Binance public-data README states USD-M kline archive data is from /fapi/v1/klines and lists the same fields",
+    "TIMESTAMPS_INTERVAL_BOUNDARIES_MATCH": "PASS: 720 contiguous UTC 1h opens and exact close boundaries",
+    "PRICE_FIELD_SEMANTICS_MATCH": "PASS: open/high/low/close fields are in the documented Binance kline positions",
+    "DATA_CAN_BE_REPRODUCED_DETERMINISTICALLY": "PASS for the frozen request bytes; immediate repeat SHA-256 matched",
+    "REQUIRED_2019_12_02_TO_2019_12_31_COVERAGE_EXISTS": "PASS: 720 hourly rows",
+    "USING_THIS_SOURCE_DOES_NOT_CHANGE_SCIENTIFIC_DESIGN": "PASS",
+    "USING_THIS_SOURCE_DOES_NOT_REQUIRE_OUTCOME_ACCESS": "PASS"
+  },
+  "known_limits": [
+    "REST responses do not provide archive-style CHECKSUM sidecars; the repaired contract therefore freezes exact response bytes and SHA-256 before any later materialization.",
+    "The daily archive mechanism is not substituted because the required 2019-12-02 object is absent.",
+    "No comparison of scientific values or outcomes was performed."
+  ],
+  "equivalence_verdict": "PROVEN_FOR_THE_FROZEN_RAW_KLINE_PROPOSITION_WITH_RESPONSE_HASH_BINDING"
+}

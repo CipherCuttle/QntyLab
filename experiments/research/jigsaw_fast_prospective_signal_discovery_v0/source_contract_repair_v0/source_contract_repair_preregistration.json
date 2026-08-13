@@ -1,0 +1,37 @@
+{
+  "artifact_type": "JFP03_V0R1_SOURCE_CONTRACT_REPAIR_PREREGISTRATION",
+  "project_id": "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_SOURCE_CONTRACT_REPAIR_V0",
+  "phase": "SOURCE_CONTRACT_FEASIBILITY_REPAIR_ONLY",
+  "question": "Can a deterministic first-party source contract supply the frozen Dec-2019 warm-up without changing JFP03 V0R1?",
+  "outcome_blind": true,
+  "frozen_bindings": {
+    "design_digest": "a52d4999038e0be814ee8770322303fce84bed9ec8941b812748a18867633736",
+    "scientific_window": "2020-01-01T00:00:00Z..2024-12-31T23:00:00Z",
+    "required_support": "2019-12-02T00:00:00Z..2025-01-01T23:00:00Z",
+    "instrument": "Binance USD-M BTCUSDT",
+    "interval": "1h",
+    "har_windows_hours": [1, 24, 168, 720],
+    "target_horizon_hours": 24,
+    "holm_family_size": 3
+  },
+  "allowed_activity": [
+    "first-party documentation review",
+    "first-party source existence and coverage probes",
+    "structural schema and timestamp-boundary checks",
+    "response identity hashing"
+  ],
+  "prohibited_activity": [
+    "reacquire the original 60 objects",
+    "compute returns, AFI, HAR, targets, regressions, HAC, p-values, or Jigsaw evidence",
+    "select a source using scientific outcomes",
+    "change the frozen scientific design"
+  ],
+  "source_selection_precedence": [
+    "authenticated canonical monthly object when the exact object and checksum are both available",
+    "otherwise authenticated exact-range Binance USD-M /fapi/v1/klines response with frozen request and response SHA-256",
+    "otherwise BLOCKED"
+  ],
+  "source_selection_is_outcome_independent": true,
+  "materialization_authorized": false,
+  "scientific_execution_authorized": false
+}

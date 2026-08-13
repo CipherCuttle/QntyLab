@@ -1,6 +1,33 @@
 schema_version = 1
 
 [[project]]
+project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_SOURCE_CONTRACT_REPAIR_V0"
+state = "CLOSED_PASS"
+authority_level = "SOURCE_CONTRACT_FEASIBILITY_ONLY"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/source_contract_repair_v0/source_contract_repair_preregistration.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/source_contract_repair_v0/source_candidate_census.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/source_contract_repair_v0/source_equivalence_analysis.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/source_contract_repair_v0/source_contract_repair_decision.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/source_contract_repair_v0/hostile_review.md",
+]
+phase_type = "SOURCE_CONTRACT_FEASIBILITY_REPAIR_ONLY"
+bound_design_digest = "a52d4999038e0be814ee8770322303fce84bed9ec8941b812748a18867633736"
+source_contract_repair_decision = "PASS"
+materialization_authorized = false
+scientific_execution_authorized = false
+historical_execution_authorized = false
+jigsaw_evidence_authorized = false
+state_snapshot_authorized = false
+router_authorized = false
+qnty_authorized = false
+trading_authorized = false
+capital_authority = "NONE"
+implementation_authorized = false
+next_action = "Source-contract repair is closed PASS. The deterministic Binance USD-M REST kline fallback is frozen as an admissible source contract for the missing warm-up; separate Git-backed materialization authorization is still required, and JFP03 scientific execution remains unauthorized."
+
+[[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_INPUT_MATERIALIZATION"
 state = "CLOSED_BLOCKED"
 authority_level = "INPUT_MATERIALIZATION_ONLY"

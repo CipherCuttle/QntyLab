@@ -6,6 +6,7 @@ qualification.  It does not calculate any scientific feature, target, or result.
 from __future__ import annotations
 
 import argparse
+import base64
 import csv
 import hashlib
 import io
@@ -221,19 +222,27 @@ class LocalReceiptClaim:
 class RemoteGitClaim:
     """Repository-wide claim that is atomic across worktrees and clones."""
 
-    def __init__(self, remote: str = "origin", remote_ref: str = REMOTE_CLAIM_REF) -> None:
+    def __init__(
+        self,
+        remote: str = "origin",
+        remote_ref: str = REMOTE_CLAIM_REF,
+        git_runner: Callable[..., subprocess.CompletedProcess[str]] = _git,
+    ) -> None:
         self.remote = remote
         self.remote_ref = remote_ref
+        self.git_runner = git_runner
 
     def claim(self, root: Path, contract: FrozenContract) -> Claim:
-        existing = _git(root, "ls-remote", "--exit-code", "--heads", self.remote, self.remote_ref, check=False)
+        existing = self.git_runner(
+            root, "ls-remote", "--exit-code", "--heads", self.remote, self.remote_ref, check=False
+        )
         if existing.returncode == 0 and existing.stdout.strip():
             raise AuthorizationAlreadyConsumed("REMOTE_CLAIM_ALREADY_EXISTS")
         if existing.returncode not in (0, 2):
             raise AuthorizationError(f"REMOTE_CLAIM_LOOKUP_FAILED:{existing.stderr.strip()}")
 
         token = uuid.uuid4().hex
-        tree = _git(root, "rev-parse", f"{contract.expected_master}^{{tree}}").stdout.strip()
+        tree = self.git_runner(root, "rev-parse", f"{contract.expected_master}^{{tree}}").stdout.strip()
         message = canonical_bytes(
             {
                 "artifact_type": "JFP03_V0R3_PREFIX_MATERIALIZATION_REMOTE_CLAIM",
@@ -244,8 +253,10 @@ class RemoteGitClaim:
                 "claim_token": token,
             }
         ).decode("utf-8")
-        commit = _git(root, "commit-tree", tree, "-p", contract.expected_master, input_text=message + "\n").stdout.strip()
-        pushed = _git(
+        commit = self.git_runner(
+            root, "commit-tree", tree, "-p", contract.expected_master, input_text=message + "\n"
+        ).stdout.strip()
+        pushed = self.git_runner(
             root,
             "push",
             "--porcelain",
@@ -517,23 +528,28 @@ def verify_reuse(root: Path, contract: FrozenContract) -> dict[str, Any]:
         raise ValidationError("V0R2_MANIFEST_ORIGINAL_60_MISMATCH")
 
     cache = root / CACHE_REL
+    cache_file_hashes: dict[str, str] = {}
     for row in original:
         local_sha = row.get("local_sha256")
         if row.get("status") != "MATERIALIZED_VERIFIED" or local_sha != row.get("official_checksum"):
             raise ValidationError("ORIGINAL_60_AUTHENTICATION_INVALID")
-        _assert_file_sha(cache / f"{local_sha}.zip", str(local_sha), "ORIGINAL_60_CACHE_IDENTITY_INVALID")
+        archive_path = cache / f"{local_sha}.zip"
+        _assert_file_sha(archive_path, str(local_sha), "ORIGINAL_60_CACHE_IDENTITY_INVALID")
+        cache_file_hashes[str(archive_path.relative_to(root))] = str(local_sha)
     if not isinstance(tail, dict) or tail.get("local_sha256") != contract.tail_sha256:
         raise ValidationError("2025_01_IDENTITY_INVALID")
     if tail.get("official_checksum") != contract.tail_sha256 or tail.get("status") != "MATERIALIZED_VERIFIED":
         raise ValidationError("2025_01_AUTHENTICATION_INVALID")
     tail_path = cache / f"{contract.tail_sha256}.zip"
     _assert_file_sha(tail_path, contract.tail_sha256, "2025_01_CACHE_IDENTITY_INVALID")
+    cache_file_hashes[str(tail_path.relative_to(root))] = contract.tail_sha256
     if not isinstance(old_rest, dict) or old_rest.get("response_sha256") != contract.v0r2_rest_sha256:
         raise ValidationError("V0R2_REST_IDENTITY_INVALID")
     if old_rest.get("row_count") != 720 or old_rest.get("status") != "MATERIALIZED_VERIFIED":
         raise ValidationError("V0R2_REST_METADATA_INVALID")
     old_rest_path = cache / f"{contract.v0r2_rest_sha256}.json"
     _assert_file_sha(old_rest_path, contract.v0r2_rest_sha256, "V0R2_REST_CACHE_IDENTITY_INVALID")
+    cache_file_hashes[str(old_rest_path.relative_to(root))] = contract.v0r2_rest_sha256
     old_rows, old_opens = _validate_old_rest(old_rest_path.read_bytes(), contract)
 
     december = original[-1]
@@ -559,8 +575,17 @@ def verify_reuse(root: Path, contract: FrozenContract) -> dict[str, Any]:
         "old_rows": old_rows,
         "old_opens": old_opens,
         "old_file_hashes": old_file_hashes,
+        "cache_file_hashes": cache_file_hashes,
         "last_target_24h_complete": True,
     }
+
+
+def revalidate_reuse(root: Path, reuse: dict[str, Any]) -> None:
+    """Close the post-request TOCTOU window before READY publication."""
+    for relative, expected in reuse["cache_file_hashes"].items():
+        _assert_file_sha(root / relative, expected, "REUSED_CACHE_CHANGED_AFTER_VERIFICATION")
+    for relative, expected in reuse["old_file_hashes"].items():
+        _assert_file_sha(root / relative, expected, "OLD_V0R2_MUTATED")
 
 
 def _validate_prefix(response: FetchResponse, contract: FrozenContract) -> tuple[list[Any], str]:
@@ -597,6 +622,9 @@ def _source_artifacts(
         "http_status": response.status,
         "response_sha256": actual_sha,
         "cache_path": str(CACHE_REL / f"{actual_sha}.json"),
+        "authoritative_response_bytes_location": "EMBEDDED_IN_THIS_SOURCE_IDENTITY",
+        "authoritative_response_bytes_encoding": "base64",
+        "authoritative_response_bytes_base64": base64.b64encode(response.body).decode("ascii"),
         "row_count": 1,
         "field_count": 12,
         "open_time_ms": int(prefix[0]),
@@ -822,8 +850,7 @@ def _blocked_after_claim(root: Path, contract: FrozenContract, claim: Claim, err
         "capital_authority": "NONE",
     }
     qualification = {**qualification_body, "qualification_digest": digest(qualification_body)}
-    if not (root / V0R3_QUALIFICATION_REL).exists():
-        _write_json_exclusive(root / V0R3_QUALIFICATION_REL, qualification)
+    _replace_json(root / V0R3_QUALIFICATION_REL, qualification)
     receipt_body = {
         "artifact_type": "JFP03_V0R3_PREFIX_MATERIALIZATION_RECEIPT",
         "schema_version": "jfp03-v0r3-prefix-materialization-receipt-v1",
@@ -886,12 +913,10 @@ def materialize(
         manifest, snapshot, qualification, receipt = _source_artifacts(
             contract, claim, response, prefix, actual_sha, reuse
         )
+        revalidate_reuse(root, reuse)
         _write_json_exclusive(root / V0R3_MANIFEST_REL, manifest)
         _write_json_exclusive(root / V0R3_SNAPSHOT_REL, snapshot)
         _write_json_exclusive(root / V0R3_QUALIFICATION_REL, qualification)
-        for relative, before in reuse["old_file_hashes"].items():
-            if _sha256_path(root / relative) != before:
-                raise ValidationError("OLD_V0R2_MUTATED")
         _replace_json(root / V0R3_RECEIPT_REL, receipt)
         return {
             "manifest": manifest,

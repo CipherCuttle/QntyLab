@@ -2,7 +2,7 @@ schema_version = 1
 
 [[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_REPAIRED_SOURCE_MATERIALIZATION_AUTHORIZATION_V0"
-state = "ACTIVE"
+state = "CLOSED_PASS"
 authority_level = "REPAIRED_SOURCE_MATERIALIZATION_AUTHORIZATION_ONLY"
 authoritative_artifacts = [
   "docs/state/projects.toml",

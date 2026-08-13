@@ -180,10 +180,12 @@ def test_human_context_does_not_claim_no_queued_projects() -> None:
 def test_jh01_temporal_replication_v0_and_v0r1_are_closed_with_their_distinct_lineages_preserved() -> None:
     data = project_context.context_data(ROOT)
     _, _, registry = project_context.load_context_sources(ROOT)
-    # JH01 temporal replication and the blocked JFP03 V0 are closed; no execution
-    # authority remains active while the required input materialization is absent.
-    assert sum(record["state"] == "ACTIVE" for record in registry["project"]) == 0
-    assert data["active_project"] is None
+    # JH01 temporal replication and the blocked JFP03 V0 are closed; the sole
+    # active project is the bounded JFP03 V0R1 input-materialization phase.
+    assert [record["project_id"] for record in registry["project"] if record["state"] == "ACTIVE"] == [
+        "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_INPUT_MATERIALIZATION"
+    ]
+    assert data["active_project"]["project_id"] == "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_INPUT_MATERIALIZATION"
     execution = next(record for record in registry["project"] if record["project_id"] == "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0")
     assert execution["state"] == "CLOSED_BLOCKED"
     assert execution["authority_level"] == "FROZEN_REPLICATION_EXECUTION_INTERRUPTED_NO_RERUN"
@@ -303,9 +305,12 @@ def test_jfp_historical_execution_v0_authorizes_only_jfp03_with_frozen_holm_fami
     _, _, registry = project_context.load_context_sources(ROOT)
     projects = {record["project_id"]: record for record in registry["project"]}
 
-    # V0 is closed blocked; no replacement execution project is authorized.
-    assert sum(record["state"] == "ACTIVE" for record in registry["project"]) == 0
-    assert data["active_project"] is None
+    # V0 is closed blocked; only the replacement input-materialization project
+    # is active, and it grants no execution authority.
+    assert [record["project_id"] for record in registry["project"] if record["state"] == "ACTIVE"] == [
+        "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_INPUT_MATERIALIZATION"
+    ]
+    assert data["active_project"]["project_id"] == "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_INPUT_MATERIALIZATION"
     execution = projects["JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_HISTORICAL_EXECUTION_V0"]
     assert execution["state"] == "CLOSED_BLOCKED"
     assert execution["authority_level"] == "FROZEN_DESIGN_UNDERSPECIFIED_BEFORE_REAL_ACCESS"
@@ -478,9 +483,12 @@ def test_jh01_jigsaw_evidence_authorization_v0_is_governance_only_and_binds_v0r1
 
     # (10) project-context/state invariants remain valid: registry validation and the doctor pass clean.
     assert data["authority_conflicts_or_warnings"] == []
-    # This JH01 governance phase is closed and no JFP replacement execution authority exists.
-    assert sum(record["state"] == "ACTIVE" for record in registry["project"]) == 0
-    assert data["active_project"] is None
+    # This JH01 governance phase is closed; the sole active project is bounded
+    # JFP03 input materialization, not execution.
+    assert [record["project_id"] for record in registry["project"] if record["state"] == "ACTIVE"] == [
+        "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_INPUT_MATERIALIZATION"
+    ]
+    assert data["active_project"]["project_id"] == "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_INPUT_MATERIALIZATION"
     for forbidden_text in (
         "narrowest truthful representation",
         "no scientific rerun, recomputation, or input reacquisition is authorized",

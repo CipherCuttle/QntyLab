@@ -1,6 +1,64 @@
 schema_version = 1
 
 [[project]]
+project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_HISTORICAL_SCIENTIFIC_EXECUTION_V0"
+display_name = "JFP03 V0R1 one-shot historical scientific execution"
+state = "CLOSED_BLOCKED"
+authority_level = "FROZEN_HISTORICAL_SCIENTIFIC_EXECUTION_BLOCKED_NO_RERUN"
+phase_type = "HISTORICAL_SCIENTIFIC_EXECUTION"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "qntylab/jfp03_v0r1_historical_scientific_execution.py",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/execution/v0r1/historical_scientific_execution_authorization.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/execution/v0r1/historical_scientific_execution_result.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r3_source_manifest.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r3_input_snapshot.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r3_input_qualification.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/jfp03_design_repair_v0r1.json",
+]
+bound_authorization_project = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_HISTORICAL_SCIENTIFIC_EXECUTION_AUTHORIZATION_V0"
+bound_snapshot_id = "jfp-input-v0r3-24311649d541c28d068addc2fc76121d614a11f0f191581c7dd988ba0b99c69f"
+bound_snapshot_digest = "24311649d541c28d068addc2fc76121d614a11f0f191581c7dd988ba0b99c69f"
+bound_qualification_digest = "420b0a4a84a57814d13393eb008affc05eb81223e06a9cf4a86c7772bc8bef5d"
+bound_design_digest = "a52d4999038e0be814ee8770322303fce84bed9ec8941b812748a18867633736"
+bound_executor_implementation_sha256 = "75a7a27930e7c772d18de9b98cea046da2fc74c07d6dd23ddcbc27374c364747"
+bound_executor_contract_digest = "75bf0ded12a82c6cc531f9a2f5fae166661ffde73c61a4b57c0c5bb436cebe75"
+bound_runtime_identity_digest = "35e70c8893e018c32f925734b666a1ba6abbac9d5942298de533d66ce1c22d60"
+historical_scientific_execution_runs_allowed = 1
+historical_scientific_execution_runs_consumed = 1
+historical_scientific_execution_performed = true
+claim_digest = "c2a0135a320c26e293d86d9ccbbf80553ee5f863be05d7184fab5074ad84038a"
+result_path = "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/execution/v0r1/historical_scientific_execution_result.json"
+result_digest = "aa42724ef37466babaf7fb81a44524fe9568d8679d0a2cf967ee9faaf9ae6dbb"
+expected_observation_count = 43848
+actual_observation_count = "NULL_IN_BLOCKED_RESULT"
+terminal_classification = "BLOCKED_CANDIDATE"
+input_integrity_pass = false
+execution_integrity_pass = false
+integrity_failure = "AFI total quote-volume denominator must be positive"
+scientific_values_are_null = true
+result_immutable = true
+replay_authorized = false
+rerun_authorized = false
+rescue_run_authorized = false
+input_reacquisition_authorized = false
+jigsaw_evidence_authorized = false
+jigsaw_synthesis_authorized = false
+promotion_authorized = false
+prospective_deployment_authorized = false
+state_snapshot_authorized = false
+forecaster_authorized = false
+router_authorized = false
+qnty_authorized = false
+paper_trading_authorized = false
+trading_authorized = false
+capital_authority = "NONE"
+downstream_authority = "NONE"
+implementation_authorized = false
+next_action = "The sole authorized JFP03 historical scientific execution run was durably consumed and terminated BLOCKED_CANDIDATE because a required AFI total quote-volume denominator was not positive. The immutable result contains no gamma, HAC, p-value, SSE, or partial-R2 estimate. No rerun, rescue run, result reinterpretation, input reacquisition, scientific mutation, Jigsaw synthesis, State Snapshot, Forecaster, Router, Qnty, trading, promotion, or capital action is authorized. Any future action requires separate explicit Git-backed governance."
+
+[[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_HISTORICAL_SCIENTIFIC_EXECUTION_AUTHORIZATION_V0"
 display_name = "JFP03 V0R1 historical scientific execution authorization"
 state = "CLOSED_PASS"
@@ -22,6 +80,7 @@ authoritative_artifacts = [
   "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/execution/v0r1/hostile_review.md",
   "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/execution/v0r1/targeted_re_review.md",
   "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/execution/v0r1/post_review_closure_repair.md",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/execution/v0r1/historical_scientific_execution_result.json",
 ]
 bound_materialization_project = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R3_PREFIX_MATERIALIZATION_V0"
 bound_snapshot_id = "jfp-input-v0r3-24311649d541c28d068addc2fc76121d614a11f0f191581c7dd988ba0b99c69f"
@@ -42,17 +101,22 @@ source_object_count = 63
 logical_warmup_rows = 721
 first_har720_complete = true
 last_target_24h_complete = true
-historical_scientific_execution_authorized = true
+historical_scientific_execution_authorized = false
 historical_scientific_execution_runs_allowed = 1
-historical_scientific_execution_runs_consumed = 0
-historical_scientific_execution_performed = false
+historical_scientific_execution_runs_consumed = 1
+historical_scientific_execution_performed = true
+claim_digest = "c2a0135a320c26e293d86d9ccbbf80553ee5f863be05d7184fab5074ad84038a"
+result_path = "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/execution/v0r1/historical_scientific_execution_result.json"
+result_digest = "aa42724ef37466babaf7fb81a44524fe9568d8679d0a2cf967ee9faaf9ae6dbb"
+terminal_classification = "BLOCKED_CANDIDATE"
+rerun_authorized = false
 input_reacquisition_authorized = false
 network_access_authorized = false
-scientific_feature_computation_authorized = true
-scientific_target_computation_authorized = true
-regression_authorized = true
-hac_authorized = true
-p_values_authorized = true
+scientific_feature_computation_authorized = false
+scientific_target_computation_authorized = false
+regression_authorized = false
+hac_authorized = false
+p_values_authorized = false
 real_afi_computed = false
 real_har_computed = false
 real_target_computed = false
@@ -72,7 +136,7 @@ trading_authorized = false
 capital_authority = "NONE"
 downstream_authority = "NONE"
 implementation_authorized = false
-next_action = "Exactly one later JFP03 historical scientific execution is authorized against the frozen V0R3 snapshot and frozen executor. The later executor must verify every bound identity and durably consume the sole run before opening any real source object. This authorization phase computed no real scientific result. No downstream, Qnty, trading, or capital authority is granted."
+next_action = "The one authorized JFP03 historical scientific execution run is consumed. Its immutable result is BLOCKED_CANDIDATE because a required AFI total quote-volume denominator was not positive; no scientific estimates were produced. No rerun, rescue run, result reinterpretation, input reacquisition, downstream, Qnty, trading, or capital authority is granted."
 
 [[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R3_PREFIX_MATERIALIZATION_V0"

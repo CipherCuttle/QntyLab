@@ -906,6 +906,42 @@ next_action = "JH01 incremental forecast-value preregistration is frozen outcome
 implementation_authorized = false
 
 [[project]]
+project_id = "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_INPUT_MATERIALIZATION_AUTHORIZATION_V0"
+display_name = "JH01 incremental forecast-value input materialization authorization"
+state = "CLOSED_BLOCKED"
+authority_level = "GOVERNANCE_AUTHORIZATION_BLOCKED_BY_PROSPECTIVE_INTEGRITY"
+phase_type = "GOVERNANCE_ONLY"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v0/preregistration.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v0/design_note.md",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v0/input_materialization_authorization_v0.json",
+  "qntylab/jh01_rv_persistence_incremental_forecast_value_input_materialization_authorization_v0.py",
+  "tests/test_jh01_rv_persistence_incremental_forecast_value_input_materialization_authorization_v0.py",
+]
+predecessor_project_id = "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_PREREG_V0"
+frozen_preregistration_digest = "324279bf493db3862be875e4aca13d78b4feb2cc5f4b11ad39aecb2a4fac3686"
+earliest_exact_prereg_commit = "b5b0914bd4313f70d82c6eb4cf899efc4f75bd03"
+earliest_exact_prereg_commit_time_utc = "2026-08-13T00:13:11Z"
+pre_freeze_origin_count = 24
+prospective_integrity = "FAILED_FROZEN_START_ALREADY_ELAPSED_WITHOUT_PERSISTED_FORECAST"
+materialization_authorized = false
+scientific_execution_authorized = false
+market_data_acquired = false
+held_out_outcomes_accessed = false
+forecast_evaluation_performed = false
+jigsaw_mutated = false
+state_snapshot_authorized = false
+router_authorized = false
+qnty_authorized = false
+trading_authorized = false
+promotion_authorized = false
+ledger_update = "NOT_APPLICABLE_EXISTING_EXACT_VARIANT_IS_TERMINALLY_BLOCKED_AND_LEDGER_FORBIDS_REPLACEMENT_WITHOUT_REOPEN"
+next_action = "A new separately preregistered JH01 incremental forecast-value experiment may be considered with a genuinely future first origin, but requires a new bounded outcome-blind preregistration phase. V0 remains immutable and terminally blocked by prospective timing integrity. No result from V0 exists; JH01 discovery and temporal-replication evidence remain unchanged."
+implementation_authorized = false
+
+[[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_PREREG_V0"
 state = "CLOSED_PASS"
 authority_level = "OUTCOME_BLIND_PREREGISTRATION_ONLY"

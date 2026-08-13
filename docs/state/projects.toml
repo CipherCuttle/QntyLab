@@ -2,7 +2,7 @@ schema_version = 1
 
 [[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_INPUT_MATERIALIZATION"
-state = "ACTIVE"
+state = "CLOSED_BLOCKED"
 authority_level = "INPUT_MATERIALIZATION_ONLY"
 authoritative_artifacts = [
   "docs/state/projects.toml",
@@ -15,8 +15,13 @@ authoritative_artifacts = [
   "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r1_supplemental_source_census.json",
   "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r1_input_materialization_authorization.json",
   "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r1_hostile_materialization_authorization_review.md",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r1_supplemental_manifest.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r1_input_qualification.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r1_snapshot_manifest.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r1_materialization_receipt.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r1_hostile_materialization_review.md",
 ]
-phase_type = "GOVERNANCE_ONLY"
+phase_type = "INPUT_MATERIALIZATION_ONLY"
 frozen_preregistration_project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_PREREG_V0"
 frozen_preregistration_digest = "9e9236b34b131c13cebfb0b8043ef59043b2928fa6fcd88dd7b10909d9e8ccfe"
 frozen_candidate_census_digest = "d718dc1c60ceccdbd7a836a1e07b911a51511456289c09d7ff9b8c6af452df94"
@@ -43,8 +48,8 @@ qnty_authorized = false
 trading_authorized = false
 promotion_authorized = false
 capital_authority = "NONE"
-implementation_authorized = true
-next_action = "Acquire and authenticate only the two supplemental BTCUSDT USD-M 1h monthly kline objects in the bound census; structurally validate them; create additive manifests and one new immutable V0R1 snapshot; qualify JFP03 V0R1 READY or BLOCKED. Do not compute science or execute."
+implementation_authorized = false
+next_action = "Materialization authority is closed BLOCKED because Binance did not publish the authorized 2019-12 monthly archive. Historical execution remains unauthorized; any continuation requires a separate Git-backed authorization after the frozen source contract is repaired."
 
 [[project]]
 project_id = "QNTYLAB_PROJECT_CONTEXT_AND_AUTHORITY_REGISTRY_V0"

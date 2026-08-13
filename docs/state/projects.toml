@@ -1,6 +1,74 @@
 schema_version = 1
 
 [[project]]
+project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R3_PREFIX_MATERIALIZATION_V0"
+display_name = "JFP03 V0R3 prefix materialization"
+state = "CLOSED_PASS"
+authority_level = "INPUT_MATERIALIZATION_ONLY"
+phase_type = "INPUT_MATERIALIZATION_ONLY"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/preregistration.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/candidate_census.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/jfp03_design_repair_v0r1.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r2_input_snapshot.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r2_input_qualification.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r2_repaired_source_materialization_receipt.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r2_repaired_source_manifest.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/close_boundary_repair_v0/close_boundary_source_contract_repair.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/close_boundary_repair_v0/prefix_source_contract.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r3_prefix_materialization_authorization.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r3_source_manifest.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r3_input_snapshot.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r3_input_qualification.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r3_materialization_receipt.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r3_hostile_review.md",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r3_targeted_re_review.md",
+]
+bound_authorization_project = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R3_PREFIX_MATERIALIZATION_AUTHORIZATION_V0"
+bound_close_boundary_repair_project = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R2_CLOSE_BOUNDARY_SOURCE_CONTRACT_REPAIR_V0"
+bound_design_digest = "a52d4999038e0be814ee8770322303fce84bed9ec8941b812748a18867633736"
+predecessor_snapshot_id = "jfp-input-v0r2-0d28756edca8e24060f32a217362cb886c8b5eebd506293c32058cd59a617852"
+predecessor_snapshot_digest = "0d28756edca8e24060f32a217362cb886c8b5eebd506293c32058cd59a617852"
+snapshot_id = "jfp-input-v0r3-24311649d541c28d068addc2fc76121d614a11f0f191581c7dd988ba0b99c69f"
+snapshot_digest = "24311649d541c28d068addc2fc76121d614a11f0f191581c7dd988ba0b99c69f"
+qualification_digest = "420b0a4a84a57814d13393eb008affc05eb81223e06a9cf4a86c7772bc8bef5d"
+materialization_receipt_digest = "6c49a2cf091ab93844b15e23e3836148cb572e71a650a92a201a5cc5831bd2b5"
+expected_master = "5d2007b4a7ede300293c1ccecea7ed4957e8fa54"
+claim_mechanism = "REMOTE_GIT_REF_PLUS_O_EXCL_RECEIPT"
+remote_claim_ref = "refs/heads/qntylab-claims/jfp03-v0r3-prefix-materialization-v0"
+remote_claim_commit = "1faaf92a341154a10d812fee4fd295c2e1b3626a"
+authorized_runs_allowed = 1
+authorized_runs_consumed = 1
+materialization_performed = true
+input_qualification = "READY"
+source_object_count = 63
+logical_warmup_rows = 721
+scientific_execution_authorized = false
+scientific_execution_performed = false
+historical_execution_authorized = false
+feature_computation_authorized = false
+feature_computation_performed = false
+target_computation_authorized = false
+target_computation_performed = false
+regression_authorized = false
+regression_performed = false
+hac_authorized = false
+hac_performed = false
+p_values_authorized = false
+p_values_computed = false
+jigsaw_evidence_authorized = false
+state_snapshot_authorized = false
+forecaster_authorized = false
+router_authorized = false
+qnty_authorized = false
+trading_authorized = false
+promotion_authorized = false
+capital_authority = "NONE"
+implementation_authorized = false
+next_action = "The corrected immutable JFP03 V0R3 input snapshot is READY. Scientific execution remains unauthorized and requires a separate Git-backed authorization."
+
+[[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R3_PREFIX_MATERIALIZATION_AUTHORIZATION_V0"
 display_name = "JFP03 V0R3 prefix materialization authorization"
 state = "CLOSED_PASS"
@@ -25,8 +93,8 @@ bound_prefix_contract = true
 bound_design_digest = "a52d4999038e0be814ee8770322303fce84bed9ec8941b812748a18867633736"
 prefix_materialization_authorized = true
 prefix_materialization_runs_allowed = 1
-prefix_materialization_performed = false
-authorized_runs_consumed = 0
+prefix_materialization_performed = true
+authorized_runs_consumed = 1
 consumption_guard_required = true
 scientific_execution_authorized = false
 scientific_execution_performed = false
@@ -45,7 +113,7 @@ trading_authorized = false
 promotion_authorized = false
 capital_authority = "NONE"
 implementation_authorized = false
-next_action = "Exactly one future V0R3 prefix materialization run is authorized under the frozen one-row contract; no prefix materialization or scientific execution occurred in this governance phase."
+next_action = "The single authorized V0R3 prefix materialization run has been consumed. The additive input snapshot qualified READY; scientific execution remains unauthorized and requires separate Git-backed authorization."
 
 [[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R2_CLOSE_BOUNDARY_SOURCE_CONTRACT_REPAIR_V0"

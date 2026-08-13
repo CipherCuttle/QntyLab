@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "project_id": "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_PREREG_V1",
+  "experiment_id": "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_PREREG_V1",
+  "candidate_id": "CANDIDATE_JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_V1",
+  "phase": "PREREGISTRATION_ONLY",
+  "state": "CLOSED_PASS",
+  "authority_level": "OUTCOME_BLIND_PREREGISTRATION_ONLY",
+  "implementation_authorized": false,
+  "preregistration_digest": "bdb85130cae75e9f156db9aa1fd955d7f565a3714ae091871d5ac4447c1ec27b",
+  "v0_lineage": {
+    "project_id": "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_PREREG_V0",
+    "candidate_id": "CANDIDATE_JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_V0",
+    "state": "CLOSED_BLOCKED",
+    "scientific_result": "NONE",
+    "prospective_integrity": "FAILED_FROZEN_START_ALREADY_ELAPSED_WITHOUT_PERSISTED_FORECAST",
+    "block_reason": "PROSPECTIVE_TIMING_AND_FORECAST_PERSISTENCE_INTEGRITY_ONLY",
+    "non_escalation": "V0 establishes neither positive nor negative forecast value, alpha, economic significance, strategy edge, or absence thereof."
+  },
+  "scientific_diff_from_v0": "TIMING_AND_PROSPECTIVE_GOVERNANCE_ONLY",
+  "source_binding": {
+    "discovery_piece_identity": "JH01_RV_PERSISTENCE",
+    "temporal_replication_piece_identity": "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_V0R1",
+    "immutable_artifacts": {
+      "experiments/research/jigsaw_harvest_v0/preregistration.json": "23cd3f17c5080a0a966aa18b4b4bf620a054afe20329e51936ddc5d402a30a97",
+      "experiments/research/jigsaw_harvest_v0/result.json": "ac40ee2c07da363cf7c53b6f4839469aca8a6d2398d672bd283a1815433390b7",
+      "experiments/research/jh01_rv_persistence_temporal_replication_v0/v0r1/execution_result.json": "00c18ed0097587ef8db0e9b5e4003546c862f6001986fe9d54952734aa6f5872",
+      "experiments/research/jh01_rv_persistence_temporal_replication_v0/v0r1/provenance_correction.json": "9c98ab16b52aef31f4cd3c939eb24c7d4ed211d954db6936e64fc97b45fb3ac1",
+      "experiments/research/jh01_rv_persistence_temporal_replication_v0/result.json": "e2be973dc5741cfb05768753a664a44194650f0758984cc7ca0caecf9532f7f8",
+      "experiments/research/jh01_rv_persistence_incremental_forecast_value_v0/preregistration.json": "20bd204a0a78ef5810e7350e055d7ebb4e1368381ac65fda7acf4476a6068d1b",
+      "experiments/research/jh01_rv_persistence_incremental_forecast_value_v0/input_materialization_authorization_v0.json": "f826e085adfb9d3f129d075415b51a288abb2835b0af06e41dd8b5b9a77f43a5"
+    },
+    "jigsaw_pair_attestation_at_freeze": {
+      "replication_relation": "TEMPORAL_REPLICATION_EXPLICITLY_ESTABLISHED",
+      "independence_status": "INDEPENDENCE_NOT_ESTABLISHED",
+      "independent_replication_established": false,
+      "allowed_synthesis": "TEMPORAL_REPLICATION_CONTEXT_ONLY"
+    },
+    "mutable_global_synthesis_aggregate_byte_pinned": false
+  },
+  "frozen_target": {
+    "return_construction": "r_i,h = log(C_i,h / C_i,h-1), at hourly close boundary h; r_m,h is the equal-weighted mean across the exact ordered 20-symbol panel.",
+    "rv24_prior_definition": "RV24_prior,t = sqrt(sum_{h=t-23}^{t} r_m,h^2).",
+    "rv24_future_definition": "RV24_future,t = sqrt(sum_{h=t+1}^{t+24} r_m,h^2).",
+    "realized_measure": "REALIZED_VOLATILITY_NOT_VARIANCE",
+    "decision_time": "00:00:00Z",
+    "safe_known_after": "Every feature return has bar_close_time <= t; the target's first return begins after t.",
+    "forecast_horizon_hours": 24,
+    "target_transformation": "NONE_UNTRANSFORMED_RV24",
+    "annualization": "NONE",
+    "panel_aggregation": "EQUAL_WEIGHTED_20_SYMBOL_MARKET_RETURN_THEN_RV",
+    "ordered_20_symbol_panel": ["ALICEUSDT", "APEUSDT", "API3USDT", "APTUSDT", "BCHUSDT", "CHRUSDT", "CHZUSDT", "ETCUSDT", "GMTUSDT", "INJUSDT", "LDOUSDT", "LINKUSDT", "LTCUSDT", "ONEUSDT", "OPUSDT", "REEFUSDT", "SANDUSDT", "TRXUSDT", "XLMUSDT", "XRPUSDT"],
+    "ordered_20_symbol_panel_sha256": "e6d1447ff2be57f81eaf943b62218ce9a7b9a6f5bf2d25f9be255cb3f2040cd8",
+    "missing_data_policy": "BLOCKED_NO_IMPUTATION_OR_ROW_DROPPING",
+    "observation_overlap": "NON_OVERLAPPING_DAILY_OUTCOMES"
+  },
+  "model_set": {
+    "candidate": {"model_id": "C_JH01", "formula": "RV24_future,t = alpha_t + beta_t * RV24_prior,t + epsilon_t", "information_set": "RV24_prior,t and only historical target/feature pairs known before t", "fitted_parameters": ["alpha_t", "beta_t"], "estimation": "OLS_WITH_INTERCEPT_AT_EACH_REFIT"},
+    "B0": {"model_id": "B0_HISTORICAL_MEAN", "formula": "expanding-history mean of prior realized RV24_future values", "status": "RETAINED"},
+    "B1": {"model_id": "B1_NAIVE_PERSISTENCE", "formula": "forecast RV24_future,t = RV24_prior,t", "status": "RETAINED"},
+    "B2": {"model_id": "B2_ONE_LAG_AR", "formula": "same intercept-and-slope one-lag RV24 regression as C_JH01", "status": "REDUNDANT_WITH_CANDIDATE", "reason": "Identical information set, target, functional form, and fitted parameters; excluded from comparisons."},
+    "B3": {"model_id": "B3_HAR_RV_STYLE", "formula": "alpha + b_d*RV24_prior,t + b_w*mean(RV24_prior,t..t-6) + b_m*mean(RV24_prior,t..t-29)", "status": "RETAINED_SECONDARY_ONLY", "windows": [1, 7, 30], "estimation": "OLS_WITH_INTERCEPT_AT_EACH_REFIT"},
+    "primary_benchmark": "B1_NAIVE_PERSISTENCE",
+    "model_equivalence_verdict": "C_JH01 is distinct from B0, B1, and B3, but mathematically identical to B2."
+  },
+  "evaluation_design": {
+    "training_policy": "EXPANDING_WINDOW",
+    "minimum_training_origins": 365,
+    "refit_policy": "REFIT_EVERY_DAILY_FORECAST_ORIGIN_USING_ONLY_COMPLETED_TARGETS_STRICTLY_BEFORE_T",
+    "initial_training_history_boundary": {"completed_target_cutoff_exclusive": "2026-09-15T00:00:00Z", "latest_eligible_training_origin": "2026-09-13T00:00:00Z", "derivation": "A target for origin o completes at o+24h.  Strict completion before 2026-09-15T00:00:00Z therefore admits o+24h < first decision, so o <= 2026-09-13T00:00:00Z; an origin completing exactly at the first decision is excluded."},
+    "forecast_bounds": "NONNEGATIVE_FLOOR_ZERO_APPLIED_IDENTICALLY_TO_ALL_FITTED_MODELS_AFTER_FORECASTING",
+    "prospective_holdout": {"first_decision": "2026-09-15T00:00:00Z", "last_decision": "2027-09-14T00:00:00Z", "required_valid_origins": 365, "maximum_valid_origins": 365, "decision_frequency": "P1D_AT_00:00:00Z", "start_rule": "FIXED_FIRST_LISTED_ORIGIN_NO_SKIP_SUBSTITUTE_OR_LATER_START", "end_rule": "EXACTLY_365_VALID_DAILY_ORIGINS_ANY_MISSING_ORIGIN_BLOCKS_EVALUATION"}
+  },
+  "loss_and_testing": {
+    "primary_loss": "MSE_ON_UNTRANSFORMED_RV24",
+    "secondary_losses": ["MAE_ON_UNTRANSFORMED_RV24"],
+    "excluded_loss": "QLIKE_EXCLUDED_BECAUSE_TARGET_IS_VOLATILITY_NOT_VARIANCE",
+    "primary_comparison": "C_JH01_VS_B1_NAIVE_PERSISTENCE",
+    "primary_test": {"method": "CLARK_WEST_STYLE_ADJUSTED_MSPE_ONE_SIDED_HAC", "alternative": "C_JH01_LOWER_LOSS_THAN_B1", "alpha": 0.05, "hac": "BARTLETT_NEWEY_WEST_AUTOMATIC_BANDWIDTH_ON_DAILY_LOSS_DIFFERENTIALS"},
+    "nested_model_handling": "C_JH01 is the fitted flexible extension of fixed B1, so the primary test uses the preregistered Clark-West-style adjusted MSPE differential. B3 nests C_JH01 and is reported descriptively only; no invalid unadjusted nested-model p-value will be used as a rescue.",
+    "serial_correlation_handling": "Daily targets do not overlap, but loss differentials may remain dependent; HAC is therefore mandatory.",
+    "materiality_gate": {"definition": "relative MSE reduction = (MSE_B1 - MSE_C_JH01) / MSE_B1", "minimum_relative_mse_reduction": 0.05, "rationale": "A fixed decision threshold to exclude trivially small improvements; it is a governance threshold, not a universal economic constant."}
+  },
+  "classification": {
+    "INCREMENTAL_FORECAST_VALUE_SUPPORTED_WITHIN_FROZEN_SCOPE": "C_JH01 has lower primary MSE, relative reduction >= 0.05, and one-sided adjusted-MSPE HAC p <= 0.05.",
+    "NO_INCREMENTAL_FORECAST_VALUE_FOUND": "A valid evaluation fails any primary direction, 5% materiality, or statistical-evidence gate.",
+    "INCONCLUSIVE": "A valid evaluation cannot be classified by the frozen primary gates because the prespecified test is computationally indeterminate without an integrity failure.",
+    "BLOCKED": "A source, data, timing, point-in-time, or contract integrity gate fails before a valid evaluation.",
+    "primary_kill_condition": "Failure to materially improve outcome-unseen primary performance versus B1 retains prior persistence evidence but ends this JH01 representation as an incremental forecasting primitive; no rescue analysis may reverse it."
+  },
+  "search_accounting": {
+    "models_considered": ["B0 historical mean", "B1 naive persistence", "B2 one-lag AR", "B3 HAR-RV-style", "C_JH01 fitted one-lag RV"],
+    "models_removed": ["B2 one-lag AR: redundant with C_JH01"],
+    "horizons_considered": [24],
+    "losses_considered": ["MSE", "MAE", "QLIKE"],
+    "losses_selected": ["MSE primary", "MAE secondary"],
+    "window_policies_considered": ["expanding", "rolling"],
+    "window_policy_selected": "expanding",
+    "multiplicity_policy": "One primary comparison and one primary loss. B0/B3 and MAE are secondary descriptive reports only and cannot rescue failure; no model sweep, horizon sweep, subgroup, asset, transform, or baseline substitution is allowed."
+  },
+  "prohibited_rescues": ["new horizon", "new transform", "new loss", "new subgroup or asset panel", "alternative benchmark hierarchy", "rolling window", "hyperparameter search", "additional features", "alternative primary comparison"],
+  "forecast_persistence_contract": {
+    "feature_information_cutoff": "MAX_INPUT_BAR_CLOSE <= t",
+    "open_or_partial_future_bars": "PROHIBITED",
+    "first_future_bar_close": "t + 1 hour",
+    "persistence_window": "t <= persistence_time < t + 1 hour",
+    "prospective_conjunction": ["candidate_origin_identity_correct", "input_cutoff_at_or_before_origin", "no_open_or_incomplete_future_bar", "immutable_forecast_artifact_exists", "persistence_within_window"],
+    "immutable_per_origin_record": ["project_experiment_candidate_identity", "preregistration_digest", "forecast_origin", "ordered_20_symbol_panel", "target_horizon_identity", "maximum_source_bar_close", "training_target_cutoff", "training_origin_count", "model_implementation_identity_digest", "data_snapshot_or_manifest_identity", "candidate_fitted_parameters_and_forecast", "B1_forecast", "B0_forecast", "B3_fitted_parameters_and_forecast", "nonnegative_floor_application", "persistence_mechanism", "persistence_timestamp", "forecast_artifact_digest"]
+  },
+  "sealed_evaluation": {"interim_scientific_evaluation": "PROHIBITED", "final_evaluation_authorized": false, "forbidden_interim_outputs": ["cumulative_mse", "relative_mse_improvement", "candidate_vs_B1_dashboard", "clark_west_statistic", "p_value", "interim_classification", "winning_losing_status", "benchmark_ranking", "rescue_analysis"]},
+  "preregistration_lead_time": {"minimum_canonical_prereg_lead_days": 14, "canonical_freeze_deadline": "2026-09-01T00:00:00Z", "eligibility_at_draft_freeze": "ELIGIBLE_PENDING_CANONICAL_MERGE_BY_DEADLINE", "canonical_freeze_gate": "MANDATORY_BEFORE_CANONICAL_MERGE", "failure_rule": "BLOCKED_DO_NOT_MOVE_FIRST_DECISION_OR_SHORTEN_MARGIN"},
+  "kill_conditions": ["SOURCE_BINDING_MISMATCH", "OUTCOME_UNSEEN_CLAIM_UNPROVEN", "PRE_FREEZE_OUTCOME_ACCESS", "UNAUTHORIZED_DATA_ACQUISITION", "TRAINING_TEST_OVERLAP", "FUTURE_BAR_USED_AT_FORECAST_ORIGIN", "NON_POINT_IN_TIME_NORMALIZATION", "REFIT_USES_HELD_OUT_OUTCOME", "DUPLICATE_OR_REORDERED_FORECAST_ORIGIN", "MISSING_OBSERVATION", "BENCHMARK_INFORMATION_SET_MISMATCH", "PROTOCOL_DIGEST_MISMATCH", "UNAUTHORIZED_EXECUTION", "POST_FREEZE_MODEL_OR_METRIC_MUTATION", "PREREG_CANONICAL_FREEZE_TOO_LATE", "FIRST_ORIGIN_REACHED_BEFORE_RUNTIME_READY", "FORECAST_NOT_PERSISTED_FOR_REQUIRED_ORIGIN", "FORECAST_PERSISTED_BEFORE_ORIGIN", "FORECAST_PERSISTED_AT_OR_AFTER_FIRST_FUTURE_BAR_CLOSE", "SOURCE_BAR_AFTER_FORECAST_ORIGIN", "OPEN_OR_PARTIAL_FUTURE_BAR_USED", "FORECAST_ARTIFACT_IDENTITY_MISMATCH", "FORECAST_ARTIFACT_DIGEST_MISMATCH", "DUPLICATE_FORECAST_ORIGIN", "REORDERED_FORECAST_ORIGIN", "UNAUTHORIZED_INTERIM_EVALUATION"],
+  "outcome_blindness": {"new_market_data_accessed": false, "held_out_outcomes_accessed": false, "forecast_execution_performed": false, "scientific_evaluation_performed": false, "result_artifact_created": false, "jigsaw_mutated": false},
+  "authority": {"state_snapshot_authorized": false, "router_authorized": false, "qnty_authorized": false, "trading_authorized": false, "promotion_authorized": false},
+  "next_action": "No direct authorization. Continuation requires a separate Git-backed governance phase for a sealed prospective input and forecast-persistence recorder qualified before the fixed first origin."
+}

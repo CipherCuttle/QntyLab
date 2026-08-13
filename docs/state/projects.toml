@@ -942,6 +942,40 @@ next_action = "A new separately preregistered JH01 incremental forecast-value ex
 implementation_authorized = false
 
 [[project]]
+project_id = "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_PREREG_V1"
+display_name = "JH01 incremental forecast-value prospective preregistration V1"
+state = "CLOSED_PASS"
+authority_level = "OUTCOME_BLIND_PREREGISTRATION_ONLY"
+phase_type = "PREREGISTRATION_ONLY"
+authoritative_artifacts = [
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/preregistration.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/ledger_candidate_proposal.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/ledger_decision.json",
+  "qntylab/jh01_rv_persistence_incremental_forecast_value_prereg_v1.py",
+  "tests/test_jh01_rv_persistence_incremental_forecast_value_prereg_v1.py",
+  "experiments/research/candidates.jsonl",
+  "experiments/research/decisions.jsonl",
+]
+predecessor_project_id = "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_INPUT_MATERIALIZATION_AUTHORIZATION_V0"
+v0_preregistration_digest = "324279bf493db3862be875e4aca13d78b4feb2cc5f4b11ad39aecb2a4fac3686"
+scientific_diff_from_v0 = "TIMING_AND_PROSPECTIVE_GOVERNANCE_ONLY"
+prospective_holdout = "2026-09-15T00:00:00Z..2027-09-14T00:00:00Z (365 required daily origins)"
+minimum_canonical_prereg_lead_days = 14
+canonical_prereg_freeze_deadline = "2026-09-01T00:00:00Z"
+new_market_data_accessed = false
+held_out_outcomes_accessed = false
+forecast_execution_performed = false
+scientific_evaluation_performed = false
+jigsaw_mutated = false
+state_snapshot_authorized = false
+router_authorized = false
+qnty_authorized = false
+trading_authorized = false
+promotion_authorized = false
+next_action = "Before canonical merge, the mandatory `python -m qntylab.jh01_rv_persistence_incremental_forecast_value_prereg_v1 --canonical-merge-time <UTC>` gate must pass at or before 2026-09-01T00:00:00Z; a late merge is BLOCKED and may not move the first decision. After timely canonical freeze, no direct authorization follows: a separate Git-backed governance phase must qualify a sealed prospective input and forecast-persistence recorder before 2026-09-15T00:00:00Z; interim scientific evaluation remains prohibited."
+implementation_authorized = false
+
+[[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_PREREG_V0"
 state = "CLOSED_PASS"
 authority_level = "OUTCOME_BLIND_PREREGISTRATION_ONLY"

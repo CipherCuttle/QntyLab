@@ -32,7 +32,7 @@ PROJECT_STATES = frozenset(
         "ARCHIVED",
     }
 )
-ADR_STATUSES = frozenset({"CURRENT_GLOBAL", "CURRENT_PROJECT_SPECIFIC", "HISTORICAL"})
+ADR_STATUSES = frozenset({"CURRENT_GLOBAL", "CURRENT_GLOBAL_COMPANION", "CURRENT_PROJECT_SPECIFIC", "HISTORICAL"})
 AUTHORITY_DOMAINS = (
     ("EXPERIMENT_SCIENCE", "immutable preregistration / frozen result or receipt"),
     ("GLOBAL_ARCHITECTURE", "current global ADR in docs/ADR/registry.toml"),
@@ -168,6 +168,12 @@ def validate_adr_registry(root: Path, registry: dict[str, Any]) -> dict[str, dic
     current = [record for record in by_id.values() if record["status"] == "CURRENT_GLOBAL"]
     if len(current) != 1:
         raise ProjectContextError("exactly one CURRENT_GLOBAL ADR is required")
+    if current[0]["authority_scope"] != "GLOBAL_ARCHITECTURE":
+        raise ProjectContextError("CURRENT_GLOBAL ADR must have GLOBAL_ARCHITECTURE scope")
+    companions = [record for record in by_id.values() if record["status"] == "CURRENT_GLOBAL_COMPANION"]
+    for companion in companions:
+        if companion["authority_scope"] == "GLOBAL_ARCHITECTURE":
+            raise ProjectContextError("CURRENT_GLOBAL_COMPANION cannot have GLOBAL_ARCHITECTURE scope")
 
     edges: dict[str, set[str]] = {adr_id: set() for adr_id in by_id}
     for record in _require_list(registry.get("supersession", []), "ADR registry supersession"):
@@ -323,6 +329,11 @@ def context_data(root: Path) -> dict[str, Any]:
     adrs = validate_adr_registry(root, adr_registry)
     projects = validate_projects_registry(root, projects_registry)
     global_adr = next(record for record in adrs.values() if record["status"] == "CURRENT_GLOBAL")
+    global_companions = [
+        {key: record[key] for key in ("adr_id", "path", "authority_scope")}
+        for record in adrs.values()
+        if record["status"] == "CURRENT_GLOBAL_COMPANION"
+    ]
     active = next((record for record in projects.values() if record["state"] == "ACTIVE"), None)
     queued = sorted(
         (
@@ -350,6 +361,7 @@ def context_data(root: Path) -> dict[str, Any]:
         "authority_boundary": "Git-tracked canonical sources only; chat, GPT memory, and handoff prose cannot override Git.",
         "git": _git_state(root),
         "current_global_adr": {key: global_adr[key] for key in ("adr_id", "path", "authority_scope")},
+        "current_global_companions": global_companions,
         "active_project": active,
         "current_permitted_next_action": active["next_action"] if active else "No project implementation is currently authorized.",
         "queued_but_unauthorized_projects": queued,
@@ -412,12 +424,18 @@ def context_text(data: dict[str, Any]) -> str:
         "",
         f"- Git: `{git['head_sha']}` on `{git['branch'] or 'DETACHED'}`; {'clean' if git['clean'] else 'dirty'}.",
         f"- Current global architecture: `{data['current_global_adr']['adr_id']}` — `{data['current_global_adr']['path']}`.",
-        f"- Active project: `{active['project_id'] if active else 'none'}`.",
-        f"- Permitted next action: {data['current_permitted_next_action']}",
         "",
-        "## Queued but not authorized",
+        "## Current global companion guidance",
         "",
     ]
+    if data["current_global_companions"]:
+        lines.extend(
+            f"- `{item['adr_id']}` — `{item['authority_scope']}` — `{item['path']}`."
+            for item in data["current_global_companions"]
+        )
+    else:
+        lines.append("- None.")
+    lines.extend(("", f"- Active project: `{active['project_id'] if active else 'none'}`.", f"- Permitted next action: {data['current_permitted_next_action']}", "", "## Queued but not authorized", ""))
     if data["queued_but_unauthorized_projects"]:
         lines.extend(f"- `{item['display_name']}`" for item in data["queued_but_unauthorized_projects"])
     else:

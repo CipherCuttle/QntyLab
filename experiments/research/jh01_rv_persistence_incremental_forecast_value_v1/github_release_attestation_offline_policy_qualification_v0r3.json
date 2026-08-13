@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "project_id": "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_V1_GITHUB_RELEASE_ATTESTATION_OFFLINE_POLICY_QUALIFICATION_V0R3",
+  "state": "CLOSED_PASS",
+  "canonical_remote_base": "f151281c9e9aa36554b99f172c22256d9591b323",
+  "predecessor_v0r2": {"state": "CLOSED_BLOCKED", "reopened": false},
+  "expected_values_source": "canonical V0R1/V0R2 result artifacts and immutable release readback; constants are compiled before bundle parsing",
+  "offline_isolation": "bubblewrap --unshare-net; loopback only; external network access NONE",
+  "inputs": {"asset_sha256": "191dfe3693a1e10f6efa8a385ca4c86953798d7e27a6f8e0c08dcbefc99ee4a7", "bundle_sha256": "c06ec4b206bfac13a6212b5befc68cee494d007885c5f4aeaae824e82cc86fc6", "trusted_root_sha256": "65ca537f6ed8a47fd0e560c421baa1f6c1efb8b25fc200d8c5c02c0e92eb2b9c"},
+  "verified": {"sigstore_library": "sigstore/sigstore-go", "sigstore_library_version": "v1.3.0", "dsse_signature_valid": true, "certificate_chain_valid": true, "signer_uri": "https://dotcom.releases.github.com", "tsa_timestamp": "2026-08-13T20:55:02Z", "tsa_minus_published_at_seconds": 0, "stage_b_policy_pass": true},
+  "negative_policy_tests": {"count": 14, "tests_pass": true, "all_fail_closed": true, "local_only": true},
+  "future_retention": {"files": ["forecast.json", "release_metadata.json", "release_attestation.sigstore.json", "trusted_root.jsonl", "retention_manifest.json"], "published_at_window": "t <= published_at < t + 1 hour", "tsa_window": "t <= VERIFIED_GITHUB_TSA_TIMESTAMP < t + 1 hour", "root_policy": "archive the root snapshot that verifies each acquired bundle; no freshness/revocation guarantee offline"},
+  "authority_level": "GITHUB_IMMUTABLE_RELEASE_PERSISTENCE_BACKEND_QUALIFIED_FOR_ONE_LATER_BOUNDED_RECORDER_IMPLEMENTATION_PHASE",
+  "future_bounded_recorder_implementation_authorized": true,
+  "implementation_authorized": false,
+  "outcome_blindness": {"market_data_accessed": false, "real_forecast_executed": false, "scientific_evaluation_performed": false, "jigsaw_mutated": false, "ledger_changed": false},
+  "next_action": "One later bounded Git-backed recorder implementation/qualification phase using only synthetic or frozen historical fixtures until separately authorized."
+}

@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- None.
+- `JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_REPAIRED_SOURCE_MATERIALIZATION_AUTHORIZATION_V0` — `ACTIVE`. Exactly one future repaired-source materialization run is authorized by the frozen contract; no materialization or JFP03 scientific execution is authorized in this governance phase.
 
 ## Queued — not authorized
 

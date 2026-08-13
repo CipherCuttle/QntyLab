@@ -388,6 +388,70 @@ def test_jfp_historical_execution_v0_authorizes_only_jfp03_with_frozen_holm_fami
     assert data["authority_conflicts_or_warnings"] == []
 
 
+def test_jfp03_v0r1_scientific_execution_authorization_is_one_shot_and_non_escalating() -> None:
+    data = project_context.context_data(ROOT)
+    _, _, registry = project_context.load_context_sources(ROOT)
+    projects = {record["project_id"]: record for record in registry["project"]}
+    project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_HISTORICAL_SCIENTIFIC_EXECUTION_AUTHORIZATION_V0"
+    authorization = projects[project_id]
+
+    assert authorization["state"] == "CLOSED_PASS"
+    assert authorization["phase_type"] == "GOVERNANCE_ONLY"
+    assert authorization["authority_level"] == "HISTORICAL_SCIENTIFIC_EXECUTION_AUTHORIZATION_ONLY"
+    assert authorization["bound_snapshot_id"] == "jfp-input-v0r3-24311649d541c28d068addc2fc76121d614a11f0f191581c7dd988ba0b99c69f"
+    assert authorization["bound_snapshot_digest"] == "24311649d541c28d068addc2fc76121d614a11f0f191581c7dd988ba0b99c69f"
+    assert authorization["bound_qualification_digest"] == "420b0a4a84a57814d13393eb008affc05eb81223e06a9cf4a86c7772bc8bef5d"
+    assert authorization["bound_design_digest"] == "a52d4999038e0be814ee8770322303fce84bed9ec8941b812748a18867633736"
+    assert authorization["input_qualification"] == "READY"
+    assert authorization["source_object_count"] == 63
+    assert authorization["logical_warmup_rows"] == 721
+    assert authorization["first_har720_complete"] is True
+    assert authorization["last_target_24h_complete"] is True
+
+    assert authorization["historical_scientific_execution_authorized"] is True
+    assert authorization["historical_scientific_execution_runs_allowed"] == 1
+    assert authorization["historical_scientific_execution_runs_consumed"] == 0
+    assert authorization["historical_scientific_execution_performed"] is False
+    assert authorization["input_reacquisition_authorized"] is False
+    assert authorization["network_access_authorized"] is False
+    assert authorization["bound_runtime_identity_digest"] == "35e70c8893e018c32f925734b666a1ba6abbac9d5942298de533d66ce1c22d60"
+    assert authorization["bound_execution_workspace_root"] == "/home/swirky/DevHub/repos/QntyLab"
+    assert authorization["bound_git_common_dir"] == "/home/swirky/DevHub/repos/QntyLab/.git"
+    assert authorization["bound_git_common_dir_device"] == 66307
+    assert authorization["bound_git_common_dir_inode"] == 7740500
+    assert authorization["claim_path_relative_to_git_common_dir"] == "qntylab-claims/jfp03-v0r1-historical-scientific-execution-v0.json"
+    assert authorization["scientific_feature_computation_authorized"] is True
+    assert authorization["scientific_target_computation_authorized"] is True
+    assert authorization["regression_authorized"] is True
+    assert authorization["hac_authorized"] is True
+    assert authorization["p_values_authorized"] is True
+
+    for field in (
+        "real_afi_computed",
+        "real_har_computed",
+        "real_target_computed",
+        "real_regression_executed",
+        "real_hac_computed",
+        "real_p_values_computed",
+        "jigsaw_evidence_authorized",
+        "jigsaw_synthesis_authorized",
+        "promotion_authorized",
+        "prospective_deployment_authorized",
+        "state_snapshot_authorized",
+        "forecaster_authorized",
+        "router_authorized",
+        "qnty_authorized",
+        "paper_trading_authorized",
+        "trading_authorized",
+    ):
+        assert authorization[field] is False, field
+    assert authorization["capital_authority"] == "NONE"
+    assert authorization["downstream_authority"] == "NONE"
+    assert authorization["implementation_authorized"] is False
+    assert data["active_project"] is None
+    assert data["authority_conflicts_or_warnings"] == []
+
+
 def test_closed_harvest_does_not_authorize_state_snapshot() -> None:
     data = project_context.context_data(ROOT)
     _, _, registry = project_context.load_context_sources(ROOT)

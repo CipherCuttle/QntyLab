@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import tomllib
 from pathlib import Path
 from typing import Any
 
@@ -13,7 +14,10 @@ CACHE_REL = Path("data/archive/binance_jfp_v0")
 PROJECT_ID = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_REPAIRED_SOURCE_MATERIALIZATION_V0"
 AUTH_PROJECT_ID = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_REPAIRED_SOURCE_MATERIALIZATION_AUTHORIZATION_V0"
 DESIGN_DIGEST = "a52d4999038e0be814ee8770322303fce84bed9ec8941b812748a18867633736"
-REST_SHA = "ef2d114a512d1d2905ccd335b3a53d9601b59b2877d31af3dd2dd7dc3fe0c70a"
+HISTORICAL_FEASIBILITY_SHA256 = "ef2d114a512d1d2905ccd335b3a53d9601b59b2877d31af3dd2dd7dc3fe0c70a"
+PRIOR_SNAPSHOT_DIGEST = "ffd6711cbc443507190a29004dad73324866c017fe440301b7fd99cd9110db5e"
+TAIL_SHA256 = "9ebc05c9b3d5ab3591edf65bc5c7e5dbc2f96c1efc4adc4ea198c651a99a41b1"
+PROJECTS_REL = Path("docs/state/projects.toml")
 EXPECTED_SCHEMA = ["open_time", "open", "high", "low", "close", "volume", "close_time", "quote_asset_volume", "number_of_trades", "taker_buy_base_asset_volume", "taker_buy_quote_asset_volume", "ignore"]
 
 
@@ -29,11 +33,24 @@ def load(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _assert_not_consumed(root: Path, out: Path) -> None:
+    for name in ("v0r2_repaired_source_materialization_receipt.json", "v0r2_input_snapshot.json", "v0r2_input_qualification.json"):
+        if (out / name).exists():
+            raise ValueError("AUTHORIZATION_ALREADY_CONSUMED")
+    projects_path = root / PROJECTS_REL
+    if projects_path.exists():
+        registry = tomllib.loads(projects_path.read_text(encoding="utf-8"))
+        for project in registry.get("project", []):
+            if project.get("project_id") == PROJECT_ID and int(project.get("authorized_runs_consumed", 0)) >= 1:
+                raise ValueError("AUTHORIZATION_ALREADY_CONSUMED")
+
+
 def run(root: Path, captured: Path) -> dict[str, Any]:
     out = root / OUT_REL
     auth = load(out / "v0r1_repaired_source_materialization_authorization.json")
     census = load(out / "v0r1_supplemental_source_census.json")
     prior = load(out / "v0r1_snapshot_manifest.json")
+    _assert_not_consumed(root, out)
     if auth["project_id"] != AUTH_PROJECT_ID or auth["authorization"]["materialization_performed"]:
         raise ValueError("AUTHORIZATION_MISSING_OR_CONSUMED")
     if auth["bound_design_digest"] != DESIGN_DIGEST or auth["authorization"]["exactly_one_future_materialization_run"] is not True:
@@ -41,8 +58,6 @@ def run(root: Path, captured: Path) -> dict[str, Any]:
     response = captured / "rest.json"
     raw = response.read_bytes()
     response_sha = hashlib.sha256(raw).hexdigest()
-    if response_sha != REST_SHA:
-        raise ValueError("AUTHORITATIVE_RESPONSE_SHA_MISMATCH")
     rows = load(response)
     opens = [int(row[0]) for row in rows]
     if len(rows) != 720 or opens[0] != 1575244800000 or opens[-1] != 1577833200000:
@@ -52,15 +67,23 @@ def run(root: Path, captured: Path) -> dict[str, Any]:
     if len(set(opens)) != 720 or any(b - a != 3600000 for a, b in zip(opens, opens[1:])):
         raise ValueError("REST_DUPLICATES_OR_GAPS")
     prior_ids = prior["identity_semantics"]["ordered_authenticated_object_identities"]
-    if len(prior_ids) != 62 or sum(x.get("calendar_period") == "2025-01" for x in prior_ids) != 1:
+    if prior["snapshot_digest"] != PRIOR_SNAPSHOT_DIGEST:
+        raise ValueError("PRIOR_SNAPSHOT_DIGEST_MISMATCH")
+    if len(prior_ids) != 62:
         raise ValueError("PRIOR_REUSE_BINDING_INVALID")
-    original_ids = [x for x in prior_ids if x.get("calendar_period") != "2025-01"]
-    if len(original_ids) != 61:
+    by_period = {x.get("calendar_period"): x for x in prior_ids}
+    if len(by_period) != 62:
         raise ValueError("ORIGINAL_REUSE_BINDING_INVALID")
-    tail = next(x for x in prior_ids if x.get("calendar_period") == "2025-01")
-    if tail.get("local_sha256") != "9ebc05c9b3d5ab3591edf65bc5c7e5dbc2f96c1efc4adc4ea198c651a99a41b1":
+    warmup = by_period.get("2019-12")
+    if not warmup or warmup.get("status") != "SOURCE_OBJECT_NOT_PUBLISHED" or warmup.get("local_sha256") is not None or warmup.get("official_checksum") is not None:
+        raise ValueError("MISSING_2019_12_PLACEHOLDER_BINDING")
+    expected_periods = [f"{year}-{month:02d}" for year in range(2020, 2025) for month in range(1, 13)]
+    original_60 = [by_period.get(period) for period in expected_periods]
+    if len(original_60) != 60 or any(item is None or item.get("status") != "MATERIALIZED_VERIFIED" for item in original_60):
+        raise ValueError("ORIGINAL_60_BINDING_INVALID")
+    tail = by_period.get("2025-01")
+    if not tail or tail.get("status") != "MATERIALIZED_VERIFIED" or tail.get("local_sha256") != TAIL_SHA256:
         raise ValueError("2025_TAIL_IDENTITY_INVALID")
-    original_60 = original_ids[:60]
     new = {"calendar_period": "2019-12", "purpose": "WARMUP", "canonical_url": "https://fapi.binance.com/fapi/v1/klines", "canonical_query_string": "symbol=BTCUSDT&interval=1h&startTime=1575244800000&endTime=1577836799999&limit=1000", "http_status": 200, "response_sha256": response_sha, "row_count": 720, "first_open_time_ms": opens[0], "last_open_time_ms": opens[-1], "field_count": 12, "schema_identity": EXPECTED_SCHEMA, "duplicates": 0, "gaps": 0, "hourly_contiguity": True, "close_time_rule": True, "product_identity": "Binance USD-M BTCUSDT", "interval_identity": "1h", "authentication": "PASS", "status": "MATERIALIZED_VERIFIED"}
     identity = {"reused_original_60": original_60, "reused_2025_01": tail, "new_2019_12": new}
     snapshot_body = {"artifact_type": "JFP03_V0R1_REPAIRED_SOURCE_IMMUTABLE_INPUT_SNAPSHOT", "project_id": PROJECT_ID, "version": "v0r2", "design_digest": DESIGN_DIGEST, "prior_snapshot_id": prior["snapshot_id"], "prior_snapshot_digest": prior["snapshot_digest"], "original_60_reused": True, "original_60_reacquired": False, "existing_2025_01_reused": True, "existing_2025_01_reacquired": False, "new_2019_12_object_count": 1, "source_object_count": 62, "identity": identity}
@@ -68,9 +91,10 @@ def run(root: Path, captured: Path) -> dict[str, Any]:
     snapshot = {**snapshot_body, "snapshot_id": f"jfp-input-v0r2-{snapshot_digest}", "snapshot_digest": snapshot_digest}
     qualification_body = {"artifact_type": "JFP03_V0R1_REPAIRED_SOURCE_INPUT_QUALIFICATION", "project_id": PROJECT_ID, "snapshot_id": snapshot["snapshot_id"], "snapshot_digest": snapshot_digest, "input_qualification": "READY", "full_required_raw_support": True, "structural_validation": "PASS", "gaps": 0, "duplicates": 0, "source_object_count": 62, "scientific_features_computed": False, "targets_computed": False, "regression_executed": False, "p_values_computed": False, "scientific_execution_authorized": False, "downstream_authority": "NONE"}
     qualification = {**qualification_body, "qualification_digest": digest(qualification_body)}
-    receipt_body = {"artifact_type": "JFP03_V0R1_REPAIRED_SOURCE_MATERIALIZATION_RECEIPT", "project_id": PROJECT_ID, "bound_authorization_project": AUTH_PROJECT_ID, "authorized_runs_before": 1, "authorized_runs_consumed": 1, "source_selected": "REST", "monthly_object_status": "HTTP_404", "monthly_checksum_status": "HTTP_404", "rest_query": new["canonical_query_string"], "authoritative_response_sha256": response_sha, "historical_feasibility_sha256_equal": response_sha == REST_SHA, "new_2019_12_source": new, "original_objects_reused": 60, "original_objects_reacquired": 0, "existing_2025_01_reused": True, "existing_2025_01_reacquired": False, "total_source_objects": 62, "snapshot_id": snapshot["snapshot_id"], "snapshot_digest": snapshot_digest, "qualification_digest": qualification["qualification_digest"], "scientific_computation_performed": False, "scientific_execution_authorized": False, "downstream_authority": "NONE"}
+    receipt_body = {"artifact_type": "JFP03_V0R1_REPAIRED_SOURCE_MATERIALIZATION_RECEIPT", "project_id": PROJECT_ID, "bound_authorization_project": AUTH_PROJECT_ID, "authorized_runs_before": 1, "authorized_runs_consumed": 1, "source_selected": "REST", "monthly_object_status": "HTTP_404", "monthly_checksum_status": "HTTP_404", "rest_query": new["canonical_query_string"], "authoritative_response_sha256": response_sha, "historical_feasibility_sha256": HISTORICAL_FEASIBILITY_SHA256, "historical_feasibility_sha256_equal": response_sha == HISTORICAL_FEASIBILITY_SHA256, "new_2019_12_source": new, "original_objects_reused": 60, "original_objects_reacquired": 0, "existing_2025_01_reused": True, "existing_2025_01_reacquired": False, "total_source_objects": 62, "snapshot_id": snapshot["snapshot_id"], "snapshot_digest": snapshot_digest, "qualification_digest": qualification["qualification_digest"], "scientific_computation_performed": False, "scientific_execution_authorized": False, "downstream_authority": "NONE"}
     receipt = {**receipt_body, "receipt_digest": digest(receipt_body)}
     cache = root / CACHE_REL / f"{response_sha}.json"
+    cache.parent.mkdir(parents=True, exist_ok=True)
     cache.write_bytes(raw)
     (out / "v0r2_repaired_source_manifest.json").write_bytes(canon({"artifact_type": "JFP03_V0R1_REPAIRED_SOURCE_MANIFEST", "snapshot_id": snapshot["snapshot_id"], "sources": identity}) + b"\n")
     (out / "v0r2_input_snapshot.json").write_bytes(canon(snapshot) + b"\n")

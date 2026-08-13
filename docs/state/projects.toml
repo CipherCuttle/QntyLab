@@ -12,6 +12,7 @@ authoritative_artifacts = [
   "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r2_input_qualification.json",
   "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r2_repaired_source_materialization_receipt.json",
   "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r2_hostile_review.md",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/v0r2_targeted_re_review.md",
 ]
 phase_type = "INPUT_MATERIALIZATION_ONLY"
 bound_authorization_project = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_JFP03_V0R1_REPAIRED_SOURCE_MATERIALIZATION_AUTHORIZATION_V0"

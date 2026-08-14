@@ -1,0 +1,14 @@
+{
+  "artifact_type": "JFPV3_COLLECTOR_CONTRACT_V0",
+  "implementation": "qntylab.jfp_v3_shadow",
+  "layers": ["SOURCE_RAW_OBSERVATION", "PER_ORIGIN_SCIENTIFIC_RECORDING"],
+  "terminal_inference": "not implemented or exposed",
+  "source": {"metadata": "official Binance USD-M exchangeInfo via injectable transport", "ohlcv": "official Binance USD-M 1h klines via injectable transport", "network_in_pr_b": false},
+  "metadata_boundary": "raw response persisted with source/transport IDs and observed_at <= origin; current metadata cannot reconstruct historical origins",
+  "eligibility": "canonical JFPV3_PIT_ELIGIBILITY_V0; structural fields only; deterministic lexicographic U_t; N_MIN=15 fail-closed",
+  "feature_window": "25 close observations per member, close times origin-24h through origin, yielding prior 24 returns",
+  "outcome_window": "same sealed U_t, close observations origin through origin+24h, yielding t+1h..t+24h returns",
+  "receipt_policy": "canonical JSONL hash chain; idempotent exact replay; conflicting duplicate or mutation fails",
+  "activation": "explicit canonical activation record required before schedule recording; no activation record created in PR-B",
+  "status_policy": "operational counts and integrity only; no inferential statistics or performance fields"
+}

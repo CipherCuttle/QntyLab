@@ -1,0 +1,21 @@
+{
+  "artifact_type": "JFPV3_PR_B_PR_A_BINDING",
+  "canonical_master": "20e707adf51cc1ab620dc8d4ca6b07b6c4a7964d",
+  "pr_a_commit": "d11f3d1b1e47439533e62efc2926b0da5b0efcba",
+  "generation_id": "JFPV3_01",
+  "candidate_id": "JFPV3_01",
+  "source_contract_id": "JFPV3_SOURCE_CONTRACT",
+  "universe_contract_id": "JFPV3_PIT_ELIGIBILITY_V0",
+  "scientific_contract_id": "JFPV3_SCIENTIFIC_CONTRACT",
+  "schedule_contract_id": "JFPV3_SCHEDULE_CONTRACT",
+  "artifact_digests": {
+    "preregistration.json": "7b0e6eeda726ddcc6e5a2a99d931df51bfbff492557fdefc30eae629c998da16",
+    "universe_contract.json": "883172c10174d52a298293b2299ab28af4095c33217e2c2a24de3a258208c9fd",
+    "source_contract.json": "64b918c8e062c55d1434a34ff5f7e3368dd59a7e2358edcacfa80bf1ab2e2348",
+    "scientific_contract.json": "8b37028ef1ebc5baf7a04bfc742069f0b1ecd0931c4017c565324e980a140e90",
+    "schedule_contract.json": "5e326a165bdf6dda8dd137ec69a4677f6029f99ae0487a80724a3c0667a36ffc",
+    "result_schema.json": "b443fd0be4dc33eaa8e00a07811bc105476b10b59a39c80a9de4f8fdd208f62b"
+  },
+  "pr_a_binding_pass": true,
+  "pr_a_mutated": false
+}

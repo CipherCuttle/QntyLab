@@ -3,6 +3,8 @@
   "phase": "JFPV3_PR_B",
   "state": "CLOSED_PASS_BRANCH_LOCAL",
   "ready_for_merge": true,
+  "implementation_candidate_sha": "e490b05476aa02f61e1fdde3b13b2bbf8ddc381f",
+  "implementation_digest": "42888d1bc9b24ef7bef8bf53b9401deaeae161772f45c4d18b078549ee510af3",
   "merged": false,
   "shadow_activated": false,
   "activation_attempts_real": 0,

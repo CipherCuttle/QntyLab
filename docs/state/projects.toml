@@ -1228,6 +1228,83 @@ implementation_authorized = false
 next_action = "Resume existing PR #89 from its preserved lineage; perform only concrete production GitHub transport completion and generic V0R3 verifier adaptation, then evaluate the conditional one-canary preconditions."
 
 [[project]]
+project_id = "JH01_V1_RECORDER_SYNTHETIC_CANARY_TIMING_REPAIR_AUTHORIZATION_V0"
+display_name = "JH01 V1 recorder synthetic canary timing repair authorization V0"
+state = "CLOSED_PASS"
+authority_level = "CORRECTIVE_SYNTHETIC_TIMING_CANARY_AUTHORITY_DEFINED_ONLY"
+phase_type = "GOVERNANCE_ONLY"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/preregistration.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/github_release_attestation_offline_policy_qualification_v0r3.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/recorder_synthetic_canary_authorization_v0.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/synthetic_canary_timing_repair_authorization_v0.json",
+]
+authority_source = "EXPLICIT_USER_AUTHORITY_REPRESENTED_BY_THIS_SEPARATE_GIT_BACKED_GOVERNANCE_PHASE"
+predecessor_governance_project_id = "JH01_V1_RECORDER_SYNTHETIC_CANARY_AUTHORIZATION_V0"
+recorder_project_id = "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_V1_PROSPECTIVE_RECORDER_AND_INPUT_MATERIALIZATION_IMPLEMENTATION_V0"
+recorder_pr = 89
+canonical_master = "47c6b674a765f6bd70f8be4a20fc11d2cf3e02a8"
+recorder_current_head = "ad058b6bce1baf6468039ba5221acaaf7a67b916"
+implementation_candidate_sha = "5dc86826040b9bd3403f03c31cfc8a64249ed907"
+canary1_release_id = 370296053
+canary1_tag = "jh01-v1-recorder-bd7d0a452c1cc6db29a78406"
+canary1_asset_name = "forecast.json"
+canary1_asset_sha256 = "0a4b85167712149f97fa370a8f9b8e8d049c19d953ffbfe298807803672a7e17"
+canary1_synthetic_origin = "2026-09-15T01:00:00Z"
+canary1_published_at = "2026-08-14T01:26:43Z"
+canary1_verified_tsa = "2026-08-14T01:26:43Z"
+canary1_result = "CLOSED_BLOCKED"
+canary1_failure_class = "PRE_EXECUTION_QUALIFICATION_INPUT_INVALID_FOR_TIMING_GATE"
+canary1_executed = true
+canary1_budget_consumed = true
+canary1_retained_forever = true
+canary1_immutable = true
+canary1_cryptographic_path_pass = true
+canary1_offline_reverified = true
+original_canary_budget_total = 1
+original_canary_budget_used = 1
+original_canary_budget_remaining = 0
+corrective_synthetic_timing_canary_authorized = true
+max_corrective_synthetic_publications = 1
+corrective_canary_used = false
+cumulative_max_synthetic_releases = 2
+implementation_changes_authorized = false
+transport_changes_authorized = false
+verifier_changes_authorized = false
+artifact_serialization_changes_authorized = false
+timing_gate_implementation_changes_authorized = false
+required_implementation_candidate_sha = "5dc86826040b9bd3403f03c31cfc8a64249ed907"
+corrective_origin_policy_floor_current_utc_hour = true
+corrective_origin_must_be_non_future = true
+corrective_origin_must_not_be_real_v1_origin = true
+minimum_headroom_minutes = 20
+current_utc_minute_must_be_at_most = 40
+pre_write_non_future_gate_required = true
+pre_write_timing_satisfiability_required = true
+time_headroom_gate_required = true
+canary1_identity_reuse_authorized = false
+canary1_deletion_authorized = false
+real_v1_collection_authorized = false
+real_v1_forecast_authorized = false
+real_v1_activation_authorized = false
+market_data_access_authorized = false
+held_out_outcome_access_authorized = false
+scientific_evaluation_authorized = false
+interim_metrics_authorized = false
+jigsaw_authorized = false
+state_snapshot_authorized = false
+router_authorized = false
+qnty_authorized = false
+trading_authorized = false
+promotion_authorized = false
+merge_pr89_authorized = false
+qualification_state = "CORRECTIVE_CANARY_GOVERNANCE_AUTHORITY_DEFINED_ONLY"
+implementation_authorized = false
+next_action = "Merge this corrective governance PR through a separate explicitly authorized merge-only phase; only after canonicalization may one current-hour corrective timing canary be considered."
+
+[[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_PREREG_V0"
 state = "CLOSED_PASS"
 authority_level = "OUTCOME_BLIND_PREREGISTRATION_ONLY"

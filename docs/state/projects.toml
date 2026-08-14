@@ -25,7 +25,7 @@ implementation_authorized = false
 [[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_V2_IMPLEMENTATION_FREEZE_V0"
 display_name = "Jigsaw fast prospective signal discovery V2 PR-B implementation freeze"
-state = "ACTIVE"
+state = "CLOSED_PASS"
 authority_level = "SOURCE_BOUND_IMPLEMENTATION_FREEZE_ONLY"
 phase_type = "SOURCE_BOUND_IMPLEMENTATION_FREEZE"
 authoritative_artifacts = [
@@ -41,9 +41,12 @@ authoritative_artifacts = [
   "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/implementation_v0/origin_schedule.json",
   "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/implementation_v0/execution_semantics_v0.json",
   "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/implementation_v0/synthetic_validation.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/implementation_v0/implementation_manifest.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/implementation_v0/hostile_implementation_review.md",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/implementation_v0/closure.json",
 ]
-implementation_authorized = true
-next_action = "Complete the bounded synthetic validation, freeze the implementation candidate, and perform one hostile implementation review."
+implementation_authorized = false
+next_action = "CANONICALIZE_PR_B_THEN_FAST_LANE_V2_PR_C"
 
 [[project]]
 project_id = "JIGSAW_TERMINAL_RESEARCH_EVIDENCE_EXTRACTION_IMPLEMENTATION_V0"

@@ -49,6 +49,15 @@ def git_head() -> str:
     return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
 
 
+def verify_implementation_identity() -> None:
+    source = ROOT / "qntylab/jfp_v2_pr_b.py"
+    if sha(source) != IMPLEMENTATION_SOURCE_DIGEST:
+        raise RuntimeError("frozen implementation source digest mismatch")
+    recorded = subprocess.check_output(["git", "show", f"{IMPLEMENTATION_COMMIT}:qntylab/jfp_v2_pr_b.py"], cwd=ROOT)
+    if hashlib.sha256(recorded).hexdigest() != IMPLEMENTATION_SOURCE_DIGEST:
+        raise RuntimeError("frozen implementation commit identity mismatch")
+
+
 def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text())
 
@@ -182,6 +191,7 @@ def execute() -> dict[str, Any]:
     authority = load_json(authority_path)
     if authority["execution_start_master"] != EXPECTED_MASTER or authority["real_execution_count_authorized"] != 1 or authority["alternate_specification"]:
         raise RuntimeError("execution authority mismatch")
+    verify_implementation_identity()
     integrity, prices = validate_source()
     rows04, rows06 = build_rows(prices)
     count = len(rows04)

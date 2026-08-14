@@ -1,0 +1,29 @@
+{
+  "artifact_type": "JFPV2_PR_C_CLOSURE",
+  "phase": "FAST_LANE_V2_PR_C",
+  "status": "CLOSED_READY_FOR_MERGE",
+  "execution_start_master": "258d225a68903790451f8aa10706af8f309d7fce",
+  "pre_execution_authority_commit": "c676619d851d6df4525683e8ac9663f2bff9cef4",
+  "implementation_sha": "5084df5f6aa3f469f2f2844972745703849abe30",
+  "source_snapshot_id": "rds-v0-c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac",
+  "source_snapshot_digest": "c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac",
+  "origin_schedule_digest": "73859b2ece7a81a1d9f4a24dfb996b21c4427f1b1449d31553541eef66c2d040",
+  "real_historical_execution_lineages": 1,
+  "determinism_pass": true,
+  "hostile_review_count": 1,
+  "critical": 0,
+  "high": 1,
+  "medium": 0,
+  "low": 0,
+  "critical_high_repair_required": true,
+  "targeted_rereview_used": true,
+  "qntyagenteval": {
+    "applicability": "NO_MATCH",
+    "contract_id": null,
+    "result_required": false,
+    "run_performed": false,
+    "result": "NO_MATCH_DO_NOT_BUILD"
+  },
+  "authority_boundary": "measurement_only_no_promotion_authority",
+  "merged": false
+}

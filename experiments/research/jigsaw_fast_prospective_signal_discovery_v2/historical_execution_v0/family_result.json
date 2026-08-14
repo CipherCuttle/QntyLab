@@ -1,0 +1,14 @@
+{
+  "artifact_type": "JFPV2_PR_C_FAMILY_RESULT",
+  "authority_boundary": "measurement_only_no_promotion_authority",
+  "blocked_candidates": [],
+  "family_size": 2,
+  "family_verdict": "FAST_LANE_HISTORICAL_SURVIVOR",
+  "no_support_candidates": [
+    "JFPV2_04"
+  ],
+  "result_digest": "ee674b14012636fb5f8221818c11bf9fd54adbcade9e953a65f9cf6a32ea33c2",
+  "support_candidates": [
+    "JFPV2_06"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "artifact_type": "JFPV2_PR_C_EXECUTION_MANIFEST",
+  "authority_digest": "84ce3016147e11cd56218c8160e24c274cf37cef5083227a7b1294ce61735e7e",
+  "blocked_origin_count": 0,
+  "eligible_origin_count": 608,
+  "execution_semantics_digest": "f3c50c7fd8d34efdaff37582cfd733c00c14c4aeb065c6ad138eb8d00ac174c6",
+  "execution_start_master": "258d225a68903790451f8aa10706af8f309d7fce",
+  "execution_timestamp_utc": "2026-08-14T21:32:11.720831Z",
+  "implementation_sha": "5084df5f6aa3f469f2f2844972745703849abe30",
+  "network_market_data_used": false,
+  "origin_schedule_digest": "73859b2ece7a81a1d9f4a24dfb996b21c4427f1b1449d31553541eef66c2d040",
+  "runtime": {
+    "polars": "1.32.3",
+    "python": "3.14.4"
+  },
+  "source_snapshot_digest": "c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac",
+  "source_snapshot_id": "rds-v0-c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac",
+  "source_substitution": false
+}

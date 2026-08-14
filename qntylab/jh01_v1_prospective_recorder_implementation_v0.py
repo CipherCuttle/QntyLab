@@ -388,7 +388,8 @@ class GitHubReleaseTransport:
                 return 404, exc.read(), dict(exc.headers.items())
             if exc.code in {408, 429, 500, 502, 503, 504}:
                 raise UnknownWrite(f"GitHub {method} uncertain: HTTP {exc.code}") from exc
-            raise RecorderBlocked(f"GitHub {method} rejected: HTTP {exc.code}") from exc
+            detail = exc.read().decode(errors="replace")[:500]
+            raise RecorderBlocked(f"GitHub {method} rejected: HTTP {exc.code}: {detail}") from exc
         except (URLError, TimeoutError) as exc:
             raise UnknownWrite(f"GitHub {method} outcome unknown") from exc
 

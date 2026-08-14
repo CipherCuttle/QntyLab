@@ -1416,6 +1416,38 @@ implementation_authorized = false
 next_action = "Merge this corrective governance PR through a separate explicitly authorized merge-only phase; only after canonicalization may one current-hour corrective timing canary be considered."
 
 [[project]]
+project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_V1_PREREGISTRATION"
+state = "CLOSED_PASS"
+authority_level = "OUTCOME_BLIND_PREREGISTRATION_ONLY"
+authoritative_artifacts = [
+  "docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md",
+  "docs/ADR/0006-qntylab-research-design-philosophy.md",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v1/candidate_census.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v1/preregistration.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v1/design_note.md",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v1/hostile_review.md",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v1/pre_merge_repair_v0.json",
+  "qntylab/jigsaw_fast_prospective_signal_discovery_prereg_v1.py",
+  "tests/test_jigsaw_fast_prospective_signal_discovery_prereg_v1.py",
+]
+phase_type = "PREREGISTRATION_ONLY"
+exploratory_candidate_count = 10
+final_confirmatory_candidate_count = 5
+candidate_census_digest = "9574f306d7b2ec1879e81af98037584ec5b0bce21e8a19649210426d50c9d37a"
+preregistration_digest = "6e4f399fad567e126e991c2aab65cd7e41859905830a6606f7b34f9b97e7a3b9"
+implementation_authorized = false
+input_materialization_authorized = false
+scientific_execution_authorized = false
+shadow_authorized = false
+state_snapshot_authorized = false
+router_authorized = false
+qnty_authorized = false
+trading_authorized = false
+promotion_authorized = false
+capital_authority = "NONE"
+next_action = "Separate Git-backed input-feasibility/materialization authorization for exactly the five frozen finalists; no market-data acquisition or scientific execution is authorized here."
+
+[[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_PREREG_V0"
 state = "CLOSED_PASS"
 authority_level = "OUTCOME_BLIND_PREREGISTRATION_ONLY"

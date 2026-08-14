@@ -12,6 +12,7 @@ from qntylab.jfp_v3_shadow import (
     bind_pr_a,
     digest,
     future_value,
+    implementation_identity,
     resolve_universe,
     resolve_runtime_canonical_state,
     schedule,
@@ -102,6 +103,12 @@ def test_runtime_canonicality_survives_a_future_merge_sha():
     future_merge = "1" * 40
     record = {"activation_master_sha": future_merge, "collector_implementation_sha": "a" * 64, "preregistration_digest": "b" * 64, "universe_contract_digest": "c" * 64, "source_contract_digest": "d" * 64, "scientific_contract_digest": "e" * 64, "schedule_contract_digest": "f" * 64, "activation_timestamp": "2026-01-01T00:00:00Z", "shadow_run_id": "run-future"}
     validate_activation(record, current_sha=future_merge, origin_master_sha=future_merge, lineage={"pr_a": True, "pr_a_merge": True, "v0_closure": True, "v0_merge": True}, expected_implementation_sha="a" * 64)
+
+
+def test_repaired_implementation_manifest_binds_exact_content():
+    identity = implementation_identity()
+    assert identity["implementation_digest"] == "7a8bbfe5b72d787608436232fd87bbe876be24b0d524a38f2d7dd6bbc5d53e01"
+    assert identity["candidate_commit_sha"] == "d50c875191fda85381cab29877738a7b136b744a"
 
 
 @pytest.mark.parametrize("case", [

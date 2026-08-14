@@ -358,6 +358,7 @@ class GitHubReleaseTransport:
         self.timeout = timeout
         self._opener = opener
         self._repository_metadata: dict[str, Any] | None = None
+        self._drafts: dict[str, RemoteRelease] = {}
 
     def _auth_token(self) -> str:
         if self.token and self.token.strip():
@@ -436,9 +437,21 @@ class GitHubReleaseTransport:
 
     def _get_tag(self, tag: str, *, expected: RemoteRelease | None = None) -> RemoteRelease | None:
         value = self._json("GET", f"/repos/{self.repository}/releases/tags/{quote(tag, safe='')}")
-        if value is None:
-            return None
-        return self._enrich(self._parse(value, expected=expected))
+        if value is not None:
+            return self._enrich(self._parse(value, expected=expected))
+        # GitHub does not expose draft releases through /releases/tags/{tag};
+        # list releases is the deterministic recovery path for a draft write.
+        status, body, _ = self._request("GET", self.API + f"/repos/{self.repository}/releases?per_page=100")
+        try:
+            values = json.loads(body)
+        except json.JSONDecodeError as exc:
+            raise RecorderBlocked("GitHub release list returned malformed JSON") from exc
+        if not isinstance(values, list):
+            raise RecorderBlocked("GitHub release list returned non-array JSON")
+        matches = [item for item in values if isinstance(item, dict) and item.get("tag_name") == tag]
+        if len(matches) > 1:
+            raise RecorderBlocked("ambiguous deterministic draft release")
+        return None if not matches else self._enrich(self._parse(matches[0], expected=expected))
 
     def _enrich(self, release: RemoteRelease) -> RemoteRelease:
         if self._repository_metadata is None:
@@ -463,10 +476,12 @@ class GitHubReleaseTransport:
         value = self._json("POST", f"/repos/{self.repository}/releases", payload={"tag_name": release.tag, "target_commitish": release.target_commit, "name": release.tag, "draft": True, "prerelease": True})
         if value is None:
             raise RecorderBlocked("GitHub draft creation returned no release")
-        return self._enrich(self._parse(value, expected=release))
+        created = self._enrich(self._parse(value, expected=release))
+        self._drafts[release.tag] = created
+        return created
 
     def upload(self, tag: str, asset_name: str, content: bytes) -> RemoteRelease:
-        release = self._get_tag(tag)
+        release = self._drafts.get(tag) or self._get_tag(tag)
         if release is None or release.release_id is None:
             raise RecorderBlocked("release disappeared before asset upload")
         value = self._json("POST", f"/repos/{self.repository}/releases/{release.release_id}/assets?name={quote(asset_name, safe='')}", upload=content)
@@ -532,8 +547,11 @@ class PublicationRuntime:
         if not candidates:
             return None
         current = candidates[0]
-        if current.tag != expected.tag or current.artifact_digest != expected.artifact_digest:
+        draft_without_asset = current.published_at is None and current.asset_sha256 is None and current.artifact_digest == ""
+        if current.tag != expected.tag or (current.artifact_digest != expected.artifact_digest and not draft_without_asset):
             raise RecorderBlocked("same origin different digest")
+        if current.target_commit and expected.target_commit and current.target_commit != expected.target_commit:
+            raise RecorderBlocked("same origin different target commit")
         return current
 
     def publish(self, artifact: Mapping[str, Any], *, origin: datetime, target_commit: str) -> tuple[tuple[OriginState, ...], RemoteRelease, VerifiedAttestation]:

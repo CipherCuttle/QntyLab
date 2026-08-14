@@ -155,3 +155,59 @@ def test_current_origin_crypto_verifier_has_no_unsafe_manifest_fallback(tmp_path
     expectation = recorder.AttestationExpectation("CipherCuttle/QntyLab", "fixture-tag", "a" * 40, "forecast.json", "0" * 64)
     with pytest.raises(recorder.RecorderBlocked, match="generic per-origin Sigstore verifier unavailable"):
         recorder.ExternalSigstoreVerifier(tmp_path / "missing").verify(asset=b"fixture", bundle=b"bundle", trusted_root=b"root", expectation=expectation)
+
+
+class _Response:
+    def __init__(self, status, payload):
+        self.status = status
+        self._payload = payload
+        self.headers = {"content-type": "application/json"}
+
+    def read(self):
+        return json.dumps(self._payload).encode()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_):
+        return False
+
+
+class _ReleaseHTTP:
+    def __init__(self, origin):
+        self.origin = origin
+        self.release = None
+        self.asset = None
+
+    def __call__(self, request, timeout):
+        path = request.full_url.split("github.com", 1)[-1]
+        if request.method == "GET" and path == "/repos/CipherCuttle/QntyLab":
+            return _Response(200, {"id": 1317911390, "owner": {"id": 97258089}})
+        if request.method == "GET" and "/releases/tags/" in path:
+            return _Response(200, self.release) if self.release else _Response(404, {})
+        if request.method == "POST" and path == "/repos/CipherCuttle/QntyLab/releases":
+            body = json.loads(request.data)
+            self.release = {"id": 991, "tag_name": body["tag_name"], "target_commitish": body["target_commitish"], "published_at": None, "immutable": False, "assets": []}
+            return _Response(201, self.release)
+        if request.method == "POST" and "/assets?name=forecast.json" in path:
+            self.asset = {"name": "forecast.json", "digest": "sha256:" + hashlib.sha256(request.data).hexdigest()}
+            self.release["assets"] = [self.asset]
+            return _Response(201, self.asset)
+        if request.method == "PATCH" and path.endswith("/releases/991"):
+            self.release.update({"published_at": self.origin.isoformat().replace("+00:00", "Z"), "immutable": True})
+            return _Response(200, self.release)
+        raise AssertionError((request.method, path))
+
+
+def test_concrete_github_transport_reads_back_publish_and_immutability():
+    origin = QUALIFICATION_ORIGIN
+    opener = _ReleaseHTTP(origin)
+    transport = recorder.GitHubReleaseTransport(token="test-token", opener=opener)
+    expected = recorder.RemoteRelease("o" * 64, "jh01-v1-recorder-" + "o" * 24, "a" * 64, "forecast.json", None, None, target_commit="b" * 40)
+    created = transport.create(expected)
+    assert created.release_id == 991 and created.published_at is None
+    uploaded = transport.upload(expected.tag, "forecast.json", b"artifact")
+    assert uploaded.asset_sha256 == hashlib.sha256(b"artifact").hexdigest()
+    published = transport.publish(uploaded)
+    assert published.immutable is True and published.published_at == origin
+    assert published.repository_id == "1317911390" and published.owner_id == "97258089"

@@ -6,7 +6,7 @@ can enter the source or forecast path.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime, timedelta
 from enum import Enum
 from hashlib import sha256
@@ -18,6 +18,9 @@ from pathlib import Path
 import subprocess
 import tempfile
 from typing import Any, Mapping, Protocol, Sequence
+from urllib.error import HTTPError, URLError
+from urllib.parse import quote
+from urllib.request import Request, urlopen
 
 from .binance_um_kline_1h import MaterializationError, receipt_from_bytes
 
@@ -64,6 +67,14 @@ class RemoteRelease:
     asset_name: str
     asset_sha256: str | None
     published_at: datetime | None
+    release_id: int | None = None
+    repository: str = "CipherCuttle/QntyLab"
+    target_commit: str | None = None
+    immutable: bool | None = None
+    repository_id: str | None = None
+    owner_id: str | None = None
+    purl: str | None = None
+    package_id: str | None = None
 
 
 @dataclass(frozen=True)
@@ -75,6 +86,11 @@ class AttestationExpectation:
     asset_sha256: str
     predicate_type: str = "https://in-toto.io/attestation/release/v0.2"
     signer_uri: str = "https://dotcom.releases.github.com"
+    repository_id: str | None = None
+    owner_id: str | None = None
+    release_id: str | None = None
+    purl: str | None = None
+    package_id: str | None = None
 
 
 @dataclass(frozen=True)
@@ -89,6 +105,7 @@ class ReleaseTransport(Protocol):
     def find(self, origin_id: str) -> Sequence[RemoteRelease]: ...
     def create(self, release: RemoteRelease) -> RemoteRelease: ...
     def upload(self, tag: str, asset_name: str, content: bytes) -> RemoteRelease: ...
+    def publish(self, release: RemoteRelease) -> RemoteRelease: ...
     def acquire_attestation(self, release: RemoteRelease) -> tuple[bytes, bytes]: ...
 
 
@@ -318,6 +335,180 @@ def release_identity(artifact: Mapping[str, Any]) -> RemoteRelease:
     return RemoteRelease(origin_id, tag, artifact["forecast_artifact_canonical_digest"], "forecast.json", None, None)
 
 
+class GitHubReleaseTransport:
+    """Concrete GitHub immutable-release transport behind ``ReleaseTransport``.
+
+    The HTTP lifecycle is deliberately small and deterministic.  Authentication
+    comes from ``QNTYLAB_GITHUB_TOKEN`` or the authenticated GitHub CLI; all
+    authoritative state is read back from GitHub after each mutating request.
+    Attestation acquisition uses the official ``gh release verify`` and
+    ``gh attestation trusted-root`` commands because GitHub's release
+    attestation endpoint is intentionally exposed through that client.
+    """
+
+    API = "https://api.github.com"
+    UPLOADS = "https://uploads.github.com"
+
+    def __init__(self, *, repository: str = "CipherCuttle/QntyLab", token: str | None = None, gh_binary: str = "gh", timeout: float = 30.0, opener=urlopen):
+        if "/" not in repository or repository.count("/") != 1:
+            raise RecorderBlocked("repository must be owner/name")
+        self.repository = repository
+        self.token = token or os.environ.get("QNTYLAB_GITHUB_TOKEN")
+        self.gh_binary = gh_binary
+        self.timeout = timeout
+        self._opener = opener
+        self._repository_metadata: dict[str, Any] | None = None
+
+    def _auth_token(self) -> str:
+        if self.token and self.token.strip():
+            return self.token.strip()
+        try:
+            result = subprocess.run([self.gh_binary, "auth", "token"], capture_output=True, text=True, check=False)
+        except OSError as exc:
+            raise RecorderBlocked("GitHub authentication unavailable") from exc
+        if result.returncode or not result.stdout.strip():
+            raise RecorderBlocked("GitHub authentication unavailable")
+        return result.stdout.strip()
+
+    def _request(self, method: str, url: str, *, payload: bytes | None = None, content_type: str = "application/json") -> tuple[int, bytes, Mapping[str, str]]:
+        headers = {
+            "Accept": "application/vnd.github+json",
+            "Authorization": f"Bearer {self._auth_token()}",
+            "X-GitHub-Api-Version": "2022-11-28",
+            "User-Agent": "QntyLab-JH01-Recorder/1",
+        }
+        if payload is not None:
+            headers["Content-Type"] = content_type
+        request = Request(url, data=payload, headers=headers, method=method)
+        try:
+            with self._opener(request, timeout=self.timeout) as response:
+                return response.status, response.read(), dict(response.headers.items())
+        except HTTPError as exc:
+            if exc.code == 404:
+                return 404, exc.read(), dict(exc.headers.items())
+            if exc.code in {408, 429, 500, 502, 503, 504}:
+                raise UnknownWrite(f"GitHub {method} uncertain: HTTP {exc.code}") from exc
+            raise RecorderBlocked(f"GitHub {method} rejected: HTTP {exc.code}") from exc
+        except (URLError, TimeoutError) as exc:
+            raise UnknownWrite(f"GitHub {method} outcome unknown") from exc
+
+    def _json(self, method: str, path: str, *, payload: Mapping[str, Any] | None = None, upload: bytes | None = None) -> dict[str, Any] | None:
+        base = self.UPLOADS if upload is not None else self.API
+        encoded = upload if upload is not None else (canonical_bytes(payload) if payload is not None else None)
+        content_type = "application/octet-stream" if upload is not None else "application/json"
+        status, body, _ = self._request(method, base + path, payload=encoded, content_type=content_type)
+        if status == 404:
+            return None
+        try:
+            value = json.loads(body)
+        except json.JSONDecodeError as exc:
+            raise RecorderBlocked("GitHub returned malformed JSON") from exc
+        if not isinstance(value, dict):
+            raise RecorderBlocked("GitHub returned non-object JSON")
+        return value
+
+    @staticmethod
+    def _remote_time(value: str) -> datetime:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        if parsed.tzinfo is None:
+            raise RecorderBlocked("GitHub returned a timestamp without timezone")
+        return parsed.astimezone(UTC)
+
+    @staticmethod
+    def _parse(value: Mapping[str, Any], *, expected: RemoteRelease | None = None) -> RemoteRelease:
+        assets = value.get("assets") or []
+        asset = next((item for item in assets if item.get("name") == (expected.asset_name if expected else "forecast.json")), None)
+        digest_value = (asset or {}).get("digest")
+        asset_sha = digest_value.removeprefix("sha256:") if isinstance(digest_value, str) else None
+        return RemoteRelease(
+            origin_id=expected.origin_id if expected else str(value.get("tag_name", "")),
+            tag=str(value.get("tag_name", "")),
+            artifact_digest=expected.artifact_digest if expected else (asset_sha or ""),
+            asset_name=str((asset or {}).get("name", expected.asset_name if expected else "forecast.json")),
+            asset_sha256=asset_sha,
+            published_at=GitHubReleaseTransport._remote_time(str(value["published_at"])) if value.get("published_at") else None,
+            release_id=int(value["id"]) if value.get("id") is not None else None,
+            repository=expected.repository if expected else "CipherCuttle/QntyLab",
+            target_commit=str(value.get("target_commitish")) if value.get("target_commitish") else (expected.target_commit if expected else None),
+            immutable=value.get("immutable") if isinstance(value.get("immutable"), bool) else None,
+        )
+
+    def _get_tag(self, tag: str, *, expected: RemoteRelease | None = None) -> RemoteRelease | None:
+        value = self._json("GET", f"/repos/{self.repository}/releases/tags/{quote(tag, safe='')}")
+        if value is None:
+            return None
+        return self._enrich(self._parse(value, expected=expected))
+
+    def _enrich(self, release: RemoteRelease) -> RemoteRelease:
+        if self._repository_metadata is None:
+            metadata = self._json("GET", f"/repos/{self.repository}")
+            if metadata is None:
+                raise RecorderBlocked("repository metadata unavailable")
+            self._repository_metadata = metadata
+        repo_id = str(self._repository_metadata["id"])
+        owner_id = str((self._repository_metadata.get("owner") or {})["id"])
+        release_id = str(release.release_id) if release.release_id is not None else None
+        purl = f"pkg:github/{self.repository}@{release.tag}"
+        return replace(release, repository_id=repo_id, owner_id=owner_id, release_id=release.release_id, purl=purl, package_id=repo_id)
+
+    def find(self, origin_id: str) -> Sequence[RemoteRelease]:
+        # The deterministic tag is derived from the origin identity; lookup is
+        # exact and never searches by a mutable title or release description.
+        tag = f"jh01-v1-recorder-{origin_id[:24]}"
+        release = self._get_tag(tag)
+        return () if release is None else (replace(release, origin_id=origin_id),)
+
+    def create(self, release: RemoteRelease) -> RemoteRelease:
+        value = self._json("POST", f"/repos/{self.repository}/releases", payload={"tag_name": release.tag, "target_commitish": release.target_commit, "name": release.tag, "draft": True, "prerelease": True})
+        if value is None:
+            raise RecorderBlocked("GitHub draft creation returned no release")
+        return self._enrich(self._parse(value, expected=release))
+
+    def upload(self, tag: str, asset_name: str, content: bytes) -> RemoteRelease:
+        release = self._get_tag(tag)
+        if release is None or release.release_id is None:
+            raise RecorderBlocked("release disappeared before asset upload")
+        value = self._json("POST", f"/repos/{self.repository}/releases/{release.release_id}/assets?name={quote(asset_name, safe='')}", upload=content)
+        if value is None:
+            raise RecorderBlocked("GitHub asset upload returned no asset")
+        updated = self._get_tag(tag, expected=release)
+        if updated is None:
+            raise RecorderBlocked("release disappeared after asset upload")
+        return updated
+
+    def publish(self, release: RemoteRelease) -> RemoteRelease:
+        if release.release_id is None:
+            raise RecorderBlocked("release ID required before publication")
+        value = self._json("PATCH", f"/repos/{self.repository}/releases/{release.release_id}", payload={"draft": False, "prerelease": False})
+        if value is None:
+            raise RecorderBlocked("GitHub publication returned no release")
+        published = self._parse(value, expected=release)
+        authoritative = self._get_tag(release.tag, expected=release)
+        if authoritative is None or authoritative.published_at is None:
+            raise RecorderBlocked("authoritative published release readback unavailable")
+        if authoritative.immutable is not True:
+            raise RecorderBlocked("GitHub release is not authoritative immutable state")
+        if authoritative.target_commit and release.target_commit and authoritative.target_commit != release.target_commit:
+            raise RecorderBlocked("authoritative target commit mismatch")
+        return authoritative
+
+    def acquire_attestation(self, release: RemoteRelease) -> tuple[bytes, bytes]:
+        try:
+            verified = subprocess.run([self.gh_binary, "release", "verify", release.tag, "--repo", self.repository, "--format", "json"], capture_output=True, text=True, check=False)
+            trusted = subprocess.run([self.gh_binary, "attestation", "trusted-root"], capture_output=True, text=False, check=False)
+        except OSError as exc:
+            raise RecorderBlocked("GitHub attestation tooling unavailable") from exc
+        if verified.returncode or trusted.returncode:
+            raise RecorderBlocked("GitHub release attestation acquisition failed")
+        try:
+            result = json.loads(verified.stdout)
+            bundle = result["attestation"]["bundle"]
+            bundle_bytes = canonical_bytes(bundle)
+        except (json.JSONDecodeError, KeyError, TypeError) as exc:
+            raise RecorderBlocked("GitHub release attestation bundle malformed") from exc
+        return bundle_bytes, trusted.stdout
+
+
 def _window(timestamp: datetime | None, origin: datetime, *, label: str) -> datetime:
     if timestamp is None or timestamp.tzinfo is None:
         raise RecorderBlocked(f"missing authoritative {label}")
@@ -345,7 +536,7 @@ class PublicationRuntime:
         return current
 
     def publish(self, artifact: Mapping[str, Any], *, origin: datetime, target_commit: str) -> tuple[tuple[OriginState, ...], RemoteRelease, VerifiedAttestation]:
-        content = canonical_bytes(artifact); expected = release_identity(artifact)
+        content = canonical_bytes(artifact); expected = replace(release_identity(artifact), target_commit=target_commit)
         states = [OriginState.ORIGIN_PRECHECK, OriginState.SOURCE_MATERIALIZED, OriginState.FORECAST_COMPUTED, OriginState.ARTIFACT_FROZEN, OriginState.PUBLICATION_IN_PROGRESS]
         release = self._existing(expected)
         if release is None:
@@ -366,13 +557,18 @@ class PublicationRuntime:
                     release = self.transport.upload(expected.tag, expected.asset_name, content)
         if release.asset_sha256 != sha256(content).hexdigest():
             raise RecorderBlocked("authoritative uploaded asset digest mismatch")
+        if release.published_at is None:
+            publish = getattr(self.transport, "publish", None)
+            if publish is None:
+                raise RecorderBlocked("transport cannot publish draft release")
+            release = publish(release)
         _window(release.published_at, origin, label="published_at")
         states.append(OriginState.PUBLICATION_AUTHORITATIVE)
         try:
             bundle, trusted_root = self.transport.acquire_attestation(release)
         except UnknownWrite:
             bundle, trusted_root = self.transport.acquire_attestation(release)  # bounded one recovery acquisition
-        expectation = AttestationExpectation("CipherCuttle/QntyLab", release.tag, target_commit, release.asset_name, release.asset_sha256)
+        expectation = AttestationExpectation("CipherCuttle/QntyLab", release.tag, target_commit, release.asset_name, release.asset_sha256, repository_id=release.repository_id, owner_id=release.owner_id, release_id=str(release.release_id) if release.release_id is not None else None, purl=release.purl, package_id=release.package_id)
         verified = self.verifier.verify(asset=content, bundle=bundle, trusted_root=trusted_root, expectation=expectation)
         if verified.expectation != expectation:
             raise RecorderBlocked("attestation subject/policy mismatch")
@@ -398,7 +594,7 @@ class ExternalSigstoreVerifier:
         with tempfile.TemporaryDirectory(prefix="qntylab-jh01-attestation-") as temporary:
             base = Path(temporary); asset_path, root_path, bundle_path, policy_path = base / "forecast.json", base / "trusted_root.jsonl", base / "release_attestation.sigstore.json", base / "expected_policy.json"
             asset_path.write_bytes(asset); root_path.write_bytes(trusted_root); bundle_path.write_bytes(bundle)
-            policy_path.write_bytes(canonical_bytes({"repository": expectation.repository, "tag": expectation.tag, "target_commit": expectation.target_commit, "asset_name": expectation.asset_name, "asset_sha256": expectation.asset_sha256, "predicate_type": expectation.predicate_type, "signer_uri": expectation.signer_uri}))
+            policy_path.write_bytes(canonical_bytes({"repository": expectation.repository, "repository_id": expectation.repository_id, "owner_id": expectation.owner_id, "release_id": expectation.release_id, "tag": expectation.tag, "purl": expectation.purl, "package_id": expectation.package_id, "target_commit": expectation.target_commit, "asset_name": expectation.asset_name, "asset_sha256": expectation.asset_sha256, "predicate_type": expectation.predicate_type, "signer_uri": expectation.signer_uri}))
             run = subprocess.run([str(self.executable), str(asset_path), str(root_path), str(bundle_path), str(policy_path)], capture_output=True, text=True)
             if run.returncode:
                 raise RecorderBlocked("per-origin Sigstore verifier rejected attestation")
@@ -446,3 +642,16 @@ def offline_reverify_v0r3_qualified_package(root: Path, *, go_binary: Path) -> N
         run = subprocess.run(["bwrap", "--unshare-net", "--ro-bind", "/", "/", "--dev", "/dev", "--proc", "/proc", "--", str(executable), str(retained / "forecast.json"), str(retained / "trusted_root.jsonl"), str(retained / "release_attestation.sigstore.json")], capture_output=True, text=True)
         if run.returncode:
             raise RecorderBlocked("V0R3 offline Sigstore policy rejected retained package")
+
+
+def offline_reverify_current_package(root: Path, *, package: Path, go_binary: Path, expected_policy: Path) -> None:
+    """Hard-isolated re-verification of a current recorder retention package."""
+    with tempfile.TemporaryDirectory(prefix="qntylab-jh01-current-") as temporary:
+        executable = Path(temporary) / "verify-v0r3-generic"
+        build = subprocess.run([str(go_binary), "build", "-o", str(executable), "."], cwd=root / "qualifications/jh01_v0r3", capture_output=True, text=True, env={**os.environ, "GOPROXY": "off"})
+        if build.returncode:
+            raise RecorderBlocked("generic V0R3 verifier build failed")
+        command = ["bwrap", "--unshare-net", "--ro-bind", "/", "/", "--dev", "/dev", "--proc", "/proc", "--", str(executable), str(package / "forecast.json"), str(package / "trusted_root.jsonl"), str(package / "release_attestation.sigstore.json"), str(expected_policy)]
+        run = subprocess.run(command, capture_output=True, text=True)
+        if run.returncode:
+            raise RecorderBlocked("current package offline Sigstore policy rejected retention package")

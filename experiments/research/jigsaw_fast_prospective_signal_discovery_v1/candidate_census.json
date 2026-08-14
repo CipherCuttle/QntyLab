@@ -35,7 +35,7 @@
       "obvious_confounders": ["volatility persistence is the intended baseline", "outliers and regime concentration"],
       "strongest_falsifier": "The incremental coefficient fails direction or materiality after the fixed HAR adjustment.",
       "scores": {"mechanism_clarity": 2, "incremental_information": 2, "structural_novelty": 1, "existing_input_readiness": 2, "pit_clarity": 2, "denominator_safety": 2, "simplicity": 2, "sample_adequacy": 2, "shadow_deployability": 2, "failure_informativeness": 2},
-      "score_total": 19, "hard_gate_pass": true, "selection_status": "FINALIST"
+      "score_total": 19, "hard_gate_pass": true, "selection_status": "REJECTED_PREMERGE_NONIDENTIFIABLE_CONTRACT", "repair_disposition": "Demoted during pre-outcome integrity repair because MARKET_RV24_t is identical to baseline RV24_t; original candidate remains in the ten-item census and is not executed."
     },
     {
       "candidate_id": "JFPV1_02",
@@ -149,8 +149,11 @@
     {
       "candidate_id": "JFPV1_10",
       "short_name": "Downside asymmetry predicts future volatility",
+      "repair_selection_status": "FINALIST_REPLACEMENT",
+      "replacement_reason": "Highest-scoring existing non-finalist that passed hard gates, remains SMALL and DATA_SPINE_REUSE, is not a substantive duplicate of the four surviving finalists, and requires no census-formula change.",
       "mechanism": "Negative-return dominance in recent market movement may distinguish stress state from symmetric volatility.", "feature": "DOWNSIDE_SHARE_t = sum of prior 24h negative BTCUSDT return-square terms / sum of all prior 24h return-square terms; positive denominator required.", "outcome": "BTC_RV24_future_t.", "decision_time": "Completed bar at t.", "horizon": "24h", "universe_panel": "BTCUSDT.", "baseline": "Intercept plus BTCUSDT RV24_t.", "incremental_information_question": "Does recent downside asymmetry add information beyond total recent volatility?", "required_raw_fields": ["timestamp", "close"], "likely_canonical_source": "Research Data Spine V0 BTCUSDT partition", "existing_data_availability": "YES", "pit_feasibility": "Explicit positive-denominator and completed-bar rules.", "expected_implementation_complexity": "SMALL", "likely_historical_sample": "Four years after 24h warmup/tail.", "shadow_deployability": "Yes.", "prior_feature_exposure": "UNKNOWN", "prior_outcome_exposure": "YES", "prior_same_proposition_test": "NO", "relation_to_existing_jigsaw": "DISTINCT_FEATURE; volatility outcome overlaps known evidence but feature proposition is new.", "relation_to_prior_failed_candidates": "No known exact failed frozen test.", "obvious_confounders": ["volatility level", "rare stress episodes", "denominator near zero"], "strongest_falsifier": "No incremental value beyond RV24 or insufficient positive denominators.", "scores": {"mechanism_clarity": 2, "incremental_information": 2, "structural_novelty": 2, "existing_input_readiness": 2, "pit_clarity": 2, "denominator_safety": 1, "simplicity": 2, "sample_adequacy": 2, "shadow_deployability": 2, "failure_informativeness": 2}, "score_total": 19, "hard_gate_pass": true, "selection_status": "REJECTED", "rejection_reason": "Strong idea, but the selected batch already contains two volatility-state questions; retain as a transparent deferred alternative to limit correlated finalists." 
     }
   ],
-  "candidate_census_digest": "2fb6a15a127b83d7e66b86a88fc0fec65a774d07e58d5eaf740b5e74feb73556"
+  "repair_provenance": {"pre_outcome_repair": true, "original_candidate_census_digest": "2fb6a15a127b83d7e66b86a88fc0fec65a774d07e58d5eaf740b5e74feb73556", "original_preregistration_digest": "035eecae9e2ecdd76d90506ce39b2fee973794866b424224235a2dce8e3dc298", "repair_reason": "PRIMARY_REGRESSOR_DUPLICATES_BASELINE_REGRESSOR", "scientific_outcomes_seen_before_repair": false, "replacement_candidate": "JFPV1_10", "no_new_candidate_created": true, "no_rescoring_performed": true},
+  "candidate_census_digest": "9574f306d7b2ec1879e81af98037584ec5b0bce21e8a19649210426d50c9d37a"
 }

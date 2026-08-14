@@ -1426,14 +1426,15 @@ authoritative_artifacts = [
   "experiments/research/jigsaw_fast_prospective_signal_discovery_v1/preregistration.json",
   "experiments/research/jigsaw_fast_prospective_signal_discovery_v1/design_note.md",
   "experiments/research/jigsaw_fast_prospective_signal_discovery_v1/hostile_review.md",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v1/pre_merge_repair_v0.json",
   "qntylab/jigsaw_fast_prospective_signal_discovery_prereg_v1.py",
   "tests/test_jigsaw_fast_prospective_signal_discovery_prereg_v1.py",
 ]
 phase_type = "PREREGISTRATION_ONLY"
 exploratory_candidate_count = 10
 final_confirmatory_candidate_count = 5
-candidate_census_digest = "2fb6a15a127b83d7e66b86a88fc0fec65a774d07e58d5eaf740b5e74feb73556"
-preregistration_digest = "035eecae9e2ecdd76d90506ce39b2fee973794866b424224235a2dce8e3dc298"
+candidate_census_digest = "9574f306d7b2ec1879e81af98037584ec5b0bce21e8a19649210426d50c9d37a"
+preregistration_digest = "6e4f399fad567e126e991c2aab65cd7e41859905830a6606f7b34f9b97e7a3b9"
 implementation_authorized = false
 input_materialization_authorized = false
 scientific_execution_authorized = false

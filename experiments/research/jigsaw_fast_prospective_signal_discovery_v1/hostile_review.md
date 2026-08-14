@@ -29,3 +29,15 @@ Exactly one bounded hostile review was performed after the draft freeze.
 
 Critical findings: 0. High findings: 0. Targeted re-review: not used.
 Medium/Low findings: 0. Review count: exactly 1.
+
+## Targeted pre-merge re-review
+
+The original review missed one High contract defect: JFPV1_01 named
+`MARKET_RV24_t` while its baseline already contained the identical `RV24_t`
+regressor. Before any outcome access, JFPV1_01 was demoted and the existing
+census candidate JFPV1_10 was selected without rescoring or formula change.
+
+Exactly one targeted re-review was consumed. It checked the repaired five-item
+set, replacement mechanics, ten-item search denominator, five-item
+confirmatory denominator, outcome blindness, unique primary regressors, and
+authority boundaries. Critical open: 0. High open: 0. Result: PASS.

@@ -19,8 +19,11 @@ from typing import Any, Iterable, Mapping, Protocol
 
 ROOT = Path(__file__).resolve().parents[1]
 V3_DIR = ROOT / "experiments" / "research" / "jigsaw_fast_prospective_signal_discovery_v3"
-CANONICAL_MASTER = "20e707adf51cc1ab620dc8d4ca6b07b6c4a7964d"
 PR_A_COMMIT = "d11f3d1b1e47439533e62efc2926b0da5b0efcba"
+PR_A_CANONICAL_MERGE = "20e707adf51cc1ab620dc8d4ca6b07b6c4a7964d"
+PR_B_V0_CLOSURE = "5fde5d670a84ea7a60a4d0109c7da7db0f858d07"
+PR_B_V0_CANONICAL_MERGE = "0dd0eacaea5abbedf086a1fb95de5134f7789e1d"
+R1_IMPLEMENTATION_MANIFEST = "experiments/research/jigsaw_fast_prospective_signal_discovery_v3/collector_v0r1/implementation_manifest.json"
 GENERATION_ID = "JFPV3_01"
 CANDIDATE_ID = "JFPV3_01"
 N_MIN = 15
@@ -31,6 +34,7 @@ EXPECTED_ARTIFACTS = (
     "result_schema.json", "artifact_manifest.json",
 )
 HEX64 = set("0123456789abcdef")
+HEX40 = set("0123456789abcdef")
 
 
 class ContractError(ValueError):
@@ -114,10 +118,43 @@ def git_sha(repo_root: Path) -> str:
         raise ContractError("cannot establish repository commit") from exc
 
 
+def _git(repo_root: Path, *args: str, check: bool = True) -> str:
+    try:
+        return subprocess.check_output(("git", *args), cwd=repo_root, text=True, stderr=subprocess.PIPE).strip()
+    except (OSError, subprocess.CalledProcessError) as exc:
+        if check:
+            raise ContractError(f"git operation failed: {' '.join(args)}") from exc
+        return ""
+
+
+def is_ancestor(repo_root: Path, ancestor: str, descendant: str) -> bool:
+    try:
+        subprocess.check_call(("git", "merge-base", "--is-ancestor", ancestor, descendant), cwd=repo_root, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        return True
+    except (OSError, subprocess.CalledProcessError):
+        return False
+
+
+def resolve_runtime_canonical_state(repo_root: Path = ROOT, *, refresh: bool = True) -> dict[str, Any]:
+    """Resolve current canonicality from a fresh remote reconciliation."""
+    if refresh:
+        try:
+            subprocess.check_call(("git", "fetch", "origin", "--prune"), cwd=repo_root, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+        except (OSError, subprocess.CalledProcessError) as exc:
+            raise ContractError("fresh origin/master reconciliation failed") from exc
+    head_sha = _git(repo_root, "rev-parse", "HEAD")
+    origin_master_sha = _git(repo_root, "rev-parse", "origin/master")
+    dirty = bool(_git(repo_root, "status", "--porcelain"))
+    anchors = {"pr_a_commit": PR_A_COMMIT, "pr_a_canonical_merge": PR_A_CANONICAL_MERGE, "pr_b_v0_closure": PR_B_V0_CLOSURE, "pr_b_v0_canonical_merge": PR_B_V0_CANONICAL_MERGE}
+    lineage = {name: is_ancestor(repo_root, anchor, head_sha) for name, anchor in anchors.items()}
+    return {"head_sha": head_sha, "origin_master_sha": origin_master_sha, "worktree_clean": not dirty, "lineage": lineage, "fresh_remote_reconciliation": refresh, "canonical": head_sha == origin_master_sha and not dirty and all(lineage.values())}
+
+
 def bind_pr_a(repo_root: Path = ROOT, *, current_sha: str | None = None) -> dict[str, Any]:
     """Verify the merged PR-A artifacts against its immutable manifest."""
-    if (current_sha or git_sha(repo_root)) != CANONICAL_MASTER:
-        raise ContractError("PR-A binding requires canonical merged master")
+    current_sha = current_sha or git_sha(repo_root)
+    if not is_ancestor(repo_root, PR_A_COMMIT, current_sha) or not is_ancestor(repo_root, PR_A_CANONICAL_MERGE, current_sha):
+        raise ContractError("PR-A immutable lineage is not ancestral to current canonical HEAD")
     try:
         subprocess.check_call(("git", "cat-file", "-e", f"{PR_A_COMMIT}^{{commit}}"), cwd=repo_root, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     except (OSError, subprocess.CalledProcessError) as exc:
@@ -131,7 +168,18 @@ def bind_pr_a(repo_root: Path = ROOT, *, current_sha: str | None = None) -> dict
     prereg = values["preregistration.json"]
     if prereg.get("generation_id") != GENERATION_ID or prereg.get("candidate_id") != CANDIDATE_ID:
         raise ContractError("PR-A generation binding mismatch")
-    return {"canonical_master": CANONICAL_MASTER, "pr_a_commit": PR_A_COMMIT, "generation_id": GENERATION_ID, "candidate_id": CANDIDATE_ID, "artifact_digests": dict(manifest["artifacts"]), "source_contract_id": "JFPV3_SOURCE_CONTRACT", "universe_contract_id": "JFPV3_PIT_ELIGIBILITY_V0", "scientific_contract_id": "JFPV3_SCIENTIFIC_CONTRACT", "schedule_contract_id": "JFPV3_SCHEDULE_CONTRACT", "result_schema_digest": manifest["artifacts"]["result_schema.json"]}
+    return {"current_head": current_sha, "pr_a_commit": PR_A_COMMIT, "pr_a_canonical_merge": PR_A_CANONICAL_MERGE, "generation_id": GENERATION_ID, "candidate_id": CANDIDATE_ID, "artifact_digests": dict(manifest["artifacts"]), "source_contract_id": "JFPV3_SOURCE_CONTRACT", "universe_contract_id": "JFPV3_PIT_ELIGIBILITY_V0", "scientific_contract_id": "JFPV3_SCIENTIFIC_CONTRACT", "schedule_contract_id": "JFPV3_SCHEDULE_CONTRACT", "result_schema_digest": manifest["artifacts"]["result_schema.json"]}
+
+
+def implementation_identity(repo_root: Path = ROOT, manifest_path: str = R1_IMPLEMENTATION_MANIFEST) -> dict[str, Any]:
+    """Verify repaired source bytes against the frozen R1 content manifest."""
+    path = repo_root / manifest_path
+    manifest = load_json(path)
+    for relative, expected in manifest.get("files", {}).items():
+        actual_path = repo_root / relative if not relative.startswith("collector_v0") else repo_root / "experiments/research/jigsaw_fast_prospective_signal_discovery_v3" / relative
+        if not actual_path.is_file() or bytes_digest(actual_path.read_bytes()) != expected:
+            raise ContractError(f"repaired implementation content mismatch: {relative}")
+    return {"implementation_digest": manifest.get("implementation_digest"), "candidate_commit_sha": manifest.get("candidate_commit_sha"), "manifest_digest": bytes_digest(path.read_bytes()), "manifest_path": manifest_path}
 
 
 def _validate_symbol(symbol: str) -> str:
@@ -191,15 +239,17 @@ def schedule(activation_timestamp: datetime, count: int = 365) -> list[datetime]
     return [first + timedelta(days=index) for index in range(count)]
 
 
-def validate_activation(record: Mapping[str, Any], *, current_sha: str, dirty: bool = False, binding: Mapping[str, Any] | None = None, expected_implementation_sha: str | None = None) -> None:
+def validate_activation(record: Mapping[str, Any], *, current_sha: str, origin_master_sha: str | None = None, dirty: bool = False, binding: Mapping[str, Any] | None = None, expected_implementation_sha: str | None = None, lineage: Mapping[str, bool] | None = None) -> None:
     required = ("activation_master_sha", "collector_implementation_sha", "preregistration_digest", "universe_contract_digest", "source_contract_digest", "scientific_contract_digest", "schedule_contract_digest", "activation_timestamp", "shadow_run_id")
     if any(key not in record for key in required): raise ContractError("activation record incomplete")
-    if dirty or current_sha != CANONICAL_MASTER or record["activation_master_sha"] != CANONICAL_MASTER: raise ContractError("activation requires clean canonical master")
+    if not origin_master_sha or dirty or current_sha != origin_master_sha or record["activation_master_sha"] != current_sha: raise ContractError("activation requires clean current canonical master")
+    if lineage is not None and not all(lineage.values()): raise ContractError("activation immutable lineage is not ancestral")
+    if len(current_sha) != 40 or any(character not in HEX40 for character in current_sha.lower()): raise ContractError("invalid activation master SHA")
     if expected_implementation_sha is not None and record["collector_implementation_sha"] != expected_implementation_sha: raise ContractError("activation implementation identity mismatch")
     if binding is not None:
         for field, key in (("preregistration_digest", "preregistration.json"), ("universe_contract_digest", "universe_contract.json"), ("source_contract_digest", "source_contract.json"), ("scientific_contract_digest", "scientific_contract.json"), ("schedule_contract_digest", "schedule_contract.json")):
             if record[field] != binding["artifact_digests"][key]: raise ContractError(f"activation contract mismatch: {field}")
-    if not record["shadow_run_id"]: raise ContractError("shadow_run_id required")
+    if not isinstance(record["shadow_run_id"], str) or not record["shadow_run_id"]: raise ContractError("shadow_run_id required")
     parse_stamp(record["activation_timestamp"])
 
 
@@ -317,10 +367,10 @@ class Collector:
             raise ContractError(f"invalid state transition: expected {event_type}")
         return event
 
-    def record_schedule(self, origins: Iterable[datetime], *, activation_record: Mapping[str, Any] | None = None, current_sha: str | None = None) -> None:
-        if activation_record is None:
-            raise ContractError("schedule recording requires explicit activation; collector remains inactive")
-        validate_activation(activation_record, current_sha=current_sha or git_sha(ROOT), binding=self.binding or None, expected_implementation_sha=self.binding.get("implementation_digest") if self.binding else None)
+    def record_schedule(self, origins: Iterable[datetime], *, activation_record: Mapping[str, Any] | None = None, canonical_state: Mapping[str, Any] | None = None) -> None:
+        if activation_record is None or canonical_state is None:
+            raise ContractError("schedule recording requires explicit fresh activation state")
+        validate_activation(activation_record, current_sha=canonical_state.get("head_sha", ""), origin_master_sha=canonical_state.get("origin_master_sha"), dirty=not canonical_state.get("worktree_clean", False), binding=self.binding or None, expected_implementation_sha=self.binding.get("implementation_digest") if self.binding else None, lineage=canonical_state.get("lineage"))
         origins = list(origins)
         if len(origins) != 365 or origins != sorted(origins): raise ContractError("schedule must contain exactly 365 ordered origins")
         for index, origin in enumerate(origins):

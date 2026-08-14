@@ -6,7 +6,6 @@ import pytest
 
 from qntylab.jfp_v3_shadow import (
     BinanceUmTransport,
-    CANONICAL_MASTER,
     Collector,
     ContractError,
     ReceiptLedger,
@@ -14,6 +13,7 @@ from qntylab.jfp_v3_shadow import (
     digest,
     future_value,
     resolve_universe,
+    resolve_runtime_canonical_state,
     schedule,
     status,
     validate_activation,
@@ -51,7 +51,8 @@ def one_origin_collector(tmp_path):
 
 
 def test_pr_a_binding_uses_manifest_and_canonical_commit():
-    binding = bind_pr_a(current_sha=CANONICAL_MASTER)
+    state = resolve_runtime_canonical_state(refresh=False)
+    binding = bind_pr_a(current_sha=state["head_sha"])
     assert binding["generation_id"] == "JFPV3_01"
     assert binding["artifact_digests"]["source_contract.json"]
 
@@ -89,11 +90,29 @@ def test_schedule_rejects_noncanonical_count():
 
 
 def test_activation_guard_rejects_noncanonical_or_duplicate_shape():
-    record = {"activation_master_sha": CANONICAL_MASTER, "collector_implementation_sha": "a" * 64, "preregistration_digest": "b" * 64, "universe_contract_digest": "c" * 64, "source_contract_digest": "d" * 64, "scientific_contract_digest": "e" * 64, "schedule_contract_digest": "f" * 64, "activation_timestamp": "2026-01-01T00:00:00Z", "shadow_run_id": "run-1"}
-    validate_activation(record, current_sha=CANONICAL_MASTER)
-    with pytest.raises(ContractError): validate_activation(record, current_sha=CANONICAL_MASTER, dirty=True)
+    runtime_head = "f" * 40
+    record = {"activation_master_sha": runtime_head, "collector_implementation_sha": "a" * 64, "preregistration_digest": "b" * 64, "universe_contract_digest": "c" * 64, "source_contract_digest": "d" * 64, "scientific_contract_digest": "e" * 64, "schedule_contract_digest": "f" * 64, "activation_timestamp": "2026-01-01T00:00:00Z", "shadow_run_id": "run-1"}
+    validate_activation(record, current_sha=runtime_head, origin_master_sha=runtime_head, lineage={"all": True})
+    with pytest.raises(ContractError): validate_activation(record, current_sha=runtime_head, origin_master_sha=runtime_head, dirty=True)
     with pytest.raises(ContractError, match="implementation"):
-        validate_activation(record, current_sha=CANONICAL_MASTER, expected_implementation_sha="0" * 64)
+        validate_activation(record, current_sha=runtime_head, origin_master_sha=runtime_head, expected_implementation_sha="0" * 64)
+
+
+def test_runtime_canonicality_survives_a_future_merge_sha():
+    future_merge = "1" * 40
+    record = {"activation_master_sha": future_merge, "collector_implementation_sha": "a" * 64, "preregistration_digest": "b" * 64, "universe_contract_digest": "c" * 64, "source_contract_digest": "d" * 64, "scientific_contract_digest": "e" * 64, "schedule_contract_digest": "f" * 64, "activation_timestamp": "2026-01-01T00:00:00Z", "shadow_run_id": "run-future"}
+    validate_activation(record, current_sha=future_merge, origin_master_sha=future_merge, lineage={"pr_a": True, "pr_a_merge": True, "v0_closure": True, "v0_merge": True}, expected_implementation_sha="a" * 64)
+
+
+@pytest.mark.parametrize("case", [
+    {"current_sha": "a" * 40, "origin_master_sha": "b" * 40},
+    {"current_sha": "a" * 40, "origin_master_sha": "a" * 40, "dirty": True},
+    {"current_sha": "a" * 40, "origin_master_sha": "a" * 40, "lineage": {"missing_anchor": False}},
+])
+def test_runtime_canonicality_negative_cases(case):
+    sha = case["current_sha"]
+    record = {"activation_master_sha": sha, "collector_implementation_sha": "a" * 64, "preregistration_digest": "b" * 64, "universe_contract_digest": "c" * 64, "source_contract_digest": "d" * 64, "scientific_contract_digest": "e" * 64, "schedule_contract_digest": "f" * 64, "activation_timestamp": "2026-01-01T00:00:00Z", "shadow_run_id": "run-negative"}
+    with pytest.raises(ContractError): validate_activation(record, **case)
 
 
 def test_transport_is_fixture_injectable_and_does_not_need_network():

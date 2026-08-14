@@ -1,0 +1,14 @@
+{
+  "schema_version": "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_V2_CONTRACT_COMPILE_V0",
+  "scientific_values_computed": false,
+  "candidates": [
+    {"candidate_id": "JFPV2_03", "status": "CONTRACT_COMPILE_PASS", "reason": "Static contract valid; not selected because the finalist family favors lower relation exposure."},
+    {"candidate_id": "JFPV2_04", "status": "CONTRACT_COMPILE_PASS", "formula": "CONCENTRATION_t = max_i(abs(r_i,t)) / sum_i(abs(r_i,t))", "outcome": "PANEL_DISPERSION_t+24h", "baseline": ["intercept", "PANEL_DISPERSION_t"], "decision_grid": "every 24h origin", "window": "2023-10-20T00:00:00Z through 2025-06-18T23:00:00Z", "warmup": "24 completed hourly returns", "future_tail": "24 hourly bars", "denominator": "sum_i(abs(r_i,t)) > 0; invalid denominator is excluded as BLOCKED, never imputed", "sd_convention": "sample SD across the fixed 20-symbol panel", "log_return_convention": "ln(close_t / close_t-1)", "missing_data": "any missing or duplicate source row blocks the origin", "timing": {"decision_time": "completed bar close", "feature_cutoff": "t", "outcome_start": "t+24h", "outcome_end": "t+25h"}, "model": "OLS with intercept; candidate regressor distinct from baseline", "inference": "ASSOCIATION_SCREEN; two-sided HAC(24), Holm FWER alpha 0.05", "materiality_gate": "standardized effect >= 0.01", "overlap_class": "NON_OVERLAPPING_24H_ORIGINS", "duplicate_regressors": false, "implementation_complexity": "SMALL"},
+    {"candidate_id": "JFPV2_06", "status": "CONTRACT_COMPILE_PASS", "formula": "DOWNSIDE_SHARE_t = sum_{i,k in prior 24h, r<0}(r_i,k^2) / sum_{i,k in prior 24h}(r_i,k^2)", "outcome": "PANEL_RV24_future_t", "baseline": ["intercept", "PANEL_RV24_t"], "decision_grid": "every 24h origin", "window": "2023-10-20T00:00:00Z through 2025-06-18T23:00:00Z", "warmup": "24 completed hourly returns", "future_tail": "24 hourly bars", "denominator": "sum_{i,k in prior 24h}(r_i,k^2) > 0; invalid denominator is excluded as BLOCKED, never imputed", "sd_convention": "not used in primary feature; panel RV uses root-sum-square", "log_return_convention": "ln(close_t / close_t-1)", "missing_data": "any missing or duplicate source row blocks the origin", "timing": {"decision_time": "completed bar close", "feature_cutoff": "t", "outcome_start": "t+1h", "outcome_end": "t+24h"}, "model": "OLS with intercept; candidate regressor distinct from baseline", "inference": "ASSOCIATION_SCREEN; two-sided HAC(24), Holm FWER alpha 0.05", "materiality_gate": "partial_R2 >= 0.001", "overlap_class": "NON_OVERLAPPING_24H_ORIGINS", "duplicate_regressors": false, "implementation_complexity": "SMALL"}
+  ],
+  "all_formula_primitives_defined": true,
+  "all_denominator_behaviors_explicit": true,
+  "all_warmup_and_tails_calculable": true,
+  "no_lookahead": true,
+  "no_random_split": true
+}

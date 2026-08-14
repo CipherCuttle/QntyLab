@@ -1,0 +1,26 @@
+{
+  "artifact_type": "JFPV3_PIT_UNIVERSE_CONTRACT",
+  "contract_id": "JFPV3_PIT_ELIGIBILITY_V0",
+  "origin_definition": "scheduled daily 00:00:00Z origin; metadata snapshot must be observed no later than origin",
+  "eligibility": {
+    "venue": "Binance",
+    "market_type": "USD-M perpetual",
+    "contract_type": "PERPETUAL",
+    "quote_asset": "USDT",
+    "status": "TRADING",
+    "listing_age": "onboardDate <= origin - 30 complete days",
+    "prior_window": "full prior 24 hourly bars and 24 hourly returns available",
+    "bar_interval": "1h",
+    "duplicate_bars": false,
+    "missing_required_bars": false,
+    "source_identity_unambiguous": true,
+    "return_independent": true
+  },
+  "listing_age_rationale": "The fixed 30-day structural threshold avoids launch-transition and micro-history contracts and is not selected using returns, volatility, or historical candidate results.",
+  "universe_policy": "ALL eligible contracts; deterministic lexicographic symbol ordering",
+  "minimum_universe": {"n_min": 15, "below_minimum": "BLOCKED_UNIVERSE_TOO_SMALL", "rationale": "15 assets is the fixed minimum for a cross-sectional measurement that is not dominated by one contract and remains feasible under ordinary churn; no outcome tuning."},
+  "selection": {"by_returns": false, "by_volume": false, "by_market_cap": false, "manual_curated": false},
+  "sealing": "U_t is immutable after feature sealing; the same ordered U_t binds the future outcome; no shrink, substitution, or re-computation is permitted.",
+  "receipt_fields": ["origin_id", "origin_timestamp", "eligibility_contract_id", "eligibility_contract_digest", "metadata_source_identity", "metadata_observed_at", "eligible_symbol_count", "ordered_eligible_symbols", "excluded_symbols_with_reason", "universe_digest", "sealed_at"],
+  "block_reasons": ["UNIVERSE_TOO_SMALL", "SOURCE_METADATA_UNAVAILABLE", "FEATURE_WINDOW_INCOMPLETE", "FEATURE_BAR_INTEGRITY_FAILURE", "OUTCOME_WINDOW_INCOMPLETE", "OUTCOME_BAR_INTEGRITY_FAILURE", "CONTRACT_IDENTITY_AMBIGUOUS", "PIT_VIOLATION"]
+}

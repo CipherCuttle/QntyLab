@@ -1,0 +1,10 @@
+{
+  "artifact_type": "JFPV3_SCHEDULE_CONTRACT",
+  "first_origin": "first 00:00:00Z daily origin at least 24 hours after canonical activation of this preregistered collector",
+  "spacing": "24h",
+  "scheduled_origin_count": 365,
+  "rationale": "one full calendar-year-scale prospective horizon captures multiple regimes and gives a smallest defensible persistence test without V2 effect-size tuning",
+  "early_stopping": false,
+  "collection_started": false,
+  "origin_states": ["SCHEDULED", "FEATURE_ELIGIBLE", "FEATURE_SEALED", "OUTCOME_MATURED", "ELIGIBLE", "BLOCKED"]
+}

@@ -1,0 +1,10 @@
+{
+  "artifact_type": "JFPV3_SYNTHETIC_CONTRACT_VALIDATION",
+  "real_data_used": false,
+  "fixtures": ["TRADING eligible", "SETTLING excluded", "listing age below 30d excluded", "missing prior bar blocks", "N below 15 blocks", "lexicographic ordering and digest deterministic", "same sealed U_t binds outcome", "future mutation cannot change sealed origin", "new listing enters later origin only", "delisting excludes future origin", "missing future bar blocks sealed outcome", "no shrink or substitution", "eligibility does not inspect returns", "no historical science execution path"],
+  "pass": 15,
+  "determinism": "PASS",
+  "pit_fail_closed": "PASS",
+  "universe_fail_closed": "PASS",
+  "execution_count": 0
+}

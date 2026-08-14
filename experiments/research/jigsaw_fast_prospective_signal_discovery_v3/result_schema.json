@@ -1,0 +1,9 @@
+{
+  "artifact_type": "JFPV3_RESULT_SCHEMA",
+  "status": "PREREGISTERED_NOT_EXECUTED",
+  "fields": ["candidate_id", "origin_id", "universe_digest", "N_t", "feature", "baseline", "outcome", "input_integrity", "execution_integrity", "block_reason", "beta_candidate", "hac_standard_error", "hac_bandwidth", "raw_p_two_sided", "holm_adjusted_p", "partial_r2", "materiality_pass", "classification"],
+  "blocked_numeric_fields": "null",
+  "family_size": 1,
+  "prospective_classifications": ["PROSPECTIVE_SUPPORT", "PROSPECTIVE_NO_SUPPORT", "BLOCKED_PROSPECTIVE_CANDIDATE"],
+  "authority_boundary": "measurement only; no causality, alpha, economic, strategy, Router, Qnty, trading, or capital authority"
+}

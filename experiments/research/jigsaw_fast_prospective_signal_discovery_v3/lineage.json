@@ -1,0 +1,15 @@
+{
+  "artifact_type": "JFPV3_LINEAGE",
+  "generation_id": "JFPV3_01",
+  "parent_generation": "JFPV2",
+  "parent_candidate": "JFPV2_06",
+  "parent_hypothesis_lineage": "greater cross-sectional downside concentration predicts higher subsequent aggregate realized volatility conditional on current aggregate realized volatility",
+  "parent_result": "HISTORICAL_SCREEN_SUPPORT",
+  "parent_result_digest": "ee674b14012636fb5f8221818c11bf9fd54adbcade9e953a65f9cf6a32ea33c2",
+  "fixed_panel_transport_status": "BLOCKED_BY_PROSPECTIVE_PANEL_AVAILABILITY",
+  "transport_failure_symbol": "REEFUSDT",
+  "new_generation_reason": "FIXED_PANEL_NOT_PROSPECTIVELY_ROBUST",
+  "new_measurement_contract": "deterministic point-in-time eligible Binance USD-M perpetual universe sealed separately at each origin",
+  "immutability_statement": "V2 historical evidence remains immutable. V3 is not a repair, rerun, or two-candidate family extension of V2.",
+  "jfpv2_04_carried_forward": false
+}

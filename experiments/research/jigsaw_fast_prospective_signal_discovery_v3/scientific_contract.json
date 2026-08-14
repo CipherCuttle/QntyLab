@@ -1,0 +1,18 @@
+{
+  "artifact_type": "JFPV3_SCIENTIFIC_CONTRACT",
+  "candidate_id": "JFPV3_01",
+  "feature": "DOWNSIDE_SHARE_t(U_t) = sum_{i in U_t,s in prior 24h,r_i,s<0}(r_i,s^2) / sum_{i in U_t,s in prior 24h}(r_i,s^2)",
+  "return": "r_i,s = ln(C_i,s / C_i,s-1)",
+  "baseline": "PANEL_RV24_t(U_t) = sqrt(sum_{i in U_t,s in prior 24h}(r_i,s^2))",
+  "outcome": "PANEL_RV24_future_t(U_t) = sqrt(sum_{i in U_t,s in t+1h..t+24h}(r_i,s^2))",
+  "outcome_universe": "same immutable sealed U_t; future membership changes do not alter the origin",
+  "universe_size_handling": "literal RV transport with sealed N_t control; no normalization and no future N",
+  "full_model": "outcome_t ~ intercept + beta_rv*PANEL_RV24_t + beta_n*N_t + beta_candidate*DOWNSIDE_SHARE_t",
+  "reduced_model": "outcome_t ~ intercept + beta_rv*PANEL_RV24_t + beta_n*N_t",
+  "expected_sign": "POSITIVE",
+  "partial_r2": "(SSE_reduced - SSE_full) / SSE_reduced",
+  "materiality_gate": "PARTIAL_R2 >= 0.001",
+  "domain_blocks": ["zero feature denominator", "SSE_reduced <= 0", "non-identifiable model", "incomplete or integrity-failing origin"],
+  "inference": {"estimator": "OLS with intercept", "hac_bandwidth": "floor(4*(T/100)^(2/9))", "T": "complete eligible origins", "lag_unit": "origins", "kernel": "Bartlett", "finite_sample_correction": "none", "test": "normal z, two-sided", "family_size": 1},
+  "classification": {"support": "all integrity/model preconditions pass AND beta_candidate > 0 AND raw two-sided p <= 0.05 AND PARTIAL_R2 >= 0.001", "no_support": "valid inference and support predicate false", "blocked": "required precondition fails", "positive_authority_ceiling": "PROSPECTIVE_MEASUREMENT_SURVIVOR"}
+}

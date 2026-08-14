@@ -1,0 +1,7 @@
+{
+  "artifact_type": "JFPV3_ACTIVATION_CONTRACT_V0",
+  "required_fields": ["activation_master_sha", "collector_implementation_sha", "preregistration_digest", "universe_contract_digest", "source_contract_digest", "scientific_contract_digest", "schedule_contract_digest", "activation_timestamp", "shadow_run_id"],
+  "guards": ["clean canonical master", "activation_master_sha equals canonical master", "implementation identity matches frozen manifest", "all PR-A contract digests match", "activation timestamp is UTC", "shadow_run_id is non-empty and unique"],
+  "activation_record_created_in_pr_b": false,
+  "shadow_activated_in_pr_b": false
+}

@@ -1,0 +1,11 @@
+{
+  "artifact_type": "JFPV3_RECEIPT_SCHEMA_V0",
+  "event_fields": ["sequence", "event_id", "event_type", "previous_event_digest", "payload", "event_digest"],
+  "required_source_fields": ["source_id", "transport_id", "raw_digest", "normalized_digest", "observed_or_acquired_at"],
+  "metadata_fields": ["origin_id", "origin_timestamp", "metadata_source_id", "metadata_transport_id", "metadata_observed_at", "raw_metadata_digest", "normalized_metadata_digest", "normalizer_version", "ordered_U_t", "N_t", "universe_digest", "sealed_at"],
+  "feature_fields": ["required_prior_bar_identities", "raw_source_digests", "normalized_bar_digests", "source_capability_id", "feature_input_sealed_at", "feature_input_receipt_digest", "downside_share", "panel_rv24", "feature_receipt_digest"],
+  "outcome_fields": ["sealed_universe_digest", "outcome_bar_source_identities", "outcome_input_digest", "panel_rv24_future", "outcome_matured_at", "outcome_receipt_digest"],
+  "serialization": "UTF-8 canonical JSON, sorted keys, JSONL",
+  "mutation_detection": "previous-event chain plus event digest",
+  "duplicate_policy": "exact duplicate is idempotent; conflicting duplicate fails"
+}

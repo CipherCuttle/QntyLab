@@ -1,0 +1,8 @@
+{
+  "artifact_type": "JFPV3_COLLECTOR_SYNTHETIC_VALIDATION_V0",
+  "real_network_used": false,
+  "real_scientific_ohlcv_used": false,
+  "covered_invariants": ["PR-A manifest binding", "manifest mismatch rejection", "metadata normalization", "TRADING eligibility", "non-TRADING exclusion", "listing-age below threshold", "listing-age boundary", "lexicographic ordering", "universe digest", "eligibility independent of returns", "N_MIN block", "365-origin schedule", "24h activation offset", "no early stopping", "prior 24h window", "DOWNSIDE_SHARE", "PANEL_RV24", "sealed N_t", "same-U_t outcome", "t+1h..t+24h outcome", "missing future bar block", "no outcome shrink", "post-seal mutation rejection", "future cannot mutate feature receipt", "metadata persisted before origin", "live metadata cannot reconstruct history", "receipt mutation detection", "idempotent replay", "status no inferential statistics", "network firewall"],
+  "test_count": 14,
+  "pass": true
+}

@@ -1,0 +1,8 @@
+{
+  "artifact_type": "JFPV3_SOURCE_CONTRACT",
+  "metadata": {"identity": "Binance Futures USD-M REST exchangeInfo", "endpoint": "GET https://fapi.binance.com/fapi/v1/exchangeInfo", "required_fields": ["symbol", "status", "contractType", "quoteAsset", "onboardDate"], "snapshot_rule": "persist raw response and sha256 before or at each origin; metadata_observed_at must be <= origin", "current_endpoint_is_not_historical_backfill": true},
+  "ohlcv": {"identity": "Binance Futures USD-M 1h klines", "endpoint": "GET https://fapi.binance.com/fapi/v1/klines", "required_fields": ["open_time", "close"], "bar_identity": "symbol + interval + open_time", "bar_close_time": "open_time + 1h", "safe_known_after": "bar_close_time", "integrity": "exactly one row per required hourly open_time; no missing or duplicate rows"},
+  "normalization": "uppercase exact Binance symbol; UTC timestamps; decimal close values; no aliases",
+  "failure_behavior": "metadata outage, stale snapshot, ambiguous contract identity, ambiguous source, or unavailable required bar blocks; no alternate exchange, spot, coin-margined, synthetic, arbitrary-third-party, or silent fallback",
+  "revision_rule": "retain original observed bytes and any later revision evidence; never silently overwrite a sealed receipt"
+}

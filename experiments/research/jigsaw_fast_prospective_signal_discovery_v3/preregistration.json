@@ -1,0 +1,13 @@
+{
+  "artifact_type": "JFPV3_PREREGISTRATION",
+  "phase": "JFPV2_V3_PR_A",
+  "generation_id": "JFPV3_01",
+  "candidate_id": "JFPV3_01",
+  "state": "PREREGISTERED_NOT_EXECUTED",
+  "parent_candidate": "JFPV2_06",
+  "parent_result_digest": "ee674b14012636fb5f8221818c11bf9fd54adbcade9e953a65f9cf6a32ea33c2",
+  "artifact_bindings": ["lineage.json", "transport_rationale.json", "universe_contract.json", "source_contract.json", "scientific_contract.json", "schedule_contract.json", "result_schema.json"],
+  "firewall": {"REAL_PROSPECTIVE_OHLCV_ACCESSED": false, "REAL_PROSPECTIVE_FEATURES_COMPUTED": 0, "REAL_PROSPECTIVE_OUTCOMES_COMPUTED": 0, "REAL_PROSPECTIVE_REGRESSIONS_RUN": 0, "REAL_PROSPECTIVE_P_VALUES_COMPUTED": 0, "REAL_HISTORICAL_V3_BACKTEST_RUN": false, "shadow_activation": false},
+  "prohibited": ["V2 repair", "historical V3 backtest", "return-conditioned universe selection", "prospective execution in this phase", "Router/Qnty/trading/capital authority"],
+  "frozen_contracts": {"pit_universe": true, "return_independent_eligibility": true, "same_sealed_outcome_universe": true, "variable_n_control": true, "model": true, "materiality": true, "inference": true, "schedule": true, "classification": true}
+}

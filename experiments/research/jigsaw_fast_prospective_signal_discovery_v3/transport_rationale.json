@@ -1,0 +1,19 @@
+{
+  "artifact_type": "JFPV3_TRANSPORT_RATIONALE",
+  "invariant_mechanism": "A cross-sectional downside-share feature is tested for association with a subsequent aggregate panel realized-volatility outcome conditional on current aggregate panel realized volatility.",
+  "instrument_only_changes": ["fixed forever symbol list", "prospective universe membership", "explicit origin-time universe-size control"],
+  "not_inherited": ["JFPV2_04", "V2 fixed 20-symbol denominator", "V2 historical result as a prospective target", "any V2 observed effect-size tuning"],
+  "soc ratic_answers": {
+    "1_invariant_mechanism": "Downside concentration across hourly asset returns is the candidate feature; future aggregate realized volatility is the outcome; current aggregate realized volatility is the conditioning baseline.",
+    "2_v2_instrument_parts": "The fixed 20-symbol membership, fixed denominator, historical window, and availability assumptions were measurement-instrument choices, not mechanism claims.",
+    "3_variable_n_confounder": "Yes. Literal sum-of-squares panel RV can mechanically increase with asset count, and churn can alter cross-sectional composition.",
+    "4_simplest_control": "Include sealed origin-time N_t in both reduced and full OLS models; do not add weights, ranking, or normalization.",
+    "5_n_min": "N_MIN=15 preserves a meaningfully cross-sectional panel, limits single-contract dominance, and tolerates ordinary churn; it is not selected from outcomes or power.",
+    "6_listing_age": "30 complete days prevents launch-transition and micro-history contracts from entering while allowing ordinary established contracts; it is based only on structural continuity.",
+    "7_all_contracts": "All qualifying contracts avoids a second PIT ranking function and minimizes researcher degrees of freedom.",
+    "8_falsifier": "A valid complete prospective sample with beta_candidate <= 0, two-sided p > .05, or partial R2 < .001 is PROSPECTIVE_NO_SUPPORT; invalid origins block rather than rescue the result.",
+    "9_missing_after_pass": "Even a pass lacks causal, alpha, economic, strategy, Router, Qnty, and capital authority; decision usefulness remains untested.",
+    "10_hidden_freedom": "The most vulnerable degree of freedom is source-time metadata interpretation, so metadata snapshot timing, fields, normalization, and fail-closed behavior are explicit."
+  },
+  "popperian_kill_criteria": ["PIT membership cannot be determined without return-conditioned selection", "the mechanism is undefined under variable N", "source metadata cannot establish membership PIT-safely", "prohibited substitutions are required", "measurement cannot be separated from trading claims"]
+}

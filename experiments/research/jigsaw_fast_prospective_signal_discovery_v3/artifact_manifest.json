@@ -1,0 +1,18 @@
+{
+  "artifact_type": "JFPV3_ARTIFACT_MANIFEST",
+  "hash_algorithm": "sha256",
+  "artifacts": {
+    "lineage.json": "cc802e15213c80067079781f078832e6a3e5e78cfb6d4c50c222f35c04999a07",
+    "transport_rationale.json": "89a461ff8c8472eca49f70c9c50a39e5870ce67469d803d1cf52f98d2515516f",
+    "universe_contract.json": "883172c10174d52a298293b2299ab28af4095c33217e2c2a24de3a258208c9fd",
+    "source_contract.json": "64b918c8e062c55d1434a34ff5f7e3368dd59a7e2358edcacfa80bf1ab2e2348",
+    "scientific_contract.json": "8b37028ef1ebc5baf7a04bfc742069f0b1ecd0931c4017c565324e980a140e90",
+    "schedule_contract.json": "5e326a165bdf6dda8dd137ec69a4677f6029f99ae0487a80724a3c0667a36ffc",
+    "result_schema.json": "b443fd0be4dc33eaa8e00a07811bc105476b10b59a39c80a9de4f8fdd208f62b",
+    "preregistration.json": "7b0e6eeda726ddcc6e5a2a99d931df51bfbff492557fdefc30eae629c998da16",
+    "synthetic_contract_validation.json": "1d90691b2b6aa7015affa514a29afe3b9b71bddcb8474258051c0633f5c76d2a",
+    "hostile_review.md": "affe19abeb7df18b94a4558abdf299a987c495ff893829dac88b6f79c657172a",
+    "closure.json": "4ff4d5a53b02d5deda21292447c65caa5f52a23ebc3cfade8e784057bc65843d",
+    "synthetic_validate.py": "4c01979ede0e58dd9325a59f1e9c2a935eaa7eab7691371c7f42b98dfb093b72"
+  }
+}

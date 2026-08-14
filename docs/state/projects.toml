@@ -1178,6 +1178,56 @@ implementation_authorized = false
 next_action = "CLOSED_PASS: this governance-only repair supersedes only the historical derived first-required-bar boundary for later recorder/source implementation. It grants no new implementation, collection, evaluation, Jigsaw, State Snapshot, Router, Qnty, trading, or promotion authority; the V0R3 one-later-phase authorization remains unconsumed."
 
 [[project]]
+project_id = "JH01_V1_RECORDER_SYNTHETIC_CANARY_AUTHORIZATION_V0"
+display_name = "JH01 V1 recorder synthetic canary authorization V0"
+state = "CLOSED_PASS"
+authority_level = "BOUNDED_RECORDER_TRANSPORT_VERIFIER_ADAPTATION_AND_ONE_SYNTHETIC_CANARY"
+phase_type = "GOVERNANCE_ONLY"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/preregistration.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/github_release_attestation_offline_policy_qualification_v0r3.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/recorder_synthetic_canary_authorization_v0.json",
+]
+authority_source = "EXPLICIT_USER_AUTHORITY_REPRESENTED_BY_THIS_SEPARATE_GIT_BACKED_GOVERNANCE_PHASE"
+predecessor_project_id = "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_V1_GITHUB_RELEASE_ATTESTATION_OFFLINE_POLICY_QUALIFICATION_V0R3"
+predecessor_state = "CLOSED_PASS"
+recorder_project_id = "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_V1_PROSPECTIVE_RECORDER_AND_INPUT_MATERIALIZATION_IMPLEMENTATION_V0"
+recorder_pr = 89
+recorder_blocked_head = "5be068269abdaa5a7f02015375587771f306f6cc"
+canonical_master = "bad0eb1b8f6ae429bbd48f84b7a770194dc931d8"
+v1_preregistration_digest = "bdb85130cae75e9f156db9aa1fd955d7f565a3714ae091871d5ac4447c1ec27b"
+v1_preregistration_bytes_sha256 = "4990688b640ad34f6f022431766bdd9539f75c9fb8bb278bdf9ae3637db09a0a"
+production_github_transport_completion_authorized = true
+generic_v0r3_verifier_adaptation_authorized = true
+synthetic_live_github_canary_authorized = true
+max_synthetic_live_publications = 1
+canary_used = false
+implementation_candidate_freeze_required = true
+historical_v0r3_preflight_required = true
+current_package_offline_reverification_required = true
+canary_execution_authorized_this_phase = false
+real_v1_collection_authorized = false
+real_v1_forecast_authorized = false
+real_v1_activation_authorized = false
+market_data_access_authorized = false
+held_out_outcome_access_authorized = false
+scientific_evaluation_authorized = false
+interim_metrics_authorized = false
+jigsaw_authorized = false
+state_snapshot_authorized = false
+router_authorized = false
+qnty_authorized = false
+trading_authorized = false
+promotion_authorized = false
+merge_pr89_authorized = false
+v0r3_reopened = false
+recorder_implementation_qualified = false
+implementation_authorized = false
+next_action = "Resume existing PR #89 from its preserved lineage; perform only concrete production GitHub transport completion and generic V0R3 verifier adaptation, then evaluate the conditional one-canary preconditions."
+
+[[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_PREREG_V0"
 state = "CLOSED_PASS"
 authority_level = "OUTCOME_BLIND_PREREGISTRATION_ONLY"

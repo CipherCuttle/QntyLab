@@ -12,7 +12,7 @@ used.
   capability snapshot was consulted; two candidates fail without rewriting.
 - Benchmark and screen: both finalists use fixed baselines, association
   screens, explicit materiality gates, non-overlapping origins, and frozen
-  HAC(24)/Holm treatment.
+  observation-unit HAC bandwidth/Holm treatment.
 - Evidence escalation: all authority remains false; historical PASS is only a
   fast-lane historical survivor and grants no capital or shadow authority.
 - Lineage: all six candidates remain in the trial-lineage denominator,
@@ -20,3 +20,27 @@ used.
 
 Conclusion: CLOSE PR-A. No scientific values, outcomes, coefficients,
 p-values, plots, materialization, implementation, or shadow were performed.
+
+## Targeted pre-merge re-review — PR-A contract finalization
+
+One targeted re-review was consumed after the mechanical repair. Scope was
+limited to finalist outcome semantics, materiality, HAC units and bandwidth,
+primary testing, Holm behavior, classification, result schema, blindness, and
+authority.
+
+- JFPV2_04 now binds one future cross-sectional sample-SD observation at the
+  next daily origin, with no aggregate-over-24h reinterpretation.
+- Both materiality metrics have exact formulas, domains, thresholds, and
+  invalid-domain block states.
+- HAC bandwidth is deterministic and measured in origin observations.
+- The two-sided OLS/HAC test, positive direction, Holm family size of two,
+  support/no-support/block predicates, and null handling are explicit.
+- The future result schema includes every scientific and integrity field,
+  including inconvenient blocked results.
+
+REREVIEW_CRITICAL = 0
+REREVIEW_HIGH = 0
+TARGETED_REREVIEW_USED = true
+
+No market values, features, outcomes, regressions, p-values, or execution were
+accessed. No candidate, finalist, source, or authority changed.

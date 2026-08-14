@@ -1,6 +1,28 @@
 schema_version = 1
 
 [[project]]
+project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_V2_PREREGISTRATION_V0"
+display_name = "Jigsaw fast prospective signal discovery V2 capability-compiled preregistration"
+state = "CLOSED_PASS"
+authority_level = "CAPABILITY_COMPILED_PREREGISTRATION_ONLY"
+phase_type = "CAPABILITY_COMPILED_PREREGISTRATION"
+authoritative_artifacts = [
+  "docs/ADR/0006-qntylab-research-design-philosophy.md",
+  "docs/state/projects.toml",
+  "qntylab/jigsaw_fast_prospective_signal_discovery_v2.py",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/mechanism_census.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/data_capabilities.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/capability_compile.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/contract_compile.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/trial_lineage.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/preregistration.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/hostile_review.md",
+  "tests/test_jigsaw_fast_prospective_signal_discovery_v2.py",
+]
+next_action = "FAST_LANE_V2_PR_B: materialize exact frozen inputs, implement minimal executors, validate synthetically, and freeze implementation identities."
+implementation_authorized = false
+
+[[project]]
 project_id = "JIGSAW_TERMINAL_RESEARCH_EVIDENCE_EXTRACTION_IMPLEMENTATION_V0"
 state = "CLOSED_PASS"
 authority_level = "FROZEN_BOUNDED_JIGSAW_EVIDENCE_IMPLEMENTATION_ONLY"

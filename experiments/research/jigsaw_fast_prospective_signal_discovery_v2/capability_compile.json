@@ -1,0 +1,15 @@
+{
+  "schema_version": "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_V2_CAPABILITY_COMPILE_V0",
+  "input_order": "mechanism_census_then_capability_snapshot",
+  "capability_ids": ["CAP_V2_RDS_FIXED_PANEL_OHLCV", "CAP_V2_JFP03_BTCUSDT_OHLCV"],
+  "candidates": [
+    {"candidate_id": "JFPV2_01", "source_match": "FAIL", "instrument_match": "FAIL", "field_match": "FAIL", "interval_match": "PASS", "coverage_match": "PASS", "pit_match": "FAIL", "local_bytes_match": "FAIL", "reuse_authority_match": "FAIL", "disposition": "CAPABILITY_FAIL", "rejection_reason": "Funding events are not in the reusable RDS OHLCV capability."},
+    {"candidate_id": "JFPV2_02", "source_match": "FAIL", "instrument_match": "FAIL", "field_match": "PASS", "interval_match": "UNKNOWN", "coverage_match": "UNKNOWN", "pit_match": "UNKNOWN", "local_bytes_match": "UNKNOWN", "reuse_authority_match": "FAIL", "disposition": "CAPABILITY_FAIL", "rejection_reason": "BTCUSDT source is separate evidence-only lineage; source intersection is not authorized."},
+    {"candidate_id": "JFPV2_03", "source_match": "PASS", "instrument_match": "PASS", "field_match": "PASS", "interval_match": "PASS", "coverage_match": "PASS", "pit_match": "PASS", "local_bytes_match": "PASS", "reuse_authority_match": "PASS", "disposition": "CAPABILITY_PASS", "rejection_reason": null},
+    {"candidate_id": "JFPV2_04", "source_match": "PASS", "instrument_match": "PASS", "field_match": "PASS", "interval_match": "PASS", "coverage_match": "PASS", "pit_match": "PASS", "local_bytes_match": "PASS", "reuse_authority_match": "PASS", "disposition": "CAPABILITY_PASS", "rejection_reason": null},
+    {"candidate_id": "JFPV2_05", "source_match": "PASS", "instrument_match": "PASS", "field_match": "PASS", "interval_match": "PASS", "coverage_match": "PASS", "pit_match": "PASS", "local_bytes_match": "PASS", "reuse_authority_match": "PASS", "disposition": "CAPABILITY_PASS", "rejection_reason": null},
+    {"candidate_id": "JFPV2_06", "source_match": "PASS", "instrument_match": "PASS", "field_match": "PASS", "interval_match": "PASS", "coverage_match": "PASS", "pit_match": "PASS", "coverage_intersection": "PASS", "local_bytes_match": "PASS", "reuse_authority_match": "PASS", "disposition": "CAPABILITY_PASS", "rejection_reason": null}
+  ],
+  "window_policy": {"selection_class": "AVAILABILITY_CONDITIONED_HISTORICAL_SCREEN", "decision_window": "2023-10-20T00:00:00Z through 2025-06-18T23:00:00Z", "derivation": "RDS coverage minus 24h warmup and 24h future tail; no value inspection"},
+  "source_substitution": false
+}

@@ -221,9 +221,13 @@ literature / mechanism / exploration
         ->
 bounded candidate census
         ->
+non-outcome data-capability compile
+        ->
+scientific-contract compile
+        ->
 preregistration
         ->
-first-party input qualification
+materialization / implementation
         ->
 one-shot historical falsification
         ->
@@ -235,6 +239,14 @@ prediction-first zero-capital prospective observation
         ->
 prospective evidence incorporation
 ```
+
+For the fast lane, data-capability metadata may be inspected before
+preregistration. This is limited to instruments, fields, source identity,
+coverage, interval, timestamp semantics, point-in-time semantics, existing
+immutable digests, and local-byte/reuse availability. It must not include
+returns, feature values, outcome values, correlations, coefficients, charts,
+regressions, p-values, or other scientific relationships. Feasibility
+information is not scientific outcome information.
 
 The system should be **fast to produce new information**, not fast to manufacture confidence.
 

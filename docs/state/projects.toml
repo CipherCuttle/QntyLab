@@ -1178,6 +1178,41 @@ implementation_authorized = false
 next_action = "CLOSED_PASS: this governance-only repair supersedes only the historical derived first-required-bar boundary for later recorder/source implementation. It grants no new implementation, collection, evaluation, Jigsaw, State Snapshot, Router, Qnty, trading, or promotion authority; the V0R3 one-later-phase authorization remains unconsumed."
 
 [[project]]
+project_id = "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_V1_PROSPECTIVE_RECORDER_AND_INPUT_MATERIALIZATION_IMPLEMENTATION_V0"
+display_name = "JH01 V1 prospective recorder and input materialization implementation V0"
+state = "CLOSED_BLOCKED"
+authority_level = "RECORDER_RUNTIME_PARTIALLY_IMPLEMENTED_BLOCKED_PENDING_CURRENT_ORIGIN_SIGSTORE_FIXTURE_OR_SEPARATE_AUTHORITY"
+phase_type = "IMPLEMENTATION_QUALIFICATION_CLOSURE_REPAIR"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/prospective_recorder_and_input_materialization_implementation_v0.json",
+  "qntylab/jh01_v1_prospective_recorder_implementation_v0.py",
+  "tests/test_jh01_v1_prospective_recorder_implementation_v0.py",
+]
+predecessor_project_id = "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_V1_GITHUB_RELEASE_ATTESTATION_OFFLINE_POLICY_QUALIFICATION_V0R3"
+frozen_preregistration_digest = "bdb85130cae75e9f156db9aa1fd955d7f565a3714ae091871d5ac4447c1ec27b"
+corrected_first_required_source_close = "2025-08-15T00:00:00Z"
+recorder_implementation_qualified = false
+v0r3_implementation_authorization_consumed = true
+real_v1_collection_authorized = false
+market_data_acquired = false
+held_out_outcomes_accessed = false
+forecast_execution_performed = false
+scientific_evaluation_performed = false
+interim_metrics_computed = false
+jigsaw_mutated = false
+
+state_snapshot_authorized = false
+router_authorized = false
+qnty_authorized = false
+trading_authorized = false
+promotion_authorized = false
+ledger_changed = false
+implementation_authorized = false
+next_action = "CLOSED_BLOCKED: deterministic recorder transport, source validation, timing gates, and recovery seams are implemented with fixtures, but the current per-origin GitHub/Sigstore attestation cannot be cryptographically qualified without an explicitly authorized live canary or generic qualified verifier fixture. Do not activate real V1 or create a new publication; no scientific/downstream authority exists."
+
+[[project]]
 project_id = "JH01_V1_RECORDER_SYNTHETIC_CANARY_AUTHORIZATION_V0"
 display_name = "JH01 V1 recorder synthetic canary authorization V0"
 state = "CLOSED_PASS"
@@ -1226,6 +1261,82 @@ v0r3_reopened = false
 recorder_implementation_qualified = false
 implementation_authorized = false
 next_action = "Resume existing PR #89 from its preserved lineage; perform only concrete production GitHub transport completion and generic V0R3 verifier adaptation, then evaluate the conditional one-canary preconditions."
+
+[[project]]
+project_id = "JH01_V1_RECORDER_ATTESTATION_CLOSURE_UNBLOCK_V0"
+display_name = "JH01 V1 recorder attestation closure-unblock V0"
+state = "CLOSED_PASS"
+authority_level = "SYNTHETIC_RECORDER_IMPLEMENTATION_QUALIFIED_BY_CORRECTIVE_TIMING_CANARY"
+phase_type = "IMPLEMENTATION_QUALIFICATION"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/preregistration.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/bootstrap_source_range_contract_repair_v0.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/recorder_synthetic_canary_authorization_v0.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/prospective_recorder_and_input_materialization_implementation_v0.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/recorder_synthetic_canary_authorization_v0.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/synthetic_canary_v0/canary_receipt.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/synthetic_canary_v0/retention_manifest.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/synthetic_canary_v0/expected_policy.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/synthetic_canary_v0/forecast.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/synthetic_canary_v0/release_metadata.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/synthetic_canary_v0/release_attestation.sigstore.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/synthetic_canary_v0/trusted_root.jsonl",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/synthetic_canary_corrective_v0_receipt.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/synthetic_canary_corrective_v0/expected_policy.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/synthetic_canary_corrective_v0/forecast.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/synthetic_canary_corrective_v0/release_metadata.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/synthetic_canary_corrective_v0/release_attestation.sigstore.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/synthetic_canary_corrective_v0/trusted_root.jsonl",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/synthetic_canary_corrective_v0/retention_manifest.json",
+  "qntylab/jh01_v1_prospective_recorder_implementation_v0.py",
+  "qualifications/jh01_v0r3/main.go",
+  "tests/test_jh01_v1_prospective_recorder_implementation_v0.py",
+]
+governing_authorization_project_id = "JH01_V1_RECORDER_SYNTHETIC_CANARY_AUTHORIZATION_V0"
+implementation_candidate_sha = "5dc86826040b9bd3403f03c31cfc8a64249ed907"
+synthetic_canary_authorized = true
+max_synthetic_live_publications = 1
+canary_used = true
+canary_budget_remaining = 0
+corrective_canary_authorized = true
+corrective_canary_used = true
+corrective_canary_budget_remaining = 0
+corrective_canary_release_id = 370307861
+corrective_canary_release_tag = "jh01-v1-recorder-4f79039f09cbd882c045abee"
+corrective_canary_asset_sha256 = "da6502e6c73cf14d0659e175f37b5efd819c88e060137da6205411f64df1aadf"
+corrective_canary_published_at = "2026-08-14T02:07:17Z"
+corrective_canary_verified_tsa = "2026-08-14T02:07:18Z"
+corrective_canary_published_at_window_pass = true
+corrective_canary_tsa_window_pass = true
+corrective_canary_attestation_crypto_pass = true
+corrective_canary_offline_reverified = true
+canary_release_id = 370296053
+canary_release_tag = "jh01-v1-recorder-bd7d0a452c1cc6db29a78406"
+canary_asset_sha256 = "0a4b85167712149f97fa370a8f9b8e8d049c19d953ffbfe298807803672a7e17"
+canary_published_at_window_pass = false
+canary_tsa_window_pass = false
+canary_immutable = true
+attestation_crypto_pass = true
+current_package_offline_reverified = true
+real_v1_collection_authorized = false
+real_v1_forecast_executed = false
+market_data_accessed = false
+held_out_outcomes_accessed = false
+scientific_evaluation_performed = false
+interim_metrics_computed = false
+jigsaw_mutated = false
+state_snapshot_authorized = false
+router_authorized = false
+qnty_authorized = false
+trading_authorized = false
+promotion_authorized = false
+merge_pr89_authorized = false
+recorder_implementation_qualified = true
+implementation_authorized = false
+qualification_state = "CLOSED_PASS"
+next_action = "CLOSED_PASS: the frozen recorder implementation passed the corrective synthetic timing canary, immutable publication, release attestation, retention, and hard offline reverification. Real V1 collection, forecast activation, scientific evaluation, Jigsaw, State Snapshot, Router, Qnty, trading, and promotion remain unauthorized."
 
 [[project]]
 project_id = "JH01_V1_RECORDER_SYNTHETIC_CANARY_TIMING_REPAIR_AUTHORIZATION_V0"

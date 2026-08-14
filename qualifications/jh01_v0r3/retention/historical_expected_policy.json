@@ -1,0 +1,15 @@
+{
+  "repository": "CipherCuttle/QntyLab",
+  "repository_id": "1317911390",
+  "owner_id": "97258089",
+  "release_id": "370208366",
+  "tag": "qntylab-jh01-v1-persistence-qualification-v0r1-7ad471c",
+  "purl": "pkg:github/CipherCuttle/QntyLab@qntylab-jh01-v1-persistence-qualification-v0r1-7ad471c",
+  "package_id": "1317911390",
+  "target_commit": "7ad471c82c9fa6aef0432f6999e0fce0649d2c55",
+  "asset_name": "github_immutable_release_qualification_v0r1.synthetic.json",
+  "asset_sha256": "191dfe3693a1e10f6efa8a385ca4c86953798d7e27a6f8e0c08dcbefc99ee4a7",
+  "predicate_type": "https://in-toto.io/attestation/release/v0.2",
+  "signer_uri": "https://dotcom.releases.github.com",
+  "tsa_timestamp": "2026-08-13T20:55:02Z"
+}

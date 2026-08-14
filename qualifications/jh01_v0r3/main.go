@@ -13,16 +13,50 @@ import (
 	"strings"
 )
 
-type Policy struct{ Repository, RepositoryID, OwnerID, ReleaseID, Tag, PURL, PackageID, TargetCommit, AssetName, AssetSHA256, PredicateType, SignerURI, TSATimestamp string }
+type Policy struct {
+	Repository    string `json:"repository"`
+	RepositoryID  string `json:"repository_id"`
+	OwnerID       string `json:"owner_id"`
+	ReleaseID     string `json:"release_id"`
+	Tag           string `json:"tag"`
+	PURL          string `json:"purl"`
+	PackageID     string `json:"package_id"`
+	TargetCommit  string `json:"target_commit"`
+	AssetName     string `json:"asset_name"`
+	AssetSHA256   string `json:"asset_sha256"`
+	PredicateType string `json:"predicate_type"`
+	SignerURI     string `json:"signer_uri"`
+	TSATimestamp  string `json:"tsa_timestamp"`
+}
 
 var frozen = Policy{"CipherCuttle/QntyLab", "1317911390", "97258089", "370208366", "qntylab-jh01-v1-persistence-qualification-v0r1-7ad471c", "pkg:github/CipherCuttle/QntyLab@qntylab-jh01-v1-persistence-qualification-v0r1-7ad471c", "1317911390", "7ad471c82c9fa6aef0432f6999e0fce0649d2c55", "github_immutable_release_qualification_v0r1.synthetic.json", "191dfe3693a1e10f6efa8a385ca4c86953798d7e27a6f8e0c08dcbefc99ee4a7", "https://in-toto.io/attestation/release/v0.2", "https://dotcom.releases.github.com", "2026-08-13T20:55:02Z"}
 
 func die(s string) { fmt.Fprintln(os.Stderr, "POLICY_REJECTED:", s); os.Exit(1) }
+func loadPolicy(path string) Policy {
+	contents, err := os.ReadFile(path)
+	if err != nil {
+		die("expected policy: " + err.Error())
+	}
+	var policy Policy
+	if err := json.Unmarshal(contents, &policy); err != nil {
+		die("expected policy JSON: " + err.Error())
+	}
+	for name, value := range map[string]string{"repository": policy.Repository, "tag": policy.Tag, "target_commit": policy.TargetCommit, "asset_name": policy.AssetName, "asset_sha256": policy.AssetSHA256, "predicate_type": policy.PredicateType, "signer_uri": policy.SignerURI} {
+		if value == "" {
+			die("malformed expected policy: missing " + name)
+		}
+	}
+	return policy
+}
 func main() {
-	if len(os.Args) != 4 {
-		die("usage: ASSET ROOT_JSONL BUNDLE_JSON")
+	if len(os.Args) != 4 && len(os.Args) != 5 {
+		die("usage: ASSET ROOT_JSONL BUNDLE_JSON [EXPECTED_POLICY_JSON]")
 	}
 	asset, rootFile, bundleFile := os.Args[1], os.Args[2], os.Args[3]
+	policy := frozen
+	if len(os.Args) == 5 {
+		policy = loadPolicy(os.Args[4])
+	}
 	rb, e := os.ReadFile(rootFile)
 	if e != nil {
 		die(e.Error())
@@ -53,15 +87,15 @@ func main() {
 	if e != nil {
 		die("stage A crypto: " + e.Error())
 	}
-	if result.Signature == nil || result.Signature.Certificate == nil || result.Signature.Certificate.SubjectAlternativeName != frozen.SignerURI {
+	if result.Signature == nil || result.Signature.Certificate == nil || result.Signature.Certificate.SubjectAlternativeName != policy.SignerURI {
 		die("signer URI")
 	}
-	if len(result.VerifiedTimestamps) != 1 || result.VerifiedTimestamps[0].Type != "TimestampAuthority" || result.VerifiedTimestamps[0].Timestamp.UTC().Format("2006-01-02T15:04:05Z") != frozen.TSATimestamp {
+	if len(result.VerifiedTimestamps) != 1 || result.VerifiedTimestamps[0].Type != "TimestampAuthority" || (policy.TSATimestamp != "" && result.VerifiedTimestamps[0].Timestamp.UTC().Format("2006-01-02T15:04:05Z") != policy.TSATimestamp) {
 		die("verified TSA timestamp")
 	}
 	// Stage B: the statement belongs to the successfully verified DSSE envelope.
 	s := result.Statement
-	if s == nil || s.Type != "https://in-toto.io/Statement/v1" || s.PredicateType != frozen.PredicateType {
+	if s == nil || s.Type != "https://in-toto.io/Statement/v1" || s.PredicateType != policy.PredicateType {
 		die("statement type")
 	}
 	raw, e := json.Marshal(s.Predicate)
@@ -72,21 +106,24 @@ func main() {
 	if e = json.Unmarshal(raw, &p); e != nil {
 		die("predicate schema")
 	}
-	for k, w := range map[string]string{"repository": frozen.Repository, "repositoryId": frozen.RepositoryID, "ownerId": frozen.OwnerID, "databaseId": frozen.ReleaseID, "tag": frozen.Tag, "purl": frozen.PURL, "packageId": frozen.PackageID} {
+	for k, w := range map[string]string{"repository": policy.Repository, "repositoryId": policy.RepositoryID, "ownerId": policy.OwnerID, "databaseId": policy.ReleaseID, "tag": policy.Tag, "purl": policy.PURL, "packageId": policy.PackageID} {
+		if w == "" {
+			continue
+		}
 		if p[k] != w {
 			die("signed " + k)
 		}
 	}
 	commit, assetSubject := 0, 0
 	for _, x := range s.Subject {
-		if x.GetName() == frozen.AssetName {
-			if x.GetDigest()["sha256"] != frozen.AssetSHA256 {
+		if x.GetName() == policy.AssetName {
+			if x.GetDigest()["sha256"] != policy.AssetSHA256 {
 				die("asset subject digest")
 			}
 			assetSubject++
 		}
-		if x.GetUri() == frozen.PURL {
-			if x.GetDigest()["sha1"] != frozen.TargetCommit {
+		if policy.PURL != "" && x.GetUri() == policy.PURL {
+			if x.GetDigest()["sha1"] != policy.TargetCommit {
 				die("commit subject digest")
 			}
 			commit++
@@ -100,8 +137,9 @@ func main() {
 		die(e.Error())
 	}
 	sum := sha256.Sum256(bytes)
-	if hex.EncodeToString(sum[:]) != frozen.AssetSHA256 {
+	if hex.EncodeToString(sum[:]) != policy.AssetSHA256 {
 		die("local asset hash")
 	}
-	fmt.Println(`{"stage_a":"PASS","stage_b":"PASS","signer":"https://dotcom.releases.github.com","tsa":"2026-08-13T20:55:02Z"}`)
+	verifiedTSA := result.VerifiedTimestamps[0].Timestamp.UTC().Format("2006-01-02T15:04:05Z")
+	fmt.Printf(`{"stage_a":"PASS","stage_b":"PASS","signer":%q,"tsa":%q}`+"\n", policy.SignerURI, verifiedTSA)
 }

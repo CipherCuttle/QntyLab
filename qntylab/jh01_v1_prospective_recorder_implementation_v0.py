@@ -565,7 +565,8 @@ class PublicationRuntime:
                 release = self._existing(expected)
                 if release is None:  # One identical-request transient retry only.
                     release = self.transport.create(expected)
-        if release.artifact_digest != expected.artifact_digest:
+        draft_without_asset = release.published_at is None and release.asset_sha256 is None and release.artifact_digest == ""
+        if release.artifact_digest != expected.artifact_digest and not draft_without_asset:
             raise RecorderBlocked("different-digest release created")
         if release.asset_sha256 is None:
             try:

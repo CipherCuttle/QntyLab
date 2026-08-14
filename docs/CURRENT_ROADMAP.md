@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- None.
+- `JFPV3 PR-B R2 activation persistence and forward runner implementation authorization` — `ACTIVE`. After this governance authority is canonicalized, start a fresh R2 implementation worktree from the new canonical master; recreate or reapply R2 under this authority, independently verify it, and require a separate later activation authority after R2 canonicalization.
 
 ## Queued — not authorized
 

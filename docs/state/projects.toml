@@ -1416,6 +1416,50 @@ implementation_authorized = false
 next_action = "Merge this corrective governance PR through a separate explicitly authorized merge-only phase; only after canonicalization may one current-hour corrective timing canary be considered."
 
 [[project]]
+project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_V1_INPUT_MATERIALIZATION_AUTHORIZATION_V0"
+state = "CLOSED_BLOCKED"
+authority_level = "INPUT_FEASIBILITY_ONLY_NO_MATERIALIZATION"
+authoritative_artifacts = [
+  "docs/forensics/RESEARCH_DATA_SPINE_V0_CONTRACT.md",
+  "docs/forensics/RESEARCH_DATA_SPINE_V0_CLOSURE.md",
+  "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_certificate_v1.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v1/preregistration.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v1/candidate_census.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v1/pre_merge_repair_v0.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v1/input_feasibility_v0.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v1/input_feasibility_hostile_review_v0.md",
+  "qntylab/jigsaw_fast_prospective_signal_discovery_input_feasibility_v0.py",
+  "tests/test_jigsaw_fast_prospective_signal_discovery_input_feasibility_v0.py",
+]
+phase_type = "INPUT_FEASIBILITY_ONLY"
+implementation_authorized = false
+canonical_preregistration_digest = "6e4f399fad567e126e991c2aab65cd7e41859905830a6606f7b34f9b97e7a3b9"
+authorized_source_snapshot_id = "rds-v0-c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac"
+authorized_source_snapshot_digest = "c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac"
+authorized_finalist_ids = ["JFPV1_02", "JFPV1_03", "JFPV1_04", "JFPV1_05", "JFPV1_10"]
+exploratory_candidate_count = 10
+confirmatory_family_size = 5
+ready_finalist_count = 0
+authorization_digest = "a6aa0d3165ed19a9ae53abf0c9e6d1d350cfe3512a6979559fc8f3223d412957"
+input_materialization_execution_authorized = false
+materialization_implementation_authorized = false
+new_source_acquisition_authorized = false
+external_network_data_acquisition_authorized = false
+scientific_execution_authorized = false
+feature_estimation_for_science_authorized = false
+outcome_estimation_for_science_authorized = false
+regression_authorized = false
+p_values_authorized = false
+shadow_authorized = false
+state_snapshot_authorized = false
+router_authorized = false
+qnty_authorized = false
+trading_authorized = false
+promotion_authorized = false
+capital_authority = "NONE"
+next_action = "No materialization execution is authorized. A future phase may reconsider the source contract or a new separately preregistered design; no source hunt or finalist rescue is authorized here."
+
+[[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_V1_PREREGISTRATION"
 state = "CLOSED_PASS"
 authority_level = "OUTCOME_BLIND_PREREGISTRATION_ONLY"

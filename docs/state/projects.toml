@@ -23,6 +23,29 @@ next_action = "FAST_LANE_V2_PR_B: materialize exact frozen inputs, implement min
 implementation_authorized = false
 
 [[project]]
+project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_V2_IMPLEMENTATION_FREEZE_V0"
+display_name = "Jigsaw fast prospective signal discovery V2 PR-B implementation freeze"
+state = "ACTIVE"
+authority_level = "SOURCE_BOUND_IMPLEMENTATION_FREEZE_ONLY"
+phase_type = "SOURCE_BOUND_IMPLEMENTATION_FREEZE"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "qntylab/jfp_v2_pr_b.py",
+  "tests/test_jfp_v2_pr_b.py",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/preregistration.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/contract_compile.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/data_capabilities.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/implementation_v0/implementation_authority.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/implementation_v0/source_binding.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/implementation_v0/input_integrity.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/implementation_v0/origin_schedule.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/implementation_v0/execution_semantics_v0.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/implementation_v0/synthetic_validation.json",
+]
+implementation_authorized = true
+next_action = "Complete the bounded synthetic validation, freeze the implementation candidate, and perform one hostile implementation review."
+
+[[project]]
 project_id = "JIGSAW_TERMINAL_RESEARCH_EVIDENCE_EXTRACTION_IMPLEMENTATION_V0"
 state = "CLOSED_PASS"
 authority_level = "FROZEN_BOUNDED_JIGSAW_EVIDENCE_IMPLEMENTATION_ONLY"

@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- None.
+- `Jigsaw fast prospective signal discovery V2 PR-B implementation freeze` — `ACTIVE`. Complete the bounded synthetic validation, freeze the implementation candidate, and perform one hostile implementation review.
 
 ## Queued — not authorized
 

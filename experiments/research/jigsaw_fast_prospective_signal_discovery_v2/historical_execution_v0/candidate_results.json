@@ -1,0 +1,400 @@
+[
+  {
+    "beta_candidate": -0.007016474803559283,
+    "block_reason": null,
+    "blocked_origin_count": 0,
+    "candidate_id": "JFPV2_04",
+    "classification": "HISTORICAL_SCREEN_NO_SUPPORT",
+    "eligible_origin_count": 608,
+    "execution_integrity": {
+      "execution_semantics_digest": "f3c50c7fd8d34efdaff37582cfd733c00c14c4aeb065c6ad138eb8d00ac174c6",
+      "implementation_source_digest": "379f9655bfb9b007da839656c99ffd34f6e72116f0ab82d0a639949742788118",
+      "origin_schedule_digest": "73859b2ece7a81a1d9f4a24dfb996b21c4427f1b1449d31553541eef66c2d040"
+    },
+    "frozen_contract_digest": "54e29bb48b208566b826f0804dadb01634dd010adb4739a65140a5b23066be65",
+    "frozen_implementation_sha": "5084df5f6aa3f469f2f2844972745703849abe30",
+    "frozen_preregistration_digest": "ba5960c07cbbb76187d4877ad074df88a43c3f8664c3e5026c533c8f8d40f07d",
+    "frozen_source_capability_digest": "926d23b8df11b4014c2465ff6b83b5afb25a2444fd584e549b1224fe9df69618",
+    "hac_maxlag": 5,
+    "hac_standard_error": 0.0031484666579838214,
+    "holm_adjusted_p": 0.038711742964217075,
+    "input_integrity": {
+      "network_market_data_used": false,
+      "panel": [
+        "ALICEUSDT",
+        "APEUSDT",
+        "API3USDT",
+        "APTUSDT",
+        "BCHUSDT",
+        "CHRUSDT",
+        "CHZUSDT",
+        "ETCUSDT",
+        "GMTUSDT",
+        "INJUSDT",
+        "LDOUSDT",
+        "LINKUSDT",
+        "LTCUSDT",
+        "ONEUSDT",
+        "OPUSDT",
+        "REEFUSDT",
+        "SANDUSDT",
+        "TRXUSDT",
+        "XLMUSDT",
+        "XRPUSDT"
+      ],
+      "panel_size": 20,
+      "partition_checks": [
+        {
+          "byte_sha256": "6a91785e6facb822436f6a1b4fba5939615c2567cdfef065b53d2822b88f0a97",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "ALICEUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "6506766694759a8e9709887c6309e4ed2f588a89588813065d963601103022e6",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "APEUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "fa8a402de956b5ed6c4c20fc7c857fdb823119c3b86e6056039c8a97434fa927",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "API3USDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "0ab6cbd4bba308a70b5b6a55ef2c1887414f4dcf8f3a591ab5fdae1505ed4685",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "APTUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "76b430642c6a641c44076a93b0705fcdda5a6b12791a035c5487d45d673bee17",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "BCHUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "089ec6d4a61cbbf3e57d29f4e57c20a9a29c54a3f01ffd49f45ac01cb2160d6a",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "CHRUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "bc0e872c8e0be6a4a10693c0cffdbd7ddfabe698cdddceadb41440cf665b5adf",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "CHZUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "a6459413d0e5cf25125517f8abb280057c3eb42dc45139a2a2d52b931efb5c62",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "ETCUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "0a962075c8171718ff7756ea24d1f4845025cd6396e3a412a315831e9738f179",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "GMTUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "93aec0c28e40cc2871345a5c677857177d378f8af0fa36040df18d9e8af13200",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "INJUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "f54f8476c43e552bc9d03292462f5b77f5160ee828d8e0ac2c655e9c19859051",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "LDOUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "3e4eab0f29da807080c66759d1f72112ea5799b9757a11c95daab6f6b759ec57",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "LINKUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "c74abbf1d9f8543684eb1c80e7ed7f52ae5ff9767e1f0a3ed40cd152ecea8f0b",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "LTCUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "c8783604bd1b59a32ede552559023bfa53f30011d15d0fc0af8cd85137810f7a",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "ONEUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "b0c6dad2b8f79a368757724d0efdcce6f78dccb14238807c6cd1ed99bbf72f2b",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "OPUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "4db9f2a4b3d491e35297c6700020ff2a64a4982fa573423f7f3b104f03bbd645",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "REEFUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "ac5e2e73b8fb12e169c9e27d045aed7ddd3a6ee436a71f2d7d84857150172884",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "SANDUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "fdec5056dc09ec05f45f657941eeb1759745805ce9cbf38fda2743269d0a24d9",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "TRXUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "9bcda81c7fc4bd328b3dbf023461bc3f868ac077f48b83b761d2ee7b5c4dbe1a",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "XLMUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "b44d3d4d098b89308e33678ed2a7de358ed3aa33c531c40d98c0e5405b8ef7f0",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "XRPUSDT",
+          "timestamp_pass": true
+        }
+      ],
+      "source_binding_pass": true,
+      "source_identity": "rds-v0-c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac",
+      "source_integrity_pass": true,
+      "source_snapshot_digest": "c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac",
+      "source_substitution": false
+    },
+    "materiality_gate": 0.01,
+    "materiality_metric_name": "STANDARDIZED_BETA",
+    "materiality_metric_value": -0.11631091922379917,
+    "materiality_pass": false,
+    "observed_beta_sign": "NEGATIVE",
+    "raw_p_two_sided": 0.02584471918340378
+  },
+  {
+    "beta_candidate": 0.0630749945081035,
+    "block_reason": null,
+    "blocked_origin_count": 0,
+    "candidate_id": "JFPV2_06",
+    "classification": "HISTORICAL_SCREEN_SUPPORT",
+    "eligible_origin_count": 608,
+    "execution_integrity": {
+      "execution_semantics_digest": "f3c50c7fd8d34efdaff37582cfd733c00c14c4aeb065c6ad138eb8d00ac174c6",
+      "implementation_source_digest": "379f9655bfb9b007da839656c99ffd34f6e72116f0ab82d0a639949742788118",
+      "origin_schedule_digest": "73859b2ece7a81a1d9f4a24dfb996b21c4427f1b1449d31553541eef66c2d040"
+    },
+    "frozen_contract_digest": "54e29bb48b208566b826f0804dadb01634dd010adb4739a65140a5b23066be65",
+    "frozen_implementation_sha": "5084df5f6aa3f469f2f2844972745703849abe30",
+    "frozen_preregistration_digest": "ba5960c07cbbb76187d4877ad074df88a43c3f8664c3e5026c533c8f8d40f07d",
+    "frozen_source_capability_digest": "926d23b8df11b4014c2465ff6b83b5afb25a2444fd584e549b1224fe9df69618",
+    "hac_maxlag": 5,
+    "hac_standard_error": 0.0269712016575752,
+    "holm_adjusted_p": 0.038711742964217075,
+    "input_integrity": {
+      "network_market_data_used": false,
+      "panel": [
+        "ALICEUSDT",
+        "APEUSDT",
+        "API3USDT",
+        "APTUSDT",
+        "BCHUSDT",
+        "CHRUSDT",
+        "CHZUSDT",
+        "ETCUSDT",
+        "GMTUSDT",
+        "INJUSDT",
+        "LDOUSDT",
+        "LINKUSDT",
+        "LTCUSDT",
+        "ONEUSDT",
+        "OPUSDT",
+        "REEFUSDT",
+        "SANDUSDT",
+        "TRXUSDT",
+        "XLMUSDT",
+        "XRPUSDT"
+      ],
+      "panel_size": 20,
+      "partition_checks": [
+        {
+          "byte_sha256": "6a91785e6facb822436f6a1b4fba5939615c2567cdfef065b53d2822b88f0a97",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "ALICEUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "6506766694759a8e9709887c6309e4ed2f588a89588813065d963601103022e6",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "APEUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "fa8a402de956b5ed6c4c20fc7c857fdb823119c3b86e6056039c8a97434fa927",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "API3USDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "0ab6cbd4bba308a70b5b6a55ef2c1887414f4dcf8f3a591ab5fdae1505ed4685",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "APTUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "76b430642c6a641c44076a93b0705fcdda5a6b12791a035c5487d45d673bee17",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "BCHUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "089ec6d4a61cbbf3e57d29f4e57c20a9a29c54a3f01ffd49f45ac01cb2160d6a",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "CHRUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "bc0e872c8e0be6a4a10693c0cffdbd7ddfabe698cdddceadb41440cf665b5adf",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "CHZUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "a6459413d0e5cf25125517f8abb280057c3eb42dc45139a2a2d52b931efb5c62",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "ETCUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "0a962075c8171718ff7756ea24d1f4845025cd6396e3a412a315831e9738f179",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "GMTUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "93aec0c28e40cc2871345a5c677857177d378f8af0fa36040df18d9e8af13200",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "INJUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "f54f8476c43e552bc9d03292462f5b77f5160ee828d8e0ac2c655e9c19859051",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "LDOUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "3e4eab0f29da807080c66759d1f72112ea5799b9757a11c95daab6f6b759ec57",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "LINKUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "c74abbf1d9f8543684eb1c80e7ed7f52ae5ff9767e1f0a3ed40cd152ecea8f0b",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "LTCUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "c8783604bd1b59a32ede552559023bfa53f30011d15d0fc0af8cd85137810f7a",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "ONEUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "b0c6dad2b8f79a368757724d0efdcce6f78dccb14238807c6cd1ed99bbf72f2b",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "OPUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "4db9f2a4b3d491e35297c6700020ff2a64a4982fa573423f7f3b104f03bbd645",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "REEFUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "ac5e2e73b8fb12e169c9e27d045aed7ddd3a6ee436a71f2d7d84857150172884",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "SANDUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "fdec5056dc09ec05f45f657941eeb1759745805ce9cbf38fda2743269d0a24d9",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "TRXUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "9bcda81c7fc4bd328b3dbf023461bc3f868ac077f48b83b761d2ee7b5c4dbe1a",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "XLMUSDT",
+          "timestamp_pass": true
+        },
+        {
+          "byte_sha256": "b44d3d4d098b89308e33678ed2a7de358ed3aa33c531c40d98c0e5405b8ef7f0",
+          "identity_pass": true,
+          "row_count": 14641,
+          "symbol": "XRPUSDT",
+          "timestamp_pass": true
+        }
+      ],
+      "source_binding_pass": true,
+      "source_identity": "rds-v0-c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac",
+      "source_integrity_pass": true,
+      "source_snapshot_digest": "c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac",
+      "source_substitution": false
+    },
+    "materiality_gate": 0.001,
+    "materiality_metric_name": "PARTIAL_R2",
+    "materiality_metric_value": 0.01789641124797724,
+    "materiality_pass": true,
+    "observed_beta_sign": "POSITIVE",
+    "raw_p_two_sided": 0.019355871482108537
+  }
+]

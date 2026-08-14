@@ -1,0 +1,8 @@
+{
+  "artifact_type": "JFPV2_PR_C_EXECUTION_RECEIPT",
+  "determinism_claim": "exact frozen computation; no alternate specification",
+  "deterministic_execution_digest": "ee674b14012636fb5f8221818c11bf9fd54adbcade9e953a65f9cf6a32ea33c2",
+  "real_historical_execution_lineages": 1,
+  "real_historical_execution_performed": true,
+  "result_digest": "dbbd529cadcfc0ffb3124eab7044c9c7b82083e0890911a18ac767745a67461a"
+}

@@ -1263,6 +1263,62 @@ implementation_authorized = false
 next_action = "Resume existing PR #89 from its preserved lineage; perform only concrete production GitHub transport completion and generic V0R3 verifier adaptation, then evaluate the conditional one-canary preconditions."
 
 [[project]]
+project_id = "JH01_V1_RECORDER_ATTESTATION_CLOSURE_UNBLOCK_V0"
+display_name = "JH01 V1 recorder attestation closure-unblock V0"
+state = "CLOSED_BLOCKED"
+authority_level = "SYNTHETIC_RECORDER_ATTESTATION_QUALIFICATION_BLOCKED_TIMING_WINDOW"
+phase_type = "IMPLEMENTATION_QUALIFICATION"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/preregistration.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/bootstrap_source_range_contract_repair_v0.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/recorder_synthetic_canary_authorization_v0.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/prospective_recorder_and_input_materialization_implementation_v0.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/recorder_synthetic_canary_authorization_v0.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/synthetic_canary_v0/canary_receipt.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/synthetic_canary_v0/retention_manifest.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/synthetic_canary_v0/expected_policy.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/synthetic_canary_v0/forecast.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/synthetic_canary_v0/release_metadata.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/synthetic_canary_v0/release_attestation.sigstore.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/synthetic_canary_v0/trusted_root.jsonl",
+  "qntylab/jh01_v1_prospective_recorder_implementation_v0.py",
+  "qualifications/jh01_v0r3/main.go",
+  "tests/test_jh01_v1_prospective_recorder_implementation_v0.py",
+]
+governing_authorization_project_id = "JH01_V1_RECORDER_SYNTHETIC_CANARY_AUTHORIZATION_V0"
+implementation_candidate_sha = "5dc86826040b9bd3403f03c31cfc8a64249ed907"
+synthetic_canary_authorized = true
+max_synthetic_live_publications = 1
+canary_used = true
+canary_budget_remaining = 0
+canary_release_id = 370296053
+canary_release_tag = "jh01-v1-recorder-bd7d0a452c1cc6db29a78406"
+canary_asset_sha256 = "0a4b85167712149f97fa370a8f9b8e8d049c19d953ffbfe298807803672a7e17"
+canary_published_at_window_pass = false
+canary_tsa_window_pass = false
+canary_immutable = true
+attestation_crypto_pass = true
+current_package_offline_reverified = true
+real_v1_collection_authorized = false
+real_v1_forecast_executed = false
+market_data_accessed = false
+held_out_outcomes_accessed = false
+scientific_evaluation_performed = false
+interim_metrics_computed = false
+jigsaw_mutated = false
+state_snapshot_authorized = false
+router_authorized = false
+qnty_authorized = false
+trading_authorized = false
+promotion_authorized = false
+merge_pr89_authorized = false
+recorder_implementation_qualified = false
+implementation_authorized = false
+next_action = "CLOSED_BLOCKED: the sole synthetic immutable release was retained and cryptographically/offline verified, but authoritative GitHub published_at and verified TSA timestamps were outside the required synthetic origin window. No second canary, repair publication, real V1 collection, scientific evaluation, or PR #89 merge is authorized."
+
+[[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_PREREG_V0"
 state = "CLOSED_PASS"
 authority_level = "OUTCOME_BLIND_PREREGISTRATION_ONLY"

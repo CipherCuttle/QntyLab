@@ -1,0 +1,20 @@
+{
+  "artifact_type": "JFPV2_PR_B_IMPLEMENTATION_MANIFEST",
+  "candidate_a_sha": "5084df5f6aa3f469f2f2844972745703849abe30",
+  "final_implementation_sha": "5084df5f6aa3f469f2f2844972745703849abe30",
+  "implementation_source_paths": ["qntylab/jfp_v2_pr_b.py"],
+  "implementation_source_digests": {
+    "qntylab/jfp_v2_pr_b.py": "379f9655bfb9b007da839656c99ffd34f6e72116f0ab82d0a639949742788118"
+  },
+  "runtime": {"python": "3.14.4", "polars": "1.32.3"},
+  "hostile_review_count": 1,
+  "hostile_review_critical": 0,
+  "hostile_review_high": 0,
+  "critical_high_repair_required": false,
+  "candidate_b_sha": null,
+  "targeted_rereview_used": false,
+  "result_schema_frozen": true,
+  "synthetic_run_1_digest": "e3b921306b72123b3f070318adee0aa692f63e10c39d201d3ced1f78f17da67b",
+  "synthetic_run_2_digest": "e3b921306b72123b3f070318adee0aa692f63e10c39d201d3ced1f78f17da67b",
+  "numerical_determinism": "PASS"
+}

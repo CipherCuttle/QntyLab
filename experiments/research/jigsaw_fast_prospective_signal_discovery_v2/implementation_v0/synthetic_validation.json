@@ -1,0 +1,16 @@
+{
+  "artifact_type": "JFPV2_PR_B_SYNTHETIC_VALIDATION",
+  "mode": "SYNTHETIC_VALIDATION",
+  "fixture_count": 14,
+  "fixtures_pass": true,
+  "independent_oracle": "tests/test_jfp_v2_pr_b.py::test_ols_hac_matches_independent_direct_oracle_and_hac_l0_larger",
+  "oracle_pass": true,
+  "real_market_values_interpreted": false,
+  "real_features_computed": false,
+  "real_outcomes_computed": false,
+  "real_regressions_computed": false,
+  "real_p_values_computed": false,
+  "historical_execution_performed": false,
+  "numerical_tolerance": 1e-12,
+  "determinism": "PASS"
+}

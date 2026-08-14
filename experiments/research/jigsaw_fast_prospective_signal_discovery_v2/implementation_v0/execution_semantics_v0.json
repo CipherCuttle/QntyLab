@@ -1,0 +1,9 @@
+{
+  "hac_bandwidth_formula": "floor(4 * (T / 100)^(2/9))",
+  "hac_finite_sample_correction": "NONE",
+  "hac_kernel": "BARTLETT",
+  "hac_lag_unit": "ORIGINS",
+  "p_value_reference_distribution": "standard_normal_two_sided",
+  "test_statistic": "normal_z",
+  "tolerance": 1e-12
+}

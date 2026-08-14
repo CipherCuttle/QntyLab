@@ -1,0 +1,20 @@
+{
+  "artifact_type": "JFPV2_PR_B_BOUNDED_IMPLEMENTATION_AUTHORITY",
+  "project_id": "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_V2_IMPLEMENTATION_FREEZE_V0",
+  "canonical_master": "b018b998413934301a2535a38f64adb8a963366d",
+  "preregistration_digest": "ba5960c07cbbb76187d4877ad074df88a43c3f8664c3e5026c533c8f8d40f07d",
+  "contract_digest": "54e29bb48b208566b826f0804dadb01634dd010adb4739a65140a5b23066be65",
+  "capability_snapshot_digest": "926d23b8df11b4014c2465ff6b83b5afb25a2444fd584e549b1224fe9df69618",
+  "source_capability": "CAP_V2_RDS_FIXED_PANEL_OHLCV",
+  "finalist_ids": ["JFPV2_04", "JFPV2_06"],
+  "permitted_operations": ["source_binding", "structural_integrity", "origin_schedule", "executor_implementation", "synthetic_validation", "hostile_review"],
+  "new_source_acquisition": false,
+  "network_market_data": false,
+  "real_scientific_execution": false,
+  "shadow": false,
+  "router": false,
+  "qnty": false,
+  "trading": false,
+  "promotion": false,
+  "capital": "NONE"
+}

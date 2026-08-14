@@ -17,7 +17,9 @@ import os
 from pathlib import Path
 import subprocess
 import tempfile
-from typing import Any, Mapping, Sequence
+from typing import Any, Mapping, Protocol, Sequence
+
+from .binance_um_kline_1h import MaterializationError, receipt_from_bytes
 
 from . import jh01_rv_persistence_incremental_forecast_value_prereg_v1 as prereg
 from .jh01_v1_bootstrap_source_range_contract_repair_v0 import derive_bootstrap_source_range
@@ -48,6 +50,50 @@ class OriginState(str, Enum):
     OFFLINE_REVERIFIED = "OFFLINE_REVERIFIED"
     ORIGIN_COMPLETE = "ORIGIN_COMPLETE"
     BLOCKED = "BLOCKED"
+
+
+class UnknownWrite(RuntimeError):
+    """The request may have committed remotely; interrogate before retrying."""
+
+
+@dataclass(frozen=True)
+class RemoteRelease:
+    origin_id: str
+    tag: str
+    artifact_digest: str
+    asset_name: str
+    asset_sha256: str | None
+    published_at: datetime | None
+
+
+@dataclass(frozen=True)
+class AttestationExpectation:
+    repository: str
+    tag: str
+    target_commit: str
+    asset_name: str
+    asset_sha256: str
+    predicate_type: str = "https://in-toto.io/attestation/release/v0.2"
+    signer_uri: str = "https://dotcom.releases.github.com"
+
+
+@dataclass(frozen=True)
+class VerifiedAttestation:
+    expectation: AttestationExpectation
+    tsa_timestamp: datetime
+    bundle: bytes
+    trusted_root: bytes
+
+
+class ReleaseTransport(Protocol):
+    def find(self, origin_id: str) -> Sequence[RemoteRelease]: ...
+    def create(self, release: RemoteRelease) -> RemoteRelease: ...
+    def upload(self, tag: str, asset_name: str, content: bytes) -> RemoteRelease: ...
+    def acquire_attestation(self, release: RemoteRelease) -> tuple[bytes, bytes]: ...
+
+
+class AttestationVerifier(Protocol):
+    def verify(self, *, asset: bytes, bundle: bytes, trusted_root: bytes, expectation: AttestationExpectation) -> VerifiedAttestation: ...
 
 
 def canonical_bytes(value: Any) -> bytes:
@@ -155,6 +201,21 @@ def _frozen_panel() -> tuple[str, ...]:
     return ("ALICEUSDT", "APEUSDT", "API3USDT", "APTUSDT", "BCHUSDT", "CHRUSDT", "CHZUSDT", "ETCUSDT", "GMTUSDT", "INJUSDT", "LDOUSDT", "LINKUSDT", "LTCUSDT", "ONEUSDT", "OPUSDT", "REEFUSDT", "SANDUSDT", "TRXUSDT", "XLMUSDT", "XRPUSDT")
 
 
+def bars_from_authenticated_archive(*, symbol: str, year: int, month: int, zip_bytes: bytes, checksum_text: str) -> tuple[Bar, ...]:
+    """REUSE_AS_IS: admit only rows accepted by the canonical USD-M parser."""
+    try:
+        _, rows = receipt_from_bytes(symbol, year, month, zip_bytes, checksum_text)
+    except MaterializationError as exc:
+        raise RecorderBlocked(f"canonical Binance source rejection: {exc.status}") from exc
+    values: list[Bar] = []
+    for row in rows:
+        opened = _utc(row["timestamp"])
+        close = opened + timedelta(hours=1)
+        raw = (int(opened.timestamp() * 1000), row["open"], row["high"], row["low"], row["close"], row["volume"], int((close - timedelta(milliseconds=1)).timestamp() * 1000), "0", 0, "0", "0", "0")
+        values.append(Bar(symbol, close, float(row["close"]), raw))
+    return tuple(values)
+
+
 def _prices(bars: Sequence[Bar], panel: Sequence[str]) -> dict[str, dict[datetime, float]]:
     result = {symbol: {} for symbol in panel}
     for bar in bars:
@@ -248,6 +309,105 @@ def recover_publication(existing: Mapping[str, str] | None, artifact: Mapping[st
     if existing.get("origin_identity") != origin_identity(_utc(artifact["forecast_origin_utc"])): raise RecorderBlocked("wrong existing origin")
     if existing.get("artifact_digest") == expected: return "IDEMPOTENT_AUTHORITATIVE_RECOVERY"
     raise RecorderBlocked("same origin different digest")
+
+
+def release_identity(artifact: Mapping[str, Any]) -> RemoteRelease:
+    """One deterministic tag/asset identity per project/candidate/prereg/origin."""
+    origin_id = origin_identity(_utc(artifact["forecast_origin_utc"]))
+    tag = f"jh01-v1-recorder-{origin_id[:24]}"
+    return RemoteRelease(origin_id, tag, artifact["forecast_artifact_canonical_digest"], "forecast.json", None, None)
+
+
+def _window(timestamp: datetime | None, origin: datetime, *, label: str) -> datetime:
+    if timestamp is None or timestamp.tzinfo is None:
+        raise RecorderBlocked(f"missing authoritative {label}")
+    value = timestamp.astimezone(UTC)
+    if not origin <= value < origin + timedelta(hours=1):
+        raise RecorderBlocked(f"{label} outside frozen one-hour window")
+    return value
+
+
+class PublicationRuntime:
+    """Small crash-safe release state machine; transport owns all HTTP effects."""
+
+    def __init__(self, transport: ReleaseTransport, verifier: AttestationVerifier):
+        self.transport, self.verifier = transport, verifier
+
+    def _existing(self, expected: RemoteRelease) -> RemoteRelease | None:
+        candidates = tuple(self.transport.find(expected.origin_id))
+        if len(candidates) > 1:
+            raise RecorderBlocked("BLOCK_AMBIGUOUS_REMOTE")
+        if not candidates:
+            return None
+        current = candidates[0]
+        if current.tag != expected.tag or current.artifact_digest != expected.artifact_digest:
+            raise RecorderBlocked("same origin different digest")
+        return current
+
+    def publish(self, artifact: Mapping[str, Any], *, origin: datetime, target_commit: str) -> tuple[tuple[OriginState, ...], RemoteRelease, VerifiedAttestation]:
+        content = canonical_bytes(artifact); expected = release_identity(artifact)
+        states = [OriginState.ORIGIN_PRECHECK, OriginState.SOURCE_MATERIALIZED, OriginState.FORECAST_COMPUTED, OriginState.ARTIFACT_FROZEN, OriginState.PUBLICATION_IN_PROGRESS]
+        release = self._existing(expected)
+        if release is None:
+            try:
+                release = self.transport.create(expected)
+            except UnknownWrite:
+                release = self._existing(expected)
+                if release is None:  # One identical-request transient retry only.
+                    release = self.transport.create(expected)
+        if release.artifact_digest != expected.artifact_digest:
+            raise RecorderBlocked("different-digest release created")
+        if release.asset_sha256 is None:
+            try:
+                release = self.transport.upload(expected.tag, expected.asset_name, content)
+            except UnknownWrite:
+                release = self._existing(expected)
+                if release is None or release.asset_sha256 is None:
+                    release = self.transport.upload(expected.tag, expected.asset_name, content)
+        if release.asset_sha256 != sha256(content).hexdigest():
+            raise RecorderBlocked("authoritative uploaded asset digest mismatch")
+        _window(release.published_at, origin, label="published_at")
+        states.append(OriginState.PUBLICATION_AUTHORITATIVE)
+        try:
+            bundle, trusted_root = self.transport.acquire_attestation(release)
+        except UnknownWrite:
+            bundle, trusted_root = self.transport.acquire_attestation(release)  # bounded one recovery acquisition
+        expectation = AttestationExpectation("CipherCuttle/QntyLab", release.tag, target_commit, release.asset_name, release.asset_sha256)
+        verified = self.verifier.verify(asset=content, bundle=bundle, trusted_root=trusted_root, expectation=expectation)
+        if verified.expectation != expectation:
+            raise RecorderBlocked("attestation subject/policy mismatch")
+        _window(verified.tsa_timestamp, origin, label="verified TSA timestamp")
+        states.extend((OriginState.ATTESTATION_ACQUIRED, OriginState.RETENTION_PACKAGE_FROZEN, OriginState.OFFLINE_REVERIFIED, OriginState.ORIGIN_COMPLETE))
+        return tuple(states), release, verified
+
+
+class ExternalSigstoreVerifier:
+    """Adapter for the qualified generic V0R3-policy verifier executable.
+
+    The command must accept ``ASSET ROOT BUNDLE POLICY`` and emit only a
+    verified JSON receipt.  This adapter deliberately has no unsafe fallback:
+    until a separately qualified generic verifier artifact exists, calling it
+    blocks instead of treating a local retention manifest as attestation proof.
+    """
+
+    def __init__(self, executable: Path): self.executable = executable
+
+    def verify(self, *, asset: bytes, bundle: bytes, trusted_root: bytes, expectation: AttestationExpectation) -> VerifiedAttestation:
+        if not self.executable.is_file():
+            raise RecorderBlocked("generic per-origin Sigstore verifier unavailable")
+        with tempfile.TemporaryDirectory(prefix="qntylab-jh01-attestation-") as temporary:
+            base = Path(temporary); asset_path, root_path, bundle_path, policy_path = base / "forecast.json", base / "trusted_root.jsonl", base / "release_attestation.sigstore.json", base / "expected_policy.json"
+            asset_path.write_bytes(asset); root_path.write_bytes(trusted_root); bundle_path.write_bytes(bundle)
+            policy_path.write_bytes(canonical_bytes({"repository": expectation.repository, "tag": expectation.tag, "target_commit": expectation.target_commit, "asset_name": expectation.asset_name, "asset_sha256": expectation.asset_sha256, "predicate_type": expectation.predicate_type, "signer_uri": expectation.signer_uri}))
+            run = subprocess.run([str(self.executable), str(asset_path), str(root_path), str(bundle_path), str(policy_path)], capture_output=True, text=True)
+            if run.returncode:
+                raise RecorderBlocked("per-origin Sigstore verifier rejected attestation")
+            try: receipt = json.loads(run.stdout)
+            except json.JSONDecodeError as exc: raise RecorderBlocked("per-origin Sigstore verifier receipt malformed") from exc
+            if receipt.get("stage_a") != "PASS" or receipt.get("stage_b") != "PASS" or receipt.get("signer") != expectation.signer_uri:
+                raise RecorderBlocked("per-origin Sigstore receipt policy mismatch")
+            tsa = datetime.fromisoformat(str(receipt.get("tsa", "")).replace("Z", "+00:00"))
+            return VerifiedAttestation(expectation, tsa, bundle, trusted_root)
 
 
 def retention_package(path: Path, *, forecast: Mapping[str, Any], release_metadata: Mapping[str, Any], bundle: bytes, trusted_root: bytes) -> dict[str, Any]:

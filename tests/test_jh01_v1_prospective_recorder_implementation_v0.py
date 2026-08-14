@@ -4,6 +4,8 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 import json
 import hashlib
+import io
+import zipfile
 import pytest
 
 from qntylab import jh01_v1_prospective_recorder_implementation_v0 as recorder
@@ -89,11 +91,67 @@ def test_direct_source_seam_rejects_reordered_frozen_panel(bars):
 def test_qualification_receipt_preserves_frozen_inputs_and_blocks_real_v1():
     result = json.loads(RESULT.read_text())
     prereg = ROOT / "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/preregistration.json"
-    assert result["state"] == "CLOSED_PASS"
+    assert result["state"] == "CLOSED_BLOCKED"
     assert hashlib.sha256(prereg.read_bytes()).hexdigest() == result["frozen_inputs"]["v1_preregistration_bytes_sha256"]
     assert result["frozen_inputs"]["first_required_source_close"] == "2025-08-15T00:00:00Z"
     assert result["frozen_inputs"]["obsolete_historical_boundary_consumed"] is False
     assert result["qualification"]["synthetic_live_canary_used"] is False
-    assert result["state"] != "CLOSED_PASS" or result["qnty_agent_eval"] == "NO_MATCH"
+    assert result["block_reason"].startswith("CURRENT_ORIGIN_GITHUB_SIGSTORE_ATTESTATION")
     assert result["authority"]["v0r3_implementation_authorization_consumed"] is True
-    assert not any(value for key, value in result["authority"].items() if key not in {"recorder_implementation_qualified", "v0r3_implementation_authorization_consumed"})
+    assert not any(value for key, value in result["authority"].items() if key != "v0r3_implementation_authorization_consumed")
+
+
+class FakeTransport:
+    def __init__(self, *, origin: datetime, fail_create=False, fail_upload=False, ambiguous=False):
+        self.origin, self.fail_create, self.fail_upload, self.ambiguous = origin, fail_create, fail_upload, ambiguous
+        self.release = None; self.create_calls = self.upload_calls = self.attestation_calls = 0
+    def find(self, origin_id):
+        if self.ambiguous and self.release: return (self.release, self.release)
+        return () if self.release is None else (self.release,)
+    def create(self, release):
+        self.create_calls += 1; self.release = recorder.RemoteRelease(*release.__dict__.values())
+        self.release = recorder.RemoteRelease(self.release.origin_id, self.release.tag, self.release.artifact_digest, self.release.asset_name, None, self.origin + timedelta(minutes=1))
+        if self.fail_create and self.create_calls == 1: raise recorder.UnknownWrite()
+        return self.release
+    def upload(self, tag, asset_name, content):
+        self.upload_calls += 1; self.release = recorder.RemoteRelease(self.release.origin_id, tag, self.release.artifact_digest, asset_name, hashlib.sha256(content).hexdigest(), self.release.published_at)
+        if self.fail_upload and self.upload_calls == 1: raise recorder.UnknownWrite()
+        return self.release
+    def acquire_attestation(self, release):
+        self.attestation_calls += 1; return b"current-fixture-bundle", b"current-fixture-root\n"
+
+
+class FakeVerifier:
+    def verify(self, *, asset, bundle, trusted_root, expectation):
+        if bundle != b"current-fixture-bundle" or trusted_root != b"current-fixture-root\n": raise recorder.RecorderBlocked("invalid synthetic attestation")
+        return recorder.VerifiedAttestation(expectation, QUALIFICATION_ORIGIN + timedelta(minutes=2), bundle, trusted_root)
+
+
+def test_publication_runtime_crash_recovery_timing_and_concurrency(bars):
+    artifact = recorder.build_forecast_artifact(ROOT, bars, origin=QUALIFICATION_ORIGIN, qualification_mode=True)
+    transport = FakeTransport(origin=QUALIFICATION_ORIGIN, fail_create=True, fail_upload=True)
+    states, release, verified = recorder.PublicationRuntime(transport, FakeVerifier()).publish(artifact, origin=QUALIFICATION_ORIGIN, target_commit="a" * 40)
+    assert states[-1] is recorder.OriginState.ORIGIN_COMPLETE
+    assert transport.create_calls == transport.upload_calls == 1
+    assert release.asset_sha256 == hashlib.sha256(recorder.canonical_bytes(artifact)).hexdigest()
+    assert verified.tsa_timestamp == QUALIFICATION_ORIGIN + timedelta(minutes=2)
+    with pytest.raises(recorder.RecorderBlocked, match="outside"):
+        recorder.PublicationRuntime(FakeTransport(origin=QUALIFICATION_ORIGIN - timedelta(hours=2)), FakeVerifier()).publish(artifact, origin=QUALIFICATION_ORIGIN, target_commit="a" * 40)
+
+
+def test_canonical_binance_archive_seam_rejects_malformed_numeric_row():
+    row = "1755212400000,100,101,99,100.5,1,1755215999999,0,1,0,0,0\n"
+    stream = io.BytesIO()
+    with zipfile.ZipFile(stream, "w") as archive: archive.writestr("ALICEUSDT-1h-2025-08.csv", row)
+    good = stream.getvalue(); checksum = f"{hashlib.sha256(good).hexdigest()} ALICEUSDT-1h-2025-08.zip"
+    assert len(recorder.bars_from_authenticated_archive(symbol="ALICEUSDT", year=2025, month=8, zip_bytes=good, checksum_text=checksum)) == 1
+    broken = io.BytesIO()
+    with zipfile.ZipFile(broken, "w") as archive: archive.writestr("ALICEUSDT-1h-2025-08.csv", row.replace("100.5", "not-a-number"))
+    payload = broken.getvalue()
+    with pytest.raises(recorder.RecorderBlocked): recorder.bars_from_authenticated_archive(symbol="ALICEUSDT", year=2025, month=8, zip_bytes=payload, checksum_text=f"{hashlib.sha256(payload).hexdigest()} ALICEUSDT-1h-2025-08.zip")
+
+
+def test_current_origin_crypto_verifier_has_no_unsafe_manifest_fallback(tmp_path):
+    expectation = recorder.AttestationExpectation("CipherCuttle/QntyLab", "fixture-tag", "a" * 40, "forecast.json", "0" * 64)
+    with pytest.raises(recorder.RecorderBlocked, match="generic per-origin Sigstore verifier unavailable"):
+        recorder.ExternalSigstoreVerifier(tmp_path / "missing").verify(asset=b"fixture", bundle=b"bundle", trusted_root=b"root", expectation=expectation)

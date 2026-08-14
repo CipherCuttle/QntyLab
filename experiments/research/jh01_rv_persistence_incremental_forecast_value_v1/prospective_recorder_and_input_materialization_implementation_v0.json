@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "project_id": "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_V1_PROSPECTIVE_RECORDER_AND_INPUT_MATERIALIZATION_IMPLEMENTATION_V0",
-  "state": "CLOSED_PASS",
-  "phase_type": "IMPLEMENTATION_QUALIFICATION",
-  "authority_level": "PROSPECTIVE_RECORDER_IMPLEMENTATION_QUALIFIED_PENDING_SEPARATE_REAL_V1_ACTIVATION_AUTHORIZATION",
+  "state": "CLOSED_BLOCKED",
+  "phase_type": "IMPLEMENTATION_QUALIFICATION_CLOSURE_REPAIR",
+  "authority_level": "RECORDER_RUNTIME_PARTIALLY_IMPLEMENTED_BLOCKED_PENDING_CURRENT_ORIGIN_SIGSTORE_FIXTURE_OR_SEPARATE_AUTHORITY",
   "canonical_remote_base": "bad0eb1b8f6ae429bbd48f84b7a770194dc931d8",
   "frozen_inputs": {
     "v1_preregistration_digest": "bdb85130cae75e9f156db9aa1fd955d7f565a3714ae091871d5ac4447c1ec27b",
@@ -33,19 +33,19 @@
     "same_digest_recovery": true,
     "different_digest_blocks": true,
     "unknown_write_recovery": true,
-    "github_immutable_release_integration": "IMPLEMENTED_WITH_LOCAL_TRANSPORT_FIXTURES; no new live publication authorized",
-    "published_at_window": "t <= published_at < t + 1 hour",
-    "attestation_acquisition": "IMPLEMENTED_BOUNDED_POLICY_INTERFACE",
-    "tsa_window": "t <= verified_github_tsa_timestamp < t + 1 hour",
+    "github_immutable_release_integration": "IMPLEMENTED_WITH_DETERMINISTIC_TRANSPORT_FIXTURES; no new live publication authorized",
+    "published_at_window": "IMPLEMENTED: t <= published_at < t + 1 hour",
+    "attestation_acquisition": "IMPLEMENTED_BOUNDED_TRANSPORT_INTERFACE; current GitHub-signed fixture unavailable",
+    "tsa_window": "IMPLEMENTED: t <= verified_github_tsa_timestamp < t + 1 hour",
     "retention_package": ["forecast.json", "release_metadata.json", "release_attestation.sigstore.json", "trusted_root.jsonl", "retention_manifest.json"],
-    "offline_reverification": "PACKAGE_INTEGRITY_AND_V0R3_POLICY_REUSE",
+    "offline_reverification": "CURRENT_PACKAGE_CRYPTOGRAPHIC_REVERIFICATION_BLOCKED: V0R3 verifier is historical-identity-specific and no new live GitHub canary is authorized",
     "interim_evaluation_firewall": "PASS_NO_EVALUATION_API_OR_IMPORT",
     "crash_replay_matrix": "PASS_FIXTURE_RECOVERY_AND_CONFLICT_CASES",
     "real_v1_activation_gate": "PASS_EXPLICIT_AUTHORITY_REQUIRED_NOT_DATE_BASED",
     "synthetic_live_canary_used": false
   },
   "authority": {
-    "recorder_implementation_qualified": true,
+    "recorder_implementation_qualified": false,
     "v0r3_implementation_authorization_consumed": true,
     "real_v1_collection_authorized": false,
     "real_v1_forecast_executed": false,
@@ -62,5 +62,7 @@
     "ledger_changed": false
   },
   "qnty_agent_eval": "NO_MATCH",
-  "next_action": "A separate, Git-backed real-V1 readiness and activation authorization must verify operational readiness before 2026-09-08T00:00:00Z. This qualified implementation cannot collect or forecast a real V1 origin without that explicit authority."
+  "qnty_agent_eval_basis": "Prior bounded lookup found no existing contract for this unchanged implementation-qualification proposition; no evaluator was created or run during closure repair.",
+  "block_reason": "CURRENT_ORIGIN_GITHUB_SIGSTORE_ATTESTATION_CANNOT_BE_CRYPTOGRAPHICALLY_QUALIFIED_WITHOUT_AN_AUTHORIZED_LIVE_CANARY_OR_GENERIC_QUALIFIED_VERIFIER_FIXTURE",
+  "next_action": "Do not activate real V1. A separate explicitly authorized governance phase must decide whether a synthetic GitHub publication canary and generic per-origin Sigstore policy verifier qualification are permitted; this closure repair does not create that authority."
 }

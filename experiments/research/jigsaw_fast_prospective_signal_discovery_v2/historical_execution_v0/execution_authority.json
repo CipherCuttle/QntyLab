@@ -1,0 +1,78 @@
+{
+  "alternate_specification": false,
+  "artifact_type": "JFPV2_PR_C_ONE_SHOT_EXECUTION_AUTHORITY",
+  "contract_digest": "54e29bb48b208566b826f0804dadb01634dd010adb4739a65140a5b23066be65",
+  "execution_semantics_digest": "f3c50c7fd8d34efdaff37582cfd733c00c14c4aeb065c6ad138eb8d00ac174c6",
+  "execution_start_master": "258d225a68903790451f8aa10706af8f309d7fce",
+  "family_size": 2,
+  "finalists": [
+    "JFPV2_04",
+    "JFPV2_06"
+  ],
+  "frozen_at_utc": "2026-08-14T21:31:55.696659Z",
+  "frozen_inputs": {
+    "digests": {
+      "capability": "926d23b8df11b4014c2465ff6b83b5afb25a2444fd584e549b1224fe9df69618",
+      "contract": "54e29bb48b208566b826f0804dadb01634dd010adb4739a65140a5b23066be65",
+      "preregistration": "ba5960c07cbbb76187d4877ad074df88a43c3f8664c3e5026c533c8f8d40f07d",
+      "schedule": "f8cfabc0322db693dcf7805673b7e06d3a0533e3e1258ac0416a5eded85d8740",
+      "semantics": "f3c50c7fd8d34efdaff37582cfd733c00c14c4aeb065c6ad138eb8d00ac174c6"
+    },
+    "origin_count": 608,
+    "paths": {
+      "capability": "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/data_capabilities.json",
+      "contract": "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/contract_compile.json",
+      "preregistration": "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/preregistration.json",
+      "schedule": "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/implementation_v0/origin_schedule.json",
+      "semantics": "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/implementation_v0/execution_semantics_v0.json"
+    },
+    "schedule_digest": "73859b2ece7a81a1d9f4a24dfb996b21c4427f1b1449d31553541eef66c2d040"
+  },
+  "implementation_commit": "5084df5f6aa3f469f2f2844972745703849abe30",
+  "implementation_source_digest": "379f9655bfb9b007da839656c99ffd34f6e72116f0ab82d0a639949742788118",
+  "local_start_head": "258d225a68903790451f8aa10706af8f309d7fce",
+  "network_market_data_used": false,
+  "origin_schedule_digest": "73859b2ece7a81a1d9f4a24dfb996b21c4427f1b1449d31553541eef66c2d040",
+  "output_schema": {
+    "artifacts": [
+      "execution_authority.json",
+      "execution_manifest.json",
+      "candidate_results.json",
+      "family_result.json",
+      "execution_receipt.json",
+      "hostile_review.md",
+      "closure.json"
+    ],
+    "candidate_result_fields": [
+      "candidate_id",
+      "frozen_preregistration_digest",
+      "frozen_contract_digest",
+      "frozen_source_capability_digest",
+      "frozen_implementation_sha",
+      "input_integrity",
+      "execution_integrity",
+      "eligible_origin_count",
+      "blocked_origin_count",
+      "beta_candidate",
+      "hac_standard_error",
+      "hac_maxlag",
+      "raw_p_two_sided",
+      "holm_adjusted_p",
+      "materiality_metric_name",
+      "materiality_metric_value",
+      "materiality_gate",
+      "materiality_pass",
+      "observed_beta_sign",
+      "classification",
+      "block_reason"
+    ],
+    "scientific_execution_count": 1
+  },
+  "phase": "FAST_LANE_V2_PR_C",
+  "preregistration_digest": "ba5960c07cbbb76187d4877ad074df88a43c3f8664c3e5026c533c8f8d40f07d",
+  "real_execution_count_authorized": 1,
+  "source_capability_digest": "926d23b8df11b4014c2465ff6b83b5afb25a2444fd584e549b1224fe9df69618",
+  "source_snapshot_digest": "c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac",
+  "source_snapshot_id": "rds-v0-c0fa7dc0e51c7680fccbd7e7cdd0945fcd63af3e8c75809a24aa3b216868b9ac",
+  "source_substitution": false
+}

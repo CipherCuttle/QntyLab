@@ -1,0 +1,21 @@
+{
+  "artifact_type": "JFPV3_PR_B_R1_REPAIR_RECORD",
+  "repair_phase": "JFPV3_PR_B_R1",
+  "root_cause": "MOVING_RUNTIME_CANONICAL_HEAD_MODELED_AS_IMMUTABLE_COMPILE_TIME_CONSTANT",
+  "parent_collector_closure": "5fde5d670a84ea7a60a4d0109c7da7db0f858d07",
+  "parent_collector_canonical_merge": "0dd0eacaea5abbedf086a1fb95de5134f7789e1d",
+  "activation_attempt_1": "BLOCKED_BY_ACTIVATION_IMPLEMENTATION_DEFECT",
+  "prospective_contamination": "NONE",
+  "repair": "replace historic master equality with fresh runtime HEAD/origin-master equality, clean-state check, immutable ancestry anchors, and repaired content-manifest binding",
+  "scientific_contract_changed": false,
+  "preregistration_changed": false,
+  "universe_changed": false,
+  "schedule_changed": false,
+  "inference_changed": false,
+  "materiality_changed": false,
+  "classification_changed": false,
+  "real_prospective_ohlcv_accessed": false,
+  "real_prospective_features_computed": 0,
+  "real_prospective_outcomes_computed": 0,
+  "shadow_activated": false
+}

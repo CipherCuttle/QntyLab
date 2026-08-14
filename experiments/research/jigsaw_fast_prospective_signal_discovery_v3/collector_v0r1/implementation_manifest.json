@@ -1,0 +1,23 @@
+{
+  "artifact_type": "JFPV3_COLLECTOR_IMPLEMENTATION_MANIFEST_R1",
+  "repair_phase": "JFPV3_PR_B_R1",
+  "parent_collector_closure": "5fde5d670a84ea7a60a4d0109c7da7db0f858d07",
+  "parent_collector_canonical_merge": "0dd0eacaea5abbedf086a1fb95de5134f7789e1d",
+  "candidate_commit_sha": "d50c875191fda85381cab29877738a7b136b744a",
+  "implementation_digest": "7a8bbfe5b72d787608436232fd87bbe876be24b0d524a38f2d7dd6bbc5d53e01",
+  "files": {
+    "qntylab/jfp_v3_shadow.py": "bf18cc4b41107f2f2678b43979811ca12eefdb6566180120c561c93572ad08e4",
+    "collector_v0/activation_contract.json": "2d9f39fc8879668eacf6128f47b6119d6c2f3ae1439aa0bb57639bf79c400876",
+    "collector_v0r1/repair_record.json": "688a90a9fdc43381cb51ebcabbf8b05fe8364e8a0ee8fe6ac4845b751ae4a92d",
+    "collector_v0r1/hostile_review.md": "457f4262441115b9fa811d3ceda29f540cf856705764cbe07a451ab26a893c92"
+  },
+  "activation_contract_digest": "2d9f39fc8879668eacf6128f47b6119d6c2f3ae1439aa0bb57639bf79c400876",
+  "pr_a_scientific_contract_digests": {
+    "preregistration.json": "7b0e6eeda726ddcc6e5a2a99d931df51bfbff492557fdefc30eae629c998da16",
+    "universe_contract.json": "883172c10174d52a298293b2299ab28af4095c33217e2c2a24de3a258208c9fd",
+    "source_contract.json": "64b918c8e062c55d1434a34ff5f7e3368dd59a7e2358edcacfa80bf1ab2e2348",
+    "scientific_contract.json": "8b37028ef1ebc5baf7a04bfc742069f0b1ecd0931c4017c565324e980a140e90",
+    "schedule_contract.json": "5e326a165bdf6dda8dd137ec69a4677f6029f99ae0487a80724a3c0667a36ffc"
+  },
+  "runtime_binding": "fresh HEAD == fresh origin/master, clean worktree, immutable historical anchors ancestral, and exact file digests"
+}

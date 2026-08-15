@@ -1,0 +1,201 @@
+{
+  "artifact_type": "QNTY_TRADING_RESULTS_SPRINT_V0_CANDIDATE_SELECTION",
+  "artifact_version": "V0",
+  "status": "FROZEN_FOR_SUBSEQUENT_EXECUTION_ONLY",
+  "execution_in_this_phase": false,
+  "selected_candidate_count": 3,
+  "selection_basis": {
+    "objective": "maximize_information_gain_about_a_robust_realistic_cost_adjusted_economic_edge",
+    "mechanism_coverage": ["MOVING_AVERAGE_TREND", "PRICE_BREAKOUT"],
+    "variant_rule": "Use exact preregistered variants with nontrivial stressed evidence; retain an adjacent PRICE_BREAKOUT pair for fixed local parameter sensitivity; do not add coordinates or retune.",
+    "selection_evidence_is_unseen_confirmation": false,
+    "selection_evidence_disclosure": "The prior Breadth V2 development outcomes were visible when selecting these variants. They are selection evidence only. The subsequent evaluation is bound to an untouched sealed-forward window and must not be described as confirmation until that window is adjudicated."
+  },
+  "canonical_reconciliation": {
+    "ledger_variant_status": "SCREENING",
+    "ledger_status_explanation": "Breadth V2 proposal and trial events are present in the append-only research ledger, but the development campaign explicitly did not append family DECISION_RECORDED events.",
+    "canonical_family_decision_artifact": "experiments/results/breadth_v2_development_v0/BREADTH_V2_DEVELOPMENT_DECISION_V0.json",
+    "canonical_family_decision_sha256": "c2fe0f50a15b8064bc0cc07383912c9584b737409ec10db249fdd8baf95f9df6",
+    "pass_families": ["MOVING_AVERAGE_TREND", "PRICE_BREAKOUT"],
+    "fail_families": ["TIME_SERIES_MOMENTUM", "CROSS_SECTIONAL_MOMENTUM", "CROSS_SECTIONAL_REVERSAL", "FUNDING_CARRY", "VOLATILITY_TARGETING"],
+    "interpretation": "SCREENING is the truthful generated ledger status; PASS is the truthful family-level status in the separate committed development decision artifact. PASS does not mean any exact variant is independently validated or promoted."
+  },
+  "implementation_identity": {
+    "repository_commit_at_freeze_input": "b5cc2cee3d76ed69e592ad90b2b43dae33c5a35e",
+    "execution_contract_digest": "547b634bb3b10bc41fd9f3d8b197aab5b0e8f766b34c90103c615dbeb532552c",
+    "relevant_source_sha256": "155bbe6afd5e7a29797036e9ec75f670ee589cbedd31805333da2468c8c5f516",
+    "source_paths": [
+      "qntylab/breadth_v2_execution.py",
+      "qntylab/breadth_v2_strategies.py",
+      "qntylab/breadth_v2_input_bundle.py",
+      "qntylab/breadth_v2_runner.py",
+      "qntylab/breadth_v2_path.py",
+      "qntylab/research_ledger.py",
+      "qntylab/instrument_contract.py"
+    ]
+  },
+  "candidates": [
+    {
+      "candidate_id": "CANDIDATE_BREADTH_V2_MA_24_96",
+      "variant_id": "variant_2584eb63c90a1aa65da2e006",
+      "event_id": "event_proposal_44b63f75098f6983eb418603",
+      "family": "MOVING_AVERAGE_TREND",
+      "mechanism": "Smoothed price state represents delayed trend participation.",
+      "strategy_id": "breadth_v2_moving_average_trend",
+      "strategy_version": "breadth-v2-preregistered-v1",
+      "parameters": {"fast": 24, "mode": "long_flat", "slow": 96},
+      "prior_evidence": {
+        "family_status": "PASS",
+        "family_stress_excess": 0.09569786257049016,
+        "variant_stress_excess": 0.19577230236403648,
+        "variant_stress_net": -0.10140228714858432,
+        "usable_observations": 46,
+        "blocked_observations": 14,
+        "evidence_paths": [
+          "experiments/results/breadth_v2_development_v0/BREADTH_V2_DEVELOPMENT_DECISION_V0.json",
+          "experiments/results/breadth_v2_development_v0/BREADTH_V2_DEVELOPMENT_EXECUTION_MANIFEST_V0.json",
+          "experiments/specs/breadth_v2_preregistration.md",
+          "experiments/specs/breadth_v2_execution_contract_v0.md",
+          "experiments/specs/breadth_v2_family_decision_aggregation_v0.md"
+        ]
+      }
+    },
+    {
+      "candidate_id": "CANDIDATE_BREADTH_V2_BREAKOUT_72",
+      "variant_id": "variant_ac4a45549606e2d83bad89a9",
+      "event_id": "event_proposal_dbe4a296167185c93b8b4594",
+      "family": "PRICE_BREAKOUT",
+      "mechanism": "Event-triggered channel breaks may capture directional persistence.",
+      "strategy_id": "breadth_v2_price_breakout",
+      "strategy_version": "breadth-v2-preregistered-v1",
+      "parameters": {"lookback": 72, "mode": "long_flat"},
+      "prior_evidence": {
+        "family_status": "PASS",
+        "family_stress_excess": 0.21747593957349115,
+        "variant_stress_excess": 0.2789698277495456,
+        "variant_stress_net": -0.01820476176307521,
+        "usable_observations": 46,
+        "blocked_observations": 14,
+        "evidence_paths": [
+          "experiments/results/breadth_v2_development_v0/BREADTH_V2_DEVELOPMENT_DECISION_V0.json",
+          "experiments/results/breadth_v2_development_v0/BREADTH_V2_DEVELOPMENT_EXECUTION_MANIFEST_V0.json",
+          "experiments/specs/breadth_v2_preregistration.md",
+          "experiments/specs/breadth_v2_execution_contract_v0.md",
+          "experiments/specs/breadth_v2_family_decision_aggregation_v0.md"
+        ]
+      }
+    },
+    {
+      "candidate_id": "CANDIDATE_BREADTH_V2_BREAKOUT_168",
+      "variant_id": "variant_057bf9fb96021b54541a31cc",
+      "event_id": "event_proposal_3515c5c2bccd85d7936a3a03",
+      "family": "PRICE_BREAKOUT",
+      "mechanism": "Event-triggered channel breaks may capture directional persistence.",
+      "strategy_id": "breadth_v2_price_breakout",
+      "strategy_version": "breadth-v2-preregistered-v1",
+      "parameters": {"lookback": 168, "mode": "long_flat"},
+      "prior_evidence": {
+        "family_status": "PASS",
+        "family_stress_excess": 0.21747593957349115,
+        "variant_stress_excess": 0.2434221289855831,
+        "variant_stress_net": -0.053752460527037735,
+        "usable_observations": 46,
+        "blocked_observations": 14,
+        "evidence_paths": [
+          "experiments/results/breadth_v2_development_v0/BREADTH_V2_DEVELOPMENT_DECISION_V0.json",
+          "experiments/results/breadth_v2_development_v0/BREADTH_V2_DEVELOPMENT_EXECUTION_MANIFEST_V0.json",
+          "experiments/specs/breadth_v2_preregistration.md",
+          "experiments/specs/breadth_v2_execution_contract_v0.md",
+          "experiments/specs/breadth_v2_family_decision_aggregation_v0.md"
+        ]
+      }
+    }
+  ],
+  "evaluation_contract": {
+    "contract_id": "QNTY_TRADING_RESULTS_SPRINT_V0_ECONOMIC_EVALUATION_CONTRACT",
+    "contract_version": "V0",
+    "assets_universe": {
+      "source_contract": "BREADTH_V2_DEV_INPUT_UNIVERSE_V0R1",
+      "sha256": "8fef4c02d113027630072bcbb0802e35ab31be17c835aa2ebdae4261265589fb",
+      "symbols": ["BCHUSDT", "XRPUSDT", "LTCUSDT", "TRXUSDT", "ETCUSDT", "LINKUSDT", "XLMUSDT", "CHZUSDT", "SANDUSDT", "REEFUSDT", "CHRUSDT", "ALICEUSDT", "ONEUSDT", "API3USDT", "GMTUSDT", "APEUSDT", "OPUSDT", "INJUSDT", "LDOUSDT", "APTUSDT"],
+      "membership_rule": "fixed historical panel; no listing, liquidity, survivorship, backfill, or dynamic top-N changes"
+    },
+    "historical_selection_windows": [
+      {"id": "DEV_2022", "start": "2022-01-01T00:00:00Z", "end": "2022-12-31T23:00:00Z"},
+      {"id": "DEV_2024", "start": "2024-01-01T00:00:00Z", "end": "2024-12-31T23:00:00Z"},
+      {"id": "DEV_2025", "start": "2025-01-01T00:00:00Z", "end": "2025-12-31T23:00:00Z"}
+    ],
+    "future_execution_window": {
+      "contract_id": "BREADTH_V2_SEALED_FORWARD_OBSERVATION_V0",
+      "sealed_t0": "2026-08-10T19:00:00Z",
+      "end": "2026-11-08T19:00:00Z",
+      "minimum_complete_hours": 2160,
+      "adjudication_authorized_at": "2026-11-08T19:00:00Z",
+      "pre_maturity_rule": "No strategy return, benchmark comparison, family decision, or candidate promotion may be computed or recorded before maturity.",
+      "selection_window_relation": "disjoint from historical selection windows"
+    },
+    "temporal_design": {
+      "bar_interval": "1h",
+      "decision_clock": "after close of completed bar t using only observations through t",
+      "execution_clock": "target applies to return from t to t+1",
+      "walk_forward": "none; parameters are frozen and there is no refit or retuning",
+      "warmup": "candidate-specific causal warmup from the existing runner; warmup bars are not scored",
+      "gaps": "fail closed; no interpolation or forward fill"
+    },
+    "benchmark": "BUY_AND_HOLD_PRIMARY_AND_CASH_SECONDARY",
+    "costs": {
+      "BASELINE_EXECUTION": {"fee_bps_per_one_way_turnover": 10, "slippage_bps_per_one_way_turnover": 0},
+      "STRESS_EXECUTION": {"fee_bps_per_one_way_turnover": 10, "slippage_bps_per_one_way_turnover": 10},
+      "funding": "realized event-time settlement cash flow is included identically in both modes"
+    },
+    "funding_treatment": {
+      "mode": "REALIZED_FUNDING_SETTLEMENTS_REQUIRED",
+      "position_boundary": "funding at t settles against the prior position before the t target is computed",
+      "missingness": "unsupported rate types, source gaps, and coverage failures block the affected cell; never zero-fill"
+    },
+    "turnover_accounting": {
+      "owner": "BREADTH_V2_PORTFOLIO_KERNEL_V0",
+      "basis": "PRE_COST_EQUITY target weights",
+      "definition": "one-way notional turnover at each rebalance; fees and slippage are charged on the same rebalance",
+      "reporting": "trade count, turnover, exposure, fee, slippage, funding, and price/funding PnL are descriptive diagnostics"
+    },
+    "parameter_sensitivity": {
+      "rule": "No new search. Report only the already-registered local neighbors from the Breadth V2 family decision as selection context.",
+      "MA_24_96_neighbors": ["variant_d5f7ee106ba428292feacd0b", "variant_83dc90d06ac8234aaacd575b"],
+      "BREAKOUT_72_neighbors": ["variant_057bf9fb96021b54541a31cc"],
+      "BREAKOUT_168_neighbors": ["variant_ac4a45549606e2d83bad89a9", "variant_81f0ae4565fe4e93e8ecfa09"],
+      "future_rule": "selected parameters cannot change based on forward outcomes; evaluating neighbors in a later phase requires a separate preregistered scope"
+    },
+    "regime_decomposition": {
+      "required": true,
+      "dimensions": ["DEV_2022", "DEV_2024", "DEV_2025", "sealed_forward_full_window"],
+      "rule": "calendar-window decomposition only; no outcome-derived regime labels, clustering, or ex-post regime selection"
+    },
+    "principal_metrics": {
+      "primary": ["candidate_net_return", "benchmark_excess_return"],
+      "robustness": ["annualized_volatility", "sharpe_like_return_over_volatility", "maximum_drawdown", "positive_asset_breadth", "positive_window_breadth", "cost_delta"],
+      "descriptive": ["gross_return", "turnover", "trade_count", "exposure_fraction", "fee_cost", "slippage_cost", "funding_cost", "price_pnl", "funding_pnl"]
+    },
+    "failure_kill_thresholds": {
+      "integrity": "any unresolved receipt, provenance, timing, non-finite, gap, or accounting failure => KILL",
+      "stress_aggregate": "aggregate stressed benchmark excess must be > 0",
+      "stress_temporal_breadth": "at least 2 of 3 historical selection windows positive, and the sealed-forward window must not be negative for PROMOTE",
+      "stress_asset_breadth": "at least 10 of 20 assets positive for PROMOTE",
+      "concentration": "no single positive asset may contribute > 35% of positive aggregate stressed excess",
+      "cost_survival": "stressed net-return advantage must retain at least 50% of baseline advantage",
+      "blocked_data": "unresolved required coverage at adjudication => KILL for the affected candidate, not deletion of the denominator"
+    },
+    "decision_rule": {
+      "PROMOTE": "all integrity, stress, temporal, breadth, concentration, cost-survival, and fixed-parameter sensitivity requirements pass; this means eligible for a separately authorized next evidence tier only",
+      "ITERATE": "no hard KILL threshold fails, but a required result is inconclusive or a predeclared soft diagnostic is unresolved; iteration requires a new preregistration and does not retune this contract",
+      "KILL": "any hard failure above, or any evidence that the candidate is not executable under the frozen timing, source, benchmark, or cost semantics"
+    }
+  },
+  "qntyagenteval_applicability": {
+    "lookup_scope": "committed QntyLab repository search for QntyAgentEval/qnty_agent_eval/economic evaluator contracts",
+    "applicability": "NO_MATCH",
+    "compatible_contract_id": null,
+    "action": "Do not build an evaluator in this phase. Subsequent execution must use the existing Breadth V2 runner/kernel contract."
+  },
+  "authority_boundary": "exploratory_only; no scientific validation, Qnty mutation, paper/live trading, capital authority, Router, State Snapshot, JH01, or JFPV3 authority"
+}

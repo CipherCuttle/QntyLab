@@ -14,8 +14,8 @@
     "preregistration_json_sha256": "34252ccf245c9d963b987e697231d4a33d66c2450d44689b7b737c0686a24979",
     "preregistration_md_sha256": "4187a37e943112b24d307fb6154fb1b3efd5eacfb485920c68e5bd0d3e4ff29f",
     "preregistration_digest": "8e75f53f19c9719b97c3626c7e39626e206505e138107601748d9213eabe7757",
-    "canonical_remote_merge_sha": null,
-    "canonicalization_status": "REPLAYED_ON_CURRENT_REMOTE_BASE_PENDING_CANONICAL_MERGE"
+    "canonical_remote_merge_sha": "1ea43ea749b2d037e588fd02697e5de838f1b68a",
+    "canonicalization_status": "CANONICALIZED_REMOTE_MERGED"
   },
   "candidate_identity": {
     "candidate_id": "CANDIDATE_ORDER_FLOW_SIGNED_TAKER_NOTIONAL_V0",

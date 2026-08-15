@@ -1686,9 +1686,9 @@ next_action = "V0 is closed blocked because the frozen JFP03 HAR baseline was un
 [[project]]
 project_id = "JFPV3_PR_B_R2_ACTIVATION_PERSISTENCE_AND_FORWARD_RUNNER_IMPLEMENTATION_AUTHORIZATION_V0"
 display_name = "JFPV3 PR-B R2 activation persistence and forward runner implementation authorization"
-state = "ACTIVE"
-authority_level = "BOUNDED_SOURCE_BOUND_IMPLEMENTATION_ONLY"
-phase_type = "GOVERNANCE_ONLY"
+state = "CLOSED_PASS"
+authority_level = "R2_ACTIVATION_PERSISTENCE_AND_FORWARD_RUNNER_IMPLEMENTED_WITHOUT_ACTIVATION"
+phase_type = "IMPLEMENTATION_QUALIFICATION_CLOSURE"
 authoritative_artifacts = [
   "docs/state/projects.toml",
   "docs/CURRENT_ROADMAP.md",
@@ -1707,9 +1707,12 @@ authoritative_artifacts = [
   "experiments/research/jigsaw_fast_prospective_signal_discovery_v3/collector_v0r1/implementation_manifest.json",
   "experiments/research/jigsaw_fast_prospective_signal_discovery_v3/collector_v0r1/repair_record.json",
   "experiments/research/jigsaw_fast_prospective_signal_discovery_v3/collector_v0r1/hostile_review.md",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v3/collector_v0r2/implementation_manifest.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v3/collector_v0r2/repair_record.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v3/collector_v0r2/hostile_review.md",
 ]
-next_action = "After this governance authority is canonicalized, start a fresh R2 implementation worktree from the new canonical master; recreate or reapply R2 under this authority, independently verify it, and require a separate later activation authority after R2 canonicalization."
-implementation_authorized = true
+next_action = "CLOSED_PASS: R2 activation persistence and forward runner are implemented and frozen from canonical PR #100 lineage. No real activation, market-data access, scientific execution, inference, Jigsaw, State Snapshot, Router, Qnty, trading, promotion, or capital authority was granted. Separately authorize or execute activation only after this R2 implementation is canonicalized and only under a new bounded authority."
+implementation_authorized = false
 authorized_implementation_phase = "JFPV3_PR_B_R2"
 authorized_operations = [
   "modify qntylab/jfp_v3_shadow.py only as required for activation persistence and the frozen source contract",
@@ -1766,7 +1769,37 @@ hostile_governance_critical_total = 0
 hostile_governance_high_total = 0
 hostile_governance_open_critical = 0
 hostile_governance_open_high = 0
-targeted_governance_rereview_used = false
+targeted_governance_rereview_used = true
 qntyageval_applicability = "NO_MATCH"
 qntyageval_lookup_performed = true
 qntyageval_run_performed = false
+r2_activation_transaction_implemented = true
+activation_prepared_state = true
+shadow_activated_commit_event = true
+partial_activation_not_active = true
+crash_recovery_idempotent = true
+conflicting_recovery_fails_closed = true
+second_activation_rejected = true
+exact_365_schedule_bound_to_activation = true
+ledger_derived_status = true
+collection_requires_committed_activation = true
+collection_requires_correct_run = true
+collection_requires_schedule_membership = true
+temporal_origin_gate = true
+temporal_outcome_gate = true
+due_origin_operation_exists = true
+production_source_path_exists = true
+real_network_used = false
+r1_future_merge_regression = "PASS"
+moving_master_defect_recurred = false
+pr_a_changed = false
+scientific_contract_changed = false
+shadow_activated = false
+open_critical = 0
+open_high = 0
+r2_implementation_digest = "3f80bcd2dd60aaae6e1307883cca2e996f631f7bbc3b76037eafef8450167e2b"
+r2_manifest_digest = "b1ca7d2bb5025b272bfdcd871a1889f6f25842c2be83c479d19ebad16075520e"
+r2_final_candidate_sha = "R2_FINAL_CANDIDATE_SHA_RECORDED_AT_FINAL_CANDIDATE_FREEZE"
+implementation_authority_consumed = true
+active_project_after_closure = "NONE"
+next_action_after_closure = "CANONICALIZE_R2_THEN_SEPARATELY_AUTHORIZE_OR_EXECUTE_ACTIVATION_AS_ALLOWED"

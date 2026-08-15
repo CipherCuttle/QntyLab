@@ -1,0 +1,16 @@
+{
+  "phase": "JFPV3_PR_B_R2 ACTIVATION_PERSISTENCE_AND_FORWARD_RUNNER_V0",
+  "candidate_id": "JFPV3_01",
+  "parent_canonical_merge": "779dac12c0e7a6db0a733ecd77c2980444ae7916",
+  "parent_implementation_digest": "7a8bbfe5b72d787608436232fd87bbe876be24b0d524a38f2d7dd6bbc5d53e01",
+  "scope": "durable append-only activation, exact 365-origin schedule persistence, crash/replay recovery, activation-gated collection, UTC temporal gates, and injected forward runner",
+  "preserved_history": {
+    "preauthorization_scratch": "NON_AUTHORITATIVE_ENGINEERING_REFERENCE",
+    "activation_count_before_r2": 0,
+    "scientific_data_accessed": false,
+    "contamination": "NONE"
+  },
+  "scientific_changes": false,
+  "activation_performed": false,
+  "real_network_used": false
+}

@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- `JFPV3 PR-B R2 activation persistence and forward runner implementation authorization` — `ACTIVE`. After this governance authority is canonicalized, start a fresh R2 implementation worktree from the new canonical master; recreate or reapply R2 under this authority, independently verify it, and require a separate later activation authority after R2 canonicalization.
+- None.
 
 ## Queued — not authorized
 
@@ -19,6 +19,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Closed / stale
 
+- `JFPV3 PR-B R2 activation persistence and forward runner implementation authorization` — `CLOSED_PASS`. CLOSED_PASS: R2 activation persistence and forward runner are implemented and frozen from canonical PR #100 lineage. No real activation, market-data access, scientific execution, inference, Jigsaw, State Snapshot, Router, Qnty, trading, promotion, or capital authority was granted. Separately authorize or execute activation only after this R2 implementation is canonicalized and only under a new bounded authority.
 - `JH01 incremental forecast-value input materialization authorization` — `CLOSED_BLOCKED`. A new separately preregistered JH01 incremental forecast-value experiment may be considered with a genuinely future first origin, but requires a new bounded outcome-blind preregistration phase. V0 remains immutable and terminally blocked by prospective timing integrity. No result from V0 exists; JH01 discovery and temporal-replication evidence remain unchanged.
 - `JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_PREREG_V0` — `CLOSED_PASS`. JH01 incremental forecast-value preregistration is frozen outcome-blind and closed. The exact candidate is blocked pending separately Git-backed prospective input/materialization authorization proving outcome-unseen integrity; no evaluator execution, Jigsaw mutation, State Snapshot, Router, Qnty, trading, or promotion authority is granted.
 - `JH01 incremental forecast-value prospective preregistration V1` — `CLOSED_PASS`. Before canonical merge, the mandatory `python -m qntylab.jh01_rv_persistence_incremental_forecast_value_prereg_v1 --canonical-merge-time <UTC>` gate must pass at or before 2026-09-01T00:00:00Z; a late merge is BLOCKED and may not move the first decision. After timely canonical freeze, no direct authorization follows: a separate Git-backed governance phase must qualify a sealed prospective input and forecast-persistence recorder before 2026-09-15T00:00:00Z; interim scientific evaluation remains prohibited.

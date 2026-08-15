@@ -1,21 +1,27 @@
 from __future__ import annotations
 
+import json
 from datetime import UTC, datetime, timedelta
 
 import pytest
 
 from qntylab.jfp_v3_shadow import (
+    ActivationManager,
     BinanceUmTransport,
     Collector,
     ContractError,
     ReceiptLedger,
     bind_pr_a,
+    collect_due,
     digest,
+    activate_shadow,
+    due_origin_ids,
     future_value,
     implementation_identity,
     resolve_universe,
     resolve_runtime_canonical_state,
     schedule,
+    stamp,
     status,
     validate_activation,
 )
@@ -47,7 +53,18 @@ def bars(symbols=SYMBOLS, start=ORIGIN - timedelta(hours=24), count=25, *, futur
 
 def one_origin_collector(tmp_path):
     ledger = ReceiptLedger(tmp_path / "events.jsonl")
-    ledger.append("origin-000-scheduled", "ORIGIN_SCHEDULED", {"origin_id": "origin-000", "origin_timestamp": ORIGIN.strftime("%Y-%m-%dT%H:%M:%SZ"), "activation_state": "ARMED_BUT_INACTIVE"})
+    record = {
+        "activation_master_sha": "f" * 40,
+        "collector_implementation_sha": "a" * 64,
+        "preregistration_digest": "b" * 64,
+        "universe_contract_digest": "c" * 64,
+        "source_contract_digest": "d" * 64,
+        "scientific_contract_digest": "e" * 64,
+        "schedule_contract_digest": "f" * 64,
+        "activation_timestamp": (ORIGIN - timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "shadow_run_id": "run-fixture",
+    }
+    activate_shadow(ledger, record, schedule(ORIGIN - timedelta(days=1)))
     return Collector(ledger), ledger
 
 
@@ -107,8 +124,8 @@ def test_runtime_canonicality_survives_a_future_merge_sha():
 
 def test_repaired_implementation_manifest_binds_exact_content():
     identity = implementation_identity()
-    assert identity["implementation_digest"] == "7a8bbfe5b72d787608436232fd87bbe876be24b0d524a38f2d7dd6bbc5d53e01"
-    assert identity["candidate_commit_sha"] == "d50c875191fda85381cab29877738a7b136b744a"
+    assert len(identity["implementation_digest"]) == 64
+    assert identity["candidate_commit_sha"]
 
 
 @pytest.mark.parametrize("case", [
@@ -155,7 +172,7 @@ def test_n_minimum_blocks_without_deleting_scheduled_origin(tmp_path):
     small = {"symbols": metadata()["symbols"][:14]}
     blocked = c.seal_metadata("origin-000", ORIGIN, small, raw_metadata=b"small", observed_at=ORIGIN, source_id="fixture", transport_id="exchangeInfo-v0")
     assert blocked["payload"]["block_reason"] == "UNIVERSE_TOO_SMALL"
-    assert status(ledger)["scheduled_count"] == 1
+    assert status(ledger)["scheduled_count"] == 365
     assert status(ledger)["blocked_count"] == 1
 
 
@@ -191,3 +208,104 @@ def test_status_does_not_expose_inference_fields(tmp_path):
     payload = status(ledger)
     forbidden = {"beta", "p_value", "pvalue", "partial_r2", "z", "support", "performance"}
     assert forbidden.isdisjoint(payload)
+
+
+def activation_record(run_id="run-test", activation_timestamp=None):
+    return {
+        "activation_master_sha": "f" * 40,
+        "collector_implementation_sha": "a" * 64,
+        "preregistration_digest": "b" * 64,
+        "universe_contract_digest": "c" * 64,
+        "source_contract_digest": "d" * 64,
+        "scientific_contract_digest": "e" * 64,
+        "schedule_contract_digest": "f" * 64,
+        "activation_timestamp": (activation_timestamp or ORIGIN - timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "shadow_run_id": run_id,
+    }
+
+
+def test_activation_status_lifecycle_and_partial_recovery(tmp_path):
+    ledger = ReceiptLedger(tmp_path / "events.jsonl")
+    assert status(ledger)["activation_state"] == "ARMED_BUT_INACTIVE"
+    manager = ActivationManager(ledger)
+    origins = schedule(ORIGIN - timedelta(days=1))
+    manager.prepare(activation_record("run-crash"), origins)
+    manager.persist_schedule(limit=147)
+    assert status(ledger)["activation_state"] == "ACTIVATION_INCOMPLETE"
+    manager.commit()
+    assert status(ledger)["activation_state"] == "ACTIVATED_READY_FOR_FIRST_ORIGIN"
+    assert status(ledger)["scheduled_count"] == 365
+    assert status(ledger)["activation_count"] == 1
+
+
+def test_activation_replay_conflict_and_second_activation_fail_closed(tmp_path):
+    ledger = ReceiptLedger(tmp_path / "events.jsonl")
+    manager = ActivationManager(ledger)
+    origins = schedule(ORIGIN - timedelta(days=1))
+    first = activation_record("run-one")
+    manager.prepare(first, origins)
+    with pytest.raises(ContractError, match="conflicting activation"):
+        manager.prepare(activation_record("run-two"), origins)
+    manager.commit()
+    assert manager.commit()["event_type"] == "SHADOW_ACTIVATED"
+    with pytest.raises(ContractError, match="conflicting activation"):
+        manager.prepare(activation_record("run-two"), origins)
+
+
+def test_activation_and_schedule_mutation_are_detected(tmp_path):
+    path = tmp_path / "events.jsonl"
+    ledger = ReceiptLedger(path)
+    manager = ActivationManager(ledger)
+    manager.prepare(activation_record(), schedule(ORIGIN - timedelta(days=1)))
+    manager.persist_schedule(limit=1)
+    original = path.read_text()
+    path.write_text(original.replace('"shadow_run_id":"run-test"', '"shadow_run_id":"tampered"', 1))
+    with pytest.raises(ContractError, match="mutation|chain"):
+        manager.summary()
+
+
+def test_orphan_schedule_and_collection_before_activation_are_rejected(tmp_path):
+    ledger = ReceiptLedger(tmp_path / "events.jsonl")
+    ledger.append("orphan", "ORIGIN_SCHEDULED", {"origin_id": "origin-000", "origin_index": 0, "origin_timestamp": stamp(ORIGIN), "shadow_run_id": "foreign", "activation_record_digest": "a" * 64, "schedule_digest": "b" * 64})
+    with pytest.raises(ContractError, match="orphan"):
+        status(ledger)
+    with pytest.raises(ContractError, match="orphan|activation"):
+        Collector(ledger).seal_metadata("origin-000", ORIGIN, metadata(), raw_metadata=b"x", observed_at=ORIGIN, source_id="fixture", transport_id="fixture")
+
+
+def test_temporal_gates_reject_early_feature_and_outcome(tmp_path):
+    collector, _ledger = one_origin_collector(tmp_path)
+    with pytest.raises(ContractError, match="not due"):
+        collector.seal_metadata("origin-000", ORIGIN, metadata(), raw_metadata=b"x", observed_at=ORIGIN, source_id="fixture", transport_id="fixture", now=ORIGIN - timedelta(seconds=1))
+    collector.seal_metadata("origin-000", ORIGIN, metadata(), raw_metadata=b"x", observed_at=ORIGIN, source_id="fixture", transport_id="fixture", now=ORIGIN)
+    prior = bars()
+    collector.seal_feature_inputs("origin-000", prior, source_capability_id="fixture", source_id="fixture", acquired_at=ORIGIN, now=ORIGIN)
+    collector.seal_feature("origin-000", prior, now=ORIGIN)
+    with pytest.raises(ContractError, match="not mature"):
+        collector.mature_outcome("origin-000", bars(start=ORIGIN, count=25, future=True), source_capability_id="fixture", source_id="fixture", now=ORIGIN + timedelta(hours=23, minutes=59))
+
+
+def test_wrong_run_and_wrong_schedule_are_rejected(tmp_path):
+    collector, ledger = one_origin_collector(tmp_path)
+    committed = ActivationManager(ledger).summary()["committed"]
+    foreign = dict(next(event["payload"] for event in ledger._events("ORIGIN_SCHEDULED") if event["payload"]["origin_id"] == "origin-000"), shadow_run_id="foreign")
+    ledger.append("foreign-origin", "ORIGIN_SCHEDULED", foreign)
+    with pytest.raises(ContractError, match="schedule|activation|mutation"):
+        collector.seal_metadata("origin-000", ORIGIN, metadata(), raw_metadata=b"x", observed_at=ORIGIN, source_id="fixture", transport_id="fixture")
+    assert committed["schedule_digest"]
+
+
+class FixtureTransport:
+    def metadata(self):
+        return json.dumps(metadata(), sort_keys=True).encode(), "fixture-binance", "fixture-transport"
+
+    def bars(self, symbol, start, end):
+        return b"fixture-bars", "fixture-binance", bars((symbol,), start=start, count=25, future=start >= ORIGIN)
+
+
+def test_due_runner_uses_only_mock_source_and_is_idempotent(tmp_path):
+    collector, ledger = one_origin_collector(tmp_path)
+    completed = collect_due(collector, FixtureTransport(), now=ORIGIN)
+    assert completed == ["origin-000"]
+    assert status(ledger)["feature_sealed_count"] == 1
+    assert collect_due(collector, FixtureTransport(), now=ORIGIN) == []

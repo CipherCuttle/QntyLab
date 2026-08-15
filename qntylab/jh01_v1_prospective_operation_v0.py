@@ -3,8 +3,9 @@
 This module owns campaign activation state and due-origin ordering.  It does
 not own the frozen models, source admission, release transport, or attestation
 policy; those remain in the qualified recorder module and are injected here.
-The implementation phase uses ``synthetic=True`` only.  No real source or
-publication client is constructed by this module.
+Synthetic qualification and future real prospective operation are distinct,
+durably bound campaign modes.  No real source or publication client is
+constructed by this module.
 """
 from __future__ import annotations
 
@@ -27,6 +28,11 @@ AUTHORIZATION_PATH = Path(
     "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/"
     "real_activation_and_forward_recorder_implementation_authorization_v0.json"
 )
+REAL_OPERATION_AUTHORIZATION_PROJECT_ID = "JH01_V1_REAL_PROSPECTIVE_OPERATION_AUTHORIZATION_V0"
+REAL_OPERATION_AUTHORIZATION_PATH = Path(
+    "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/"
+    "real_prospective_operation_authorization_v0.json"
+)
 PREREGISTRATION_DIGEST = "bdb85130cae75e9f156db9aa1fd955d7f565a3714ae091871d5ac4447c1ec27b"
 QUALIFIED_RECORDER_MERGE = "b50e8e3cd17199265cb7040588d97822d45dd170"
 QUALIFIED_RECORDER_CANDIDATE = "5dc86826040b9bd3403f03c31cfc8a64249ed907"
@@ -38,6 +44,11 @@ TARGET_STATE = "REAL_V1_ARMED_BUT_INACTIVE"
 
 class OperationBlocked(ValueError):
     """The frozen activation or prospective-operation contract rejects a call."""
+
+
+class OperationMode(str, Enum):
+    SYNTHETIC_QUALIFICATION = "SYNTHETIC_QUALIFICATION"
+    REAL_PROSPECTIVE = "REAL_PROSPECTIVE"
 
 
 class CampaignState(str, Enum):
@@ -147,8 +158,65 @@ def _validate_recorder_lineage(root: Path, authorization: Mapping[str, Any]) -> 
     return source_digest
 
 
-def build_activation_contract(root: Path) -> dict[str, Any]:
-    """Build and validate the one immutable campaign binding."""
+def _load_real_operation_authority(root: Path, *, fixture: Mapping[str, Any] | None = None) -> tuple[dict[str, Any], str]:
+    """Load the separate future real-operation authority, or fail closed.
+
+    ``fixture`` is an explicit test-only seam used by synthetic tests.  The
+    production path always reads the canonical future authority pathname; the
+    implementation authorization above is never accepted as a substitute.
+    """
+    if fixture is None:
+        path = root / REAL_OPERATION_AUTHORIZATION_PATH
+        try:
+            document = json.loads(path.read_text())
+        except (OSError, json.JSONDecodeError) as exc:
+            raise OperationBlocked("REAL_OPERATION_AUTHORITY_REQUIRED") from exc
+    else:
+        document = dict(fixture)
+    if not isinstance(document, dict):
+        raise OperationBlocked("malformed real-operation authority")
+    required = {
+        "project_id": REAL_OPERATION_AUTHORIZATION_PROJECT_ID,
+        "state": "ACTIVE",
+        "candidate_id": recorder.CANDIDATE_ID,
+        "preregistration_digest": PREREGISTRATION_DIGEST,
+        "qualified_recorder_identity": EXPECTED_RECORDER_SOURCE_DIGEST,
+        "wrapper_implementation_identity": implementation_identity(),
+        "first_live_origin": _stamp(recorder.FIRST_LIVE_ORIGIN),
+        "last_live_origin": _stamp(recorder.LAST_LIVE_ORIGIN),
+        "required_origin_count": 365,
+        "schedule_digest": schedule_digest(),
+        "ordered_panel_digest": "e6d1447ff2be57f81eaf943b62218ce9a7b9a6f5bf2d25f9be255cb3f2040cd8",
+        "source_contract_identity": SOURCE_CONTRACT,
+        "persistence_mechanism_identity": PERSISTENCE_MECHANISM,
+        "attestation_policy_identity": "JH01_V1_GITHUB_RELEASE_SIGSTORE_V0R3",
+    }
+    if any(document.get(key) != value for key, value in required.items()):
+        raise OperationBlocked("real-operation authority binding mismatch")
+    if (
+        document.get("real_v1_activation_authorized") is not True
+        or document.get("forward_collection_authorized") is not True
+        or document.get("scientific_evaluation_authorized") is not False
+        or document.get("interim_metrics_authorized") is not False
+        or document.get("downstream_authority") != "NONE"
+    ):
+        raise OperationBlocked("real-operation authority firewall mismatch")
+    if document.get("implementation_canonical_lineage") != {
+        "base_canonical_merge": AUTHORIZATION_CANONICAL_MERGE,
+        "implementation_pr": 104,
+    }:
+        raise OperationBlocked("real-operation authority lineage mismatch")
+    return document, _digest(document)
+
+
+def build_activation_contract(
+    root: Path,
+    *,
+    mode: OperationMode = OperationMode.SYNTHETIC_QUALIFICATION,
+    real_authority: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Build and validate one immutable campaign binding for one mode."""
+    mode = OperationMode(mode)
     authorization = _load_authorization(root)
     recorder_digest = _validate_recorder_lineage(root, authorization)
     origins = required_origins()
@@ -195,7 +263,14 @@ def build_activation_contract(root: Path) -> dict[str, Any]:
         "persistence_mechanism_identity": PERSISTENCE_MECHANISM,
         "attestation_policy_identity": "JH01_V1_GITHUB_RELEASE_SIGSTORE_V0R3",
         "target_state": TARGET_STATE,
+        "operation_mode": mode.value,
+        "real_operation_authorization_project_id": None,
+        "real_operation_authorization_artifact_digest": None,
     }
+    if mode is OperationMode.REAL_PROSPECTIVE:
+        _, authority_digest = _load_real_operation_authority(root, fixture=real_authority)
+        contract["real_operation_authorization_project_id"] = REAL_OPERATION_AUTHORIZATION_PROJECT_ID
+        contract["real_operation_authorization_artifact_digest"] = authority_digest
     return {**contract, "activation_contract_digest": _digest(contract)}
 
 
@@ -362,17 +437,22 @@ OfflineReverify = Callable[[Path], None]
 
 
 class Operation:
-    """Campaign API: synthetic activation, no-peek status, and due recording."""
+    """Campaign API with mechanically separated synthetic and real modes."""
 
-    def __init__(self, root: Path, state_dir: Path):
+    def __init__(self, root: Path, state_dir: Path, *, _test_real_authority: Mapping[str, Any] | None = None):
         self.root = root
         self.ledger = OperationLedger(state_dir)
         self.retention_dir = state_dir / "retention"
+        self._test_real_authority = dict(_test_real_authority) if _test_real_authority is not None else None
 
-    def activate(self, *, activation_time: datetime, synthetic: bool) -> dict[str, Any]:
-        if not synthetic:
-            raise OperationBlocked("REAL_V1_ACTIVATION_NOT_AUTHORIZED_IN_IMPLEMENTATION_PHASE")
-        contract = build_activation_contract(self.root)
+    @classmethod
+    def for_test_real_authority(cls, root: Path, state_dir: Path, authority: Mapping[str, Any]) -> "Operation":
+        """Construct only a test fixture seam for a future authority document."""
+        return cls(root, state_dir, _test_real_authority=authority)
+
+    def _activate(self, *, mode: OperationMode, activation_time: datetime) -> dict[str, Any]:
+        authority = self._test_real_authority if mode is OperationMode.REAL_PROSPECTIVE else None
+        contract = build_activation_contract(self.root, mode=mode, real_authority=authority)
         state, existing = self.ledger.activation()
         if state is not CampaignState.UNARMED or existing is not None:
             raise OperationBlocked("second activation campaign rejected")
@@ -384,6 +464,27 @@ class Operation:
         committed = {**payload, "activation_state": CampaignState.ARMED_BUT_INACTIVE.value}
         self.ledger.append("ACTIVATION_COMMITTED", committed)
         return self.status(now=activation_time)
+
+    def activate_synthetic(self, *, activation_time: datetime) -> dict[str, Any]:
+        return self._activate(mode=OperationMode.SYNTHETIC_QUALIFICATION, activation_time=activation_time)
+
+    def activate_real(self, *, activation_time: datetime) -> dict[str, Any]:
+        return self._activate(mode=OperationMode.REAL_PROSPECTIVE, activation_time=activation_time)
+
+    def _require_mode(self, mode: OperationMode) -> dict[str, Any]:
+        campaign, activation = self.ledger.activation()
+        if campaign is not CampaignState.ARMED_BUT_INACTIVE or activation is None:
+            raise OperationBlocked("activation is not committed")
+        if activation.get("operation_mode") != mode.value:
+            if mode is OperationMode.REAL_PROSPECTIVE:
+                raise OperationBlocked("REAL_OPERATION_AUTHORITY_REQUIRED")
+            raise OperationBlocked("synthetic campaign cannot execute real-operation path")
+        authority = self._test_real_authority if mode is OperationMode.REAL_PROSPECTIVE else None
+        expected = build_activation_contract(self.root, mode=mode, real_authority=authority)
+        for key, value in expected.items():
+            if activation.get(key) != value:
+                raise OperationBlocked("durable activation binding mismatch")
+        return activation
 
     def status(self, *, now: datetime) -> dict[str, Any]:
         campaign, activation = self.ledger.activation()
@@ -398,6 +499,9 @@ class Operation:
         return {
             "campaign_state": campaign.value,
             "activation_present": activation is not None,
+            "operation_mode": activation.get("operation_mode") if activation else None,
+            "real_operation_authorization_project_id": activation.get("real_operation_authorization_project_id") if activation else None,
+            "real_operation_authorization_artifact_digest": activation.get("real_operation_authorization_artifact_digest") if activation else None,
             "candidate_id": activation.get("candidate_id") if activation else recorder.CANDIDATE_ID,
             "preregistration_digest": activation.get("preregistration_digest") if activation else PREREGISTRATION_DIGEST,
             "wrapper_implementation_identity": activation.get("wrapper_implementation_identity") if activation else implementation_identity(),
@@ -417,7 +521,7 @@ class Operation:
             "last_offline_reverification_state": latest.get("offline_reverification_status"),
         }
 
-    def record_due(
+    def _record_due(
         self,
         *,
         now: datetime,
@@ -478,13 +582,39 @@ class Operation:
         self.ledger.append("ORIGIN_RECORDED", payload)
         return payload
 
+    def record_due(
+        self,
+        *,
+        now: datetime,
+        bars: Sequence[recorder.Bar],
+        runtime: recorder.PublicationRuntime,
+        target_commit: str,
+        offline_reverify: OfflineReverify,
+    ) -> dict[str, Any]:
+        """Production-capable seam; only a validated real campaign may enter."""
+        self._require_mode(OperationMode.REAL_PROSPECTIVE)
+        return self._record_due(now=now, bars=bars, runtime=runtime, target_commit=target_commit, offline_reverify=offline_reverify)
+
+    def record_due_synthetic(
+        self,
+        *,
+        now: datetime,
+        bars: Sequence[recorder.Bar],
+        runtime: recorder.PublicationRuntime,
+        target_commit: str,
+        offline_reverify: OfflineReverify,
+    ) -> dict[str, Any]:
+        """Fixture-only seam; a synthetic campaign can never enter ``record_due``."""
+        self._require_mode(OperationMode.SYNTHETIC_QUALIFICATION)
+        return self._record_due(now=now, bars=bars, runtime=runtime, target_commit=target_commit, offline_reverify=offline_reverify)
+
 
 def status(root: Path, state_dir: Path, *, now: datetime) -> dict[str, Any]:
     return Operation(root, state_dir).status(now=now)
 
 
 __all__ = [
-    "AUTHORIZATION_CANONICAL_MERGE", "AUTHORIZATION_PROJECT_ID", "CampaignState", "DueState",
+    "AUTHORIZATION_CANONICAL_MERGE", "AUTHORIZATION_PROJECT_ID", "CampaignState", "DueState", "OperationMode",
     "Operation", "OperationBlocked", "OperationLedger", "build_activation_contract",
     "implementation_identity", "required_origins", "schedule_digest", "status",
 ]
@@ -498,19 +628,21 @@ def main(argv: Sequence[str] | None = None) -> int:
     offline verifier.  The CLI never constructs real network clients.
     """
     parser = argparse.ArgumentParser(description="JH01 V1 prospective operation seam")
-    parser.add_argument("command", choices=("status", "activate", "record-due"))
+    parser.add_argument("command", choices=("status", "activate-synthetic", "activate-real", "record-due"))
     parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument("--state-dir", type=Path, required=True)
     parser.add_argument("--now", required=True, help="UTC timestamp")
-    parser.add_argument("--synthetic", action="store_true")
     args = parser.parse_args(argv)
     operation = Operation(args.root, args.state_dir)
     now = _instant(args.now)
     if args.command == "status":
         print(json.dumps(operation.status(now=now), sort_keys=True))
         return 0
-    if args.command == "activate":
-        print(json.dumps(operation.activate(activation_time=now, synthetic=args.synthetic), sort_keys=True))
+    if args.command == "activate-synthetic":
+        print(json.dumps(operation.activate_synthetic(activation_time=now), sort_keys=True))
+        return 0
+    if args.command == "activate-real":
+        print(json.dumps(operation.activate_real(activation_time=now), sort_keys=True))
         return 0
     raise OperationBlocked("record-due CLI requires injected source, transport, and verifier seams")
 

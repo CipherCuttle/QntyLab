@@ -33,3 +33,31 @@ Targeted rereview required: no
 The candidate is safe to freeze for the bounded implementation phase. This
 review does not authorize real activation, market-data access, publication,
 scientific evaluation, or downstream operation.
+
+## Closure history: external H-01
+
+The original review above recorded 0 critical and 0 high findings at the
+original freeze. An external closure review then identified H-01 HIGH: the
+caller-controlled synthetic marker was not durably bound to campaign mode and
+the production-shaped `record_due()` path lacked a real-operation authority
+gate.
+
+Targeted closure repair: performed on PR #104. The wrapper now durably binds
+`SYNTHETIC_QUALIFICATION` or `REAL_PROSPECTIVE`; synthetic campaigns can enter
+only `record_due_synthetic()`, while `record_due()` requires a validated,
+separate future real-operation authority. The current canonical repository has
+no such authority artifact, so real activation fails closed with
+`REAL_OPERATION_AUTHORITY_REQUIRED`.
+
+## Targeted H-01 rereview
+
+Rereview count: 1
+Scope: campaign separation, stale implementation-authority rejection, future
+authority binding, pre-source record gate, and future activation without
+wrapper-source mutation.
+
+Verdict: PASS
+
+Open critical: 0
+Open high: 0
+Further review: none

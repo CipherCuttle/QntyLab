@@ -2084,3 +2084,42 @@ qntyageval_lookup_performed = true
 qntyageval_run_performed = false
 active_project_after_closure = "NONE"
 next_action = "CLOSED_PASS: the exact real-operation authority artifact exists but has not been exercised. Canonicalize this governance candidate before exactly one later REAL_PROSPECTIVE activation; no activation, real market-data access, forecast, release, scientific evaluation, or downstream authority occurred in this phase."
+
+[[project]]
+project_id = "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_EXECUTION"
+display_name = "Order-Flow V0 historical execution authorization readiness"
+state = "CLOSED_BLOCKED"
+authority_level = "HISTORICAL_SCIENTIFIC_EXECUTION_AUTHORIZATION_BLOCKED"
+phase_type = "GOVERNANCE_ONLY"
+authoritative_artifacts = [
+  "docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md",
+  "docs/ADR/0006-qntylab-research-design-philosophy.md",
+  "docs/state/projects.toml",
+  "experiments/specs/qnty_edge_discovery_h010_order_flow_prior_evidence_reconciliation.md",
+  "experiments/specs/qnty_edge_discovery_order_flow_v0_preregistration.json",
+  "experiments/specs/qnty_edge_discovery_order_flow_v0_preregistration.md",
+  "experiments/specs/qnty_edge_discovery_order_flow_v0_hostile_review.md",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/execution/authorization.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/execution/hostile_review.md",
+  "tests/test_qnty_edge_discovery_order_flow_v0_preregistration.py",
+  "tests/test_qnty_edge_discovery_order_flow_v0_execution_authorization.py",
+]
+preregistration_commit_sha = "651a4f73850a62e15cf17b32db25176da70334ee"
+preregistration_digest = "8e75f53f19c9719b97c3626c7e39626e206505e138107601748d9213eabe7757"
+candidate_id = "CANDIDATE_ORDER_FLOW_SIGNED_TAKER_NOTIONAL_V0"
+variant_id = "variant_23f758ef7052522d70172239"
+proposal_event_id = "event_proposal_order_flow_v0_20260815"
+expected_scientific_cells = 40
+execution_authorized = false
+implementation_authorized = false
+outcome_accessed = false
+qntyageval_applicability = "NO_MATCH"
+hostile_review_count = 1
+hostile_review_verdict = "BLOCKED_READINESS"
+blocking_reasons = [
+  "SOURCE_PARTITION_SEMANTICS_NOT_PROVEN",
+  "REQUIRED_QUOTE_FIELDS_DROPPED_BY_NORMALIZED_INPUT_CONTRACT",
+  "OPEN_TO_OPEN_TARGET_EXECUTION_ADAPTER_NOT_EXISTING",
+  "NO_IMPLEMENTATION_AUTHORITY_IN_THIS_PHASE",
+]
+next_action = "CLOSED_BLOCKED: create a separately authorized outcome-free source/input contract and open-to-open implementation phase; do not execute V0 or create trial events until readiness is proven and canonicalized."

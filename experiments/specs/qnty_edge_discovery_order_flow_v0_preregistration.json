@@ -1,0 +1,197 @@
+{
+  "project_id": "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0",
+  "phase": "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_PREREGISTRATION",
+  "status": "PREREGISTRATION_ONLY_OUTCOME_UNSEEN",
+  "preregistration_digest": "8e75f53f19c9719b97c3626c7e39626e206505e138107601748d9213eabe7757",
+  "primary_question": "Does strictly pre-decision signed aggressive taker quote-notional contain economically useful information about the immediately following 1-hour Binance USD-M perpetual return after explicit conservative taker friction?",
+  "prior_evidence": {
+    "prior_order_flow_family": "H010_taker_flow",
+    "prior_status": "EXACT_VARIANT_FALSIFIED_FAMILY_OPEN",
+    "prior_variants_tested": 6,
+    "prior_asset_rows": 18,
+    "prior_direction_search": ["continuation", "reversal"],
+    "prior_lookbacks": ["1h", "6h", "24h"],
+    "prior_feature": "rolling normalized hourly OFI = 2*taker_buy_quote_volume/quote_volume - 1",
+    "prior_cost_model": "fixed 5/10/20 bps fee stress plus funding; no explicit spread/slippage/taker-fill model",
+    "prior_prospective_evidence": "NONE",
+    "reconciliation_artifact": "experiments/specs/qnty_edge_discovery_h010_order_flow_prior_evidence_reconciliation.md",
+    "reconciliation_artifact_sha256": "672d14f8da1e8b8fcbc19230517ef17a09ebae2063d3a090a89e804dd7d6f75d",
+    "h010_spec_sha256": "6531980b099aa6cdc5fcc94c5ab49422e24d763bb76efc9ac469eaa9ea1bd555",
+    "h010_result_sha256": "125217bd971e0dac739528a714ac3dcebba9819412aa1feee08e1c2f73043d99",
+    "related_but_distinct": {
+      "JFP01": "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/preregistration.json; quarter-hour boundary order imbalance association proposition; no identity link to H010",
+      "JFP03": "experiments/research/jfp03_afi_computability_within_frozen_scope_v0/result.json; absolute hourly taker-flow imbalance for 24-hour realized-volatility value; blocked before scientific outcomes; no identity link to H010"
+    },
+    "ancestry_disclosure": "Any later result must disclose H010, JFP01, and JFP03 ancestry. This is a material-gap follow-up, not pristine order-flow discovery, a replication of H010, or a rescue of H010."
+  },
+  "material_gap_from_h010": {
+    "feature": "raw signed taker quote-notional rather than H010 normalized OFI",
+    "timing": "strictly pre-decision source interval with a fixed one-bar embargo",
+    "economics": "explicit taker fee and slippage modes with event-time realized funding",
+    "benchmark": "flat/cash plus one fixed prior-return continuation opponent",
+    "scope": "one continuation proposition only; no reversal, alternate horizon, alternate normalization, or H010 coordinate rerun"
+  },
+  "mechanism": "Persistent aggressive buying or selling may represent information or directional pressure that is not fully incorporated immediately.",
+  "primary_direction": "CONTINUATION",
+  "source_contract": {
+    "provider": "Binance",
+    "market_data_source": "Binance USD-M Futures 1h kline archive/API contract",
+    "source_contract_identity": "BINANCE_USD_M_PERPETUAL_1H_MATERIALIZER_V0",
+    "source_documentation": "https://developers.binance.com/docs/derivatives/usds-margined-futures/market-data/rest-api/Kline-Candlestick-Data",
+    "required_kline_fields": ["open_time", "open", "close", "quote_volume", "taker_buy_quote_volume"],
+    "required_funding_source": "realized Binance USD-M funding settlement events with event timestamp and realized rate",
+    "instrument_contract_id": "BINANCE_USDM_PERPETUAL_USDT_V1",
+    "instrument_contract_digest": "3a1f9c64cf653a19d0bdf32b0ae58aad78be978261840b808f9098705c31e700",
+    "semantic_admission": "The execution-phase source contract must verify that total quote volume is partitioned into taker-buy and taker-sell quote notional so taker_sell_quote_notional = total_quote_volume - taker_buy_quote_volume is valid. If not verified, block; never infer or substitute another field.",
+    "metadata_only_in_this_phase": true
+  },
+  "instrument_type": "BINANCE_USD_M_PERPETUAL_USDT",
+  "universe": {
+    "selection": "Reuse the canonical Breadth V2 fixed 20-identity panel; membership is not changed using new-feature coverage or outcomes.",
+    "ordered_symbols": ["BCHUSDT", "XRPUSDT", "LTCUSDT", "TRXUSDT", "ETCUSDT", "LINKUSDT", "XLMUSDT", "CHZUSDT", "SANDUSDT", "REEFUSDT", "CHRUSDT", "ALICEUSDT", "ONEUSDT", "API3USDT", "GMTUSDT", "APEUSDT", "OPUSDT", "INJUSDT", "LDOUSDT", "APTUSDT"],
+    "count": 20,
+    "universe_digest": "becdf4bd2157ebbad416526f414c3b9f647e8832753a61642d8a5d60b6620bcd",
+    "source_panel_digest": "8a37866705efa5d68d80fb6770db49dbaba84c6e2c4848df6a406b885f0b5c1e",
+    "source_panel_artifact": "experiments/specs/breadth_v2_preregistration.md",
+    "coverage_rule": "Required kline fields, causal normalization history, target prices, and realized funding must be available for a cell; missing cells remain in the denominator and block that scientific cell. No asset deletion, replacement, ranking, or survivorship filtering."
+  },
+  "feature_formula": {
+    "name": "SIGNED_TAKER_QUOTE_NOTIONAL_LAGGED_1H",
+    "target_bar": "[t, t+1h)",
+    "source_bar": "[t-2h, t-1h)",
+    "signed_taker_quote_notional": "taker_buy_quote_notional[t-2] - taker_sell_quote_notional[t-2]",
+    "taker_sell_quote_notional": "total_quote_volume[t-2] - taker_buy_quote_volume[t-2], only after source semantic admission",
+    "normalization": "scale[t] = median(total_quote_volume[t-26:t-2]) over exactly 24 prior completed 1h bars, excluding the source bar",
+    "normalization_window_bars": 24,
+    "primary_feature": "feature[t] = signed_taker_quote_notional[t-2] / scale[t]",
+    "position_rule": "position[t] = sign(feature[t]); zero is flat only when the signed numerator is exactly zero",
+    "degrees_of_freedom": "No threshold, lookback tournament, alternate scale, or post-outcome transform is eligible.",
+    "material_distinction": "This uses raw signed notional, a lagged source bar, and a prior-bar median liquidity scale; it does not algebraically collapse into H010 same-bar normalized OFI or reuse H010's rolling-mean/direction grid."
+  },
+  "safe_known_timing": {
+    "feature_source_end": "t-1h source-bar close",
+    "safe_known_after": "t-1h plus source publication/closure; execution admission must verify the completed source bar",
+    "decision_time": "t at the target bar open, after the fixed one-bar embargo",
+    "execution_eligible_time": "t at target-bar open",
+    "outcome_start": "t at target-bar open",
+    "outcome_end": "t+1h at target-bar close/open boundary",
+    "ordering_contract": "FEATURE_SOURCE_END < DECISION_TIME <= EXECUTION_ELIGIBLE_TIME < OUTCOME_END",
+    "no_overlap_rule": "No unfinished bar, same-period source, close[t] decision, or source-to-target overlap is permitted.",
+    "delay_selection": "The one-bar embargo is frozen structurally before any V0 outcome and cannot be changed after outcome access."
+  },
+  "prediction_horizon": {
+    "primary": "NEXT_1_HOUR_RETURN",
+    "return_definition": "open[t+1h] / open[t] - 1 for the target bar's taker-executable open-to-open path",
+    "alternatives": []
+  },
+  "simple_opponents": {
+    "eligible_primary_opponent": "FLAT_CASH",
+    "diagnostic_only_controls": [
+      {
+        "id": "PRIOR_1H_RETURN_CONTINUATION",
+        "formula": "sign(close[t-1h] / close[t-2h] - 1)",
+        "purpose": "Test whether V0 adds incremental utility beyond the simplest prior-return continuation rule.",
+        "optimization": "None; one fixed prior 1h return only.",
+        "eligible_survivor": false
+      }
+    ],
+    "control_policy": "Controls diagnose incremental utility and cannot rescue, replace, or create an alternate V0 candidate."
+  },
+  "execution_contract": {
+    "semantics": "Conservative taker execution; no maker, queue, rebate, or free-close assumption.",
+    "entry_price": "Target-bar open plus the declared slippage cost; position is eligible only at target-bar open.",
+    "exit_price": "Following-bar open plus the declared slippage cost; no terminal close fill.",
+    "position_domain": [-1, 0, 1],
+    "turnover": "absolute position change per one-way transition; a direct long/short flip is two turnover units",
+    "cost_timing": "fee and slippage are charged at each transition using the same turnover convention as canonical QntyLab accounting",
+    "funding_treatment": "Realized event-time funding is charged or credited only when the position is open at the settlement event; no forward-fill or zero-fill",
+    "implementation_boundary": "Existing qntylab.bar_path is close-to-close and cannot honestly implement this open-to-open entry/exit contract without a separately authorized adapter. This preregistration adds no executor; an execution phase must either prove compatibility or remain blocked."
+  },
+  "cost_modes": {
+    "BASELINE": {"fee_bps_per_one_way_turnover": 10, "slippage_bps_per_one_way_turnover": 0, "funding": "realized_event_time"},
+    "STRESS": {"fee_bps_per_one_way_turnover": 10, "slippage_bps_per_one_way_turnover": 10, "funding": "realized_event_time"},
+    "count": 2,
+    "policy": "Both modes are fixed before outcomes; no 5/10/20 bps search and no cost rescue is permitted."
+  },
+  "temporal_design": {
+    "lane": "EXPLORATORY_DISCOVERY",
+    "market_history_pristine": false,
+    "new_feature_outcomes_unseen": true,
+    "related_h010_outcomes_known": true,
+    "confirmatory_status": "NO",
+    "historical_window": "2022-01-01T00:00:00Z..2025-12-31T23:00:00Z",
+    "fixed_chronological_blocks": [
+      {"id": "DEV_2022", "start": "2022-01-01T00:00:00Z", "end": "2022-12-31T23:00:00Z"},
+      {"id": "DEV_2024", "start": "2024-01-01T00:00:00Z", "end": "2024-12-31T23:00:00Z"},
+      {"id": "DEV_2025", "start": "2025-01-01T00:00:00Z", "end": "2025-12-31T23:00:00Z"}
+    ],
+    "excluded_interval": "2023 is not promoted to a fresh holdout; the canonical Breadth V2 fixed development partition is reused.",
+    "sealed_holdout": "NONE_IN_THIS_PHASE",
+    "adaptive_regime_slicing": false,
+    "random_k_fold": false,
+    "later_confirmation": "A sealed or prospective confirmation requires a separate preregistration and authorization."
+  },
+  "search_denominator": {
+    "mechanisms": 1,
+    "feature_formulas": 1,
+    "normalizations": 1,
+    "directions": 1,
+    "horizons": 1,
+    "universes": 1,
+    "cost_modes": 2,
+    "eligible_strategy_variants": 1,
+    "eligible_asset_rows": 20,
+    "eligible_asset_cost_cells": 40,
+    "diagnostic_only_controls": 2,
+    "temporal_blocks": 3,
+    "new_v0_primary_denominator": "1 mechanism × 1 feature formula × 1 normalization × 1 direction × 1 horizon × 1 universe × 2 cost modes × 20 fixed assets = 40 asset-cost cells, with 3 fixed chronological diagnostics",
+    "prior_h010_denominator_binding": "H010 remains 6 variants × 3 assets = 18 prior asset-variant rows and is not erased or pooled as new V0 evidence."
+  },
+  "primary_metrics": ["gross_return", "net_return", "turnover", "fee_cost", "slippage_cost", "funding_pnl_or_cost", "benchmark_excess", "maximum_drawdown", "positive_asset_breadth", "positive_temporal_breadth"],
+  "robustness_metrics": ["Sharpe_like_descriptive_only", "cost_delta", "single_asset_concentration", "period_contribution_concentration", "control_excess_vs_prior_return_continuation"],
+  "economic_survivor_gate": {
+    "all_required_cells": "Every required asset-cost-period cell must be valid; any missing source, funding, timing, semantic, or integrity cell blocks V0 and cannot be deleted.",
+    "aggregate_economics": "Aggregate net return is positive under BASELINE and STRESS, and aggregate benchmark excess versus FLAT_CASH is positive under STRESS.",
+    "incremental_utility": "Aggregate STRESS excess versus PRIOR_1H_RETURN_CONTINUATION is positive; the prior-return control is fixed and is not an eligible V0 variant.",
+    "asset_breadth": "At least 10 of 20 assets have positive STRESS net return and positive STRESS excess versus the fixed prior-return control.",
+    "temporal_breadth": "At least 2 of 3 fixed chronological blocks have positive STRESS net return and positive STRESS excess versus the fixed prior-return control.",
+    "concentration": "No single asset contributes more than 35% of the sum of positive STRESS incremental-excess contributions, and no single block contributes more than 65% of that sum.",
+    "stress_retention": "STRESS incremental excess is at least 50% of positive BASELINE incremental excess.",
+    "integrity": "No unresolved timing, source-semantic, funding, coverage, execution, denominator, or authority failure remains.",
+    "interpretation": "A positive aggregate net return alone is insufficient; failure of any gate kills V0 for this frozen proposition."
+  },
+  "cheap_kill_rule": "If the single frozen signed-flow proposition cannot produce broad, temporally credible, cost-adjusted incremental economic utility under the conservative execution contract, KILL V0. Failure authorizes no alternate normalization, reversal, horizon, threshold, universe, or execution assumption.",
+  "multiplicity_treatment": "The low-dimensional denominator is preserved explicitly. No formal p-value or generic statistical infrastructure is authorized in this phase. Any later family-appropriate selection adjustment must use the frozen denominator and cannot rescue a gate failure.",
+  "integrity_failure_rules": ["OUTCOME_ACCESSED_BEFORE_FREEZE", "H010_COORDINATE_RERUN_OR_SILENT_REOPEN", "UNSUPPORTED_TAKER_SELL_IDENTITY", "SAFE_KNOWN_AFTER_VIOLATION", "SAME_PERIOD_OVERLAP", "UNFINISHED_BAR_USED", "OPEN_TO_OPEN_CONTRACT_NOT_IMPLEMENTED_HONESTLY", "FUNDING_GAP_OR_ZERO_FILL", "MISSING_CELL_DELETED", "UNIVERSE_CHANGED_AFTER_FREEZE", "SEARCH_DENOMINATOR_CHANGED", "CONTROL_PROMOTED_TO_RESCUE", "UNAUTHORIZED_EXECUTION_OR_DOWNSTREAM_MUTATION"],
+  "missing_data_rules": "Preserve every ordered asset and period in the denominator. Missing required kline, normalization history, target price, or realized funding coverage blocks the affected cell; do not zero-fill, forward-fill, backfill, substitute assets, or inspect outcomes to choose exclusions.",
+  "evidence_scope": {
+    "allowed_now": ["source metadata", "schema", "coverage metadata", "source semantics", "existing immutable digests", "prior H010/JFP evidence", "existing accounting capability", "synthetic/unit fixtures"],
+    "forbidden_now": ["new feature values across history", "conditioned returns", "correlation", "PnL", "regression", "parameter comparison", "outcome plots", "strategy execution", "trial completion", "prospective collection"],
+    "new_feature_outcomes_unseen": true
+  },
+  "authority_boundary": ["NO_HISTORICAL_EXECUTION", "NO_NEW_FEATURE_OUTCOME_COMPUTATION", "NO_TRIAL_COMPLETED", "NO_JIGSAW_MUTATION", "NO_STATE_SNAPSHOT", "NO_REACTIVE_JIGSAW", "NO_FORECASTER", "NO_ROUTER", "NO_QNTY_MUTATION", "NO_PAPER_OR_LIVE_TRADING", "NO_CAPITAL_ALLOCATION", "NO_TRADING_RESULTS_SEALED_OUTCOME_ACCESS", "NO_JH01_OR_JFPV3_MUTATION"],
+  "ledger_action": {
+    "event_type": "CANDIDATE_PROPOSED",
+    "event_id": "event_proposal_order_flow_v0_20260815",
+    "candidate_id": "CANDIDATE_ORDER_FLOW_SIGNED_TAKER_NOTIONAL_V0",
+    "family_id": "ORDER_FLOW_SIGNED_TAKER_NOTIONAL_MATERIAL_GAP_V0",
+    "variant_id": "variant_23f758ef7052522d70172239",
+    "prior_evidence_reference": "experiments/specs/qnty_edge_discovery_h010_order_flow_prior_evidence_reconciliation.md",
+    "trial_completed_event": false,
+    "h010_reopened": false,
+    "jigsaw_mutated": false
+  },
+  "qntyagenteval_applicability": {
+    "applicability": "NO_MATCH",
+    "compatible_contract_id": null,
+    "lookup_scope": "Committed QntyLab repository search for QntyAgentEval/qnty_agent_eval/evaluator contracts.",
+    "action": "Do not build one; this preregistration is outcome-blind and principally a research contract."
+  },
+  "hostile_review_policy": {
+    "review_count": 1,
+    "review_scope": "One independent hostile review covering H010 duplication, material distinction, direction selection, timing, source semantics, execution, costs, funding, universe, denominator, benchmarks, multiplicity, and rescue pathways.",
+    "targeted_rereview": "At most one targeted re-review only if a Critical or High finding requires repair."
+  },
+  "next_phase_if_ready": "SEPARATE_GIT_BACKED_HISTORICAL_EXECUTION_AUTHORIZATION",
+  "strict_stop": "This artifact authorizes no scientific execution and stops after contract review and canonical Git verification."
+}

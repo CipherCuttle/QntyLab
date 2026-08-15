@@ -27,8 +27,8 @@ QntyLab
 → mechanism-first hypotheses
 → cheap, high-throughput discovery and falsification
 → trial ledger + Jigsaw skeptical evidence
-→ survivor gate
 → net economic-utility and robustness tests
+→ ECONOMIC SURVIVOR GATE
 → sealed / prospective confirmation for earned survivors
 → immutable promotion candidate
 → optional State Snapshot / Forecaster / Router composition

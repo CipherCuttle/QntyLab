@@ -2105,6 +2105,8 @@ authoritative_artifacts = [
   "tests/test_qnty_edge_discovery_order_flow_v0_execution_authorization.py",
 ]
 preregistration_commit_sha = "651a4f73850a62e15cf17b32db25176da70334ee"
+canonical_master_sha = "1ea43ea749b2d037e588fd02697e5de838f1b68a"
+canonicalization_pr = 110
 preregistration_digest = "8e75f53f19c9719b97c3626c7e39626e206505e138107601748d9213eabe7757"
 candidate_id = "CANDIDATE_ORDER_FLOW_SIGNED_TAKER_NOTIONAL_V0"
 variant_id = "variant_23f758ef7052522d70172239"

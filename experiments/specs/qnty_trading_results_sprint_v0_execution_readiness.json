@@ -1,0 +1,93 @@
+{
+  "artifact_type": "QNTY_TRADING_RESULTS_SPRINT_V0_EXECUTION_READINESS",
+  "artifact_version": "V0",
+  "status": "FROZEN_FOR_POST_MATURITY_ADJUDICATION_ONLY",
+  "execution_in_this_phase": false,
+  "candidate_freeze": {
+    "path": "experiments/specs/qnty_trading_results_sprint_v0_candidate_selection.json",
+    "sha256": "91c3ccd147b6fe5e19e0851834ea601dc90acf0d60f5c942aca13de4d37d5e11",
+    "selected_candidate_count": 3,
+    "candidate_ids": [
+      "CANDIDATE_BREADTH_V2_MA_24_96",
+      "CANDIDATE_BREADTH_V2_BREAKOUT_72",
+      "CANDIDATE_BREADTH_V2_BREAKOUT_168"
+    ],
+    "selection_evidence_is_unseen_confirmation": false
+  },
+  "implementation": {
+    "module": "qntylab/qnty_trading_results_sprint_v0_execution.py",
+    "implementation_sha256": "9867b3809f74890d9be9228763096409f42c0446692d20e50f4085b419db677e",
+    "source_paths": [
+      {"path": "qntylab/qnty_trading_results_sprint_v0_execution.py", "sha256": "682cfe7cd2c50b5c41f4f3def8855e518d5f6fd56e00c9be301581414968694e"},
+      {"path": "qntylab/breadth_v2_runner.py", "sha256": "18e8a89b7aa60a3e5893892e02046f37f3e84b41bc66f992d132406c7c5d6038"},
+      {"path": "qntylab/breadth_v2_execution.py", "sha256": "340263395174530829c6f74c1fca22cb77ac06e186de40265b64d2cbe225f698"},
+      {"path": "qntylab/breadth_v2_strategies.py", "sha256": "893386b5ed0b641fe5b31b18b5db10b2ef1bef917d277f3bae87de62bc7394e1"},
+      {"path": "qntylab/breadth_v2_input_bundle.py", "sha256": "461fe84e5c1febaa0baeeb0844ef3d055ad49f4676fd24d183cf54e2912aa2e7"},
+      {"path": "qntylab/breadth_v2_path.py", "sha256": "77af2c84888500a7d883d36144801085ffbc5750831875cc647ed98261a57f3d"},
+      {"path": "qntylab/breadth_v2_sealed.py", "sha256": "4508ca941d2386b2b5d9b84a690ebd69db914f56818ba6de18bca8e7f80b8b7d"},
+      {"path": "qntylab/instrument_contract.py", "sha256": "3f63264eb6b63f09ebc701dd2db501ce55b3eafe52af7336a68165e0517ca0cd"}
+    ]
+  },
+  "source_contract": {
+    "input_contract": "BREADTH_V2_INPUT_BUNDLE_V0",
+    "execution_contract": "BREADTH_V2_PORTFOLIO_KERNEL_V0",
+    "source_universe_contract": "BREADTH_V2_DEV_INPUT_UNIVERSE_V0R1",
+    "price_source": "BINANCE_USDM_PERPETUAL_1H_OHLCV",
+    "funding_source": "BINANCE_USDM_FUNDING_SETTLEMENT_MATERIALIZER_V0",
+    "funding": "realized event-time settlement against prior position; missing, unsupported, or incomplete funding blocks the affected candidate",
+    "decision_clock": "after close of completed 1h bar t; target applies to t->t+1",
+    "cost_modes": {
+      "BASELINE_EXECUTION": {"fee_bps": 10, "slippage_bps": 0},
+      "STRESS_EXECUTION": {"fee_bps": 10, "slippage_bps": 10}
+    },
+    "turnover": "kernel-owned one-way notional turnover on PRE_COST_EQUITY target weights, including terminal liquidation",
+    "benchmark": "BUY_AND_HOLD_PRIMARY_AND_CASH_SECONDARY",
+    "gap_policy": "FAIL_CLOSED_NO_GAPS"
+  },
+  "forward_plan": {
+    "sealed_t0": "2026-08-10T19:00:00Z",
+    "end": "2026-11-08T19:00:00Z",
+    "required_complete_hours": 2160,
+    "adjudication_authorized_at": "2026-11-08T19:00:00Z",
+    "boundary_count": 2161,
+    "assets": 20,
+    "cost_modes": 2,
+    "executions_per_candidate": 40,
+    "total_executions": 120,
+    "plan": "three exact frozen variants × 20 fixed single-asset panel members × baseline/stress"
+  },
+  "input_identity_rules": [
+    "exact three candidate IDs and exact candidate-specific parameters",
+    "exact fixed 20-symbol order and source-universe digest from selection freeze",
+    "exact 2,161 hourly boundaries from SEALED_T0 through end",
+    "candidate-specific causal warmup from the existing input-bundle contract",
+    "bundle payload digest must recompute; asset coverage must be COMPLETE",
+    "no interpolation, forward fill, listing filter, liquidity filter, backfill, or dynamic universe"
+  ],
+  "output_schema": {
+    "top_level": ["contract_id", "candidate_freeze_digest", "adjudication_authorized_at", "results"],
+    "per_candidate": ["candidate_id", "variant_id", "family", "parameters", "window", "cell_count", "metrics", "asset_window_cost_cells", "selection_evidence_context", "regime_decomposition", "gates", "reason_codes", "decision"],
+    "cell_dimensions": ["asset", "sealed_forward_full_window", "BASELINE_EXECUTION|STRESS_EXECUTION"],
+    "principal_metrics": ["candidate_net_return", "benchmark_excess_return", "annualized_volatility", "sharpe_like_return_over_volatility", "maximum_drawdown", "positive_asset_breadth", "cost_delta"],
+    "descriptive_metrics": ["gross_return", "turnover", "trade_count", "exposure_fraction", "fee_cost", "slippage_cost", "funding_cost", "price_pnl", "funding_pnl"]
+  },
+  "decision_reducer": {
+    "PROMOTE": "all integrity, stress aggregate, non-negative forward, asset breadth, concentration, cost-survival, and fixed-parameter identity gates pass; eligible only for a separately authorized next evidence tier",
+    "ITERATE": "reserved for a separately preregistered future contract; this complete-data implementation emits no ambiguous forward result",
+    "KILL": "any hard failure, non-finite result, unresolved coverage, identity violation, or inability to execute under frozen timing/source/benchmark/cost semantics",
+    "stress_aggregate": "> 0",
+    "forward_non_negative": ">= 0",
+    "positive_assets": ">= 10 of 20",
+    "max_positive_asset_share": "<= 0.35",
+    "cost_retention": ">= 0.50 of positive baseline benchmark-excess advantage",
+    "selection_context": "historical selection evidence is copied as context only; no forward result is confirmation of it"
+  },
+  "commands": {
+    "pre_maturity_identity_only": "python -m qntylab.project_context && python -m qntylab.research_ledger context && python -m qntylab.research_ledger doctor",
+    "maturity_gate": "qntylab.breadth_v2_sealed.enforce_sealed_adjudication_authorized(as_of)",
+    "adjudication": "authorized operator invokes qntylab.qnty_trading_results_sprint_v0_execution.adjudicate(as_of, canonical_freeze, bundles_by_candidate) only at/after 2026-11-08T19:00:00Z",
+    "ledger": "no QntyLab ledger append is performed by this readiness seam"
+  },
+  "qntyagenteval": {"applicability": "NO_MATCH", "action": "do not build an evaluator"},
+  "authority_boundary": "exploratory_only; no Qnty mutation, paper/live trading, capital authority, JH01, JFPV3, Router, State Snapshot, or Reactive Jigsaw"
+}

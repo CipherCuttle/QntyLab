@@ -14,6 +14,7 @@ from qntylab import project_context, research_ledger
 ROOT = Path(__file__).resolve().parents[1]
 R2_AUTHORIZATION_PROJECT_ID = "JFPV3_PR_B_R2_ACTIVATION_PERSISTENCE_AND_FORWARD_RUNNER_IMPLEMENTATION_AUTHORIZATION_V0"
 PROSPECTIVE_SHADOW_AUTHORIZATION_PROJECT_ID = "JFPV3_PROSPECTIVE_SHADOW_ACTIVATION_AND_FORWARD_COLLECTION_AUTHORIZATION_V0"
+JH01_REAL_OPERATION_AUTHORIZATION_PROJECT_ID = "JH01_V1_REAL_ACTIVATION_AND_FORWARD_RECORDER_IMPLEMENTATION_V0"
 
 
 def _tracked_root(tmp_path: Path) -> Path:
@@ -185,8 +186,8 @@ def test_jh01_temporal_replication_v0_and_v0r1_are_closed_with_their_distinct_li
     _, _, registry = project_context.load_context_sources(ROOT)
     # JH01 temporal replication and JFP03 materialization are closed; no
     # project implementation is currently authorized.
-    assert [record["project_id"] for record in registry["project"] if record["state"] == "ACTIVE"] == []
-    assert data["active_project"] is None
+    assert [record["project_id"] for record in registry["project"] if record["state"] == "ACTIVE"] == [JH01_REAL_OPERATION_AUTHORIZATION_PROJECT_ID]
+    assert data["active_project"]["project_id"] == JH01_REAL_OPERATION_AUTHORIZATION_PROJECT_ID
     execution = next(record for record in registry["project"] if record["project_id"] == "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_EXECUTION_V0")
     assert execution["state"] == "CLOSED_BLOCKED"
     assert execution["authority_level"] == "FROZEN_REPLICATION_EXECUTION_INTERRUPTED_NO_RERUN"
@@ -308,8 +309,8 @@ def test_jfp_historical_execution_v0_authorizes_only_jfp03_with_frozen_holm_fami
 
     # V0 and the replacement input-materialization phase are closed blocked;
     # no project implementation is currently authorized.
-    assert [record["project_id"] for record in registry["project"] if record["state"] == "ACTIVE"] == []
-    assert data["active_project"] is None
+    assert [record["project_id"] for record in registry["project"] if record["state"] == "ACTIVE"] == [JH01_REAL_OPERATION_AUTHORIZATION_PROJECT_ID]
+    assert data["active_project"]["project_id"] == JH01_REAL_OPERATION_AUTHORIZATION_PROJECT_ID
     execution = projects["JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_HISTORICAL_EXECUTION_V0"]
     assert execution["state"] == "CLOSED_BLOCKED"
     assert execution["authority_level"] == "FROZEN_DESIGN_UNDERSPECIFIED_BEFORE_REAL_ACCESS"
@@ -482,7 +483,7 @@ def test_jfp03_v0r1_scientific_execution_is_consumed_blocked_and_non_escalating(
     assert execution["downstream_authority"] == "NONE"
     assert execution["capital_authority"] == "NONE"
     assert execution["implementation_authorized"] is False
-    assert data["active_project"] is None
+    assert data["active_project"]["project_id"] == JH01_REAL_OPERATION_AUTHORIZATION_PROJECT_ID
     assert data["authority_conflicts_or_warnings"] == []
 
 
@@ -579,8 +580,8 @@ def test_jh01_jigsaw_evidence_authorization_v0_is_governance_only_and_binds_v0r1
     assert data["authority_conflicts_or_warnings"] == []
     # This JH01 governance phase and JFP03 input materialization are closed;
     # no project implementation is currently authorized.
-    assert [record["project_id"] for record in registry["project"] if record["state"] == "ACTIVE"] == []
-    assert data["active_project"] is None
+    assert [record["project_id"] for record in registry["project"] if record["state"] == "ACTIVE"] == [JH01_REAL_OPERATION_AUTHORIZATION_PROJECT_ID]
+    assert data["active_project"]["project_id"] == JH01_REAL_OPERATION_AUTHORIZATION_PROJECT_ID
     for forbidden_text in (
         "narrowest truthful representation",
         "no scientific rerun, recomputation, or input reacquisition is authorized",
@@ -602,7 +603,7 @@ def test_jfp03_terminal_evidence_extraction_authorization_is_governance_only_and
     assert authorization["authority_level"] == "GOVERNANCE_AUTHORIZATION_ONLY"
     assert authorization["phase_type"] == "GOVERNANCE_ONLY"
     assert authorization["implementation_authorized"] is False
-    assert data["active_project"] is None
+    assert data["active_project"]["project_id"] == JH01_REAL_OPERATION_AUTHORIZATION_PROJECT_ID
     assert not any(record["project_id"] == authorization["project_id"] for record in data["queued_but_unauthorized_projects"])
 
     assert authorization["terminal_result_path"] == predecessor["result_path"]
@@ -653,7 +654,7 @@ def test_jfpv3_r2_implementation_authorization_closes_without_escalation() -> No
     data = project_context.context_data(ROOT)
     _, _, registry = project_context.load_context_sources(ROOT)
     active = [record for record in registry["project"] if record["state"] == "ACTIVE"]
-    assert active == []
+    assert [record["project_id"] for record in active] == [JH01_REAL_OPERATION_AUTHORIZATION_PROJECT_ID]
     authorization = next(record for record in registry["project"] if record["project_id"] == R2_AUTHORIZATION_PROJECT_ID)
     assert authorization["project_id"] == R2_AUTHORIZATION_PROJECT_ID
     assert authorization["state"] == "CLOSED_PASS"
@@ -690,8 +691,8 @@ def test_jfpv3_r2_implementation_authorization_closes_without_escalation() -> No
     assert authorization["qntyageval_run_performed"] is False
     assert "activation persistence and forward runner are implemented and frozen" in authorization["next_action"].lower()
     assert "new bounded authority" in authorization["next_action"].lower()
-    assert data["active_project"] is None
-    assert data["current_permitted_next_action"] == "No project implementation is currently authorized."
+    assert data["active_project"]["project_id"] == JH01_REAL_OPERATION_AUTHORIZATION_PROJECT_ID
+    assert data["current_permitted_next_action"] == data["active_project"]["next_action"]
     assert authorization["next_action_after_closure"] == "CANONICALIZE_R2_THEN_SEPARATELY_AUTHORIZE_OR_EXECUTE_ACTIVATION_AS_ALLOWED"
     assert authorization["r2_activation_transaction_implemented"] is True
     assert authorization["shadow_activated"] is False
@@ -703,7 +704,7 @@ def test_jfpv3_prospective_shadow_authorization_is_one_shot_and_non_scientific()
     data = project_context.context_data(ROOT)
     _, _, registry = project_context.load_context_sources(ROOT)
     authorization = next(record for record in registry["project"] if record["project_id"] == PROSPECTIVE_SHADOW_AUTHORIZATION_PROJECT_ID)
-    assert data["active_project"] is None
+    assert data["active_project"]["project_id"] == JH01_REAL_OPERATION_AUTHORIZATION_PROJECT_ID
     assert authorization["state"] == "CLOSED_PASS"
     assert authorization["authority_level"] == "FROZEN_PROSPECTIVE_SHADOW_OPERATION_AUTHORIZATION_ONLY"
     assert authorization["phase_type"] == "GOVERNANCE_ONLY"
@@ -747,6 +748,35 @@ def test_jfpv3_prospective_shadow_authorization_is_one_shot_and_non_scientific()
     assert authorization["real_prospective_partial_r2_computed"] == 0
     assert authorization["scientific_classifications_computed"] == 0
     assert authorization["next_action"].startswith("CLOSED_PASS: Canonicalize this authorization")
+
+
+def test_jh01_real_operation_authorization_is_single_active_source_bound_phase() -> None:
+    data = project_context.context_data(ROOT)
+    _, _, registry = project_context.load_context_sources(ROOT)
+    authorization = next(record for record in registry["project"] if record["project_id"] == JH01_REAL_OPERATION_AUTHORIZATION_PROJECT_ID)
+    artifact = json.loads((ROOT / "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/real_activation_and_forward_recorder_implementation_authorization_v0.json").read_text(encoding="utf-8"))
+
+    assert data["active_project"]["project_id"] == JH01_REAL_OPERATION_AUTHORIZATION_PROJECT_ID
+    assert authorization["state"] == artifact["state"] == "ACTIVE"
+    assert authorization["phase_type"] == "IMPLEMENTATION_AUTHORIZATION"
+    assert authorization["implementation_authorized"] is True
+    assert authorization["frozen_preregistration_digest"] == artifact["lineage"]["preregistration_digest"]
+    assert authorization["canonical_recorder_merge"] == artifact["lineage"]["recorder_qualification_merge"] == "b50e8e3cd17199265cb7040588d97822d45dd170"
+    assert authorization["qualified_implementation_candidate"] == artifact["lineage"]["qualified_implementation_candidate"] == "5dc86826040b9bd3403f03c31cfc8a64249ed907"
+    assert authorization["qualified_recorder_module_immutable"] is True
+    assert authorization["wrapper_first_required"] is True
+    assert artifact["frozen_contract"]["required_valid_origins"] == 365
+    assert artifact["frozen_contract"]["persistence_window"] == "t <= persistence_time < t + 1 hour"
+    assert artifact["authority_firewall"]["real_v1_collection_authorized"] is False
+    assert artifact["authority_firewall"]["real_market_data_authorized"] is False
+    assert artifact["authority_firewall"]["real_github_forecast_publication_authorized"] is False
+    assert artifact["authority_firewall"]["scientific_evaluation_authorized"] is False
+    assert artifact["authority_firewall"]["capital_authority"] == "NONE"
+    assert artifact["hostile_governance_review"]["review_count"] == 1
+    assert artifact["hostile_governance_review"]["critical_total"] == artifact["hostile_governance_review"]["high_total"] == 0
+    assert artifact["hostile_governance_review"]["targeted_rereview_used"] is False
+    assert artifact["qntyageval"] == {"applicability": "NO_MATCH", "lookup_performed": True, "run_performed": False}
+    assert data["authority_conflicts_or_warnings"] == []
 
 
 def test_jfpv3_prospective_authorization_binds_immutable_r2_and_scientific_bytes() -> None:

@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- None.
+- `JH01 V1 real activation and forward recorder implementation authorization V0` — `ACTIVE`. CANONICALIZE THIS AUTHORIZATION, THEN START A FRESH IMPLEMENTATION WORKTREE FROM THE NEW MASTER AND IMPLEMENT ONLY THE MINIMAL REAL-ACTIVATION / DUE-ORIGIN WRAPPER. NO REAL V1 FORECAST, MARKET DATA, REAL GITHUB FORECAST RELEASE, SCIENTIFIC EVALUATION, OR DOWNSTREAM AUTHORITY IS AUTHORIZED.
 
 ## Queued — not authorized
 

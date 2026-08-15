@@ -13,6 +13,7 @@ from qntylab import project_context, research_ledger
 
 ROOT = Path(__file__).resolve().parents[1]
 R2_AUTHORIZATION_PROJECT_ID = "JFPV3_PR_B_R2_ACTIVATION_PERSISTENCE_AND_FORWARD_RUNNER_IMPLEMENTATION_AUTHORIZATION_V0"
+PROSPECTIVE_SHADOW_AUTHORIZATION_PROJECT_ID = "JFPV3_PROSPECTIVE_SHADOW_ACTIVATION_AND_FORWARD_COLLECTION_AUTHORIZATION_V0"
 
 
 def _tracked_root(tmp_path: Path) -> Path:
@@ -696,3 +697,67 @@ def test_jfpv3_r2_implementation_authorization_closes_without_escalation() -> No
     assert authorization["shadow_activated"] is False
     assert authorization["open_critical"] == 0
     assert authorization["open_high"] == 0
+
+
+def test_jfpv3_prospective_shadow_authorization_is_one_shot_and_non_scientific() -> None:
+    data = project_context.context_data(ROOT)
+    _, _, registry = project_context.load_context_sources(ROOT)
+    authorization = next(record for record in registry["project"] if record["project_id"] == PROSPECTIVE_SHADOW_AUTHORIZATION_PROJECT_ID)
+    assert data["active_project"] is None
+    assert authorization["state"] == "CLOSED_PASS"
+    assert authorization["authority_level"] == "FROZEN_PROSPECTIVE_SHADOW_OPERATION_AUTHORIZATION_ONLY"
+    assert authorization["phase_type"] == "GOVERNANCE_ONLY"
+    assert authorization["implementation_authorized"] is False
+    assert authorization["generation_id"] == authorization["candidate_id"] == "JFPV3_01"
+    assert authorization["canonical_r2_final_candidate"] == "64d2e421545b0fd4a0364c0814d4b87eef779fa2"
+    assert authorization["canonical_r2_merge"] == "bc4f3a327f23d057da1ad970e9eeb7ed2fe10c91"
+    assert authorization["canonical_r2_implementation_digest"] == "3f80bcd2dd60aaae6e1307883cca2e996f631f7bbc3b76037eafef8450167e2b"
+    assert authorization["canonical_r2_manifest_digest"] == "b1ca7d2bb5025b272bfdcd871a1889f6f25842c2be83c479d19ebad16075520e"
+    assert authorization["activation_authorized_after_canonicalization"] is True
+    assert authorization["activation_authorization_canonicalization_required"] is True
+    assert authorization["activations_authorized"] == authorization["committed_activation_count_allowed"] == 1
+    assert authorization["activate_shadow_command"] == "python -m qntylab.jfp_v3_shadow activate-shadow"
+    assert authorization["forward_collection_authorized_after_activation"] is True
+    assert authorization["collect_due_command"] == "python -m qntylab.jfp_v3_shadow collect-due"
+    assert authorization["forward_collection_requires_committed_activation"] is True
+    assert authorization["forward_collection_requires_due_origin"] is True
+    assert authorization["real_binance_source_access_authorized_only_when_due"] is True
+    for field in (
+        "duplicate_activation_authorized", "replacement_origins_authorized", "schedule_extension_authorized",
+        "early_origin_execution_authorized", "interim_inference_authorized", "terminal_evaluation_authorized",
+        "historical_v3_backtest_authorized", "jigsaw_mutation_authorized", "state_snapshot_authorized",
+        "forecaster_authorized", "router_authorized", "qnty_authorized", "paper_trading_authorized",
+        "trading_authorized", "promotion_authorized",
+    ):
+        assert authorization[field] is False, field
+    assert authorization["capital_authority"] == "NONE"
+    assert authorization["activation_attempt_1"] == "BLOCKED_BY_ACTIVATION_IMPLEMENTATION_DEFECT"
+    assert authorization["activation_attempt_2"] == "BLOCKED_BY_ACTIVATION_PERSISTENCE_IMPLEMENTATION"
+    assert authorization["valid_activation_count"] == 0
+    assert authorization["shadow_run_id"] == "NONE_BEFORE_AUTHORIZED_ACTIVATION"
+    assert authorization["prospective_contamination"] == "NONE"
+    assert authorization["shadow_activated"] is False
+    assert authorization["real_network_used"] is False
+    assert authorization["real_market_data_accessed"] is False
+    assert authorization["real_prospective_ohlcv_accessed"] is False
+    assert authorization["real_prospective_features_computed"] == 0
+    assert authorization["real_prospective_outcomes_computed"] == 0
+    assert authorization["real_prospective_regressions_run"] == 0
+    assert authorization["real_prospective_p_values_computed"] == 0
+    assert authorization["real_prospective_partial_r2_computed"] == 0
+    assert authorization["scientific_classifications_computed"] == 0
+    assert authorization["next_action"].startswith("CLOSED_PASS: Canonicalize this authorization")
+
+
+def test_jfpv3_prospective_authorization_binds_immutable_r2_and_scientific_bytes() -> None:
+    expected = {
+        "qntylab/jfp_v3_shadow.py": "d0c434b37244da977a1285322122f36012a787beb1d5eb944f87e34b2a2c174b",
+        "experiments/research/jigsaw_fast_prospective_signal_discovery_v3/preregistration.json": "7b0e6eeda726ddcc6e5a2a99d931df51bfbff492557fdefc30eae629c998da16",
+        "experiments/research/jigsaw_fast_prospective_signal_discovery_v3/universe_contract.json": "883172c10174d52a298293b2299ab28af4095c33217e2c2a24de3a258208c9fd",
+        "experiments/research/jigsaw_fast_prospective_signal_discovery_v3/source_contract.json": "64b918c8e062c55d1434a34ff5f7e3368dd59a7e2358edcacfa80bf1ab2e2348",
+        "experiments/research/jigsaw_fast_prospective_signal_discovery_v3/scientific_contract.json": "8b37028ef1ebc5baf7a04bfc742069f0b1ecd0931c4017c565324e980a140e90",
+        "experiments/research/jigsaw_fast_prospective_signal_discovery_v3/schedule_contract.json": "5e326a165bdf6dda8dd137ec69a4677f6029f99ae0487a80724a3c0667a36ffc",
+    }
+    for relative, expected_digest in expected.items():
+        assert hashlib.sha256((ROOT / relative).read_bytes()).hexdigest() == expected_digest, relative
+    assert not (ROOT / "data/jfp_v3_shadow/events.jsonl").exists()

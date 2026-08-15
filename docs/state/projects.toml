@@ -1803,3 +1803,85 @@ r2_final_candidate_sha = "R2_FINAL_CANDIDATE_SHA_RECORDED_AT_FINAL_CANDIDATE_FRE
 implementation_authority_consumed = true
 active_project_after_closure = "NONE"
 next_action_after_closure = "CANONICALIZE_R2_THEN_SEPARATELY_AUTHORIZE_OR_EXECUTE_ACTIVATION_AS_ALLOWED"
+
+[[project]]
+project_id = "JFPV3_PROSPECTIVE_SHADOW_ACTIVATION_AND_FORWARD_COLLECTION_AUTHORIZATION_V0"
+display_name = "JFPV3 prospective shadow activation and forward collection authorization"
+state = "CLOSED_PASS"
+authority_level = "FROZEN_PROSPECTIVE_SHADOW_OPERATION_AUTHORIZATION_ONLY"
+phase_type = "GOVERNANCE_ONLY"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "tests/test_project_context_v0.py",
+  "qntylab/jfp_v3_shadow.py",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v3/collector_v0r2/implementation_manifest.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v3/preregistration.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v3/universe_contract.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v3/source_contract.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v3/scientific_contract.json",
+  "experiments/research/jigsaw_fast_prospective_signal_discovery_v3/schedule_contract.json",
+]
+next_action = "CLOSED_PASS: Canonicalize this authorization, then execute exactly one real activate-shadow, verify the committed 365-origin schedule, and stop before any origin collection unless an origin is actually due. No scientific inference or terminal evaluation is authorized."
+implementation_authorized = false
+generation_id = "JFPV3_01"
+candidate_id = "JFPV3_01"
+canonical_r2_final_candidate = "64d2e421545b0fd4a0364c0814d4b87eef779fa2"
+canonical_r2_merge = "bc4f3a327f23d057da1ad970e9eeb7ed2fe10c91"
+canonical_r2_implementation_digest = "3f80bcd2dd60aaae6e1307883cca2e996f631f7bbc3b76037eafef8450167e2b"
+canonical_r2_manifest_digest = "b1ca7d2bb5025b272bfdcd871a1889f6f25842c2be83c479d19ebad16075520e"
+parent_r1_canonical_merge = "779dac12c0e7a6db0a733ecd77c2980444ae7916"
+activation_authorized_after_canonicalization = true
+activation_authorization_canonicalization_required = true
+activations_authorized = 1
+committed_activation_count_allowed = 1
+activate_shadow_command = "python -m qntylab.jfp_v3_shadow activate-shadow"
+activation_timestamp_policy = "ACTUAL_UTC_EXECUTION_TIME"
+shadow_run_id_policy = "GENERATED_BY_CANONICAL_R2"
+forward_collection_authorized_after_activation = true
+collect_due_command = "python -m qntylab.jfp_v3_shadow collect-due"
+forward_collection_requires_committed_activation = true
+forward_collection_requires_due_origin = true
+real_binance_source_access_authorized_only_when_due = true
+real_binance_source_contract = "FROZEN_BINANCE_USDM_EXCHANGEINFO_AND_1H_KLINES_ONLY"
+duplicate_activation_authorized = false
+replacement_origins_authorized = false
+schedule_extension_authorized = false
+early_origin_execution_authorized = false
+interim_inference_authorized = false
+terminal_evaluation_authorized = false
+historical_v3_backtest_authorized = false
+jigsaw_mutation_authorized = false
+state_snapshot_authorized = false
+forecaster_authorized = false
+router_authorized = false
+qnty_authorized = false
+paper_trading_authorized = false
+trading_authorized = false
+promotion_authorized = false
+capital_authority = "NONE"
+activation_attempt_1 = "BLOCKED_BY_ACTIVATION_IMPLEMENTATION_DEFECT"
+activation_attempt_2 = "BLOCKED_BY_ACTIVATION_PERSISTENCE_IMPLEMENTATION"
+valid_activation_count = 0
+shadow_run_id = "NONE_BEFORE_AUTHORIZED_ACTIVATION"
+prospective_contamination = "NONE"
+real_network_used = false
+real_market_data_accessed = false
+real_prospective_ohlcv_accessed = false
+real_prospective_features_computed = 0
+real_prospective_outcomes_computed = 0
+real_prospective_regressions_run = 0
+real_prospective_p_values_computed = 0
+real_prospective_partial_r2_computed = 0
+scientific_classifications_computed = 0
+shadow_activated = false
+qntyageval_applicability = "NO_MATCH"
+qntyageval_lookup_performed = false
+qntyageval_run_performed = false
+hostile_governance_review_count = 1
+hostile_governance_review_verdict = "PASS"
+hostile_governance_critical_total = 0
+hostile_governance_high_total = 0
+hostile_governance_open_critical = 0
+hostile_governance_open_high = 0
+targeted_governance_rereview_used = false

@@ -20,11 +20,19 @@ fit, or architectural sophistication. It is to maximize the rate at which
 QntyLab can discover and falsify credible economic edge while preserving enough
 research integrity that survivors can later earn much stronger confirmation.
 
+A useful optimization target for the Discovery Lane is therefore not raw idea
+count or nominal information gain alone, but **expected decision-changing
+information per bounded research cost**. Research cost includes researcher time,
+data acquisition and qualification burden, implementation complexity, search
+budget consumed, and the risk that a more complex experiment creates additional
+degrees of freedom without answering a more valuable question.
+
 The intended direction is:
 
 ```text
 QntyLab
 → mechanism-first hypotheses
+→ outcome-blind data qualification + bounded search budget
 → cheap, high-throughput discovery and falsification
 → trial ledger + Jigsaw skeptical evidence
 → net economic-utility and robustness tests
@@ -84,6 +92,72 @@ Existing long-horizon prospective experiments remain valid evidence programs.
 They must not, however, become a global bottleneck that prevents parallel cheap
 falsification and candidate discovery.
 
+### Discovery Integrity Kernel
+
+Fast discovery is not permission for untracked adaptive backtesting. The
+Discovery Lane has a deliberately small integrity kernel that is cheap enough to
+apply broadly and strong enough to prevent the most common forms of self-created
+edge.
+
+Before scientific outcome access for a bounded mechanism family, freeze at the
+appropriate level:
+
+- the economic mechanism and the simplest executable expression capable of
+  falsifying it;
+- the simplest credible opponent or abstaining baseline;
+- the finite family/search budget, including meaningful variants, horizons,
+  universes, transformations, and conditional branches that may be explored;
+- the causal decision/execution timing convention;
+- the relevant execution-friction model; and
+- a cheap failure condition stating what observation is sufficient to kill the
+  frozen proposition rather than rescue-tune it.
+
+Every material interaction with historical scientific outcomes consumes
+research budget. Human exploration, scripted sweeps, LLM-generated variants,
+manual parameter changes, alternate horizons, alternate universes, alternate
+benchmarks, abandoned variants, and informal "quick checks" are part of the
+search denominator when they can influence what is tested next. A clean final
+candidate must not erase this adaptive path.
+
+Discovery integrity is therefore primarily enforced by **preserving the search,
+freezing the bounded question before outcome access, and making failures die**,
+not by applying confirmation-grade ceremony to every exploratory idea.
+
+### Outcome-blind data qualification
+
+Data feasibility must be separated from scientific outcome evaluation.
+Outcome-blind qualification may inspect only facts needed to determine whether a
+mechanism can be tested honestly, such as:
+
+- source and venue identity;
+- instrument and contract identity;
+- available fields and interval/granularity;
+- historical coverage and missingness;
+- timestamp units and timestamp semantics;
+- point-in-time / publication-time semantics;
+- source revision and replacement policy;
+- immutable source snapshots or digests where available; and
+- the existence of execution-relevant fields required by the proposed
+  mechanism.
+
+It must not inspect returns, candidate PnL, outcome direction, feature/outcome
+relationships, correlations, regressions, rankings, charts selected for their
+scientific result, or any other information that could adapt the mechanism or
+search budget to the answer.
+
+For event mechanisms, the relevant point-in-time boundary is the **first
+publicly actionable information time**, not merely the later effective-event
+time. For high-frequency or cross-venue mechanisms, timestamp synchronization
+and observation granularity must be capable of resolving the claimed lead/lag
+or dislocation; a bar-level backtest must not manufacture a sub-bar execution
+advantage. If data timing uncertainty is of the same order as the hypothesized
+edge, the experiment is not qualified to make that claim.
+
+Outcome-blind data qualification is an evidence-integrity boundary, not generic
+infrastructure authority. New data plumbing should be built only when a concrete
+mechanism cannot be falsified with already-qualified data and the expected
+information gain justifies the bounded cost.
+
 ### Mechanism-first search and simple opponents
 
 Candidate generation should prefer hypotheses with an identifiable economic
@@ -97,6 +171,12 @@ ensembles, equal-weight alternatives, and `FLAT` / `ABSTAIN` where appropriate.
 Additional complexity is justified only by reproducible incremental out-of-
 sample economic utility.
 
+Prefer the lowest-description-length expression that can falsify the mechanism.
+Interaction rules, regime definitions, model complexity, feature stacks, and
+parameter breadth must earn their additional degrees of freedom through a
+separate information-bearing question rather than being added until history
+fits.
+
 ### Search itself is part of the evidence problem
 
 Human, scripted, and LLM-assisted candidate generation all create researcher
@@ -107,6 +187,34 @@ even when the final survivor is later preregistered cleanly.
 QntyLab must therefore preserve family-level trial history and treat broad
 candidate search as a multiple-comparison / overfitting risk. A clean final
 experiment must not erase the exploratory path that selected it.
+
+Selection-bias and multiplicity controls should be **family-appropriate**, not a
+single mandatory statistical framework. Depending on the actual experiment,
+relevant tools may include benchmark-relative multiple-model tests,
+family-level false-discovery control, probability-of-backtest-overfitting
+analysis, deflated performance statistics, or a simpler finite family gate when
+that is sufficient. The method must match the search that actually occurred;
+the architecture does not authorize building a generic statistical bureaucracy
+in advance of a concrete need.
+
+### Conservative execution semantics
+
+A historical edge claim must use information that was available at the decision
+time and an execution model appropriate to the mechanism's horizon and market
+microstructure.
+
+As applicable, economic evaluation must account for fees, spread/slippage,
+funding, turnover, latency, borrow or margin constraints, market impact,
+exchange outages, and fill/queue uncertainty. Missing execution information must
+not be replaced with favorable assumptions. Maker fills, queue priority,
+sub-bar timing, or cross-venue synchronization must not be treated as free or
+certain when the data cannot support them.
+
+Risk-transfer or premium mechanisms must be tested as executable risk-bearing
+policies rather than promoted from a raw statistical spread. For example, a
+premium between two measured quantities is not itself net economic edge unless
+the relevant hedge, rebalance, financing, tail, and implementation costs are
+represented by the frozen contract.
 
 ### Jigsaw is durable, skeptical evidence
 
@@ -156,7 +264,9 @@ checks relevant to its family, including as applicable:
 - an explicit statement of what observation would kill the mechanism.
 
 The gate need not be identical for every experiment, but it must test economic
-credibility rather than merely statistical detectability.
+credibility rather than merely statistical detectability. A plausible economic
+story may improve a mechanism's priority for testing; it must not weaken the
+survivor threshold or convert an exploratory result into stronger evidence.
 
 ### State Snapshot and Reactive Jigsaw are downstream composition
 
@@ -190,13 +300,16 @@ discovery and falsification throughput.
 
 QntyLab should optimize not only correctness of individual experiments but also
 the speed of epistemic correction. A useful control metric is the amount of
-decision-changing evidence produced per researcher-hour or per bounded research
-cycle.
+decision-changing evidence produced per bounded research cost, not merely per
+backtest or per candidate. Cost includes researcher time, data qualification,
+implementation complexity, and search budget consumed.
 
 Fast negative results are valuable. The architecture should make it cheap to
 kill weak mechanisms early and expensive to confirm only the survivors.
-Governance that does not materially improve claim validity, authority safety,
-or downstream trust must not become an end in itself.
+Mechanisms requiring substantial new data or execution infrastructure must earn
+that burden through higher expected decision value; intellectual novelty alone
+is insufficient. Governance that does not materially improve claim validity,
+authority safety, or downstream trust must not become an end in itself.
 
 ### QntyLab and Qnty remain separate
 
@@ -248,6 +361,27 @@ That conclusion is a valid successful research outcome and should redirect work
 toward new mechanisms or terminate the trading thesis rather than silently
 escalating complexity.
 
+## Methodological grounding
+
+The Discovery Integrity Kernel reflects established problems and controls in
+quantitative research rather than a project-specific aesthetic. Relevant
+methodological lineages include:
+
+- White's Reality Check for data snooping and Hansen's Superior Predictive
+  Ability framework for multiple-model benchmark comparison;
+- Harvey, Liu, and Zhu on multiple testing and false discoveries in the
+  cross-section of expected returns;
+- Bailey and coauthors on probability of backtest overfitting and deflated
+  performance statistics after strategy search;
+- Novy-Marx and Velikov on turnover and transaction costs materially changing
+  apparent anomaly profitability; and
+- standard event-study methodology on event timing, anticipation, and
+  contamination.
+
+These references motivate the invariants; they do not prescribe one universal
+test for every QntyLab experiment. Project-specific search structure, data,
+horizon, and economic claim determine the appropriate bounded controls.
+
 ## Relationship to ADR 0001
 
 ADR 0001 remains authoritative for the `QntyLab Probationary Prospective
@@ -258,14 +392,24 @@ To the extent ADR 0001 contains broader statements about QntyLab's global role
 that conflict with this ADR, this ADR supersedes those broader global-role
 statements. Project-specific restrictions in ADR 0001 remain intact.
 
+## Relationship to ADR 0006
+
+ADR 0006 remains the companion research-design philosophy. Its principles such
+as preserving the denominator, separating exploration from confirmation,
+outcome-blind data-capability compile, simple-first research, prospective
+prediction-first evidence, and failure-as-information remain aligned with this
+North Star. ADR 0005 defines the architecture and durable strategic invariants;
+ADR 0006 provides the broader epistemic philosophy inside those boundaries.
+
 ## Non-goals and current status
 
-This ADR does not implement a Discovery Lane, confirmation system, Jigsaw, State
-Snapshot, Reactive Jigsaw, a Forecaster, a Router, a strategy sleeve, a
-promotion pipeline, or Qnty integration. It does not authorize historical
-execution, paper or live activity, trading, external effects, or a shared
-control plane. It does not replace project-specific preregistrations, execution
-contracts, research results, or other immutable historical artifacts.
+This ADR does not implement a Discovery Lane, data-qualification framework,
+multiple-testing framework, confirmation system, Jigsaw, State Snapshot,
+Reactive Jigsaw, a Forecaster, a Router, a strategy sleeve, a promotion
+pipeline, or Qnty integration. It does not authorize market-data acquisition,
+historical execution, paper or live activity, trading, external effects, or a
+shared control plane. It does not replace project-specific preregistrations,
+execution contracts, research results, or other immutable historical artifacts.
 
 The Funding Pressure → Future RV24 experiment remains a bounded exploratory
 predictive proposition. Even a positive `HIGH_MINUS_LOW_MEAN_RV24` result does

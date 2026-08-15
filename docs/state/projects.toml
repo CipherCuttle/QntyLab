@@ -1885,3 +1885,73 @@ hostile_governance_high_total = 0
 hostile_governance_open_critical = 0
 hostile_governance_open_high = 0
 targeted_governance_rereview_used = false
+
+[[project]]
+project_id = "JH01_V1_REAL_ACTIVATION_AND_FORWARD_RECORDER_IMPLEMENTATION_V0"
+display_name = "JH01 V1 real activation and forward recorder implementation authorization V0"
+state = "ACTIVE"
+authority_level = "SOURCE_BOUND_BOUNDED_REAL_OPERATION_SEAM_IMPLEMENTATION_ONLY"
+phase_type = "IMPLEMENTATION_AUTHORIZATION"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/preregistration.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/prospective_recorder_and_input_materialization_implementation_v0.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/github_release_attestation_offline_policy_qualification_v0r3.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/bootstrap_source_range_contract_repair_v0.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/real_activation_and_forward_recorder_implementation_authorization_v0.json",
+  "qntylab/jh01_v1_prospective_recorder_implementation_v0.py",
+  "tests/test_project_context_v0.py",
+]
+governing_phase = "JH01_V1_REAL_ACTIVATION_AND_FORWARD_RECORDER_IMPLEMENTATION_AUTHORIZATION_V0"
+authorized_implementation_phase = "JH01_V1_REAL_ACTIVATION_AND_FORWARD_RECORDER_IMPLEMENTATION_V0"
+predecessor_project_id = "JH01_V1_RECORDER_ATTESTATION_CLOSURE_UNBLOCK_V0"
+canonical_recorder_pr = 89
+canonical_recorder_merge = "b50e8e3cd17199265cb7040588d97822d45dd170"
+qualified_implementation_candidate = "5dc86826040b9bd3403f03c31cfc8a64249ed907"
+frozen_preregistration_project_id = "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_PREREG_V1"
+frozen_preregistration_digest = "bdb85130cae75e9f156db9aa1fd955d7f565a3714ae091871d5ac4447c1ec27b"
+frozen_preregistration_canonical_merge = "c32afe563c6093775cc0195e3c57ac192345b549"
+frozen_preregistration_lead_time_gate_pass = true
+first_live_origin = "2026-09-15T00:00:00Z"
+last_live_origin = "2027-09-14T00:00:00Z"
+required_valid_origins = 365
+ordered_panel_digest = "e6d1447ff2be57f81eaf943b62218ce9a7b9a6f5bf2d25f9be255cb3f2040cd8"
+target_identity = "RV24_future,t"
+source_contract_identity = "BINANCE_USD_M_PERPETUAL_1H_LOGICAL_CLOSE"
+first_required_source_close = "2025-08-15T00:00:00Z"
+persistence_mechanism_identity = "GITHUB_IMMUTABLE_RELEASE_V0R3_QUALIFIED"
+qualified_recorder_source_path = "qntylab/jh01_v1_prospective_recorder_implementation_v0.py"
+qualified_recorder_source_sha256 = "4f5e1791be9f17c1871f9b510329a1632412e028d2a84223fa59e83bbe95ec1a"
+qualified_recorder_module_immutable = true
+wrapper_first_required = true
+real_v1_armed_but_inactive_target_state = true
+implementation_authorized = true
+real_v1_collection_authorized = false
+real_market_data_authorized = false
+real_github_forecast_publication_authorized = false
+scientific_evaluation_authorized = false
+interim_metrics_authorized = false
+jigsaw_authorized = false
+state_snapshot_authorized = false
+router_authorized = false
+qnty_authorized = false
+trading_authorized = false
+capital_authority = "NONE"
+qntyageval_applicability = "NO_MATCH"
+qntyageval_lookup_performed = true
+qntyageval_run_performed = false
+hostile_governance_review_count = 1
+hostile_governance_review_verdict = "PASS"
+hostile_governance_critical_total = 0
+hostile_governance_high_total = 0
+hostile_governance_open_critical = 0
+hostile_governance_open_high = 0
+targeted_governance_rereview_used = false
+market_data_accessed = false
+real_forecast_executed = false
+real_release_created = false
+held_out_outcome_accessed = false
+scientific_evaluation_performed = false
+jfpv3_mutated = false
+next_action = "CANONICALIZE THIS AUTHORIZATION, THEN START A FRESH IMPLEMENTATION WORKTREE FROM THE NEW MASTER AND IMPLEMENT ONLY THE MINIMAL REAL-ACTIVATION / DUE-ORIGIN WRAPPER. NO REAL V1 FORECAST, MARKET DATA, REAL GITHUB FORECAST RELEASE, SCIENTIFIC EVALUATION, OR DOWNSTREAM AUTHORITY IS AUTHORIZED."

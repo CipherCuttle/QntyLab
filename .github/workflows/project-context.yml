@@ -16,7 +16,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: python -m pip install pytest
+      - run: python -m pip install pytest requests
       - run: python -m qntylab.project_context doctor --strict
       - run: python -m qntylab.project_context render --check
       - run: python -m qntylab.research_ledger doctor

@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 R2_AUTHORIZATION_PROJECT_ID = "JFPV3_PR_B_R2_ACTIVATION_PERSISTENCE_AND_FORWARD_RUNNER_IMPLEMENTATION_AUTHORIZATION_V0"
 PROSPECTIVE_SHADOW_AUTHORIZATION_PROJECT_ID = "JFPV3_PROSPECTIVE_SHADOW_ACTIVATION_AND_FORWARD_COLLECTION_AUTHORIZATION_V0"
 JH01_REAL_OPERATION_AUTHORIZATION_PROJECT_ID = "JH01_V1_REAL_ACTIVATION_AND_FORWARD_RECORDER_IMPLEMENTATION_V0"
+JH01_REAL_PROSPECTIVE_AUTHORIZATION_PROJECT_ID = "JH01_V1_REAL_PROSPECTIVE_OPERATION_AUTHORIZATION_V0"
 
 
 def _tracked_root(tmp_path: Path) -> Path:
@@ -783,6 +784,59 @@ def test_jh01_real_operation_authorization_is_single_active_source_bound_phase()
     assert artifact["hostile_governance_review"]["targeted_rereview_used"] is False
     assert artifact["qntyageval"] == {"applicability": "NO_MATCH", "lookup_performed": True, "run_performed": False}
     assert data["authority_conflicts_or_warnings"] == []
+
+
+def test_jh01_real_prospective_authority_is_exact_and_fail_closed() -> None:
+    from qntylab import jh01_v1_prospective_operation_v0 as operation
+
+    data = project_context.context_data(ROOT)
+    _, _, registry = project_context.load_context_sources(ROOT)
+    projects = {record["project_id"]: record for record in registry["project"]}
+    project = projects[JH01_REAL_PROSPECTIVE_AUTHORIZATION_PROJECT_ID]
+    path = ROOT / "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/real_prospective_operation_authorization_v0.json"
+    artifact = json.loads(path.read_text(encoding="utf-8"))
+
+    assert data["active_project"] is None
+    assert project["state"] == "CLOSED_PASS"
+    assert artifact["state"] == "ACTIVE"
+    assert project["phase_type"] == "GOVERNANCE_ONLY"
+    assert project["implementation_authorized"] is False
+    assert artifact["schedule_digest"] == operation.schedule_digest()
+    assert artifact["required_origin_count"] == 365
+    assert artifact["real_v1_activation_authorized"] is True
+    assert artifact["forward_collection_authorized"] is True
+    assert artifact["scientific_evaluation_authorized"] is False
+    assert artifact["interim_metrics_authorized"] is False
+    assert artifact["downstream_authority"] == "NONE"
+    assert artifact["real_market_data_accessed"] is False
+    assert artifact["real_activation_count"] == 0
+    assert artifact["real_forecasts_persisted"] == 0
+    assert artifact["qntyageval"] == {"applicability": "NO_MATCH", "lookup_performed": True, "run_performed": False}
+
+    operation.build_activation_contract(ROOT, mode=operation.OperationMode.REAL_PROSPECTIVE)
+
+    mutations = (
+        ("wrapper_implementation_identity", "wrong-wrapper"),
+        ("qualified_recorder_identity", "wrong-recorder"),
+        ("preregistration_digest", "wrong-preregistration"),
+        ("schedule_digest", "wrong-schedule"),
+        ("required_origin_count", 364),
+        ("first_live_origin", "2026-09-16T00:00:00Z"),
+        ("scientific_evaluation_authorized", True),
+        ("forward_collection_authorized", False),
+        ("state", "CLOSED_PASS"),
+    )
+    for key, value in mutations:
+        mutated = dict(artifact)
+        mutated[key] = value
+        with pytest.raises(operation.OperationBlocked):
+            operation._load_real_operation_authority(ROOT, fixture=mutated)
+
+    before = hashlib.sha256((ROOT / "qntylab/jh01_v1_prospective_operation_v0.py").read_bytes()).hexdigest()
+    recorder_before = hashlib.sha256((ROOT / "qntylab/jh01_v1_prospective_recorder_implementation_v0.py").read_bytes()).hexdigest()
+    assert before == "1176037ff0d3102afc67670202154970e4af1491cff1cd19bc9526c9c9d67c41"
+    assert recorder_before == "4f5e1791be9f17c1871f9b510329a1632412e028d2a84223fa59e83bbe95ec1a"
+    assert not (ROOT / "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/real_prospective_operation_authorization_v0.receipt.json").exists()
 
 
 def test_jfpv3_prospective_authorization_binds_immutable_r2_and_scientific_bytes() -> None:

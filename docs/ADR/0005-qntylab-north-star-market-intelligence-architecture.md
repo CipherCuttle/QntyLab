@@ -1,6 +1,6 @@
 # ADR 0005: QntyLab North-Star Market-Intelligence Architecture
 
-**Status:** `CURRENT_GLOBAL_ARCHITECTURE_NORTH_STAR_NO_IMPLEMENTATION_AUTHORIZATION`
+**Status:** `CURRENT_GLOBAL_SCIENTIFIC_NORTH_STAR_NO_IMPLEMENTATION_AUTHORIZATION`
 
 ## Context
 
@@ -9,11 +9,13 @@ bounded, falsifiable, provenance-linked knowledge about market behavior. It is
 not an AI trading bot, a monolithic trading system, or an authority for trading
 or external effects.
 
-This ADR establishes the current global architecture so that repository state
+This ADR establishes the current scientific north star so that repository state
 can be interpreted without relying on older, broader wording. It is a
 north-star architecture, not authorization to implement every layer described
 here. Current implementation status must be established independently from Git
-and from the contract governing each project.
+and from the contract governing each project. ADR 0007 holds the current global
+architecture and cross-repository role boundary; this ADR remains current for
+the scientific and research-design north star inside that boundary.
 
 The primary objective is not to maximize governance, artifact count, predictive
 fit, or architectural sophistication. It is to maximize the rate at which
@@ -400,6 +402,22 @@ outcome-blind data-capability compile, simple-first research, prospective
 prediction-first evidence, and failure-as-information remain aligned with this
 North Star. ADR 0005 defines the architecture and durable strategic invariants;
 ADR 0006 provides the broader epistemic philosophy inside those boundaries.
+
+## Relationship to ADR 0007
+
+ADR 0007 is the current global architecture (`GLOBAL_ARCHITECTURE`) and holds
+the cross-repository role boundary, `QNTY_HANDOFF` and downstream-acceptance
+semantics, the shared identity vocabulary, Context Spine ownership, context
+source precedence, and the Architecture Relevance Gate. This ADR is superseded
+on exactly those points and must not be read as an independent authority over
+them.
+
+This ADR remains current as the QntyLab scientific north star
+(`GLOBAL_SCIENTIFIC_NORTH_STAR`). Its research integrity, discovery-integrity,
+outcome-blind qualification, evidence non-escalation, survivor-gate, promotion
+boundary, and no-implementation-authority constraints remain in force and are
+not weakened by ADR 0007. Being current here confers no implementation,
+execution, paper, shadow, live, or capital authority.
 
 ## Non-goals and current status
 

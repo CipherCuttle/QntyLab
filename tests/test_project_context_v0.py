@@ -162,18 +162,25 @@ def test_json_is_byte_stable_for_identical_state() -> None:
     first = subprocess.run(command, cwd=ROOT, check=True, capture_output=True).stdout
     second = subprocess.run(command, cwd=ROOT, check=True, capture_output=True).stdout
     assert first == second
-    assert json.loads(first)["current_global_adr"]["adr_id"] == "ADR-0005"
-    assert [item["adr_id"] for item in json.loads(first)["current_global_companions"]] == ["ADR-0006"]
+    assert json.loads(first)["current_global_adr"]["adr_id"] == "ADR-0007"
+    assert [item["adr_id"] for item in json.loads(first)["current_global_companions"]] == ["ADR-0005", "ADR-0006"]
 
 
 def test_canonical_companion_is_current_but_not_architecture_authority() -> None:
     data = project_context.context_data(ROOT)
-    assert data["current_global_adr"]["adr_id"] == "ADR-0005"
-    assert data["current_global_companions"] == [{
-        "adr_id": "ADR-0006",
-        "path": "docs/ADR/0006-qntylab-research-design-philosophy.md",
-        "authority_scope": "GLOBAL_RESEARCH_DESIGN_PHILOSOPHY",
-    }]
+    assert data["current_global_adr"]["adr_id"] == "ADR-0007"
+    assert data["current_global_companions"] == [
+        {
+            "adr_id": "ADR-0005",
+            "path": "docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md",
+            "authority_scope": "GLOBAL_SCIENTIFIC_NORTH_STAR",
+        },
+        {
+            "adr_id": "ADR-0006",
+            "path": "docs/ADR/0006-qntylab-research-design-philosophy.md",
+            "authority_scope": "GLOBAL_RESEARCH_DESIGN_PHILOSOPHY",
+        },
+    ]
 
 
 def test_human_context_does_not_claim_no_queued_projects() -> None:

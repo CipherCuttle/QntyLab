@@ -1,0 +1,107 @@
+{
+  "bounded_outcome_free_audit": {
+    "aggregate_trade_count": 81,
+    "buy_aggressor_quote": "6162.527280",
+    "buy_match": true,
+    "close_time_ms": 1786835999999,
+    "interval": "5m",
+    "kline_taker_buy_quote_volume": "6162.527280",
+    "kline_total_quote_volume": "16424.698460",
+    "later_returns_accessed": false,
+    "open_time_ms": 1786835700000,
+    "partition_sum": "16424.698460",
+    "provider": "Binance USD-M public REST",
+    "selection_by_signal_or_outcome": false,
+    "sell_aggressor_quote": "10262.171180",
+    "symbol": "APTUSDT",
+    "total_match": true
+  },
+  "candidate_id": "CANDIDATE_ORDER_FLOW_SIGNED_TAKER_NOTIONAL_V0",
+  "materialization": {
+    "implementation_module": "qntylab.binance_um_kline_1h",
+    "materialization_digest": "a1739f645ad1bd80a0fa6d0ca4a4186990e36b7daebc92f55162fa40fa39614e",
+    "normalized_fields": [
+      "open_time",
+      "timestamp",
+      "open",
+      "high",
+      "low",
+      "close",
+      "volume",
+      "close_time",
+      "quote_volume",
+      "trade_count",
+      "taker_buy_base_volume",
+      "taker_buy_quote_volume"
+    ],
+    "project_id": "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_SOURCE_INPUT_AND_OPEN_EXECUTION_READINESS_R1",
+    "provenance_fields": [
+      "source identity",
+      "instrument",
+      "interval",
+      "coverage",
+      "row count",
+      "source object identity",
+      "checksum/digest",
+      "materialization identity",
+      "timestamp semantics"
+    ],
+    "quote_fields_dropped_by_normalized_input_contract": false,
+    "required_fields": [
+      "open_time",
+      "timestamp",
+      "open",
+      "quote_volume",
+      "taker_buy_quote_volume"
+    ],
+    "required_fields_preserved": true,
+    "schema_version": "qnty-edge-order-flow-v0-source-materialization-r1",
+    "source_bytes_remain_checksum_bound": true,
+    "source_contract": "BINANCE_USD_M_PERPETUAL_1H_MATERIALIZER_V0"
+  },
+  "official_evidence": [
+    {
+      "fields": [
+        "open time",
+        "open",
+        "quote asset volume",
+        "taker buy quote asset volume"
+      ],
+      "title": "Binance USD-M Kline/Candlestick Data",
+      "url": "https://developers.binance.info/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data#symbol-price-ticker-v2"
+    },
+    {
+      "fields": [
+        "price",
+        "quantity",
+        "timestamp",
+        "was the buyer the maker"
+      ],
+      "title": "Binance USD-M Compressed/Aggregate Trades List",
+      "url": "https://developers.binance.info/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data#symbol-price-ticker-v2"
+    },
+    {
+      "fields": [
+        "quote asset volume",
+        "taker buy quote asset volume",
+        "isBuyerMaker"
+      ],
+      "title": "Binance Public Data field table",
+      "url": "https://github.com/binance/binance-public-data/blob/master/README.md"
+    }
+  ],
+  "project_id": "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_SOURCE_INPUT_AND_OPEN_EXECUTION_READINESS_R1",
+  "schema_version": "qnty-edge-order-flow-v0-source-semantics-r1",
+  "semantic_proof": {
+    "admissible_derivation": "SELL_AGGRESSOR_QUOTE = TOTAL_QUOTE_TRADED - BUY_AGGRESSOR_QUOTE",
+    "aggregate_trade_taking_side": "Binance aggregates trades with the same taking side",
+    "buyer_is_maker": "true means the buyer is maker, so the seller is the taking side; false means buyer is taking side",
+    "partition": "TOTAL_QUOTE_TRADED = BUY_AGGRESSOR_QUOTE + SELL_AGGRESSOR_QUOTE",
+    "quote_asset_volume": "total quote notional for trades in the kline interval",
+    "taker_buy_quote_asset_volume": "quote notional where the buyer is the taker/aggressor",
+    "unknown_flow_treated_as_seller": false
+  },
+  "source_contract": "BINANCE_USD_M_PERPETUAL_1H_MATERIALIZER_V0",
+  "source_semantics_digest": "fa9289a13777dadf2f32a458097d5fe4f0e240e761274890eac132882d5a3ce0",
+  "verdict": "SOURCE_PARTITION_PROVEN"
+}

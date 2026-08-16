@@ -1,0 +1,22 @@
+{
+  "authorization_project_id": "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_SOURCE_INPUT_AND_OPEN_EXECUTION_READINESS_R1_AUTHORIZATION",
+  "candidate_id": "CANDIDATE_ORDER_FLOW_SIGNED_TAKER_NOTIONAL_V0",
+  "cost_digest": "efb39c8f1635e833957f19148637afd527c1bb0584950084c3a6c36d0bc82877",
+  "cost_funding_contract_digest": "6a96acf0e87dabc5ceba039ff2835c23550109e2d521f0ae3ba0ec0337471a91",
+  "direction": "CONTINUATION",
+  "feature_digest": "4db4f40cebc5f476727ef624281404b5443cddb49548eceeffa513118926c481",
+  "implementation_module": "qntylab.qnty_edge_order_flow_v0_readiness",
+  "implementation_sha256": "a0ca76f433970222b85e7e7742140839e577b2a0c2100349abfaa2fe668e07be",
+  "open_to_open_contract_digest": "f36646b4f79fa5ae6f2f697f7c19f5fde9e8bca2f6061b3e7e3baadd1af51483",
+  "preregistration_digest": "8e75f53f19c9719b97c3626c7e39626e206505e138107601748d9213eabe7757",
+  "preregistration_json_sha256": "34252ccf245c9d963b987e697231d4a33d66c2450d44689b7b737c0686a24979",
+  "project_id": "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_SOURCE_INPUT_AND_OPEN_EXECUTION_READINESS_R1",
+  "runtime_identity_digest": "2bbc63c45e1db57caf5c6751928464104ccca1fc912efdec9d77089f244613f3",
+  "schema_version": "qnty-edge-order-flow-v0-implementation-manifest-r1",
+  "scientific_execution_authorized": false,
+  "scientific_executor_added": false,
+  "source_materialization_digest": "a1739f645ad1bd80a0fa6d0ca4a4186990e36b7daebc92f55162fa40fa39614e",
+  "source_semantics_digest": "fa9289a13777dadf2f32a458097d5fe4f0e240e761274890eac132882d5a3ce0",
+  "universe_digest": "becdf4bd2157ebbad416526f414c3b9f647e8832753a61642d8a5d60b6620bcd",
+  "variant_id": "variant_23f758ef7052522d70172239"
+}

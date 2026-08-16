@@ -22,7 +22,21 @@ import requests
 from .market_observation import InstrumentIdentity
 
 ARCHIVE_BASE = "https://data.binance.vision/data/futures/um/monthly/klines"
-FIELDS = ("timestamp", "open", "high", "low", "close", "volume")
+FIELDS = (
+    "open_time",
+    "timestamp",
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume",
+    "close_time",
+    "quote_volume",
+    "trade_count",
+    "taker_buy_base_volume",
+    "taker_buy_quote_volume",
+)
+LEGACY_FIELDS = ("timestamp", "open", "high", "low", "close", "volume")
 CONTRACT_VERSION = "BINANCE_USD_M_PERPETUAL_1H_MATERIALIZER_V0"
 SCHEMA_VERSION = "binance-um-monthly-kline-12-v1"
 MARKET, CONTRACT_TYPE, VENUE = "usd-m", "perpetual", "binance"
@@ -148,15 +162,46 @@ def _parse_rows(zip_bytes: bytes, filename: str) -> tuple[str, list[dict[str, st
                 raise ValueError
             when = datetime.fromtimestamp(ms / 1000, UTC)
             values = [float(row[i]) for i in range(1, 6)]
+            close_ms = int(row[6])
+            trade_count = int(row[8])
+            quote_volume = float(row[7])
+            taker_buy_base_volume = float(row[9])
+            taker_buy_quote_volume = float(row[10])
         except (ValueError, OverflowError, OSError) as exc:
             raise MaterializationError("SCHEMA_INVALID", f"invalid kline timestamp/numeric field at row {position}") from exc
         o, h, l, c, v = values
-        if not all(math.isfinite(x) for x in values) or min(o, h, l, c) <= 0 or v < 0 or h < max(o, c, l) or l > min(o, c, h):
+        all_numeric = [*values, quote_volume, taker_buy_base_volume, taker_buy_quote_volume]
+        if (
+            not all(math.isfinite(x) for x in all_numeric)
+            or close_ms < 0
+            or trade_count < 0
+            or min(o, h, l, c) <= 0
+            or min(v, quote_volume, taker_buy_base_volume, taker_buy_quote_volume) < 0
+            or taker_buy_quote_volume > quote_volume
+            or taker_buy_base_volume > v
+            or h < max(o, c, l)
+            or l > min(o, c, h)
+        ):
             raise MaterializationError("SCHEMA_INVALID", f"invalid OHLCV at row {position}")
         if ms in seen:
             raise MaterializationError("SCHEMA_INVALID", f"duplicate opening timestamp at row {position}")
         seen.add(ms)
-        parsed.append({"timestamp": _stamp(when), "open": row[1], "high": row[2], "low": row[3], "close": row[4], "volume": row[5]})
+        parsed.append(
+            {
+                "open_time": row[0],
+                "timestamp": _stamp(when),
+                "open": row[1],
+                "high": row[2],
+                "low": row[3],
+                "close": row[4],
+                "volume": row[5],
+                "close_time": row[6],
+                "quote_volume": row[7],
+                "trade_count": row[8],
+                "taker_buy_base_volume": row[9],
+                "taker_buy_quote_volume": row[10],
+            }
+        )
     if not parsed:
         raise MaterializationError("SCHEMA_INVALID", "archive contains no data rows")
     parsed.sort(key=lambda row: row["timestamp"])

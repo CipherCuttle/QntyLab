@@ -51,6 +51,7 @@ def test_a1_valid_archive_checksum_and_six_field_normalization():
     result = _result({(2024, 1): (data, _check(data))})
     assert result["status"] == "MATERIALIZED_VERIFIED"
     assert result["normalized_csv"].splitlines()[0] == ",".join(FIELDS)
+    assert {"open_time", "quote_volume", "taker_buy_quote_volume"} <= set(result["normalized_csv"].splitlines()[0].split(","))
     assert result["manifest"]["normalized_row_count"] == 3
 
 
@@ -111,7 +112,7 @@ def test_h8_to_h10_header_does_not_weaken_data_validation_or_output():
     a = _result({(2024, 1): (headered, _check(headered))})
     b = _result({(2024, 1): (bare, _check(bare))})
     assert a["normalized_csv"] == b["normalized_csv"]
-    assert "open_time" not in a["normalized_csv"]
+    assert "open_time" in a["normalized_csv"]
 
 
 def test_a10_conflicting_duplicate_timestamp_fails_closed():
@@ -130,7 +131,7 @@ def test_a11_gap_is_preserved_and_reported_not_filled():
 def test_a12_a13_clip_is_inclusive_at_both_edges():
     data = _zip(_rows(0, 1, 2))
     result = _result({(2024, 1): (data, _check(data))}, "2024-01-01T01:00:00Z", "2024-01-01T01:00:00Z")
-    assert result["normalized_csv"].splitlines()[1].startswith("2024-01-01T01:00:00Z,")
+    assert result["normalized_csv"].splitlines()[1].split(",")[1] == "2024-01-01T01:00:00Z"
     assert result["manifest"]["normalized_row_count"] == 1
 
 

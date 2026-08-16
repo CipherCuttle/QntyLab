@@ -1,0 +1,14 @@
+{
+  "asset_or_period_rankings_accessed": false,
+  "candidate_proposed_events_created": 0,
+  "candidate_reopened_events_created": 0,
+  "invariant_digest": "b4bec21f17a15c5320692bcb206b1843b8125471cba3acc273ce669c55bfe058",
+  "new_v0_feature_values_accessed": false,
+  "new_v0_pnl_accessed": false,
+  "new_v0_returns_accessed": false,
+  "project_id": "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_SOURCE_INPUT_AND_OPEN_EXECUTION_READINESS_R1",
+  "schema_version": "qnty-edge-order-flow-v0-outcome-firewall-r1",
+  "scientific_execution_performed": false,
+  "survivor_metrics_accessed": false,
+  "trial_completed_events_created": 0
+}

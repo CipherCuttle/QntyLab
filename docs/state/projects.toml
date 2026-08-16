@@ -2189,3 +2189,61 @@ hostile_governance_open_high = 0
 targeted_governance_rereview_used = false
 active_project_after_closure = "NONE"
 next_action = "CANONICAL_READY_FOR_IMPLEMENTATION: canonicalize exactly one later separately Git-backed outcome-free readiness phase QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_SOURCE_INPUT_AND_OPEN_EXECUTION_READINESS_R1; preserve the predecessor CLOSED_BLOCKED state, do not execute V0, do not create trial events, and stop after that phase."
+
+[[project]]
+project_id = "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_SOURCE_INPUT_AND_OPEN_EXECUTION_READINESS_R1"
+display_name = "Order-Flow V0 source/input and open-execution readiness R1"
+state = "CLOSED_BLOCKED"
+authority_level = "OUTCOME_FREE_SOURCE_BOUND_IMPLEMENTATION_READINESS_ONLY"
+phase_type = "OUTCOME_FREE_SOURCE_BOUND_IMPLEMENTATION_READINESS"
+authoritative_artifacts = [
+  "docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md",
+  "docs/ADR/0006-qntylab-research-design-philosophy.md",
+  "docs/state/projects.toml",
+  "experiments/specs/qnty_edge_discovery_h010_order_flow_prior_evidence_reconciliation.md",
+  "experiments/specs/qnty_edge_discovery_order_flow_v0_preregistration.json",
+  "experiments/specs/qnty_edge_discovery_order_flow_v0_preregistration.md",
+  "experiments/specs/qnty_edge_discovery_order_flow_v0_hostile_review.md",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/execution/authorization.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/execution/readiness_r1_authorization.json",
+  "qntylab/binance_um_kline_1h.py",
+  "qntylab/qnty_edge_order_flow_v0_readiness.py",
+  "experiments/data/binance_um_kline_1h_materializer_v0.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/readiness_r1/source_semantics_and_field_preservation_receipt.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/readiness_r1/coverage_census.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/readiness_r1/open_to_open_adapter_contract_receipt.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/readiness_r1/cost_and_funding_contract_receipt.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/readiness_r1/synthetic_mechanical_validation_receipt.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/readiness_r1/outcome_firewall_and_ledger_invariant_receipt.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/readiness_r1/implementation_manifest.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/readiness_r1/closure.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/readiness_r1/hostile_review.md",
+  "tests/test_binance_um_kline_1h.py",
+  "tests/test_qnty_edge_order_flow_v0_readiness.py",
+]
+governing_authorization_project_id = "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_SOURCE_INPUT_AND_OPEN_EXECUTION_READINESS_R1_AUTHORIZATION"
+predecessor_project_id = "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_EXECUTION"
+candidate_id = "CANDIDATE_ORDER_FLOW_SIGNED_TAKER_NOTIONAL_V0"
+variant_id = "variant_23f758ef7052522d70172239"
+preregistration_digest = "8e75f53f19c9719b97c3626c7e39626e206505e138107601748d9213eabe7757"
+preregistration_json_sha256 = "34252ccf245c9d963b987e697231d4a33d66c2450d44689b7b737c0686a24979"
+universe_digest = "becdf4bd2157ebbad416526f414c3b9f647e8832753a61642d8a5d60b6620bcd"
+feature_digest = "4db4f40cebc5f476727ef624281404b5443cddb49548eceeffa513118926c481"
+cost_digest = "efb39c8f1635e833957f19148637afd527c1bb0584950084c3a6c36d0bc82877"
+expected_scientific_cells = 40
+implementation_authorized = false
+scientific_execution_authorized = false
+historical_outcome_access_authorized = false
+new_v0_execution_authorized = false
+new_candidate_proposed_events = 0
+new_candidate_reopened_events = 0
+new_trial_completed_events = 0
+readiness_verdict = "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_SOURCE_INPUT_AND_OPEN_EXECUTION_READINESS_R1_BLOCKED"
+source_partition_verdict = "SOURCE_PARTITION_PROVEN"
+coverage_census_status = "BLOCKED"
+coverage_census_path = "experiments/research/qnty_edge_discovery_order_flow_v0/readiness_r1/coverage_census.json"
+implementation_identity_path = "experiments/research/qnty_edge_discovery_order_flow_v0/readiness_r1/implementation_manifest.json"
+hostile_review_verdict = "PASS"
+outcome_firewall_breach = false
+scientific_execution_performed = false
+next_action = "CLOSED_BLOCKED: bind complete Git-tracked quote-preserving source/input coverage for DEV_2022, DEV_2024, and DEV_2025 before requesting separate historical execution authorization; do not execute V0."

@@ -22,7 +22,7 @@ import requests
 from . import jh01_rv_persistence_temporal_replication_prereg_v0 as prereg
 from .binance_um_kline_1h import (
     CONTRACT_VERSION,
-    FIELDS,
+    LEGACY_FIELDS,
     SCHEMA_VERSION,
     archive_paths,
     materialize_from_objects,
@@ -123,7 +123,7 @@ def materialization_request(root: Path) -> dict[str, Any]:
             "timestamp_set": "EXACT_INCLUSIVE_HOURLY_SET",
             "duplicate_policy": "REJECT",
             "missing_policy": "REJECT",
-            "required_schema": list(FIELDS),
+            "required_schema": list(LEGACY_FIELDS),
             "required_raw_prices": "FINITE_AND_STRICTLY_POSITIVE",
             "source_authentication": "PUBLISHED_CHECKSUM_SHA256_MATCHES_ZIP_BYTES",
         },
@@ -151,7 +151,7 @@ def qualify_symbol(symbol: str, rows: list[Mapping[str, str]], *, source_object_
     schema_valid = True
     finite_positive = True
     for row in rows:
-        if set(row) != set(FIELDS):
+        if set(row) != set(LEGACY_FIELDS):
             schema_valid = False
             continue
         timestamp = row.get("timestamp")

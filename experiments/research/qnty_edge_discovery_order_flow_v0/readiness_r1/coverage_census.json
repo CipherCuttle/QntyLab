@@ -1,0 +1,1033 @@
+{
+  "candidate_id": "CANDIDATE_ORDER_FLOW_SIGNED_TAKER_NOTIONAL_V0",
+  "coverage_basis": "GIT_TRACKED_INPUT_EVIDENCE_ONLY",
+  "denominator_preserved": true,
+  "diagnostic_controls": [
+    "FLAT_CASH",
+    "PRIOR_1H_RETURN_CONTINUATION"
+  ],
+  "diagnostics_non_eligible_for_survivor": true,
+  "ordered_symbols": [
+    "BCHUSDT",
+    "XRPUSDT",
+    "LTCUSDT",
+    "TRXUSDT",
+    "ETCUSDT",
+    "LINKUSDT",
+    "XLMUSDT",
+    "CHZUSDT",
+    "SANDUSDT",
+    "REEFUSDT",
+    "CHRUSDT",
+    "ALICEUSDT",
+    "ONEUSDT",
+    "API3USDT",
+    "GMTUSDT",
+    "APEUSDT",
+    "OPUSDT",
+    "INJUSDT",
+    "LDOUSDT",
+    "APTUSDT"
+  ],
+  "project_id": "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_SOURCE_INPUT_AND_OPEN_EXECUTION_READINESS_R1",
+  "rows": [
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/BCHUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2022",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/BCHUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "BCHUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/XRPUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2022",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/XRPUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "XRPUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/LTCUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2022",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/LTCUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "LTCUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/TRXUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2022",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/TRXUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "TRXUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/ETCUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2022",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/ETCUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "ETCUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/LINKUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2022",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/LINKUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "LINKUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/XLMUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2022",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/XLMUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "XLMUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/CHZUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2022",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/CHZUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "CHZUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/SANDUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2022",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/SANDUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "SANDUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/REEFUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2022",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/REEFUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "REEFUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/CHRUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2022",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/CHRUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "CHRUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/ALICEUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2022",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/ALICEUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "ALICEUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/ONEUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2022",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/ONEUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "ONEUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/API3USDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2022",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/API3USDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "API3USDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/GMTUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2022",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/GMTUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "GMTUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/APEUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2022",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/APEUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "APEUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/OPUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2022",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/OPUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "OPUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/INJUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2022",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/INJUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "INJUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/LDOUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2022",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/LDOUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "LDOUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/APTUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2022",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/APTUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "APTUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": true,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": true
+      },
+      "funding_manifest": "data/manifests/BCHUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2024",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/BCHUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_TAKER_FIELD",
+      "symbol": "BCHUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": true,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": true
+      },
+      "funding_manifest": "data/manifests/XRPUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2024",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/XRPUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_TAKER_FIELD",
+      "symbol": "XRPUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": true,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": true
+      },
+      "funding_manifest": "data/manifests/LTCUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2024",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/LTCUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_TAKER_FIELD",
+      "symbol": "LTCUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": true,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": true
+      },
+      "funding_manifest": "data/manifests/TRXUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2024",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/TRXUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_TAKER_FIELD",
+      "symbol": "TRXUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": true,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": true
+      },
+      "funding_manifest": "data/manifests/ETCUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2024",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/ETCUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_TAKER_FIELD",
+      "symbol": "ETCUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": true,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": true
+      },
+      "funding_manifest": "data/manifests/LINKUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2024",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/LINKUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_TAKER_FIELD",
+      "symbol": "LINKUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": true,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": true
+      },
+      "funding_manifest": "data/manifests/XLMUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2024",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/XLMUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_TAKER_FIELD",
+      "symbol": "XLMUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": true,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": true
+      },
+      "funding_manifest": "data/manifests/CHZUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2024",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/CHZUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_TAKER_FIELD",
+      "symbol": "CHZUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": true,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": true
+      },
+      "funding_manifest": "data/manifests/SANDUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2024",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/SANDUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_TAKER_FIELD",
+      "symbol": "SANDUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": true,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": true
+      },
+      "funding_manifest": "data/manifests/REEFUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2024",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/REEFUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_TAKER_FIELD",
+      "symbol": "REEFUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": true,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": true
+      },
+      "funding_manifest": "data/manifests/CHRUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2024",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/CHRUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_TAKER_FIELD",
+      "symbol": "CHRUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": true,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": true
+      },
+      "funding_manifest": "data/manifests/ALICEUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2024",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/ALICEUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_TAKER_FIELD",
+      "symbol": "ALICEUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": true,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": true
+      },
+      "funding_manifest": "data/manifests/ONEUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2024",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/ONEUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_TAKER_FIELD",
+      "symbol": "ONEUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": true,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": true
+      },
+      "funding_manifest": "data/manifests/API3USDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2024",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/API3USDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_TAKER_FIELD",
+      "symbol": "API3USDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": true,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": true
+      },
+      "funding_manifest": "data/manifests/GMTUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2024",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/GMTUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_TAKER_FIELD",
+      "symbol": "GMTUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": true,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": true
+      },
+      "funding_manifest": "data/manifests/APEUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2024",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/APEUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_TAKER_FIELD",
+      "symbol": "APEUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": true,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": true
+      },
+      "funding_manifest": "data/manifests/OPUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2024",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/OPUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_TAKER_FIELD",
+      "symbol": "OPUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": true,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": true
+      },
+      "funding_manifest": "data/manifests/INJUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2024",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/INJUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_TAKER_FIELD",
+      "symbol": "INJUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": true,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": true
+      },
+      "funding_manifest": "data/manifests/LDOUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2024",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/LDOUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_TAKER_FIELD",
+      "symbol": "LDOUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": true,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": true
+      },
+      "funding_manifest": "data/manifests/APTUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2024",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/APTUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_TAKER_FIELD",
+      "symbol": "APTUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/BCHUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2025",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/BCHUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "BCHUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/XRPUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2025",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/XRPUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "XRPUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/LTCUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2025",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/LTCUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "LTCUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/TRXUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2025",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/TRXUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "TRXUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/ETCUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2025",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/ETCUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "ETCUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/LINKUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2025",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/LINKUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "LINKUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/XLMUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2025",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/XLMUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "XLMUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/CHZUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2025",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/CHZUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "CHZUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/SANDUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2025",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/SANDUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "SANDUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/REEFUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2025",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/REEFUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "REEFUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/CHRUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2025",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/CHRUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "CHRUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/ALICEUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2025",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/ALICEUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "ALICEUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/ONEUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2025",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/ONEUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "ONEUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/API3USDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2025",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/API3USDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "API3USDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/GMTUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2025",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/GMTUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "GMTUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/APEUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2025",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/APEUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "APEUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/OPUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2025",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/OPUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "OPUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/INJUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2025",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/INJUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "INJUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/LDOUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2025",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/LDOUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "LDOUSDT"
+    },
+    {
+      "checks": {
+        "FUNDING_AVAILABLE": true,
+        "GAP_STATUS": "NO_GAP",
+        "PRICE_OPEN_AVAILABLE": false,
+        "QUOTE_VOLUME_AVAILABLE": false,
+        "SOURCE_IDENTITY_VALID": true,
+        "TAKER_BUY_QUOTE_VOLUME_AVAILABLE": false,
+        "TIMESTAMP_CONTINUITY": false
+      },
+      "funding_manifest": "data/manifests/APTUSDT-perp-funding-events-v0.json",
+      "period_id": "DEV_2025",
+      "price_manifest": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/manifests/APTUSDT-perp-1h-hourly-input-v0.json",
+      "status": "BLOCKED_MISSING_PRICE",
+      "symbol": "APTUSDT"
+    }
+  ],
+  "schema_version": "qnty-edge-order-flow-v0-coverage-census-r1",
+  "scientific_asset_cost_cells": 40,
+  "symbol_count": 20,
+  "temporal_blocks": {
+    "DEV_2022": [
+      "2022-01-01T00:00:00Z",
+      "2022-12-31T23:00:00Z"
+    ],
+    "DEV_2024": [
+      "2024-01-01T00:00:00Z",
+      "2024-12-31T23:00:00Z"
+    ],
+    "DEV_2025": [
+      "2025-01-01T00:00:00Z",
+      "2025-12-31T23:00:00Z"
+    ]
+  },
+  "universe_digest": "becdf4bd2157ebbad416526f414c3b9f647e8832753a61642d8a5d60b6620bcd",
+  "variant_id": "variant_23f758ef7052522d70172239",
+  "window_count": 60,
+  "window_counts": {
+    "BLOCKED_MISSING_PRICE": 40,
+    "BLOCKED_MISSING_TAKER_FIELD": 20
+  },
+  "window_counts_by_period": {
+    "DEV_2022": {
+      "BLOCKED_MISSING_PRICE": 20,
+      "BLOCKED_MISSING_TAKER_FIELD": 0
+    },
+    "DEV_2024": {
+      "BLOCKED_MISSING_PRICE": 0,
+      "BLOCKED_MISSING_TAKER_FIELD": 20
+    },
+    "DEV_2025": {
+      "BLOCKED_MISSING_PRICE": 20,
+      "BLOCKED_MISSING_TAKER_FIELD": 0
+    }
+  }
+}

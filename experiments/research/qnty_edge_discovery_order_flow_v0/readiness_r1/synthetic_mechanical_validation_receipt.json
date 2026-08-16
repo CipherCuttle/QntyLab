@@ -1,0 +1,21 @@
+{
+  "project_id": "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_SOURCE_INPUT_AND_OPEN_EXECUTION_READINESS_R1",
+  "real_outcomes_accessed": false,
+  "real_source_rows_used": false,
+  "schema_version": "qnty-edge-order-flow-v0-synthetic-validation-r1",
+  "scientific_values_computed": false,
+  "tests": [
+    "source partition admission and sell derivation",
+    "required source fields preserved",
+    "24-bar prior median and warmup",
+    "source shock cannot affect source/gap/previous interval",
+    "OPEN(t) entry and OPEN(t+1h) exit",
+    "continuation-only positions",
+    "baseline/stress fees and slippage",
+    "realized event-time funding and fail-closed missing funding",
+    "40-cell denominator and diagnostic non-eligibility",
+    "at-most-once identity and technical recovery states"
+  ],
+  "validation_digest": "328d3fd40a00010483ce03706cd0416361608ad29176180fac26e764c8b141b9",
+  "validation_scope": "synthetic_mechanical_only"
+}

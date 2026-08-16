@@ -1,0 +1,19 @@
+{
+  "contract_digest": "6a96acf0e87dabc5ceba039ff2835c23550109e2d521f0ae3ba0ec0337471a91",
+  "cost_modes": {
+    "BASELINE": {
+      "fee_bps_one_way": 10,
+      "slippage_bps_one_way": 0
+    },
+    "STRESS": {
+      "fee_bps_one_way": 10,
+      "slippage_bps_one_way": 10
+    }
+  },
+  "funding": "realized event-time funding only while position is open; missing event coverage blocks",
+  "maker_or_queue_assumption": false,
+  "project_id": "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_SOURCE_INPUT_AND_OPEN_EXECUTION_READINESS_R1",
+  "schema_version": "qnty-edge-order-flow-v0-cost-funding-contract-r1",
+  "turnover": "abs(position_change); direct long/short flip is 2",
+  "zero_fill_funding": false
+}

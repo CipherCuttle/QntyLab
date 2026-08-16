@@ -1,0 +1,16 @@
+{
+  "close_to_close_substitution": false,
+  "continuation_only": true,
+  "contract_digest": "f36646b4f79fa5ae6f2f697f7c19f5fde9e8bca2f6061b3e7e3baadd1af51483",
+  "decision_time": "OPEN(t)",
+  "entry_price": "OPEN(t)",
+  "exit_price": "OPEN(t+1h)",
+  "invalid_scale_rule": "return no feature / block; never zero-fill",
+  "mechanical_adapter": "qntylab.qnty_edge_order_flow_v0_readiness.open_to_open_trade",
+  "normalizer": "median(quote_volume[t-26:t-2]) over exactly 24 completed bars",
+  "outcome_interval": "[t,t+1h)",
+  "project_id": "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_SOURCE_INPUT_AND_OPEN_EXECUTION_READINESS_R1",
+  "safe_known_gap": "[t-1h,t)",
+  "schema_version": "qnty-edge-order-flow-v0-open-to-open-contract-r1",
+  "source_interval": "[t-2h,t-1h)"
+}

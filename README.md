@@ -22,10 +22,20 @@ Under [ADR 0007](docs/ADR/0007-ecosystem-role-boundary-and-context-spine-governa
 `qntylab.project_context` owns the Context Spine compiler. `spine` writes a
 versioned foundation packet as canonical JSON (recursively sorted keys, `,`/`:`
 separators, ASCII escaping) followed by one newline, and exits non-zero when
-`packet_status` is `ARCHITECTURE_CONFLICT`. `docs/state/ecosystem.toml` is the
-machine-readable catalog it compiles; that catalog references canonical
-authority — ADR IDs and `qntylab.toml` `[authority]` keys — rather than copying
-it, and the compiler fails closed when a reference does not reconcile.
+`packet_status` is `ARCHITECTURE_CONFLICT`.
+
+`docs/state/ecosystem.toml` is the machine-readable catalog. It carries durable
+ecosystem semantics only and references canonical authority by ADR ID rather
+than copying it; the compiler resolves those references against
+`docs/ADR/registry.toml` and fails closed when one does not reconcile.
+
+The catalog does not declare context sources or their precedence. Those are
+derived from the `qntylab.toml` `[authority]` sources the repository already
+owns, with the ADR-0007 precedence class assigned by the compiler — so the
+catalog cannot classify a source, omit one, bind one twice, or reorder the
+ladder, and an authority source with no assigned class fails closed rather than
+defaulting to a rank. While a conflict is open, `render` refuses to rewrite the
+generated roadmap.
 
 Compilation is read-only and local. It never writes a file, mutates Git,
 touches project or research state, or reaches the network. Qnty, QntyAgentEval,

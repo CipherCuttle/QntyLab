@@ -5,15 +5,18 @@
 # nothing here grants scientific, economic, acceptance, or operational
 # authority.
 #
-# `qntylab.project_context` reconciles every reference against the source that
-# owns it and fails closed: `architecture_authority` and `scientific_north_star`
-# against docs/ADR/registry.toml, the local `repository_id` and every
-# `authority_key`/`availability_key` against qntylab.toml, and each bound path
-# against Git. Every declared `[authority]` key must be bound exactly once.
+# It deliberately does NOT declare context sources or their precedence. Those
+# are derived by `qntylab.project_context` from the authority sources this
+# repository already owns, so this file cannot classify a source, omit one,
+# bind one twice, or reorder the ADR-0007 precedence ladder.
 #
-# `durable_role` and `default_branch` are declared naming, not observed state:
-# no local source owns them, and no adapter reads the external repositories.
-
+# What the compiler reconciles here, failing closed on disagreement:
+# `architecture_authority` and `scientific_north_star` against
+# docs/ADR/registry.toml, and the local `repository_id` against qntylab.toml.
+#
+# `ecosystem_id`, `durable_role`, and `default_branch` are declared naming, not
+# observed state: no local source owns them, and no adapter reads the external
+# repositories.
 schema_version = 1
 ecosystem_id = "QNTY_ECOSYSTEM"
 
@@ -49,56 +52,3 @@ durable_role = "EXTERNAL_GIT_GOVERNANCE_POLICY_BOUNDARY"
 default_branch = "main"
 context_access = "NARROW_READ_ONLY_ADAPTER"
 adapter_status = "ADAPTER_NOT_IMPLEMENTED"
-
-# Every source below is owned by the local repository. A source owned by any
-# other repository requires a cross-repository adapter, which does not exist.
-# `authority_key` names a key of the qntylab.toml [authority] table rather than
-# repeating its path.
-
-[[context_source]]
-source_id = "CANONICAL_GIT_IDENTITY"
-repository_id = "QntyLab"
-precedence_class = "CANONICAL_GIT_IDENTITY"
-source_kind = "INTRINSIC"
-
-[[context_source]]
-source_id = "ECOSYSTEM_CATALOG"
-repository_id = "QntyLab"
-precedence_class = "REPOSITORY_MACHINE_READABLE_AUTHORITY_STATE"
-source_kind = "FILE"
-authority_key = "ecosystem_catalog"
-
-[[context_source]]
-source_id = "PROJECT_REGISTRY"
-repository_id = "QntyLab"
-precedence_class = "REPOSITORY_MACHINE_READABLE_AUTHORITY_STATE"
-source_kind = "FILE"
-authority_key = "project_registry"
-
-[[context_source]]
-source_id = "DATASET_REGISTRY"
-repository_id = "QntyLab"
-precedence_class = "REPOSITORY_MACHINE_READABLE_AUTHORITY_STATE"
-source_kind = "NOT_ESTABLISHED"
-availability_key = "data.registry_status"
-
-[[context_source]]
-source_id = "ARCHITECTURE_REGISTRY"
-repository_id = "QntyLab"
-precedence_class = "REGISTERED_ARCHITECTURE_CONTRACT"
-source_kind = "FILE"
-authority_key = "global_architecture_registry"
-
-[[context_source]]
-source_id = "RESEARCH_LEDGER"
-repository_id = "QntyLab"
-precedence_class = "APPEND_ONLY_LEDGER_OR_IMMUTABLE_RECEIPT"
-source_kind = "DIRECTORY"
-authority_key = "research_ledger_root"
-
-[[context_source]]
-source_id = "GENERATED_ROADMAP"
-repository_id = "QntyLab"
-precedence_class = "DETERMINISTIC_GENERATED_VIEW"
-source_kind = "FILE"
-authority_key = "current_roadmap"

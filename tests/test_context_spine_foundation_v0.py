@@ -76,52 +76,14 @@ def _catalog(**overrides: Any) -> dict[str, Any]:
                 "adapter_status": "ADAPTER_NOT_IMPLEMENTED",
             },
         ],
-        "context_source": [
-            {
-                "source_id": "CANONICAL_GIT_IDENTITY",
-                "repository_id": "LocalRepo",
-                "precedence_class": "CANONICAL_GIT_IDENTITY",
-                "source_kind": "INTRINSIC",
-            },
-            {
-                "source_id": "PROJECT_REGISTRY",
-                "repository_id": "LocalRepo",
-                "precedence_class": "REPOSITORY_MACHINE_READABLE_AUTHORITY_STATE",
-                "source_kind": "FILE",
-                "authority_key": "project_registry",
-            },
-            {
-                "source_id": "RESEARCH_LEDGER",
-                "repository_id": "LocalRepo",
-                "precedence_class": "APPEND_ONLY_LEDGER_OR_IMMUTABLE_RECEIPT",
-                "source_kind": "DIRECTORY",
-                "authority_key": "research_ledger_root",
-            },
-        ]
-        + [
-            {
-                "source_id": source_id,
-                "repository_id": "LocalRepo",
-                "precedence_class": precedence_class,
-                "source_kind": "FILE",
-                "authority_key": authority_key,
-            }
-            for source_id, authority_key, precedence_class in (
-                ("ARCHITECTURE_REGISTRY", "global_architecture_registry", "REGISTERED_ARCHITECTURE_CONTRACT"),
-                ("ECOSYSTEM_CATALOG", "ecosystem_catalog", "REPOSITORY_MACHINE_READABLE_AUTHORITY_STATE"),
-                ("GENERATED_ROADMAP", "current_roadmap", "DETERMINISTIC_GENERATED_VIEW"),
-            )
-        ],
     }
     value.update(overrides)
     return value
 
 
 def _validate(tmp_path: Path, catalog: dict[str, Any], config: dict[str, Any] | None = None) -> dict[str, Any]:
-    root = tmp_path / "repo"
-    if not root.exists():
-        _tracked_root(tmp_path)
-    return project_context.validate_ecosystem_catalog(root, config or _config(), catalog)
+    _tracked_root(tmp_path) if not (tmp_path / "repo").exists() else None
+    return project_context.validate_ecosystem_catalog(config or _config(), catalog)
 
 
 QNTYLAB_TOML = """schema_version = 1
@@ -187,53 +149,6 @@ default_branch = "main"
 context_access = "NARROW_READ_ONLY_ADAPTER"
 adapter_status = "ADAPTER_NOT_IMPLEMENTED"
 
-[[context_source]]
-source_id = "CANONICAL_GIT_IDENTITY"
-repository_id = "{local}"
-precedence_class = "CANONICAL_GIT_IDENTITY"
-source_kind = "INTRINSIC"
-
-[[context_source]]
-source_id = "PROJECT_REGISTRY"
-repository_id = "{local}"
-precedence_class = "REPOSITORY_MACHINE_READABLE_AUTHORITY_STATE"
-source_kind = "FILE"
-authority_key = "project_registry"
-
-[[context_source]]
-source_id = "ECOSYSTEM_CATALOG"
-repository_id = "{local}"
-precedence_class = "REPOSITORY_MACHINE_READABLE_AUTHORITY_STATE"
-source_kind = "FILE"
-authority_key = "ecosystem_catalog"
-
-[[context_source]]
-source_id = "ARCHITECTURE_REGISTRY"
-repository_id = "{local}"
-precedence_class = "REGISTERED_ARCHITECTURE_CONTRACT"
-source_kind = "FILE"
-authority_key = "global_architecture_registry"
-
-[[context_source]]
-source_id = "RESEARCH_LEDGER"
-repository_id = "{local}"
-precedence_class = "APPEND_ONLY_LEDGER_OR_IMMUTABLE_RECEIPT"
-source_kind = "DIRECTORY"
-authority_key = "research_ledger_root"
-
-[[context_source]]
-source_id = "GENERATED_ROADMAP"
-repository_id = "{local}"
-precedence_class = "DETERMINISTIC_GENERATED_VIEW"
-source_kind = "FILE"
-authority_key = "current_roadmap"
-
-[[context_source]]
-source_id = "DATASET_REGISTRY"
-repository_id = "{local}"
-precedence_class = "REPOSITORY_MACHINE_READABLE_AUTHORITY_STATE"
-source_kind = "NOT_ESTABLISHED"
-availability_key = "data.registry_status"
 """
 
 
@@ -287,19 +202,8 @@ def test_catalog_validation_pass(tmp_path: Path) -> None:
     assert normalized["ecosystem_id"] == "TEST_ECOSYSTEM"
     assert normalized["local_repository_id"] == "LocalRepo"
     assert sorted(normalized["repositories"]) == ["LocalRepo", "RemoteRepo"]
-    assert normalized["context_sources"]["RESEARCH_LEDGER"]["precedence_rank"] == 4
-
-
-def test_precedence_rank_follows_the_adr_ladder_and_is_not_catalog_controlled(tmp_path: Path) -> None:
-    catalog = _catalog()
-    catalog["context_source"][1]["precedence_rank"] = 1
-    sources = _validate(tmp_path, catalog)["context_sources"]
-    assert sources["CANONICAL_GIT_IDENTITY"]["precedence_rank"] == 1
-    assert sources["PROJECT_REGISTRY"]["precedence_rank"] == 2
-    assert sources["RESEARCH_LEDGER"]["precedence_rank"] == 4
-    assert sources["GENERATED_ROADMAP"]["precedence_rank"] == 6
-    for source in sources.values():
-        assert source["precedence_rank"] == project_context.PRECEDENCE_CLASSES.index(source["precedence_class"]) + 1
+    # The catalog carries ecosystem semantics only; it declares no source set.
+    assert set(normalized) == {"ecosystem_id", "architecture_references", "repositories", "local_repository_id"}
 
 
 @pytest.mark.parametrize(
@@ -309,7 +213,9 @@ def test_precedence_rank_follows_the_adr_ladder_and_is_not_catalog_controlled(tm
         (lambda catalog: catalog.pop("ecosystem_id"), "ecosystem_id"),
         (lambda catalog: catalog.pop("architecture"), r"\[architecture\]"),
         (lambda catalog: catalog["architecture"].pop("scientific_north_star"), "scientific_north_star"),
+        (lambda catalog: catalog["architecture"].pop("architecture_authority"), "architecture_authority"),
         (lambda catalog: catalog.update(repository="not-a-list"), "must be an array"),
+        (lambda catalog: catalog.update(repository=[]), "exactly one LOCAL_CANONICAL_SOURCES"),
         (lambda catalog: catalog["repository"].append(copy.deepcopy(catalog["repository"][0])), "duplicate ecosystem repository"),
         (lambda catalog: catalog["repository"][1].update(context_access="TOTALLY_NEW"), "unknown context_access"),
         (lambda catalog: catalog["repository"][1].update(adapter_status="ADAPTER_IMPLEMENTED"), "unknown adapter_status"),
@@ -318,18 +224,7 @@ def test_precedence_rank_follows_the_adr_ladder_and_is_not_catalog_controlled(tm
         (lambda catalog: catalog["repository"][0].update(context_access="NARROW_READ_ONLY_ADAPTER", adapter_status="ADAPTER_NOT_IMPLEMENTED"), "exactly one LOCAL_CANONICAL_SOURCES"),
         (lambda catalog: catalog["repository"][1].update(context_access="LOCAL_CANONICAL_SOURCES", adapter_status="NOT_APPLICABLE"), "exactly one LOCAL_CANONICAL_SOURCES"),
         (lambda catalog: catalog["repository"][0].pop("default_branch"), "default_branch"),
-        (lambda catalog: catalog["context_source"].append(copy.deepcopy(catalog["context_source"][1])), "duplicate context source"),
-        (lambda catalog: catalog["context_source"][1].update(precedence_class="MOST_IMPORTANT"), "unknown precedence_class"),
-        (lambda catalog: catalog["context_source"][1].update(source_kind="SOCKET"), "unknown source_kind"),
-        (lambda catalog: catalog["context_source"][1].update(authority_key="undeclared_key"), "authority key is not declared"),
-        (lambda catalog: catalog["context_source"][1].pop("authority_key"), "authority_key"),
-        (lambda catalog: catalog["context_source"][0].update(authority_key="project_registry"), "may not bind an authority key"),
-        (lambda catalog: catalog["context_source"][0].update(precedence_class="ORIENTATION_PROSE"), "canonical Git identity and intrinsic kind must agree"),
-        (lambda catalog: catalog["context_source"][1].update(availability_key="data.registry_status"), "may not bind an availability key"),
-        (lambda catalog: catalog["context_source"].pop(1), "no context source"),
-        (lambda catalog: catalog["context_source"][2].update(source_kind="FILE"), "must be a file"),
-        (lambda catalog: catalog["context_source"][1].update(source_kind="DIRECTORY"), "must be a non-symlink directory"),
-        (lambda catalog: catalog.update(context_source=[]), "exactly one canonical Git identity"),
+        (lambda catalog: catalog["repository"][0].pop("durable_role"), "durable_role"),
     ],
 )
 def test_malformed_foundation_fails_closed(tmp_path: Path, mutate: Any, message: str) -> None:
@@ -339,94 +234,72 @@ def test_malformed_foundation_fails_closed(tmp_path: Path, mutate: Any, message:
         _validate(tmp_path, catalog)
 
 
-def test_canonical_git_identity_class_cannot_be_claimed_by_a_tracked_file(tmp_path: Path) -> None:
-    """A generated prose view must not be classifiable as the canonical Git identity."""
-    catalog = _catalog()
-    catalog["context_source"][-1]["precedence_class"] = "CANONICAL_GIT_IDENTITY"
-    with pytest.raises(project_context.ProjectContextError, match="canonical Git identity and intrinsic kind must agree"):
-        _validate(tmp_path, catalog)
+def test_no_implemented_adapter_token_exists_at_this_schema_version() -> None:
+    """A catalog cannot spell cross-repository observation that no code performs."""
+    assert project_context.ADAPTER_STATUSES == frozenset({"NOT_APPLICABLE", "ADAPTER_NOT_IMPLEMENTED"})
 
 
-def test_exactly_one_canonical_git_identity_source_is_required(tmp_path: Path) -> None:
-    catalog = _catalog()
-    catalog["context_source"].append({**copy.deepcopy(catalog["context_source"][0]), "source_id": "SECOND_GIT_IDENTITY"})
-    with pytest.raises(project_context.ProjectContextError, match="exactly one canonical Git identity"):
-        _validate(tmp_path, catalog)
-    catalog = _catalog()
-    catalog["context_source"].pop(0)
-    with pytest.raises(project_context.ProjectContextError, match="exactly one canonical Git identity"):
-        _validate(tmp_path, catalog)
+# --- Derived context sources --------------------------------------------
 
 
-def test_one_authority_key_cannot_be_bound_at_two_precedence_ranks(tmp_path: Path) -> None:
-    catalog = _catalog()
-    catalog["context_source"].append(
-        {
-            "source_id": "PROJECT_REGISTRY_AGAIN",
-            "repository_id": "LocalRepo",
-            "precedence_class": "NON_AUTHORITATIVE_CONVENIENCE",
-            "source_kind": "FILE",
-            "authority_key": "project_registry",
-        }
-    )
-    with pytest.raises(project_context.ProjectContextError, match="bound by more than one context source"):
-        _validate(tmp_path, catalog)
+def test_context_sources_are_derived_from_authority_not_declared_by_the_catalog() -> None:
+    """The catalog has no say over which sources exist or where they rank."""
+    catalog = tomllib.loads((ROOT / "docs/state/ecosystem.toml").read_text(encoding="utf-8"))
+    assert "context_source" not in catalog
+    assert "precedence_class" not in (ROOT / "docs/state/ecosystem.toml").read_text(encoding="utf-8")
+
+    sources = project_context._context_sources(_config())
+    assert sources["CANONICAL_GIT_IDENTITY"]["precedence_rank"] == 1
+    assert sources["PROJECT_REGISTRY"]["precedence_rank"] == 2
+    assert sources["GLOBAL_ARCHITECTURE_REGISTRY"]["precedence_rank"] == 3
+    assert sources["RESEARCH_LEDGER_ROOT"]["precedence_rank"] == 4
+    # A generated view stays below the contract it is generated from.
+    assert sources["CURRENT_ROADMAP"]["precedence_rank"] == 6
+    for source in sources.values():
+        assert source["precedence_class"] == project_context.PRECEDENCE_CLASSES[source["precedence_rank"] - 1]
 
 
-def test_every_declared_authority_source_must_be_classified(tmp_path: Path) -> None:
-    """Adding a canonical source without cataloguing it cannot silently shrink the packet."""
-    catalog = _catalog()
-    config = _config(new_canonical_registry="docs/state/projects.toml")
-    with pytest.raises(project_context.ProjectContextError, match="have no context source: new_canonical_registry"):
-        project_context.validate_ecosystem_catalog(_tracked_root(tmp_path), config, catalog)
+def test_every_authority_source_appears_exactly_once() -> None:
+    """The source set is total over [authority], so none can be omitted or doubled."""
+    config = _config()
+    sources = project_context._context_sources(config)
+    bound = [source["authority_key"] for source in sources.values() if source["authority_key"]]
+    assert sorted(bound) == sorted(config["authority"])
+    assert len(bound) == len(set(bound))
+    assert len(sources) == len(config["authority"]) + 1  # plus the intrinsic Git identity
 
 
-def test_unestablished_source_must_name_the_key_that_owns_its_status(tmp_path: Path) -> None:
-    catalog = _catalog()
-    unestablished = {
-        "source_id": "FUTURE_SOURCE",
-        "repository_id": "LocalRepo",
-        "precedence_class": "REPOSITORY_MACHINE_READABLE_AUTHORITY_STATE",
-        "source_kind": "NOT_ESTABLISHED",
-    }
-    catalog["context_source"].append(unestablished)
-    with pytest.raises(project_context.ProjectContextError, match="availability_key"):
-        _validate(tmp_path, catalog)
-    unestablished["availability_key"] = "data.absent_key"
-    with pytest.raises(project_context.ProjectContextError, match="does not resolve: data.absent_key"):
-        _validate(tmp_path, catalog)
+def test_exactly_one_intrinsic_canonical_git_identity_source_exists() -> None:
+    sources = project_context._context_sources(_config())
+    intrinsic = [source for source in sources.values() if source["source_kind"] == "INTRINSIC"]
+    assert len(intrinsic) == 1
+    assert intrinsic[0]["precedence_class"] == "CANONICAL_GIT_IDENTITY"
+    assert intrinsic[0]["authority_key"] is None and intrinsic[0]["path"] is None
+    # No file-backed source may occupy rank 1.
+    assert [source["source_id"] for source in sources.values() if source["precedence_rank"] == 1] == ["CANONICAL_GIT_IDENTITY"]
 
 
-def test_unestablished_source_disagreeing_with_its_owner_is_an_architecture_conflict(tmp_path: Path) -> None:
-    root = _spine_root(tmp_path, config=QNTYLAB_TOML.replace('registry_status = "NOT_ESTABLISHED"', 'registry_status = "ESTABLISHED"'))
-    packet = project_context.compile_context_spine(root)
-    assert packet["packet_status"] == project_context.ARCHITECTURE_CONFLICT
-    assert [item["code"] for item in packet["conflicts"]] == ["CONTEXT_SOURCE_AVAILABILITY_DISAGREEMENT"]
-    # The catalog's claim is reported, not quietly overwritten by the owning key.
-    source = next(item for item in packet["context_sources"] if item["source_id"] == "DATASET_REGISTRY")
-    assert source["availability"] == "NOT_ESTABLISHED"
-    assert _spine_cli(root, "spine").returncode == 1
+def test_unclassified_authority_source_fails_closed() -> None:
+    """Adding a canonical source without ranking it cannot silently shrink the packet."""
+    with pytest.raises(project_context.ProjectContextError, match="no precedence class: new_canonical_registry"):
+        project_context._context_sources(_config(new_canonical_registry="docs/state/projects.toml"))
 
 
-def test_context_source_owned_by_another_repository_is_rejected_because_no_adapter_exists(tmp_path: Path) -> None:
-    catalog = _catalog()
-    catalog["context_source"][1]["repository_id"] = "RemoteRepo"
-    with pytest.raises(project_context.ProjectContextError, match="unimplemented cross-repository adapter"):
-        _validate(tmp_path, catalog)
+def test_two_authority_keys_cannot_bind_the_same_path() -> None:
+    """One file must not appear at two contradictory precedence ranks."""
+    with pytest.raises(project_context.ProjectContextError, match="bind the same path"):
+        project_context._context_sources(_config(current_roadmap="docs/state/projects.toml"))
 
 
-def test_context_source_owner_must_be_a_declared_ecosystem_repository(tmp_path: Path) -> None:
-    catalog = _catalog()
-    catalog["context_source"][1]["repository_id"] = "UnknownRepo"
-    with pytest.raises(project_context.ProjectContextError, match="not an ecosystem repository"):
-        _validate(tmp_path, catalog)
+def test_every_derived_source_is_owned_by_the_local_repository() -> None:
+    config = _config()
+    assert all(source["repository_id"] == config["repository_id"] for source in project_context._context_sources(config).values())
 
 
-def test_catalog_cannot_reach_outside_the_repository(tmp_path: Path) -> None:
-    root = _tracked_root(tmp_path)
-    config = _config(project_registry="../outside.toml")
+def test_authority_paths_cannot_reach_outside_the_repository(tmp_path: Path) -> None:
+    root = _spine_root(tmp_path, config=QNTYLAB_TOML.replace('project_registry = "docs/state/projects.toml"', 'project_registry = "../outside.toml"'))
     with pytest.raises(project_context.ProjectContextError, match="repository-relative|escapes repository"):
-        project_context.validate_ecosystem_catalog(root, config, _catalog())
+        project_context.compile_context_spine(root)
 
 
 # --- Compiled packet ----------------------------------------------------
@@ -526,7 +399,7 @@ def test_canonical_serialization_stable_across_processes() -> None:
 def test_packet_is_insensitive_to_catalog_declaration_order(tmp_path: Path) -> None:
     blocks = _ecosystem_toml().split("\n\n")
     tables = [block for block in blocks if block.startswith("[[")]
-    assert len(tables) > 5
+    assert len(tables) == 2
     shuffled = "\n\n".join([block for block in blocks if not block.startswith("[[")] + list(reversed(tables)))
     forward_packet = project_context.compile_context_spine(_spine_root(tmp_path))
     reverse_packet = project_context.compile_context_spine(_spine_root(tmp_path / "shuffled", catalog=shuffled))
@@ -660,6 +533,37 @@ def test_read_only_compilation() -> None:
     assert subprocess.run(["git", "-C", str(ROOT), "rev-parse", "HEAD"], check=True, capture_output=True).stdout == before_head
 
 
+def test_git_reads_ignore_an_ambient_git_location(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """An inherited GIT_DIR must not redirect the compiler at another repository."""
+    root = _spine_root(tmp_path)
+    other = _spine_root(tmp_path / "other")
+    subprocess.run(["git", "-C", str(other), "rm", "-q", "docs/CURRENT_ROADMAP.md"], check=True)
+    expected = subprocess.run(["git", "-C", str(root), "rev-parse", "HEAD"], check=True, capture_output=True, text=True).stdout.strip()
+
+    monkeypatch.setenv("GIT_DIR", str(other / ".git"))
+    monkeypatch.setenv("GIT_WORK_TREE", str(other))
+    monkeypatch.setenv("GIT_INDEX_FILE", str(other / ".git/index"))
+    identity = project_context.compile_context_spine(root)["generated_from"]["canonical_git_identity"]
+    assert identity["head_sha"] == expected
+    assert identity["worktree_status"] == "CLEAN"
+    assert identity["compiled_bytes_bound_to_head_sha"] is True
+
+
+def test_render_check_does_not_write_the_git_index(tmp_path: Path) -> None:
+    """Gating render on the foundation must not cost it its read-only check path."""
+    root = _spine_root(tmp_path)
+    index = root / ".git/index"
+    assert project_context.render(root, check=False) == 0
+    # A stale stat cache is what would make a read command rewrite the index.
+    for path in sorted(root.rglob("*")):
+        if path.is_file() and ".git" not in path.parts:
+            os.utime(path, (0, 0))
+    before = (index.read_bytes(), index.stat().st_mtime_ns)
+    assert project_context.render(root, check=True) == 0
+    assert (index.read_bytes(), index.stat().st_mtime_ns) == before
+    assert not (root / ".git/index.lock").exists()
+
+
 def test_compilation_does_not_inherit_render_write_behaviour(monkeypatch: pytest.MonkeyPatch) -> None:
     def refuse(*args: Any, **kwargs: Any) -> None:
         raise AssertionError("Context Spine compilation must not write")
@@ -758,7 +662,7 @@ def test_generic_foundation_embeds_no_commit_or_digest_literals() -> None:
 
 def test_generic_foundation_knows_only_ecosystem_level_vocabulary() -> None:
     catalog = tomllib.loads((ROOT / "docs/state/ecosystem.toml").read_text(encoding="utf-8"))
-    assert set(catalog) == {"schema_version", "ecosystem_id", "architecture", "repository", "context_source"}
+    assert set(catalog) == {"schema_version", "ecosystem_id", "architecture", "repository"}
     # The catalog references canonical authority; it never copies its prose.
     assert set(catalog["architecture"]) == {"architecture_authority", "scientific_north_star"}
     assert all(len(value) < 16 for value in catalog["architecture"].values())

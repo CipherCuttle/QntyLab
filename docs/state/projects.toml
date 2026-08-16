@@ -2447,3 +2447,75 @@ hostile_governance_open_high = 0
 targeted_governance_rereview_used = false
 active_project_after_closure = "NONE"
 next_action = "CANONICAL_READY: next phase is exactly QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_BLOCKED_WINDOW_FORENSICS_V0; diagnose the 14 blocked rows only, do not repair them, and do not run the strategy."
+
+[[project]]
+project_id = "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_BLOCKED_WINDOW_FORENSICS_V0"
+display_name = "Order-Flow V0 blocked-window forensics"
+state = "CLOSED_PASS"
+authority_level = "DIAGNOSIS_ONLY"
+phase_type = "OUTCOME_FREE_FORENSIC_CLASSIFICATION"
+authoritative_artifacts = [
+  "docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md",
+  "docs/ADR/0006-qntylab-research-design-philosophy.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/specs/qnty_edge_discovery_order_flow_v0_preregistration.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/blocked_window_forensics_authorization.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/coverage_census.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/source_manifest.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/input_snapshot.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/input_qualification.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/materialization_receipt.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/implementation_manifest.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/blocked_window_forensics.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/blocked_window_forensics_hostile_review.md",
+  "qntylab/qnty_edge_order_flow_v0_blocked_window_forensics.py",
+  "tests/test_qnty_edge_order_flow_v0_blocked_window_forensics.py"
+]
+canonical_master_sha = "b7f96e7a57ce6ed78dfeb946e937e8110fb52a70"
+bound_authorization_project = "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_BLOCKED_WINDOW_FORENSICS_AUTHORIZATION_V0"
+predecessor_project_id = "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_INPUT_MATERIALIZATION_V0"
+predecessor_state = "CLOSED_BLOCKED"
+candidate_id = "CANDIDATE_ORDER_FLOW_SIGNED_TAKER_NOTIONAL_V0"
+variant_id = "variant_23f758ef7052522d70172239"
+proposal_event_id = "event_proposal_order_flow_v0_20260815"
+preregistration_digest = "8e75f53f19c9719b97c3626c7e39626e206505e138107601748d9213eabe7757"
+preregistration_json_sha256 = "34252ccf245c9d963b987e697231d4a33d66c2450d44689b7b737c0686a24979"
+universe_digest = "becdf4bd2157ebbad416526f414c3b9f647e8832753a61642d8a5d60b6620bcd"
+feature_digest = "4db4f40cebc5f476727ef624281404b5443cddb49548eceeffa513118926c481"
+cost_digest = "efb39c8f1635e833957f19148637afd527c1bb0584950084c3a6c36d0bc82877"
+source_contract_identity = "BINANCE_USD_M_PERPETUAL_1H_MATERIALIZER_V0"
+required_asset_period_windows = 60
+input_ready_windows = 46
+blocked_windows = 14
+forensic_artifact_digest = "d30fe9a3ec0c2045bbd3e0792d651fed9757631797c3cd49fd5c0d9fdd39e5ba"
+A_count = 0
+B_count = 0
+C_count = 14
+D_count = 0
+all_recoverable_under_existing_frozen_contract = false
+any_genuine_frozen_source_absence = true
+any_scientific_contract_change_required_to_reach_60_of_60 = true
+repair_authorized = false
+materialization_rerun_authorized = false
+scientific_execution_authorized = false
+scientific_features_computed = false
+future_returns_accessed = false
+pnl_computed = false
+scientific_execution_performed = false
+outcome_firewall_breach = false
+new_candidate_proposed_events = 0
+new_candidate_reopened_events = 0
+new_trial_completed_events = 0
+hostile_review_count = 1
+hostile_review_verdict = "PASS"
+hostile_governance_critical_total = 0
+hostile_governance_high_total = 0
+hostile_governance_open_critical = 0
+hostile_governance_open_high = 0
+targeted_governance_rereview_used = false
+qntyagenteval_applicability = "NO_MATCH"
+qntyagenteval_lookup_count = 1
+implementation_authorized = false
+active_project_after_closure = "NONE"
+next_action = "CLOSED_PASS: all 14 blocked rows classified C. No repair, rematerialization, scientific execution, or downstream authority is authorized; any attempt to reach 60/60 requires separate Git-backed contract authority."

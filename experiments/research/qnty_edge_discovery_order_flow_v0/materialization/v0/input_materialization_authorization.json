@@ -1,0 +1,193 @@
+{
+  "artifact_type": "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_INPUT_MATERIALIZATION_AUTHORIZATION",
+  "schema_version": "qnty-edge-discovery-order-flow-v0-input-materialization-authorization-v1",
+  "project_id": "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_INPUT_MATERIALIZATION_AUTHORIZATION_V0",
+  "state": "CLOSED_PASS",
+  "phase_type": "GOVERNANCE_ONLY",
+  "authority_level": "GOVERNANCE_AUTHORIZATION_ONLY",
+  "status": "AUTHORIZED_FOR_ONE_LATER_OUTCOME_FREE_INPUT_MATERIALIZATION_PHASE",
+  "canonicalization": {
+    "canonical_master_sha": "e32f4b66c731942d7c64a28584637b2098a772f3",
+    "canonical_master_required": true,
+    "predecessor_project_id": "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_SOURCE_INPUT_AND_OPEN_EXECUTION_READINESS_R1",
+    "predecessor_state": "CLOSED_BLOCKED",
+    "predecessor_verdict": "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_SOURCE_INPUT_AND_OPEN_EXECUTION_READINESS_R1_BLOCKED",
+    "predecessor_source_partition_verdict": "SOURCE_PARTITION_PROVEN",
+    "predecessor_scientific_execution_performed": false,
+    "predecessor_outcome_firewall_breach": false,
+    "canonicalization_required_before_later_phase_effect": true
+  },
+  "later_phase": {
+    "project_id": "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_INPUT_MATERIALIZATION_V0",
+    "authorization_scope": "ONE_SEPARATELY_GIT_BACKED_OUTCOME_FREE_INPUT_ACQUISITION_AND_MATERIALIZATION_PHASE",
+    "later_materialization_phase_authorized": true,
+    "implementation_authorized": false,
+    "scientific_execution_authorized": false,
+    "historical_outcome_access_authorized": false,
+    "automatic_execution_after_input_ready": false,
+    "terminal_verdicts": ["INPUT_READY", "BLOCKED"]
+  },
+  "candidate_identity": {
+    "candidate_id": "CANDIDATE_ORDER_FLOW_SIGNED_TAKER_NOTIONAL_V0",
+    "variant_id": "variant_23f758ef7052522d70172239",
+    "proposal_event_id": "event_proposal_order_flow_v0_20260815",
+    "proposal_event_type": "CANDIDATE_PROPOSED",
+    "exactly_one_proposal_event": true,
+    "trial_completed_event": false,
+    "h010_reopened": false
+  },
+  "frozen_contract_identity": {
+    "preregistration_digest": "8e75f53f19c9719b97c3626c7e39626e206505e138107601748d9213eabe7757",
+    "preregistration_json_sha256": "34252ccf245c9d963b987e697231d4a33d66c2450d44689b7b737c0686a24979",
+    "universe_digest": "becdf4bd2157ebbad416526f414c3b9f647e8832753a61642d8a5d60b6620bcd",
+    "feature_digest": "4db4f40cebc5f476727ef624281404b5443cddb49548eceeffa513118926c481",
+    "cost_digest": "efb39c8f1635e833957f19148637afd527c1bb0584950084c3a6c36d0bc82877",
+    "expected_scientific_cells": 40
+  },
+  "source_scope": {
+    "source_contract_identity": "BINANCE_USD_M_PERPETUAL_1H_MATERIALIZER_V0",
+    "materializer_spec": "experiments/data/binance_um_kline_1h_materializer_v0.json",
+    "provider": "BINANCE",
+    "market": "USD-M_PERPETUAL",
+    "allowed_source_family": "BINANCE_PUBLIC_HISTORICAL_DATA",
+    "source_substitution": false,
+    "allowed_operations": [
+      "acquire officially admissible Binance USD-M source objects",
+      "verify provider checksums where available and downloaded-byte SHA256",
+      "preserve required quote-volume and taker-buy quote-volume fields",
+      "materialize exact frozen asset-period input windows",
+      "acquire and bind required realized event-time funding events",
+      "run schema, continuity, duplicate, gap, and identity checks",
+      "bind immutable source, materialized-file, manifest, snapshot, and census digests",
+      "qualify the later phase as INPUT_READY or BLOCKED"
+    ],
+    "fail_closed_conditions": [
+      "missing, replaced, unavailable, checksum-invalid, or semantically inconsistent source object",
+      "unsupported quote-volume/taker-buy partition semantics",
+      "missing required price, quote, taker, or funding coverage",
+      "unresolved gap, duplicate, continuity, schema, or identity failure"
+    ]
+  },
+  "required_input_schema": [
+    "open_time",
+    "timestamp",
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume",
+    "close_time",
+    "quote_volume",
+    "trade_count",
+    "taker_buy_base_volume",
+    "taker_buy_quote_volume"
+  ],
+  "funding_contract": {
+    "required_funding_source": "realized Binance USD-M funding settlement events with event timestamp and realized rate",
+    "realized_event_time_funding_required": true,
+    "missing_funding_blocks": true,
+    "missing_funding_zero_fill": false,
+    "no_event_exists_must_be_distinguished_from_event_data_missing": true
+  },
+  "frozen_universe": {
+    "ordered_symbols": [
+      "BCHUSDT", "XRPUSDT", "LTCUSDT", "TRXUSDT", "ETCUSDT", "LINKUSDT",
+      "XLMUSDT", "CHZUSDT", "SANDUSDT", "REEFUSDT", "CHRUSDT", "ALICEUSDT",
+      "ONEUSDT", "API3USDT", "GMTUSDT", "APEUSDT", "OPUSDT", "INJUSDT",
+      "LDOUSDT", "APTUSDT"
+    ],
+    "count": 20,
+    "universe_digest": "becdf4bd2157ebbad416526f414c3b9f647e8832753a61642d8a5d60b6620bcd",
+    "replacement_or_survivorship_selection": false
+  },
+  "frozen_temporal_scope": {
+    "blocks": {
+      "DEV_2022": ["2022-01-01T00:00:00Z", "2022-12-31T23:00:00Z"],
+      "DEV_2024": ["2024-01-01T00:00:00Z", "2024-12-31T23:00:00Z"],
+      "DEV_2025": ["2025-01-01T00:00:00Z", "2025-12-31T23:00:00Z"]
+    },
+    "bound_source": "experiments/specs/qnty_edge_discovery_order_flow_v0_preregistration.json",
+    "warmup_and_terminal_tail_must_be_derived_from_frozen_contract": true,
+    "window_expansion_or_shrinkage": false
+  },
+  "coverage_denominator": {
+    "required_asset_period_windows": 60,
+    "formula": "20 assets x 3 temporal blocks",
+    "scientific_asset_cost_cells": 40,
+    "formula_scientific_cells": "20 assets x 2 cost modes",
+    "missing_windows_remain_in_denominator": true,
+    "diagnostic_controls_are_not_eligible_survivors": true
+  },
+  "immutable_input_identity_requirements": [
+    "provider/source object identity",
+    "remote path or object key",
+    "provider checksum when available",
+    "downloaded-byte SHA256",
+    "symbol, market type, interval, and source date/range",
+    "normalized row count, first/last timestamp, gap census, duplicate census",
+    "materialized file SHA256",
+    "manifest digest",
+    "input snapshot digest",
+    "coverage census digest"
+  ],
+  "outcome_firewall": {
+    "raw_source_bytes_and_required_fields_allowed": true,
+    "coverage_dates_row_counts_gaps_checksums_and_digests_allowed": true,
+    "new_v0_feature_values_accessed": false,
+    "future_returns_accessed": false,
+    "pnl_accessed": false,
+    "correlations_or_regressions": false,
+    "sharpe_or_survivor_metrics": false,
+    "asset_or_period_rankings": false,
+    "scientific_execution": false,
+    "scientific_results_created": false
+  },
+  "forbidden_scope": [
+    "Order Flow V0 feature/outcome relationship evaluation",
+    "scientific feature computation, positions, returns, PnL, Sharpe, or rankings",
+    "parameter, direction, horizon, threshold, normalization, universe, or cost selection",
+    "denominator shrinkage, temporal-window changes, zero-fill, forward-fill, backfill, or asset substitution",
+    "order books, other exchanges, options, extra symbols, extra years, extra intervals, or unrelated datasets",
+    "new candidate, replication, reopen, or trial ledger events",
+    "H010, JH01, JFPV3, Jigsaw, State Snapshot, Forecaster, Router, Qnty, paper/live trading, promotion, or capital work"
+  ],
+  "ledger_invariant": {
+    "new_candidate_proposed_events": 0,
+    "new_candidate_reopened_events": 0,
+    "new_trial_completed_events": 0,
+    "exact_frozen_proposal_event_preserved": true,
+    "h010_untouched": true
+  },
+  "authority_boundary": {
+    "capital_authority": "NONE",
+    "downstream_authority": "NONE",
+    "jigsaw_mutation_authorized": false,
+    "state_snapshot_authorized": false,
+    "forecaster_authorized": false,
+    "router_authorized": false,
+    "qnty_authorized": false,
+    "paper_or_live_trading_authorized": false
+  },
+  "hostile_review": {
+    "review_count": 1,
+    "review_verdict": "PASS",
+    "critical_findings": 0,
+    "high_findings": 0,
+    "targeted_rereview_used": false,
+    "review_artifact": "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/input_materialization_hostile_review.md"
+  },
+  "active_project_after_closure": "NONE",
+  "implementation_changeset": {
+    "files_changed_in_this_governance_phase": [
+      "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/input_materialization_authorization.json",
+      "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/input_materialization_hostile_review.md",
+      "docs/state/projects.toml",
+      "docs/CURRENT_ROADMAP.md"
+    ],
+    "source_inputs_acquired": false,
+    "source_inputs_materialized": false,
+    "scientific_executor_added": false,
+    "ledger_mutated": false
+  },
+  "next_action": "CANONICAL_READY_FOR_MATERIALIZATION: create exactly one later separately Git-backed outcome-free input materialization phase QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_INPUT_MATERIALIZATION_V0; acquire and bind only frozen inputs, stop at INPUT_READY or BLOCKED, and do not authorize execution automatically."
+}

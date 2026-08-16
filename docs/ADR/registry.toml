@@ -27,8 +27,8 @@ authority_scope = "DVOL_V0_COMPLETED_PHASE_RECORD"
 [[adr]]
 adr_id = "ADR-0005"
 path = "docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md"
-status = "CURRENT_GLOBAL"
-authority_scope = "GLOBAL_ARCHITECTURE"
+status = "CURRENT_GLOBAL_COMPANION"
+authority_scope = "GLOBAL_SCIENTIFIC_NORTH_STAR"
 
 [[adr]]
 adr_id = "ADR-0006"
@@ -36,7 +36,18 @@ path = "docs/ADR/0006-qntylab-research-design-philosophy.md"
 status = "CURRENT_GLOBAL_COMPANION"
 authority_scope = "GLOBAL_RESEARCH_DESIGN_PHILOSOPHY"
 
+[[adr]]
+adr_id = "ADR-0007"
+path = "docs/ADR/0007-ecosystem-role-boundary-and-context-spine-governance.md"
+status = "CURRENT_GLOBAL"
+authority_scope = "GLOBAL_ARCHITECTURE"
+
 [[supersession]]
 superseded_adr_id = "ADR-0001"
 superseding_adr_id = "ADR-0005"
 scope = "CONFLICTING_GLOBAL_ROLE_LANGUAGE"
+
+[[supersession]]
+superseded_adr_id = "ADR-0005"
+superseding_adr_id = "ADR-0007"
+scope = "CROSS_REPOSITORY_ROLE_HANDOFF_IDENTITY_CONTEXT_SPINE_AND_RELEVANCE_SEMANTICS"

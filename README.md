@@ -12,6 +12,30 @@ Individual preregistered research contracts may define a sealed holdout,
 temporal evaluation, or prospective shadow boundary when appropriate. Such a
 boundary remains specific to that contract and does not grant Qnty authority.
 
+## Context Spine foundation
+
+```bash
+python -m qntylab.project_context spine
+```
+
+Under [ADR 0007](docs/ADR/0007-ecosystem-role-boundary-and-context-spine-governance.md)
+`qntylab.project_context` owns the Context Spine compiler. `spine` writes a
+versioned foundation packet as canonical JSON (recursively sorted keys, `,`/`:`
+separators, ASCII escaping) followed by one newline, and exits non-zero when
+`packet_status` is `ARCHITECTURE_CONFLICT`. `docs/state/ecosystem.toml` is the
+machine-readable catalog it compiles; that catalog references canonical
+authority — ADR IDs and `qntylab.toml` `[authority]` keys — rather than copying
+it, and the compiler fails closed when a reference does not reconcile.
+
+Compilation is read-only and local. It never writes a file, mutates Git,
+touches project or research state, or reaches the network. Qnty, QntyAgentEval,
+and QntyPolicyGate appear only as declared ecosystem participants with
+`adapter_status = ADAPTER_NOT_IMPLEMENTED`; no cross-repository adapter exists,
+so their state is reported as `UNAVAILABLE_WITHOUT_ADAPTER` and never inferred.
+The packet is a derived view: it binds the Git identity that selected the bytes
+it compiled without that identity granting semantic authority, and it is never
+itself an authority source.
+
 It downloads public Binance Spot OHLCV into `data/raw/` (ignored by Git), records per-file manifests, and evaluates fixed, pre-registered price-only strategy variants. The engine computes a signal with data through close *t*, applies it from bar *t+1*, and charges costs on absolute position changes. Results are exploratory diagnostics, never trading advice or validation.
 
 Sprint v1 adds a narrowly scoped USD-M perpetual-futures path: complete monthly Binance archives for 1h futures klines, premium-index klines, and settled funding events. It keeps premiums distinct from perpetual closes, applies funding using `-position * funding_rate` (positive funding: long pays short), and never earns a return across a source gap. Its preregistration is frozen at `experiments/specs/sprint_v1_perp.json` before runs.

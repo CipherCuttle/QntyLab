@@ -43,6 +43,42 @@ AUTHORITY_DOMAINS = (
     ("NON_AUTHORITATIVE_CONVENIENCE", "chat history, GPT memory, and handoff prose"),
 )
 
+# Context Spine foundation.  The compiler is a read-only projection of canonical
+# repository state; it stores nothing, mutates nothing, and is never an
+# authority source.  Cross-repository reads require an adapter that this
+# foundation deliberately does not implement.
+CONTEXT_SPINE_VERSION = 1
+ECOSYSTEM_CATALOG_SCHEMA_VERSION = 1
+# ADR-0007 source precedence, highest authority first.  The rank is the position
+# in this tuple; a catalog may only classify a source, never reorder the ladder.
+PRECEDENCE_CLASSES = (
+    "CANONICAL_GIT_IDENTITY",
+    "REPOSITORY_MACHINE_READABLE_AUTHORITY_STATE",
+    "REGISTERED_ARCHITECTURE_CONTRACT",
+    "APPEND_ONLY_LEDGER_OR_IMMUTABLE_RECEIPT",
+    "VALIDATED_IMPLEMENTATION_AND_TESTS",
+    "DETERMINISTIC_GENERATED_VIEW",
+    "ORIENTATION_PROSE",
+    "HISTORICAL_ARTIFACT",
+    "NON_AUTHORITATIVE_CONVENIENCE",
+)
+CONTEXT_ACCESS_CLASSES = frozenset({"LOCAL_CANONICAL_SOURCES", "NARROW_READ_ONLY_ADAPTER"})
+# No implemented-adapter token exists at this schema version, so a catalog
+# cannot declare cross-repository observation that no code performs.
+ADAPTER_STATUSES = frozenset({"NOT_APPLICABLE", "ADAPTER_NOT_IMPLEMENTED"})
+SOURCE_KINDS = frozenset({"INTRINSIC", "FILE", "DIRECTORY", "NOT_ESTABLISHED"})
+EXTERNAL_CONTEXT_STATES = {"ADAPTER_NOT_IMPLEMENTED": "UNAVAILABLE_WITHOUT_ADAPTER"}
+CONTEXT_SPINE_COMPILED = "CONTEXT_SPINE_COMPILED"
+ARCHITECTURE_CONFLICT = "ARCHITECTURE_CONFLICT"
+CONTEXT_SPINE_PROHIBITIONS = (
+    "CONTEXT_SPINE_IS_A_DERIVED_VIEW_AND_NEVER_AN_AUTHORITY_SOURCE",
+    "CONTEXT_SPINE_DOES_NOT_MUTATE_ANY_REPOSITORY_OR_SCIENTIFIC_STATE",
+    "CONTEXT_SPINE_DOES_NOT_CREATE_OR_TRANSITION_A_PERMITTED_NEXT_ACTION",
+    "GIT_IDENTITY_SELECTS_BYTES_AND_GRANTS_NO_SEMANTIC_AUTHORITY",
+    "EXTERNAL_REPOSITORY_STATE_IS_NOT_OBSERVED_WITHOUT_AN_IMPLEMENTED_ADAPTER",
+    "GENERATED_VIEWS_AND_REMEMBERED_SUMMARIES_CANNOT_OVERRIDE_CANONICAL_GIT",
+)
+
 
 class ProjectContextError(RuntimeError):
     """A canonical Project Context source is malformed, conflicting, or untrusted."""
@@ -141,6 +177,7 @@ def load_context_sources(root: Path) -> tuple[dict[str, Any], dict[str, Any], di
         raise ProjectContextError("qntylab.toml [authority] table is required")
     adr_path = _authority_path(root, authority.get("global_architecture_registry"), label="global_architecture_registry")
     projects_path = _authority_path(root, authority.get("project_registry"), label="project_registry")
+    _authority_path(root, authority.get("ecosystem_catalog"), label="ecosystem_catalog")
     _authority_path(root, authority.get("current_roadmap"), label="current_roadmap")
     _authority_directory(root, authority.get("research_ledger_root"), label="research_ledger_root")
     adr_registry = _load_toml(adr_path)
@@ -276,11 +313,210 @@ def validate_projects_registry(root: Path, registry: dict[str, Any]) -> dict[str
     return by_id
 
 
+def _catalog_repositories(catalog: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    repositories: dict[str, dict[str, Any]] = {}
+    for record in _require_list(catalog.get("repository"), "ecosystem catalog repository"):
+        if not isinstance(record, dict):
+            raise ProjectContextError("ecosystem repository record must be a table")
+        repository_id = _as_string(record.get("repository_id"), "ecosystem repository_id")
+        if repository_id in repositories:
+            raise ProjectContextError(f"duplicate ecosystem repository ID: {repository_id}")
+        _as_string(record.get("durable_role"), f"repository {repository_id} durable_role")
+        _as_string(record.get("default_branch"), f"repository {repository_id} default_branch")
+        access = _as_string(record.get("context_access"), f"repository {repository_id} context_access")
+        if access not in CONTEXT_ACCESS_CLASSES:
+            raise ProjectContextError(f"unknown context_access: {access}")
+        adapter_status = _as_string(record.get("adapter_status"), f"repository {repository_id} adapter_status")
+        if adapter_status not in ADAPTER_STATUSES:
+            raise ProjectContextError(f"unknown adapter_status: {adapter_status}")
+        # A repository read through local canonical sources has no adapter, and
+        # any other repository must declare one that is not implemented.
+        if (access == "LOCAL_CANONICAL_SOURCES") != (adapter_status == "NOT_APPLICABLE"):
+            raise ProjectContextError(f"repository {repository_id} adapter_status contradicts context_access")
+        repositories[repository_id] = record
+    local = [record for record in repositories.values() if record["context_access"] == "LOCAL_CANONICAL_SOURCES"]
+    if len(local) != 1:
+        raise ProjectContextError("exactly one LOCAL_CANONICAL_SOURCES ecosystem repository is required")
+    return repositories
+
+
+def validate_ecosystem_catalog(root: Path, config: dict[str, Any], catalog: dict[str, Any]) -> dict[str, Any]:
+    """Structurally validate the ecosystem catalog against local canonical state.
+
+    Malformed foundation state raises.  Disagreement between two individually
+    valid canonical sources is not decided here; :func:`compile_context_spine`
+    reports it as ``ARCHITECTURE_CONFLICT``.
+    """
+    if catalog.get("schema_version") != ECOSYSTEM_CATALOG_SCHEMA_VERSION:
+        raise ProjectContextError("unsupported ecosystem catalog schema_version")
+    ecosystem_id = _as_string(catalog.get("ecosystem_id"), "ecosystem_id")
+    architecture = catalog.get("architecture")
+    if not isinstance(architecture, dict):
+        raise ProjectContextError("ecosystem catalog [architecture] table is required")
+    references = {key: _as_string(architecture.get(key), f"ecosystem architecture {key}") for key in ("architecture_authority", "scientific_north_star")}
+    repositories = _catalog_repositories(catalog)
+    local_id = next(record["repository_id"] for record in repositories.values() if record["context_access"] == "LOCAL_CANONICAL_SOURCES")
+    authority = config["authority"]
+    sources: dict[str, dict[str, Any]] = {}
+    for record in _require_list(catalog.get("context_source"), "ecosystem catalog context_source"):
+        if not isinstance(record, dict):
+            raise ProjectContextError("ecosystem context source must be a table")
+        source_id = _as_string(record.get("source_id"), "context source source_id")
+        if source_id in sources:
+            raise ProjectContextError(f"duplicate context source ID: {source_id}")
+        owner = _as_string(record.get("repository_id"), f"context source {source_id} repository_id")
+        if owner not in repositories:
+            raise ProjectContextError(f"context source owner is not an ecosystem repository: {source_id}")
+        if owner != local_id:
+            raise ProjectContextError(f"context source needs an unimplemented cross-repository adapter: {source_id}")
+        precedence_class = _as_string(record.get("precedence_class"), f"context source {source_id} precedence_class")
+        if precedence_class not in PRECEDENCE_CLASSES:
+            raise ProjectContextError(f"unknown precedence_class: {precedence_class}")
+        source_kind = _as_string(record.get("source_kind"), f"context source {source_id} source_kind")
+        if source_kind not in SOURCE_KINDS:
+            raise ProjectContextError(f"unknown source_kind: {source_kind}")
+        authority_key = record.get("authority_key")
+        if source_kind in {"INTRINSIC", "NOT_ESTABLISHED"}:
+            if authority_key is not None:
+                raise ProjectContextError(f"context source {source_id} may not bind an authority key")
+            if source_kind == "INTRINSIC" and precedence_class != "CANONICAL_GIT_IDENTITY":
+                raise ProjectContextError(f"only canonical Git identity may be intrinsic: {source_id}")
+            path = None
+        else:
+            authority_key = _as_string(authority_key, f"context source {source_id} authority_key")
+            if authority_key not in authority:
+                raise ProjectContextError(f"context source authority key is not declared: {source_id}")
+            label = f"context source {source_id} authority_key"
+            if source_kind == "DIRECTORY":
+                _authority_directory(root, authority[authority_key], label=label)
+            else:
+                _authority_path(root, authority[authority_key], label=label)
+            path = _as_string(authority[authority_key], label)
+        sources[source_id] = {
+            "source_id": source_id,
+            "repository_id": owner,
+            "precedence_class": precedence_class,
+            "precedence_rank": PRECEDENCE_CLASSES.index(precedence_class) + 1,
+            "source_kind": source_kind,
+            "authority_key": authority_key,
+            "path": path,
+            "availability": "NOT_ESTABLISHED" if source_kind == "NOT_ESTABLISHED" else "AVAILABLE",
+        }
+    if not sources:
+        raise ProjectContextError("ecosystem catalog requires at least one context source")
+    return {
+        "ecosystem_id": ecosystem_id,
+        "architecture_references": references,
+        "repositories": repositories,
+        "local_repository_id": local_id,
+        "context_sources": sources,
+    }
+
+
+def _adr_view(record: dict[str, Any]) -> dict[str, Any]:
+    return {key: record[key] for key in ("adr_id", "authority_scope", "path", "status")}
+
+
+def _architecture_conflicts(normalized: dict[str, Any], config: dict[str, Any], adrs: dict[str, dict[str, Any]], global_adr: dict[str, Any]) -> tuple[list[dict[str, str]], dict[str, Any] | None]:
+    conflicts: list[dict[str, str]] = []
+    declared_repository = normalized["local_repository_id"]
+    if declared_repository != config["repository_id"]:
+        conflicts.append(
+            {
+                "code": "REPOSITORY_IDENTITY_DISAGREEMENT",
+                "detail": f"qntylab.toml declares {config['repository_id']}; ecosystem catalog declares {declared_repository}",
+            }
+        )
+    references = normalized["architecture_references"]
+    if references["architecture_authority"] != global_adr["adr_id"]:
+        conflicts.append(
+            {
+                "code": "ARCHITECTURE_AUTHORITY_DISAGREEMENT",
+                "detail": f"ADR registry declares {global_adr['adr_id']} CURRENT_GLOBAL; ecosystem catalog declares {references['architecture_authority']}",
+            }
+        )
+    north_star_id = references["scientific_north_star"]
+    north_star = adrs.get(north_star_id)
+    if north_star is None or north_star["status"] != "CURRENT_GLOBAL_COMPANION" or north_star["authority_scope"] != "GLOBAL_SCIENTIFIC_NORTH_STAR":
+        conflicts.append(
+            {
+                "code": "SCIENTIFIC_NORTH_STAR_DISAGREEMENT",
+                "detail": f"ecosystem catalog declares {north_star_id}, which the ADR registry does not register as a GLOBAL_SCIENTIFIC_NORTH_STAR companion",
+            }
+        )
+        north_star = None
+    return sorted(conflicts, key=lambda conflict: conflict["code"]), north_star
+
+
+def compile_context_spine(root: Path) -> dict[str, Any]:
+    """Compile the read-only Context Spine foundation packet.
+
+    The packet is derived only from canonical local repository bytes.  It binds
+    the Git identity that selected those bytes without treating that identity as
+    semantic authority, and it never observes another repository.
+    """
+    root = root.resolve()
+    config, adr_registry, _ = load_context_sources(root)
+    catalog_path = _authority_path(root, config["authority"]["ecosystem_catalog"], label="ecosystem_catalog")
+    adrs = validate_adr_registry(root, adr_registry)
+    normalized = validate_ecosystem_catalog(root, config, _load_toml(catalog_path))
+    global_adr = next(record for record in adrs.values() if record["status"] == "CURRENT_GLOBAL")
+    conflicts, north_star = _architecture_conflicts(normalized, config, adrs, global_adr)
+    git = _git_state(root)
+    local = normalized["repositories"][normalized["local_repository_id"]]
+    repository_keys = ("repository_id", "durable_role", "default_branch", "context_access", "adapter_status")
+    return {
+        "context_spine_version": CONTEXT_SPINE_VERSION,
+        "ecosystem_id": normalized["ecosystem_id"],
+        "packet_status": ARCHITECTURE_CONFLICT if conflicts else CONTEXT_SPINE_COMPILED,
+        "generated_from": {
+            "repository_id": config["repository_id"],
+            "canonical_git_identity": {
+                "repository_id": config["repository_id"],
+                "head_sha": git["head_sha"],
+                "worktree_status": "CLEAN" if git["clean"] else "DIRTY",
+            },
+            "git_identity_semantics": "GIT_IDENTITY_SELECTS_BYTES_NOT_SEMANTIC_AUTHORITY",
+        },
+        "architecture": {
+            "current_global": _adr_view(global_adr),
+            "scientific_north_star": _adr_view(north_star) if north_star else {"adr_id": normalized["architecture_references"]["scientific_north_star"], "authority_scope": None, "path": None, "status": "NOT_ESTABLISHED"},
+            "companions": [_adr_view(adrs[adr_id]) for adr_id in sorted(adrs) if adrs[adr_id]["status"] == "CURRENT_GLOBAL_COMPANION"],
+        },
+        "repository": {key: local[key] for key in repository_keys},
+        "external_repositories": [
+            {
+                **{key: record[key] for key in repository_keys},
+                "context_state": EXTERNAL_CONTEXT_STATES.get(record["adapter_status"], "UNAVAILABLE"),
+            }
+            for _, record in sorted(normalized["repositories"].items())
+            if record["repository_id"] != normalized["local_repository_id"]
+        ],
+        "context_sources": sorted(normalized["context_sources"].values(), key=lambda source: (source["precedence_rank"], source["source_id"])),
+        "conflicts": conflicts,
+        "prohibitions": list(CONTEXT_SPINE_PROHIBITIONS),
+        "architecture_relevance_contract": {
+            "contract_reference": global_adr["adr_id"],
+            "contract_path": global_adr["path"],
+            "default_relevance": "NOT_REQUIRED",
+            "evaluation_status": "NOT_IMPLEMENTED",
+        },
+    }
+
+
+def context_spine_bytes(root: Path) -> bytes:
+    """Canonical serialization of the Context Spine packet, without a newline."""
+    return _canonical_json(compile_context_spine(root))
+
+
 def doctor(root: Path) -> list[str]:
     try:
         config, adr_registry, projects_registry = load_context_sources(root)
         validate_adr_registry(root, adr_registry)
         validate_projects_registry(root, projects_registry)
+        packet = compile_context_spine(root)
+        if packet["packet_status"] != CONTEXT_SPINE_COMPILED:
+            raise ProjectContextError("context spine conflict: " + "; ".join(f"{item['code']}: {item['detail']}" for item in packet["conflicts"]))
         data = config.get("data")
         if not isinstance(data, dict) or data.get("registry_status") != "NOT_ESTABLISHED":
             raise ProjectContextError("dataset registry status must be NOT_ESTABLISHED for V0")
@@ -463,6 +699,7 @@ def _parser() -> argparse.ArgumentParser:
     doctor_parser.add_argument("--strict", action="store_true")
     render_parser = subparsers.add_parser("render")
     render_parser.add_argument("--check", action="store_true")
+    subparsers.add_parser("spine", help="emit the read-only Context Spine foundation packet as canonical JSON")
     return parser
 
 
@@ -480,6 +717,10 @@ def main(argv: list[str] | None = None) -> None:
             return
         if args.command == "render":
             raise SystemExit(render(root, check=args.check))
+        if args.command == "spine":
+            packet = compile_context_spine(root)
+            sys.stdout.buffer.write(_canonical_json(packet) + b"\n")
+            raise SystemExit(0 if packet["packet_status"] == CONTEXT_SPINE_COMPILED else 1)
         data = context_data(root)
         if args.as_json:
             sys.stdout.buffer.write(_canonical_json(data) + b"\n")

@@ -1,0 +1,95 @@
+# Ecosystem / context catalog for the QntyLab Context Spine compiler.
+#
+# This file carries durable ecosystem semantics only. It references canonical
+# repository-owned authority; it never copies it. `qntylab.project_context`
+# reconciles every reference below against the canonical source that owns it
+# and fails closed on disagreement. It is not an authority plane: nothing here
+# grants scientific, economic, acceptance, or operational authority.
+
+schema_version = 1
+ecosystem_id = "QNTY_ECOSYSTEM"
+
+# Resolved against docs/ADR/registry.toml, which owns ADR status and scope.
+[architecture]
+architecture_authority = "ADR-0007"
+scientific_north_star = "ADR-0005"
+
+[[repository]]
+repository_id = "QntyLab"
+durable_role = "EXPLORATORY_SCIENTIFIC_RESEARCH_AND_EVIDENCE_PRODUCTION"
+default_branch = "master"
+context_access = "LOCAL_CANONICAL_SOURCES"
+adapter_status = "NOT_APPLICABLE"
+
+[[repository]]
+repository_id = "Qnty"
+durable_role = "DOWNSTREAM_ACCEPTANCE_AND_EXECUTION_REALISM"
+default_branch = "main"
+context_access = "NARROW_READ_ONLY_ADAPTER"
+adapter_status = "ADAPTER_NOT_IMPLEMENTED"
+
+[[repository]]
+repository_id = "QntyAgentEval"
+durable_role = "EXTERNAL_DETERMINISTIC_AGENT_EVALUATOR"
+default_branch = "main"
+context_access = "NARROW_READ_ONLY_ADAPTER"
+adapter_status = "ADAPTER_NOT_IMPLEMENTED"
+
+[[repository]]
+repository_id = "QntyPolicyGate"
+durable_role = "EXTERNAL_GIT_GOVERNANCE_POLICY_BOUNDARY"
+default_branch = "main"
+context_access = "NARROW_READ_ONLY_ADAPTER"
+adapter_status = "ADAPTER_NOT_IMPLEMENTED"
+
+# Every source below is owned by the local repository. A source owned by any
+# other repository requires a cross-repository adapter, which does not exist.
+# `authority_key` names a key of the qntylab.toml [authority] table rather than
+# repeating its path.
+
+[[context_source]]
+source_id = "CANONICAL_GIT_IDENTITY"
+repository_id = "QntyLab"
+precedence_class = "CANONICAL_GIT_IDENTITY"
+source_kind = "INTRINSIC"
+
+[[context_source]]
+source_id = "ECOSYSTEM_CATALOG"
+repository_id = "QntyLab"
+precedence_class = "REPOSITORY_MACHINE_READABLE_AUTHORITY_STATE"
+source_kind = "FILE"
+authority_key = "ecosystem_catalog"
+
+[[context_source]]
+source_id = "PROJECT_REGISTRY"
+repository_id = "QntyLab"
+precedence_class = "REPOSITORY_MACHINE_READABLE_AUTHORITY_STATE"
+source_kind = "FILE"
+authority_key = "project_registry"
+
+[[context_source]]
+source_id = "DATASET_REGISTRY"
+repository_id = "QntyLab"
+precedence_class = "REPOSITORY_MACHINE_READABLE_AUTHORITY_STATE"
+source_kind = "NOT_ESTABLISHED"
+
+[[context_source]]
+source_id = "ARCHITECTURE_REGISTRY"
+repository_id = "QntyLab"
+precedence_class = "REGISTERED_ARCHITECTURE_CONTRACT"
+source_kind = "FILE"
+authority_key = "global_architecture_registry"
+
+[[context_source]]
+source_id = "RESEARCH_LEDGER"
+repository_id = "QntyLab"
+precedence_class = "APPEND_ONLY_LEDGER_OR_IMMUTABLE_RECEIPT"
+source_kind = "DIRECTORY"
+authority_key = "research_ledger_root"
+
+[[context_source]]
+source_id = "GENERATED_ROADMAP"
+repository_id = "QntyLab"
+precedence_class = "DETERMINISTIC_GENERATED_VIEW"
+source_kind = "FILE"
+authority_key = "current_roadmap"

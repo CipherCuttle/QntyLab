@@ -19,5 +19,6 @@ jobs:
       - run: python -m pip install pytest requests
       - run: python -m qntylab.project_context doctor --strict
       - run: python -m qntylab.project_context render --check
+      - run: python -m qntylab.project_context spine > /dev/null
       - run: python -m qntylab.research_ledger doctor
-      - run: python -m pytest -q tests/test_project_context_v0.py
+      - run: python -m pytest -q tests/test_project_context_v0.py tests/test_context_spine_foundation_v0.py

@@ -313,6 +313,15 @@ def validate_projects_registry(root: Path, registry: dict[str, Any]) -> dict[str
     return by_id
 
 
+def _config_value(config: dict[str, Any], dotted_key: str, label: str) -> Any:
+    value: Any = config
+    for part in dotted_key.split("."):
+        if not isinstance(value, dict) or part not in value:
+            raise ProjectContextError(f"{label} does not resolve: {dotted_key}")
+        value = value[part]
+    return value
+
+
 def _catalog_repositories(catalog: dict[str, Any]) -> dict[str, dict[str, Any]]:
     repositories: dict[str, dict[str, Any]] = {}
     for record in _require_list(catalog.get("repository"), "ecosystem catalog repository"):
@@ -358,6 +367,7 @@ def validate_ecosystem_catalog(root: Path, config: dict[str, Any], catalog: dict
     local_id = next(record["repository_id"] for record in repositories.values() if record["context_access"] == "LOCAL_CANONICAL_SOURCES")
     authority = config["authority"]
     sources: dict[str, dict[str, Any]] = {}
+    bound_keys: set[str] = set()
     for record in _require_list(catalog.get("context_source"), "ecosystem catalog context_source"):
         if not isinstance(record, dict):
             raise ProjectContextError("ecosystem context source must be a table")
@@ -375,23 +385,36 @@ def validate_ecosystem_catalog(root: Path, config: dict[str, Any], catalog: dict
         source_kind = _as_string(record.get("source_kind"), f"context source {source_id} source_kind")
         if source_kind not in SOURCE_KINDS:
             raise ProjectContextError(f"unknown source_kind: {source_kind}")
+        # The rank-1 class and the intrinsic kind imply each other, so no tracked
+        # file can be classified as the canonical Git identity it is not.
+        if (source_kind == "INTRINSIC") != (precedence_class == "CANONICAL_GIT_IDENTITY"):
+            raise ProjectContextError(f"canonical Git identity and intrinsic kind must agree: {source_id}")
         authority_key = record.get("authority_key")
+        availability_key = record.get("availability_key")
         if source_kind in {"INTRINSIC", "NOT_ESTABLISHED"}:
             if authority_key is not None:
                 raise ProjectContextError(f"context source {source_id} may not bind an authority key")
-            if source_kind == "INTRINSIC" and precedence_class != "CANONICAL_GIT_IDENTITY":
-                raise ProjectContextError(f"only canonical Git identity may be intrinsic: {source_id}")
             path = None
         else:
             authority_key = _as_string(authority_key, f"context source {source_id} authority_key")
             if authority_key not in authority:
                 raise ProjectContextError(f"context source authority key is not declared: {source_id}")
+            if authority_key in bound_keys:
+                raise ProjectContextError(f"authority key is bound by more than one context source: {authority_key}")
+            bound_keys.add(authority_key)
             label = f"context source {source_id} authority_key"
             if source_kind == "DIRECTORY":
                 _authority_directory(root, authority[authority_key], label=label)
             else:
                 _authority_path(root, authority[authority_key], label=label)
             path = _as_string(authority[authority_key], label)
+        # An unestablished source names the canonical key that owns its status,
+        # so the claim is reconciled rather than asserted by the catalog alone.
+        if source_kind == "NOT_ESTABLISHED":
+            availability_key = _as_string(availability_key, f"context source {source_id} availability_key")
+            _as_string(_config_value(config, availability_key, f"context source {source_id} availability_key"), f"context source {source_id} availability")
+        elif availability_key is not None:
+            raise ProjectContextError(f"context source {source_id} may not bind an availability key")
         sources[source_id] = {
             "source_id": source_id,
             "repository_id": owner,
@@ -399,11 +422,18 @@ def validate_ecosystem_catalog(root: Path, config: dict[str, Any], catalog: dict
             "precedence_rank": PRECEDENCE_CLASSES.index(precedence_class) + 1,
             "source_kind": source_kind,
             "authority_key": authority_key,
+            "availability_key": availability_key,
             "path": path,
             "availability": "NOT_ESTABLISHED" if source_kind == "NOT_ESTABLISHED" else "AVAILABLE",
         }
-    if not sources:
-        raise ProjectContextError("ecosystem catalog requires at least one context source")
+    intrinsic = [source for source in sources.values() if source["source_kind"] == "INTRINSIC"]
+    if len(intrinsic) != 1:
+        raise ProjectContextError("exactly one canonical Git identity context source is required")
+    # The catalog must account for every declared authority source, so adding one
+    # without classifying it cannot silently shrink the compiled source set.
+    missing = sorted(set(authority) - bound_keys)
+    if missing:
+        raise ProjectContextError("declared authority sources have no context source: " + ", ".join(missing))
     return {
         "ecosystem_id": ecosystem_id,
         "architecture_references": references,
@@ -445,7 +475,18 @@ def _architecture_conflicts(normalized: dict[str, Any], config: dict[str, Any], 
             }
         )
         north_star = None
-    return sorted(conflicts, key=lambda conflict: conflict["code"]), north_star
+    for source in normalized["context_sources"].values():
+        if source["availability_key"] is None:
+            continue
+        owned = _config_value(config, source["availability_key"], f"context source {source['source_id']} availability_key")
+        if owned != source["availability"]:
+            conflicts.append(
+                {
+                    "code": "CONTEXT_SOURCE_AVAILABILITY_DISAGREEMENT",
+                    "detail": f"{source['availability_key']} declares {owned}; ecosystem catalog declares {source['source_id']} {source['availability']}",
+                }
+            )
+    return sorted(conflicts, key=lambda conflict: (conflict["code"], conflict["detail"])), north_star
 
 
 def compile_context_spine(root: Path) -> dict[str, Any]:
@@ -475,6 +516,9 @@ def compile_context_spine(root: Path) -> dict[str, Any]:
                 "repository_id": config["repository_id"],
                 "head_sha": git["head_sha"],
                 "worktree_status": "CLEAN" if git["clean"] else "DIRTY",
+                # An uncommitted worktree compiled bytes the head commit does not
+                # contain, so the packet states outright that it is not bound.
+                "compiled_bytes_bound_to_head_sha": git["clean"],
             },
             "git_identity_semantics": "GIT_IDENTITY_SELECTS_BYTES_NOT_SEMANTIC_AUTHORITY",
         },
@@ -639,6 +683,12 @@ def _roadmap_bytes(root: Path) -> bytes:
 
 def render(root: Path, *, check: bool) -> int:
     config, _, _ = load_context_sources(root)
+    # ADR-0007 stops architecture-affecting mutation while canonical sources
+    # conflict, so a generated view is never rewritten during a conflict.
+    packet = compile_context_spine(root)
+    if packet["packet_status"] != CONTEXT_SPINE_COMPILED:
+        print(f"project context error: {packet['packet_status']}; roadmap generation is blocked", file=sys.stderr)
+        return 1
     expected = _roadmap_bytes(root)
     path = root / config["authority"]["current_roadmap"]
     if check:

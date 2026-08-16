@@ -1,10 +1,18 @@
 # Ecosystem / context catalog for the QntyLab Context Spine compiler.
 #
 # This file carries durable ecosystem semantics only. It references canonical
-# repository-owned authority; it never copies it. `qntylab.project_context`
-# reconciles every reference below against the canonical source that owns it
-# and fails closed on disagreement. It is not an authority plane: nothing here
-# grants scientific, economic, acceptance, or operational authority.
+# repository-owned authority; it never copies it. It is not an authority plane:
+# nothing here grants scientific, economic, acceptance, or operational
+# authority.
+#
+# `qntylab.project_context` reconciles every reference against the source that
+# owns it and fails closed: `architecture_authority` and `scientific_north_star`
+# against docs/ADR/registry.toml, the local `repository_id` and every
+# `authority_key`/`availability_key` against qntylab.toml, and each bound path
+# against Git. Every declared `[authority]` key must be bound exactly once.
+#
+# `durable_role` and `default_branch` are declared naming, not observed state:
+# no local source owns them, and no adapter reads the external repositories.
 
 schema_version = 1
 ecosystem_id = "QNTY_ECOSYSTEM"
@@ -72,6 +80,7 @@ source_id = "DATASET_REGISTRY"
 repository_id = "QntyLab"
 precedence_class = "REPOSITORY_MACHINE_READABLE_AUTHORITY_STATE"
 source_kind = "NOT_ESTABLISHED"
+availability_key = "data.registry_status"
 
 [[context_source]]
 source_id = "ARCHITECTURE_REGISTRY"

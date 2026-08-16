@@ -97,6 +97,20 @@ def _catalog(**overrides: Any) -> dict[str, Any]:
                 "source_kind": "DIRECTORY",
                 "authority_key": "research_ledger_root",
             },
+        ]
+        + [
+            {
+                "source_id": source_id,
+                "repository_id": "LocalRepo",
+                "precedence_class": precedence_class,
+                "source_kind": "FILE",
+                "authority_key": authority_key,
+            }
+            for source_id, authority_key, precedence_class in (
+                ("ARCHITECTURE_REGISTRY", "global_architecture_registry", "REGISTERED_ARCHITECTURE_CONTRACT"),
+                ("ECOSYSTEM_CATALOG", "ecosystem_catalog", "REPOSITORY_MACHINE_READABLE_AUTHORITY_STATE"),
+                ("GENERATED_ROADMAP", "current_roadmap", "DETERMINISTIC_GENERATED_VIEW"),
+            )
         ],
     }
     value.update(overrides)
@@ -185,17 +199,52 @@ repository_id = "{local}"
 precedence_class = "REPOSITORY_MACHINE_READABLE_AUTHORITY_STATE"
 source_kind = "FILE"
 authority_key = "project_registry"
+
+[[context_source]]
+source_id = "ECOSYSTEM_CATALOG"
+repository_id = "{local}"
+precedence_class = "REPOSITORY_MACHINE_READABLE_AUTHORITY_STATE"
+source_kind = "FILE"
+authority_key = "ecosystem_catalog"
+
+[[context_source]]
+source_id = "ARCHITECTURE_REGISTRY"
+repository_id = "{local}"
+precedence_class = "REGISTERED_ARCHITECTURE_CONTRACT"
+source_kind = "FILE"
+authority_key = "global_architecture_registry"
+
+[[context_source]]
+source_id = "RESEARCH_LEDGER"
+repository_id = "{local}"
+precedence_class = "APPEND_ONLY_LEDGER_OR_IMMUTABLE_RECEIPT"
+source_kind = "DIRECTORY"
+authority_key = "research_ledger_root"
+
+[[context_source]]
+source_id = "GENERATED_ROADMAP"
+repository_id = "{local}"
+precedence_class = "DETERMINISTIC_GENERATED_VIEW"
+source_kind = "FILE"
+authority_key = "current_roadmap"
+
+[[context_source]]
+source_id = "DATASET_REGISTRY"
+repository_id = "{local}"
+precedence_class = "REPOSITORY_MACHINE_READABLE_AUTHORITY_STATE"
+source_kind = "NOT_ESTABLISHED"
+availability_key = "data.registry_status"
 """
 
 
-def _spine_root(tmp_path: Path, *, catalog: str | None = _ecosystem_toml()) -> Path:
+def _spine_root(tmp_path: Path, *, catalog: str | None = _ecosystem_toml(), config: str = QNTYLAB_TOML) -> Path:
     """A self-contained repository the compiler can be driven against end to end."""
     root = tmp_path / "spine-repo"
     (root / "docs/ADR").mkdir(parents=True)
     (root / "docs/state").mkdir(parents=True)
     (root / "experiments/research").mkdir(parents=True)
     files = {
-        "qntylab.toml": QNTYLAB_TOML,
+        "qntylab.toml": config,
         "docs/ADR/registry.toml": ADR_REGISTRY_TOML,
         "docs/ADR/global.md": "global architecture\n",
         "docs/ADR/north.md": "scientific north star\n",
@@ -247,9 +296,10 @@ def test_precedence_rank_follows_the_adr_ladder_and_is_not_catalog_controlled(tm
     sources = _validate(tmp_path, catalog)["context_sources"]
     assert sources["CANONICAL_GIT_IDENTITY"]["precedence_rank"] == 1
     assert sources["PROJECT_REGISTRY"]["precedence_rank"] == 2
-    assert [entry["precedence_class"] for entry in sorted(sources.values(), key=lambda item: item["precedence_rank"])] == [
-        project_context.PRECEDENCE_CLASSES[rank - 1] for rank in (1, 2, 4)
-    ]
+    assert sources["RESEARCH_LEDGER"]["precedence_rank"] == 4
+    assert sources["GENERATED_ROADMAP"]["precedence_rank"] == 6
+    for source in sources.values():
+        assert source["precedence_rank"] == project_context.PRECEDENCE_CLASSES.index(source["precedence_class"]) + 1
 
 
 @pytest.mark.parametrize(
@@ -274,10 +324,12 @@ def test_precedence_rank_follows_the_adr_ladder_and_is_not_catalog_controlled(tm
         (lambda catalog: catalog["context_source"][1].update(authority_key="undeclared_key"), "authority key is not declared"),
         (lambda catalog: catalog["context_source"][1].pop("authority_key"), "authority_key"),
         (lambda catalog: catalog["context_source"][0].update(authority_key="project_registry"), "may not bind an authority key"),
-        (lambda catalog: catalog["context_source"][0].update(precedence_class="ORIENTATION_PROSE"), "only canonical Git identity may be intrinsic"),
+        (lambda catalog: catalog["context_source"][0].update(precedence_class="ORIENTATION_PROSE"), "canonical Git identity and intrinsic kind must agree"),
+        (lambda catalog: catalog["context_source"][1].update(availability_key="data.registry_status"), "may not bind an availability key"),
+        (lambda catalog: catalog["context_source"].pop(1), "no context source"),
         (lambda catalog: catalog["context_source"][2].update(source_kind="FILE"), "must be a file"),
         (lambda catalog: catalog["context_source"][1].update(source_kind="DIRECTORY"), "must be a non-symlink directory"),
-        (lambda catalog: catalog.update(context_source=[]), "at least one context source"),
+        (lambda catalog: catalog.update(context_source=[]), "exactly one canonical Git identity"),
     ],
 )
 def test_malformed_foundation_fails_closed(tmp_path: Path, mutate: Any, message: str) -> None:
@@ -285,6 +337,75 @@ def test_malformed_foundation_fails_closed(tmp_path: Path, mutate: Any, message:
     mutate(catalog)
     with pytest.raises(project_context.ProjectContextError, match=message):
         _validate(tmp_path, catalog)
+
+
+def test_canonical_git_identity_class_cannot_be_claimed_by_a_tracked_file(tmp_path: Path) -> None:
+    """A generated prose view must not be classifiable as the canonical Git identity."""
+    catalog = _catalog()
+    catalog["context_source"][-1]["precedence_class"] = "CANONICAL_GIT_IDENTITY"
+    with pytest.raises(project_context.ProjectContextError, match="canonical Git identity and intrinsic kind must agree"):
+        _validate(tmp_path, catalog)
+
+
+def test_exactly_one_canonical_git_identity_source_is_required(tmp_path: Path) -> None:
+    catalog = _catalog()
+    catalog["context_source"].append({**copy.deepcopy(catalog["context_source"][0]), "source_id": "SECOND_GIT_IDENTITY"})
+    with pytest.raises(project_context.ProjectContextError, match="exactly one canonical Git identity"):
+        _validate(tmp_path, catalog)
+    catalog = _catalog()
+    catalog["context_source"].pop(0)
+    with pytest.raises(project_context.ProjectContextError, match="exactly one canonical Git identity"):
+        _validate(tmp_path, catalog)
+
+
+def test_one_authority_key_cannot_be_bound_at_two_precedence_ranks(tmp_path: Path) -> None:
+    catalog = _catalog()
+    catalog["context_source"].append(
+        {
+            "source_id": "PROJECT_REGISTRY_AGAIN",
+            "repository_id": "LocalRepo",
+            "precedence_class": "NON_AUTHORITATIVE_CONVENIENCE",
+            "source_kind": "FILE",
+            "authority_key": "project_registry",
+        }
+    )
+    with pytest.raises(project_context.ProjectContextError, match="bound by more than one context source"):
+        _validate(tmp_path, catalog)
+
+
+def test_every_declared_authority_source_must_be_classified(tmp_path: Path) -> None:
+    """Adding a canonical source without cataloguing it cannot silently shrink the packet."""
+    catalog = _catalog()
+    config = _config(new_canonical_registry="docs/state/projects.toml")
+    with pytest.raises(project_context.ProjectContextError, match="have no context source: new_canonical_registry"):
+        project_context.validate_ecosystem_catalog(_tracked_root(tmp_path), config, catalog)
+
+
+def test_unestablished_source_must_name_the_key_that_owns_its_status(tmp_path: Path) -> None:
+    catalog = _catalog()
+    unestablished = {
+        "source_id": "FUTURE_SOURCE",
+        "repository_id": "LocalRepo",
+        "precedence_class": "REPOSITORY_MACHINE_READABLE_AUTHORITY_STATE",
+        "source_kind": "NOT_ESTABLISHED",
+    }
+    catalog["context_source"].append(unestablished)
+    with pytest.raises(project_context.ProjectContextError, match="availability_key"):
+        _validate(tmp_path, catalog)
+    unestablished["availability_key"] = "data.absent_key"
+    with pytest.raises(project_context.ProjectContextError, match="does not resolve: data.absent_key"):
+        _validate(tmp_path, catalog)
+
+
+def test_unestablished_source_disagreeing_with_its_owner_is_an_architecture_conflict(tmp_path: Path) -> None:
+    root = _spine_root(tmp_path, config=QNTYLAB_TOML.replace('registry_status = "NOT_ESTABLISHED"', 'registry_status = "ESTABLISHED"'))
+    packet = project_context.compile_context_spine(root)
+    assert packet["packet_status"] == project_context.ARCHITECTURE_CONFLICT
+    assert [item["code"] for item in packet["conflicts"]] == ["CONTEXT_SOURCE_AVAILABILITY_DISAGREEMENT"]
+    # The catalog's claim is reported, not quietly overwritten by the owning key.
+    source = next(item for item in packet["context_sources"] if item["source_id"] == "DATASET_REGISTRY")
+    assert source["availability"] == "NOT_ESTABLISHED"
+    assert _spine_cli(root, "spine").returncode == 1
 
 
 def test_context_source_owned_by_another_repository_is_rejected_because_no_adapter_exists(tmp_path: Path) -> None:
@@ -403,12 +524,12 @@ def test_canonical_serialization_stable_across_processes() -> None:
 
 
 def test_packet_is_insensitive_to_catalog_declaration_order(tmp_path: Path) -> None:
-    forward = _spine_root(tmp_path)
-    shuffled = tmp_path / "shuffled"
-    lines = _ecosystem_toml().split("\n\n")
-    reverse_root = _spine_root(shuffled, catalog="\n\n".join(lines[:2] + lines[3:4] + lines[2:3] + lines[5:6] + lines[4:5]))
-    forward_packet = project_context.compile_context_spine(forward)
-    reverse_packet = project_context.compile_context_spine(reverse_root)
+    blocks = _ecosystem_toml().split("\n\n")
+    tables = [block for block in blocks if block.startswith("[[")]
+    assert len(tables) > 5
+    shuffled = "\n\n".join([block for block in blocks if not block.startswith("[[")] + list(reversed(tables)))
+    forward_packet = project_context.compile_context_spine(_spine_root(tmp_path))
+    reverse_packet = project_context.compile_context_spine(_spine_root(tmp_path / "shuffled", catalog=shuffled))
     for key in ("architecture", "context_sources", "external_repositories", "repository", "conflicts"):
         assert forward_packet[key] == reverse_packet[key]
 
@@ -424,6 +545,7 @@ def _conflict_codes(catalog: dict[str, Any], config: dict[str, Any] | None = Non
     normalized = {
         "local_repository_id": catalog["repository"][0]["repository_id"],
         "architecture_references": catalog["architecture"],
+        "context_sources": {},
     }
     conflicts, _ = project_context._architecture_conflicts(normalized, config or _config(), adrs, adrs["ADR-GLOBAL"])
     return [item["code"] for item in conflicts]
@@ -476,6 +598,31 @@ def test_architecture_conflict_fails_closed_end_to_end(tmp_path: Path, overrides
     # The conflict is reported rather than resolved: the packet still ships.
     assert json.loads(completed.stdout)["packet_status"] == "ARCHITECTURE_CONFLICT"
     assert _spine_cli(root, "doctor", "--strict").returncode == 1
+
+
+def test_uncommitted_worktree_is_declared_not_bound_to_the_head_commit(tmp_path: Path) -> None:
+    root = _spine_root(tmp_path)
+    identity = project_context.compile_context_spine(root)["generated_from"]["canonical_git_identity"]
+    assert identity["worktree_status"] == "CLEAN"
+    assert identity["compiled_bytes_bound_to_head_sha"] is True
+
+    (root / "docs/state/projects.toml").write_text(PROJECTS_TOML.replace("Nothing is authorized.", "Still nothing."), encoding="utf-8")
+    dirty = project_context.compile_context_spine(root)["generated_from"]["canonical_git_identity"]
+    assert dirty["head_sha"] == identity["head_sha"]
+    assert dirty["worktree_status"] == "DIRTY"
+    # The head commit does not contain the compiled bytes, and the packet says so.
+    assert dirty["compiled_bytes_bound_to_head_sha"] is False
+
+
+def test_architecture_conflict_blocks_generated_view_mutation(tmp_path: Path) -> None:
+    root = _spine_root(tmp_path, catalog=_ecosystem_toml(north_star="ADR-ABSENT"))
+    roadmap = root / "docs/CURRENT_ROADMAP.md"
+    before = roadmap.read_bytes()
+    assert project_context.render(root, check=False) == 1
+    assert roadmap.read_bytes() == before, "a conflicting foundation must not rewrite a generated view"
+    assert project_context.render(root, check=True) == 1
+    assert _spine_cli(root, "render").returncode == 1
+    assert roadmap.read_bytes() == before
 
 
 def test_conflicting_reference_is_never_silently_replaced(tmp_path: Path) -> None:

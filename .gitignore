@@ -6,5 +6,6 @@ data/raw/*.zip
 data/raw/jigsaw_external_replication_v0/
 data/raw/jh01_rv_persistence_temporal_replication_v0/
 data/archive/
+data/raw/qnty_edge_order_flow_v0/
 .r1_input_cache/
 experiments/research/breadth_v2_paths/

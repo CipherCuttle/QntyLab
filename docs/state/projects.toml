@@ -2306,3 +2306,81 @@ hostile_governance_open_high = 0
 targeted_governance_rereview_used = false
 active_project_after_closure = "NONE"
 next_action = "CANONICAL_READY_FOR_MATERIALIZATION: create exactly one later separately Git-backed outcome-free input materialization phase QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_INPUT_MATERIALIZATION_V0; stop at INPUT_READY or BLOCKED and require separate historical execution authorization afterward."
+
+[[project]]
+project_id = "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_INPUT_MATERIALIZATION_V0"
+display_name = "Order-Flow V0 outcome-free input materialization"
+state = "CLOSED_BLOCKED"
+authority_level = "INPUT_MATERIALIZATION_ONLY"
+phase_type = "INPUT_MATERIALIZATION_ONLY"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md",
+  "docs/ADR/0006-qntylab-research-design-philosophy.md",
+  "experiments/specs/qnty_edge_discovery_order_flow_v0_preregistration.json",
+  "experiments/specs/qnty_edge_discovery_order_flow_v0_preregistration.md",
+  "experiments/data/binance_um_kline_1h_materializer_v0.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/input_materialization_authorization.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/input_materialization_request.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/source_manifest.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/coverage_census.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/input_snapshot.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/input_qualification.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/materialization_receipt.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/implementation_manifest.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/input_materialization_hostile_review.md",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/materialization_run_hostile_review.md",
+  "qntylab/qnty_edge_order_flow_v0_input_materialization.py",
+  "qntylab/binance_um_kline_1h.py",
+  "qntylab/binance_um_funding_settlement.py",
+]
+bound_authorization_project = "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_INPUT_MATERIALIZATION_AUTHORIZATION_V0"
+predecessor_project_id = "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_SOURCE_INPUT_AND_OPEN_EXECUTION_READINESS_R1"
+candidate_id = "CANDIDATE_ORDER_FLOW_SIGNED_TAKER_NOTIONAL_V0"
+variant_id = "variant_23f758ef7052522d70172239"
+proposal_event_id = "event_proposal_order_flow_v0_20260815"
+preregistration_digest = "8e75f53f19c9719b97c3626c7e39626e206505e138107601748d9213eabe7757"
+preregistration_json_sha256 = "34252ccf245c9d963b987e697231d4a33d66c2450d44689b7b737c0686a24979"
+universe_digest = "becdf4bd2157ebbad416526f414c3b9f647e8832753a61642d8a5d60b6620bcd"
+feature_digest = "4db4f40cebc5f476727ef624281404b5443cddb49548eceeffa513118926c481"
+cost_digest = "efb39c8f1635e833957f19148637afd527c1bb0584950084c3a6c36d0bc82877"
+source_contract_identity = "BINANCE_USD_M_PERPETUAL_1H_MATERIALIZER_V0"
+required_asset_period_windows = 60
+expected_scientific_cells = 40
+canonical_master_sha = "eb184dfc97d7d08aa78dcea6fae33508aaf98e6e"
+source_inputs_acquired = true
+source_inputs_materialized = true
+input_materialization_terminal_state = "BLOCKED"
+input_ready_windows = 46
+blocked_windows = 14
+coverage_census_digest = "e6f3c5b93712866386a439b96a87a1ade52e9da381f93b26070500a39b74be23"
+source_manifest_digest = "fcfb94e0478b6d439140249f1c5d9e1ad18940b510a893d214856f49c64c67b2"
+snapshot_id = "qnty-edge-order-flow-v0-input-c4fb706307eea5cea1868675b71de5e8b251d07b8b9e8542108a037de77496bf"
+snapshot_digest = "c4fb706307eea5cea1868675b71de5e8b251d07b8b9e8542108a037de77496bf"
+qualification_digest = "62da233fa185dd86257853747c4d8e4ae5af52e4580e492ec555d9661f4fa4da"
+materialization_receipt_digest = "4e03f5d116da071fdc83aa23ed6bbac5b226510c93d00e4195d6f402a54b6944"
+implementation_authorized = false
+scientific_execution_authorized = false
+historical_outcome_access_authorized = false
+new_v0_execution_authorized = false
+new_candidate_proposed_events = 0
+new_candidate_reopened_events = 0
+new_trial_completed_events = 0
+scientific_features_computed = false
+future_returns_accessed = false
+pnl_computed = false
+scientific_execution_performed = false
+outcome_firewall_breach = false
+jigsaw_mutation_authorized = false
+state_snapshot_authorized = false
+forecaster_authorized = false
+router_authorized = false
+qnty_authorized = false
+paper_or_live_trading_authorized = false
+capital_authority = "NONE"
+downstream_authority = "NONE"
+authorized_runs_allowed = 1
+authorized_runs_consumed = 1
+hostile_review_verdict = "PASS"
+next_action = "CLOSED_BLOCKED: 14 of 60 frozen asset-period windows lack complete required source coverage. Preserve the immutable BLOCKED census; do not execute V0, do not create trial events, and require separate Git-backed governance for any future action."

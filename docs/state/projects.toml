@@ -2519,3 +2519,59 @@ qntyagenteval_lookup_count = 1
 implementation_authorized = false
 active_project_after_closure = "NONE"
 next_action = "CLOSED_PASS: all 14 blocked rows classified C. No repair, rematerialization, scientific execution, or downstream authority is authorized; any attempt to reach 60/60 requires separate Git-backed contract authority."
+
+[[project]]
+project_id = "QNTYLAB_CONTEXT_SPINE_ORIENTATION_COMPLETENESS_V0_AUTHORIZATION"
+display_name = "QntyLab Context Spine Orientation Completeness V0 OC-A authorization"
+state = "CLOSED_PASS"
+authority_level = "GOVERNANCE_AUTHORIZATION_ONLY"
+phase_type = "GOVERNANCE_ONLY"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "AGENTS.md",
+  ".github/workflows/project-context.yml",
+  "qntylab/project_context.py",
+  "tests/test_project_context_v0.py",
+  "tests/test_context_spine_foundation_v0.py",
+  "tests/test_context_spine_brief_v0.py",
+  "experiments/research/qntylab_context_spine/orientation_completeness_v0/orientation_completeness_authorization.json",
+  "experiments/research/qntylab_context_spine/orientation_completeness_v0/orientation_completeness_authorization_hostile_review.md"
+]
+canonical_master_sha = "57f86e7d8f6f1081b5aa8a01c7b06ad54a26115c"
+planning_basis = "REVISION_2_FROZEN"
+oc_b_project_id = "QNTYLAB_CONTEXT_SPINE_ORIENTATION_COMPLETENESS_V0_OC_B_IMPLEMENTATION"
+oc_b_implementation_authorized = true
+implementation_authorized = false
+context_spine_version_current = 2
+context_spine_version_authorized_for_oc_b = 3
+project_code_reference_semantics = "PROJECT_STATE_REFERENCES_PATH_ONLY"
+project_code_reference_terminology = "project_code_references"
+project_code_reference_scope = "AUTHORITATIVE_ARTIFACTS_ONLY_FILTERED_TO_QNTYLAB_PYTHON"
+project_code_reference_completeness = "PARTIAL_PROJECTION_NOT_REPOSITORY_COMPLETENESS"
+module_inventory_provenance = "GIT_INDEX_TRACKED_QNTYLAB_PYTHON"
+arbitrary_record_value_crawling = false
+order_flow_positive_control_required = true
+reuse_preflight_required_before_new_code_behavior = true
+bounded_search_required = true
+unknown_is_valid_terminal_disposition = true
+hostile_review_count = 1
+hostile_review_verdict = "PASS"
+hostile_governance_critical_total = 0
+hostile_governance_high_total = 0
+hostile_governance_open_critical = 0
+hostile_governance_open_high = 0
+targeted_governance_rereview_used = false
+qntyageval_applicability = "NOT_APPLICABLE"
+qntyageval_lookup_count = 0
+qntyageval_run_performed = false
+harness_authorized = false
+qnty_agent_runtime_authorized = false
+scientific_execution_authorized = false
+historical_outcome_access_authorized = false
+qnty_authorized = false
+trading_authorized = false
+capital_authority = "NONE"
+downstream_authority = "NONE"
+active_project_after_closure = "NONE"
+next_action = "OC_A_READY_FOR_MERGE: after canonical closure/merge and fresh reconciliation, begin only the separately named OC-B implementation phase; do not begin OC-B before OC-A is canonical and closed or merged."

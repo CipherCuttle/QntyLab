@@ -1,0 +1,249 @@
+{
+  "artifact_type": "QNTYLAB_CONTEXT_SPINE_ORIENTATION_COMPLETENESS_V0_AUTHORIZATION",
+  "schema_version": "qntylab-context-spine-orientation-completeness-v0-authorization-v1",
+  "project_id": "QNTYLAB_CONTEXT_SPINE_ORIENTATION_COMPLETENESS_V0_AUTHORIZATION",
+  "state": "CLOSED_PASS",
+  "phase_type": "GOVERNANCE_ONLY",
+  "authority_level": "GOVERNANCE_AUTHORIZATION_ONLY",
+  "status": "AUTHORIZED_FOR_ONE_LATER_BOUNDED_OC_B_IMPLEMENTATION_PHASE",
+  "canonicalization": {
+    "canonical_master_sha": "57f86e7d8f6f1081b5aa8a01c7b06ad54a26115c",
+    "planning_basis": "REVISION_2_FROZEN",
+    "canonicalization_required_before_oc_b_effect": true,
+    "oc_b_cannot_begin_until_oc_a_is_canonical_and_closed_or_merged": true
+  },
+  "objective": "Expose canonical clues to existing code before a receiving agent proposes new capability.",
+  "product_semantics": {
+    "product": "EVIDENCE_NOT_SEMANTIC_CONCLUSION",
+    "permissible_relation": "PROJECT_STATE_REFERENCES_PATH",
+    "semantic_ceiling": "project state references path only",
+    "preserved_non_equivalence": "EXISTS != AUTHORIZED",
+    "forbidden_inference": [
+      "reusable",
+      "solves_the_task",
+      "recommended",
+      "validated",
+      "scientifically_supported",
+      "execution_authorized",
+      "production_ready"
+    ],
+    "relation_terminology": "project_code_references",
+    "relation_is_not": [
+      "capabilities",
+      "implementation_bindings",
+      "reusable_capabilities"
+    ]
+  },
+  "oc_b_packet_version": {
+    "current_context_spine_version": 2,
+    "authorized_context_spine_version": 3,
+    "change_is_authorized_only_for_oc_b": true
+  },
+  "project_orientation_packet_schema": {
+    "packet_field": "project_orientation",
+    "schema_version": "project-orientation-v0",
+    "shape": "OBJECT",
+    "fields": {
+      "project_orientation_scope": "PROJECT_CODE_REFERENCE_PROJECTION",
+      "project_code_reference_scope": "AUTHORITATIVE_ARTIFACTS_ONLY_FILTERED_TO_QNTYLAB_PYTHON",
+      "project_code_reference_completeness": "PARTIAL_PROJECTION_NOT_REPOSITORY_COMPLETENESS",
+      "module_inventory_provenance": "GIT_INDEX_TRACKED_QNTYLAB_PYTHON",
+      "rows": "DETERMINISTIC_SORTED_ARRAY"
+    },
+    "row_schema": {
+      "project_id": "PROJECT_REGISTRY_PROJECT_ID",
+      "project_state": "PROJECT_REGISTRY_STATE",
+      "project_display_name": "PROJECT_REGISTRY_DISPLAY_NAME_OR_PROJECT_ID",
+      "project_code_references": "SORTED_UNIQUE_PATHS"
+    },
+    "row_field_rule": "All row fields are project_-prefixed; no row field is a semantic recommendation or authorization result.",
+    "module_inventory": {
+      "source": "GIT_INDEX_TRACKED_QNTYLAB_PYTHON",
+      "selection": "git-index-tracked paths with path.startswith('qntylab/') and path.endswith('.py')",
+      "ordering": "lexicographic path order",
+      "deduplication": "none beyond Git index path identity"
+    },
+    "reference_derivation": {
+      "source_field": "project.authoritative_artifacts",
+      "selection": "authoritative_artifacts only",
+      "filter": "path.startswith('qntylab/') and path.endswith('.py')",
+      "ordering": "project_id then path lexicographic order",
+      "deduplication": "sorted unique project_id/path relations",
+      "arbitrary_record_value_crawling": false,
+      "repository_wide_ast_or_content_scan": false
+    },
+    "partial_coverage_rule": "Absence from this projection does not mean absence from the repository.",
+    "authority_rule": "The packet is read-only, deterministic, bounded, non-authoritative, and derived from canonical Git; it never changes project state or grants authority."
+  },
+  "positive_control": {
+    "project_id": "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_SOURCE_INPUT_AND_OPEN_EXECUTION_READINESS_R1",
+    "required": true,
+    "reference_path": "qntylab/qnty_edge_order_flow_v0_readiness.py",
+    "acceptance": {
+      "brief_not_truncated": "The receiving agent can see the Order Flow reference in brief.",
+      "brief_truncated": "The brief explicitly reports truncation and points to python -m qntylab.project_context spine.",
+      "cold_start": "A fresh reviewer following AGENTS.md reaches the existing Order Flow reference before proposing a replacement implementation."
+    },
+    "prohibition": "Do not hard-code Order Flow into production implementation to make this control pass."
+  },
+  "bounded_brief_contract": {
+    "brief_command": "python -m qntylab.project_context brief",
+    "complete_projection_command": "python -m qntylab.project_context spine",
+    "max_lines": 120,
+    "max_line_bytes": 240,
+    "max_bytes": 28920,
+    "truncation_is_explicit": true,
+    "truncation_marker": "- TRUNCATED: deterministic brief byte/line budget reached.",
+    "truncated_brief_requires_complete_projection_inspection": true,
+    "brief_must_not_read_sources_or_write_state": true
+  },
+  "reuse_preflight": {
+    "trigger": "Before proposing or writing new capability or new behaviour in code.",
+    "behavior_based": true,
+    "required_for": [
+      "new module",
+      "new function representing new capability",
+      "new behavior added to an existing implementation"
+    ],
+    "not_required_for": [
+      "docs-only work",
+      "roadmap regeneration",
+      "projects.toml governance records",
+      "hostile-review notes",
+      "formatting",
+      "a bug fix confined to implementation already explicitly named by the task"
+    ],
+    "report_format": {
+      "reuse_preflight": "REQUIRED | NOT_REQUIRED",
+      "project_code_reference_matches": "paths with project_id and project_state | NONE",
+      "projection_truncated": "YES | NO",
+      "bounded_search": "exact commands",
+      "candidates_inspected": "paths actually opened/read | NONE",
+      "disposition": "REUSE | EXTEND | NEW_JUSTIFIED | UNKNOWN"
+    },
+    "bounded_search": [
+      "Choose 2-4 task-specific terms.",
+      "Run one filename/path search over qntylab/ and tests/.",
+      "Run at most one broad content grep if still inconclusive.",
+      "Do not run a third broad search unless prior evidence identifies a specific path.",
+      "A plausible match stops broad search.",
+      "Inspect the candidate and choose a disposition."
+    ],
+    "unknown_is_valid_terminal_disposition": true,
+    "no_archaeology_loop": true
+  },
+  "authorized_future_oc_b": {
+    "project_id": "QNTYLAB_CONTEXT_SPINE_ORIENTATION_COMPLETENESS_V0_OC_B_IMPLEMENTATION",
+    "scope": "ONE_LATER_BOUNDED_IMPLEMENTATION_PHASE",
+    "exact_file_surface": [
+      "qntylab/project_context.py",
+      "tests/test_context_spine_orientation_completeness_v0.py",
+      "tests/test_context_spine_foundation_v0.py",
+      "AGENTS.md",
+      ".github/workflows/project-context.yml",
+      "docs/state/projects.toml",
+      "docs/CURRENT_ROADMAP.md",
+      "experiments/research/qntylab_context_spine/orientation_completeness_v0/implementation_manifest.json",
+      "experiments/research/qntylab_context_spine/orientation_completeness_v0/hostile_review.md",
+      "experiments/research/qntylab_context_spine/orientation_completeness_v0/closure.json"
+    ],
+    "exact_future_foundation_test_edits": [
+      "Update the foundation packet schema/version expectation from Context Spine version 2 to version 3 and assert the project_orientation packet field.",
+      "Update the foundation authority-boundary assertion only to cover the new evidence-only project orientation fields while retaining the existing no-planning/no-scientific-authority invariant."
+    ],
+    "no_other_foundation_test_edits_authorized": true,
+    "exact_ci_suites": [
+      "python -m qntylab.project_context doctor --strict",
+      "python -m qntylab.project_context render --check",
+      "python -m qntylab.project_context spine > /dev/null",
+      "python -m qntylab.project_context brief > /dev/null",
+      "python -m qntylab.research_ledger doctor",
+      "python -m pytest -q tests/test_project_context_v0.py tests/test_context_spine_foundation_v0.py tests/test_context_spine_brief_v0.py tests/test_context_spine_orientation_completeness_v0.py"
+    ],
+    "implementation_constraints": [
+      "No generic capability infrastructure.",
+      "No arbitrary project-record crawling.",
+      "No task-to-path matching, relevance scoring, recommendations, or NEXT_ACTION projection.",
+      "Context Spine remains read-only, deterministic, bounded, non-authoritative, derived from canonical Git, and not a second control plane."
+    ]
+  },
+  "future_review_budget": {
+    "hostile_governance_review_count": 1,
+    "repair_only_critical_or_high": true,
+    "bounded_critical_or_high_repair_rounds": 1,
+    "targeted_rereview_rounds_if_repair_needed": 1,
+    "second_targeted_rereview_authorized": false,
+    "medium_or_low_reopen_rule": "Do not restart unless an explicit phase invariant, required evidence, fail-closed safety boundary, or trust/authority boundary is falsified."
+  },
+  "implementation_non_authorities": [
+    "chat history",
+    "GPT memory",
+    "handoff prose",
+    "README prose",
+    "generated roadmap",
+    "Context Spine packet",
+    "QntyAgentEval",
+    "QntyPolicyGate",
+    "Harness",
+    "qnty-agentd",
+    "QntyAgentRuntime"
+  ],
+  "forbidden_scope": [
+    "OC-B implementation in OC-A",
+    "QntyAgentEval changes or evaluator lookup",
+    "DeepSeek Harness integration",
+    "QntyAgentRuntime",
+    "autonomous orchestration infrastructure",
+    "semantic repository crawler",
+    "RAG, embeddings, vector database, knowledge graph, or repo-wide AST index",
+    "automatic task-to-path matching or automatic reuse recommendations",
+    "Order Flow execution or scientific work",
+    "shadow, live, trading, or capital work"
+  ],
+  "authority_boundary": {
+    "implementation_authorized_in_oc_a": false,
+    "later_oc_b_implementation_authorized": true,
+    "scientific_execution_authorized": false,
+    "historical_outcome_access_authorized": false,
+    "qnty_agent_eval_applicability": "NOT_APPLICABLE",
+    "qnty_agent_eval_lookup_performed": false,
+    "qnty_agent_eval_run_performed": false,
+    "harness_authorized": false,
+    "qnty_agent_runtime_authorized": false,
+    "qnty_authorized": false,
+    "trading_authorized": false,
+    "capital_authority": "NONE",
+    "downstream_authority": "NONE"
+  },
+  "hostile_review_budget": {
+    "review_identity": "ONE_INDEPENDENT_HOSTILE_GOVERNANCE_REVIEW",
+    "review_targets": [
+      "semantic overclaim",
+      "authority laundering",
+      "false completeness",
+      "source/projection freshness confusion",
+      "accidental capability semantics",
+      "hidden second source of truth",
+      "unauthorized OC-B implementation",
+      "unbounded search semantics",
+      "accidental NEXT_ACTION projection",
+      "OC-A/OC-B boundary erosion",
+      "unauthorized Harness coupling"
+    ]
+  },
+  "implementation_changeset": {
+    "files_changed_in_oc_a": [
+      "docs/state/projects.toml",
+      "docs/CURRENT_ROADMAP.md",
+      "experiments/research/qntylab_context_spine/orientation_completeness_v0/orientation_completeness_authorization.json",
+      "experiments/research/qntylab_context_spine/orientation_completeness_v0/orientation_completeness_authorization_hostile_review.md"
+    ],
+    "qntylab_python_changes": false,
+    "test_changes": false,
+    "agents_changes": false,
+    "ci_changes": false,
+    "oc_b_implementation_performed": false
+  },
+  "next_action": "OC_A_READY_FOR_MERGE: after canonical closure/merge and fresh reconciliation, begin only the separately named OC-B implementation phase.",
+  "active_project_after_closure": "NONE"
+}

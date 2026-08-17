@@ -22,6 +22,7 @@ EXPECTED_CONTROL_KIND = "qnty_active_task_pointer"
 EXPECTED_RECEIPT_KIND = "qnty_cross_agent_handoff_receipt"
 RECEIPT_NAME = re.compile(r"^handoff_v[0-9]+\.json$")
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
+GITHUB_COMPONENT = re.compile(r"^[A-Za-z0-9._-]+$")
 REQUIRED_ACTIVE_FIELDS = (
     "task_id",
     "protocol_id",
@@ -124,11 +125,56 @@ def _head_binding(root: Path, compiled_inputs: list[str]) -> tuple[str, list[str
     return head_sha, unbound
 
 
-def observe(root: Path) -> dict[str, Any]:
+def _canonical_locator(locator: str) -> str:
+    if not isinstance(locator, str):
+        raise QntyAdapterError("REPOSITORY_LOCATOR_INVALID")
+    parts = locator.split("/")
+    if len(parts) != 3 or parts[0] != "github.com" or not all(GITHUB_COMPONENT.fullmatch(part) for part in parts[1:]):
+        raise QntyAdapterError("REPOSITORY_LOCATOR_INVALID")
+    return locator
+
+
+def _remote_locator(raw: str) -> str:
+    value = raw.strip()
+    prefixes = ("https://github.com/", "git@github.com:", "ssh://git@github.com/")
+    suffix = next((value[len(prefix):] for prefix in prefixes if value.startswith(prefix)), None)
+    if suffix is None:
+        raise QntyAdapterError("REMOTE_ORIGIN_URL_UNSUPPORTED")
+    if suffix.endswith("/"):
+        suffix = suffix[:-1]
+    if suffix.endswith(".git"):
+        suffix = suffix[:-4]
+    parts = suffix.split("/")
+    if len(parts) != 2 or not all(GITHUB_COMPONENT.fullmatch(part) for part in parts):
+        raise QntyAdapterError("REMOTE_ORIGIN_URL_UNSUPPORTED")
+    return f"github.com/{parts[0]}/{parts[1]}"
+
+
+def _repository_root_binding(root: Path, *, expected_locator: str, expected_branch: str) -> None:
+    locator = _canonical_locator(expected_locator)
+    if not isinstance(expected_branch, str) or not GITHUB_COMPONENT.fullmatch(expected_branch):
+        raise QntyAdapterError("REPOSITORY_DEFAULT_BRANCH_INVALID")
+    configured = _git_bytes(root, "config", "--get", "remote.origin.url", check=False).decode("utf-8", "replace").splitlines()
+    if len(configured) != 1 or _remote_locator(configured[0]) != locator:
+        if not configured:
+            raise QntyAdapterError("REMOTE_ORIGIN_MISSING")
+        raise QntyAdapterError("REMOTE_ORIGIN_MISMATCH")
+    remote_ref = f"refs/remotes/origin/{expected_branch}"
+    try:
+        head_sha = _git_bytes(root, "rev-parse", "HEAD").decode("utf-8").strip()
+        remote_sha = _git_bytes(root, "rev-parse", "--verify", f"{remote_ref}^{{commit}}").decode("utf-8").strip()
+    except (QntyAdapterError, UnicodeDecodeError) as exc:
+        raise QntyAdapterError("REMOTE_TRACKING_BRANCH_MISSING") from exc
+    if head_sha != remote_sha:
+        raise QntyAdapterError("HEAD_NOT_CANONICAL_REMOTE_BRANCH")
+
+
+def observe(root: Path, *, expected_locator: str, expected_branch: str) -> dict[str, Any]:
     """Return the bounded Qnty orientation packet for an explicit root."""
     root = root.resolve()
     if not root.is_dir():
         raise QntyAdapterError("ROOT_NOT_DIRECTORY")
+    _repository_root_binding(root, expected_locator=expected_locator, expected_branch=expected_branch)
     active_path = _tracked_regular_file(root, ACTIVE_TASK_PATH)
     active, _ = _load_canonical_object(active_path, "ACTIVE_TASK_MALFORMED")
     if active.get("control_kind") != EXPECTED_CONTROL_KIND:

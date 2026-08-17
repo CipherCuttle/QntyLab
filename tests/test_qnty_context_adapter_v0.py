@@ -15,6 +15,7 @@ from qntylab import project_context, qnty_context_adapter
 
 
 ROOT = Path(__file__).resolve().parents[1]
+QNTY_LOCATOR = "github.com/CipherCuttle/Qnty"
 
 
 def _canonical(value: object) -> bytes:
@@ -25,7 +26,13 @@ def _git(root: Path, *args: str) -> None:
     subprocess.run(["git", "-C", str(root), *args], check=True, capture_output=True)
 
 
-def _qnty_root(tmp_path: Path, *, active_updates: dict[str, object] | None = None, receipt: dict[str, object] | None = None) -> Path:
+def _qnty_root(
+    tmp_path: Path,
+    *,
+    active_updates: dict[str, object] | None = None,
+    receipt: dict[str, object] | None = None,
+    remote_url: str = "https://github.com/CipherCuttle/Qnty.git",
+) -> Path:
     root = tmp_path / "qnty"
     (root / "docs/control/tasks/SYNTHETIC_TASK").mkdir(parents=True)
     receipt_value: dict[str, object] = {
@@ -61,7 +68,13 @@ def _qnty_root(tmp_path: Path, *, active_updates: dict[str, object] | None = Non
         capture_output=True,
         env={**os.environ, "GIT_CONFIG_GLOBAL": "/dev/null", "GIT_CONFIG_SYSTEM": "/dev/null"},
     )
+    _git(root, "remote", "add", "origin", remote_url)
+    _git(root, "update-ref", "refs/remotes/origin/main", "HEAD")
     return root
+
+
+def _observe(root: Path) -> dict[str, object]:
+    return qnty_context_adapter.observe(root, expected_locator=QNTY_LOCATOR, expected_branch="main")
 
 
 def _packet(qnty_root: Path, **kwargs: object) -> dict[str, object]:
@@ -121,11 +134,11 @@ def test_valid_pointer_observed_with_bounded_fields(tmp_path: Path) -> None:
 
 def test_canonical_json_and_digest_are_mechanically_verified(tmp_path: Path) -> None:
     qnty = _qnty_root(tmp_path)
-    assert qnty_context_adapter.observe(qnty)["handoff_integrity"] == "POINTER_DIGEST_MATCH"
+    assert _observe(qnty)["handoff_integrity"] == "POINTER_DIGEST_MATCH"
     active = qnty / "docs/control/active_task.json"
     active.write_bytes(active.read_bytes() + b"\n")
     with pytest.raises(qnty_context_adapter.QntyAdapterError, match="ACTIVE_TASK_MALFORMED"):
-        qnty_context_adapter.observe(qnty)
+        _observe(qnty)
 
 
 @pytest.mark.parametrize(
@@ -180,6 +193,50 @@ def test_wrong_root_fails_closed(tmp_path: Path) -> None:
     _assert_conflict(_packet(wrong))
 
 
+def test_unrelated_git_repo_with_copied_valid_control_files_fails_closed(tmp_path: Path) -> None:
+    canonical = _qnty_root(tmp_path)
+    unrelated = tmp_path / "unrelated"
+    shutil.copytree(canonical, unrelated)
+    _git(unrelated, "remote", "set-url", "origin", "https://github.com/Other/Repository.git")
+    _assert_conflict(_packet(unrelated))
+
+
+def test_wrong_origin_remote_fails_closed(tmp_path: Path) -> None:
+    _assert_conflict(_packet(_qnty_root(tmp_path, remote_url="https://github.com/Other/Repository.git")))
+
+
+def test_missing_origin_remote_fails_closed(tmp_path: Path) -> None:
+    qnty = _qnty_root(tmp_path)
+    _git(qnty, "remote", "remove", "origin")
+    _assert_conflict(_packet(qnty))
+
+
+def test_wrong_remote_tracking_branch_fails_closed(tmp_path: Path) -> None:
+    qnty = _qnty_root(tmp_path)
+    _git(qnty, "update-ref", "-d", "refs/remotes/origin/main")
+    _git(qnty, "update-ref", "refs/remotes/origin/develop", "HEAD")
+    _assert_conflict(_packet(qnty))
+
+
+def test_head_not_canonical_remote_main_fails_closed(tmp_path: Path) -> None:
+    qnty = _qnty_root(tmp_path)
+    _git(qnty, "-c", "user.name=test", "-c", "user.email=test@example.invalid", "commit", "--allow-empty", "-q", "-m", "advance")
+    _assert_conflict(_packet(qnty))
+
+
+@pytest.mark.parametrize(
+    "remote_url",
+    [
+        "https://github.com/CipherCuttle/Qnty.git",
+        "git@github.com:CipherCuttle/Qnty.git",
+        "ssh://git@github.com/CipherCuttle/Qnty.git",
+    ],
+)
+def test_canonical_qnty_locator_accepts_known_github_spellings(tmp_path: Path, remote_url: str) -> None:
+    record = _qnty_record(_packet(_qnty_root(tmp_path, remote_url=remote_url)))
+    assert record["context_state"] == "AVAILABLE_READ_ONLY"
+
+
 @pytest.mark.parametrize("flag", ["--assume-unchanged", "--skip-worktree"])
 def test_dirty_compiled_input_is_unbound_even_when_index_flags_claim_unchanged(tmp_path: Path, flag: str) -> None:
     qnty = _qnty_root(tmp_path)
@@ -195,7 +252,7 @@ def test_read_only_adapter_does_not_change_qnty_files_or_git_state(tmp_path: Pat
     qnty = _qnty_root(tmp_path)
     before_files = {path.relative_to(qnty): path.read_bytes() for path in qnty.rglob("*") if path.is_file() and ".git" not in path.parts}
     before_git = {path.relative_to(qnty / ".git"): path.read_bytes() for path in (qnty / ".git").rglob("*") if path.is_file()}
-    qnty_context_adapter.observe(qnty)
+    _observe(qnty)
     after_files = {path.relative_to(qnty): path.read_bytes() for path in qnty.rglob("*") if path.is_file() and ".git" not in path.parts}
     after_git = {path.relative_to(qnty / ".git"): path.read_bytes() for path in (qnty / ".git").rglob("*") if path.is_file()}
     assert after_files == before_files
@@ -208,7 +265,7 @@ def test_hostile_git_environment_cannot_redirect_root(tmp_path: Path, monkeypatc
     monkeypatch.setenv("GIT_DIR", str(other / ".git"))
     monkeypatch.setenv("GIT_WORK_TREE", str(other))
     monkeypatch.setenv("GIT_INDEX_FILE", str(other / ".git/index"))
-    observation = qnty_context_adapter.observe(qnty)
+    observation = _observe(qnty)
     expected = subprocess.run(["git", "-C", str(qnty), "rev-parse", "HEAD"], check=True, capture_output=True, text=True).stdout.strip()
     assert observation["generated_from"]["canonical_git_identity"]["head_sha"] == expected  # type: ignore[index]
 
@@ -217,7 +274,7 @@ def test_same_git_bytes_are_deterministic_across_absolute_roots(tmp_path: Path) 
     first = _qnty_root(tmp_path)
     second = tmp_path / "different-root"
     shutil.copytree(first, second)
-    assert qnty_context_adapter.observe(first) == qnty_context_adapter.observe(second)
+    assert _observe(first) == _observe(second)
 
 
 def test_adapter_does_not_execute_or_import_qnty_code() -> None:

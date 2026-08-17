@@ -57,7 +57,7 @@ def _tracked_root(tmp_path: Path) -> Path:
 
 def _catalog(**overrides: Any) -> dict[str, Any]:
     value: dict[str, Any] = {
-        "schema_version": 1,
+        "schema_version": 2,
         "ecosystem_id": "TEST_ECOSYSTEM",
         "architecture": {"architecture_authority": "ADR-GLOBAL", "scientific_north_star": "ADR-NORTH"},
         "repository": [
@@ -128,7 +128,7 @@ authoritative_artifacts = ["docs/state/projects.toml"]
 
 
 def _ecosystem_toml(*, authority: str = "ADR-GLOBAL", north_star: str = "ADR-NORTH", local: str = "LocalRepo") -> str:
-    return f"""schema_version = 1
+    return f"""schema_version = 2
 ecosystem_id = "TEST_ECOSYSTEM"
 
 [architecture]
@@ -257,7 +257,7 @@ def test_catalog_validation_pass(tmp_path: Path) -> None:
 @pytest.mark.parametrize(
     ("mutate", "message"),
     [
-        (lambda catalog: catalog.update(schema_version=2), "schema_version"),
+        (lambda catalog: catalog.update(schema_version=3), "schema_version"),
         (lambda catalog: catalog.pop("ecosystem_id"), "ecosystem_id"),
         (lambda catalog: catalog.pop("architecture"), r"\[architecture\]"),
         (lambda catalog: catalog["architecture"].pop("scientific_north_star"), "scientific_north_star"),

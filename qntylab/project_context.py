@@ -50,7 +50,7 @@ AUTHORITY_DOMAINS = (
 # authority source.  Cross-repository reads require an adapter that this
 # foundation deliberately does not implement.
 CONTEXT_SPINE_VERSION = 2
-ECOSYSTEM_CATALOG_SCHEMA_VERSION = 1
+ECOSYSTEM_CATALOG_SCHEMA_VERSION = 2
 # ADR-0007 source precedence, highest authority first.  The rank is the position
 # in this tuple; a catalog may only classify a source, never reorder the ladder.
 PRECEDENCE_CLASSES = (
@@ -426,6 +426,8 @@ def _catalog_repositories(catalog: dict[str, Any]) -> dict[str, dict[str, Any]]:
             raise ProjectContextError(f"repository {repository_id} adapter_status contradicts context_access")
         if adapter_status == "READ_ONLY_ADAPTER_IMPLEMENTED" and repository_id != qnty_context_adapter.QNTY_REPOSITORY_ID:
             raise ProjectContextError(f"implemented external adapter is not supported for {repository_id}")
+        if adapter_status == "READ_ONLY_ADAPTER_IMPLEMENTED":
+            _as_string(record.get("canonical_repository_locator"), f"repository {repository_id} canonical_repository_locator")
         repositories[repository_id] = record
     local = [record for record in repositories.values() if record["context_access"] == "LOCAL_CANONICAL_SOURCES"]
     if len(local) != 1:
@@ -590,7 +592,11 @@ def _external_repository_views(
             root = supplied.get(source["repository_id"])
             if root is not None:
                 try:
-                    record["observation"] = qnty_context_adapter.observe(root)
+                    record["observation"] = qnty_context_adapter.observe(
+                        root,
+                        expected_locator=source["canonical_repository_locator"],
+                        expected_branch=source["default_branch"],
+                    )
                     record["context_state"] = "AVAILABLE_READ_ONLY"
                 except qnty_context_adapter.QntyAdapterError as exc:
                     record["context_state"] = ARCHITECTURE_CONFLICT

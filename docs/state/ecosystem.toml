@@ -14,10 +14,11 @@
 # `architecture_authority` and `scientific_north_star` against
 # docs/ADR/registry.toml, and the local `repository_id` against qntylab.toml.
 #
-# `ecosystem_id`, `durable_role`, and `default_branch` are declared naming, not
-# observed state: no local source owns them, and no adapter reads the external
-# repositories.
-schema_version = 1
+# `ecosystem_id`, `durable_role`, `default_branch`, and
+# `canonical_repository_locator` are declared naming, not authority: no local
+# source owns external semantic state, and no adapter reads external content
+# beyond its bounded contract.
+schema_version = 2
 ecosystem_id = "QNTY_ECOSYSTEM"
 
 # Resolved against docs/ADR/registry.toml, which owns ADR status and scope.
@@ -36,6 +37,7 @@ adapter_status = "NOT_APPLICABLE"
 repository_id = "Qnty"
 durable_role = "DOWNSTREAM_ACCEPTANCE_AND_EXECUTION_REALISM"
 default_branch = "main"
+canonical_repository_locator = "github.com/CipherCuttle/Qnty"
 context_access = "NARROW_READ_ONLY_ADAPTER"
 adapter_status = "READ_ONLY_ADAPTER_IMPLEMENTED"
 

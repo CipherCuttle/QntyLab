@@ -623,10 +623,13 @@ def test_authority_source_may_not_retype_a_registered_adr_document(tmp_path: Pat
 
     # The misdirection this closes: a stale-roadmap message inviting the render
     # that would overwrite the architecture contract with a generated view.
+    # Rejection now happens earlier than the conflict, at the write capability:
+    # this ADR is not the one destination the roadmap writer can address, so the
+    # attempt never gets as far as being a conflict about a generated view.
     check = _spine_cli(root, "render", "--check")
-    assert check.returncode == 1
-    assert b"ARCHITECTURE_CONFLICT" in check.stderr and b"stale" not in check.stderr
-    assert _spine_cli(root, "render").returncode == 1
+    assert check.returncode == 2
+    assert b"written only to docs/CURRENT_ROADMAP.md" in check.stderr and b"stale" not in check.stderr
+    assert _spine_cli(root, "render").returncode == 2
     assert adr.read_bytes() == before
 
 
@@ -638,7 +641,10 @@ def test_authority_source_may_not_retype_the_declaration_that_names_it(tmp_path:
     packet = project_context.compile_context_spine(root)
     assert packet["packet_status"] == project_context.ARCHITECTURE_CONFLICT
     assert [item["code"] for item in packet["conflicts"]] == ["SOURCE_CLASSIFICATION_DISAGREEMENT"]
-    assert project_context.render(root, check=False) == 1
+    # The declaration is likewise outside the roadmap writer's one destination,
+    # so render refuses the target rather than merely refusing while conflicted.
+    with pytest.raises(project_context.ProjectContextError, match="written only to docs/CURRENT_ROADMAP.md"):
+        project_context.render(root, check=False)
     assert (root / "qntylab.toml").read_bytes() == before
 
 
@@ -739,6 +745,215 @@ def test_render_check_does_not_write_the_git_index(tmp_path: Path) -> None:
     assert project_context.render(root, check=True) == 0
     assert (index.read_bytes(), index.stat().st_mtime_ns) == before
     assert not (root / ".git/index.lock").exists()
+
+
+# --- Generated-view write capability --------------------------------------
+#
+# ``render`` is the compiler's only writer.  Its allowed write set is exactly the
+# canonical generated CURRENT_ROADMAP destination, expressed as a positive
+# capability rather than a denylist: a repository path is refused because it is
+# not the supported destination, never because a classifier recognised it as
+# sensitive.  Paths no classifier has heard of, and paths that do not exist yet,
+# are therefore protected by construction.
+
+
+# Extra victims the fixture repository carries so the sweep spans the real
+# exploit class rather than only the sources the compiler already parses.
+CAPABILITY_VICTIMS = {
+    "experiments/research/CANDIDATE-A/frozen_result.json": '{"immutable": "evidence"}\n',
+    "experiments/receipts/receipt-0001.json": '{"immutable": "receipt"}\n',
+    "qntylab/some_implementation.py": "SOURCE = 'implementation'\n",
+    "notes/ordinary.txt": "an ordinary tracked file with no classification\n",
+    "notes/nested/deeper/unknown.txt": "a nested path no classifier knows\n",
+    "docs/CURRENT_ROADMAP.md.bak": "adjacent to the real destination\n",
+}
+
+# Repository-relative paths that are not the supported destination.  The list
+# deliberately mixes classified and wholly unclassified paths to show that
+# classification is not what protects them.
+UNAUTHORIZED_DESTINATIONS = (
+    "docs/ADR/global.md",
+    "docs/ADR/registry.toml",
+    "docs/state/projects.toml",
+    "docs/state/ecosystem.toml",
+    "qntylab.toml",
+    "experiments/research/CANDIDATE-A/frozen_result.json",
+    "experiments/receipts/receipt-0001.json",
+    "qntylab/some_implementation.py",
+    "notes/ordinary.txt",
+    "notes/nested/deeper/unknown.txt",
+    "docs/CURRENT_ROADMAP.md.bak",
+    # A repository-relative path that does not exist yet: a future file must be
+    # outside the capability before anyone creates it.
+    "docs/FUTURE_VIEW.md",
+    "experiments/research/CANDIDATE-B/not_created_yet.json",
+)
+
+# Spellings that name the supported destination without being it.  Accepting any
+# of them would reintroduce configuration-controlled path construction through
+# normalization rather than through a second declared literal.
+EQUIVALENT_LOOKING_SPELLINGS = (
+    "./docs/CURRENT_ROADMAP.md",
+    "docs//CURRENT_ROADMAP.md",
+    "docs/./CURRENT_ROADMAP.md",
+    "docs/../docs/CURRENT_ROADMAP.md",
+    "/docs/CURRENT_ROADMAP.md",
+    "../spine-repo/docs/CURRENT_ROADMAP.md",
+    "docs/CURRENT_ROADMAP.md/",
+    "DOCS/CURRENT_ROADMAP.md",
+)
+
+
+def _capability_root(tmp_path: Path, *, current_roadmap: str) -> Path:
+    """A spine repository carrying extra victims, with the roadmap redirected."""
+    config = QNTYLAB_TOML.replace(
+        'current_roadmap = "docs/CURRENT_ROADMAP.md"',
+        f'current_roadmap = "{current_roadmap}"',
+    )
+    root = _spine_root(tmp_path, config=config)
+    for relative, body in CAPABILITY_VICTIMS.items():
+        (root / relative).parent.mkdir(parents=True, exist_ok=True)
+        (root / relative).write_text(body, encoding="utf-8")
+    subprocess.run(["git", "-C", str(root), "add", "."], check=True)
+    subprocess.run(
+        ["git", "-C", str(root), "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "victims"],
+        check=True,
+        env={"GIT_CONFIG_GLOBAL": "/dev/null", "GIT_CONFIG_SYSTEM": "/dev/null", "PATH": os.environ["PATH"]},
+    )
+    return root
+
+
+def _repository_bytes(root: Path) -> dict[str, bytes]:
+    """Every repository-content file by exact bytes, Git internals excluded.
+
+    Exit status alone would not prove the invariant, so rejection is measured as
+    byte identity across the whole working tree.
+    """
+    return {
+        str(path.relative_to(root)): path.read_bytes()
+        for path in sorted(root.rglob("*"))
+        if path.is_file() and ".git" not in path.relative_to(root).parts
+    }
+
+
+@pytest.mark.parametrize("target", UNAUTHORIZED_DESTINATIONS + EQUIVALENT_LOOKING_SPELLINGS)
+def test_render_refuses_every_destination_but_its_own(tmp_path: Path, target: str) -> None:
+    """Any target but the canonical destination fails closed and writes nothing."""
+    root = _capability_root(tmp_path, current_roadmap=target)
+    before = _repository_bytes(root)
+
+    with pytest.raises(project_context.ProjectContextError):
+        project_context.render(root, check=False)
+    assert _repository_bytes(root) == before, f"render mutated repository content targeting {target}"
+
+    # The same through the CLI, which is how the capability is actually reachable.
+    completed = _spine_cli(root, "render")
+    assert completed.returncode == 2, completed.stderr
+    assert _repository_bytes(root) == before, f"the CLI mutated repository content targeting {target}"
+    assert _spine_cli(root, "render", "--check").returncode == 2
+    assert _repository_bytes(root) == before
+
+
+def test_render_writes_exactly_its_canonical_destination(tmp_path: Path) -> None:
+    """The positive half of the invariant: the allowed write set is that one file."""
+    root = _capability_root(tmp_path, current_roadmap="docs/CURRENT_ROADMAP.md")
+    before = _repository_bytes(root)
+
+    assert project_context.render(root, check=False) == 0
+
+    after = _repository_bytes(root)
+    changed = sorted(name for name in set(before) | set(after) if before.get(name) != after.get(name))
+    assert changed == ["docs/CURRENT_ROADMAP.md"]
+    assert after["docs/CURRENT_ROADMAP.md"].startswith(b"# GENERATED")
+    # ``--check`` agrees with what was just written and stays read-only.
+    assert project_context.render(root, check=True) == 0
+    assert _repository_bytes(root) == after
+
+
+def test_accepted_destination_set_is_exactly_one_over_the_whole_repository(tmp_path: Path) -> None:
+    """Sweep the declaration across every tracked path: exactly one is accepted.
+
+    This is the generalization the denylist could not offer.  It asserts the size
+    and identity of the accepted set rather than enumerating forbidden targets,
+    so a path added to the repository later is covered without editing a list.
+    """
+    root = _capability_root(tmp_path, current_roadmap="docs/CURRENT_ROADMAP.md")
+    tracked = subprocess.run(
+        ["git", "-C", str(root), "ls-files"], check=True, capture_output=True, text=True
+    ).stdout.split()
+    assert len(tracked) > 10, "the sweep needs a repository with paths of several kinds"
+
+    accepted = []
+    for candidate in [*tracked, *UNAUTHORIZED_DESTINATIONS, *EQUIVALENT_LOOKING_SPELLINGS]:
+        try:
+            project_context._generated_view_destination(
+                root, _config(current_roadmap=candidate), project_context.CURRENT_ROADMAP_VIEW
+            )
+        except project_context.ProjectContextError:
+            continue
+        accepted.append(candidate)
+
+    assert sorted(set(accepted)) == ["docs/CURRENT_ROADMAP.md"]
+
+
+def test_write_capability_is_a_compiler_owned_contract() -> None:
+    """A second destination must cost a contract edit, not a configuration edit.
+
+    Pinning the whole mapping is deliberate: a future developer who adds an entry
+    has to change this assertion, which is the point at which the capability is
+    reviewed rather than quietly widened.
+    """
+    assert project_context.GENERATED_VIEW_DESTINATIONS == {"CURRENT_ROADMAP": "docs/CURRENT_ROADMAP.md"}
+    assert set(project_context.GENERATED_VIEW_AUTHORITY_KEYS) == set(project_context.GENERATED_VIEW_DESTINATIONS)
+    assert project_context.CURRENT_ROADMAP_VIEW in project_context.GENERATED_VIEW_DESTINATIONS
+    for destination in project_context.GENERATED_VIEW_DESTINATIONS.values():
+        assert not Path(destination).is_absolute() and ".." not in Path(destination).parts
+    # The repository's own declaration matches the supported destination, which is
+    # what makes the shipped configuration valid rather than merely tolerated.
+    assert tomllib.loads((ROOT / "qntylab.toml").read_text(encoding="utf-8"))["authority"]["current_roadmap"] == (
+        project_context.GENERATED_VIEW_DESTINATIONS[project_context.CURRENT_ROADMAP_VIEW]
+    )
+
+
+def test_declared_roadmap_is_reconciled_and_never_followed(tmp_path: Path) -> None:
+    """Configuration declares; it does not grant. A mismatch is not repaired."""
+    root = _capability_root(tmp_path, current_roadmap="docs/state/projects.toml")
+    config, _, _ = project_context.load_context_sources(root)
+
+    with pytest.raises(project_context.ProjectContextError, match="written only to docs/CURRENT_ROADMAP.md"):
+        project_context._generated_view_destination(root, config, project_context.CURRENT_ROADMAP_VIEW)
+
+    # Not silently redirected to the supported path either: a declaration the
+    # repository did not make must not become a write somewhere else.
+    assert (root / "docs/CURRENT_ROADMAP.md").read_bytes() == b"roadmap\n"
+
+
+def test_rejected_target_never_reaches_a_write(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Reconciliation completes before mutation, so rejection is not a late abort."""
+    root = _capability_root(tmp_path, current_roadmap="experiments/receipts/receipt-0001.json")
+
+    def refuse(*args: Any, **kwargs: Any) -> None:
+        raise AssertionError("render attempted a write with an unauthorized destination")
+
+    monkeypatch.setattr(Path, "write_bytes", refuse)
+    monkeypatch.setattr(Path, "write_text", refuse)
+    with pytest.raises(project_context.ProjectContextError):
+        project_context.render(root, check=False)
+    with pytest.raises(project_context.ProjectContextError):
+        project_context.render(root, check=True)
+
+
+def test_capability_holds_while_the_foundation_also_conflicts(tmp_path: Path) -> None:
+    """The capability is independent of the conflict gate, not layered behind it."""
+    config = QNTYLAB_TOML.replace(
+        'current_roadmap = "docs/CURRENT_ROADMAP.md"', 'current_roadmap = "docs/state/projects.toml"'
+    )
+    root = _spine_root(tmp_path, catalog=_ecosystem_toml(north_star="ADR-ABSENT"), config=config)
+    before = _repository_bytes(root)
+
+    with pytest.raises(project_context.ProjectContextError, match="written only to docs/CURRENT_ROADMAP.md"):
+        project_context.render(root, check=False)
+    assert _repository_bytes(root) == before
 
 
 def test_compilation_does_not_inherit_render_write_behaviour(monkeypatch: pytest.MonkeyPatch) -> None:

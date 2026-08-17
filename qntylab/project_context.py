@@ -76,6 +76,18 @@ AUTHORITY_PRECEDENCE = {
     "current_roadmap": "DETERMINISTIC_GENERATED_VIEW",
 }
 DIRECTORY_AUTHORITY_KEYS = frozenset({"research_ledger_root"})
+# The complete set of files this compiler is able to write, keyed by the logical
+# generated view.  This table — not ``[authority]`` — is what grants the writer a
+# destination.  Configuration still declares where a generated view lives, but a
+# declaration is only ever reconciled against this mapping and can never
+# introduce a path that is absent from it, so every repository path outside the
+# table is outside the writer's capability rather than merely unlisted by a
+# denylist.  A second writable destination requires editing this contract, and
+# the tests that pin it, instead of editing mutable repository state.
+GENERATED_VIEW_DESTINATIONS = {"CURRENT_ROADMAP": "docs/CURRENT_ROADMAP.md"}
+# Which ``[authority]`` key declares each generated view's location.
+GENERATED_VIEW_AUTHORITY_KEYS = {"CURRENT_ROADMAP": "current_roadmap"}
+CURRENT_ROADMAP_VIEW = "CURRENT_ROADMAP"
 GIT_IDENTITY_SOURCE_ID = "CANONICAL_GIT_IDENTITY"
 # The declaration that names every other authority source, and therefore itself a
 # canonical source at the rank its own contents define.
@@ -744,8 +756,43 @@ def _roadmap_bytes(root: Path) -> bytes:
     return ("\n".join(lines)).encode("utf-8")
 
 
+def _generated_view_destination(root: Path, config: dict[str, Any], view: str) -> Path:
+    """The one path this compiler may write for ``view``, or a closed failure.
+
+    The destination is taken from :data:`GENERATED_VIEW_DESTINATIONS`;
+    configuration never supplies it.  ``[authority]`` still declares the roadmap
+    location, because that declaration is useful machine-readable repository
+    state, but its only role here is to be reconciled: naming some other file is
+    a disagreement about repository layout, not a grant of a new write
+    capability, so it fails closed rather than redirecting the writer.  The
+    declaration is likewise not normalized, repaired, or quietly followed toward
+    the supported path — writing somewhere the repository did not declare would
+    be the same defect wearing a different mask.
+
+    Because the accepted value is one compiler-owned literal, a path this
+    repository has never classified, or does not contain yet, is refused for the
+    same reason a registered ADR is: it is not the supported destination.
+    """
+    supported = GENERATED_VIEW_DESTINATIONS[view]
+    key = GENERATED_VIEW_AUTHORITY_KEYS[view]
+    declared = config["authority"].get(key)
+    if declared != supported:
+        raise ProjectContextError(
+            f"generated view {view} is written only to {supported}; "
+            f"qntylab.toml declares {key} = {declared!r}"
+        )
+    # Resolved through the same guard as every other authority source, so the
+    # supported path must still be a Git-tracked, non-symlink file inside this
+    # repository before any byte is written to it.
+    return _authority_path(root, supported, label=key)
+
+
 def render(root: Path, *, check: bool) -> int:
     config, _, _ = load_context_sources(root)
+    # Resolving the destination is the first thing that happens and the only
+    # thing that decides where bytes may land, so an unauthorized target is
+    # rejected before a single repository byte can be produced or written.
+    path = _generated_view_destination(root, config, CURRENT_ROADMAP_VIEW)
     # ADR-0007 stops architecture-affecting mutation while canonical sources
     # conflict, so a generated view is never rewritten during a conflict.  The
     # reconciliation alone is enough here, and it leaves the Git index untouched.
@@ -753,7 +800,6 @@ def render(root: Path, *, check: bool) -> int:
         print(f"project context error: {ARCHITECTURE_CONFLICT}; roadmap generation is blocked", file=sys.stderr)
         return 1
     expected = _roadmap_bytes(root)
-    path = root / config["authority"]["current_roadmap"]
     if check:
         if path.read_bytes() != expected:
             print("project context error: generated roadmap is stale; run python -m qntylab.project_context render", file=sys.stderr)

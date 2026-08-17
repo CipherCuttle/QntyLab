@@ -893,6 +893,151 @@ def context_text(data: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+BRIEF_TARGET_TOKENS = 2500
+BRIEF_MAX_LINES = 120
+
+
+def _brief_field(value: Any, missing: str = "NOT_PRESENT_IN_PACKET") -> str:
+    if value is None:
+        return missing
+    return str(value)
+
+
+def _brief_external_record(packet: dict[str, Any], repository_id: str) -> dict[str, Any] | None:
+    return next(
+        (record for record in packet.get("external_repositories", []) if record.get("repository_id") == repository_id),
+        None,
+    )
+
+
+def _brief_qnty_lines(record: dict[str, Any] | None) -> list[str]:
+    if record is None:
+        return [f"- {field} = NOT_PRESENT_IN_PACKET" for field in ("adapter", "context")]
+    lines = [
+        f"- adapter = {_brief_field(record.get('adapter_status'))}",
+        f"- context = {_brief_field(record.get('context_state'))}",
+    ]
+    observation = record.get("observation")
+    if not isinstance(observation, dict):
+        unavailable = record.get("context_state", "NOT_AVAILABLE_WITHOUT_EXPLICIT_ROOT")
+        lines.extend(
+            f"- {field} = {unavailable}"
+            for field in ("head SHA", "task_id", "protocol_id", "phase", "handoff integrity", "continuity verifier status", "next-action authority")
+        )
+        return lines
+    identity = observation.get("generated_from", {}).get("canonical_git_identity", {})
+    pointer = observation.get("control_pointer", {})
+    lines.extend(
+        [
+            f"- head SHA = {_brief_field(identity.get('head_sha'))}",
+            f"- task_id = {_brief_field(pointer.get('task_id'))}",
+            f"- protocol_id = {_brief_field(pointer.get('protocol_id'))}",
+            f"- phase = {_brief_field(pointer.get('phase'))}",
+            f"- handoff integrity = {_brief_field(observation.get('handoff_integrity'))}",
+            f"- continuity verifier status = {_brief_field(observation.get('continuity_verifier_status'))}",
+            f"- next-action authority = {_brief_field(observation.get('next_action_authority'))}",
+        ]
+    )
+    return lines
+
+
+def _brief_sections(packet: dict[str, Any]) -> list[list[str]]:
+    conflicts = packet.get("conflicts") or []
+    status = "ARCHITECTURE_CONFLICT" if conflicts else "CONTEXT_AVAILABLE"
+    qnty = _brief_external_record(packet, "Qnty")
+    if not conflicts and (qnty is None or qnty.get("context_state") != "AVAILABLE_READ_ONLY"):
+        status = "CONTEXT_PARTIAL"
+    repository = packet.get("repository", {})
+    external = {
+        record.get("repository_id"): record
+        for record in packet.get("external_repositories", [])
+        if isinstance(record, dict)
+    }
+
+    return [
+        [
+            "# Qnty Ecosystem Brief",
+            "",
+            f"**Orientation status: {status}**",
+            "",
+            "This is a deterministic view of the compiled Context Spine packet.",
+        ],
+        [
+            "## Canonical identity",
+            "",
+            f"- QntyLab canonical head = {_brief_field(packet.get('generated_from', {}).get('canonical_git_identity', {}).get('head_sha'))}",
+            f"- Context Spine packet version = {_brief_field(packet.get('context_spine_version'))}",
+            f"- ecosystem catalog version = {_brief_field(packet.get('ecosystem_catalog_version'))}",
+        ],
+        [
+            "## Architecture",
+            "",
+            f"- QntyLab durable role = {_brief_field(repository.get('durable_role'))}",
+            f"- Qnty durable role = {_brief_field(external.get('Qnty', {}).get('durable_role'))}",
+            f"- QntyAgentEval role = {_brief_field(external.get('QntyAgentEval', {}).get('durable_role'))}",
+            f"- QntyPolicyGate role = {_brief_field(external.get('QntyPolicyGate', {}).get('durable_role'))}",
+        ],
+        [
+            "## Current QntyLab state",
+            "",
+            "- active project(s) = NOT_PRESENT_IN_PACKET (Context Spine foundation packet)",
+            "- queued/not-authorized = NOT_PRESENT_IN_PACKET (Context Spine foundation packet)",
+            f"- architecture conflicts = {len(conflicts)}",
+        ],
+        ["## External repositories", "", "For Qnty:", *_brief_qnty_lines(qnty), ""],
+        [
+            "For QntyAgentEval:",
+            f"- adapter = {_brief_field(external.get('QntyAgentEval', {}).get('adapter_status'))}",
+            "",
+            "For QntyPolicyGate:",
+            f"- adapter = {_brief_field(external.get('QntyPolicyGate', {}).get('adapter_status'))}",
+        ],
+        [
+            "## Authority boundaries",
+            "",
+            "- Git identity selects bytes, not semantic authority.",
+            "- Handoff is not Qnty acceptance.",
+            "- NEXT_ACTION authority is not established unless a canonical source says otherwise; no NEXT_ACTION field is emitted.",
+            "- No science, runtime, live, trading, or capital authority is inferred.",
+        ],
+        [
+            "## Conflicts / blockers",
+            "",
+            *(
+                ["**ARCHITECTURE_CONFLICT**"]
+                + [f"- {item.get('code', 'CONFLICT')}: {item.get('detail', 'unspecified conflict')}" for item in conflicts]
+                if conflicts
+                else ["- None."]
+            ),
+            "",
+            "- unavailable external roots = "
+            + (", ".join(record["repository_id"] for record in packet.get("external_repositories", []) if record.get("context_state") == "UNAVAILABLE_WITHOUT_EXPLICIT_ROOT") or "None"),
+        ],
+    ]
+
+
+def _bounded_brief(sections: list[list[str]]) -> str:
+    lines: list[str] = []
+    truncated = False
+    for section in sections:
+        candidate = lines + section
+        if len(candidate) > BRIEF_MAX_LINES or len("\n".join(candidate).split()) > BRIEF_TARGET_TOKENS:
+            truncated = True
+            break
+        lines = candidate
+    if truncated:
+        marker = "- TRUNCATED: deterministic brief section budget reached."
+        while len(lines + [marker]) > BRIEF_MAX_LINES or len("\n".join(lines + [marker]).split()) > BRIEF_TARGET_TOKENS:
+            lines.pop()
+        lines.append(marker)
+    return "\n".join(lines)
+
+
+def brief_text(packet: dict[str, Any]) -> str:
+    """Render only already-normalized Context Spine packet data."""
+    return _bounded_brief(_brief_sections(packet))
+
+
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="QntyLab Git-backed project context")
     parser.add_argument("--root", type=Path, default=Path.cwd(), help=argparse.SUPPRESS)
@@ -905,6 +1050,7 @@ def _parser() -> argparse.ArgumentParser:
     render_parser.add_argument("--check", action="store_true")
     spine_parser = subparsers.add_parser("spine", help="emit the read-only Context Spine foundation packet as canonical JSON")
     spine_parser.add_argument("--external-root", action="append", dest="external_roots", metavar="REPOSITORY_ID=PATH", default=argparse.SUPPRESS)
+    subparsers.add_parser("brief", help="emit a bounded deterministic view of the compiled Context Spine packet")
     return parser
 
 
@@ -935,6 +1081,10 @@ def main(argv: list[str] | None = None) -> None:
         if args.command == "spine":
             packet = compile_context_spine(root, external_roots=_parse_external_roots(args.external_roots))
             sys.stdout.buffer.write(_canonical_json(packet) + b"\n")
+            raise SystemExit(0 if packet["packet_status"] == CONTEXT_SPINE_COMPILED else 1)
+        if args.command == "brief":
+            packet = compile_context_spine(root, external_roots=_parse_external_roots(args.external_roots))
+            print(brief_text(packet))
             raise SystemExit(0 if packet["packet_status"] == CONTEXT_SPINE_COMPILED else 1)
         data = context_data(root)
         if args.as_json:

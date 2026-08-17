@@ -1,0 +1,184 @@
+{
+  "artifact_type": "QNTY_AGENT_ORCHESTRATION_CONTROL_CONTRACT_V0_GOVERNANCE_AUTHORIZATION",
+  "schema_version": "qnty-agent-orchestration-control-contract-v0-governance-authorization-v1",
+  "project_id": "QNTY_AGENT_ORCHESTRATION_CONTROL_CONTRACT_V0_GOVERNANCE_FREEZE",
+  "state": "CLOSED_PASS",
+  "phase_type": "GOVERNANCE_ONLY",
+  "authority_level": "GOVERNANCE_AUTHORIZATION_ONLY",
+  "canonicalization": {
+    "canonical_repository": "QntyLab",
+    "canonical_master_sha": "c5ea1b735172527a98febad9c3165fd2e9a4bf77",
+    "source_conflict": false,
+    "architecture_relevance": "REQUIRED",
+    "current_global_architecture": "ADR-0007",
+    "adr_0007_preserved": true,
+    "companion_adr": "ADR-0008",
+    "predecessor_verdict": "CONTROL_CONTRACT_V0_FREEZE_PLAN_READY",
+    "predecessor_sha_at_forensic_pass": "c5ea1b735172527a98febad9c3165fd2e9a4bf77"
+  },
+  "authorization": {
+    "current_phase_implementation_authorized": false,
+    "later_contract_only_repository_bootstrap_authorized": true,
+    "future_repository_id": "QntyAgentRuntime",
+    "future_repository_visibility": "PRIVATE",
+    "future_repository_role": "NON_AUTHORITATIVE_AGENT_EXECUTION_AND_ROUTING_RUNTIME",
+    "future_canonical_contract_path": "docs/control/QNTY_AGENT_ORCHESTRATION_CONTROL_CONTRACT_V0.md",
+    "runtime_implementation_authorized": false,
+    "dsh_implementation_authorized": false,
+    "scheduler_authorized": false,
+    "autonomous_pr_authorized": false,
+    "auto_merge_authorized": false,
+    "scientific_execution_authorized": false,
+    "paper_authorized": false,
+    "shadow_trading_authorized": false,
+    "live_authorized": false,
+    "capital_authority": "NONE",
+    "qnty_next_action_authority": "NONE",
+    "qnty_authority": "NONE",
+    "qntylab_authority": "NONE",
+    "qntyagenteval_authority": "NONE",
+    "qntypolicygate_authority": "NONE",
+    "merge_authority": "NONE",
+    "current_max_autonomy": "L0_SHADOW"
+  },
+  "role_boundaries": {
+    "QntyLab": "EXPLORATORY_SCIENTIFIC_RESEARCH_EVIDENCE_CONTEXT_SPINE_AND_PROJECT_AUTHORITY",
+    "Qnty": "DOWNSTREAM_ACCEPTANCE_REPLAY_ACCOUNTING_EXECUTION_REALISM_AND_CONTROL_STATE",
+    "QntyAgentEval": "EXTERNAL_DETERMINISTIC_AGENT_EVALUATOR",
+    "QntyPolicyGate": "EXTERNAL_GIT_GOVERNANCE_POLICY_BOUNDARY",
+    "QntyAgentRuntime": "NON_AUTHORITATIVE_AGENT_EXECUTION_AND_ROUTING_RUNTIME",
+    "runtime_non_authorities": [
+      "SCIENTIFIC_AUTHORITY",
+      "RESEARCH_STATE_AUTHORITY",
+      "QNTY_NEXT_ACTION_AUTHORITY",
+      "DOWNSTREAM_ACCEPTANCE_AUTHORITY",
+      "QNTYLAB_PROJECT_AUTHORITY",
+      "QNTYAGENTEVAL_AUTHORITY",
+      "POLICYGATE_AUTHORITY",
+      "MERGE_AUTHORITY",
+      "TRADING_AUTHORITY",
+      "CAPITAL_AUTHORITY"
+    ],
+    "dependency_direction": [
+      "QntyAgentRuntime READS_INVOKES QntyLab Context Spine V3",
+      "QntyAgentRuntime READS_INVOKES Qnty continuity",
+      "QntyAgentRuntime READS_INVOKES repository Git and contracts",
+      "QntyAgentRuntime INVOKES replaceable execution substrate",
+      "QntyAgentRuntime INVOKES bounded agent workers",
+      "QntyLab and Qnty do not depend on QntyAgentRuntime for canonical authority",
+      "QntyAgentEval evaluates but does not operate the runtime",
+      "QntyPolicyGate evaluates Git policy but does not control the runtime"
+    ],
+    "second_authority_plane_created": false
+  },
+  "topology": [
+    "HUMAN_GOVERNANCE",
+    "GPT_SUPERVISOR_NON_AUTHORITATIVE",
+    "IMMUTABLE_TASK_CONTRACT_V0",
+    "QntyAgentRuntime_DETERMINISTIC_CONTROLLER",
+    "CANONICAL_ADMISSION",
+    "PASS_STOP",
+    "REPLACEABLE_EXECUTION_SUBSTRATE_INITIAL_CANDIDATE_DEEPSEEK_HARNESS",
+    "BOUNDED_CODEX_BUILDER",
+    "BOUNDED_CLAUDE_HOSTILE_REVIEWER",
+    "SEPARATE_DETERMINISTIC_VERIFIER",
+    "EPISODE_PACKAGE",
+    "TRUSTED_GIT_BROKER",
+    "DRAFT_PR",
+    "HUMAN_BRANCH_PROTECTION_MERGE_GATE",
+    "POST_MERGE_CANONICAL_RECONCILIATION"
+  ],
+  "invariants": [
+    {"id":"C01","status":"KEEP","rule":"Runtime state never overrides Qnty or QntyLab authority."},
+    {"id":"C02","status":"KEEP","rule":"Domain state and execution state are separate namespaces."},
+    {"id":"C03","status":"KEEP","rule":"Fresh canonical admission occurs before every task."},
+    {"id":"C04","status":"KEEP","rule":"A task binds exact repository identity and immutable base SHA."},
+    {"id":"C05","status":"KEEP","rule":"Canonical movement after admission is STALE_BASE; no implicit rebase."},
+    {"id":"C06","status":"MODIFIED","rule":"Prompts grant no technical capability; outer policy enforces capability fail-closed."},
+    {"id":"C07","status":"MODIFIED","rule":"Model API egress may be explicitly permitted; tool egress is deny-by-default; filesystem sandbox alone is insufficient."},
+    {"id":"C08","status":"KEEP","rule":"Agent children receive no general GitHub write credentials."},
+    {"id":"C09","status":"KEEP","rule":"At most one mutable autonomous task per target repository in V0."},
+    {"id":"C10","status":"KEEP","rule":"Author and independent hostile reviewer are mechanically distinct."},
+    {"id":"C11","status":"MODIFIED","rule":"IMPLEMENT → VERIFY → REVIEW → bounded C/H REPAIR if required → VERIFY → at most one REREVIEW → controller/verifier freeze; model prose never freezes a candidate."},
+    {"id":"C12","status":"KEEP","rule":"Machine hard gates dominate LLM completion or review prose."},
+    {"id":"C13","status":"KEEP","rule":"Continuation proposals have zero Qnty NEXT_ACTION authority."},
+    {"id":"C14","status":"KEEP","rule":"Episode package reconstructs provenance and content bindings."},
+    {"id":"C15","status":"KEEP","rule":"Requests, dispatches, and transitions are idempotent."},
+    {"id":"C16","status":"KEEP","rule":"Ambiguity, conflict, stale state, lost process, or missing evidence fail closed."},
+    {"id":"C17","status":"MODIFIED","rule":"Runtime identity includes pinned DSH commit/package lock/profile/patch digest/model/provider identity; self-modification is absent."},
+    {"id":"C18","status":"MODIFIED","rule":"Autonomous science, protected-data mutation, paper, shadow, live, capital, and automatic merge are explicitly denied."}
+  ],
+  "schemas": {
+    "TASK_CONTRACT_V0": {
+      "fields": ["contract_version","task_id","campaign_id","target_repository","base_sha","objective","authority_refs","allowed_paths","forbidden_paths","role_pipeline","preflight_profile","required_checks","capability_policy","network_policy","merge_policy","max_builder_attempts","max_repair_rounds","max_review_rounds","continuation_policy","runtime_requirements","predecessor_episode_digest","post_merge_canonical_sha","task_digest"],
+      "target_repository_fields": ["repository_id","canonical_locator","canonical_branch"],
+      "identity_exclusions": ["timestamps","ambient_runtime_facts","mutable_state","model_output"]
+    },
+    "DISPATCH_RECEIPT_V0": {
+      "fields": ["receipt_version","task_digest","dispatch_id","runner_identity","provider_identity","attempt","started_at","finished_at","terminal_state","process_identity","runtime_identity","workspace_identity","trace_digest"]
+    },
+    "EPISODE_PACKAGE_V0": {
+      "fields": ["episode_version","episode_digest","task_contract_digest","dispatch_receipts","repository_identity","base_sha","candidate_tree_digest","raw_changed_paths","semantic_changed_paths","verifier_receipts","review_receipts","process_trace_manifest","session_trace_manifest","runtime_identity","capability_network_decision_manifest","git_publication_facts","continuation_proposal","terminal_state"]
+    },
+    "CONTINUATION_PROPOSAL_V0": {
+      "fields": ["proposal_version","predecessor_episode_digest","continuation_status","suggested_followup","suggested_role","authority_claim"],
+      "continuation_status": ["COMPLETE_NO_FOLLOWUP","FOLLOWUP_PROPOSED","HUMAN_REQUIRED","BLOCKED"],
+      "authority_claim": "NONE",
+      "forbidden_fields": ["NEXT_ACTION","HANDOFF_AUTHORITY","ACCEPTANCE","AUTHORIZATION"]
+    }
+  },
+  "state_machine": {
+    "execution_states": ["QUEUED","ADMISSION_CHECK","WORKSPACE_READY","BUILDING","VERIFYING","REVIEWING","REPAIRING","REREVIEWING","CANDIDATE_FROZEN","PR_OPEN","WAITING_MERGE","POST_MERGE_RECONCILE","READY_FOR_SUPERVISOR","CLOSED"],
+    "fail_closed_terminals": ["BLOCKED_AUTHORITY","SOURCE_CONFLICT","STALE_BASE","AGENT_CAPACITY","HARD_GATE","REVIEW","RUNTIME_INCOMPATIBLE","PROCESS_LOST","PROVENANCE_INCOMPLETE","DUPLICATE_DISPATCH","CANCELLED","HUMAN_REQUIRED"],
+    "forbidden_domain_states": ["EDGE_PROVEN","SCIENTIFICALLY_VALID","PROMOTION_AUTHORIZED","SHADOW_ACTIVE","LIVE","NEXT_ACTION"]
+  },
+  "trust_and_execution_policy": {
+    "trust_roots": ["HUMAN_GOVERNANCE","CANONICAL_REPOSITORY_GIT_IDENTITY","QntyLab_CONTEXT_SPINE_V3","Qnty_CONTINUITY","REPOSITORY_CONTRACTS","TRUSTED_VERIFIER","TRUSTED_GIT_BROKER","HUMAN_BRANCH_PROTECTION_MERGE_GATE"],
+    "network_policy": "MODEL_API_EGRESS_ONLY_WHEN_EXPLICITLY_PERMITTED; TOOL_EGRESS_DENY_BY_DEFAULT; NO_UNBOUNDED_NETWORK",
+    "credential_policy": "BOUNDED_WORKERS_HAVE_NO_GENERAL_GITHUB_WRITE_CREDENTIALS; ONLY_TRUSTED_GIT_BROKER_MAY_PUBLISH_WITH_SCOPED_CREDENTIALS",
+    "workspace_policy": "ISOLATED_WORKSPACE_BOUND_TO_REPOSITORY_ID_AND_BASE_SHA; NO_IMPLICIT_REBASE; LOST_OR_AMBIGUOUS_WORKSPACE_FAILS_CLOSED",
+    "git_policy": "BROKER_PUBLISHES_ONLY_VERIFIED_FROZEN_CANDIDATE_AS_DRAFT_PR; HUMAN_OR_BRANCH_PROTECTION_MERGE_GATE_REQUIRED; AUTO_MERGE_FALSE",
+    "review_policy": "AUTHOR_AND_INDEPENDENT_HOSTILE_REVIEWER_MUST_BE_MECHANICALLY_DISTINCT"
+  },
+  "autonomy_ladder": {
+    "levels": ["L0_SHADOW","L1_ONE_SHOT","L2_BOUNDED_INNER_LOOP","L3_SUPERVISED_CONTINUATION","L4_SCHEDULED_CONTINUATION","L5_SELECTIVE_AUTO_MERGE"],
+    "current_authorized_max": "L0_SHADOW",
+    "repository_bootstrap_is_autonomy_increase": false,
+    "runtime_implementation_after_governance": false
+  },
+  "stage_a": {
+    "sequence": ["CONTROL_CONTRACT_CANONICAL","DSH_SHADOW_EVALUATION_INSIDE_EXTERNAL_EVALUATION_BOUNDARY","HISTORICAL_OC_B_FIXTURE","NATIVE_BASELINE_VS_DSH_ARM","MACHINE_HARD_GATES","SEPARATE_GOVERNANCE_AUTHORIZATION_FOR_RUNTIME_IMPLEMENTATION_ONLY_IF_PASS"],
+    "implementation_in_this_phase": false,
+    "historical_fixture": {
+      "base": "1b93858857daddacd1795cf980edb3d562eabc77",
+      "reviewed_reference": "73a0bacd4b244f9b83967612ad92d4eb474bbcc7",
+      "post_merge_reference": "c5ea1b735172527a98febad9c3165fd2e9a4bf77"
+    },
+    "gates": {
+      "UNAUTHORIZED_WRITES": 0,
+      "FALSE_HARD_GATE_PASS": 0,
+      "CROSS_TASK_STATE_LEAK": 0,
+      "SOURCE_IDENTITY_MISMATCH": 0,
+      "FROZEN_TASK_REPRODUCIBILITY": "PASS",
+      "PROCESS_OWNERSHIP": "PASS",
+      "RUNTIME_IDENTITY_CAPTURE": "PASS",
+      "TRACE_COMPLETENESS": "PASS",
+      "REVIEW_INDEPENDENCE_VIOLATIONS": 0,
+      "STALE_STATE_EXECUTIONS": 0,
+      "DUPLICATE_DISPATCH_RATE": 0,
+      "DSH_CORRECTNESS": ">= NATIVE_BASELINE",
+      "HUMAN_INTERVENTION": "<= NATIVE_BASELINE"
+    }
+  },
+  "future_contract_only_repository_bootstrap": {
+    "exactly_one_later_phase": true,
+    "surface": ["AGENTS.md","README.md","docs/control/QNTY_AGENT_ORCHESTRATION_CONTROL_CONTRACT_V0.md","contracts/TASK_CONTRACT_V0.schema.json","contracts/DISPATCH_RECEIPT_V0.schema.json","contracts/EPISODE_PACKAGE_V0.schema.json","contracts/CONTINUATION_PROPOSAL_V0.schema.json","tests/deterministic_contract_schema_invariant_tests_only","normal_Git_metadata_only"],
+    "forbidden": ["src/","runtime_controller","qnty-agentd","DSH_adapter","agent_runners","GitHub_mutation_service","scheduler","daemon","worker_dispatcher","network_broker","workspace_manager"],
+    "ecosystem_catalog_registration_now": false,
+    "ecosystem_catalog_registration_rule": "Only after repository exists with immutable Git identity and separate bounded reconciliation."
+  },
+  "qntyagenteval": {"applicability":"NOT_APPLICABLE","run":false,"evaluator_created":false},
+  "review_budget": {"independent_hostile_reviews":1,"repair_only_critical_or_high":true,"targeted_rereviews_if_repair_needed":1,"second_targeted_rereview":false},
+  "next_action": "After canonical merge: fresh canonical reconciliation → QNTY_AGENT_ORCHESTRATION_CONTROL_CONTRACT_V0_CONTRACT_ONLY_REPOSITORY_BOOTSTRAP.",
+  "post_closure_authority": {"qnty_agent_runtime_implementation_authorized":false,"dsh_implementation_authorized":false}
+}

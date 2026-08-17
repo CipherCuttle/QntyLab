@@ -42,6 +42,12 @@ path = "docs/ADR/0007-ecosystem-role-boundary-and-context-spine-governance.md"
 status = "CURRENT_GLOBAL"
 authority_scope = "GLOBAL_ARCHITECTURE"
 
+[[adr]]
+adr_id = "ADR-0008"
+path = "docs/ADR/0008-qnty-agent-orchestration-runtime-boundary.md"
+status = "CURRENT_GLOBAL_COMPANION"
+authority_scope = "QNTY_AGENT_ORCHESTRATION_RUNTIME_BOUNDARY"
+
 [[supersession]]
 superseded_adr_id = "ADR-0001"
 superseding_adr_id = "ADR-0005"

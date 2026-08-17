@@ -77,6 +77,15 @@ AUTHORITY_PRECEDENCE = {
 }
 DIRECTORY_AUTHORITY_KEYS = frozenset({"research_ledger_root"})
 GIT_IDENTITY_SOURCE_ID = "CANONICAL_GIT_IDENTITY"
+# The declaration that names every other authority source, and therefore itself a
+# canonical source at the rank its own contents define.
+CONFIG_SOURCE_PATH = "qntylab.toml"
+# Authority sources whose bytes the Context Spine compiler actually parses.  The
+# packet's binding claim covers exactly these files plus the declaration above; a
+# source that is only located and type-checked contributes no compiled bytes, so
+# claiming it would make the binding a statement about the worktree instead of
+# about what was compiled.
+COMPILED_AUTHORITY_KEYS = ("ecosystem_catalog", "global_architecture_registry", "project_registry")
 CONTEXT_ACCESS_CLASSES = frozenset({"LOCAL_CANONICAL_SOURCES", "NARROW_READ_ONLY_ADAPTER"})
 # No implemented-adapter token exists at this schema version, so a catalog
 # cannot declare cross-repository observation that no code performs.
@@ -102,22 +111,27 @@ def _canonical_json(value: Any) -> bytes:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("utf-8")
 
 
-def _run_git(root: Path, *args: str, check: bool = True) -> str:
+def _git_bytes(root: Path, *args: str, check: bool = True) -> bytes:
     # An inherited GIT_DIR or GIT_WORK_TREE would silently point these reads at a
     # different repository, so the ambient Git location is dropped and ``-C``
     # remains the only thing that selects which repository is inspected.
+    # ``--no-optional-locks`` keeps a read from refreshing the index stat cache,
+    # which is the one way an otherwise read-only command rewrites ``.git/index``.
     environment = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
     completed = subprocess.run(
-        ["git", "-C", str(root), *args],
+        ["git", "--no-optional-locks", "-C", str(root), *args],
         check=False,
         capture_output=True,
-        text=True,
         env=environment,
     )
     if check and completed.returncode:
-        message = completed.stderr.strip() or completed.stdout.strip() or "git command failed"
+        message = completed.stderr.decode("utf-8", "replace").strip() or "git command failed"
         raise ProjectContextError(message)
     return completed.stdout
+
+
+def _run_git(root: Path, *args: str, check: bool = True) -> str:
+    return _git_bytes(root, *args, check=check).decode("utf-8", "replace")
 
 
 def _load_toml(path: Path) -> dict[str, Any]:
@@ -186,7 +200,7 @@ def _require_list(value: Any, label: str) -> list[Any]:
 
 def load_context_sources(root: Path) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     root = root.resolve()
-    config_path = _authority_path(root, "qntylab.toml", label="qntylab.toml")
+    config_path = _authority_path(root, CONFIG_SOURCE_PATH, label=CONFIG_SOURCE_PATH)
     config = _load_toml(config_path)
     if config.get("schema_version") != SCHEMA_VERSION:
         raise ProjectContextError("unsupported qntylab.toml schema_version")
@@ -431,8 +445,50 @@ def _adr_view(record: dict[str, Any]) -> dict[str, Any]:
     return {key: record[key] for key in ("adr_id", "authority_scope", "path", "status")}
 
 
+def _classified_paths(adrs: dict[str, dict[str, Any]]) -> dict[str, tuple[str, str]]:
+    """Canonical paths another source model has already placed on the ladder.
+
+    Each entry maps a repository-relative path to the source model that
+    classified it and the precedence class that classification implies.
+    """
+    classified = {CONFIG_SOURCE_PATH: (CONFIG_SOURCE_PATH, "REPOSITORY_MACHINE_READABLE_AUTHORITY_STATE")}
+    for record in adrs.values():
+        classified[record["path"]] = (f"ADR registry entry {record['adr_id']}", "REGISTERED_ARCHITECTURE_CONTRACT")
+    return classified
+
+
+def _source_classification_conflicts(config: dict[str, Any], adrs: dict[str, dict[str, Any]]) -> list[dict[str, str]]:
+    """Disagreements about which precedence class one canonical path occupies.
+
+    ``[authority]`` decides which path fills a role and the compiler decides the
+    role's rank, but neither sees what a *different* canonical source already
+    said about that path.  Pointing an authority key at a registered ADR document
+    would otherwise compile clean while the packet asserted the same file both as
+    a registered architecture contract and as something below it — and would then
+    invite ``render`` to overwrite the contract with a generated view.  One
+    canonical path may not silently occupy two mutually exclusive precedence
+    classes, so the disagreement is reported rather than resolved.
+    """
+    classified = _classified_paths(adrs)
+    conflicts = []
+    for key in sorted(config["authority"]):
+        path = config["authority"][key]
+        if not isinstance(path, str) or path not in classified:
+            continue
+        owner, owning_class = classified[path]
+        declared_class = AUTHORITY_PRECEDENCE.get(key)
+        if declared_class != owning_class:
+            conflicts.append(
+                {
+                    "code": "SOURCE_CLASSIFICATION_DISAGREEMENT",
+                    "detail": f"authority source {key} classifies {path} as {declared_class or 'UNCLASSIFIED'}; {owner} classifies it as {owning_class}",
+                }
+            )
+    return conflicts
+
+
 def _architecture_conflicts(normalized: dict[str, Any], config: dict[str, Any], adrs: dict[str, dict[str, Any]], global_adr: dict[str, Any]) -> tuple[list[dict[str, str]], dict[str, Any] | None]:
-    conflicts: list[dict[str, str]] = []
+    conflicts: list[dict[str, str]] = _source_classification_conflicts(config, adrs)
     declared_repository = normalized["local_repository_id"]
     if declared_repository != config["repository_id"]:
         conflicts.append(
@@ -473,6 +529,26 @@ def _foundation(root: Path) -> tuple[dict[str, Any], dict[str, dict[str, Any]], 
     return config, adrs, normalized, global_adr, conflicts, north_star
 
 
+def _unbound_compiled_inputs(root: Path, relatives: list[str]) -> list[str]:
+    """Compiled inputs whose worktree bytes are not the bytes HEAD records.
+
+    ``git status``, the index stat cache, and the ``assume-unchanged`` and
+    ``skip-worktree`` bits are self-reports about the index, not statements about
+    the bytes this compiler read, so each input is compared directly against the
+    blob HEAD stores for its path.  A path HEAD does not record is unbound.
+    """
+    unbound = []
+    for relative in relatives:
+        try:
+            head = _git_bytes(root, "cat-file", "blob", f"HEAD:{relative}")
+        except ProjectContextError:
+            unbound.append(relative)
+            continue
+        if (root / relative).read_bytes() != head:
+            unbound.append(relative)
+    return unbound
+
+
 def compile_context_spine(root: Path) -> dict[str, Any]:
     """Compile the read-only Context Spine foundation packet.
 
@@ -484,6 +560,8 @@ def compile_context_spine(root: Path) -> dict[str, Any]:
     config, adrs, normalized, global_adr, conflicts, north_star = _foundation(root)
     sources = _context_sources(config)
     git = _git_state(root)
+    compiled_inputs = sorted({CONFIG_SOURCE_PATH, *(config["authority"][key] for key in COMPILED_AUTHORITY_KEYS)})
+    unbound = _unbound_compiled_inputs(root, compiled_inputs)
     local = normalized["repositories"][normalized["local_repository_id"]]
     repository_keys = ("repository_id", "durable_role", "default_branch", "context_access", "adapter_status")
     return {
@@ -495,10 +573,15 @@ def compile_context_spine(root: Path) -> dict[str, Any]:
             "canonical_git_identity": {
                 "repository_id": config["repository_id"],
                 "head_sha": git["head_sha"],
+                # Worktree status is the coarser, separate statement: it describes
+                # the whole checkout, including files this compilation never read.
                 "worktree_status": "CLEAN" if git["clean"] else "DIRTY",
-                # An uncommitted worktree compiled bytes the head commit does not
-                # contain, so the packet states outright that it is not bound.
-                "compiled_bytes_bound_to_head_sha": git["clean"],
+                # The binding claim is decided only by the bytes actually compiled,
+                # each compared against its blob at HEAD, and it names them so the
+                # claim is auditable rather than a vague whole-tree assertion.
+                "compiled_bytes_bound_to_head_sha": not unbound,
+                "compiled_inputs": compiled_inputs,
+                "unbound_compiled_inputs": unbound,
             },
             "git_identity_semantics": "GIT_IDENTITY_SELECTS_BYTES_NOT_SEMANTIC_AUTHORITY",
         },

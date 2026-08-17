@@ -194,6 +194,54 @@ def _tracked_tree_digest(root: Path) -> str:
     return digest.hexdigest()
 
 
+def _git_dir(root: Path) -> Path:
+    """The repository's Git directory, resolved without invoking Git.
+
+    A linked worktree's ``.git`` is a file naming the real directory, so this
+    has to be followed by hand to keep the measurement Git-free.
+    """
+    marker = root / ".git"
+    if marker.is_dir():
+        return marker
+    return (root / marker.read_text(encoding="utf-8").split("gitdir:", 1)[1].strip()).resolve()
+
+
+def _git_dir_snapshot(root: Path) -> dict[str, Any]:
+    """Raw Git state read straight off disk.
+
+    Deliberately shells out to nothing. A measurement that ran ``git status``
+    would refresh the index stat cache itself and so hide exactly the write it
+    is supposed to observe.
+    """
+    git_dir = _git_dir(root)
+    commondir = git_dir / "commondir"
+    common = (git_dir / commondir.read_text(encoding="utf-8").strip()).resolve() if commondir.exists() else git_dir
+    index = git_dir / "index"
+    packed_refs = common / "packed-refs"
+    refs = []
+    for base in {git_dir, common}:
+        refs.extend((path.relative_to(base).as_posix(), path.read_bytes()) for path in (base / "refs").rglob("*") if path.is_file())
+    return {
+        "index_bytes": index.read_bytes() if index.exists() else None,
+        "index_mtime_ns": index.stat().st_mtime_ns if index.exists() else None,
+        "index_lock": (git_dir / "index.lock").exists(),
+        "head": (git_dir / "HEAD").read_bytes(),
+        "refs": sorted(refs),
+        "packed_refs": packed_refs.read_bytes() if packed_refs.exists() else None,
+    }
+
+
+def _stale_stat_cache(root: Path) -> None:
+    """Age every tracked file without changing a byte of it.
+
+    This is the ordinary post-checkout condition, and the only state in which an
+    otherwise read-only Git command rewrites the index.
+    """
+    for path in sorted(root.rglob("*")):
+        if path.is_file() and ".git" not in path.parts:
+            os.utime(path, (0, 0))
+
+
 # --- Catalog validation -------------------------------------------------
 
 
@@ -473,18 +521,79 @@ def test_architecture_conflict_fails_closed_end_to_end(tmp_path: Path, overrides
     assert _spine_cli(root, "doctor", "--strict").returncode == 1
 
 
+COMPILED_INPUTS = ["docs/ADR/registry.toml", "docs/state/ecosystem.toml", "docs/state/projects.toml", "qntylab.toml"]
+
+
+def _identity(root: Path) -> dict[str, Any]:
+    return project_context.compile_context_spine(root)["generated_from"]["canonical_git_identity"]
+
+
 def test_uncommitted_worktree_is_declared_not_bound_to_the_head_commit(tmp_path: Path) -> None:
     root = _spine_root(tmp_path)
-    identity = project_context.compile_context_spine(root)["generated_from"]["canonical_git_identity"]
+    identity = _identity(root)
     assert identity["worktree_status"] == "CLEAN"
     assert identity["compiled_bytes_bound_to_head_sha"] is True
+    assert identity["compiled_inputs"] == COMPILED_INPUTS
+    assert identity["unbound_compiled_inputs"] == []
 
     (root / "docs/state/projects.toml").write_text(PROJECTS_TOML.replace("Nothing is authorized.", "Still nothing."), encoding="utf-8")
-    dirty = project_context.compile_context_spine(root)["generated_from"]["canonical_git_identity"]
+    dirty = _identity(root)
     assert dirty["head_sha"] == identity["head_sha"]
     assert dirty["worktree_status"] == "DIRTY"
     # The head commit does not contain the compiled bytes, and the packet says so.
     assert dirty["compiled_bytes_bound_to_head_sha"] is False
+    assert dirty["unbound_compiled_inputs"] == ["docs/state/projects.toml"]
+
+
+def test_declared_compiled_inputs_are_the_files_the_compiler_actually_parses(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """The binding claim must not drift away from what compilation reads."""
+    root = _spine_root(tmp_path)
+    opened: list[str] = []
+    real_load = project_context._load_toml
+
+    def record(path: Path) -> Any:
+        opened.append(Path(path).resolve().relative_to(root.resolve()).as_posix())
+        return real_load(path)
+
+    monkeypatch.setattr(project_context, "_load_toml", record)
+    identity = _identity(root)
+    assert sorted(set(opened)) == identity["compiled_inputs"]
+
+
+def test_an_index_bit_cannot_falsify_the_binding_claim(tmp_path: Path) -> None:
+    """``assume-unchanged`` is a self-report about the index, not about the bytes."""
+    root = _spine_root(tmp_path)
+    (root / "docs/state/projects.toml").write_text(PROJECTS_TOML.replace("Nothing is authorized.", "Still nothing."), encoding="utf-8")
+    subprocess.run(["git", "-C", str(root), "update-index", "--assume-unchanged", "docs/state/projects.toml"], check=True)
+
+    identity = _identity(root)
+    # Git now reports a clean tree; the bytes that were compiled disagree.
+    assert identity["worktree_status"] == "CLEAN"
+    assert identity["compiled_bytes_bound_to_head_sha"] is False
+    assert identity["unbound_compiled_inputs"] == ["docs/state/projects.toml"]
+
+
+def test_unrelated_dirty_bytes_do_not_falsify_the_binding_claim(tmp_path: Path) -> None:
+    """The two provenance statements stay distinct rather than collapsing."""
+    root = _spine_root(tmp_path)
+    (root / "docs/CURRENT_ROADMAP.md").write_text("hand edited\n", encoding="utf-8")
+
+    identity = _identity(root)
+    assert identity["worktree_status"] == "DIRTY"
+    # The roadmap is a declared source the compiler locates and never reads, so it
+    # contributes no compiled bytes for the binding claim to be about.
+    assert identity["compiled_bytes_bound_to_head_sha"] is True
+    assert "docs/CURRENT_ROADMAP.md" not in identity["compiled_inputs"]
+
+
+def test_an_untracked_file_is_never_compiled_canonical_content(tmp_path: Path) -> None:
+    root = _spine_root(tmp_path)
+    (root / "docs/state/stray.toml").write_text("stray = true\n", encoding="utf-8")
+
+    identity = _identity(root)
+    assert identity["worktree_status"] == "DIRTY"
+    assert identity["compiled_bytes_bound_to_head_sha"] is True
+    assert identity["compiled_inputs"] == COMPILED_INPUTS
 
 
 def test_architecture_conflict_blocks_generated_view_mutation(tmp_path: Path) -> None:
@@ -496,6 +605,52 @@ def test_architecture_conflict_blocks_generated_view_mutation(tmp_path: Path) ->
     assert project_context.render(root, check=True) == 1
     assert _spine_cli(root, "render").returncode == 1
     assert roadmap.read_bytes() == before
+
+
+def test_authority_source_may_not_retype_a_registered_adr_document(tmp_path: Path) -> None:
+    """One canonical path may not occupy two mutually exclusive precedence classes."""
+    config = QNTYLAB_TOML.replace('current_roadmap = "docs/CURRENT_ROADMAP.md"', 'current_roadmap = "docs/ADR/global.md"')
+    root = _spine_root(tmp_path, config=config)
+    adr = root / "docs/ADR/global.md"
+    before = adr.read_bytes()
+
+    packet = project_context.compile_context_spine(root)
+    assert packet["packet_status"] == project_context.ARCHITECTURE_CONFLICT
+    assert [item["code"] for item in packet["conflicts"]] == ["SOURCE_CLASSIFICATION_DISAGREEMENT"]
+    assert any("context spine conflict" in issue for issue in project_context.doctor(root))
+    assert _spine_cli(root, "spine").returncode == 1
+    assert _spine_cli(root, "doctor", "--strict").returncode == 1
+
+    # The misdirection this closes: a stale-roadmap message inviting the render
+    # that would overwrite the architecture contract with a generated view.
+    check = _spine_cli(root, "render", "--check")
+    assert check.returncode == 1
+    assert b"ARCHITECTURE_CONFLICT" in check.stderr and b"stale" not in check.stderr
+    assert _spine_cli(root, "render").returncode == 1
+    assert adr.read_bytes() == before
+
+
+def test_authority_source_may_not_retype_the_declaration_that_names_it(tmp_path: Path) -> None:
+    config = QNTYLAB_TOML.replace('current_roadmap = "docs/CURRENT_ROADMAP.md"', 'current_roadmap = "qntylab.toml"')
+    root = _spine_root(tmp_path, config=config)
+    before = (root / "qntylab.toml").read_bytes()
+
+    packet = project_context.compile_context_spine(root)
+    assert packet["packet_status"] == project_context.ARCHITECTURE_CONFLICT
+    assert [item["code"] for item in packet["conflicts"]] == ["SOURCE_CLASSIFICATION_DISAGREEMENT"]
+    assert project_context.render(root, check=False) == 1
+    assert (root / "qntylab.toml").read_bytes() == before
+
+
+def test_agreeing_classification_of_one_path_is_not_a_conflict() -> None:
+    """The guard rejects contradiction, not every restatement of a path."""
+    adrs = {"ADR-GLOBAL": {"adr_id": "ADR-GLOBAL", "path": "docs/ADR/global.md"}}
+    # ``global_architecture_registry`` is itself a REGISTERED_ARCHITECTURE_CONTRACT,
+    # so naming a registered ADR document restates its class rather than competing
+    # with it; ``current_roadmap`` is a generated view and does compete.
+    assert project_context._source_classification_conflicts(_config(global_architecture_registry="docs/ADR/global.md"), adrs) == []
+    assert project_context._source_classification_conflicts(_config(current_roadmap="docs/ADR/global.md"), adrs)
+    assert project_context._source_classification_conflicts(_config(), adrs) == []
 
 
 def test_conflicting_reference_is_never_silently_replaced(tmp_path: Path) -> None:
@@ -520,17 +675,37 @@ def test_missing_catalog_fails_every_project_context_entry_point(tmp_path: Path)
 
 
 def test_read_only_compilation() -> None:
-    before = _tracked_tree_digest(ROOT)
-    before_status = subprocess.run(["git", "-C", str(ROOT), "status", "--porcelain=v1", "-uall"], check=True, capture_output=True).stdout
-    before_head = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "HEAD"], check=True, capture_output=True).stdout
+    before_tree = _tracked_tree_digest(ROOT)
+    before_git = _git_dir_snapshot(ROOT)
 
     project_context.compile_context_spine(ROOT)
     project_context.context_spine_bytes(ROOT)
     subprocess.run(SPINE_COMMAND, cwd=ROOT, check=True, capture_output=True)
 
-    assert _tracked_tree_digest(ROOT) == before
-    assert subprocess.run(["git", "-C", str(ROOT), "status", "--porcelain=v1", "-uall"], check=True, capture_output=True).stdout == before_status
-    assert subprocess.run(["git", "-C", str(ROOT), "rev-parse", "HEAD"], check=True, capture_output=True).stdout == before_head
+    # The index is read back before anything else touches Git.
+    assert _git_dir_snapshot(ROOT) == before_git
+    assert _tracked_tree_digest(ROOT) == before_tree
+
+
+@pytest.mark.parametrize(
+    "command",
+    [("spine",), ("--json",), (), ("doctor", "--strict"), ("render", "--check")],
+    ids=["spine", "json", "default", "doctor-strict", "render-check"],
+)
+def test_read_commands_never_write_the_git_index(tmp_path: Path, command: tuple[str, ...]) -> None:
+    """Every read entry point stays read-only, stale stat cache included."""
+    root = _spine_root(tmp_path)
+    assert project_context.render(root, check=False) == 0
+    _stale_stat_cache(root)
+    before_tree = _tracked_tree_digest(root)
+    before_git = _git_dir_snapshot(root)
+
+    completed = _spine_cli(root, *command)
+    assert completed.returncode != 2, completed.stderr
+
+    assert _git_dir_snapshot(root) == before_git
+    assert _tracked_tree_digest(root) == before_tree
+    assert not (root / ".git/index.lock").exists()
 
 
 def test_git_reads_ignore_an_ambient_git_location(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -543,10 +718,12 @@ def test_git_reads_ignore_an_ambient_git_location(tmp_path: Path, monkeypatch: p
     monkeypatch.setenv("GIT_DIR", str(other / ".git"))
     monkeypatch.setenv("GIT_WORK_TREE", str(other))
     monkeypatch.setenv("GIT_INDEX_FILE", str(other / ".git/index"))
-    identity = project_context.compile_context_spine(root)["generated_from"]["canonical_git_identity"]
+    identity = _identity(root)
     assert identity["head_sha"] == expected
     assert identity["worktree_status"] == "CLEAN"
+    # The binding is resolved against this repository's HEAD, not the ambient one.
     assert identity["compiled_bytes_bound_to_head_sha"] is True
+    assert identity["unbound_compiled_inputs"] == []
 
 
 def test_render_check_does_not_write_the_git_index(tmp_path: Path) -> None:
@@ -600,9 +777,11 @@ def test_no_cross_repo_mutation_or_execution(monkeypatch: pytest.MonkeyPatch) ->
     assert calls, "the compiler is expected to read canonical Git identity"
     for command in calls:
         # Only read-only Git plumbing, and only ever against this repository.
-        assert command[:2] == ["git", "-C"]
-        assert Path(command[2]).resolve() == ROOT.resolve()
-        assert command[3] in {"rev-parse", "status", "ls-files", "symbolic-ref"}
+        # ``--no-optional-locks`` is part of the contract: it is what keeps a read
+        # from refreshing the index stat cache.
+        assert command[:3] == ["git", "--no-optional-locks", "-C"]
+        assert Path(command[3]).resolve() == ROOT.resolve()
+        assert command[4] in {"rev-parse", "status", "ls-files", "symbolic-ref", "cat-file"}
 
 
 def test_compilation_reads_no_repository_other_than_its_own(tmp_path: Path) -> None:

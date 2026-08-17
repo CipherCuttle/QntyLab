@@ -34,17 +34,24 @@ derived from the `qntylab.toml` `[authority]` sources the repository already
 owns, with the ADR-0007 precedence class assigned by the compiler — so the
 catalog cannot classify a source, omit one, bind one twice, or reorder the
 ladder, and an authority source with no assigned class fails closed rather than
-defaulting to a rank. While a conflict is open, `render` refuses to rewrite the
-generated roadmap.
+defaulting to a rank. Naming a path another canonical source has already
+classified — a registered ADR document, or the declaration itself — is reported
+as `SOURCE_CLASSIFICATION_DISAGREEMENT` rather than compiled, because one
+canonical path may not occupy two mutually exclusive precedence classes. While a
+conflict is open, `render` refuses to rewrite the generated roadmap.
 
 Compilation is read-only and local. It never writes a file, mutates Git,
-touches project or research state, or reaches the network. Qnty, QntyAgentEval,
-and QntyPolicyGate appear only as declared ecosystem participants with
+touches project or research state, or reaches the network; its Git reads pass
+`--no-optional-locks`, so not even the index stat cache is rewritten. Qnty,
+QntyAgentEval and QntyPolicyGate appear only as declared ecosystem participants with
 `adapter_status = ADAPTER_NOT_IMPLEMENTED`; no cross-repository adapter exists,
 so their state is reported as `UNAVAILABLE_WITHOUT_ADAPTER` and never inferred.
 The packet is a derived view: it binds the Git identity that selected the bytes
 it compiled without that identity granting semantic authority, and it is never
-itself an authority source.
+itself an authority source. `compiled_bytes_bound_to_head_sha` names the inputs
+it covers and is decided by comparing each of them against its blob at `HEAD`,
+never by `git status` or an index bit; the coarser `worktree_status` remains a
+separate statement about the whole checkout.
 
 It downloads public Binance Spot OHLCV into `data/raw/` (ignored by Git), records per-file manifests, and evaluates fixed, pre-registered price-only strategy variants. The engine computes a signal with data through close *t*, applies it from bar *t+1*, and charges costs on absolute position changes. Results are exploratory diagnostics, never trading advice or validation.
 

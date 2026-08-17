@@ -163,11 +163,106 @@ def test_brief_has_no_historical_task_protocol_or_action_literals() -> None:
     assert "synthetic_protocol" not in source + sections
 
 
+def _bounds(text: str) -> tuple[int, int, int]:
+    lines = text.splitlines()
+    return (
+        len(text.encode("utf-8")),
+        len(lines),
+        max((len(line.encode("utf-8")) for line in lines), default=0),
+    )
+
+
+def _assert_bounded(text: str) -> None:
+    total_bytes, line_count, widest_line = _bounds(text)
+    assert total_bytes <= project_context.BRIEF_MAX_BYTES
+    assert line_count <= project_context.BRIEF_MAX_LINES
+    assert widest_line <= project_context.BRIEF_MAX_LINE_BYTES
+
+
+def _conflict_packet(conflicts: list[dict[str, str]]) -> dict[str, Any]:
+    packet = _packet()
+    packet["packet_status"] = project_context.ARCHITECTURE_CONFLICT
+    packet["conflicts"] = conflicts
+    return packet
+
+
 def test_brief_output_is_bounded() -> None:
     text = project_context.brief_text(_packet())
-    assert len(text.splitlines()) <= project_context.BRIEF_MAX_LINES
-    assert len(text.split()) <= project_context.BRIEF_TARGET_TOKENS
-    assert len(text.split()) < 3000
+    _assert_bounded(text)
+
+
+def test_brief_bounds_are_byte_and_line_budgets_not_claimed_token_counts() -> None:
+    names = [name for name in vars(project_context) if name.startswith("BRIEF_")]
+    assert not [name for name in names if "TOKEN" in name]
+    assert project_context.BRIEF_MAX_BYTES == project_context.BRIEF_MAX_LINES * (
+        project_context.BRIEF_MAX_LINE_BYTES + 1
+    )
+
+
+def test_brief_bounds_a_single_whitespace_free_packet_value() -> None:
+    # Pre-repair this rendered ~201_737 bytes: one 200_000-character value is a
+    # single whitespace-delimited word, so a word-count proxy bounded nothing.
+    baseline = len(project_context.brief_text(_packet()).encode("utf-8"))
+    packet = _packet()
+    packet["repository"]["durable_role"] = "A" * 200_000
+    text = project_context.brief_text(packet)
+    _assert_bounded(text)
+    assert len(text.encode("utf-8")) - baseline <= project_context.BRIEF_MAX_LINE_BYTES
+    assert project_context.BRIEF_LINE_TRUNCATION_MARKER in text
+    assert "A" * (project_context.BRIEF_MAX_LINE_BYTES + 1) not in text
+
+
+def test_brief_bounds_a_large_conflict_detail_value() -> None:
+    packet = _conflict_packet([{"code": "HUGE_CONFLICT", "detail": "d" * 300_000}])
+    text = project_context.brief_text(packet)
+    _assert_bounded(text)
+    assert "ARCHITECTURE_CONFLICT" in text
+    assert "HUGE_CONFLICT" in text
+    assert project_context.BRIEF_LINE_TRUNCATION_MARKER in text
+
+
+def test_brief_holds_the_global_byte_ceiling_under_saturating_packet_growth() -> None:
+    packet = _conflict_packet([{"code": f"C{index:05d}", "detail": "d" * 4_000} for index in range(5_000)])
+    packet["repository"]["durable_role"] = "r" * 100_000
+    for record in packet["external_repositories"]:
+        record["durable_role"] = "x" * 100_000
+        record["adapter_status"] = "y" * 100_000
+    text = project_context.brief_text(packet)
+    _assert_bounded(text)
+    assert project_context.BRIEF_TRUNCATION_MARKER in text
+
+
+def test_brief_line_budget_is_not_bypassed_by_embedded_newlines() -> None:
+    packet = _packet()
+    packet["repository"]["durable_role"] = "X\n" * 50_000
+    text = project_context.brief_text(packet)
+    _assert_bounded(text)
+
+
+def test_brief_clamps_multibyte_values_without_splitting_a_codepoint() -> None:
+    packet = _packet()
+    packet["repository"]["durable_role"] = "\U0001f600" * 100_000
+    text = project_context.brief_text(packet)
+    _assert_bounded(text)
+    assert text.encode("utf-8").decode("utf-8") == text
+
+
+def test_brief_truncation_is_deterministic_and_explicit() -> None:
+    packet = _conflict_packet([{"code": "C", "detail": "d" * 300_000} for _ in range(5_000)])
+    first = project_context.brief_text(packet)
+    assert first == project_context.brief_text(packet)
+    assert first.encode("utf-8") == project_context.brief_text(packet).encode("utf-8")
+    _assert_bounded(first)
+    assert first.splitlines()[-1] == project_context.BRIEF_TRUNCATION_MARKER
+    clamped = [line for line in first.splitlines() if line.endswith(project_context.BRIEF_LINE_TRUNCATION_MARKER)]
+    assert all(len(line.encode("utf-8")) == project_context.BRIEF_MAX_LINE_BYTES for line in clamped)
+
+
+def test_brief_render_is_byte_identical_across_repeated_renders() -> None:
+    packet = _packet()
+    packet["repository"]["durable_role"] = "A" * 200_000
+    renders = {project_context.brief_text(packet).encode("utf-8") for _ in range(5)}
+    assert len(renders) == 1
 
 
 def test_brief_is_stable_across_cwd_locale_timezone_and_hashseed(tmp_path: Path) -> None:

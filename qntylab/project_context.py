@@ -893,8 +893,18 @@ def context_text(data: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-BRIEF_TARGET_TOKENS = 2500
+# Brief output bounds.  These are deterministic UTF-8 byte and line budgets, not
+# tokenizer counts: no tokenizer is consulted, so no token limit is claimed.  A
+# byte budget is the property that actually holds, because a single packet value
+# carrying no whitespace bounds nothing under a word count.
 BRIEF_MAX_LINES = 120
+BRIEF_MAX_LINE_BYTES = 240
+BRIEF_MAX_BYTES = BRIEF_MAX_LINES * (BRIEF_MAX_LINE_BYTES + 1)
+BRIEF_LINE_TRUNCATION_MARKER = "...[LINE_TRUNCATED]"
+BRIEF_TRUNCATION_MARKER = "- TRUNCATED: deterministic brief byte/line budget reached."
+# Control characters are flattened to spaces so an embedded newline in a packet
+# value cannot smuggle extra rendered lines past the line budget.
+_BRIEF_CONTROL_TRANSLATION = {code: " " for code in (*range(0x20), 0x7F)}
 
 
 def _brief_field(value: Any, missing: str = "NOT_PRESENT_IN_PACKET") -> str:
@@ -1016,21 +1026,44 @@ def _brief_sections(packet: dict[str, Any]) -> list[list[str]]:
     ]
 
 
+def _brief_line(line: str) -> str:
+    """Flatten and clamp one rendered line to a deterministic UTF-8 byte budget."""
+    flattened = line.translate(_BRIEF_CONTROL_TRANSLATION)
+    encoded = flattened.encode("utf-8")
+    if len(encoded) <= BRIEF_MAX_LINE_BYTES:
+        return flattened
+    keep = BRIEF_MAX_LINE_BYTES - len(BRIEF_LINE_TRUNCATION_MARKER)
+    return encoded[:keep].decode("utf-8", "ignore") + BRIEF_LINE_TRUNCATION_MARKER
+
+
+def _brief_byte_length(lines: list[str]) -> int:
+    return len("\n".join(lines).encode("utf-8"))
+
+
 def _bounded_brief(sections: list[list[str]]) -> str:
     lines: list[str] = []
     truncated = False
     for section in sections:
-        candidate = lines + section
-        if len(candidate) > BRIEF_MAX_LINES or len("\n".join(candidate).split()) > BRIEF_TARGET_TOKENS:
+        candidate = lines + [_brief_line(line) for line in section]
+        if len(candidate) > BRIEF_MAX_LINES or _brief_byte_length(candidate) > BRIEF_MAX_BYTES:
             truncated = True
             break
         lines = candidate
     if truncated:
-        marker = "- TRUNCATED: deterministic brief section budget reached."
-        while len(lines + [marker]) > BRIEF_MAX_LINES or len("\n".join(lines + [marker]).split()) > BRIEF_TARGET_TOKENS:
+        while lines and (
+            len(lines) + 1 > BRIEF_MAX_LINES
+            or _brief_byte_length(lines + [BRIEF_TRUNCATION_MARKER]) > BRIEF_MAX_BYTES
+        ):
             lines.pop()
-        lines.append(marker)
-    return "\n".join(lines)
+        lines.append(BRIEF_TRUNCATION_MARKER)
+    text = "\n".join(lines)
+    encoded = text.encode("utf-8")
+    if len(encoded) > BRIEF_MAX_BYTES:
+        # Unconditional backstop: the rendered brief never exceeds the ceiling,
+        # whatever a future section composition does.
+        keep = BRIEF_MAX_BYTES - len(BRIEF_TRUNCATION_MARKER) - 1
+        text = encoded[:keep].decode("utf-8", "ignore") + "\n" + BRIEF_TRUNCATION_MARKER
+    return text
 
 
 def brief_text(packet: dict[str, Any]) -> str:

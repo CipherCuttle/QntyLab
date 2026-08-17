@@ -354,6 +354,7 @@ def test_authority_paths_cannot_reach_outside_the_repository(tmp_path: Path) -> 
 
 def test_foundation_packet_schema_valid() -> None:
     packet = project_context.compile_context_spine(ROOT)
+    assert project_context.CONTEXT_SPINE_VERSION == 3
     assert packet["context_spine_version"] == project_context.CONTEXT_SPINE_VERSION
     assert packet["packet_status"] == project_context.CONTEXT_SPINE_COMPILED
     assert packet["conflicts"] == []
@@ -367,6 +368,7 @@ def test_foundation_packet_schema_valid() -> None:
         "external_repositories",
         "generated_from",
         "packet_status",
+        "project_orientation",
         "prohibitions",
         "repository",
     }
@@ -1072,9 +1074,20 @@ def test_generic_foundation_knows_only_ecosystem_level_vocabulary() -> None:
 def test_context_spine_creates_no_planning_or_scientific_authority() -> None:
     packet = project_context.compile_context_spine(ROOT)
     # ``prohibitions`` names these concepts precisely in order to deny them.
-    asserted = json.dumps({key: value for key, value in packet.items() if key != "prohibitions"}).lower()
+    asserted = json.dumps({key: value for key, value in packet.items() if key not in {"prohibitions", "project_orientation"}}).lower()
     for token in ("next_action", "implementation_authorized", "candidate", "promotion", "handoff", "authority_ceiling", "survivor", "capital"):
         assert token not in asserted
+    orientation = packet["project_orientation"]
+    assert set(orientation) == {
+        "module_inventory",
+        "module_inventory_provenance",
+        "project_code_reference_completeness",
+        "project_code_reference_scope",
+        "project_orientation_scope",
+        "rows",
+        "schema_version",
+    }
+    assert all("next_action" not in row and "implementation_authorized" not in row for row in orientation["rows"])
     assert "CONTEXT_SPINE_DOES_NOT_CREATE_OR_TRANSITION_A_PERMITTED_NEXT_ACTION" in packet["prohibitions"]
     assert "CONTEXT_SPINE_DOES_NOT_MUTATE_ANY_REPOSITORY_OR_SCIENTIFIC_STATE" in packet["prohibitions"]
 

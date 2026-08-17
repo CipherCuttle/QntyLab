@@ -49,7 +49,12 @@ AUTHORITY_DOMAINS = (
 # repository state; it stores nothing, mutates nothing, and is never an
 # authority source.  Cross-repository reads require an adapter that this
 # foundation deliberately does not implement.
-CONTEXT_SPINE_VERSION = 2
+CONTEXT_SPINE_VERSION = 3
+PROJECT_ORIENTATION_SCHEMA_VERSION = "project-orientation-v0"
+PROJECT_ORIENTATION_SCOPE = "PROJECT_CODE_REFERENCE_PROJECTION"
+PROJECT_CODE_REFERENCE_SCOPE = "AUTHORITATIVE_ARTIFACTS_ONLY_FILTERED_TO_QNTYLAB_PYTHON"
+PROJECT_CODE_REFERENCE_COMPLETENESS = "PARTIAL_PROJECTION_NOT_REPOSITORY_COMPLETENESS"
+MODULE_INVENTORY_PROVENANCE = "GIT_INDEX_TRACKED_QNTYLAB_PYTHON"
 ECOSYSTEM_CATALOG_SCHEMA_VERSION = 2
 # ADR-0007 source precedence, highest authority first.  The rank is the position
 # in this tuple; a catalog may only classify a source, never reorder the ladder.
@@ -610,6 +615,43 @@ def _external_repository_views(
     return records, conflicts
 
 
+def _project_orientation(root: Path) -> dict[str, Any]:
+    """Project-scoped code references, with explicit partial-coverage semantics."""
+    _, _, projects_registry = load_context_sources(root)
+    projects = validate_projects_registry(root, projects_registry)
+    module_inventory = sorted(
+        path
+        for path in _git_bytes(root, "ls-files", "--cached", "-z", "--", "qntylab/").decode("utf-8").split("\0")
+        if path.startswith("qntylab/") and path.endswith(".py")
+    )
+    rows = []
+    for project_id, project in sorted(projects.items()):
+        references = sorted(
+            {
+                path
+                for path in project["authoritative_artifacts"]
+                if path.startswith("qntylab/") and path.endswith(".py")
+            }
+        )
+        rows.append(
+            {
+                "project_id": project_id,
+                "project_state": project["state"],
+                "project_display_name": project.get("display_name", project_id),
+                "project_code_references": references,
+            }
+        )
+    return {
+        "schema_version": PROJECT_ORIENTATION_SCHEMA_VERSION,
+        "project_orientation_scope": PROJECT_ORIENTATION_SCOPE,
+        "project_code_reference_scope": PROJECT_CODE_REFERENCE_SCOPE,
+        "project_code_reference_completeness": PROJECT_CODE_REFERENCE_COMPLETENESS,
+        "module_inventory_provenance": MODULE_INVENTORY_PROVENANCE,
+        "module_inventory": module_inventory,
+        "rows": rows,
+    }
+
+
 def compile_context_spine(root: Path, *, external_roots: dict[str, Path] | None = None) -> dict[str, Any]:
     """Compile the read-only Context Spine foundation packet.
 
@@ -654,6 +696,7 @@ def compile_context_spine(root: Path, *, external_roots: dict[str, Path] | None 
             "companions": [_adr_view(adrs[adr_id]) for adr_id in sorted(adrs) if adrs[adr_id]["status"] == "CURRENT_GLOBAL_COMPANION"],
         },
         "repository": {key: local[key] for key in repository_keys},
+        "project_orientation": _project_orientation(root),
         "external_repositories": external,
         "context_sources": sorted(sources.values(), key=lambda source: (source["precedence_rank"], source["source_id"])),
         "conflicts": conflicts,
@@ -902,6 +945,7 @@ BRIEF_MAX_LINE_BYTES = 240
 BRIEF_MAX_BYTES = BRIEF_MAX_LINES * (BRIEF_MAX_LINE_BYTES + 1)
 BRIEF_LINE_TRUNCATION_MARKER = "...[LINE_TRUNCATED]"
 BRIEF_TRUNCATION_MARKER = "- TRUNCATED: deterministic brief byte/line budget reached."
+BRIEF_COMPLETE_PROJECTION = "- Complete projection: python -m qntylab.project_context spine"
 # Control characters are flattened to spaces so an embedded newline in a packet
 # value cannot smuggle extra rendered lines past the line budget.
 _BRIEF_CONTROL_TRANSLATION = {code: " " for code in (*range(0x20), 0x7F)}
@@ -963,6 +1007,15 @@ def _brief_sections(packet: dict[str, Any]) -> list[list[str]]:
         for record in packet.get("external_repositories", [])
         if isinstance(record, dict)
     }
+    orientation = packet.get("project_orientation", {})
+    orientation_rows = []
+    for row in orientation.get("rows", []):
+        references = ", ".join(row.get("project_code_references", [])) or "NONE"
+        orientation_rows.append(
+            f"- {row.get('project_display_name', row.get('project_id', 'UNKNOWN'))}"
+            f" [{row.get('project_id', 'UNKNOWN')}] ({row.get('project_state', 'UNKNOWN')})"
+            f" -> {references}"
+        )
 
     return [
         [
@@ -1001,6 +1054,17 @@ def _brief_sections(packet: dict[str, Any]) -> list[list[str]]:
             "",
             "For QntyPolicyGate:",
             f"- adapter = {_brief_field(external.get('QntyPolicyGate', {}).get('adapter_status'))}",
+        ],
+        [
+            "## Project orientation",
+            "",
+            f"- scope = {_brief_field(orientation.get('project_orientation_scope'))}",
+            f"- reference scope = {_brief_field(orientation.get('project_code_reference_scope'))}",
+            f"- completeness = {_brief_field(orientation.get('project_code_reference_completeness'))}",
+            f"- module inventory provenance = {_brief_field(orientation.get('module_inventory_provenance'))}",
+            "- project_code_references =",
+            *orientation_rows,
+            "",
         ],
         [
             "## Authority boundaries",
@@ -1044,25 +1108,28 @@ def _bounded_brief(sections: list[list[str]]) -> str:
     lines: list[str] = []
     truncated = False
     for section in sections:
-        candidate = lines + [_brief_line(line) for line in section]
+        rendered_section = [_brief_line(line) for line in section]
+        candidate = lines + rendered_section
+        if any(BRIEF_LINE_TRUNCATION_MARKER in line for line in rendered_section):
+            truncated = True
         if len(candidate) > BRIEF_MAX_LINES or _brief_byte_length(candidate) > BRIEF_MAX_BYTES:
             truncated = True
             break
         lines = candidate
     if truncated:
         while lines and (
-            len(lines) + 1 > BRIEF_MAX_LINES
-            or _brief_byte_length(lines + [BRIEF_TRUNCATION_MARKER]) > BRIEF_MAX_BYTES
+            len(lines) + 2 > BRIEF_MAX_LINES
+            or _brief_byte_length(lines + [BRIEF_COMPLETE_PROJECTION, BRIEF_TRUNCATION_MARKER]) > BRIEF_MAX_BYTES
         ):
             lines.pop()
-        lines.append(BRIEF_TRUNCATION_MARKER)
+        lines.extend((BRIEF_COMPLETE_PROJECTION, BRIEF_TRUNCATION_MARKER))
     text = "\n".join(lines)
     encoded = text.encode("utf-8")
     if len(encoded) > BRIEF_MAX_BYTES:
         # Unconditional backstop: the rendered brief never exceeds the ceiling,
         # whatever a future section composition does.
-        keep = BRIEF_MAX_BYTES - len(BRIEF_TRUNCATION_MARKER) - 1
-        text = encoded[:keep].decode("utf-8", "ignore") + "\n" + BRIEF_TRUNCATION_MARKER
+        keep = BRIEF_MAX_BYTES - len(BRIEF_TRUNCATION_MARKER) - len(BRIEF_COMPLETE_PROJECTION) - 2
+        text = encoded[:keep].decode("utf-8", "ignore") + "\n" + BRIEF_COMPLETE_PROJECTION + "\n" + BRIEF_TRUNCATION_MARKER
     return text
 
 

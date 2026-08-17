@@ -37,7 +37,7 @@ repository_id = "Qnty"
 durable_role = "DOWNSTREAM_ACCEPTANCE_AND_EXECUTION_REALISM"
 default_branch = "main"
 context_access = "NARROW_READ_ONLY_ADAPTER"
-adapter_status = "ADAPTER_NOT_IMPLEMENTED"
+adapter_status = "READ_ONLY_ADAPTER_IMPLEMENTED"
 
 [[repository]]
 repository_id = "QntyAgentEval"

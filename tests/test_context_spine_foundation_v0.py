@@ -3,7 +3,7 @@
 These tests bind the foundation compiler to its invariants: it is a read-only,
 deterministic projection of canonical local repository bytes, it fails closed on
 malformed or mutually contradictory foundation state, it never claims
-cross-repository observation it does not perform, and the generic engine holds
+cross-repository observation outside an implemented adapter, and the generic engine holds
 no instance history.
 """
 
@@ -282,9 +282,8 @@ def test_malformed_foundation_fails_closed(tmp_path: Path, mutate: Any, message:
         _validate(tmp_path, catalog)
 
 
-def test_no_implemented_adapter_token_exists_at_this_schema_version() -> None:
-    """A catalog cannot spell cross-repository observation that no code performs."""
-    assert project_context.ADAPTER_STATUSES == frozenset({"NOT_APPLICABLE", "ADAPTER_NOT_IMPLEMENTED"})
+def test_implemented_adapter_status_is_explicitly_versioned() -> None:
+    assert "READ_ONLY_ADAPTER_IMPLEMENTED" in project_context.ADAPTER_STATUSES
 
 
 # --- Derived context sources --------------------------------------------
@@ -398,7 +397,11 @@ def test_external_adapter_status_is_explicit_not_implemented() -> None:
     packet = project_context.compile_context_spine(ROOT)
     external = {record["repository_id"]: record for record in packet["external_repositories"]}
     assert sorted(external) == ["Qnty", "QntyAgentEval", "QntyPolicyGate"]
-    for record in external.values():
+    assert external["Qnty"]["adapter_status"] == "READ_ONLY_ADAPTER_IMPLEMENTED"
+    assert external["Qnty"]["context_state"] == "UNAVAILABLE_WITHOUT_EXPLICIT_ROOT"
+    assert external["Qnty"]["observation"] is None
+    for repository_id in ("QntyAgentEval", "QntyPolicyGate"):
+        record = external[repository_id]
         assert record["adapter_status"] == "ADAPTER_NOT_IMPLEMENTED"
         assert record["context_state"] == "UNAVAILABLE_WITHOUT_ADAPTER"
         assert record["context_access"] == "NARROW_READ_ONLY_ADAPTER"

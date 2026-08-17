@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any
 
 from qntylab import research_ledger
+from qntylab import qnty_context_adapter
 
 
 SCHEMA_VERSION = 1
@@ -48,7 +49,7 @@ AUTHORITY_DOMAINS = (
 # repository state; it stores nothing, mutates nothing, and is never an
 # authority source.  Cross-repository reads require an adapter that this
 # foundation deliberately does not implement.
-CONTEXT_SPINE_VERSION = 1
+CONTEXT_SPINE_VERSION = 2
 ECOSYSTEM_CATALOG_SCHEMA_VERSION = 1
 # ADR-0007 source precedence, highest authority first.  The rank is the position
 # in this tuple; a catalog may only classify a source, never reorder the ladder.
@@ -99,10 +100,13 @@ CONFIG_SOURCE_PATH = "qntylab.toml"
 # about what was compiled.
 COMPILED_AUTHORITY_KEYS = ("ecosystem_catalog", "global_architecture_registry", "project_registry")
 CONTEXT_ACCESS_CLASSES = frozenset({"LOCAL_CANONICAL_SOURCES", "NARROW_READ_ONLY_ADAPTER"})
-# No implemented-adapter token exists at this schema version, so a catalog
-# cannot declare cross-repository observation that no code performs.
-ADAPTER_STATUSES = frozenset({"NOT_APPLICABLE", "ADAPTER_NOT_IMPLEMENTED"})
-EXTERNAL_CONTEXT_STATES = {"ADAPTER_NOT_IMPLEMENTED": "UNAVAILABLE_WITHOUT_ADAPTER"}
+# Only the Qnty read-only adapter is implemented at this schema version; the
+# catalog cannot declare observation for another repository without code.
+ADAPTER_STATUSES = frozenset({"NOT_APPLICABLE", "ADAPTER_NOT_IMPLEMENTED", "READ_ONLY_ADAPTER_IMPLEMENTED"})
+EXTERNAL_CONTEXT_STATES = {
+    "ADAPTER_NOT_IMPLEMENTED": "UNAVAILABLE_WITHOUT_ADAPTER",
+    "READ_ONLY_ADAPTER_IMPLEMENTED": "UNAVAILABLE_WITHOUT_EXPLICIT_ROOT",
+}
 CONTEXT_SPINE_COMPILED = "CONTEXT_SPINE_COMPILED"
 ARCHITECTURE_CONFLICT = "ARCHITECTURE_CONFLICT"
 CONTEXT_SPINE_PROHIBITIONS = (
@@ -111,6 +115,7 @@ CONTEXT_SPINE_PROHIBITIONS = (
     "CONTEXT_SPINE_DOES_NOT_CREATE_OR_TRANSITION_A_PERMITTED_NEXT_ACTION",
     "GIT_IDENTITY_SELECTS_BYTES_AND_GRANTS_NO_SEMANTIC_AUTHORITY",
     "EXTERNAL_REPOSITORY_STATE_IS_NOT_OBSERVED_WITHOUT_AN_IMPLEMENTED_ADAPTER",
+    "EXTERNAL_ROOT_IS_EXPLICIT_INPUT_AND_NOT_PACKET_IDENTITY",
     "GENERATED_VIEWS_AND_REMEMBERED_SUMMARIES_CANNOT_OVERRIDE_CANONICAL_GIT",
 )
 
@@ -419,6 +424,8 @@ def _catalog_repositories(catalog: dict[str, Any]) -> dict[str, dict[str, Any]]:
         # any other repository must declare one that is not implemented.
         if (access == "LOCAL_CANONICAL_SOURCES") != (adapter_status == "NOT_APPLICABLE"):
             raise ProjectContextError(f"repository {repository_id} adapter_status contradicts context_access")
+        if adapter_status == "READ_ONLY_ADAPTER_IMPLEMENTED" and repository_id != qnty_context_adapter.QNTY_REPOSITORY_ID:
+            raise ProjectContextError(f"implemented external adapter is not supported for {repository_id}")
         repositories[repository_id] = record
     local = [record for record in repositories.values() if record["context_access"] == "LOCAL_CANONICAL_SOURCES"]
     if len(local) != 1:
@@ -561,12 +568,48 @@ def _unbound_compiled_inputs(root: Path, relatives: list[str]) -> list[str]:
     return unbound
 
 
-def compile_context_spine(root: Path) -> dict[str, Any]:
+def _external_repository_views(
+    normalized: dict[str, Any], external_roots: dict[str, Path] | None,
+) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
+    supplied = external_roots or {}
+    unknown = sorted(set(supplied) - set(normalized["repositories"]))
+    if unknown:
+        raise ProjectContextError("external root names unknown repository IDs: " + ", ".join(unknown))
+    records: list[dict[str, Any]] = []
+    conflicts: list[dict[str, str]] = []
+    repository_keys = ("repository_id", "durable_role", "default_branch", "context_access", "adapter_status")
+    for _, source in sorted(normalized["repositories"].items()):
+        if source["repository_id"] == normalized["local_repository_id"]:
+            continue
+        record: dict[str, Any] = {
+            **{key: source[key] for key in repository_keys},
+            "context_state": EXTERNAL_CONTEXT_STATES.get(source["adapter_status"], "UNAVAILABLE"),
+        }
+        if source["repository_id"] == qnty_context_adapter.QNTY_REPOSITORY_ID and source["adapter_status"] == "READ_ONLY_ADAPTER_IMPLEMENTED":
+            record["observation"] = None
+            root = supplied.get(source["repository_id"])
+            if root is not None:
+                try:
+                    record["observation"] = qnty_context_adapter.observe(root)
+                    record["context_state"] = "AVAILABLE_READ_ONLY"
+                except qnty_context_adapter.QntyAdapterError as exc:
+                    record["context_state"] = ARCHITECTURE_CONFLICT
+                    conflicts.append(
+                        {
+                            "code": "EXTERNAL_ADAPTER_CONTRACT_CONFLICT",
+                            "detail": f"Qnty read-only adapter rejected explicit root: {exc}",
+                        }
+                    )
+        records.append(record)
+    return records, conflicts
+
+
+def compile_context_spine(root: Path, *, external_roots: dict[str, Path] | None = None) -> dict[str, Any]:
     """Compile the read-only Context Spine foundation packet.
 
-    The packet is derived only from canonical local repository bytes.  It binds
-    the Git identity that selected those bytes without treating that identity as
-    semantic authority, and it never observes another repository.
+    The local foundation is derived from canonical local repository bytes. Any
+    external observation is opt-in through a named read-only adapter root and
+    remains bounded by that adapter's contract.
     """
     root = root.resolve()
     config, adrs, normalized, global_adr, conflicts, north_star = _foundation(root)
@@ -574,6 +617,8 @@ def compile_context_spine(root: Path) -> dict[str, Any]:
     git = _git_state(root)
     compiled_inputs = sorted({CONFIG_SOURCE_PATH, *(config["authority"][key] for key in COMPILED_AUTHORITY_KEYS)})
     unbound = _unbound_compiled_inputs(root, compiled_inputs)
+    external, adapter_conflicts = _external_repository_views(normalized, external_roots)
+    conflicts = sorted([*conflicts, *adapter_conflicts], key=lambda conflict: (conflict["code"], conflict["detail"]))
     local = normalized["repositories"][normalized["local_repository_id"]]
     repository_keys = ("repository_id", "durable_role", "default_branch", "context_access", "adapter_status")
     return {
@@ -603,14 +648,7 @@ def compile_context_spine(root: Path) -> dict[str, Any]:
             "companions": [_adr_view(adrs[adr_id]) for adr_id in sorted(adrs) if adrs[adr_id]["status"] == "CURRENT_GLOBAL_COMPANION"],
         },
         "repository": {key: local[key] for key in repository_keys},
-        "external_repositories": [
-            {
-                **{key: record[key] for key in repository_keys},
-                "context_state": EXTERNAL_CONTEXT_STATES.get(record["adapter_status"], "UNAVAILABLE"),
-            }
-            for _, record in sorted(normalized["repositories"].items())
-            if record["repository_id"] != normalized["local_repository_id"]
-        ],
+        "external_repositories": external,
         "context_sources": sorted(sources.values(), key=lambda source: (source["precedence_rank"], source["source_id"])),
         "conflicts": conflicts,
         "prohibitions": list(CONTEXT_SPINE_PROHIBITIONS),
@@ -623,9 +661,9 @@ def compile_context_spine(root: Path) -> dict[str, Any]:
     }
 
 
-def context_spine_bytes(root: Path) -> bytes:
+def context_spine_bytes(root: Path, *, external_roots: dict[str, Path] | None = None) -> bytes:
     """Canonical serialization of the Context Spine packet, without a newline."""
-    return _canonical_json(compile_context_spine(root))
+    return _canonical_json(compile_context_spine(root, external_roots=external_roots))
 
 
 def doctor(root: Path) -> list[str]:
@@ -853,13 +891,25 @@ def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="QntyLab Git-backed project context")
     parser.add_argument("--root", type=Path, default=Path.cwd(), help=argparse.SUPPRESS)
     parser.add_argument("--json", action="store_true", dest="as_json")
+    parser.add_argument("--external-root", action="append", default=[], dest="external_roots", metavar="REPOSITORY_ID=PATH")
     subparsers = parser.add_subparsers(dest="command")
     doctor_parser = subparsers.add_parser("doctor")
     doctor_parser.add_argument("--strict", action="store_true")
     render_parser = subparsers.add_parser("render")
     render_parser.add_argument("--check", action="store_true")
-    subparsers.add_parser("spine", help="emit the read-only Context Spine foundation packet as canonical JSON")
+    spine_parser = subparsers.add_parser("spine", help="emit the read-only Context Spine foundation packet as canonical JSON")
+    spine_parser.add_argument("--external-root", action="append", dest="external_roots", metavar="REPOSITORY_ID=PATH", default=argparse.SUPPRESS)
     return parser
+
+
+def _parse_external_roots(values: list[str]) -> dict[str, Path]:
+    roots: dict[str, Path] = {}
+    for value in values:
+        repository_id, separator, raw_path = value.partition("=")
+        if not separator or not repository_id or not raw_path or repository_id in roots:
+            raise ProjectContextError("external root must be a unique REPOSITORY_ID=PATH binding")
+        roots[repository_id] = Path(raw_path)
+    return roots
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -877,7 +927,7 @@ def main(argv: list[str] | None = None) -> None:
         if args.command == "render":
             raise SystemExit(render(root, check=args.check))
         if args.command == "spine":
-            packet = compile_context_spine(root)
+            packet = compile_context_spine(root, external_roots=_parse_external_roots(args.external_roots))
             sys.stdout.buffer.write(_canonical_json(packet) + b"\n")
             raise SystemExit(0 if packet["packet_status"] == CONTEXT_SPINE_COMPILED else 1)
         data = context_data(root)

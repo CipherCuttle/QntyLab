@@ -2575,3 +2575,38 @@ capital_authority = "NONE"
 downstream_authority = "NONE"
 active_project_after_closure = "NONE"
 next_action = "OC_A_READY_FOR_MERGE: after canonical closure/merge and fresh reconciliation, begin only the separately named OC-B implementation phase; do not begin OC-B before OC-A is canonical and closed or merged."
+
+[[project]]
+project_id = "QNTYLAB_CONTEXT_SPINE_ORIENTATION_COMPLETENESS_V0_OC_B_IMPLEMENTATION"
+display_name = "QntyLab Context Spine Orientation Completeness V0 OC-B implementation"
+state = "CLOSED_PASS"
+authority_level = "BOUNDED_CONTEXT_SPINE_ORIENTATION_COMPLETENESS_IMPLEMENTATION_ONLY"
+phase_type = "BOUNDED_IMPLEMENTATION"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "AGENTS.md",
+  ".github/workflows/project-context.yml",
+  "qntylab/project_context.py",
+  "tests/test_project_context_v0.py",
+  "tests/test_context_spine_foundation_v0.py",
+  "tests/test_context_spine_brief_v0.py",
+  "tests/test_context_spine_orientation_completeness_v0.py",
+  "experiments/research/qntylab_context_spine/orientation_completeness_v0/orientation_completeness_authorization.json",
+  "experiments/research/qntylab_context_spine/orientation_completeness_v0/implementation_manifest.json",
+  "experiments/research/qntylab_context_spine/orientation_completeness_v0/hostile_review.md",
+  "experiments/research/qntylab_context_spine/orientation_completeness_v0/closure.json"
+]
+implementation_authorized = false
+governing_project_id = "QNTYLAB_CONTEXT_SPINE_ORIENTATION_COMPLETENESS_V0_AUTHORIZATION"
+context_spine_version = 3
+project_code_reference_semantics = "PROJECT_STATE_REFERENCES_PATH_ONLY"
+project_code_reference_completeness = "PARTIAL_PROJECTION_NOT_REPOSITORY_COMPLETENESS"
+module_inventory_provenance = "GIT_INDEX_TRACKED_QNTYLAB_PYTHON"
+qnty_agent_eval_applicability = "NO_MATCH"
+scientific_execution_authorized = false
+qnty_authorized = false
+trading_authorized = false
+capital_authority = "NONE"
+downstream_authority = "NONE"
+next_action = "OC_B_READY_FOR_MERGE: implementation is frozen and verified; open a PR, do not merge without separate authorization."

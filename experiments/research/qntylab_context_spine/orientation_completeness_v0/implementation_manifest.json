@@ -1,0 +1,65 @@
+{
+  "artifact_type": "QNTYLAB_CONTEXT_SPINE_ORIENTATION_COMPLETENESS_V0_OC_B_IMPLEMENTATION_MANIFEST",
+  "schema_version": "qntylab-context-spine-orientation-completeness-v0-implementation-v1",
+  "project_id": "QNTYLAB_CONTEXT_SPINE_ORIENTATION_COMPLETENESS_V0_OC_B_IMPLEMENTATION",
+  "status": "IMPLEMENTATION_FROZEN_READY_FOR_MERGE",
+  "base_master": "1b93858857daddacd1795cf980edb3d562eabc77",
+  "candidate_sha": "aa89da7cff278614f9abdd404ccde61f5ebe44b5",
+  "context_spine_version": 3,
+  "project_orientation": {
+    "schema_version": "project-orientation-v0",
+    "semantics": "PROJECT_STATE_REFERENCES_PATH_ONLY",
+    "completeness": "PARTIAL_PROJECTION_NOT_REPOSITORY_COMPLETENESS",
+    "module_inventory_provenance": "GIT_INDEX_TRACKED_QNTYLAB_PYTHON",
+    "source_field": "project.authoritative_artifacts",
+    "filter": "path.startswith('qntylab/') and path.endswith('.py')"
+  },
+  "brief": {
+    "max_lines": 120,
+    "max_line_bytes": 240,
+    "max_bytes": 28920,
+    "truncation_is_explicit": true,
+    "complete_projection_command": "python -m qntylab.project_context spine"
+  },
+  "exact_changed_file_surface": [
+    "qntylab/project_context.py",
+    "tests/test_context_spine_orientation_completeness_v0.py",
+    "tests/test_context_spine_foundation_v0.py",
+    "AGENTS.md",
+    ".github/workflows/project-context.yml",
+    "docs/state/projects.toml",
+    "docs/CURRENT_ROADMAP.md",
+    "experiments/research/qntylab_context_spine/orientation_completeness_v0/implementation_manifest.json",
+    "experiments/research/qntylab_context_spine/orientation_completeness_v0/hostile_review.md",
+    "experiments/research/qntylab_context_spine/orientation_completeness_v0/closure.json"
+  ],
+  "verification": {
+    "project_context_doctor_strict": "PASS",
+    "project_context_render_check": "PASS",
+    "project_context_spine": "PASS",
+    "project_context_brief": "PASS",
+    "research_ledger_doctor": "PASS",
+    "pytest": "151 passed",
+    "order_flow_positive_control": "PASS",
+    "cold_start_v10": "PASS",
+    "network_or_write_behavior_added": false
+  },
+  "hostile_review": {
+    "review_artifact": "experiments/research/qntylab_context_spine/orientation_completeness_v0/hostile_review.md",
+    "review_count": 1,
+    "critical": 0,
+    "high": 0,
+    "repair_rounds": 0,
+    "targeted_rereviews": 0
+  },
+  "qnty_agent_eval": {
+    "applicability": "NO_MATCH",
+    "bounded_lookup_count": 1,
+    "execution_authority": "NOT_ESTABLISHED",
+    "run": false
+  },
+  "merge": {
+    "authorized": false,
+    "merged": false
+  }
+}

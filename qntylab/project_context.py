@@ -1017,7 +1017,39 @@ def _brief_sections(packet: dict[str, Any]) -> list[list[str]]:
             f" -> {references}"
         )
 
-    return [
+    orientation_section = [
+        "## Project orientation",
+        "",
+        f"- scope = {_brief_field(orientation.get('project_orientation_scope'))}",
+        f"- reference scope = {_brief_field(orientation.get('project_code_reference_scope'))}",
+        f"- completeness = {_brief_field(orientation.get('project_code_reference_completeness'))}",
+        f"- module inventory provenance = {_brief_field(orientation.get('module_inventory_provenance'))}",
+        "- project_code_references =",
+        *orientation_rows,
+        "",
+    ]
+    authority_section = [
+        "## Authority boundaries",
+        "",
+        "- Git identity selects bytes, not semantic authority.",
+        "- Handoff is not Qnty acceptance.",
+        "- NEXT_ACTION authority is not established unless a canonical source says otherwise; no NEXT_ACTION field is emitted.",
+        "- No science, runtime, live, trading, or capital authority is inferred.",
+    ]
+    conflicts_section = [
+        "## Conflicts / blockers",
+        "",
+        *(
+            ["**ARCHITECTURE_CONFLICT**"]
+            + [f"- {item.get('code', 'CONFLICT')}: {item.get('detail', 'unspecified conflict')}" for item in conflicts]
+            if conflicts
+            else ["- None."]
+        ),
+        "",
+        "- unavailable external roots = "
+        + (", ".join(record["repository_id"] for record in packet.get("external_repositories", []) if record.get("context_state") == "UNAVAILABLE_WITHOUT_EXPLICIT_ROOT") or "None"),
+    ]
+    sections = [
         [
             "# Qnty Ecosystem Brief",
             "",
@@ -1055,39 +1087,13 @@ def _brief_sections(packet: dict[str, Any]) -> list[list[str]]:
             "For QntyPolicyGate:",
             f"- adapter = {_brief_field(external.get('QntyPolicyGate', {}).get('adapter_status'))}",
         ],
-        [
-            "## Project orientation",
-            "",
-            f"- scope = {_brief_field(orientation.get('project_orientation_scope'))}",
-            f"- reference scope = {_brief_field(orientation.get('project_code_reference_scope'))}",
-            f"- completeness = {_brief_field(orientation.get('project_code_reference_completeness'))}",
-            f"- module inventory provenance = {_brief_field(orientation.get('module_inventory_provenance'))}",
-            "- project_code_references =",
-            *orientation_rows,
-            "",
-        ],
-        [
-            "## Authority boundaries",
-            "",
-            "- Git identity selects bytes, not semantic authority.",
-            "- Handoff is not Qnty acceptance.",
-            "- NEXT_ACTION authority is not established unless a canonical source says otherwise; no NEXT_ACTION field is emitted.",
-            "- No science, runtime, live, trading, or capital authority is inferred.",
-        ],
-        [
-            "## Conflicts / blockers",
-            "",
-            *(
-                ["**ARCHITECTURE_CONFLICT**"]
-                + [f"- {item.get('code', 'CONFLICT')}: {item.get('detail', 'unspecified conflict')}" for item in conflicts]
-                if conflicts
-                else ["- None."]
-            ),
-            "",
-            "- unavailable external roots = "
-            + (", ".join(record["repository_id"] for record in packet.get("external_repositories", []) if record.get("context_state") == "UNAVAILABLE_WITHOUT_EXPLICIT_ROOT") or "None"),
-        ],
     ]
+    if conflicts:
+        sections.append(conflicts_section)
+    sections.extend((orientation_section, authority_section))
+    if not conflicts:
+        sections.append(conflicts_section)
+    return sections
 
 
 def _brief_line(line: str) -> str:

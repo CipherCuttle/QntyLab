@@ -1,0 +1,54 @@
+# Ecosystem / context catalog for the QntyLab Context Spine compiler.
+#
+# This file carries durable ecosystem semantics only. It references canonical
+# repository-owned authority; it never copies it. It is not an authority plane:
+# nothing here grants scientific, economic, acceptance, or operational
+# authority.
+#
+# It deliberately does NOT declare context sources or their precedence. Those
+# are derived by `qntylab.project_context` from the authority sources this
+# repository already owns, so this file cannot classify a source, omit one,
+# bind one twice, or reorder the ADR-0007 precedence ladder.
+#
+# What the compiler reconciles here, failing closed on disagreement:
+# `architecture_authority` and `scientific_north_star` against
+# docs/ADR/registry.toml, and the local `repository_id` against qntylab.toml.
+#
+# `ecosystem_id`, `durable_role`, and `default_branch` are declared naming, not
+# observed state: no local source owns them, and no adapter reads the external
+# repositories.
+schema_version = 1
+ecosystem_id = "QNTY_ECOSYSTEM"
+
+# Resolved against docs/ADR/registry.toml, which owns ADR status and scope.
+[architecture]
+architecture_authority = "ADR-0007"
+scientific_north_star = "ADR-0005"
+
+[[repository]]
+repository_id = "QntyLab"
+durable_role = "EXPLORATORY_SCIENTIFIC_RESEARCH_AND_EVIDENCE_PRODUCTION"
+default_branch = "master"
+context_access = "LOCAL_CANONICAL_SOURCES"
+adapter_status = "NOT_APPLICABLE"
+
+[[repository]]
+repository_id = "Qnty"
+durable_role = "DOWNSTREAM_ACCEPTANCE_AND_EXECUTION_REALISM"
+default_branch = "main"
+context_access = "NARROW_READ_ONLY_ADAPTER"
+adapter_status = "ADAPTER_NOT_IMPLEMENTED"
+
+[[repository]]
+repository_id = "QntyAgentEval"
+durable_role = "EXTERNAL_DETERMINISTIC_AGENT_EVALUATOR"
+default_branch = "main"
+context_access = "NARROW_READ_ONLY_ADAPTER"
+adapter_status = "ADAPTER_NOT_IMPLEMENTED"
+
+[[repository]]
+repository_id = "QntyPolicyGate"
+durable_role = "EXTERNAL_GIT_GOVERNANCE_POLICY_BOUNDARY"
+default_branch = "main"
+context_access = "NARROW_READ_ONLY_ADAPTER"
+adapter_status = "ADAPTER_NOT_IMPLEMENTED"

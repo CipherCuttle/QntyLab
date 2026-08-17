@@ -4,10 +4,12 @@ repository_id = "QntyLab"
 [bootstrap]
 context_command = "python -m qntylab.project_context"
 research_context_command = "python -m qntylab.research_ledger context"
+context_spine_command = "python -m qntylab.project_context spine"
 
 [authority]
 global_architecture_registry = "docs/ADR/registry.toml"
 project_registry = "docs/state/projects.toml"
+ecosystem_catalog = "docs/state/ecosystem.toml"
 current_roadmap = "docs/CURRENT_ROADMAP.md"
 research_ledger_root = "experiments/research"
 

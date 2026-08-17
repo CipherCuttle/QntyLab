@@ -1,12 +1,12 @@
 # OC-B hostile implementation review
 
 review_identity = "ONE_INDEPENDENT_HOSTILE_IMPLEMENTATION_REVIEW"
-candidate_sha = "43d0ca91d9a3452ae6a768e3c6bb8fd19318f66b"
+candidate_sha = "aa89da7cff278614f9abdd404ccde61f5ebe44b5"
 review_scope = "frozen OC-B implementation candidate only"
 
 ## Review method
 
-The frozen candidate was reviewed from its canonical diff and exercised through
+The frozen candidate, including the bounded conflict-visibility repair, was reviewed from its canonical diff and exercised through
 the Context Spine CLI, the complete authorized pytest suite, deterministic
 serialization checks, byte/line budget checks, and a cold-start brief lookup.
 No production source was searched or modified to add a project-specific

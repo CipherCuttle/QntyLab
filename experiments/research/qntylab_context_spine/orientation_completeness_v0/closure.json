@@ -4,7 +4,7 @@
   "project_id": "QNTYLAB_CONTEXT_SPINE_ORIENTATION_COMPLETENESS_V0_OC_B_IMPLEMENTATION",
   "state": "READY_FOR_MERGE",
   "base_master": "1b93858857daddacd1795cf980edb3d562eabc77",
-  "immutable_implementation_candidate_sha": "43d0ca91d9a3452ae6a768e3c6bb8fd19318f66b",
+  "immutable_implementation_candidate_sha": "aa89da7cff278614f9abdd404ccde61f5ebe44b5",
   "context_spine_version": 3,
   "project_orientation_semantics": "PROJECT_STATE_REFERENCES_PATH_ONLY",
   "partial_coverage": "PARTIAL_PROJECTION_NOT_REPOSITORY_COMPLETENESS",

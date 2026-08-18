@@ -163,7 +163,7 @@ def test_json_is_byte_stable_for_identical_state() -> None:
     second = subprocess.run(command, cwd=ROOT, check=True, capture_output=True).stdout
     assert first == second
     assert json.loads(first)["current_global_adr"]["adr_id"] == "ADR-0007"
-    assert [item["adr_id"] for item in json.loads(first)["current_global_companions"]] == ["ADR-0005", "ADR-0006"]
+    assert [item["adr_id"] for item in json.loads(first)["current_global_companions"]] == ["ADR-0005", "ADR-0006", "ADR-0008"]
 
 
 def test_canonical_companion_is_current_but_not_architecture_authority() -> None:
@@ -179,6 +179,11 @@ def test_canonical_companion_is_current_but_not_architecture_authority() -> None
             "adr_id": "ADR-0006",
             "path": "docs/ADR/0006-qntylab-research-design-philosophy.md",
             "authority_scope": "GLOBAL_RESEARCH_DESIGN_PHILOSOPHY",
+        },
+        {
+            "adr_id": "ADR-0008",
+            "path": "docs/ADR/0008-qnty-agent-orchestration-runtime-boundary.md",
+            "authority_scope": "QNTY_AGENT_ORCHESTRATION_RUNTIME_BOUNDARY",
         },
     ]
 

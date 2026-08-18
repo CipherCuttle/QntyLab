@@ -2664,3 +2664,53 @@ hostile_governance_open_high = 0
 targeted_governance_rereview_used = false
 active_project_after_closure = "NONE"
 next_action = "After canonical merge, perform a fresh reconciliation, then begin exactly QNTY_AGENT_ORCHESTRATION_CONTROL_CONTRACT_V0_CONTRACT_ONLY_REPOSITORY_BOOTSTRAP."
+
+[[project]]
+project_id = "QNTY_AGENT_RUNTIME_CONTRACT_ONLY_BOOTSTRAP_H01_MACHINE_ENFORCEMENT_REPAIR_AUTHORIZATION_V0"
+display_name = "QntyAgentRuntime H01 machine-enforcement repair authorization"
+state = "CLOSED_PASS"
+authority_level = "BOUNDED_CONTRACT_ONLY_REPAIR_AUTHORIZATION"
+phase_type = "GOVERNANCE_ONLY"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/ADR/registry.toml",
+  "docs/ADR/0007-ecosystem-role-boundary-and-context-spine-governance.md",
+  "docs/ADR/0008-qnty-agent-orchestration-runtime-boundary.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/bootstrap_h01_repair_authorization/authorization.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/bootstrap_h01_repair_authorization/hostile_governance_review.md",
+]
+canonical_master_sha = "5375604e1e8a69d1faca1e9c2895636951194381"
+source_conflict = false
+architecture_change = false
+architecture_relevance = "NOT_REQUIRED_WITHIN_EXISTING_ADR_0008_BOUNDARY"
+current_global_architecture = "ADR-0007"
+adr_0007_preserved = true
+companion_adr = "ADR-0008"
+blocked_predecessor_repository = "CipherCuttle/QntyAgentRuntime"
+blocked_predecessor_sha = "75e3db0c9f08ed16f3d542751b30c3fd0bec892c"
+one_later_h01_repair_phase_authorized = true
+second_bootstrap_authorized = false
+runtime_implementation_authorized = false
+dsh_implementation_authorized = false
+implementation_authorized = false
+scientific_execution_authorized = false
+qnty_next_action_authority = "NONE"
+trading_authorized = false
+capital_authority = "NONE"
+auto_merge_authorized = false
+current_max_autonomy = "L0_SHADOW"
+qntyagenteval_applicability = "NOT_APPLICABLE"
+qntyagenteval_run = false
+hostile_review_count = 1
+hostile_review_verdict = "PASS"
+hostile_governance_critical_total = 0
+hostile_governance_high_total = 0
+hostile_governance_medium_total = 0
+hostile_governance_low_total = 0
+hostile_governance_open_critical = 0
+hostile_governance_open_high = 0
+targeted_governance_rereview_used = false
+active_project_after_closure = "NONE"
+next_action = "After canonical merge, perform exactly one QNTY_AGENT_RUNTIME_CONTRACT_ONLY_BOOTSTRAP_H01_MACHINE_ENFORCEMENT_REPAIR_V0 phase; if any Critical or High remains after its one targeted re-review, terminate this bootstrap attempt permanently as QNTY_AGENT_RUNTIME_CONTRACT_BOOTSTRAP_H01_UNRESOLVED."

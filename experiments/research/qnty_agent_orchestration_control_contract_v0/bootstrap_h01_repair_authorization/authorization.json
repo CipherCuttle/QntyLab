@@ -1,0 +1,133 @@
+{
+  "artifact_type": "QNTY_AGENT_RUNTIME_H01_REPAIR_GOVERNANCE_AUTHORIZATION",
+  "schema_version": "qnty-agent-runtime-h01-repair-authorization-v1",
+  "project_id": "QNTY_AGENT_RUNTIME_CONTRACT_ONLY_BOOTSTRAP_H01_MACHINE_ENFORCEMENT_REPAIR_AUTHORIZATION_V0",
+  "state": "CLOSED_PASS",
+  "phase_type": "GOVERNANCE_ONLY",
+  "authority_level": "BOUNDED_CONTRACT_ONLY_REPAIR_AUTHORIZATION",
+  "canonicalization": {
+    "canonical_repository": "QntyLab",
+    "canonical_master_sha": "5375604e1e8a69d1faca1e9c2895636951194381",
+    "source_conflict": false,
+    "architecture_change": false,
+    "architecture_relevance": "NOT_REQUIRED_WITHIN_EXISTING_ADR_0008_BOUNDARY",
+    "current_global_architecture": "ADR-0007",
+    "adr_0007": "CURRENT_GLOBAL_PRESERVED",
+    "adr_0008": "CURRENT_GLOBAL_COMPANION",
+    "current_max_autonomy": "L0_SHADOW"
+  },
+  "blocked_bootstrap": {
+    "repository": "CipherCuttle/QntyAgentRuntime",
+    "main_sha": "c18f87423e0323f14c28c1295a90966137b6dd55",
+    "blocked_branch": "agent/control-contract-v0-bootstrap",
+    "blocked_sha": "75e3db0c9f08ed16f3d542751b30c3fd0bec892c",
+    "blocked_sha_preserved": true,
+    "pr_exists": false,
+    "runtime_code_present": false,
+    "dsh_present": false,
+    "bootstrap_verdict": "QNTY_AGENT_RUNTIME_BOOTSTRAP_BLOCKED_REVIEW",
+    "remaining_high": "REVIEWER_AUTHOR_IDENTITY_INEQUALITY_AND_REQUIRED_RECEIPT_EVIDENCE_NOT_FULLY_MACHINE_ENFORCED"
+  },
+  "h01_diagnosis": {
+    "dispatch_receipts_can_be_empty": true,
+    "verifier_receipts_can_be_empty": true,
+    "review_receipts_can_be_empty": false,
+    "review_receipts_min_items": 1,
+    "mechanically_distinct_is_self_attested_const_true": true,
+    "mechanically_distinct_self_attestation_sufficient": false,
+    "cross_identity_inequality_machine_enforced": false,
+    "review_dispatch_binding_present": false,
+    "review_independent_in_task_is_optional": true,
+    "provenance_complete_in_task_is_optional": true,
+    "json_schema_cross_record_identity_comparison_available": false,
+    "diagnosis_confirmed": true
+  },
+  "authorization": {
+    "one_later_h01_repair_phase_authorized": true,
+    "authorized_phase": "QNTY_AGENT_RUNTIME_CONTRACT_ONLY_BOOTSTRAP_H01_MACHINE_ENFORCEMENT_REPAIR_V0",
+    "second_bootstrap_authorized": false,
+    "runtime_implementation_authorized": false,
+    "dsh_implementation_authorized": false,
+    "scientific_authority": "NONE",
+    "qnty_next_action_authority": "NONE",
+    "trading_authority": "NONE",
+    "capital_authority": "NONE",
+    "auto_merge_authorized": false,
+    "qntyagenteval_applicability": "NOT_APPLICABLE",
+    "qntyagenteval_run": false
+  },
+  "repair_objective": {
+    "non_empty_core_evidence": ["dispatch_receipts", "review_receipts", "verifier_receipts"],
+    "required_hard_checks": ["PROVENANCE_COMPLETE", "REVIEW_INDEPENDENT"],
+    "review_binding": ["author_dispatch_id", "reviewer_dispatch_id"],
+    "review_independence_gate": [
+      "author dispatch exists",
+      "reviewer dispatch exists",
+      "author_dispatch_id differs from reviewer_dispatch_id",
+      "recorded author identity matches referenced author dispatch",
+      "recorded reviewer identity matches referenced reviewer dispatch",
+      "frozen machine identities differ",
+      "mechanically_distinct is derived only and never trusted as evidence",
+      "failure fails closed and model prose cannot satisfy the gate"
+    ],
+    "provenance_complete_gate": [
+      "dispatch evidence is non-empty and validly referenced",
+      "verifier evidence is non-empty and validly referenced",
+      "hostile-review evidence is non-empty and validly referenced",
+      "missing required evidence fails closed"
+    ],
+    "schema_vs_verifier_boundary": {
+      "schema_enforceable": ["non-empty arrays", "required fields", "strict objects", "required hard-check names", "required dispatch references"],
+      "trusted_deterministic_verifier": ["cross-record identity equality/inequality and referenced identity consistency"]
+    }
+  },
+  "allowed_future_repair_paths": [
+    "docs/control/QNTY_AGENT_ORCHESTRATION_CONTROL_CONTRACT_V0.md",
+    "contracts/TASK_CONTRACT_V0.schema.json",
+    "contracts/EPISODE_PACKAGE_V0.schema.json",
+    "tests/test_control_contract_v0.py",
+    "contracts/DISPATCH_RECEIPT_V0.schema.json only if existing fields cannot express deterministic identity binding"
+  ],
+  "forbidden_future_repair_paths": [
+    "src/",
+    "runtime controller",
+    "qnty-agentd",
+    "DSH adapter",
+    "DeepSeek Harness",
+    "Codex runner",
+    "Claude runner",
+    "scheduler",
+    "daemon",
+    "workspace manager",
+    "Git broker implementation",
+    "network broker",
+    "credential manager",
+    "database",
+    "queue",
+    "GitHub Actions",
+    "auto merge",
+    "scientific execution",
+    "paper/shadow/live execution",
+    "trading",
+    "capital",
+    "Qnty NEXT_ACTION control"
+  ],
+  "review_budget": {
+    "old_bootstrap_review_budget_exhausted": true,
+    "new_separately_named_lifecycle": true,
+    "implementation_scope": "EXACT_H01_REPAIR",
+    "independent_hostile_reviews": 1,
+    "critical_high_repair_only": true,
+    "targeted_rereviews_maximum": 1,
+    "third_review": false,
+    "review_of_review": false,
+    "h02_creation": false
+  },
+  "terminal_anti_loop_rule": {
+    "if_critical_or_high_remains_after_targeted_rereview": "QNTY_AGENT_RUNTIME_CONTRACT_BOOTSTRAP_H01_UNRESOLVED",
+    "terminate_bootstrap_attempt": true,
+    "no_new_repair_phase": true,
+    "no_third_review_cycle": true
+  },
+  "next_after_canonical_merge": "fresh canonical reconciliation -> QNTY_AGENT_RUNTIME_CONTRACT_ONLY_BOOTSTRAP_H01_MACHINE_ENFORCEMENT_REPAIR_V0"
+}

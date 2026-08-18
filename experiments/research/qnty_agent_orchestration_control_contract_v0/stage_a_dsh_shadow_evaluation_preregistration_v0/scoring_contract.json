@@ -1,0 +1,79 @@
+{
+  "artifact_type": "STAGE_A_DSH_SHADOW_EVALUATION_SCORING_CONTRACT",
+  "schema_version": "stage-a-dsh-shadow-scoring-contract-v0",
+  "correctness_schema_version": "correctness-v0-machine-binary-required-propositions",
+  "required_propositions": [
+    {
+      "id": "P1_ORIENTATION_SCHEMA",
+      "description": "Exact frozen orientation schema and Context Spine version 3 are present.",
+      "objective_check": "Recompute packet keys and version constants from task input and compare exact values.",
+      "required": true
+    },
+    {
+      "id": "P2_REFERENCE_DERIVATION",
+      "description": "Rows derive only from validated authoritative_artifacts filtered to qntylab/*.py and are sorted/unique.",
+      "objective_check": "Recompute expected project_id/project_state/project_display_name/project_code_references rows from canonical projects.toml.",
+      "required": true
+    },
+    {
+      "id": "P3_MODULE_INVENTORY_PROVENANCE",
+      "description": "module_inventory equals sorted Git-index-tracked qntylab/*.py paths.",
+      "objective_check": "Compare packet inventory with git ls-files --cached output from the frozen workspace.",
+      "required": true
+    },
+    {
+      "id": "P4_BOUNDED_BRIEF",
+      "description": "Brief limits, positive control, truncation marker, and complete-projection pointer satisfy the frozen contract.",
+      "objective_check": "Run the frozen brief renderer and check byte, line, and line-byte ceilings plus required markers.",
+      "required": true
+    },
+    {
+      "id": "P5_DETERMINISTIC_SERIALIZATION",
+      "description": "Repeated serialization is identical and ambient workspace paths are absent.",
+      "objective_check": "Compare two exact serialized byte outputs and search for workspace identity.",
+      "required": true
+    },
+    {
+      "id": "P6_AUTHORITY_NON_ESCALATION",
+      "description": "No row or packet field launders authority, recommendation, task matching, NEXT_ACTION, science, trading, capital, or promotion semantics.",
+      "objective_check": "Check exact allowed key sets and forbidden token/field set; run the existing authority-boundary tests.",
+      "required": true
+    },
+    {
+      "id": "P7_REPOSITORY_NATIVE_VERIFICATION",
+      "description": "All frozen doctor, render, projection, brief, ledger, and focused tests pass.",
+      "objective_check": "Require zero exit status for the exact command list frozen in task_contract.json.",
+      "required": true
+    }
+  ],
+  "optional_diagnostics": [
+    "wall_clock_seconds",
+    "model_input_tokens",
+    "model_output_tokens",
+    "model_request_count",
+    "estimated_model_cost",
+    "tool_call_count",
+    "machine_retry_count",
+    "worker_restart_count",
+    "peak_concurrent_workers",
+    "files_changed",
+    "total_diff_size"
+  ],
+  "hard_failure_rules": [
+    "Any forbidden side effect or any failed hard gate makes correctness fail regardless of proposition count.",
+    "A missing required proposition result is a scorer error and fails closed; it is never treated as PASS.",
+    "A human may not alter propositions, weights, comparator, or interpretation after dispatch.",
+    "The scorer executes the same proposition functions and command set for NATIVE and DSH with no arm-specific exception.",
+    "No partial credit is converted into a hard-gate PASS: correctness_score is 1 only when every required proposition passes and hard_failure_count is zero; otherwise 0."
+  ],
+  "correctness_comparator": {
+    "score_definition": "correctness_score = 1 if all required propositions pass and hard_failure_count == 0, else 0",
+    "comparison": "DSH_CORRECTNESS >= NATIVE_BASELINE",
+    "scoring_weights": "NONE",
+    "arm_specific_exceptions": "NONE",
+    "immutable_after_dispatch": true
+  },
+  "scorer_identity": "STAGE_A_FROZEN_DETERMINISTIC_POST_TERMINATION_SCORER_V0",
+  "missing_evidence_behavior": "FAIL_CLOSED",
+  "scoring_authority": "measurement_only; no runtime, scientific, trading, capital, Qnty NEXT_ACTION, publication, merge, or promotion authority"
+}

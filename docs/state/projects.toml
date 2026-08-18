@@ -2818,3 +2818,78 @@ hostile_governance_open_high = 0
 targeted_governance_rereview_used = false
 active_project_after_closure = "NONE"
 next_action = "After canonical merge and fresh reconciliation, a separately authorized STAGE_A_DSH_SHADOW_EVALUATION_PREREGISTRATION_V0 may be considered; this phase authorizes no Stage-A execution, DSH installation, runtime implementation, publication, merge, scientific action, Qnty NEXT_ACTION, trading, or capital action."
+
+[[project]]
+project_id = "STAGE_A_DSH_SHADOW_EVALUATION_PREREGISTRATION_V0"
+display_name = "Stage-A DSH shadow evaluation preregistration V0"
+state = "CLOSED_PASS"
+authority_level = "PREREGISTRATION_ONLY"
+phase_type = "EXPERIMENT_PREREGISTRATION"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md",
+  "docs/ADR/0007-ecosystem-role-boundary-and-context-spine-governance.md",
+  "docs/ADR/0008-qnty-agent-orchestration-runtime-boundary.md",
+  "docs/state/ecosystem.toml",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/governance_freeze/authorization.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/ecosystem_registration_v0r1/registration.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/stage_a_zero_write_authorization_v0/authorization.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/stage_a_dsh_shadow_evaluation_preregistration_v0/preregistration.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/stage_a_dsh_shadow_evaluation_preregistration_v0/task_contract.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/stage_a_dsh_shadow_evaluation_preregistration_v0/scoring_contract.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/stage_a_dsh_shadow_evaluation_preregistration_v0/intervention_schema.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/stage_a_dsh_shadow_evaluation_preregistration_v0/gate_schema.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/stage_a_dsh_shadow_evaluation_preregistration_v0/receipt_schema.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/stage_a_dsh_shadow_evaluation_preregistration_v0/hostile_governance_review.md"
+]
+canonical_master_sha = "a013c5f63c5c70cebef396236de99498d09028d9"
+source_conflict = false
+architecture_change = false
+architecture_relevance = "REQUIRED_WITHIN_EXISTING_ADR_0007_AND_ADR_0008_BOUNDARY"
+predecessor_project_id = "STAGE_A_DSH_SHADOW_EVALUATION_AUTHORIZATION_V0"
+predecessor_state = "CLOSED_PASS"
+phase_reopen_trigger_present = false
+historical_fixture_frozen = true
+answer_key_firewall = "PASS"
+dsh_identity_resolved = true
+dsh_immutable_source_pinned = true
+native_baseline_frozen = true
+dsh_arm_frozen = true
+contrast_class_frozen = true
+model_identities_frozen = true
+task_bytes_identical_between_arms = true
+correctness_machine_scorable = true
+human_intervention_machine_countable = true
+retry_budgets_bounded = true
+process_isolation_frozen = true
+workspace_isolation_frozen = true
+network_policy_frozen = true
+receipt_schema_frozen = true
+trace_completeness_defined = true
+all_hard_gates_operationalized = true
+tie_policy_frozen = true
+stage_a_execution_authorized = false
+implementation_authorized = false
+runtime_implementation_authorized = false
+dsh_implementation_authorized = false
+scientific_execution_authorized = false
+qnty_next_action_authority = "NONE"
+scientific_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+auto_merge_authorized = false
+current_max_autonomy = "L0_SHADOW"
+qntyagenteval_applicability = "NO_MATCH"
+qntyagenteval_run = false
+hostile_review_count = 1
+hostile_review_verdict = "PASS"
+hostile_governance_critical_total = 0
+hostile_governance_high_total = 0
+hostile_governance_medium_total = 0
+hostile_governance_low_total = 0
+targeted_governance_rereview_used = false
+active_project_after_closure = "NONE"
+experiment_state = "PREREGISTERED_NOT_EXECUTED"
+next_action = "A separately authorized STAGE_A_DSH_SHADOW_EVALUATION_EXECUTION_V0 is required before either arm may run; this phase authorizes no execution, DSH installation, runtime implementation, science, Qnty NEXT_ACTION, trading, capital, publication, merge, or auto-merge."

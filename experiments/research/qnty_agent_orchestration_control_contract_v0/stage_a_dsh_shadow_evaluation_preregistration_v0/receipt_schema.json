@@ -1,0 +1,60 @@
+{
+  "artifact_type": "STAGE_A_DSH_SHADOW_EVALUATION_EXECUTION_RECEIPT_SCHEMA",
+  "schema_version": "stage-a-dsh-shadow-receipt-v0",
+  "required_fields": [
+    "experiment_id",
+    "arm_id",
+    "task_digest",
+    "base_sha",
+    "harness_identity",
+    "harness_version_or_commit",
+    "harness_config_digest",
+    "model_provider",
+    "model_id",
+    "model_revision",
+    "tool_capability_digest",
+    "process_identity",
+    "workspace_identity",
+    "start_time",
+    "end_time",
+    "exit_state",
+    "retry_counts",
+    "human_intervention_events",
+    "gate_results",
+    "output_artifact_digests"
+  ],
+  "required_event_classes": [
+    "TASK_ADMISSION",
+    "WORKER_DISPATCH",
+    "WORKER_COMPLETION_OR_FAILURE",
+    "TOOL_INVOCATION_CLASS",
+    "MACHINE_RETRY",
+    "HUMAN_INTERVENTION",
+    "REVIEW_DISPATCH",
+    "REVIEW_OUTCOME",
+    "VERIFICATION",
+    "TERMINATION",
+    "FINAL_ARTIFACT_IDENTITY",
+    "GATE_SCORING"
+  ],
+  "retry_counts_fields": [
+    "machine_retry_count",
+    "worker_restart_count",
+    "review_loop_count",
+    "verifier_retry_count"
+  ],
+  "diagnostic_fields": [
+    "wall_clock_seconds",
+    "model_input_tokens",
+    "model_output_tokens",
+    "model_request_count",
+    "estimated_model_cost",
+    "tool_call_count",
+    "peak_concurrent_workers",
+    "files_changed",
+    "total_diff_size"
+  ],
+  "missing_required_field_behavior": "FAIL_CLOSED",
+  "chain_of_thought_capture": "NOT_REQUIRED; operational events, commands, artifacts, state transitions, and verdicts are sufficient",
+  "immutable_after_termination": true
+}

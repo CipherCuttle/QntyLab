@@ -1,0 +1,37 @@
+{
+  "artifact_type": "STAGE_A_DSH_SHADOW_EVALUATION_HUMAN_INTERVENTION_SCHEMA",
+  "schema_version": "human-intervention-v0",
+  "event_types": [
+    "CORRECTIVE_PROMPT",
+    "POST_DISPATCH_CLARIFICATION",
+    "MANUAL_CODE_EDIT",
+    "MANUAL_ADVANCE_COMMAND",
+    "HUMAN_DIRECTED_RETRY",
+    "HUMAN_DIRECTED_RESTART",
+    "MANUAL_OUTPUT_REPAIR",
+    "MANUAL_RECONFIGURATION",
+    "HUMAN_SELECTED_ALTERNATE_STRATEGY"
+  ],
+  "excluded_initial_actions": [
+    "identical_frozen_task_dispatch",
+    "frozen_pre_run_environment_provisioning_completed_before_arm_start",
+    "machine_generated_trace_and_receipt_events"
+  ],
+  "event_definition": "A human intervention is any human-originated input after immutable task dispatch that materially changes the trajectory of an arm.",
+  "machine_retry_accounting": "Machine-initiated retries are not human interventions but are append-only receipt events and are separately counted against the frozen retry ceiling.",
+  "counting_rule": "Count one intervention for each append-only event with timestamp/order, actor=HUMAN, event_type in event_types, and material_effect=true. Do not coalesce events after outcomes are known.",
+  "ambiguity_rule": "FAIL_CLOSED",
+  "append_only_event_fields": [
+    "event_id",
+    "sequence",
+    "timestamp",
+    "actor",
+    "event_type",
+    "material_effect",
+    "cause",
+    "artifact_digest_before",
+    "artifact_digest_after"
+  ],
+  "comparator": "DSH_HUMAN_INTERVENTION_COUNT <= NATIVE_BASELINE_HUMAN_INTERVENTION_COUNT",
+  "immutable_after_dispatch": true
+}

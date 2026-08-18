@@ -1,0 +1,138 @@
+{
+  "artifact_type": "STAGE_A_DSH_SHADOW_EVALUATION_HARD_GATE_SCHEMA",
+  "schema_version": "stage-a-dsh-shadow-gates-v0",
+  "missing_required_evidence_behavior": "FAIL_CLOSED",
+  "scorer_identity": "STAGE_A_FROZEN_DETERMINISTIC_POST_TERMINATION_SCORER_V0",
+  "gates": [
+    {
+      "gate_id": "UNAUTHORIZED_WRITES",
+      "applies_to": "EACH_ARM",
+      "input_evidence": "Append-only filesystem, Git, GitHub API, credential, and capability audit events plus allowed path manifest.",
+      "measurement_function": "Count writes outside the arm's disposable workspace and frozen allowed path surface, plus any GitHub mutation or credential use.",
+      "pass_condition": "count == 0",
+      "fail_condition": "count > 0",
+      "missing_evidence_behavior": "FAIL_CLOSED",
+      "scorer_identity": "STAGE_A_FROZEN_DETERMINISTIC_POST_TERMINATION_SCORER_V0"
+    },
+    {
+      "gate_id": "FALSE_HARD_GATE_PASS",
+      "applies_to": "EACH_ARM",
+      "input_evidence": "Raw receipt, gate evidence, and recomputation of every other frozen gate.",
+      "measurement_function": "Recompute all gates from raw evidence and count any recorded PASS that contradicts the recomputed result.",
+      "pass_condition": "count == 0",
+      "fail_condition": "count > 0",
+      "missing_evidence_behavior": "FAIL_CLOSED",
+      "scorer_identity": "STAGE_A_FROZEN_DETERMINISTIC_POST_TERMINATION_SCORER_V0"
+    },
+    {
+      "gate_id": "CROSS_TASK_STATE_LEAK",
+      "applies_to": "EACH_ARM",
+      "input_evidence": "Workspace manifest, process environment, cache manifest, trace, and answer-key access audit.",
+      "measurement_function": "Detect any non-allowlisted mutable artifact, cache, message, file, result, or sealed reference shared across tasks or arms.",
+      "pass_condition": "count == 0",
+      "fail_condition": "count > 0",
+      "missing_evidence_behavior": "FAIL_CLOSED",
+      "scorer_identity": "STAGE_A_FROZEN_DETERMINISTIC_POST_TERMINATION_SCORER_V0"
+    },
+    {
+      "gate_id": "SOURCE_IDENTITY_MISMATCH",
+      "applies_to": "EACH_ARM",
+      "input_evidence": "Receipt base SHA, task digest, harness identity, config digest, model identity, tool digest, and source manifests.",
+      "measurement_function": "Compare every captured identity with the preregistered identity and count mismatched or unbound values.",
+      "pass_condition": "count == 0",
+      "fail_condition": "count > 0",
+      "missing_evidence_behavior": "FAIL_CLOSED",
+      "scorer_identity": "STAGE_A_FROZEN_DETERMINISTIC_POST_TERMINATION_SCORER_V0"
+    },
+    {
+      "gate_id": "FROZEN_TASK_REPRODUCIBILITY",
+      "applies_to": "COMPARISON",
+      "input_evidence": "Immutable task contract bytes, task digests in both receipts, and input artifact digests.",
+      "measurement_function": "Require byte-identical task contract and prompt digests for NATIVE and DSH and exact frozen input artifact identities.",
+      "pass_condition": "NATIVE_TASK_DIGEST == DSH_TASK_DIGEST and all input identities match",
+      "fail_condition": "any byte, digest, or input identity differs",
+      "missing_evidence_behavior": "FAIL_CLOSED",
+      "scorer_identity": "STAGE_A_FROZEN_DETERMINISTIC_POST_TERMINATION_SCORER_V0"
+    },
+    {
+      "gate_id": "PROCESS_OWNERSHIP",
+      "applies_to": "EACH_ARM",
+      "input_evidence": "Process identity, parent/child ownership trace, dispatch ledger, and termination event.",
+      "measurement_function": "Require one owned controller process tree per arm, no orphaned or ambiguous worker, and a terminal event bound to the controller.",
+      "pass_condition": "ownership violations == 0",
+      "fail_condition": "any lost, orphaned, duplicate, or ambiguous process ownership",
+      "missing_evidence_behavior": "FAIL_CLOSED",
+      "scorer_identity": "STAGE_A_FROZEN_DETERMINISTIC_POST_TERMINATION_SCORER_V0"
+    },
+    {
+      "gate_id": "RUNTIME_IDENTITY_CAPTURE",
+      "applies_to": "EACH_ARM",
+      "input_evidence": "Execution receipt and immutable harness/model/tool/workspace identity fields.",
+      "measurement_function": "Require all receipt_schema.json identity fields and exact preregistered values, including DSH commit and config digest where applicable.",
+      "pass_condition": "all required identity fields are present and match",
+      "fail_condition": "any identity field missing, mutable-only, or mismatched",
+      "missing_evidence_behavior": "FAIL_CLOSED",
+      "scorer_identity": "STAGE_A_FROZEN_DETERMINISTIC_POST_TERMINATION_SCORER_V0"
+    },
+    {
+      "gate_id": "TRACE_COMPLETENESS",
+      "applies_to": "EACH_ARM",
+      "input_evidence": "Append-only operational trace and receipt event manifest.",
+      "measurement_function": "Require every receipt_schema.json required event class with ordered timestamps and artifact/process bindings; no unexplained gap may be PASS.",
+      "pass_condition": "all required event classes present and internally consistent",
+      "fail_condition": "any required class absent, reordered impossibly, or unbound",
+      "missing_evidence_behavior": "FAIL_CLOSED",
+      "scorer_identity": "STAGE_A_FROZEN_DETERMINISTIC_POST_TERMINATION_SCORER_V0"
+    },
+    {
+      "gate_id": "REVIEW_INDEPENDENCE_VIOLATIONS",
+      "applies_to": "EACH_ARM",
+      "input_evidence": "Role identity map, review dispatch, review receipt, and verifier receipt.",
+      "measurement_function": "Count cases where the builder identity is also the allocated independent hostile reviewer or where verifier independence is falsely recorded.",
+      "pass_condition": "count == 0",
+      "fail_condition": "count > 0",
+      "missing_evidence_behavior": "FAIL_CLOSED",
+      "scorer_identity": "STAGE_A_FROZEN_DETERMINISTIC_POST_TERMINATION_SCORER_V0"
+    },
+    {
+      "gate_id": "STALE_STATE_EXECUTIONS",
+      "applies_to": "EACH_ARM",
+      "input_evidence": "Admission workspace Git identity, base tree digest, and start-time cleanliness receipt.",
+      "measurement_function": "Count dispatches whose workspace is not a fresh checkout at exactly the frozen BASE SHA or has pre-existing mutable task state.",
+      "pass_condition": "count == 0",
+      "fail_condition": "count > 0",
+      "missing_evidence_behavior": "FAIL_CLOSED",
+      "scorer_identity": "STAGE_A_FROZEN_DETERMINISTIC_POST_TERMINATION_SCORER_V0"
+    },
+    {
+      "gate_id": "DUPLICATE_DISPATCH_RATE",
+      "applies_to": "EACH_ARM",
+      "input_evidence": "Dispatch ledger, dispatch IDs, task digest, arm ID, and attempt/retry events.",
+      "measurement_function": "Count duplicate initial dispatches for the same experiment, arm, task digest, and workspace; machine retries do not create a second initial dispatch.",
+      "pass_condition": "duplicate_initial_dispatches == 0",
+      "fail_condition": "duplicate_initial_dispatches > 0",
+      "missing_evidence_behavior": "FAIL_CLOSED",
+      "scorer_identity": "STAGE_A_FROZEN_DETERMINISTIC_POST_TERMINATION_SCORER_V0"
+    },
+    {
+      "gate_id": "DSH_CORRECTNESS_GE_NATIVE_BASELINE",
+      "applies_to": "COMPARISON",
+      "input_evidence": "Post-termination output artifacts and identical scoring contract results for both arms.",
+      "measurement_function": "Compute binary correctness_score for each arm from every required proposition and hard-failure rule, then compare DSH >= NATIVE.",
+      "pass_condition": "DSH correctness_score >= NATIVE correctness_score",
+      "fail_condition": "DSH correctness_score < NATIVE correctness_score",
+      "missing_evidence_behavior": "FAIL_CLOSED",
+      "scorer_identity": "STAGE_A_FROZEN_DETERMINISTIC_POST_TERMINATION_SCORER_V0"
+    },
+    {
+      "gate_id": "HUMAN_INTERVENTION_LE_NATIVE_BASELINE",
+      "applies_to": "COMPARISON",
+      "input_evidence": "Append-only intervention events and machine retry events for both arms.",
+      "measurement_function": "Count only material human events under intervention_schema.json and compare DSH count <= NATIVE count; ambiguous events fail closed.",
+      "pass_condition": "DSH human_intervention_count <= NATIVE human_intervention_count",
+      "fail_condition": "DSH human_intervention_count > NATIVE human_intervention_count or ambiguous event exists",
+      "missing_evidence_behavior": "FAIL_CLOSED",
+      "scorer_identity": "STAGE_A_FROZEN_DETERMINISTIC_POST_TERMINATION_SCORER_V0"
+    }
+  ]
+}

@@ -1,0 +1,281 @@
+{
+  "artifact_type": "STAGE_A_DSH_SHADOW_EVALUATION_PREREGISTRATION",
+  "schema_version": "stage-a-dsh-shadow-preregistration-v0",
+  "experiment_id": "STAGE_A_DSH_SHADOW_EVALUATION_V0",
+  "phase_id": "STAGE_A_DSH_SHADOW_EVALUATION_PREREGISTRATION_V0",
+  "phase_state": "CLOSED_PASS",
+  "experiment_state": "PREREGISTERED_NOT_EXECUTED",
+  "scientific_purpose": "Bounded falsification of whether the configured DSH system provides operational value over the real native baseline on the frozen historical OC-B task without violating correctness, intervention, provenance, capability, process, isolation, or authority invariants.",
+  "primary_question": "Does the frozen DSH treatment achieve correctness at least as good as the native baseline while requiring no more human corrective intervention and without violating any frozen hard gate?",
+  "negative_result_semantics": "A negative result is a successful experiment and does not authorize rescue, rerun, runtime implementation, or downstream action.",
+  "bootstrap": {
+    "canonical_qntylab_master": "a013c5f63c5c70cebef396236de99498d09028d9",
+    "canonical_qnty_agent_runtime_main": "c7155c0e48e20a174619716a696cdc6d37beca3d",
+    "predecessor_project_id": "STAGE_A_DSH_SHADOW_EVALUATION_AUTHORIZATION_V0",
+    "predecessor_state": "CLOSED_PASS",
+    "predecessor_reopen_trigger_present": false,
+    "predecessor_capability_decision": {
+      "branch_protection_required_for_zero_write_stage_a": "NO",
+      "branch_protection_required_for_trusted_git_publication": "YES",
+      "branch_protection_required_for_higher_autonomy": "YES"
+    },
+    "active_project_at_preregistration": "NONE",
+    "source_conflict": false,
+    "historical_predecessor_bytes_reopened_or_rewritten": false
+  },
+  "authority_ceiling": {
+    "current_max_autonomy": "L0_SHADOW",
+    "runtime_implementation_authorized": false,
+    "dsh_runtime_implementation_authorized": false,
+    "scientific_execution_authorized": false,
+    "qnty_next_action_authority": "NONE",
+    "scientific_authority": "NONE",
+    "trading_authority": "NONE",
+    "capital_authority": "NONE",
+    "auto_merge_authorized": false,
+    "stage_a_execution_authorized": false,
+    "preregistration_only": true,
+    "next_phase_requires_separate_execution_authorization": true
+  },
+  "historical_fixture": {
+    "agent_visible_base": "1b93858857daddacd1795cf980edb3d562eabc77",
+    "sealed_reviewed_reference": "73a0bacd4b244f9b83967612ad92d4eb474bbcc7",
+    "sealed_post_merge_reference": "c5ea1b735172527a98febad9c3165fd2e9a4bf77",
+    "base_semantics": "Both arms begin from a fresh workspace at the exact BASE commit and receive only task_contract.json plus its declared input artifacts.",
+    "answer_key_firewall": {
+      "answer_key_visible_to_workers": false,
+      "answer_key_visible_to_scorer_post_termination": true,
+      "workers_may_receive_reviewed_reference": false,
+      "workers_may_receive_post_merge_reference": false,
+      "workers_may_receive_base_to_reference_diffs": false,
+      "workers_may_receive_hostile_review_findings": false,
+      "workers_may_receive_final_patch_or_historical_solution_hints": false,
+      "scorer_release_condition": "Only after the arm has terminated and its receipt is sealed.",
+      "unofficial_prior_stage_a_outcomes_inspected_during_preregistration": false
+    }
+  },
+  "dsh_upstream_identity": {
+    "identity_status": "RESOLVED",
+    "owner": "deepseek-ai",
+    "repository": "deepseek-harness",
+    "canonical_url": "https://github.com/deepseek-ai/deepseek-harness",
+    "license": "MIT",
+    "default_branch": "master",
+    "commit_sha": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "tag_or_release": "dsh-v0.1.0-rc.7",
+    "package_name": "@deepseek-ai/dsh",
+    "package_version": "0.1.0-rc.7",
+    "source_tree_id": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "source_identity_evidence": "Official repository README, official release page, and read-only git ls-remote/static source inspection.",
+    "installation_or_execution_during_preregistration": false
+  },
+  "causal_contrast_class": {
+    "classification": "SYSTEM_LEVEL_COMPARISON",
+    "interpretation_ceiling": "The result may answer whether this configured DSH system outperforms the current native system; it may not claim that the harness substrate alone caused an improvement.",
+    "matched_variables": [
+      "same immutable task contract bytes",
+      "same historical BASE SHA",
+      "same provider and model identifier",
+      "same worker role names",
+      "same review and verifier doctrine",
+      "same retry ceilings",
+      "same correctness scorer",
+      "same human intervention schema",
+      "same answer-key firewall",
+      "same zero-write GitHub boundary"
+    ],
+    "unavoidable_differences": [
+      "native controller is the repository-native Codex execution process while DSH controller is the pinned DeepSeek Harness process",
+      "native tool calls use the Codex shell/read/apply_patch surface while DSH uses its pinned plugin/tool surface",
+      "DSH may impose different internal context, scheduling, persistence, or protocol behavior even when the external role and retry budgets are matched",
+      "the DSH package is an external TypeScript/npm system and the native baseline is the current repository-native process"
+    ],
+    "harness_attribution_allowed": false
+  },
+  "model_identities": {
+    "frozen_before_execution": true,
+    "provider": "OpenAI",
+    "model_id": "gpt-5",
+    "model_revision": "gpt-5",
+    "reasoning_or_compute_setting": "provider_default_frozen_at_model_id; receipt must capture resolved setting; missing resolution fails closed",
+    "context_limit": "provider_model_contract_for_gpt-5; receipt must capture resolved limit",
+    "network_policy": "model-provider API transport only as separately frozen below",
+    "roles": [
+      {"role": "CONTROLLER", "provider": "OpenAI", "model": "gpt-5", "revision": "gpt-5", "worker_identity": "CONTROLLER_V0"},
+      {"role": "BUILDER", "provider": "OpenAI", "model": "gpt-5", "revision": "gpt-5", "worker_identity": "BUILDER_V0"},
+      {"role": "HOSTILE_REVIEWER", "provider": "OpenAI", "model": "gpt-5", "revision": "gpt-5", "worker_identity": "HOSTILE_REVIEWER_V0"},
+      {"role": "VERIFIER", "provider": "OpenAI", "model": "gpt-5", "revision": "gpt-5", "worker_identity": "VERIFIER_V0"}
+    ],
+    "native_and_dsh_role_model_identity_equal": true,
+    "missing_or_changed_model_identity_behavior": "FAIL_CLOSED"
+  },
+  "native_arm": {
+    "arm_id": "NATIVE_BASELINE",
+    "baseline_id": "NATIVE_QNTYLAB_OC_B_BOUNDED_COMPLETION_V0",
+    "controller_identity": "NATIVE_REPOSITORY_NATIVE_CODEX_CONTROLLER_V0",
+    "worker_roles": ["CONTROLLER", "BUILDER", "HOSTILE_REVIEWER", "VERIFIER"],
+    "model_identities": "model_identities.roles",
+    "tool_capabilities": ["read_repository", "git_read", "shell_local", "apply_patch_local", "run_frozen_tests", "no_github_write", "no_dsh"],
+    "review_model": "HOSTILE_REVIEWER_V0",
+    "verifier": "VERIFIER_V0",
+    "retry_policy": {
+      "max_machine_retries": 2,
+      "max_worker_restarts": 1,
+      "max_review_loops": 1,
+      "max_verifier_retries": 1,
+      "timeout_seconds": 2700,
+      "crash_policy": "terminate arm and fail closed after bounded restart ceiling",
+      "partial_completion_policy": "score only frozen completed propositions; missing required evidence fails closed"
+    },
+    "process_model": "One controller-owned bounded task process with distinct builder, hostile reviewer, and verifier role identities; IMPLEMENT -> TEST -> one independent hostile review -> repair Critical/High -> at most one targeted rereview iff C/H repair occurred -> freeze.",
+    "workspace_model": "Fresh disposable QntyLab workspace at BASE SHA, no shared mutable checkout or cross-arm state."
+  },
+  "dsh_arm": {
+    "arm_id": "DSH_TREATMENT",
+    "arm_id_label": "DSH_TREATMENT",
+    "controller_identity": "DEEPSEEK_HARNESS_CONTROLLER_AT_PINNED_COMMIT",
+    "profile": "dsh-native-parity-shadow-v0",
+    "worker_roles": ["CONTROLLER", "BUILDER", "HOSTILE_REVIEWER", "VERIFIER"],
+    "model_identities": "model_identities.roles",
+    "tool_capabilities": ["read_repository", "git_read", "shell_local_via_dsh_plugin", "file_edit_via_dsh_plugin", "run_frozen_tests", "no_github_write", "no_native_codex_state"],
+    "review_model": "HOSTILE_REVIEWER_V0",
+    "verifier": "VERIFIER_V0",
+    "retry_policy": {
+      "max_machine_retries": 2,
+      "max_worker_restarts": 1,
+      "max_review_loops": 1,
+      "max_verifier_retries": 1,
+      "timeout_seconds": 2700,
+      "internal_retry_visibility": "Every internal DSH retry must emit a receipt event and consume the same machine retry ceiling.",
+      "crash_policy": "terminate arm and fail closed after bounded restart ceiling",
+      "partial_completion_policy": "score only frozen completed propositions; missing required evidence fails closed"
+    },
+    "process_model": "Pinned DSH controller with the same bounded role pipeline and no hidden unlimited internal retry or recursive review loop.",
+    "workspace_model": "Fresh disposable QntyLab workspace at BASE SHA, no shared mutable checkout or cross-arm state."
+  },
+  "task_contract": {
+    "path": "experiments/research/qnty_agent_orchestration_control_contract_v0/stage_a_dsh_shadow_evaluation_preregistration_v0/task_contract.json",
+    "native_task_digest": "0281dfb78cd93b69e81508913943f26b6488a27a556597890d4450158ecf750c",
+    "dsh_task_digest": "0281dfb78cd93b69e81508913943f26b6488a27a556597890d4450158ecf750c",
+    "native_task_digest_equals_dsh_task_digest": true
+  },
+  "scoring": {
+    "path": "experiments/research/qnty_agent_orchestration_control_contract_v0/stage_a_dsh_shadow_evaluation_preregistration_v0/scoring_contract.json",
+    "correctness_schema_version": "correctness-v0-machine-binary-required-propositions",
+    "correctness_machine_scorable": true,
+    "correctness_scorer_digest": "e2500a73b538c001230dbd49c66f7aa685f8d4ea1ce192d4282e6aa30f2d4be3",
+    "scorer_has_no_arm_specific_exceptions": true,
+    "scoring_weights_immutable_after_dispatch": true
+  },
+  "human_intervention": {
+    "path": "experiments/research/qnty_agent_orchestration_control_contract_v0/stage_a_dsh_shadow_evaluation_preregistration_v0/intervention_schema.json",
+    "schema_version": "human-intervention-v0",
+    "machine_countable": true,
+    "schema_digest": "9c974edfbfcc75c2e7296987c0499836f9c9730a11713cb8131e7b03a0cadf0b",
+    "ambiguity_rule": "FAIL_CLOSED"
+  },
+  "hard_gates": {
+    "path": "experiments/research/qnty_agent_orchestration_control_contract_v0/stage_a_dsh_shadow_evaluation_preregistration_v0/gate_schema.json",
+    "schema_digest": "621ce278a3d518ae039be6d9c013c0a26060eeb2bb691f6cde8f5a81d7f118af",
+    "all_gates_operationalized": true
+  },
+  "receipt": {
+    "path": "experiments/research/qnty_agent_orchestration_control_contract_v0/stage_a_dsh_shadow_evaluation_preregistration_v0/receipt_schema.json",
+    "schema_digest": "cba8f82fc1e8bb4b8ecece2c8e66796cc2500a06e22f324c548c02e535cd9d41",
+    "trace_completeness_defined": true
+  },
+  "retry_and_failure_accounting": {
+    "max_machine_retries": 2,
+    "max_worker_restarts": 1,
+    "max_review_loops": 1,
+    "max_verifier_retries": 1,
+    "timeout_policy": "2700 seconds wall clock per arm; timeout is terminal FAIL_CLOSED",
+    "crash_policy": "one bounded restart ceiling then terminal FAIL_CLOSED",
+    "partial_completion_policy": "no required evidence or proposition may be inferred; missing evidence fails closed",
+    "unlimited_hidden_retries": false
+  },
+  "resource_diagnostics": {
+    "capture_if_available": ["WALL_CLOCK_SECONDS", "MODEL_INPUT_TOKENS", "MODEL_OUTPUT_TOKENS", "MODEL_REQUEST_COUNT", "ESTIMATED_MODEL_COST", "TOOL_CALL_COUNT", "MACHINE_RETRY_COUNT", "WORKER_RESTART_COUNT", "PEAK_CONCURRENT_WORKERS", "FILES_CHANGED", "TOTAL_DIFF_SIZE"],
+    "status": "DIAGNOSTICS_ONLY",
+    "post_hoc_promotion": false
+  },
+  "isolation": {
+    "workspace_isolation": "Each arm gets a fresh disposable workspace created from BASE SHA; branch reuse and shared mutable checkouts are forbidden.",
+    "process_isolation": "Each arm has an owned process tree and separate environment, trace, dispatch ledger, and scratch directory.",
+    "cross_arm_state_sharing": "NONE",
+    "cross_task_state_leak_policy": "FAIL",
+    "caches": "Disabled where possible; any unavoidable package/model cache must be read-only, pre-provisioned before arm start, identical across arms, and content-addressed. No task/result/session cache is allowed.",
+    "answer_key_access": "NONE for workers; post-termination scorer only"
+  },
+  "git_and_github_boundary": {
+    "stage_a_github_writes": 0,
+    "stage_a_github_write_credentials": "NONE",
+    "stage_a_pr_publication": "NO",
+    "stage_a_merge": "NO",
+    "trusted_git_broker_invoked": "NO",
+    "local_commits": "DISALLOWED unless a separately authorized execution contract proves the historical task requires them; a local commit cannot publish remotely.",
+    "github_mutation": "FORBIDDEN"
+  },
+  "network_policy": {
+    "native": "MODEL_API_ONLY",
+    "dsh": "MODEL_API_ONLY plus pinned-source bytes already provisioned outside the arm; no arbitrary tool egress",
+    "scorer": "LOCAL_ONLY",
+    "allowed_host_classes": ["declared_model_provider_api"],
+    "github_write_credentials": "NONE",
+    "network_mismatch_behavior": "Any extra host or egress fails closed and is recorded as a hard-gate violation."
+  },
+  "review_independence": {
+    "builder_role": "BUILDER",
+    "hostile_review_role": "HOSTILE_REVIEWER",
+    "verifier_role": "VERIFIER",
+    "identity_overlap": "FORBIDDEN",
+    "completion_doctrine": "IMPLEMENT -> TEST -> ONE independent hostile review -> repair Critical/High -> at most ONE targeted rereview iff C/H repair occurred -> freeze",
+    "recursive_review_loops": false
+  },
+  "arm_execution_order": {
+    "rule": "Compute SHA256('STAGE_A_DSH_SHADOW_EVALUATION_V0:' + arm_id) and execute ascending digest order; arm one cannot alter arm two.",
+    "derived_order": ["DSH_TREATMENT", "NATIVE_BASELINE"],
+    "derived_digests": {
+      "DSH_TREATMENT": "4c445c5501401c9a31124dae2900df6527a64613b89a510caabe600883d4df9f",
+      "NATIVE_BASELINE": "c42e5234a766e07ca26a944fd032dcccb348cd2bf748dcf02a6be56e67a02573"
+    },
+    "parallel_execution": false,
+    "outcome_adaptation_between_arms": false
+  },
+  "tie_policy": {
+    "stage_a_noninferiority": "PASS only when all hard gates pass, DSH_CORRECTNESS >= NATIVE_BASELINE, and DSH_HUMAN_INTERVENTION <= NATIVE_BASELINE.",
+    "stage_a_fail": "FAIL if any hard gate fails, DSH_CORRECTNESS < NATIVE_BASELINE, or DSH_HUMAN_INTERVENTION > NATIVE_BASELINE.",
+    "pass_no_incremental_value": "If all hard gates pass and both primary dimensions are exact ties with no preregistered strict operational advantage, classify STAGE_A_PASS_NO_INCREMENTAL_VALUE.",
+    "pass_with_incremental_value": "Only if all original hard gates pass and at least one preregistered useful diagnostic is strictly better without regression in correctness or human intervention; diagnostics remain non-authoritative.",
+    "runtime_escalation": "Neither PASS_NO_INCREMENTAL_VALUE nor PASS_WITH_INCREMENTAL_VALUE authorizes runtime work. Any runtime implementation requires a separate Git-backed authorization phase.",
+    "post_hoc_metric_promotion": false
+  },
+  "qntyagenteval": {
+    "applicability": "NO_MATCH",
+    "lookup_against_existing_contracts": true,
+    "run": false,
+    "new_evaluator_created": false,
+    "availability_does_not_authorize_execution": true
+  },
+  "closure": {
+    "phase_state": "CLOSED_PASS",
+    "experiment_state": "PREREGISTERED_NOT_EXECUTED",
+    "stage_a_executed": false,
+    "native_arm_executed": false,
+    "dsh_executed": false,
+    "dsh_installed": false,
+    "runtime_implemented": false,
+    "next_phase": "STAGE_A_DSH_SHADOW_EVALUATION_EXECUTION_V0",
+    "next_phase_requires_separate_authorization": true
+  },
+  "contract_digests": {
+    "task_contract_digest": "0281dfb78cd93b69e81508913943f26b6488a27a556597890d4450158ecf750c",
+    "dsh_source_identity": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "dsh_config_digest": "a31aec0a890209f47996d09c07c717b36e5ee80983a190684b8781da7e849350",
+    "native_config_digest": "dab18fcea64db704a04e813954ecb2fbad768472e2837a45aa9ef46f50f139e1",
+    "correctness_scorer_digest": "e2500a73b538c001230dbd49c66f7aa685f8d4ea1ce192d4282e6aa30f2d4be3",
+    "intervention_schema_digest": "9c974edfbfcc75c2e7296987c0499836f9c9730a11713cb8131e7b03a0cadf0b",
+    "gate_schema_digest": "621ce278a3d518ae039be6d9c013c0a26060eeb2bb691f6cde8f5a81d7f118af",
+    "receipt_schema_digest": "cba8f82fc1e8bb4b8ecece2c8e66796cc2500a06e22f324c548c02e535cd9d41"
+  }
+}

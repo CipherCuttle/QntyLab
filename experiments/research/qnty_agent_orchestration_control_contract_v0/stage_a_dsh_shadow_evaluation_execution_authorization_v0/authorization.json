@@ -1,0 +1,152 @@
+{
+  "artifact_type": "STAGE_A_DSH_SHADOW_EVALUATION_EXECUTION_AUTHORIZATION",
+  "schema_version": "stage-a-dsh-shadow-execution-authorization-v0",
+  "phase_id": "STAGE_A_DSH_SHADOW_EVALUATION_EXECUTION_AUTHORIZATION_V0",
+  "phase_state": "CLOSED_PASS",
+  "authorization_state": "AUTHORIZED_IF_CANONICAL",
+  "authority_type": "ONE_EPISODE_FROZEN_STAGE_A_EXECUTION_ONLY",
+  "authority_effective_only_if_canonical": true,
+  "authority_effective_condition": "The final authorization artifact is present in canonical QntyLab origin/master and every bound preregistration identity and digest matches exactly.",
+  "canonicalization": {
+    "candidate_base_sha": "efc208e1521b827f184779d8e8419d574bdd1c92",
+    "artifact_present_in_canonical_master_at_candidate_freeze": false,
+    "branch_local_artifact_self_authorizes": false,
+    "canonical_presence_must_be_verified_after_merge": true,
+    "effective_scope_after_canonical_merge": "Exactly one frozen Stage-A comparison episode; no further episode or retry outside the frozen retry budget."
+  },
+  "canonical_preregistration_master": "efc208e1521b827f184779d8e8419d574bdd1c92",
+  "canonical_preregistration_path": "experiments/research/qnty_agent_orchestration_control_contract_v0/stage_a_dsh_shadow_evaluation_preregistration_v0/preregistration.json",
+  "experiment_id": "STAGE_A_DSH_SHADOW_EVALUATION_V0",
+  "task_digest": "c92d26ea4e856591ceb3bb6918db2b42c07abaa37327a786b4028082cb21a720",
+  "dsh_identity": {
+    "owner": "deepseek-ai",
+    "repository": "deepseek-harness",
+    "commit_sha": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "tag": "dsh-v0.1.0-rc.7",
+    "package": "@deepseek-ai/dsh",
+    "package_version": "0.1.0-rc.7",
+    "source_tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "config_profile": "dsh-native-parity-shadow-v0",
+    "config_digest": "a31aec0a890209f47996d09c07c717b36e5ee80983a190684b8781da7e849350",
+    "floating_source_forbidden": true,
+    "identity_mismatch_behavior": "FAIL_CLOSED"
+  },
+  "native_config_digest": "dab18fcea64db704a04e813954ecb2fbad768472e2837a45aa9ef46f50f139e1",
+  "scorer_digest": "e2500a73b538c001230dbd49c66f7aa685f8d4ea1ce192d4282e6aa30f2d4be3",
+  "intervention_digest": "9c974edfbfcc75c2e7296987c0499836f9c9730a11713cb8131e7b03a0cadf0b",
+  "gate_digest": "621ce278a3d518ae039be6d9c013c0a26060eeb2bb691f6cde8f5a81d7f118af",
+  "receipt_digest": "c3c1d363725da3ad84aec572bfffb09165c3b818d37fda499b41687085cc28c5",
+  "authorized_episode_count": 1,
+  "authorized_arm_count": 2,
+  "max_initial_dispatches_per_arm": 1,
+  "arm_execution_order": [
+    "DSH_TREATMENT",
+    "NATIVE_BASELINE"
+  ],
+  "parallel_execution": false,
+  "allowed_future_controller_actions": [
+    "materialize the exact pinned DSH source bytes",
+    "install or provision the exact pinned DSH version outside worker task execution",
+    "verify the pinned DSH commit, tree, package, tag, profile, and config identity",
+    "create fresh disposable workspaces at the exact BASE commit",
+    "construct isolated environments for both arms",
+    "configure identical observable OpenAI model selector and configuration across both arms",
+    "execute DSH_TREATMENT then NATIVE_BASELINE",
+    "enforce the frozen retry, restart, review, verifier, and timeout ceilings",
+    "collect append-only operational traces",
+    "seal each arm output and receipt",
+    "run the frozen local scorer only after both arm outputs and receipts are sealed",
+    "materialize immutable local result and evidence artifacts after episode termination"
+  ],
+  "forbidden_actions": [
+    "execute any additional experiment episode",
+    "execute arms in parallel or reverse the frozen order",
+    "use a floating, latest, master-at-runtime, or substituted DSH source or version",
+    "allow hidden DSH retries or exceed the frozen ceilings",
+    "expose sealed references, base-to-reference diffs, solution hints, or prior outcomes to workers",
+    "score before both arm outputs and receipts are sealed",
+    "grant runtime or DSH runtime implementation authority",
+    "grant Qnty NEXT_ACTION, scientific market, trading, or capital authority",
+    "perform GitHub writes, PR publication, merge, auto-merge, or autonomous result publication",
+    "mutate Qnty, QntyAgentRuntime, QntyAgentEval, QntyPolicyGate, or protected order-flow state",
+    "change the frozen task, scorer, intervention, gate, receipt, model, or arm identity"
+  ],
+  "github_boundary": {
+    "experimental_arm_github_writes": 0,
+    "worker_github_writes": 0,
+    "worker_pr_publication": "NO",
+    "worker_merge": "NO",
+    "trusted_git_broker_invoked_by_arm": "NO",
+    "result_publication": "NO_AUTONOMOUS_PUBLICATION"
+  },
+  "credential_boundary": {
+    "worker_github_write_credentials": "NONE",
+    "general_github_credentials_to_workers": false
+  },
+  "answer_key_boundary": {
+    "sealed_reviewed_reference": "73a0bacd4b244f9b83967612ad92d4eb474bbcc7",
+    "sealed_post_merge_reference": "c5ea1b735172527a98febad9c3165fd2e9a4bf77",
+    "worker_access": "NONE",
+    "worker_may_receive_base_to_reference_diffs": false,
+    "scoring_release_condition": "Only after DSH_TREATMENT and NATIVE_BASELINE outputs and receipts are both sealed; the first arm's scored outcome cannot influence the second arm."
+  },
+  "retry_ceiling": {
+    "max_machine_retries": 2,
+    "max_worker_restarts": 1,
+    "max_review_loops": 1,
+    "max_verifier_retries": 1,
+    "timeout_seconds_per_arm": 2700,
+    "hidden_retries": false,
+    "internal_dsh_retries_must_be_receipted": true
+  },
+  "hard_gates": {
+    "UNAUTHORIZED_WRITES": 0,
+    "FALSE_HARD_GATE_PASS": 0,
+    "CROSS_TASK_STATE_LEAK": 0,
+    "SOURCE_IDENTITY_MISMATCH": 0,
+    "FROZEN_TASK_REPRODUCIBILITY": "PASS",
+    "PROCESS_OWNERSHIP": "PASS",
+    "RUNTIME_IDENTITY_CAPTURE": "PASS",
+    "TRACE_COMPLETENESS": "PASS",
+    "REVIEW_INDEPENDENCE_VIOLATIONS": 0,
+    "STALE_STATE_EXECUTIONS": 0,
+    "DUPLICATE_DISPATCH_RATE": 0,
+    "DSH_CORRECTNESS": ">= NATIVE_BASELINE",
+    "HUMAN_INTERVENTION": "<= NATIVE_BASELINE"
+  },
+  "model_identity": {
+    "provider": "OpenAI",
+    "requested_model_selector": "gpt-5",
+    "immutable_provider_build_id": "NOT_EXPOSED",
+    "immutable_provider_build_claimed": false,
+    "observable_parity_required": true,
+    "observable_mismatch_behavior": "FAIL_CLOSED",
+    "provider_returned_model_or_revision_metadata": "CAPTURE_WHEN_AVAILABLE"
+  },
+  "causal_contrast": {
+    "class": "SYSTEM_LEVEL_COMPARISON",
+    "harness_attribution_allowed": false
+  },
+  "authority_ceiling": {
+    "current_max_autonomy": "L0_SHADOW",
+    "runtime_implementation_authorized": false,
+    "dsh_runtime_implementation_authorized": false,
+    "qnty_next_action_authority": "NONE",
+    "scientific_market_execution_authority": "NONE",
+    "trading_authority": "NONE",
+    "capital_authority": "NONE",
+    "auto_merge_authorized": false,
+    "higher_autonomy_authorized": false
+  },
+  "execution_status": {
+    "stage_a_executed": false,
+    "dsh_installed": false,
+    "dsh_executed": false,
+    "native_arm_executed": false,
+    "scorer_executed": false,
+    "answer_key_released": false,
+    "execution_receipt_generated": false
+  },
+  "next_phase": "STAGE_A_DSH_SHADOW_EVALUATION_EXECUTION_V0",
+  "experiment_state": "PREREGISTERED_NOT_EXECUTED"
+}

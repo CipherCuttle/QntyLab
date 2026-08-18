@@ -54,3 +54,10 @@ durable_role = "EXTERNAL_GIT_GOVERNANCE_POLICY_BOUNDARY"
 default_branch = "main"
 context_access = "NARROW_READ_ONLY_ADAPTER"
 adapter_status = "ADAPTER_NOT_IMPLEMENTED"
+
+[[repository]]
+repository_id = "QntyAgentRuntime"
+durable_role = "NON_AUTHORITATIVE_AGENT_EXECUTION_AND_ROUTING_RUNTIME"
+default_branch = "main"
+context_access = "NARROW_READ_ONLY_ADAPTER"
+adapter_status = "ADAPTER_NOT_IMPLEMENTED"

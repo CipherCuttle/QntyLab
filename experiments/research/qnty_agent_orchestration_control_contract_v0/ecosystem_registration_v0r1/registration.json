@@ -1,0 +1,101 @@
+{
+  "artifact_type": "QNTY_AGENT_RUNTIME_ECOSYSTEM_REGISTRATION_V0R1",
+  "schema_version": "qnty-agent-runtime-ecosystem-registration-v1",
+  "phase": "QNTY_AGENT_RUNTIME_ECOSYSTEM_REGISTRATION_V0R1",
+  "registration_status": "CLOSED_PASS",
+  "pre_review_candidate_sha": "b91c7927683d792c10ac418a33c9fb2fd0117f63",
+  "canonical_reconciliation": {
+    "qntylab_repository": "CipherCuttle/QntyLab",
+    "qntylab_canonical_master_sha": "942332d6b572d0ff3b7ac0def9e22a4060b14312",
+    "qnty_agent_runtime_repository": "CipherCuttle/QntyAgentRuntime",
+    "qnty_agent_runtime_repository_id": 1337831072,
+    "qnty_agent_runtime_visibility": "PRIVATE",
+    "qnty_agent_runtime_default_branch": "main",
+    "qnty_agent_runtime_canonical_main_sha": "c7155c0e48e20a174619716a696cdc6d37beca3d",
+    "source_conflict": false,
+    "h01_canonical_closure": "CLOSED_PASS",
+    "old_blocked_registration_reused": false
+  },
+  "runtime_identity": {
+    "repository_full_name": "CipherCuttle/QntyAgentRuntime",
+    "repository_id": 1337831072,
+    "visibility": "PRIVATE",
+    "default_branch": "main",
+    "canonical_main": "c7155c0e48e20a174619716a696cdc6d37beca3d",
+    "canonical_contract": "docs/control/QNTY_AGENT_ORCHESTRATION_CONTROL_CONTRACT_V0.md",
+    "canonical_tree_files": [
+      "AGENTS.md",
+      "README.md",
+      "contracts/CONTINUATION_PROPOSAL_V0.schema.json",
+      "contracts/DISPATCH_RECEIPT_V0.schema.json",
+      "contracts/EPISODE_PACKAGE_V0.schema.json",
+      "contracts/TASK_CONTRACT_V0.schema.json",
+      "docs/control/QNTY_AGENT_ORCHESTRATION_CONTROL_CONTRACT_V0.md",
+      "tests/test_control_contract_v0.py"
+    ],
+    "no_runtime": true,
+    "no_dsh": true,
+    "current_max_autonomy": "L0_SHADOW",
+    "control_invariants": "C01-C18_PRESERVED",
+    "review_independent_preserved": true,
+    "provenance_complete_preserved": true
+  },
+  "registration_eligibility": {
+    "repository_exists": true,
+    "immutable_git_identity_established": true,
+    "canonical_contract_present": true,
+    "h01_canonical_closure": "CLOSED_PASS",
+    "role_unambiguous": true,
+    "authority_boundary_valid": true,
+    "no_runtime_implementation": true,
+    "no_dsh_implementation": true,
+    "second_control_plane_created": false,
+    "eligible": true
+  },
+  "context_view": {
+    "spine_visible": true,
+    "brief_visible": false,
+    "brief_external_repository_section_visible": false,
+    "brief_omission": "EXPECTED_NON_ADAPTER_PRESENTATION_LIMIT",
+    "project_context_py_changed": false
+  },
+  "branch_protection": {
+    "state": "UNAVAILABLE_GITHUB_PLAN_403",
+    "current_l0_registration_blocker": false,
+    "stage_a_blocker": true,
+    "future_trusted_git_broker_prerequisite": true,
+    "future_higher_autonomy_prerequisite": true,
+    "mutated": false
+  },
+  "qnty_agent_eval": {
+    "compatible_existing_contract": "NO_MATCH",
+    "run": false,
+    "result": "NOT_APPLICABLE"
+  },
+  "authority": {
+    "runtime_implementation_authorized": false,
+    "dsh_implementation_authorized": false,
+    "current_max_autonomy": "L0_SHADOW",
+    "qnty_next_action_authority": "NONE",
+    "scientific_authority": "NONE",
+    "trading_authority": "NONE",
+    "capital_authority": "NONE",
+    "auto_merge_authorized": false,
+    "authority_increase": false
+  },
+  "review": {
+    "status": "PASS",
+    "independent_reviewer": "INDEPENDENT_HOSTILE_GOVERNANCE_PASS_1",
+    "attacks_checked": 20,
+    "findings": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "c_h_repair": false,
+    "repaired_sha": null,
+    "targeted_rereview": false,
+    "predeclared_review_results": false
+  }
+}

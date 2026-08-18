@@ -398,11 +398,11 @@ def test_adr0007_resolves_as_global_architecture_and_adr0005_as_scientific_compa
 def test_external_adapter_status_is_explicit_not_implemented() -> None:
     packet = project_context.compile_context_spine(ROOT)
     external = {record["repository_id"]: record for record in packet["external_repositories"]}
-    assert sorted(external) == ["Qnty", "QntyAgentEval", "QntyPolicyGate"]
+    assert sorted(external) == ["Qnty", "QntyAgentEval", "QntyAgentRuntime", "QntyPolicyGate"]
     assert external["Qnty"]["adapter_status"] == "READ_ONLY_ADAPTER_IMPLEMENTED"
     assert external["Qnty"]["context_state"] == "UNAVAILABLE_WITHOUT_EXPLICIT_ROOT"
     assert external["Qnty"]["observation"] is None
-    for repository_id in ("QntyAgentEval", "QntyPolicyGate"):
+    for repository_id in ("QntyAgentEval", "QntyAgentRuntime", "QntyPolicyGate"):
         record = external[repository_id]
         assert record["adapter_status"] == "ADAPTER_NOT_IMPLEMENTED"
         assert record["context_state"] == "UNAVAILABLE_WITHOUT_ADAPTER"

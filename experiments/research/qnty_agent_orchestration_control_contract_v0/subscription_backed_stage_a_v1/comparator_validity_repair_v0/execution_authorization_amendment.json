@@ -1,0 +1,102 @@
+{
+  "artifact_type": "SUBSCRIPTION_BACKED_STAGE_A_V1_EXECUTION_AUTHORIZATION_AMENDMENT",
+  "schema_version": "subscription-backed-stage-a-execution-authorization-amendment-v0",
+  "amendment_id": "SUBSCRIPTION_BACKED_STAGE_A_V1_COMPARATOR_VALIDITY_REPAIR_V0",
+  "phase_id": "SUBSCRIPTION_BACKED_STAGE_A_V1_COMPARATOR_VALIDITY_REPAIR_V0",
+  "authorization_state": "AUTHORIZED_IF_CANONICAL",
+  "amendment_type": "SUPERSEDING_ADDITIVE_SAME_EPISODE",
+  "reason": "Execution semantics are being narrowed by the comparator-validity amendment. The prior authorization alone is not claimed to bind the repaired interpretation, so this superseding additive authorization is issued in the same pull request.",
+  "amends": {
+    "prior_authorization_path": "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_stage_a_v1/execution_authorization.json",
+    "prior_authorization_artifact_type": "SUBSCRIPTION_BACKED_STAGE_A_V1_EXECUTION_AUTHORIZATION",
+    "prior_authorization_bytes_changed": false,
+    "prior_authorized_episode_count": 1,
+    "prior_episode_consumption": 0,
+    "prior_authorization_superseded_only_in_interpretation": true
+  },
+  "authorized_experiment": "SUBSCRIPTION_BACKED_STAGE_A_V1",
+  "authority_type": "ONE_EPISODE_SUBSCRIPTION_BACKED_STAGE_A_V1_ONLY",
+  "same_experiment": true,
+  "same_single_episode": true,
+  "additional_episode_added": false,
+  "authorized_episode_count_after_repair": 1,
+  "authorized_arm_count": 2,
+  "prior_episode_consumption": 0,
+  "cumulative_authorized_episode_count": 1,
+  "second_episode_allowed": false,
+  "rescue_rerun_allowed": false,
+  "no_rescue_rerun_after_capacity_failure": true,
+  "no_rescue_rerun_after_invalid_benchmark": true,
+  "requires": {
+    "comparator_validity_amendment_canonical": true,
+    "comparator_validity_amendment_path": "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_stage_a_v1/comparator_validity_repair_v0/amendment.json",
+    "canonical_pr_131_merge_present": "332bf46a5543b852197547ffd850b563039c75e5",
+    "canonical_merge_presence_must_be_verified": true
+  },
+  "effectiveness": {
+    "authority_effective_only_if_canonical": true,
+    "effective_only_after_canonical_merge": true,
+    "branch_local_execution_authorized": false,
+    "branch_local_candidate_cannot_self_authorize": true,
+    "canonical_master_at_amendment_base": "332bf46a5543b852197547ffd850b563039c75e5"
+  },
+  "preserved_boundaries": {
+    "zero_fee_contract_preserved": true,
+    "pay_per_token_model_api_keys_allowed": false,
+    "openai_api_key_allowed": false,
+    "anthropic_api_key_allowed": false,
+    "deepseek_api_key_allowed": false,
+    "other_model_api_key_allowed": false,
+    "existing_product_subscription_auth_allowed": true,
+    "product_identities_preserved": true,
+    "role_mapping_preserved": true,
+    "answer_key_firewall_preserved": true,
+    "retry_ceilings_preserved": true,
+    "arm_order_preserved": true,
+    "arm_1": "DSH_TREATMENT",
+    "arm_2": "NATIVE_BASELINE",
+    "dsh_arm_first_native_arm_second": true
+  },
+  "digest_bindings": {
+    "task_digest": "c92d26ea4e856591ceb3bb6918db2b42c07abaa37327a786b4028082cb21a720",
+    "scorer_digest": "e2500a73b538c001230dbd49c66f7aa685f8d4ea1ce192d4282e6aa30f2d4be3",
+    "intervention_digest": "9c974edfbfcc75c2e7296987c0499836f9c9730a11713cb8131e7b03a0cadf0b",
+    "gate_digest": "a5960abe091a3f7938e2d0bd9c9e91d166d95a32900ce20711201547af5be88f",
+    "receipt_digest": "aa2f6585531c8241e267421c99ba14ea6af6a492b6185aaf407e8d27a0023575",
+    "controller_contract_digest": "08790f522dcd3c0df6edd321ec62bd2ffda25758e413fa9a5d899c9c6e528178",
+    "digests_changed_by_this_amendment": "NONE"
+  },
+  "controller_path": "qntylab/subscription_backed_stage_a_v1.py",
+  "comparator_path": "qntylab/subscription_backed_stage_a_v1_comparator_validity_v0.py",
+  "execution_status": {
+    "historical_task_executed": false,
+    "treatment_dispatch_count": 0,
+    "baseline_dispatch_count": 0,
+    "episode_consumed": false,
+    "answer_key_released": false,
+    "empirical_scoring": false,
+    "execution_receipt_generated": false
+  },
+  "forbidden_actions": [
+    "execute the historical task in this phase",
+    "add a second authorized episode",
+    "rescue-rerun after STAGE_A_V1_INVALID_BENCHMARK_BOTH_ARMS_INCORRECT",
+    "rescue-rerun after STAGE_A_V1_INVALID_ENVIRONMENT_OR_PRODUCT_CAPACITY",
+    "reorder the frozen classification precedence after observing results",
+    "merge automatically",
+    "publish empirical result automatically",
+    "authorize runtime integration",
+    "authorize Qnty/runtime/science/trading/capital action"
+  ],
+  "authority_ceiling": {
+    "current_max_autonomy": "L0_SHADOW",
+    "runtime_implementation_authorized": false,
+    "dsh_runtime_implementation_authorized": false,
+    "qnty_next_action_authority": "NONE",
+    "trading_authority": "NONE",
+    "capital_authority": "NONE",
+    "auto_merge_authorized": false
+  },
+  "qntyagenteval": {"applicability": "NO_MATCH", "run": false},
+  "source_conflict": false
+}

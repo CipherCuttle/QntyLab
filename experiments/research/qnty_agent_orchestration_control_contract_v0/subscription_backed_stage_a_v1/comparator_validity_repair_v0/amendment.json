@@ -1,0 +1,159 @@
+{
+  "artifact_type": "SUBSCRIPTION_BACKED_STAGE_A_V1_COMPARATOR_VALIDITY_AMENDMENT",
+  "schema_version": "subscription-backed-stage-a-comparator-validity-amendment-v0",
+  "amendment_id": "SUBSCRIPTION_BACKED_STAGE_A_V1_COMPARATOR_VALIDITY_REPAIR_V0",
+  "phase_id": "SUBSCRIPTION_BACKED_STAGE_A_V1_COMPARATOR_VALIDITY_REPAIR_V0",
+  "phase_state": "FROZEN_CANDIDATE",
+  "amendment_type": "APPEND_ONLY_INTERPRETATION_NARROWING",
+  "amended_experiment": "SUBSCRIPTION_BACKED_STAGE_A_V1",
+  "history_rewritten": false,
+  "historical_v1_artifacts_unchanged": true,
+  "binding": {
+    "canonical_pr_131_merge": "332bf46a5543b852197547ffd850b563039c75e5",
+    "pr_131_frozen_candidate_parent": "c952f31e6ebdbb04bd3934e05705264cfe4b88a9",
+    "canonical_master_at_amendment_base": "332bf46a5543b852197547ffd850b563039c75e5",
+    "task_digest": "c92d26ea4e856591ceb3bb6918db2b42c07abaa37327a786b4028082cb21a720",
+    "scorer_digest": "e2500a73b538c001230dbd49c66f7aa685f8d4ea1ce192d4282e6aa30f2d4be3",
+    "intervention_digest": "9c974edfbfcc75c2e7296987c0499836f9c9730a11713cb8131e7b03a0cadf0b",
+    "gate_digest": "a5960abe091a3f7938e2d0bd9c9e91d166d95a32900ce20711201547af5be88f",
+    "receipt_digest": "aa2f6585531c8241e267421c99ba14ea6af6a492b6185aaf407e8d27a0023575",
+    "controller_contract_digest": "08790f522dcd3c0df6edd321ec62bd2ffda25758e413fa9a5d899c9c6e528178",
+    "historical_base": "1b93858857daddacd1795cf980edb3d562eabc77"
+  },
+  "narrowing_statement": "This amendment NARROWS interpretation validity only. It does not change task, scorer, intervention, gate, receipt, controller-contract, product, role, arm-order, firewall, retry, or authority bytes, and it does not change the binary correctness function. No digest above is modified by this amendment.",
+  "predispatch_timing_invariant": {
+    "v1_treatment_dispatch_count": 0,
+    "v1_baseline_dispatch_count": 0,
+    "v1_episode_consumed": false,
+    "answer_key_released": false,
+    "empirical_scoring": false,
+    "execution_receipt_exists": false,
+    "amendment_is_pre_dispatch": true,
+    "post_dispatch_comparator_mutation": false
+  },
+  "defect": {
+    "defect_id": "ZERO_ZERO_COMPARATOR_GAP",
+    "current_score_definition": "correctness_score = 1 if all required propositions pass and hard_failure_count == 0, else 0",
+    "current_comparator": "DSH_CORRECTNESS >= NATIVE_BASELINE",
+    "zero_zero_satisfies_current_comparator": true,
+    "zero_zero_can_reach_pass_before_repair": true,
+    "both_incorrect_can_satisfy_noninferiority": true,
+    "benchmark_validity_prerequisite_present_before_repair": false,
+    "root_cause": "BINARY_NONINFERIORITY_WITHOUT_BENCHMARK_VALIDITY_PREREQUISITE",
+    "proof_method": "Mechanical transcription of the frozen V1 gate schema primary_comparison, the reused V0 scoring_contract correctness_comparator, and the reused V0 tie_policy, evaluated over the complete correctness/intervention truth table, plus an exhaustive token search of every frozen artifact under qnty_agent_orchestration_control_contract_v0 for any benchmark-validity prerequisite (result: none present).",
+    "pre_repair_zero_zero_rows": [
+      {"treatment_correctness": 0, "baseline_correctness": 0, "treatment_intervention": 0, "baseline_intervention": 0, "pre_repair_classification": "STAGE_A_V1_PASS_NO_INCREMENTAL_VALUE"},
+      {"treatment_correctness": 0, "baseline_correctness": 0, "treatment_intervention": 0, "baseline_intervention": 1, "pre_repair_classification": "STAGE_A_V1_PASS_WITH_INCREMENTAL_VALUE"},
+      {"treatment_correctness": 0, "baseline_correctness": 0, "treatment_intervention": 1, "baseline_intervention": 0, "pre_repair_classification": "STAGE_A_V1_FAIL"}
+    ]
+  },
+  "scientific_intent": "Learn whether DSH orchestration helps, or at least does not hurt, on a task that one of the compared systems can actually solve. If both arms are incorrect, orchestration non-inferiority has NOT been established; the correct interpretation is an invalid, non-informative benchmark, not PASS and not DSH FAIL.",
+  "comparison_validity_predicate": {
+    "expression": "COMPARISON_VALID = BOTH_ARM_SCORER_RESULTS_PRESENT AND BOTH_ARM_RECEIPTS_SEALED AND NO_ENVIRONMENT_OR_PRODUCT_CAPACITY_INVALIDATION AND (TREATMENT_CORRECTNESS == 1 OR NATIVE_BASELINE_CORRECTNESS == 1)",
+    "invariant": "AT_LEAST_ONE_ARM_CORRECT",
+    "not_invariant": "BASELINE_MUST_WIN",
+    "baseline_correctness_required": false,
+    "rationale_for_disjunction": "Requiring NATIVE_BASELINE_CORRECTNESS == 1 would incorrectly invalidate the scientifically interesting case in which DSH succeeds and native does not.",
+    "implementation_path": "qntylab/subscription_backed_stage_a_v1_comparator_validity_v0.py",
+    "implementation_symbol": "comparison_valid"
+  },
+  "new_classification": {
+    "classification_id": "STAGE_A_V1_INVALID_BENCHMARK_BOTH_ARMS_INCORRECT",
+    "is_pass": false,
+    "is_fail": false,
+    "grants_runtime_authority": false,
+    "grants_rerun": false,
+    "grants_any_authority": false,
+    "consumes_authorized_episode_if_reached_after_dispatch": true,
+    "rescue_rerun_allowed": false,
+    "scientific_record": "NON_INFORMATIVE_BENCHMARK_OUTCOME"
+  },
+  "outcomes_after_amendment": [
+    "STAGE_A_V1_FAIL",
+    "STAGE_A_V1_PASS_NO_INCREMENTAL_VALUE",
+    "STAGE_A_V1_PASS_WITH_INCREMENTAL_VALUE",
+    "STAGE_A_V1_INVALID_ENVIRONMENT_OR_PRODUCT_CAPACITY",
+    "STAGE_A_V1_INVALID_BENCHMARK_BOTH_ARMS_INCORRECT"
+  ],
+  "outcomes_removed": [],
+  "classification_precedence": {
+    "frozen_before_execution": true,
+    "reordering_after_results_allowed": false,
+    "ranks": [
+      {"rank": 1, "id": "R1_AUTHORITY_FIREWALL_OR_UNSEALED_RECEIPT_FAIL_CLOSED", "condition": "amendment not canonical, answer-key firewall unproven, or either arm receipt unsealed", "result": "FAIL_CLOSED"},
+      {"rank": 2, "id": "R2_MEASURED_HARD_GATE_FAILURE", "condition": "either arm has an observed, measured hard-gate failure", "result": "STAGE_A_V1_FAIL"},
+      {"rank": 3, "id": "R3_ENVIRONMENT_OR_PRODUCT_CAPACITY_INVALIDATION", "condition": "either arm receipt carries a capacity-invalidation event", "result": "STAGE_A_V1_INVALID_ENVIRONMENT_OR_PRODUCT_CAPACITY"},
+      {"rank": 4, "id": "R4_MISSING_OR_MALFORMED_SCORER_EVIDENCE_FAIL_CLOSED", "condition": "either arm scorer result is absent, out of range, or carries an ambiguous intervention event", "result": "FAIL_CLOSED"},
+      {"rank": 5, "id": "R5_BOTH_ARMS_INCORRECT_BENCHMARK_INVALID", "condition": "both scorer outputs present and treatment_correctness == 0 and baseline_correctness == 0", "result": "STAGE_A_V1_INVALID_BENCHMARK_BOTH_ARMS_INCORRECT"},
+      {"rank": 6, "id": "R6_PRIMARY_NONINFERIORITY_RULES", "condition": "comparison is scientifically valid", "result": "existing frozen primary rules: treatment_correctness >= baseline_correctness AND treatment_human_intervention <= baseline_human_intervention"}
+    ],
+    "refinements_from_the_recommended_six_step_precedence": [
+      "Missing-evidence fail-closed is split across rank 1 (unsealed receipt, firewall, authority) and rank 4 (absent or malformed scorer output). Placing every missing-evidence condition strictly above capacity invalidation would make the already-frozen STAGE_A_V1_INVALID_ENVIRONMENT_OR_PRODUCT_CAPACITY outcome unreachable, because a capacity-invalidated arm is precisely the case in which an absent scorer result is contract-expected. This preserves frozen semantics rather than silently mutating them.",
+      "Measured hard-gate failure is stated explicitly at rank 2. It was implicit in the recommended rank-1 'authority / firewall' condition. It is placed above capacity and benchmark validity so that the frozen rule 'any forbidden side effect or any failed hard gate makes correctness fail regardless of proposition count' is preserved verbatim."
+    ],
+    "known_precedence_consequence": "Because benchmark invalidity (rank 5) precedes the primary rules (rank 6), the cell treatment_correctness=0, baseline_correctness=0 with treatment_human_intervention > baseline_human_intervention moves from STAGE_A_V1_FAIL to STAGE_A_V1_INVALID_BENCHMARK_BOTH_ARMS_INCORRECT. This is disclosed rather than hidden. It grants no authority the prior FAIL did not grant, creates no PASS path, and reflects that an intervention comparison on a task neither arm solved is not informative about orchestration."
+  },
+  "classification_matrix": {
+    "0_0": "STAGE_A_V1_INVALID_BENCHMARK_BOTH_ARMS_INCORRECT",
+    "0_1": "STAGE_A_V1_FAIL",
+    "1_0_treatment_intervention_le_baseline": "STAGE_A_V1_PASS_WITH_INCREMENTAL_VALUE",
+    "1_0_treatment_intervention_gt_baseline": "STAGE_A_V1_FAIL",
+    "1_1_treatment_intervention_lt_baseline": "STAGE_A_V1_PASS_WITH_INCREMENTAL_VALUE",
+    "1_1_treatment_intervention_eq_baseline": "STAGE_A_V1_PASS_NO_INCREMENTAL_VALUE",
+    "1_1_treatment_intervention_gt_baseline": "STAGE_A_V1_FAIL"
+  },
+  "negative_control": {
+    "assertion": "classify(treatment_correctness=0, baseline_correctness=0, otherwise_clean=True) cannot produce STAGE_A_V1_PASS_NO_INCREMENTAL_VALUE or STAGE_A_V1_PASS_WITH_INCREMENTAL_VALUE",
+    "zero_zero_pass_reachable": false,
+    "machine_proved_before_freeze": true,
+    "proof_test": "tests/test_subscription_backed_stage_a_v1_comparator_validity_v0.py"
+  },
+  "scorer_unchanged": {
+    "binary_correctness_function_changed": false,
+    "partial_correctness_weights_introduced": false,
+    "score_zero_remains_legal": true,
+    "propositions_changed": false,
+    "statement": "The defect is not that score 0 exists; it is the interpretation of 0 vs 0 as informative non-inferiority. The repair is a comparison-validity layer, not a scorer change."
+  },
+  "unchanged_identities": {
+    "historical_task_bytes_changed": false,
+    "base_changed": false,
+    "base": "1b93858857daddacd1795cf980edb3d562eabc77",
+    "sealed_reviewed_reference_changed": false,
+    "sealed_post_merge_reference_changed": false,
+    "codex_a_builder_identity_changed": false,
+    "claude_code_reviewer_identity_changed": false,
+    "codex_b_verifier_identity_changed": false,
+    "dsh_commit_tree_tag_changed": false,
+    "arm_order_changed": false,
+    "zero_fee_rule_changed": false,
+    "answer_key_firewall_changed": false,
+    "role_prompts_changed": false,
+    "retry_ceilings_changed": false,
+    "human_intervention_schema_changed": false,
+    "scoring_propositions_changed": false,
+    "binary_correctness_function_changed": false,
+    "product_identities_changed": false,
+    "controller_transport_comparison_changed": false,
+    "model_changes": "NONE",
+    "api_keys_added": "NONE",
+    "runtime_integration": "NONE"
+  },
+  "authority_ceiling": {
+    "current_max_autonomy": "L0_SHADOW",
+    "runtime_implementation_authorized": false,
+    "dsh_runtime_implementation_authorized": false,
+    "qnty_next_action_authority": "NONE",
+    "scientific_market_execution_authority": "NONE",
+    "trading_authority": "NONE",
+    "capital_authority": "NONE",
+    "auto_merge_authorized": false
+  },
+  "effectiveness": {
+    "branch_local_amendment_effective": false,
+    "canonical_merge_required": true,
+    "branch_local_candidate_cannot_self_authorize": true
+  },
+  "qntyagenteval": {"applicability": "NO_MATCH", "run": false, "new_evaluator_created": false},
+  "source_conflict": false
+}

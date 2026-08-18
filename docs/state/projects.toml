@@ -3009,3 +3009,108 @@ execution_authorization_candidate_hostile_review_verdict = "PASS"
 execution_authorization_candidate_open_critical_findings = 0
 execution_authorization_candidate_open_high_findings = 0
 next_action = "After canonical merge and fresh reconciliation, exactly one subscription-backed Stage-A V1 episode may be considered under the frozen controller; no historical V0 dispatch, runtime integration, Qnty NEXT_ACTION, trading, capital action, or auto-merge is authorized."
+
+[[project]]
+project_id = "SUBSCRIPTION_BACKED_STAGE_A_V1_COMPARATOR_VALIDITY_REPAIR_V0"
+display_name = "Subscription-backed Stage-A V1 comparator validity repair V0"
+state = "CLOSED_PASS"
+authority_level = "ONE_EPISODE_SUBSCRIPTION_BACKED_STAGE_A_V1_ONLY"
+phase_type = "PREDISPATCH_COMPARATOR_VALIDITY_REPAIR"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/ADR/0007-ecosystem-role-boundary-and-context-spine-governance.md",
+  "docs/ADR/0008-qnty-agent-orchestration-runtime-boundary.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_stage_a_v1/preregistration.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_stage_a_v1/execution_authorization.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_stage_a_v1/gate_schema.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/stage_a_dsh_shadow_evaluation_preregistration_v0/scoring_contract.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_stage_a_v1/comparator_validity_repair_v0/amendment.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_stage_a_v1/comparator_validity_repair_v0/execution_authorization_amendment.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_stage_a_v1/comparator_validity_repair_v0/hostile_review.md",
+  "qntylab/subscription_backed_stage_a_v1.py",
+  "qntylab/subscription_backed_stage_a_v1_comparator_validity_v0.py",
+  "tests/test_subscription_backed_stage_a_v1_comparator_validity_v0.py"
+]
+canonical_master_sha = "332bf46a5543b852197547ffd850b563039c75e5"
+canonical_pr_131_merge = "332bf46a5543b852197547ffd850b563039c75e5"
+pr_131_frozen_candidate_parent = "c952f31e6ebdbb04bd3934e05705264cfe4b88a9"
+source_conflict = false
+architecture_change = false
+architecture_relevance = "NOT_REQUIRED_WITHIN_EXISTING_ADR_0007_AND_ADR_0008_BOUNDARY"
+predecessor_project_id = "SUBSCRIPTION_BACKED_STAGE_A_V1_FREEZE_AND_EXECUTION_AUTHORIZATION_V0"
+predecessor_state = "CLOSED_PASS"
+repair_type = "APPEND_ONLY_INTERPRETATION_NARROWING"
+history_rewritten = false
+historical_v1_artifacts_unchanged = true
+defect_root_cause = "BINARY_NONINFERIORITY_WITHOUT_BENCHMARK_VALIDITY_PREREQUISITE"
+zero_zero_satisfied_pre_repair_comparator = true
+zero_zero_could_reach_pass_before_repair = true
+zero_zero_pass_reachable_after_repair = false
+comparison_validity_predicate_frozen = true
+at_least_one_arm_correct_invariant = true
+baseline_correctness_required = false
+new_invalid_classification = "STAGE_A_V1_INVALID_BENCHMARK_BOTH_ARMS_INCORRECT"
+classification_precedence_frozen_before_execution = true
+task_digest_changed = false
+scorer_digest_changed = false
+intervention_digest_changed = false
+gate_digest_changed = false
+receipt_digest_changed = false
+binary_correctness_function_changed = false
+product_identities_changed = false
+role_mapping_changed = false
+arm_order_changed = false
+dsh_identity_changed = false
+zero_fee_contract_changed = false
+answer_key_firewall_changed = false
+historical_task_executed = false
+treatment_dispatch_count = 0
+baseline_dispatch_count = 0
+episode_consumed = false
+answer_key_released = false
+empirical_result_exists = false
+authorized_episode_count_after_repair = 1
+second_episode_allowed = false
+rescue_rerun_allowed = false
+branch_local_execution_authorized = false
+post_merge_execution_authorized = true
+stage_a_execution_authorized = false
+implementation_authorized = false
+runtime_implementation_authorized = false
+dsh_implementation_authorized = false
+scientific_execution_authorized = false
+qnty_next_action_authority = "NONE"
+scientific_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+auto_merge_authorized = false
+current_max_autonomy = "L0_SHADOW"
+qntyagenteval_applicability = "NO_MATCH"
+qntyagenteval_run = false
+hostile_review_count = 1
+hostile_review_verdict = "PASS"
+hostile_governance_critical_total = 0
+hostile_governance_high_total = 0
+hostile_governance_medium_total = 1
+hostile_governance_low_total = 2
+hostile_governance_open_critical = 0
+hostile_governance_open_high = 0
+targeted_governance_rereview_used = false
+active_project_after_closure = "NONE"
+experiment_state = "PREREGISTERED_NOT_EXECUTED"
+execution_authorization_candidate_state = "AUTHORIZED_IF_CANONICAL"
+execution_authorization_candidate_scope = "ONE_EPISODE_SUBSCRIPTION_BACKED_STAGE_A_V1_ONLY"
+execution_authorization_candidate_authorized_episode_count = 1
+execution_authorization_candidate_stage_a_execution_authorized = false
+execution_authorization_candidate_runtime_implementation_authorized = false
+execution_authorization_candidate_qnty_next_action_authority = "NONE"
+execution_authorization_candidate_trading_authority = "NONE"
+execution_authorization_candidate_capital_authority = "NONE"
+execution_authorization_candidate_auto_merge_authorized = false
+execution_authorization_candidate_hostile_review_count = 1
+execution_authorization_candidate_hostile_review_verdict = "PASS"
+execution_authorization_candidate_open_critical_findings = 0
+execution_authorization_candidate_open_high_findings = 0
+next_action = "After canonical merge of this comparator-validity amendment and fresh reconciliation, exactly one subscription-backed Stage-A V1 episode may be considered under the frozen controller and the repaired classification precedence; a 0/0 correctness pair classifies STAGE_A_V1_INVALID_BENCHMARK_BOTH_ARMS_INCORRECT with no rescue rerun. No second episode, historical V0 dispatch, runtime integration, Qnty NEXT_ACTION, trading, capital action, or auto-merge is authorized."

@@ -1,0 +1,26 @@
+{
+  "artifact_type": "SUBSCRIPTION_BACKED_STAGE_A_V1_CONTROLLER_CONTRACT",
+  "schema_version": "subscription-backed-stage-a-controller-v1",
+  "controller": "DETERMINISTIC_NON_MODEL_CONTROLLER",
+  "owns": ["role order", "dispatch admission", "retry ceilings", "workspace creation", "process/session identity", "evidence collection", "receipt sealing", "scorer release after both arms terminate"],
+  "does_not_own": ["task solution", "code critique", "patch generation", "scientific outcome decision", "prompt changes", "worker coaching", "answer-key access before scoring"],
+  "role_mapping": {
+    "BUILDER": "CODEX_PROFILE_A",
+    "HOSTILE_REVIEWER": "CLAUDE_CODE_PRODUCT",
+    "VERIFIER": "CODEX_PROFILE_B"
+  },
+  "pipeline": ["BUILDER", "TEST", "HOSTILE_REVIEWER", "REPAIR_CRITICAL_HIGH_ONLY", "TARGETED_REREVIEW_IF_REPAIR", "VERIFIER", "TERMINATE"],
+  "session_policy": "Every product-role invocation is fresh; no builder transcript is reused as reviewer context.",
+  "retry_ceiling": {"max_machine_retries": 2, "max_review_loops": 1, "max_verifier_retries": 1},
+  "arm_symmetry": "Only frozen transport differs between arms; role order, prompts, task bytes, retry ceilings, scorer, intervention schema, and firewall are shared.",
+  "authority": {
+    "branch_local_execution_authorized": false,
+    "canonical_merge_required": true,
+    "authorized_episode_count": 1,
+    "second_episode_allowed": false
+  },
+  "transports": {
+    "DSH_TREATMENT": "Pinned DSH SubagentRuntime/provider abstraction",
+    "NATIVE_BASELINE": "Direct official product transport; bypasses DSH provider abstraction"
+  }
+}

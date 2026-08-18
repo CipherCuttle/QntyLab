@@ -12,6 +12,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 REG = ROOT / "experiments/research/qnty_agent_orchestration_control_contract_v0/stage_a_dsh_shadow_evaluation_preregistration_v0"
 
+# Immutable identities of the closed STAGE_A_DSH_SHADOW_EVALUATION_PREREGISTRATION_V0 phase.
+# PHASE_BASE is the canonical master this phase branched from (preregistration.json
+# bootstrap.canonical_qntylab_master and the projects.toml canonical_master_sha).
+# PHASE_FROZEN_TARGET is the frozen candidate head merged by PHASE_CANONICAL_MERGE
+# (merge parents: PHASE_BASE, PHASE_FROZEN_TARGET; the merge tree equals the frozen
+# candidate tree, so either target yields the identical phase diff).
+PHASE_BASE = "a013c5f63c5c70cebef396236de99498d09028d9"
+PHASE_FROZEN_TARGET = "e873a5a7e83261d5721c1fe8c8d7be5add5f2dd5"
+PHASE_CANONICAL_MERGE = "efc208e1521b827f184779d8e8419d574bdd1c92"
+
 
 def load(name: str) -> dict:
     return json.loads((REG / name).read_text())
@@ -214,16 +224,41 @@ def test_tie_policy_cannot_authorize_runtime() -> None:
 
 
 def test_order_flow_and_runtime_paths_are_absent_from_phase_diff() -> None:
+    # Scope: the frozen historical phase diff only. Repository state after this phase
+    # closed is out of scope and must not be able to fail this guard.
     names = subprocess.run(
-        ["git", "diff", "--name-only", "a013c5f63c5c70cebef396236de99498d09028d9"],
+        ["git", "diff", "--name-only", PHASE_BASE, PHASE_FROZEN_TARGET, "--"],
         cwd=ROOT,
         check=True,
         capture_output=True,
         text=True,
     ).stdout.splitlines()
+    assert names, "historical phase diff must be non-empty"
     forbidden_fragments = ("order_flow", "qnty_agent_runtime", "qntyagenteval", "qntypolicygate", "dispatcher", "scheduler", "daemon", "broker")
     assert not [path for path in names if any(fragment in path.lower() for fragment in forbidden_fragments)]
     assert "qntylab/project_context.py" not in names
+
+
+def test_frozen_phase_target_is_the_canonical_merge_candidate() -> None:
+    parents = subprocess.run(
+        ["git", "rev-list", "-1", "--parents", PHASE_CANONICAL_MERGE],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.split()
+    assert parents == [PHASE_CANONICAL_MERGE, PHASE_BASE, PHASE_FROZEN_TARGET]
+    trees = [
+        subprocess.run(
+            ["git", "rev-parse", f"{ref}^{{tree}}"],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+        for ref in (PHASE_CANONICAL_MERGE, PHASE_FROZEN_TARGET)
+    ]
+    assert trees[0] == trees[1]
 
 
 def test_arm_order_is_hash_derived_and_task_is_not_answer_key_bearing() -> None:

@@ -1,0 +1,32 @@
+{
+  "artifact_type": "SUBSCRIPTION_BACKED_STAGE_A_V1_EXECUTION_RECEIPT_SCHEMA",
+  "schema_version": "subscription-backed-stage-a-receipt-v1",
+  "receipt_required_fields": [
+    "experiment_id",
+    "episode_id",
+    "arm_id",
+    "arm_order",
+    "transport",
+    "task_digest",
+    "role_mapping",
+    "product_identity_digests",
+    "session_ids",
+    "initial_dispatch_count",
+    "retry_events",
+    "process_identity",
+    "workspace_identity",
+    "answer_key_firewall",
+    "api_key_presence",
+    "dsh_parent_llm_provider",
+    "dsh_parent_llm_request_count",
+    "rate_limit_events",
+    "files_changed",
+    "diagnostics",
+    "termination",
+    "receipt_sealed"
+  ],
+  "scorer_release_condition": "Only after both treatment and baseline receipts are sealed",
+  "answer_key_release_before_both_sealed": false,
+  "diagnostic_unavailability": "NOT_AVAILABLE",
+  "result_publication_automatic": false
+}

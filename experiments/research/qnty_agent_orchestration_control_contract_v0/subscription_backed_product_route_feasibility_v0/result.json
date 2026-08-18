@@ -1,0 +1,119 @@
+{
+  "artifact_type": "SUBSCRIPTION_BACKED_PRODUCT_ROUTE_FEASIBILITY_SPIKE",
+  "schema_version": "subscription-backed-product-route-feasibility-v0",
+  "status": "SANITIZED_SENTINEL_SUCCESS",
+  "experimental_episode": false,
+  "historical_stage_a_dispatches": 0,
+  "scratch_root": "/tmp/dsh-product-route-feasibility-v0",
+  "scratch_evidence_recovery": {
+    "runner_recovered": true,
+    "runner_path": "runner.mjs",
+    "runner_sha256": "ad6ad3182fa92bf8f1d441438df930276fb33e345f21e560701c7c4af0e27ba2",
+    "package_manager": "npm 10.9.4",
+    "node_version": "v22.22.0",
+    "package_json_sha256": "2b0b4e631791bb463a0c82cf57a7c7b30d6189df53cb274c34d66d676ff45c61",
+    "package_lock_sha256": "75f469bb429be6cb386d7855f30f285e2ebd62efc710667a7f05542ba47daf3d",
+    "dsh_pack_manifest_sha256": "c866d97ca24f9044119ce9cb813447577af2b07ea511c7e939374465bc71071f",
+    "dsh_tarball_sha256": "2f8f0b763d611ac536f7a9411ee43c0afc067c1b8732c3102c04dbe398bcacc5",
+    "dsh_source_package_json_sha256": "7a9f356ad1e27c7013b44619bc675b8cb877f995cd0951ab3dfeb10d4edcc361",
+    "dsh_source_git_blob_for_runner": "845ac43a2eb109f3a68c6236e123b0dcda729546",
+    "original_persisted_result_logs": "NOT_PRESENT_IN_SCRATCH",
+    "sanitized_result_logs": "CAPTURED_FROM_SENTINEL_RERUNS_ON_2026-08-18"
+  },
+  "dsh_identity": {
+    "commit_sha": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "tag": "dsh-v0.1.0-rc.7",
+    "tree_sha": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "package": "@deepseek-ai/dsh@0.1.0-rc.7",
+    "provider_packages": [
+      "@deepseek-ai/dsh-subagent@0.1.0-rc.7",
+      "@deepseek-ai/dsh-subagent-codex@0.1.0-rc.7",
+      "@deepseek-ai/dsh-subagent-claude-code@0.1.0-rc.7",
+      "@deepseek-ai/dsh-subprocess-local@0.1.0-rc.7"
+    ],
+    "services_used": ["SubagentRuntime", "LocalSubprocessRuntime", "subagent-codex", "subagent-claude-code"],
+    "parent_llm_provider": "NONE",
+    "model_facing_dsh_tool_consumer": "NOT_USED"
+  },
+  "sentinel_task_bytes": {
+    "codex_a": "Return exactly: DSH_CODEX_A_OK",
+    "codex_b": "Return exactly: DSH_CODEX_B_OK",
+    "claude": "Return exactly: DSH_CLAUDE_OK"
+  },
+  "product_identity": {
+    "codex_binary_path": "/home/swirky/.local/bin/codex",
+    "codex_version": "codex-cli 0.147.0",
+    "claude_binary_path": "/usr/bin/claude",
+    "claude_version": "2.1.223",
+    "codex_a_home": "/home/swirky/.codex",
+    "codex_b_home": "/home/swirky/.codex-pro2",
+    "codex_auth_class": "ChatGPT_PRODUCT_AUTHENTICATION",
+    "claude_auth_class": "FIRST_PARTY_CLAUDE_PRODUCT_SUBSCRIPTION",
+    "provider_internal_model_build": "NOT_EXPOSED"
+  },
+  "runs": [
+    {
+      "route": "codex-a",
+      "expected": "DSH_CODEX_A_OK",
+      "observed_result": "DSH_CODEX_A_OK",
+      "stop_reason": "completed",
+      "process_command": "codex app-server --stdio",
+      "process_terminated": true,
+      "process_exit_code": null,
+      "process_signal": "SIGTERM",
+      "parent_llm_service_mounted": false,
+      "parent_llm_request_count": 0,
+      "api_key_presence": {
+        "OPENAI_API_KEY": false,
+        "ANTHROPIC_API_KEY": false,
+        "DEEPSEEK_API_KEY": false,
+        "OPENROUTER_API_KEY": false
+      },
+      "warnings": ["Codex profile emitted unknown experimental_use_rmcp_client feature warning", "profile MCP connectors emitted authentication warnings; no sentinel failure"]
+    },
+    {
+      "route": "codex-b",
+      "expected": "DSH_CODEX_B_OK",
+      "observed_result": "DSH_CODEX_B_OK",
+      "stop_reason": "completed",
+      "process_command": "codex app-server --stdio",
+      "process_terminated": true,
+      "process_exit_code": null,
+      "process_signal": "SIGTERM",
+      "parent_llm_service_mounted": false,
+      "parent_llm_request_count": 0,
+      "api_key_presence": {
+        "OPENAI_API_KEY": false,
+        "ANTHROPIC_API_KEY": false,
+        "DEEPSEEK_API_KEY": false,
+        "OPENROUTER_API_KEY": false
+      },
+      "warnings": ["profile MCP connectors emitted authentication warnings; no sentinel failure"]
+    },
+    {
+      "route": "claude",
+      "expected": "DSH_CLAUDE_OK",
+      "observed_result": "DSH_CLAUDE_OK",
+      "stop_reason": "completed",
+      "process_command": "/usr/bin/claude --output-format stream-json --verbose --input-format stream-json --disallowedTools AskUserQuestion --permission-mode default --no-session-persistence",
+      "process_terminated": true,
+      "process_exit_code": 0,
+      "process_signal": null,
+      "parent_llm_service_mounted": false,
+      "parent_llm_request_count": 0,
+      "api_key_presence": {
+        "OPENAI_API_KEY": false,
+        "ANTHROPIC_API_KEY": false,
+        "DEEPSEEK_API_KEY": false,
+        "OPENROUTER_API_KEY": false
+      }
+    }
+  ],
+  "secret_handling": {
+    "credential_contents_read": false,
+    "credential_contents_serialized": false,
+    "auth_files_committed": false,
+    "token_material_hashed": false
+  },
+  "conclusion": "The recovered real DSH provider path can invoke the three existing subscription-backed product routes without a DSH parent LLM service or listed pay-per-token API keys. This is feasibility evidence only and authorizes no historical task execution."
+}

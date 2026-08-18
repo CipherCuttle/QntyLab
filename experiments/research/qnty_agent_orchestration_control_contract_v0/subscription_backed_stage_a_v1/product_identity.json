@@ -1,0 +1,42 @@
+{
+  "artifact_type": "SUBSCRIPTION_BACKED_STAGE_A_V1_PRODUCT_IDENTITY",
+  "schema_version": "subscription-backed-stage-a-product-identity-v0",
+  "captured_before_freeze": true,
+  "secret_free": true,
+  "workers": {
+    "CODEX_PROFILE_A": {
+      "binary_path": "/home/swirky/.local/bin/codex",
+      "version": "codex-cli 0.147.0",
+      "home": "/home/swirky/.codex",
+      "auth_class": "ChatGPT_PRODUCT_AUTHENTICATION",
+      "config_digest": "59c41779ac8543e83cf454744e6773c377ddf0c2e2c17283c9e6d24a91169481",
+      "config_digest_inputs": "binary path/version, app-server stdio argv, profile path, sanitized auth class, API-key absence policy, and NOT_EXPOSED product settings",
+      "model_build": "NOT_EXPOSED"
+    },
+    "CODEX_PROFILE_B": {
+      "binary_path": "/home/swirky/.local/bin/codex",
+      "version": "codex-cli 0.147.0",
+      "home": "/home/swirky/.codex-pro2",
+      "auth_class": "ChatGPT_PRODUCT_AUTHENTICATION",
+      "config_digest": "e032873044b2bb47dc9208630ad42fa4886cc79a3b9087f27ff32a22c49d56ee",
+      "config_digest_inputs": "binary path/version, app-server stdio argv, profile path, sanitized auth class, API-key absence policy, and NOT_EXPOSED product settings",
+      "model_build": "NOT_EXPOSED"
+    },
+    "CLAUDE_CODE_PRODUCT": {
+      "binary_path": "/usr/bin/claude",
+      "version": "2.1.223",
+      "home": "FIRST_PARTY_PRODUCT_STATE",
+      "auth_class": "FIRST_PARTY_CLAUDE_PRODUCT_SUBSCRIPTION",
+      "config_digest": "842ace110397be85d03644355dcaa6b6d843bf8826566eddc83f81b9e77a5d2d",
+      "config_digest_inputs": "binary path/version, observed non-persisted stream-json argv, sanitized auth class, API-key absence policy, and NOT_EXPOSED product settings",
+      "model_build": "NOT_EXPOSED"
+    }
+  },
+  "arm_parity": {
+    "role_mapping_identical": true,
+    "corresponding_product_identity_identical": true,
+    "observable_mismatch_behavior": "FAIL_CLOSED",
+    "unavailable_settings": "NOT_EXPOSED",
+    "secrets_read_or_serialized": false
+  }
+}

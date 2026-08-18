@@ -96,6 +96,7 @@ def test_qnty_adapter_is_implemented_and_other_adapters_remain_unimplemented() -
     assert records["Qnty"]["adapter_status"] == "READ_ONLY_ADAPTER_IMPLEMENTED"
     assert records["Qnty"]["context_state"] == "UNAVAILABLE_WITHOUT_EXPLICIT_ROOT"
     assert records["QntyAgentEval"]["adapter_status"] == "ADAPTER_NOT_IMPLEMENTED"
+    assert records["QntyAgentRuntime"]["adapter_status"] == "ADAPTER_NOT_IMPLEMENTED"
     assert records["QntyPolicyGate"]["adapter_status"] == "ADAPTER_NOT_IMPLEMENTED"
 
 

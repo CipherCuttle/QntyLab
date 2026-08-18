@@ -2,7 +2,8 @@
   "artifact_type": "QNTY_AGENT_RUNTIME_ECOSYSTEM_REGISTRATION_V0R1",
   "schema_version": "qnty-agent-runtime-ecosystem-registration-v1",
   "phase": "QNTY_AGENT_RUNTIME_ECOSYSTEM_REGISTRATION_V0R1",
-  "registration_status": "CANDIDATE",
+  "registration_status": "CLOSED_PASS",
+  "pre_review_candidate_sha": "b91c7927683d792c10ac418a33c9fb2fd0117f63",
   "canonical_reconciliation": {
     "qntylab_repository": "CipherCuttle/QntyLab",
     "qntylab_canonical_master_sha": "942332d6b572d0ff3b7ac0def9e22a4060b14312",
@@ -83,7 +84,18 @@
     "authority_increase": false
   },
   "review": {
-    "status": "PENDING",
-    "findings": null
+    "status": "PASS",
+    "independent_reviewer": "INDEPENDENT_HOSTILE_GOVERNANCE_PASS_1",
+    "attacks_checked": 20,
+    "findings": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "c_h_repair": false,
+    "repaired_sha": null,
+    "targeted_rereview": false,
+    "predeclared_review_results": false
   }
 }

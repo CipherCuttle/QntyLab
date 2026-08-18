@@ -9,7 +9,7 @@ Spine behavior, order-flow contamination, and review-evidence causality.
 
 ## Target
 
-Pre-review candidate SHA: recorded after the candidate commit is created.
+Pre-review candidate SHA: `b91c7927683d792c10ac418a33c9fb2fd0117f63`
 
 ## Attack vectors
 
@@ -36,4 +36,13 @@ Pre-review candidate SHA: recorded after the candidate commit is created.
 
 ## Review status
 
-PENDING
+PASS
+
+## Actual findings
+
+- Critical: 0
+- High: 0
+- Medium: 0
+- Low: 0
+
+No repair was required. No targeted rereview was used.

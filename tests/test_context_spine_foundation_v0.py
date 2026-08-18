@@ -392,7 +392,7 @@ def test_adr0007_resolves_as_global_architecture_and_adr0005_as_scientific_compa
         "status": "CURRENT_GLOBAL_COMPANION",
     }
     assert architecture["scientific_north_star"]["authority_scope"] != architecture["current_global"]["authority_scope"]
-    assert [item["adr_id"] for item in architecture["companions"]] == ["ADR-0005", "ADR-0006"]
+    assert [item["adr_id"] for item in architecture["companions"]] == ["ADR-0005", "ADR-0006", "ADR-0008"]
 
 
 def test_external_adapter_status_is_explicit_not_implemented() -> None:

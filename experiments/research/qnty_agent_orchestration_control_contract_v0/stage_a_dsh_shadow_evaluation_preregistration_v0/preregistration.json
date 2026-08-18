@@ -5,6 +5,17 @@
   "phase_id": "STAGE_A_DSH_SHADOW_EVALUATION_PREREGISTRATION_V0",
   "phase_state": "CLOSED_PASS",
   "experiment_state": "PREREGISTERED_NOT_EXECUTED",
+  "repair_provenance": {
+    "repair_trigger": "DIRECT_POST_FREEZE_CONTRACT_INSPECTION",
+    "historical_pre_repair_candidate": "68a2cb8c0634376fba2cc34869ab6fd584ac40f2",
+    "findings": {
+      "H01": "WORKER_TASK_CONTRACT_SELF_PROHIBITED_EXPERIMENT",
+      "H02": "PROMPT_IDENTITY_PLACEHOLDER_IN_FROZEN_CONTRACT",
+      "M01": "MODEL_SELECTOR_MISREPRESENTED_AS_REVISION_OR_BUILD"
+    },
+    "original_hostile_review_consumed": true,
+    "targeted_rereview_required": true
+  },
   "scientific_purpose": "Bounded falsification of whether the configured DSH system provides operational value over the real native baseline on the frozen historical OC-B task without violating correctness, intervention, provenance, capability, process, isolation, or authority invariants.",
   "primary_question": "Does the frozen DSH treatment achieve correctness at least as good as the native baseline while requiring no more human corrective intervention and without violating any frozen hard gate?",
   "negative_result_semantics": "A negative result is a successful experiment and does not authorize rescue, rerun, runtime implementation, or downstream action.",
@@ -36,6 +47,13 @@
     "stage_a_execution_authorized": false,
     "preregistration_only": true,
     "next_phase_requires_separate_execution_authorization": true
+  },
+  "future_execution_controller": {
+    "phase_id": "STAGE_A_DSH_SHADOW_EVALUATION_EXECUTION_V0",
+    "requires_separate_authorization": true,
+    "may_provision_pinned_dsh_bytes_before_dispatch": true,
+    "worker_may_fetch_or_change_dsh": false,
+    "preregistration_grants_execution_authority": false
   },
   "historical_fixture": {
     "agent_visible_base": "1b93858857daddacd1795cf980edb3d562eabc77",
@@ -75,7 +93,11 @@
     "matched_variables": [
       "same immutable task contract bytes",
       "same historical BASE SHA",
-      "same provider and model identifier",
+      "same provider and requested model selector",
+      "same model/client configuration and endpoint/API mode",
+      "same exposed reasoning or compute setting",
+      "same provider-returned model/revision metadata when available",
+      "same semantic tool capability contract",
       "same worker role names",
       "same review and verifier doctrine",
       "same retry ceilings",
@@ -95,19 +117,27 @@
   "model_identities": {
     "frozen_before_execution": true,
     "provider": "OpenAI",
-    "model_id": "gpt-5",
-    "model_revision": "gpt-5",
-    "reasoning_or_compute_setting": "provider_default_frozen_at_model_id; receipt must capture resolved setting; missing resolution fails closed",
-    "context_limit": "provider_model_contract_for_gpt-5; receipt must capture resolved limit",
+    "requested_model_selector": "gpt-5",
+    "immutable_provider_build_id": "NOT_EXPOSED",
+    "immutable_provider_build_claimed": false,
+    "model_client_configuration": "Frozen identically for both arms; any observable mismatch fails closed.",
+    "endpoint_api_mode": "MODEL_API_ONLY via the same provider endpoint/API mode; any observable mismatch fails closed.",
+    "reasoning_or_compute_setting": "Provider-exposed/configurable setting must be frozen identically and captured in the execution receipt; unavailable provider-internal settings are not guessed.",
+    "context_limit": "Provider-exposed resolved limit must be captured when available; no unexposed provider limit is claimed as immutable.",
     "network_policy": "model-provider API transport only as separately frozen below",
+    "provider_exposed_runtime_metadata": ["model_provider", "model_id", "model_revision"],
+    "provider_exposed_runtime_metadata_capture": "Capture every provider-returned model or revision field in the receipt. If an immutable provider build identifier is not returned, record NOT_EXPOSED rather than treating the requested selector as a build identifier.",
+    "observable_identity_comparison_fields": ["provider", "requested_model_selector", "model_client_configuration", "endpoint_api_mode", "reasoning_or_compute_setting", "tool_capability_contract", "provider_exposed_runtime_metadata"],
     "roles": [
-      {"role": "CONTROLLER", "provider": "OpenAI", "model": "gpt-5", "revision": "gpt-5", "worker_identity": "CONTROLLER_V0"},
-      {"role": "BUILDER", "provider": "OpenAI", "model": "gpt-5", "revision": "gpt-5", "worker_identity": "BUILDER_V0"},
-      {"role": "HOSTILE_REVIEWER", "provider": "OpenAI", "model": "gpt-5", "revision": "gpt-5", "worker_identity": "HOSTILE_REVIEWER_V0"},
-      {"role": "VERIFIER", "provider": "OpenAI", "model": "gpt-5", "revision": "gpt-5", "worker_identity": "VERIFIER_V0"}
+      {"role": "CONTROLLER", "provider": "OpenAI", "requested_model_selector": "gpt-5", "immutable_provider_build_id": "NOT_EXPOSED", "worker_identity": "CONTROLLER_V0"},
+      {"role": "BUILDER", "provider": "OpenAI", "requested_model_selector": "gpt-5", "immutable_provider_build_id": "NOT_EXPOSED", "worker_identity": "BUILDER_V0"},
+      {"role": "HOSTILE_REVIEWER", "provider": "OpenAI", "requested_model_selector": "gpt-5", "immutable_provider_build_id": "NOT_EXPOSED", "worker_identity": "HOSTILE_REVIEWER_V0"},
+      {"role": "VERIFIER", "provider": "OpenAI", "requested_model_selector": "gpt-5", "immutable_provider_build_id": "NOT_EXPOSED", "worker_identity": "VERIFIER_V0"}
     ],
     "native_and_dsh_role_model_identity_equal": true,
-    "missing_or_changed_model_identity_behavior": "FAIL_CLOSED"
+    "missing_or_changed_model_identity_behavior": "FAIL_CLOSED",
+    "observable_model_identity_mismatch_behavior": "FAIL_CLOSED",
+    "absence_of_unexposed_build_id": "KNOWN_SYSTEM_LEVEL_LIMITATION"
   },
   "native_arm": {
     "arm_id": "NATIVE_BASELINE",
@@ -155,8 +185,8 @@
   },
   "task_contract": {
     "path": "experiments/research/qnty_agent_orchestration_control_contract_v0/stage_a_dsh_shadow_evaluation_preregistration_v0/task_contract.json",
-    "native_task_digest": "0281dfb78cd93b69e81508913943f26b6488a27a556597890d4450158ecf750c",
-    "dsh_task_digest": "0281dfb78cd93b69e81508913943f26b6488a27a556597890d4450158ecf750c",
+    "native_task_digest": "c92d26ea4e856591ceb3bb6918db2b42c07abaa37327a786b4028082cb21a720",
+    "dsh_task_digest": "c92d26ea4e856591ceb3bb6918db2b42c07abaa37327a786b4028082cb21a720",
     "native_task_digest_equals_dsh_task_digest": true
   },
   "scoring": {
@@ -181,7 +211,7 @@
   },
   "receipt": {
     "path": "experiments/research/qnty_agent_orchestration_control_contract_v0/stage_a_dsh_shadow_evaluation_preregistration_v0/receipt_schema.json",
-    "schema_digest": "cba8f82fc1e8bb4b8ecece2c8e66796cc2500a06e22f324c548c02e535cd9d41",
+    "schema_digest": "c3c1d363725da3ad84aec572bfffb09165c3b818d37fda499b41687085cc28c5",
     "trace_completeness_defined": true
   },
   "retry_and_failure_accounting": {
@@ -269,13 +299,13 @@
     "next_phase_requires_separate_authorization": true
   },
   "contract_digests": {
-    "task_contract_digest": "0281dfb78cd93b69e81508913943f26b6488a27a556597890d4450158ecf750c",
+    "task_contract_digest": "c92d26ea4e856591ceb3bb6918db2b42c07abaa37327a786b4028082cb21a720",
     "dsh_source_identity": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
     "dsh_config_digest": "a31aec0a890209f47996d09c07c717b36e5ee80983a190684b8781da7e849350",
     "native_config_digest": "dab18fcea64db704a04e813954ecb2fbad768472e2837a45aa9ef46f50f139e1",
     "correctness_scorer_digest": "e2500a73b538c001230dbd49c66f7aa685f8d4ea1ce192d4282e6aa30f2d4be3",
     "intervention_schema_digest": "9c974edfbfcc75c2e7296987c0499836f9c9730a11713cb8131e7b03a0cadf0b",
     "gate_schema_digest": "621ce278a3d518ae039be6d9c013c0a26060eeb2bb691f6cde8f5a81d7f118af",
-    "receipt_schema_digest": "cba8f82fc1e8bb4b8ecece2c8e66796cc2500a06e22f324c548c02e535cd9d41"
+    "receipt_schema_digest": "c3c1d363725da3ad84aec572bfffb09165c3b818d37fda499b41687085cc28c5"
   }
 }

@@ -1,6 +1,8 @@
 {
   "artifact_type": "STAGE_A_DSH_SHADOW_EVALUATION_TASK_CONTRACT",
   "schema_version": "stage-a-dsh-shadow-task-contract-v0",
+  "contract_scope": "FUTURE_EXECUTION_ARM_TASK_INPUT",
+  "execution_scope": "The admitted native baseline or DSH treatment arm may execute this task only after separate STAGE_A_DSH_SHADOW_EVALUATION_EXECUTION_V0 authorization; this task input grants no present execution authority.",
   "task_id": "STAGE_A_OC_B_HISTORICAL_ORIENTATION_COMPLETENESS_V0",
   "task_source_commit": "1b93858857daddacd1795cf980edb3d562eabc77",
   "task_input_artifacts": [
@@ -12,7 +14,10 @@
     "tests/test_context_spine_foundation_v0.py",
     "experiments/research/qntylab_context_spine/orientation_completeness_v0/orientation_completeness_authorization.json"
   ],
-  "prompt_sha256": "PENDING_FREEZE_COMPUTE",
+  "prompt_digest_algorithm": "SHA256",
+  "prompt_digest_encoding": "UTF-8",
+  "prompt_digest_scope": "The exact decoded JSON prompt string encoded as UTF-8, with no extra newline or normalization added by the digest function.",
+  "prompt_sha256": "2c086284374a8df94792e9281b8aca90366d886029fbae4949765871ea0faff3",
   "prompt": "Starting from the exact frozen historical BASE commit, perform one bounded OC-B implementation task authorized by the canonical OC-A authorization artifact. Expose deterministic, read-only, evidence-only project orientation for a receiving agent before it proposes new capability. Preserve the existing authority boundaries: project state may reference canonical qntylab Python paths, but the projection must not become a capability registry, recommendation engine, task matcher, NEXT_ACTION source, or second control plane. Preserve bounded brief limits and make truncation point to the complete projection. Use the repository-native tests and CI checks, keep the allowed file surface bounded, and stop after one implementation, verification, one independent hostile review, any necessary Critical/High repair, and freeze. Do not inspect or use any reviewed or post-merge answer reference.",
   "acceptance_predicates": [
     {
@@ -63,10 +68,21 @@
     "use any diff from BASE to a sealed answer reference",
     "inspect unofficial prior Stage-A outcomes",
     "modify Qnty, QntyAgentRuntime, QntyAgentEval, QntyPolicyGate, or protected order-flow paths",
-    "install or execute DSH",
-    "execute either Stage-A arm",
-    "implement runtime, dispatcher, scheduler, daemon, broker, worker runner, or GitHub mutation capability",
-    "create NEXT_ACTION, scientific, trading, capital, merge, or auto-merge authority"
+    "perform GitHub mutation or use GitHub write credentials",
+    "create or publish a pull request",
+    "merge or auto-merge",
+    "mutate protected order-flow state",
+    "access mutable state belonging to another arm",
+    "leak state across tasks",
+    "retry without the frozen retry ceilings",
+    "create or escalate authority",
+    "create Qnty NEXT_ACTION authority",
+    "create scientific, trading, or capital authority",
+    "implement runtime, dispatcher, scheduler, daemon, broker, worker runner, or other orchestration substrate",
+    "self-upgrade or self-replace the worker",
+    "mutate the orchestration substrate or model configuration",
+    "fetch an arbitrary newer DSH version",
+    "alter the pinned DSH harness identity"
   ],
   "allowed_repositories": ["QntyLab"],
   "allowed_paths": [

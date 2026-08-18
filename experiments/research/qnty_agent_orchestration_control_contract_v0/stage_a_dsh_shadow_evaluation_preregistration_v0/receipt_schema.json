@@ -54,6 +54,13 @@
     "files_changed",
     "total_diff_size"
   ],
+  "provider_exposed_identity_fields": [
+    "model_provider",
+    "model_id",
+    "model_revision"
+  ],
+  "provider_identity_capture_rule": "Capture every provider-returned model or revision metadata field in the receipt. An unavailable immutable provider build identifier must be represented as NOT_EXPOSED; model_id is the requested/returned selector and must not be relabeled as an immutable provider build.",
+  "observable_identity_mismatch_behavior": "FAIL_CLOSED",
   "missing_required_field_behavior": "FAIL_CLOSED",
   "chain_of_thought_capture": "NOT_REQUIRED; operational events, commands, artifacts, state transitions, and verdicts are sufficient",
   "immutable_after_termination": true

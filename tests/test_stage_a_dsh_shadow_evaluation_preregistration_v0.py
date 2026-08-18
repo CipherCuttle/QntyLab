@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import subprocess
 from pathlib import Path
 
@@ -58,6 +59,104 @@ def test_task_bytes_and_models_are_shared() -> None:
     assert len(prereg["task_contract"]["native_task_digest"]) == 64
     assert prereg["task_contract"]["native_task_digest_equals_dsh_task_digest"] is True
     assert prereg["model_identities"]["native_and_dsh_role_model_identity_equal"] is True
+    assert prereg["causal_contrast_class"]["classification"] == "SYSTEM_LEVEL_COMPARISON"
+    assert prereg["causal_contrast_class"]["harness_attribution_allowed"] is False
+
+
+def test_future_arm_task_scope_does_not_self_prohibit_the_admitted_arm() -> None:
+    prereg = load("preregistration.json")
+    task = load("task_contract.json")
+    assert task["contract_scope"] == "FUTURE_EXECUTION_ARM_TASK_INPUT"
+    assert "separate STAGE_A_DSH_SHADOW_EVALUATION_EXECUTION_V0 authorization" in task["execution_scope"]
+    forbidden = "\n".join(task["forbidden_actions"])
+    assert "install or execute DSH" not in forbidden
+    assert "execute either Stage-A arm" not in forbidden
+    for required_prohibition in (
+        "SEALED_REVIEWED_REFERENCE",
+        "GitHub mutation",
+        "GitHub write credentials",
+        "Qnty",
+        "QntyAgentRuntime",
+        "QntyAgentEval",
+        "QntyPolicyGate",
+        "protected order-flow",
+        "cross",
+        "retry",
+        "authority",
+        "NEXT_ACTION",
+        "self-upgrade",
+        "self-replace",
+        "arbitrary newer DSH",
+        "pinned DSH harness identity",
+    ):
+        assert required_prohibition.lower() in forbidden.lower()
+    assert prereg["authority_ceiling"]["stage_a_execution_authorized"] is False
+    assert prereg["future_execution_controller"]["requires_separate_authorization"] is True
+    assert prereg["future_execution_controller"]["preregistration_grants_execution_authority"] is False
+    assert prereg["closure"] == {
+        "phase_state": "CLOSED_PASS",
+        "experiment_state": "PREREGISTERED_NOT_EXECUTED",
+        "stage_a_executed": False,
+        "native_arm_executed": False,
+        "dsh_executed": False,
+        "dsh_installed": False,
+        "runtime_implemented": False,
+        "next_phase": "STAGE_A_DSH_SHADOW_EVALUATION_EXECUTION_V0",
+        "next_phase_requires_separate_authorization": True,
+    }
+
+
+def test_prompt_digest_and_frozen_identity_fields_are_resolved() -> None:
+    task = load("task_contract.json")
+    assert task["prompt_digest_algorithm"] == "SHA256"
+    assert task["prompt_digest_encoding"] == "UTF-8"
+    assert hashlib.sha256(task["prompt"].encode("utf-8")).hexdigest() == task["prompt_sha256"]
+    assert re.fullmatch(r"[0-9a-f]{64}", task["prompt_sha256"])
+    for value in (task["prompt_sha256"],):
+        assert value not in {"PENDING_FREEZE_COMPUTE", "PENDING", "TBD", "TODO", "PLACEHOLDER"}
+
+
+def test_all_frozen_digest_references_bind_current_sources() -> None:
+    prereg = load("preregistration.json")
+    files = {
+        "task_contract_digest": "task_contract.json",
+        "correctness_scorer_digest": "scoring_contract.json",
+        "intervention_schema_digest": "intervention_schema.json",
+        "gate_schema_digest": "gate_schema.json",
+        "receipt_schema_digest": "receipt_schema.json",
+    }
+    for field, name in files.items():
+        expected = hashlib.sha256((REG / name).read_bytes()).hexdigest()
+        assert prereg["contract_digests"][field] == expected
+    assert prereg["task_contract"]["native_task_digest"] == prereg["contract_digests"]["task_contract_digest"]
+    assert prereg["task_contract"]["dsh_task_digest"] == prereg["contract_digests"]["task_contract_digest"]
+    for arm, field in (("native_arm", "native_config_digest"), ("dsh_arm", "dsh_config_digest")):
+        actual = hashlib.sha256(json.dumps(prereg[arm], sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+        assert prereg["contract_digests"][field] == actual
+    assert prereg["contract_digests"]["dsh_source_identity"] == prereg["dsh_upstream_identity"]["commit_sha"]
+
+
+def test_model_identity_limitation_and_fail_closed_parity_are_explicit() -> None:
+    prereg = load("preregistration.json")
+    models = prereg["model_identities"]
+    assert models["provider"] == "OpenAI"
+    assert models["requested_model_selector"] == "gpt-5"
+    assert models["immutable_provider_build_id"] == "NOT_EXPOSED"
+    assert models["immutable_provider_build_claimed"] is False
+    assert models["absence_of_unexposed_build_id"] == "KNOWN_SYSTEM_LEVEL_LIMITATION"
+    assert models["observable_model_identity_mismatch_behavior"] == "FAIL_CLOSED"
+    assert "model_id" not in models
+    assert "model_revision" not in models
+    assert all(role["requested_model_selector"] == "gpt-5" for role in models["roles"])
+    assert all(role["immutable_provider_build_id"] == "NOT_EXPOSED" for role in models["roles"])
+    assert all("revision" not in role for role in models["roles"])
+    receipt = load("receipt_schema.json")
+    assert set(receipt["provider_exposed_identity_fields"]) <= set(receipt["required_fields"])
+    assert receipt["observable_identity_mismatch_behavior"] == "FAIL_CLOSED"
+    gates = load("gate_schema.json")
+    source_gate = next(g for g in gates["gates"] if g["gate_id"] == "SOURCE_IDENTITY_MISMATCH")
+    assert "model identity" in source_gate["input_evidence"]
+    assert "mismatched" in source_gate["measurement_function"]
     assert prereg["causal_contrast_class"]["classification"] == "SYSTEM_LEVEL_COMPARISON"
     assert prereg["causal_contrast_class"]["harness_attribution_allowed"] is False
 

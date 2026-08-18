@@ -1088,9 +1088,13 @@ def _brief_sections(packet: dict[str, Any]) -> list[list[str]]:
             f"- adapter = {_brief_field(external.get('QntyPolicyGate', {}).get('adapter_status'))}",
         ],
     ]
+    # Authority boundaries are fixed safety content.  Render them before the
+    # variable-length conflict and orientation sections so bounded truncation
+    # cannot silently remove them as the packet grows.
+    sections.append(authority_section)
     if conflicts:
         sections.append(conflicts_section)
-    sections.extend((orientation_section, authority_section))
+    sections.append(orientation_section)
     if not conflicts:
         sections.append(conflicts_section)
     return sections

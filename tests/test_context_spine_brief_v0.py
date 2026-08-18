@@ -153,6 +153,34 @@ def test_brief_does_not_infer_or_launder_authority() -> None:
     assert "permitted next action" not in text.lower()
 
 
+def test_brief_preserves_authority_boundaries_when_orientation_saturates_output() -> None:
+    packet = _packet()
+    packet["project_orientation"]["rows"] = [
+        {
+            "project_id": f"SYNTHETIC_PROJECT_{index:04d}",
+            "project_display_name": "Synthetic project",
+            "project_state": "PLANNED",
+            "project_code_references": [],
+        }
+        for index in range(project_context.BRIEF_MAX_LINES * 2)
+    ]
+
+    first = project_context.brief_text(packet)
+    second = project_context.brief_text(packet)
+
+    _assert_bounded(first)
+    assert project_context.BRIEF_TRUNCATION_MARKER in first
+    assert first == second
+    assert first.encode("utf-8").decode("utf-8") == first
+    assert "Git identity selects bytes, not semantic authority." in first
+    assert "Handoff is not Qnty acceptance." in first
+    assert "NEXT_ACTION authority is not established" in first
+    assert "no NEXT_ACTION field is emitted" in first
+    assert "No science, runtime, live, trading, or capital authority is inferred." in first
+    assert "NEXT_ACTION =" not in first
+    assert "permitted next action" not in first.lower()
+
+
 def test_brief_has_no_historical_task_protocol_or_action_literals() -> None:
     source = inspect.getsource(project_context.brief_text)
     sections = inspect.getsource(project_context._brief_sections)

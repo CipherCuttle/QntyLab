@@ -2714,3 +2714,50 @@ hostile_governance_open_high = 0
 targeted_governance_rereview_used = false
 active_project_after_closure = "NONE"
 next_action = "After canonical merge, perform exactly one QNTY_AGENT_RUNTIME_CONTRACT_ONLY_BOOTSTRAP_H01_MACHINE_ENFORCEMENT_REPAIR_V0 phase; if any Critical or High remains after its one targeted re-review, terminate this bootstrap attempt permanently as QNTY_AGENT_RUNTIME_CONTRACT_BOOTSTRAP_H01_UNRESOLVED."
+
+[[project]]
+project_id = "QNTY_AGENT_RUNTIME_CONTRACT_ONLY_BOOTSTRAP_H01_MACHINE_ENFORCEMENT_REPAIR_V0"
+display_name = "QntyAgentRuntime H01 contract-only bootstrap canonical closure"
+state = "CLOSED_PASS"
+authority_level = "CROSS_REPOSITORY_CONTRACT_ONLY_REPAIR_CLOSURE"
+phase_type = "CROSS_REPOSITORY_EVIDENCE_RECONCILIATION_CLOSURE"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/ADR/0007-ecosystem-role-boundary-and-context-spine-governance.md",
+  "docs/ADR/0008-qnty-agent-orchestration-runtime-boundary.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/bootstrap_h01_repair_authorization/authorization.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/bootstrap_h01_closure/closure.json",
+]
+canonical_qntylab_master_sha = "319be7737813752fcc0312733af23c40d792f4d6"
+target_repository = "CipherCuttle/QntyAgentRuntime"
+source_conflict = false
+architecture_change = false
+architecture_relevance = "NOT_REQUIRED_WITHIN_EXISTING_ADR_0008_BOUNDARY"
+adr_0007_preserved = true
+adr_0008_preserved = true
+authorization_project_id = "QNTY_AGENT_RUNTIME_CONTRACT_ONLY_BOOTSTRAP_H01_MACHINE_ENFORCEMENT_REPAIR_AUTHORIZATION_V0"
+authorization_qntylab_sha = "319be7737813752fcc0312733af23c40d792f4d6"
+one_later_h01_repair_phase_authorized = true
+second_bootstrap_authorized = false
+runtime_implementation_authorized = false
+dsh_implementation_authorized = false
+implementation_authorized = false
+scientific_authority = "NONE"
+qnty_next_action_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+auto_merge_authorized = false
+current_max_autonomy = "L0_SHADOW"
+hostile_review_count = 1
+hostile_review_verdict = "PASS"
+hostile_governance_critical_total = 0
+hostile_governance_high_total = 0
+hostile_governance_medium_total = 0
+hostile_governance_low_total = 0
+hostile_governance_open_critical = 0
+hostile_governance_open_high = 0
+targeted_governance_rereview_used = false
+active_project_after_closure = "NONE"
+next_action = "fresh bounded QntyAgentRuntime ecosystem-registration phase; not Stage-A directly"

@@ -1,0 +1,36 @@
+{
+  "artifact_type": "SUBSCRIPTION_BACKED_STAGE_A_V1_GATE_SCHEMA",
+  "schema_version": "subscription-backed-stage-a-gates-v1",
+  "missing_required_evidence": "FAIL_CLOSED",
+  "hard_gates": {
+    "PAY_PER_TOKEN_MODEL_API_USED": 0,
+    "OPENAI_API_KEY_PRESENT_IN_WORKER": 0,
+    "ANTHROPIC_API_KEY_PRESENT_IN_WORKER": 0,
+    "DEEPSEEK_API_KEY_PRESENT_IN_WORKER": 0,
+    "OTHER_MODEL_API_KEY_PRESENT_IN_WORKER": 0,
+    "DSH_PARENT_LLM_REQUEST_COUNT": 0,
+    "DSH_PARENT_LLM_PROVIDER": "NONE",
+    "PRODUCT_ROLE_MAPPING_MISMATCH": 0,
+    "PRODUCT_PROFILE_MISMATCH": 0,
+    "PRODUCT_CONFIG_MISMATCH": 0,
+    "PRODUCT_SESSION_STATE_LEAK": 0,
+    "RATE_LIMIT_ASYMMETRY_INVALIDATION": 0,
+    "UNAUTHORIZED_WRITES": 0,
+    "FALSE_HARD_GATE_PASS": 0,
+    "CROSS_TASK_STATE_LEAK": 0,
+    "SOURCE_IDENTITY_MISMATCH": 0,
+    "FROZEN_TASK_REPRODUCIBILITY": "PASS",
+    "PROCESS_OWNERSHIP": "PASS",
+    "RUNTIME_IDENTITY_CAPTURE": "PASS",
+    "TRACE_COMPLETENESS": "PASS",
+    "REVIEW_INDEPENDENCE_VIOLATIONS": 0,
+    "STALE_STATE_EXECUTIONS": 0,
+    "DUPLICATE_DISPATCH_RATE": 0
+  },
+  "primary_comparison": {
+    "treatment_correctness": ">= NATIVE_BASELINE",
+    "treatment_human_intervention": "<= NATIVE_BASELINE"
+  },
+  "capacity_invalid_classification": "STAGE_A_V1_INVALID_ENVIRONMENT_OR_PRODUCT_CAPACITY",
+  "no_post_hoc_metric_promotion": true
+}

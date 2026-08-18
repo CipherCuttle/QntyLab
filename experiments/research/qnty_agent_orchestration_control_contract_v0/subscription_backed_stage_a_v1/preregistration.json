@@ -1,0 +1,94 @@
+{
+  "artifact_type": "SUBSCRIPTION_BACKED_STAGE_A_V1_PREREGISTRATION",
+  "schema_version": "subscription-backed-stage-a-preregistration-v1",
+  "experiment_id": "SUBSCRIPTION_BACKED_STAGE_A_V1",
+  "phase_id": "SUBSCRIPTION_BACKED_STAGE_A_V1_FREEZE_AND_EXECUTION_AUTHORIZATION_V0",
+  "phase_state": "FROZEN_CANDIDATE",
+  "experiment_state": "PREREGISTERED_NOT_EXECUTED",
+  "scientific_purpose": "Determine whether DSH-managed invocation/lifecycle of existing subscription-backed coding products provides at least non-inferior task correctness and human-intervention burden relative to equivalent direct native product orchestration.",
+  "causal_contrast": {
+    "classification": "SYSTEM_LEVEL_PRODUCT_ORCHESTRATION_COMPARISON",
+    "interpretation_ceiling": "Compare DSH-managed product invocation/lifecycle with native direct product invocation/lifecycle under the same worker-role/product/profile mapping; do not attribute a result to one isolated DSH primitive.",
+    "harness_attribution_allowed": false
+  },
+  "historical_fixture": {
+    "base": "1b93858857daddacd1795cf980edb3d562eabc77",
+    "sealed_reviewed_reference": "73a0bacd4b244f9b83967612ad92d4eb474bbcc7",
+    "sealed_post_merge_reference": "c5ea1b735172527a98febad9c3165fd2e9a4bf77",
+    "task_contract_path": "experiments/research/qnty_agent_orchestration_control_contract_v0/stage_a_dsh_shadow_evaluation_preregistration_v0/task_contract.json",
+    "task_digest": "c92d26ea4e856591ceb3bb6918db2b42c07abaa37327a786b4028082cb21a720",
+    "scorer_path": "experiments/research/qnty_agent_orchestration_control_contract_v0/stage_a_dsh_shadow_evaluation_preregistration_v0/scoring_contract.json",
+    "scorer_digest": "e2500a73b538c001230dbd49c66f7aa685f8d4ea1ce192d4282e6aa30f2d4be3",
+    "intervention_path": "experiments/research/qnty_agent_orchestration_control_contract_v0/stage_a_dsh_shadow_evaluation_preregistration_v0/intervention_schema.json",
+    "intervention_digest": "9c974edfbfcc75c2e7296987c0499836f9c9730a11713cb8131e7b03a0cadf0b",
+    "reuse_unchanged_bytes": true
+  },
+  "workers": {
+    "controller": "DETERMINISTIC_NON_MODEL_CONTROLLER",
+    "builder": "CODEX_PROFILE_A",
+    "codex_a_home": "/home/swirky/.codex",
+    "hostile_reviewer": "CLAUDE_CODE_PRODUCT",
+    "verifier": "CODEX_PROFILE_B",
+    "codex_b_home": "/home/swirky/.codex-pro2",
+    "repair_builder": "CODEX_PROFILE_A",
+    "targeted_rereviewer": "FRESH_CLAUDE_CODE_PRODUCT_SESSION",
+    "mapping_identical_in_both_arms": true,
+    "account_identity_is_not_treatment": true
+  },
+  "treatment": {
+    "id": "DSH_MANAGED_PRODUCT_SUBAGENT_ORCHESTRATION_V1",
+    "dsh_commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "dsh_tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "dsh_tag": "dsh-v0.1.0-rc.7",
+    "dsh_parent_llm_provider": "NONE",
+    "dsh_parent_llm_request_count": 0,
+    "dsh_services": ["SubagentRuntime", "subagent-codex", "subagent-claude-code", "LocalSubprocessRuntime"],
+    "model_facing_dsh_tool_consumer": "NOT_REQUIRED"
+  },
+  "baseline": {
+    "id": "NATIVE_DIRECT_PRODUCT_ORCHESTRATION_V1",
+    "direct_codex_transport": "OFFICIAL_CODEX_APP_SERVER_STDIO_EQUIVALENT",
+    "direct_claude_transport": "OFFICIAL_CLAUDE_CODE_STREAM_JSON_NON_PERSISTED_EQUIVALENT",
+    "unavoidable_system_differences": ["DSH owns subagent process/session orchestration in treatment; native controller owns direct product process/session orchestration in baseline", "provider-specific tool protocols may differ and are diagnostic, not hidden"]
+  },
+  "product_identity_path": "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_stage_a_v1/product_identity.json",
+  "product_settings_parity": {"required": true, "mismatch_behavior": "FAIL_CLOSED"},
+  "zero_fee_contract": {
+    "pay_per_token_model_api_keys_allowed": false,
+    "openai_api_key_allowed": false,
+    "anthropic_api_key_allowed": false,
+    "deepseek_api_key_allowed": false,
+    "other_model_api_key_allowed": false,
+    "existing_product_subscription_auth_allowed": true
+  },
+  "answer_key_firewall": {
+    "fresh_base_only_repositories": true,
+    "workers_can_resolve_sealed_commits": false,
+    "remotes_refs_packed_objects_alternates_hidden": true,
+    "scorer_release": "Only after both arms terminate and receipts seal"
+  },
+  "pipeline": ["BUILDER", "TEST", "ONE_INDEPENDENT_HOSTILE_REVIEW", "REPAIR_CRITICAL_HIGH_ONLY", "AT_MOST_ONE_TARGETED_REREVIEW_IF_REPAIR", "VERIFIER", "TERMINATE"],
+  "retry_ceiling": {"max_machine_retries": 2, "max_worker_restarts": 1, "max_review_loops": 1, "max_verifier_retries": 1},
+  "arm_order": {
+    "derivation": "SHA256('SUBSCRIPTION_BACKED_STAGE_A_V1:' + arm_id), ascending digest",
+    "arm_1": "DSH_TREATMENT",
+    "arm_2": "NATIVE_BASELINE",
+    "derived_digests": {
+      "DSH_TREATMENT": "5cec70230c34b4776fd23faab708bf1ad38ec79acd863a98f8153e92faeee037",
+      "NATIVE_BASELINE": "83ecce883ef241236c16f7515d1d727ea784fe5ef3bff65615aefc0b221fc35e"
+    }
+  },
+  "diagnostics": ["wall-clock", "product invocation count", "reported model/token usage", "observable tool calls", "machine retries", "worker restarts", "files changed", "diff size", "process failures", "rate-limit events"],
+  "diagnostic_unavailability": "NOT_AVAILABLE",
+  "outcomes_frozen_before_execution": ["STAGE_A_V1_FAIL", "STAGE_A_V1_PASS_NO_INCREMENTAL_VALUE", "STAGE_A_V1_PASS_WITH_INCREMENTAL_VALUE", "STAGE_A_V1_INVALID_ENVIRONMENT_OR_PRODUCT_CAPACITY"],
+  "primary_noninferiority": {"treatment_correctness": ">= native baseline", "treatment_human_intervention": "<= native baseline"},
+  "gate_schema_path": "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_stage_a_v1/gate_schema.json",
+  "receipt_schema_path": "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_stage_a_v1/receipt_schema.json",
+  "controller_contract_path": "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_stage_a_v1/controller_contract.json",
+  "gate_digest": "a5960abe091a3f7938e2d0bd9c9e91d166d95a32900ce20711201547af5be88f",
+  "receipt_digest": "aa2f6585531c8241e267421c99ba14ea6af6a492b6185aaf407e8d27a0023575",
+  "controller_contract_digest": "08790f522dcd3c0df6edd321ec62bd2ffda25758e413fa9a5d899c9c6e528178",
+  "execution_status": {"historical_task_executed": false, "treatment_dispatch_count": 0, "baseline_dispatch_count": 0, "answer_key_released": false, "empirical_scoring": false},
+  "authority_ceiling": {"current_max_autonomy": "L0_SHADOW", "runtime_implementation_authorized": false, "dsh_runtime_implementation_authorized": false, "qnty_next_action_authority": "NONE", "scientific_market_execution_authority": "NONE", "trading_authority": "NONE", "capital_authority": "NONE", "auto_merge_authorized": false},
+  "qntyagenteval": {"applicability": "NO_MATCH", "run": false, "new_evaluator_created": false}
+}

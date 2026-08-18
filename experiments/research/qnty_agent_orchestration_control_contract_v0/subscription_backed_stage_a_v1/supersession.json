@@ -1,0 +1,22 @@
+{
+  "artifact_type": "STAGE_A_DSH_SHADOW_EVALUATION_SUPERSESSION",
+  "schema_version": "stage-a-dsh-shadow-supersession-v0",
+  "phase_id": "SUBSCRIPTION_BACKED_STAGE_A_V1_FREEZE_AND_EXECUTION_AUTHORIZATION_V0",
+  "superseded_experiment": "STAGE_A_DSH_SHADOW_EVALUATION_V0",
+  "superseded_reason": "FROZEN_MODEL_API_ONLY_ROUTE_INCOMPATIBLE_WITH_ZERO_INCREMENTAL_API_FEE_CONSTRAINT",
+  "historical_artifacts_unchanged": true,
+  "superseded_paths": [
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/stage_a_dsh_shadow_evaluation_preregistration_v0/preregistration.json",
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/stage_a_dsh_shadow_evaluation_execution_authorization_v0/authorization.json"
+  ],
+  "v0_empirical_episode_consumed": false,
+  "v0_empirical_result_exists": false,
+  "v0_state_if_this_candidate_is_not_canonical": "FROZEN_AUTHORIZED_IF_CANONICAL",
+  "branch_local_supersession_effective": false,
+  "v0_state_after_canonical_supersession": "SUPERSEDED_UNEXECUTED",
+  "v0_execution_authority_after_canonical_supersession": "REVOKED",
+  "v0_future_dispatch_allowed_after_canonical_supersession": false,
+  "replacement_experiment": "SUBSCRIPTION_BACKED_STAGE_A_V1",
+  "canonical_merge_required": true,
+  "source_conflict": false
+}

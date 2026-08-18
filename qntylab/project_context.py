@@ -946,6 +946,16 @@ BRIEF_MAX_BYTES = BRIEF_MAX_LINES * (BRIEF_MAX_LINE_BYTES + 1)
 BRIEF_LINE_TRUNCATION_MARKER = "...[LINE_TRUNCATED]"
 BRIEF_TRUNCATION_MARKER = "- TRUNCATED: deterministic brief byte/line budget reached."
 BRIEF_COMPLETE_PROJECTION = "- Complete projection: python -m qntylab.project_context spine"
+# Reduced-fidelity orientation markers.  A section that cannot be rendered in
+# full degrades through these instead of being dropped whole, so the reference
+# evidence that makes the projection machine-checkable against the repository
+# survives budget pressure from unrelated growth.
+BRIEF_ORIENTATION_ROWS_REDUCED = (
+    "- ORIENTATION_ROWS_REDUCED: rows carrying no project_code_references omitted for the brief budget."
+)
+BRIEF_ORIENTATION_INDEX_ONLY = (
+    "- ORIENTATION_ROWS_REPLACED_BY_REFERENCE_INDEX: per-project attribution omitted for the brief budget."
+)
 # Control characters are flattened to spaces so an embedded newline in a packet
 # value cannot smuggle extra rendered lines past the line budget.
 _BRIEF_CONTROL_TRANSLATION = {code: " " for code in (*range(0x20), 0x7F)}
@@ -995,7 +1005,86 @@ def _brief_qnty_lines(record: dict[str, Any] | None) -> list[str]:
     return lines
 
 
-def _brief_sections(packet: dict[str, Any]) -> list[list[str]]:
+class _BriefVariants(tuple):
+    """One brief section offered at decreasing fidelity, most complete first.
+
+    Bounded rendering admits the first variant that fits the remaining budget.
+    A section that would overflow therefore degrades to a smaller rendering of
+    the same material instead of being dropped whole, which is what lets
+    required control content survive growth in unrelated sections.
+    """
+
+    __slots__ = ()
+
+
+def _packed_reference_lines(references: list[str]) -> list[str]:
+    """Pack reference paths greedily into deterministic budget-width lines."""
+    if not references:
+        return ["- NONE"]
+    lines: list[str] = []
+    current = ""
+    for reference in references:
+        candidate = f"{current}, {reference}" if current else f"- {reference}"
+        if current and len(candidate.encode("utf-8")) > BRIEF_MAX_LINE_BYTES:
+            lines.append(current)
+            current = f"- {reference}"
+        else:
+            current = candidate
+    lines.append(current)
+    return lines
+
+
+def _orientation_variants(orientation: dict[str, Any]) -> _BriefVariants:
+    """Render project orientation at three decreasing fidelities.
+
+    ``project_code_references`` are the evidence that the projection is grounded
+    in real repository paths, so they are the last orientation material to go:
+    full attributed rows degrade to the rows that actually carry references, and
+    those degrade to a packed index of every distinct referenced path.  The
+    reduction is content-driven and carries no project, path or phase literal.
+    """
+    header = [
+        "## Project orientation",
+        "",
+        f"- scope = {_brief_field(orientation.get('project_orientation_scope'))}",
+        f"- reference scope = {_brief_field(orientation.get('project_code_reference_scope'))}",
+        f"- completeness = {_brief_field(orientation.get('project_code_reference_completeness'))}",
+        f"- module inventory provenance = {_brief_field(orientation.get('module_inventory_provenance'))}",
+    ]
+    rows = [row for row in orientation.get("rows", []) if isinstance(row, dict)]
+
+    def _row_line(row: dict[str, Any]) -> str:
+        references = ", ".join(row.get("project_code_references", [])) or "NONE"
+        return (
+            f"- {row.get('project_display_name', row.get('project_id', 'UNKNOWN'))}"
+            f" [{row.get('project_id', 'UNKNOWN')}] ({row.get('project_state', 'UNKNOWN')})"
+            f" -> {references}"
+        )
+
+    referencing = [row for row in rows if row.get("project_code_references")]
+    index = sorted({reference for row in rows for reference in row.get("project_code_references", [])})
+    return _BriefVariants(
+        (
+            [*header, "- project_code_references =", *(_row_line(row) for row in rows), ""],
+            [
+                *header,
+                BRIEF_ORIENTATION_ROWS_REDUCED,
+                "- project_code_references =",
+                *(_row_line(row) for row in referencing),
+                "",
+            ],
+            [
+                *header,
+                BRIEF_ORIENTATION_INDEX_ONLY,
+                "- project_code_reference_index =",
+                *_packed_reference_lines(index),
+                "",
+            ],
+        )
+    )
+
+
+def _brief_sections(packet: dict[str, Any]) -> list[list[str] | _BriefVariants]:
     conflicts = packet.get("conflicts") or []
     status = "ARCHITECTURE_CONFLICT" if conflicts else "CONTEXT_AVAILABLE"
     qnty = _brief_external_record(packet, "Qnty")
@@ -1007,27 +1096,7 @@ def _brief_sections(packet: dict[str, Any]) -> list[list[str]]:
         for record in packet.get("external_repositories", [])
         if isinstance(record, dict)
     }
-    orientation = packet.get("project_orientation", {})
-    orientation_rows = []
-    for row in orientation.get("rows", []):
-        references = ", ".join(row.get("project_code_references", [])) or "NONE"
-        orientation_rows.append(
-            f"- {row.get('project_display_name', row.get('project_id', 'UNKNOWN'))}"
-            f" [{row.get('project_id', 'UNKNOWN')}] ({row.get('project_state', 'UNKNOWN')})"
-            f" -> {references}"
-        )
-
-    orientation_section = [
-        "## Project orientation",
-        "",
-        f"- scope = {_brief_field(orientation.get('project_orientation_scope'))}",
-        f"- reference scope = {_brief_field(orientation.get('project_code_reference_scope'))}",
-        f"- completeness = {_brief_field(orientation.get('project_code_reference_completeness'))}",
-        f"- module inventory provenance = {_brief_field(orientation.get('module_inventory_provenance'))}",
-        "- project_code_references =",
-        *orientation_rows,
-        "",
-    ]
+    orientation_section = _orientation_variants(packet.get("project_orientation", {}))
     authority_section = [
         "## Authority boundaries",
         "",
@@ -1049,7 +1118,7 @@ def _brief_sections(packet: dict[str, Any]) -> list[list[str]]:
         "- unavailable external roots = "
         + (", ".join(record["repository_id"] for record in packet.get("external_repositories", []) if record.get("context_state") == "UNAVAILABLE_WITHOUT_EXPLICIT_ROOT") or "None"),
     ]
-    sections = [
+    sections: list[list[str] | _BriefVariants] = [
         [
             "# Qnty Ecosystem Brief",
             "",
@@ -1114,18 +1183,28 @@ def _brief_byte_length(lines: list[str]) -> int:
     return len("\n".join(lines).encode("utf-8"))
 
 
-def _bounded_brief(sections: list[list[str]]) -> str:
+def _bounded_brief(sections: list[list[str] | _BriefVariants]) -> str:
     lines: list[str] = []
     truncated = False
     for section in sections:
-        rendered_section = [_brief_line(line) for line in section]
-        candidate = lines + rendered_section
-        if any(BRIEF_LINE_TRUNCATION_MARKER in line for line in rendered_section):
-            truncated = True
-        if len(candidate) > BRIEF_MAX_LINES or _brief_byte_length(candidate) > BRIEF_MAX_BYTES:
+        # A section may offer decreasing fidelities.  Admitting the first one
+        # that fits keeps required content present when only optional detail
+        # overflows, instead of deleting the whole section for one line.
+        variants = section if isinstance(section, _BriefVariants) else (section,)
+        for index, variant in enumerate(variants):
+            rendered_section = [_brief_line(line) for line in variant]
+            candidate = lines + rendered_section
+            if any(BRIEF_LINE_TRUNCATION_MARKER in line for line in rendered_section):
+                truncated = True
+            if len(candidate) > BRIEF_MAX_LINES or _brief_byte_length(candidate) > BRIEF_MAX_BYTES:
+                continue
+            if index:
+                truncated = True
+            lines = candidate
+            break
+        else:
             truncated = True
             break
-        lines = candidate
     if truncated:
         while lines and (
             len(lines) + 2 > BRIEF_MAX_LINES

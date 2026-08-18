@@ -86,3 +86,67 @@ def test_truncated_brief_is_explicit_and_points_to_complete_spine() -> None:
     assert len(text.encode("utf-8")) <= project_context.BRIEF_MAX_BYTES
     assert len(text.splitlines()) <= project_context.BRIEF_MAX_LINES
     assert max(len(line.encode("utf-8")) for line in text.splitlines()) <= project_context.BRIEF_MAX_LINE_BYTES
+
+
+def _assert_bounded(text: str) -> None:
+    lines = text.splitlines()
+    assert len(text.encode("utf-8")) <= project_context.BRIEF_MAX_BYTES
+    assert len(lines) <= project_context.BRIEF_MAX_LINES
+    assert max(len(line.encode("utf-8")) for line in lines) <= project_context.BRIEF_MAX_LINE_BYTES
+
+
+def _distinct_references(packet: dict) -> list[str]:
+    return sorted(
+        {
+            reference
+            for row in packet["project_orientation"]["rows"]
+            for reference in row["project_code_references"]
+        }
+    )
+
+
+def _padded_packet(references_per_row: list[str]) -> dict:
+    """Grow the projection with unrelated rows until the full section overflows."""
+    packet = _packet()
+    packet["project_orientation"]["rows"] = packet["project_orientation"]["rows"] + [
+        {
+            "project_id": f"SYNTHETIC_PROJECT_{index:04d}",
+            "project_display_name": "Synthetic project",
+            "project_state": "PLANNED",
+            "project_code_references": [
+                reference.format(index=index) for reference in references_per_row
+            ],
+        }
+        for index in range(project_context.BRIEF_MAX_LINES * 2)
+    ]
+    return packet
+
+
+def test_orientation_reference_evidence_survives_unrelated_growth_forcing_truncation() -> None:
+    packet = _padded_packet([])
+    text = project_context.brief_text(packet)
+    _assert_bounded(text)
+    assert project_context.BRIEF_TRUNCATION_MARKER in text
+    assert project_context.BRIEF_COMPLETE_PROJECTION in text
+    assert project_context.BRIEF_ORIENTATION_ROWS_REDUCED in text
+    assert POSITIVE_REFERENCE in text
+    # Reduction is content-driven: rows carrying reference evidence are kept and
+    # rows carrying none are the ones that yield the budget.
+    assert all(
+        row["project_id"] in text
+        for row in packet["project_orientation"]["rows"]
+        if row["project_code_references"]
+    )
+    assert "SYNTHETIC_PROJECT_0000" not in text
+    assert text == project_context.brief_text(packet)
+
+
+def test_orientation_reference_index_survives_saturating_reference_bearing_growth() -> None:
+    packet = _padded_packet(["qntylab/synthetic_{index:04d}.py"])
+    text = project_context.brief_text(packet)
+    _assert_bounded(text)
+    assert project_context.BRIEF_ORIENTATION_INDEX_ONLY in text
+    assert project_context.BRIEF_TRUNCATION_MARKER in text
+    assert POSITIVE_REFERENCE in text
+    assert all(reference in text for reference in _distinct_references(packet))
+    assert text == project_context.brief_text(packet)

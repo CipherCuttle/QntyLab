@@ -3507,6 +3507,17 @@ authoritative_artifacts = [
   "AGENTS.md",
   "docs/state/projects.toml",
   "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/qualification_contract.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/prompts/builder.txt",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/prompts/reviewer.txt",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/prompts/verifier.txt",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/native_codex_role_driver_v0.py",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/claude_reviewer_driver_v0.py",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/run_qualification_batch_v0.py",
+  "qntylab/subscription_backed_native_product_execution_qualification_v0.py",
+  "tests/fixtures/fake_claude_code_v0.py",
+  "tests/fixtures/fake_codex_app_server_v0.py",
+  "tests/test_subscription_backed_native_product_execution_qualification_v0.py",
 ]
 canonical_parent_master = "5490d3f213bb1dc1b8fde86fe1cd464d09ddbead"
 source_conflict = false

@@ -1,0 +1,190 @@
+{
+  "api_key_gate": {
+    "must_be_absent": [
+      "ANTHROPIC_API_KEY",
+      "DEEPSEEK_API_KEY",
+      "OPENAI_API_KEY",
+      "OPENROUTER_API_KEY"
+    ],
+    "record_values": false
+  },
+  "authority": {
+    "capital": "NONE",
+    "merge": "NOT_AUTHORIZED",
+    "qnty_runtime": "NONE",
+    "scientific_evaluation": false,
+    "stage_a_v1_rerun": false,
+    "stage_a_v2_authorized": false,
+    "stage_a_v2_created": false,
+    "trading": "NONE"
+  },
+  "canonical_parent_master": "5490d3f213bb1dc1b8fde86fe1cd464d09ddbead",
+  "credential_and_identity": {
+    "claude": {
+      "auth_classification": "FIRST_PARTY_CLAUDE_AI_PRO_SUBSCRIPTION",
+      "binary": "/usr/bin/claude",
+      "subscription_backed": true,
+      "version": "2.1.223 (Claude Code)"
+    },
+    "codex": {
+      "auth_classification": "CHATGPT_LOGIN",
+      "binary": "/home/swirky/.local/bin/codex",
+      "profile_a": "/home/swirky/.codex",
+      "profile_b": "/home/swirky/.codex-pro2",
+      "subscription_backed": true,
+      "version": "codex-cli 0.147.0"
+    }
+  },
+  "dsh": {
+    "executed": false,
+    "imported": false,
+    "subprocess_started": false
+  },
+  "exactly_once": {
+    "batch_marker": "live_batch_v0/batch_started.json",
+    "exclusive_creation": true,
+    "per_role_attempt_limit": 1,
+    "role_markers": {
+      "BUILDER": "live_batch_v0/builder_started.json",
+      "INDEPENDENT_REVIEWER": "live_batch_v0/reviewer_started.json",
+      "VERIFIER": "live_batch_v0/verifier_started.json"
+    },
+    "started_marker_consumes_attempt": true
+  },
+  "implementation_paths": {
+    "claude_driver": "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/claude_reviewer_driver_v0.py",
+    "controller": "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/run_qualification_batch_v0.py",
+    "core_and_strict_parsers": "qntylab/subscription_backed_native_product_execution_qualification_v0.py",
+    "native_codex_driver": "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/native_codex_role_driver_v0.py"
+  },
+  "live_batch": {
+    "batch_limit": 1,
+    "fail_closed_downstream": true,
+    "order": [
+      "BUILDER",
+      "INDEPENDENT_REVIEWER",
+      "VERIFIER"
+    ],
+    "retries": 0
+  },
+  "product_argv": {
+    "claude_reviewer": [
+      "/usr/bin/claude",
+      "--print",
+      "--output-format",
+      "json",
+      "--json-schema",
+      "<CANONICAL_REVIEWER_SCHEMA_JSON>",
+      "--permission-mode",
+      "plan",
+      "--tools",
+      "<EMPTY_STRING>",
+      "--safe-mode",
+      "--disable-slash-commands",
+      "--no-session-persistence",
+      "--strict-mcp-config",
+      "--mcp-config",
+      "{\"mcpServers\":{}}"
+    ],
+    "codex_builder": [
+      "/home/swirky/.local/bin/codex",
+      "app-server",
+      "--stdio"
+    ],
+    "codex_verifier": [
+      "/home/swirky/.local/bin/codex",
+      "app-server",
+      "--stdio"
+    ]
+  },
+  "project_id": "SUBSCRIPTION_BACKED_NATIVE_PRODUCT_EXECUTION_QUALIFICATION_V0",
+  "prompt_paths": {
+    "BUILDER": "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/prompts/builder.txt",
+    "INDEPENDENT_REVIEWER": "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/prompts/reviewer.txt",
+    "VERIFIER": "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/prompts/verifier.txt"
+  },
+  "receipt_policy": {
+    "exact_role_schema": true,
+    "missing_or_null_required_field": "FAIL_CLOSED",
+    "process_nonzero": "FAIL_CLOSED",
+    "prose_success": "FORBIDDEN",
+    "stale_or_wrong_binding": "FAIL_CLOSED",
+    "timeout": "FAIL_CLOSED",
+    "unknown_role_or_route": "FAIL_CLOSED"
+  },
+  "reuse_preflight": {
+    "bounded_search": "rg --files qntylab tests | rg '(subscription_backed|native|codex|product_execution)'",
+    "candidates_inspected": [
+      "qntylab/subscription_backed_codex_app_server_write_path_diagnostic_v0.py",
+      "qntylab/subscription_backed_product_execution_plumbing_v0.py",
+      "tests/test_subscription_backed_codex_app_server_write_path_diagnostic_v0.py",
+      "tests/test_subscription_backed_product_execution_plumbing_v0.py"
+    ],
+    "disposition": "EXTEND",
+    "project_code_reference_matches": [
+      {
+        "path": "qntylab/subscription_backed_codex_app_server_write_path_diagnostic_v0.py",
+        "project_id": "SUBSCRIPTION_BACKED_CODEX_APP_SERVER_WRITE_PATH_DIAGNOSTIC_V0",
+        "project_state": "CLOSED_PASS"
+      },
+      {
+        "path": "qntylab/subscription_backed_product_execution_plumbing_v0.py",
+        "project_id": "SUBSCRIPTION_BACKED_PRODUCT_EXECUTION_PLUMBING_QUALIFICATION_V0",
+        "project_state": "CLOSED_BLOCKED"
+      }
+    ],
+    "projection_truncated": true,
+    "rationale": "Reuse the committed #135 JSON-RPC client and effective-policy evidence model plus #134 hashing, environment, and workspace primitives; add a new strict native-only role/controller contract and do not reuse #134 ephemeral bridge assumptions.",
+    "required": true
+  },
+  "roles": {
+    "BUILDER": {
+      "approval_policy": "never",
+      "effective_policy_required": {
+        "cwd": "<EXACT_SYNTHETIC_WORKSPACE>",
+        "network_access": false,
+        "sandbox": "workspaceWrite",
+        "writable_roots": [
+          "<EXACT_SYNTHETIC_WORKSPACE>"
+        ]
+      },
+      "product": "CODEX_PROFILE_A",
+      "profile": "/home/swirky/.codex"
+    },
+    "INDEPENDENT_REVIEWER": {
+      "filesystem_enforcement": "NO_BUILTIN_TOOLS_STRICT_EMPTY_MCP_SAFE_MODE_PLUS_BEFORE_AFTER_SNAPSHOT",
+      "permission_mode": "plan",
+      "product": "CLAUDE_CODE_SUBSCRIPTION",
+      "profile": "CLAUDE_AI_PRO_SUBSCRIPTION"
+    },
+    "VERIFIER": {
+      "approval_policy": "never",
+      "effective_policy_required": {
+        "cwd": "<EXACT_SYNTHETIC_WORKSPACE>",
+        "network_access": false,
+        "sandbox": "readOnly",
+        "writable_roots": []
+      },
+      "product": "CODEX_PROFILE_B",
+      "profile": "/home/swirky/.codex-pro2"
+    }
+  },
+  "schema_version": "subscription-backed-native-product-execution-qualification-contract-v0",
+  "synthetic_task": {
+    "allowed_changed_paths": [
+      "fixture.txt"
+    ],
+    "fixture_after_literal": "AFTER\n",
+    "fixture_after_sha256": "f72c713b7b432dd18949ca10f1be6dbcf493479945653609d1c715b2d8d74356",
+    "fixture_before_literal": "BEFORE\n",
+    "fixture_before_sha256": "be9351741a8155d01fd028d158546f1005e73ceeb0bb2d093335feac4144e450",
+    "workspace": "FRESH_DISPOSABLE_GIT_REPOSITORY_OUTSIDE_QNTYLAB"
+  },
+  "timeouts_seconds": {
+    "BUILDER": 180,
+    "INDEPENDENT_REVIEWER": 180,
+    "VERIFIER": 180,
+    "codex_handshake": 60,
+    "process_disposal_grace": 10
+  }
+}

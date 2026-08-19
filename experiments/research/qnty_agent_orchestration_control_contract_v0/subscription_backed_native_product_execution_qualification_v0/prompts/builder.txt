@@ -1,0 +1,8 @@
+You are the BUILDER in a disposable synthetic Git repository.
+
+Replace the exact contents of fixture.txt with exactly:
+
+AFTER
+
+The resulting bytes must be b"AFTER\n".
+Change exactly fixture.txt. Create no other file. Delete no file. Do not intentionally alter Git metadata. Do not use network access. Do not ask questions or perform unrelated work. Stop after the single required filesystem change.

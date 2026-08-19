@@ -99,6 +99,59 @@ def run_turn(params: dict) -> None:
         notify("turn/completed", {"threadId": THREAD_ID, "turn": turn_object("completed")})
         return
 
+    if SCENARIO == "wrong_bytes":
+        Path(cwd, "fixture.txt").write_bytes(b"WRONG\n")
+        notify("turn/completed", {"threadId": THREAD_ID, "turn": turn_object("completed")})
+        return
+
+    if SCENARIO == "extra_write":
+        emit_write(cwd)
+        Path(cwd, "extra.txt").write_bytes(b"UNAUTHORIZED\n")
+        notify("turn/completed", {"threadId": THREAD_ID, "turn": turn_object("completed")})
+        return
+
+    if SCENARIO == "deleted_file":
+        Path(cwd, "fixture.txt").unlink()
+        notify("turn/completed", {"threadId": THREAD_ID, "turn": turn_object("completed")})
+        return
+
+    if SCENARIO == "wrong_thread":
+        notify("turn/completed", {"threadId": "thread-wrong", "turn": turn_object("completed")})
+        return
+
+    if SCENARIO == "wrong_turn":
+        wrong = turn_object("completed")
+        wrong["id"] = "turn-wrong"
+        notify("turn/completed", {"threadId": THREAD_ID, "turn": wrong})
+        return
+
+    if params.get("outputSchema") is not None:
+        if SCENARIO == "verifier_mutation":
+            Path(cwd, "verifier-write.txt").write_bytes(b"forbidden\n")
+        if SCENARIO == "verifier_malformed":
+            emit_agent_message("PASS")
+        elif SCENARIO == "verifier_wrong_role":
+            emit_agent_message(json.dumps({
+                "role": "BUILDER", "verdict": "PASS",
+                "builder_result_valid": True, "reviewer_result_consistent": True,
+                "workspace_matches_contract": True, "unauthorized_writes": [], "reasons": [],
+            }, separators=(",", ":")))
+        elif SCENARIO == "verifier_fail":
+            emit_agent_message(json.dumps({
+                "role": "VERIFIER", "verdict": "FAIL",
+                "builder_result_valid": False, "reviewer_result_consistent": True,
+                "workspace_matches_contract": True, "unauthorized_writes": [],
+                "reasons": ["builder evidence is invalid"],
+            }, separators=(",", ":")))
+        else:
+            emit_agent_message(json.dumps({
+                "role": "VERIFIER", "verdict": "PASS",
+                "builder_result_valid": True, "reviewer_result_consistent": True,
+                "workspace_matches_contract": True, "unauthorized_writes": [], "reasons": [],
+            }, separators=(",", ":")))
+        notify("turn/completed", {"threadId": THREAD_ID, "turn": turn_object("completed")})
+        return
+
     if SCENARIO == "attempt_without_effect":
         notify("item/completed", {
             "threadId": THREAD_ID, "turnId": TURN_ID, "completedAtMs": 0,
@@ -196,7 +249,7 @@ def main() -> None:
                 "approvalPolicy": params.get("approvalPolicy", "on-request"),
                 "approvalsReviewer": "user",
                 "sandbox": effective_sandbox,
-                "runtimeWorkspaceRoots": [],
+                "runtimeWorkspaceRoots": [params.get("cwd")],
             }})
             notify("thread/started", {"threadId": THREAD_ID, "thread": {"id": THREAD_ID}})
         elif method == "turn/start":

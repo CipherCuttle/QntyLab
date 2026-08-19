@@ -204,20 +204,28 @@ def test_human_context_does_not_claim_no_queued_projects() -> None:
     assert "- None." not in queued_section
 
 
-def test_funding_incremental_implementation_is_the_single_active_source_bound_project() -> None:
+def test_funding_incremental_implementation_freeze_is_closed_without_escalation() -> None:
     data = project_context.context_data(ROOT)
     _, _, registry = project_context.load_context_sources(ROOT)
-    active = [record for record in registry["project"] if record["state"] == "ACTIVE"]
-    assert [record["project_id"] for record in active] == [FUNDING_INCREMENTAL_IMPLEMENTATION_PROJECT_ID]
-    project = active[0]
-    assert data["active_project"]["project_id"] == FUNDING_INCREMENTAL_IMPLEMENTATION_PROJECT_ID
-    assert project["state"] == "ACTIVE"
+    # The source-bound implementation freeze is complete, so it is no longer
+    # ACTIVE and no successor phase is authorized: the registry has no ACTIVE
+    # project at all.
+    assert [record["project_id"] for record in registry["project"] if record["state"] == "ACTIVE"] == []
+    assert data["active_project"] is None
+    assert data["current_permitted_next_action"] == "No project implementation is currently authorized."
+    _assert_project_is_not_active(registry, FUNDING_INCREMENTAL_IMPLEMENTATION_PROJECT_ID)
+    _assert_project_is_not_current_active(data, FUNDING_INCREMENTAL_IMPLEMENTATION_PROJECT_ID)
+    project = next(
+        record for record in registry["project"] if record["project_id"] == FUNDING_INCREMENTAL_IMPLEMENTATION_PROJECT_ID
+    )
+    assert project["state"] == "CLOSED_PASS"
     assert project["authority_level"] == "SOURCE_BOUND_IMPLEMENTATION_AND_SYNTHETIC_VALIDATION_ONLY"
     assert project["phase_type"] == "SOURCE_BOUND_IMPLEMENTATION_FREEZE"
-    assert project["implementation_authorized"] is True
+    assert project["implementation_authorized"] is False
     assert project["synthetic_validation_authorized"] is True
     assert project["governing_preregistration_project_id"] == "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_PREREGISTRATION_V0"
     assert project["governing_preregistration_digest"] == "d7ec718ab14e73d2aea24749a22caa2921fd81b8a336e2f2eaffb30ae1e992ef"
+    assert project["selected_architecture"] == "A_EXPLORATORY_610_INCREMENTAL_FORECAST_TEST"
     for field in (
         "real_evidence_execution_authorized",
         "scientific_execution_authorized",
@@ -231,15 +239,32 @@ def test_funding_incremental_implementation_is_the_single_active_source_bound_pr
         "qnty_authorized",
         "trading_authorized",
         "promotion_authorized",
+        "critical_high_repair_required",
+        "targeted_rereview_used",
     ):
         assert project[field] is False, field
     assert project["capital_authority"] == "NONE"
     assert project["downstream_authority"] == "NONE"
-    next_action = data["current_permitted_next_action"]
-    assert "IMPLEMENT THE FROZEN FUNDING-PRESSURE INCREMENTAL FORECAST EXECUTOR" in next_action
-    assert "SYNTHETIC VALIDATION ONLY" in next_action
-    assert "DO NOT ACCESS REAL EVALUATION OUTCOMES" in next_action
-    assert "PERFORM SCIENTIFIC EXECUTION" in next_action
+    assert project["active_project_after_closure"] == "NONE"
+    # The single hostile implementation review closed clean.
+    assert project["hostile_review_count"] == 1
+    assert project["hostile_review_verdict"] == "PASS"
+    assert project["hostile_review_critical"] == 0
+    assert project["hostile_review_high"] == 0
+    assert project["synthetic_validation_result"] == "PASS"
+    assert project["numerical_determinism"] == "PASS"
+    assert project["final_implementation_sha"] == project["reviewed_implementation_candidate_sha"]
+    assert project["implementation_source_path"] == "qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py"
+    next_action = project["next_action"]
+    assert "CLOSED_PASS" in next_action
+    assert "PREREGISTERED_NOT_EXECUTED" in next_action
+    assert "separate Git-backed execution authorization" in next_action
+    for disclaimed in (
+        "No real evidence execution",
+        "no evaluation origin was consumed",
+        "No State Snapshot, Router, Qnty, trading, promotion, or capital authority",
+    ):
+        assert disclaimed in next_action, disclaimed
 
 
 def test_jh01_temporal_replication_v0_and_v0r1_are_closed_with_their_distinct_lineages_preserved() -> None:
@@ -756,7 +781,10 @@ def test_jfpv3_r2_implementation_authorization_closes_without_escalation() -> No
     assert "activation persistence and forward runner are implemented and frozen" in authorization["next_action"].lower()
     assert "new bounded authority" in authorization["next_action"].lower()
     _assert_project_is_not_current_active(data, R2_AUTHORIZATION_PROJECT_ID)
-    assert data["current_permitted_next_action"] == data["active_project"]["next_action"]
+    active = data["active_project"]
+    assert data["current_permitted_next_action"] == (
+        active["next_action"] if active else "No project implementation is currently authorized."
+    )
     assert authorization["next_action_after_closure"] == "CANONICALIZE_R2_THEN_SEPARATELY_AUTHORIZE_OR_EXECUTE_ACTIVATION_AS_ALLOWED"
     assert authorization["r2_activation_transaction_implemented"] is True
     assert authorization["shadow_activated"] is False

@@ -1,0 +1,33 @@
+{
+  "ambient_decimal_context_immunity": "PASS",
+  "analytic_noise_fixture_classification": "FUNDING_PRESSURE_INCREMENTAL_VALUE_NOT_ESTABLISHED",
+  "analytic_signal_fixture_classification": "FUNDING_PRESSURE_INCREMENTAL_VALUE_ESTABLISHED_EXPLORATORY_ONLY",
+  "artifact_type": "FUNDING_INCREMENTAL_FORECAST_SYNTHETIC_VALIDATION",
+  "evidence_loader_invoked": false,
+  "historical_execution_performed": false,
+  "independent_oracles": [
+    "tests/test_jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py::test_one_sided_p_value_matches_an_independent_erfc_oracle",
+    "tests/test_jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py::test_bartlett_newey_west_matches_an_independent_direct_oracle",
+    "tests/test_jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py::test_frozen_pi_expansion_matches_an_independent_machin_expansion",
+    "tests/test_jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py::test_exact_ols_recovers_an_analytically_known_fit",
+    "tests/test_jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py::test_an_analytically_obvious_funding_signal_is_detected_with_the_right_sign"
+  ],
+  "mode": "SYNTHETIC_VALIDATION",
+  "network_access_performed": false,
+  "numerical_determinism": "PASS",
+  "oracles_pass": true,
+  "real_clark_west_computed": false,
+  "real_features_computed": false,
+  "real_forecasts_computed": false,
+  "real_funding_values_interpreted": false,
+  "real_market_values_interpreted": false,
+  "real_mse_computed": false,
+  "real_outcomes_accessed": false,
+  "real_p_values_computed": false,
+  "synthetic_run_1_digest": "sha256:1fca55ebdbe5c4d5b835cb65f87930755d231449c924eae912b522bd04b53ea2",
+  "synthetic_run_2_digest": "sha256:1fca55ebdbe5c4d5b835cb65f87930755d231449c924eae912b522bd04b53ea2",
+  "test_count": 78,
+  "test_file_sha256": "7de2bd14b2997b5aee9f8820b54a1819b8423da5b55d362a8ab7b0bb95bb6d30",
+  "test_relative_path": "tests/test_jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py",
+  "tests_pass": true
+}

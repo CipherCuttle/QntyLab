@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- `Funding-pressure incremental forecast-value implementation V0` — `ACTIVE`. IMPLEMENT THE FROZEN FUNDING-PRESSURE INCREMENTAL FORECAST EXECUTOR USING SYNTHETIC VALIDATION ONLY; FREEZE IMPLEMENTATION IDENTITY; DO NOT ACCESS REAL EVALUATION OUTCOMES OR PERFORM SCIENTIFIC EXECUTION.
+- None.
 
 ## Queued — not authorized
 
@@ -59,6 +59,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 - `JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_V1_PREREGISTRATION` — `CLOSED_PASS`. Separate Git-backed input-feasibility/materialization authorization for exactly the five frozen finalists; no market-data acquisition or scientific execution is authorized here.
 - `Jigsaw fast prospective signal discovery V2 PR-B implementation freeze` — `CLOSED_PASS`. CANONICALIZE_PR_B_THEN_FAST_LANE_V2_PR_C
 - `Jigsaw fast prospective signal discovery V2 capability-compiled preregistration` — `CLOSED_PASS`. FAST_LANE_V2_PR_B: materialize exact frozen inputs, implement minimal executors, validate synthetically, and freeze implementation identities.
+- `Funding-pressure incremental forecast-value implementation V0` — `CLOSED_PASS`. CLOSED_PASS: the preregistered funding-pressure incremental forecast executor is implemented, source-bound and synthetically validated at f6f12994d65c3dfeaf7839de560e58ad99547c62, and the single hostile implementation review closed with 0 Critical and 0 High (2 Medium, 4 Low recorded, none reopening the phase). The governing preregistration is byte-unchanged and remains PREREGISTERED_NOT_EXECUTED. No real evidence execution, scientific execution, outcome access, market-data or funding acquisition, network access, scientific result, or trial completion occurred; no evaluation origin was consumed. The 244-origin scientific evaluation requires a separate Git-backed execution authorization that must, before any real run, bind the frozen 20-member panel to the preregistration (hostile review M-02). No State Snapshot, Router, Qnty, trading, promotion, or capital authority is granted or implied.
 - `Funding-pressure incremental forecast-value preregistration V0` — `CLOSED_PASS`. CLOSED_PASS: preregistration is frozen at A_EXPLORATORY_610_INCREMENTAL_FORECAST_TEST and remains PREREGISTERED_NOT_EXECUTED. Any evaluation requires separate Git-backed authorization; no execution, data acquisition, outcome access, Order Flow reopening, JH01 ledger access, Router, Qnty, trading, or capital authority follows.
 - `JIGSAW_FUNDING_PRESSURE_VOLATILITY_FROZEN_RESULT_RECORDING_V0` — `CLOSED_NEGATIVE`. No further implementation is authorized by this closed negative result.
 - `JIGSAW_HARVEST_V0` — `CLOSED_PASS`. Jigsaw Harvest V0 is closed. Preserve its four bounded evidence pieces; no State Snapshot, Router, Qnty, or trading implementation is authorized by this phase.

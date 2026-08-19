@@ -1,0 +1,61 @@
+{
+  "artifact_type": "FUNDING_INCREMENTAL_FORECAST_IMPLEMENTATION_MANIFEST",
+  "candidate_a_sha": "f6f12994d65c3dfeaf7839de560e58ad99547c62",
+  "candidate_b_sha": null,
+  "critical_high_repair_required": false,
+  "final_implementation_sha": "f6f12994d65c3dfeaf7839de560e58ad99547c62",
+  "hostile_review_count": 1,
+  "hostile_review_critical": 0,
+  "hostile_review_high": 0,
+  "hostile_review_low": 4,
+  "hostile_review_medium": 2,
+  "implementation_identity": {
+    "capital_authority": "NONE",
+    "downstream_authority": "NONE",
+    "execution_modes": [
+      "SYNTHETIC_VALIDATION"
+    ],
+    "governing_candidate_id": "CANDIDATE_FUNDING_PRESSURE_INCREMENTAL_RV_FORECAST_VALUE_V0",
+    "governing_preregistration_digest": "d7ec718ab14e73d2aea24749a22caa2921fd81b8a336e2f2eaffb30ae1e992ef",
+    "governing_preregistration_project_id": "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_PREREGISTRATION_V0",
+    "implementation_source_path": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py",
+    "implementation_source_sha256": "b894d4d9316bed6f8c4f7171b32692aff7b1f0eb32abd686a33fdb38425a7490",
+    "no_real_execution_attestation": {
+      "AUTHORIZATION_CLAIM_CONSUMED": false,
+      "FUNDING_DATA_ACQUIRED": false,
+      "JH01_LEDGER_ACCESSED": false,
+      "MARKET_DATA_ACQUIRED": false,
+      "NETWORK_ACCESS_PERFORMED": false,
+      "ORDER_FLOW_REOPENED": false,
+      "PREREGISTRATION_MUTATED": false,
+      "REAL_CLARK_WEST_COMPUTED": false,
+      "REAL_EVALUATION_OUTCOMES_ACCESSED": false,
+      "REAL_EVIDENCE_EXECUTION_PERFORMED": false,
+      "REAL_FORECASTS_COMPUTED": false,
+      "REAL_MSE_COMPUTED": false,
+      "REAL_P_VALUE_COMPUTED": false,
+      "REAL_SCIENTIFIC_EXECUTION_PERFORMED": false,
+      "SCIENTIFIC_RESULT_RECORDED": false,
+      "TRIAL_COMPLETION_RECORDED": false
+    },
+    "project_id": "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_EXECUTION_IMPLEMENTATION_V0",
+    "selected_architecture": "A_EXPLORATORY_610_INCREMENTAL_FORECAST_TEST"
+  },
+  "implementation_source_digests": {
+    "qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py": "b894d4d9316bed6f8c4f7171b32692aff7b1f0eb32abd686a33fdb38425a7490",
+    "tests/test_jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py": "7de2bd14b2997b5aee9f8820b54a1819b8423da5b55d362a8ab7b0bb95bb6d30"
+  },
+  "implementation_source_paths": [
+    "qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py",
+    "tests/test_jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py"
+  ],
+  "numerical_determinism": "PASS",
+  "result_schema_frozen": true,
+  "runtime": {
+    "python": "3.14.4",
+    "third_party_dependencies": []
+  },
+  "synthetic_run_1_digest": "sha256:1fca55ebdbe5c4d5b835cb65f87930755d231449c924eae912b522bd04b53ea2",
+  "synthetic_run_2_digest": "sha256:1fca55ebdbe5c4d5b835cb65f87930755d231449c924eae912b522bd04b53ea2",
+  "targeted_rereview_used": false
+}

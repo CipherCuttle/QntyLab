@@ -1,0 +1,44 @@
+{
+  "artifact_type": "FUNDING_INCREMENTAL_FORECAST_ORIGIN_SCHEDULE",
+  "cutoff_inequality": "STRICT",
+  "decision_frequency": "P1D_AT_00:00:00Z",
+  "development_origin_count": 365,
+  "development_range": [
+    "2023-10-19T00:00:00Z",
+    "2024-10-17T00:00:00Z"
+  ],
+  "ecdf_history_observations": 365,
+  "evaluation_origin_count": 244,
+  "evaluation_range": [
+    "2024-10-19T00:00:00Z",
+    "2025-06-19T00:00:00Z"
+  ],
+  "excluded_boundary_origin": "2024-10-18T00:00:00Z",
+  "excluded_boundary_reason": "TARGET_COMPLETION_TIME_EQUALS_FIRST_EVALUATION_ORIGIN_AND_IS_NOT_STRICTLY_BEFORE_IT",
+  "first_evaluation_origin_training_count": 365,
+  "forecast_row_origin_count": 609,
+  "har_lag_windows": [
+    1,
+    7,
+    30
+  ],
+  "har_max_lag_days": 30,
+  "last_evaluation_origin_training_count": 607,
+  "minimum_training_origins": 365,
+  "random_split": false,
+  "refit_cadence": "EVERY_DAILY_ORIGIN",
+  "required_pressure_observation_days": 975,
+  "required_pressure_range": [
+    "2022-10-19T00:00:00Z",
+    "2025-06-19T00:00:00Z"
+  ],
+  "required_rv24_observation_days": 640,
+  "required_rv24_range": [
+    "2023-09-19T00:00:00Z",
+    "2025-06-19T00:00:00Z"
+  ],
+  "schedule_digest": "520fc48273478c5aa6dbd7fe8a6665ec378eae1d78045b34daa6719972a759aa",
+  "shuffled_cross_validation": false,
+  "training_scheme": "EXPANDING_WINDOW",
+  "training_target_cutoff": "TARGET_COMPLETION_TIME < FORECAST_ORIGIN"
+}

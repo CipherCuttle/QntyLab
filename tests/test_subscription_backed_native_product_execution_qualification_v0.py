@@ -12,6 +12,7 @@ import pytest
 import qntylab.subscription_backed_native_product_execution_qualification_v0 as core
 
 from qntylab.subscription_backed_native_product_execution_qualification_v0 import (
+    CANONICAL_TIMEOUTS,
     FIXTURE_BEFORE_BYTES,
     FIXTURE_TARGET_BYTES,
     QualificationError,
@@ -94,7 +95,7 @@ def codex_receipt(tmp_path: Path, scenario: str, role: str = "BUILDER", *, timeo
             workspace_identity=workspace_identity(workspace)["identity_sha256"],
             prompt_template_sha256=sha256_bytes(prompt), driver_sha256="d" * 64,
             started_marker_sha256="m" * 64, binary_sha256=sha256_file(fake),
-            timeout_seconds=timeout,
+            timeouts=dict(CANONICAL_TIMEOUTS),
         )
     finally:
         core.CODEX_BINARY = old_binary
@@ -133,9 +134,12 @@ def test_builder_wrong_thread_or_turn_fails(tmp_path: Path, scenario: str) -> No
 
 
 def test_builder_timeout_process_failure_and_malformed_app_server_fail(tmp_path: Path) -> None:
-    assert codex_receipt(tmp_path / "timeout", "stall", timeout=1)["timed_out"] is True
     assert codex_receipt(tmp_path / "failed", "turn_failed")["machine_status"] == "FAIL"
     assert codex_receipt(tmp_path / "malformed", "initialize_reject")["machine_status"] == "FAIL"
+    invalid = dict(CANONICAL_TIMEOUTS)
+    invalid["BUILDER"] = 1
+    with pytest.raises(QualificationError):
+        core.validate_timeout_map(invalid)
 
 
 def test_builder_effective_policy_mismatch_fails(tmp_path: Path) -> None:
@@ -160,6 +164,7 @@ def test_builder_wrong_profile_and_api_key_presence_fail_closed(tmp_path: Path) 
             workspace_id=clean["workspace_identity"], prompt_sha=clean["prompt_sha256"],
             template_sha=clean["prompt_template_sha256"], driver_sha=clean["driver_sha256"],
             marker_sha=clean["started_marker_sha256"], binary_sha=clean["binary_sha256"],
+            timeouts=clean["timeouts_seconds"],
         )
     assert "never-serialize" not in json.dumps(receipt)
 
@@ -194,7 +199,7 @@ def reviewer_receipt(tmp_path: Path, scenario: str, *, target: bool = True, time
             workspace_identity=workspace_identity(workspace)["identity_sha256"],
             prompt_template_sha256=sha256_bytes(prompt), driver_sha256="c" * 64,
             started_marker_sha256="m" * 64, binary_sha256=sha256_file(fake),
-            timeout_seconds=timeout,
+            timeouts=dict(CANONICAL_TIMEOUTS),
         )
     finally:
         claude_driver.CLAUDE_BINARY = old_binary
@@ -223,7 +228,6 @@ def test_reviewer_malformed_extra_prose_missing_fields_wrong_role_fail(tmp_path:
 
 def test_reviewer_process_nonzero_timeout_mutation_and_api_key_fail(tmp_path: Path) -> None:
     assert reviewer_receipt(tmp_path / "nonzero", "process_failure")["machine_status"] == "FAIL"
-    assert reviewer_receipt(tmp_path / "timeout", "timeout", timeout=1)["timed_out"] is True
     mutated = reviewer_receipt(tmp_path / "mutation", "workspace_mutation")
     assert mutated["machine_status"] == "FAIL"
     assert mutated["workspace"]["unauthorized_writes"] == ["reviewer-write.txt"]
@@ -250,8 +254,10 @@ def test_verifier_valid_pass_and_valid_fail(tmp_path: Path) -> None:
 
 def test_verifier_malformed_wrong_role_profile_timeout_api_key_and_mutation_fail(tmp_path: Path) -> None:
     assert codex_receipt(tmp_path / "bad", "verifier_malformed", role="VERIFIER")["machine_status"] == "FAIL"
-    timeout = codex_receipt(tmp_path / "timeout", "stall", role="VERIFIER", timeout=1)
-    assert timeout["timed_out"] is True
+    invalid = dict(CANONICAL_TIMEOUTS)
+    invalid["VERIFIER"] = 1
+    with pytest.raises(QualificationError):
+        core.validate_timeout_map(invalid)
     gated = codex_receipt(tmp_path / "api", "verifier_pass", role="VERIFIER", environment={"PATH": os.environ["PATH"], "OPENROUTER_API_KEY": "x"})
     assert gated["product_started"] is False
     assert codex_receipt(tmp_path / "mutation", "verifier_mutation", role="VERIFIER")["machine_status"] == "FAIL"
@@ -264,6 +270,7 @@ def test_verifier_malformed_wrong_role_profile_timeout_api_key_and_mutation_fail
             workspace_id=valid["workspace_identity"], prompt_sha=valid["prompt_sha256"],
             template_sha=valid["prompt_template_sha256"], driver_sha=valid["driver_sha256"],
             marker_sha=valid["started_marker_sha256"], binary_sha=valid["binary_sha256"],
+            timeouts=valid["timeouts_seconds"],
         )
     valid_profile = codex_receipt(tmp_path / "profile", "verifier_pass", role="VERIFIER")
     valid_profile["profile"] = "/home/swirky/.codex"
@@ -273,6 +280,7 @@ def test_verifier_malformed_wrong_role_profile_timeout_api_key_and_mutation_fail
             workspace_id=valid_profile["workspace_identity"], prompt_sha=valid_profile["prompt_sha256"],
             template_sha=valid_profile["prompt_template_sha256"], driver_sha=valid_profile["driver_sha256"],
             marker_sha=valid_profile["started_marker_sha256"], binary_sha=valid_profile["binary_sha256"],
+            timeouts=valid_profile["timeouts_seconds"],
         )
 
 
@@ -366,13 +374,13 @@ def test_prelive_manifest_rejects_omitted_frozen_paths(tmp_path: Path, monkeypat
     repo.mkdir()
     manifest_path = repo / "prelive.json"
     manifest = {
-        "schema_version": "subscription-backed-native-product-prelive-freeze-v0",
+        "schema_version": "subscription-backed-native-product-prelive-freeze-v0r2",
         "project_id": core.PROJECT_ID,
         "canonical_parent_master": "5490d3f213bb1dc1b8fde86fe1cd464d09ddbead",
         "prelive_sha": "a" * 40, "prelive_tree": "b" * 40,
         "freeze_record_parent_required": True, "open_critical": 0, "open_high": 0,
         "hashes": {}, "binary_hashes": {},
-        "timeouts_seconds": {"BUILDER": 180, "INDEPENDENT_REVIEWER": 180, "VERIFIER": 180},
+        "timeouts_seconds": dict(CANONICAL_TIMEOUTS),
         "qntyagenteval": "NO_MATCH", "review": {}, "frozen_at": "2026-01-01T00:00:00Z",
         "fixture_hashes": {"before_sha256": sha256_bytes(FIXTURE_BEFORE_BYTES), "target_sha256": sha256_bytes(FIXTURE_TARGET_BYTES)},
         "product_identity": {},
@@ -398,6 +406,122 @@ def test_prelive_manifest_rejects_omitted_frozen_paths(tmp_path: Path, monkeypat
         )
 
 
+@pytest.mark.parametrize("missing", sorted(CANONICAL_TIMEOUTS))
+def test_exact_timeout_schema_rejects_each_missing_key(missing: str) -> None:
+    candidate = dict(CANONICAL_TIMEOUTS)
+    candidate.pop(missing)
+    with pytest.raises(QualificationError, match="exact canonical timeout schema"):
+        core.validate_timeout_map(candidate)
+
+
+def test_exact_timeout_schema_rejects_extra_key() -> None:
+    candidate = {**CANONICAL_TIMEOUTS, "unexpected": 1}
+    with pytest.raises(QualificationError, match="exact canonical timeout schema"):
+        core.validate_timeout_map(candidate)
+
+
+@pytest.mark.parametrize("key", sorted(CANONICAL_TIMEOUTS))
+def test_exact_timeout_schema_rejects_wrong_value_for_each_key(key: str) -> None:
+    candidate = dict(CANONICAL_TIMEOUTS)
+    candidate[key] += 1
+    with pytest.raises(QualificationError, match="canonical timeout schema"):
+        core.validate_timeout_map(candidate)
+
+
+@pytest.mark.parametrize("key", sorted(CANONICAL_TIMEOUTS))
+@pytest.mark.parametrize("bad", [None, "180", 180.0, True, 0, -1])
+def test_exact_timeout_schema_rejects_null_string_float_bool_zero_and_negative(key: str, bad: object) -> None:
+    candidate = dict(CANONICAL_TIMEOUTS)
+    candidate[key] = bad
+    with pytest.raises(QualificationError):
+        core.validate_timeout_map(candidate)
+
+
+def test_contract_manifest_timeout_mismatch_and_stale_manifest_fail_closed(tmp_path: Path, monkeypatch) -> None:
+    repo, manifest_path, base, frozen_sources = make_controller_repo(tmp_path)
+    manifest = {
+        **base,
+        "schema_version": "subscription-backed-native-product-prelive-freeze-v0r2",
+        "project_id": core.PROJECT_ID,
+        "canonical_parent_master": "5490d3f213bb1dc1b8fde86fe1cd464d09ddbead",
+        "prelive_sha": "a" * 40,
+        "prelive_tree": "b" * 40,
+        "freeze_record_parent_required": True,
+        "open_critical": 0,
+        "open_high": 0,
+        "timeouts_seconds": dict(CANONICAL_TIMEOUTS),
+        "qntyagenteval": "NO_MATCH",
+        "review": {},
+        "frozen_at": "2026-01-01T00:00:00Z",
+        "fixture_hashes": {
+            "before_sha256": sha256_bytes(FIXTURE_BEFORE_BYTES),
+            "target_sha256": sha256_bytes(FIXTURE_TARGET_BYTES),
+        },
+        "product_identity": {
+            "codex": {
+                "binary": "/home/swirky/.local/bin/codex", "version": "codex-cli 0.147.0",
+                "profile_a": "/home/swirky/.codex", "profile_b": "/home/swirky/.codex-pro2",
+                "authentication_mode": "CHATGPT_LOGIN", "subscription_backed": True,
+            },
+            "claude": {
+                "binary": "/usr/bin/claude", "version": "2.1.223 (Claude Code)",
+                "authentication_mode": "FIRST_PARTY_CLAUDE_AI_PRO_SUBSCRIPTION", "subscription_backed": True,
+            },
+        },
+    }
+
+    def fake_git(_root, *args):
+        joined = " ".join(args)
+        if joined == "rev-parse HEAD":
+            return "c" * 40
+        if joined == "rev-parse HEAD^":
+            return "a" * 40
+        if "^{tree}" in joined:
+            return manifest["prelive_tree"]
+        if args[0] == "ls-files":
+            return args[-1]
+        return ""
+
+    monkeypatch.setattr(controller, "_git", fake_git)
+    manifest["timeouts_seconds"] = {**CANONICAL_TIMEOUTS, "VERIFIER": 181}
+    with pytest.raises(QualificationError, match="canonical timeout|semantics"):
+        controller.validate_prelive_manifest(
+            repo, manifest_path, manifest_bytes=canonical_json(manifest), frozen_sources=frozen_sources,
+        )
+
+    manifest["timeouts_seconds"] = dict(CANONICAL_TIMEOUTS)
+    manifest["prelive_sha"] = "d" * 40
+    with pytest.raises(QualificationError, match="ancestry"):
+        controller.validate_prelive_manifest(
+            repo, manifest_path, manifest_bytes=canonical_json(manifest), frozen_sources=frozen_sources,
+        )
+
+
+@pytest.mark.parametrize("key", sorted(CANONICAL_TIMEOUTS))
+def test_runtime_timeout_map_rejects_fallback_shapes_before_spawn(key: str) -> None:
+    invalid = dict(CANONICAL_TIMEOUTS)
+    invalid[key] = 1
+    with pytest.raises(QualificationError):
+        core.run_codex_role(
+            role="BUILDER", workspace=Path("/does/not/exist"), qntylab_root=ROOT,
+            prompt=b"p", workspace_id="w", template_sha="t", driver_sha="d",
+            marker_sha="m", binary_sha256="b", timeouts=invalid,
+        )
+
+
+def test_runtime_has_no_authoritative_timeout_fallback_literals() -> None:
+    core_source = (ROOT / "qntylab/subscription_backed_native_product_execution_qualification_v0.py").read_text()
+    codex_source = (PHASE / "native_codex_role_driver_v0.py").read_text()
+    claude_source = (PHASE / "claude_reviewer_driver_v0.py").read_text()
+    assert "time.monotonic() + 60" not in core_source
+    assert "grace_seconds=10" not in core_source
+    assert "timeout=10" not in claude_source
+    assert "handshake_timeout_seconds" in core_source and "process_disposal_grace_seconds" in core_source
+    assert "timeouts" in codex_source and "timeouts" in claude_source
+    assert "timeout_seconds=180" not in codex_source
+    assert "process.communicate(timeout=10)" not in claude_source
+
+
 def test_incomplete_and_stale_pass_receipts_are_rejected(tmp_path: Path) -> None:
     workspace = make_workspace(tmp_path / "workspace", target=True)
     kwargs = {
@@ -405,7 +529,7 @@ def test_incomplete_and_stale_pass_receipts_are_rejected(tmp_path: Path) -> None
         "workspace_identity": workspace_identity(workspace)["identity_sha256"],
         "prompt_template_sha256": "t" * 64, "driver_sha256": "d" * 64,
         "started_marker_sha256": "m" * 64, "binary_sha256": "b" * 64,
-        "timeout_seconds": 180,
+        "timeouts": dict(CANONICAL_TIMEOUTS),
     }
     receipt = fake_role_receipt("VERIFIER", kwargs, pass_role=True)
     incomplete = json.loads(json.dumps(receipt))
@@ -416,6 +540,7 @@ def test_incomplete_and_stale_pass_receipts_are_rejected(tmp_path: Path) -> None
             workspace_id=kwargs["workspace_identity"], prompt_sha=sha256_bytes(b"p"),
             template_sha="t" * 64, driver_sha="d" * 64, marker_sha="m" * 64,
             binary_sha="b" * 64,
+            timeouts=kwargs["timeouts"],
         )
     (workspace / "fixture.txt").write_bytes(b"WRONG\n")
     with pytest.raises(QualificationError, match="stale"):
@@ -424,6 +549,7 @@ def test_incomplete_and_stale_pass_receipts_are_rejected(tmp_path: Path) -> None
             workspace=workspace, workspace_id=kwargs["workspace_identity"], prompt=b"p",
             template_sha="t" * 64, driver_sha="d" * 64, marker_sha="m" * 64,
             binary_sha="b" * 64, qntylab_root=ROOT,
+            timeouts=kwargs["timeouts"],
         )
 
 
@@ -441,7 +567,7 @@ def test_process_exit_missing_any_required_member_fails_closed(tmp_path: Path, m
         "workspace_identity": workspace_identity(workspace)["identity_sha256"],
         "prompt_template_sha256": "t" * 64, "driver_sha256": "d" * 64,
         "started_marker_sha256": "m" * 64, "binary_sha256": "b" * 64,
-        "timeout_seconds": 180,
+        "timeouts": dict(CANONICAL_TIMEOUTS),
     }
     receipt = fake_role_receipt("VERIFIER", kwargs, pass_role=True)
     del receipt["process_exit"][member]
@@ -451,6 +577,7 @@ def test_process_exit_missing_any_required_member_fails_closed(tmp_path: Path, m
             workspace_id=kwargs["workspace_identity"], prompt_sha=sha256_bytes(b"p"),
             template_sha="t" * 64, driver_sha="d" * 64, marker_sha="m" * 64,
             binary_sha="b" * 64,
+            timeouts=kwargs["timeouts"],
         )
 
 
@@ -469,7 +596,7 @@ def test_process_exit_wrong_types_and_extra_members_fail_closed(tmp_path: Path, 
         "workspace_identity": workspace_identity(workspace)["identity_sha256"],
         "prompt_template_sha256": "t" * 64, "driver_sha256": "d" * 64,
         "started_marker_sha256": "m" * 64, "binary_sha256": "b" * 64,
-        "timeout_seconds": 180,
+        "timeouts": dict(CANONICAL_TIMEOUTS),
     }
     receipt = fake_role_receipt("VERIFIER", kwargs, pass_role=True)
     receipt["process_exit"][member] = value
@@ -479,6 +606,7 @@ def test_process_exit_wrong_types_and_extra_members_fail_closed(tmp_path: Path, 
             workspace_id=kwargs["workspace_identity"], prompt_sha=sha256_bytes(b"p"),
             template_sha="t" * 64, driver_sha="d" * 64, marker_sha="m" * 64,
             binary_sha="b" * 64,
+            timeouts=kwargs["timeouts"],
         )
     extra = json.loads(json.dumps(fake_role_receipt("VERIFIER", kwargs, pass_role=True)))
     extra["process_exit"]["unexpected"] = True
@@ -488,6 +616,7 @@ def test_process_exit_wrong_types_and_extra_members_fail_closed(tmp_path: Path, 
             workspace_id=kwargs["workspace_identity"], prompt_sha=sha256_bytes(b"p"),
             template_sha="t" * 64, driver_sha="d" * 64, marker_sha="m" * 64,
             binary_sha="b" * 64,
+            timeouts=kwargs["timeouts"],
         )
 
 
@@ -508,7 +637,7 @@ def test_process_exit_contradictory_pass_evidence_fails_closed(tmp_path: Path, m
         "workspace_identity": workspace_identity(workspace)["identity_sha256"],
         "prompt_template_sha256": "t" * 64, "driver_sha256": "d" * 64,
         "started_marker_sha256": "m" * 64, "binary_sha256": "b" * 64,
-        "timeout_seconds": 180,
+        "timeouts": dict(CANONICAL_TIMEOUTS),
     }
     receipt = fake_role_receipt("VERIFIER", kwargs, pass_role=True)
     mutation(receipt)
@@ -518,6 +647,7 @@ def test_process_exit_contradictory_pass_evidence_fails_closed(tmp_path: Path, m
             workspace_id=kwargs["workspace_identity"], prompt_sha=sha256_bytes(b"p"),
             template_sha="t" * 64, driver_sha="d" * 64, marker_sha="m" * 64,
             binary_sha="b" * 64,
+            timeouts=kwargs["timeouts"],
         )
 
 
@@ -542,6 +672,7 @@ def make_controller_repo(tmp_path: Path) -> tuple[Path, Path, dict, dict[str, by
     manifest = {
         "prelive_sha": "a" * 40,
         "hashes": {path: sha256_bytes(payload) for path, payload in frozen_sources.items()},
+        "timeouts_seconds": dict(CANONICAL_TIMEOUTS),
         "binary_hashes": {
             "/home/swirky/.local/bin/codex": executable_sha256(Path("/home/swirky/.local/bin/codex")),
             "/usr/bin/claude": executable_sha256(Path("/usr/bin/claude")),
@@ -605,7 +736,7 @@ def fake_role_receipt(role: str, kwargs: dict, *, pass_role: bool, mutate_builde
         workspace_id=kwargs["workspace_identity"], prompt=kwargs["prompt"],
         template_sha=kwargs["prompt_template_sha256"], driver_sha=kwargs["driver_sha256"],
         marker_sha=kwargs["started_marker_sha256"], started_at="2026-01-01T00:00:00Z",
-        finished_at="2026-01-01T00:00:01Z", timeout_seconds=kwargs["timeout_seconds"],
+        finished_at="2026-01-01T00:00:01Z", timeouts=kwargs["timeouts"],
         timed_out=False, product_started=True,
         process_exit=(
             {"disposed": True, "termination": "EXITED", "exit_code": 0, "exit_signal": 0}
@@ -695,7 +826,7 @@ def test_stale_receipt_prompt_driver_workspace_and_role_laundering_rejected(tmp_
         "workspace_identity": workspace_identity(workspace)["identity_sha256"],
         "prompt_template_sha256": "t" * 64, "driver_sha256": "d" * 64,
         "started_marker_sha256": "m" * 64, "binary_sha256": "b" * 64,
-        "timeout_seconds": 180,
+        "timeouts": dict(CANONICAL_TIMEOUTS),
     }
     receipt = fake_role_receipt("VERIFIER", kwargs, pass_role=True)
     base = dict(
@@ -703,6 +834,7 @@ def test_stale_receipt_prompt_driver_workspace_and_role_laundering_rejected(tmp_
         workspace_id=kwargs["workspace_identity"], prompt_sha=sha256_bytes(b"p"),
         template_sha="t" * 64, driver_sha="d" * 64, marker_sha="m" * 64,
         binary_sha="b" * 64,
+        timeouts=kwargs["timeouts"],
     )
     validate_role_receipt(**base)
     wrong_argv = json.loads(json.dumps(receipt))
@@ -773,6 +905,7 @@ def test_execution_uses_bound_prompt_and_manifest_bytes_after_swap_restore(tmp_p
     assert [role for role, _ in seen] == ["BUILDER", "INDEPENDENT_REVIEWER", "VERIFIER"]
     assert result["execution_bindings"]["manifest_source_sha256"] == result["execution_bindings"]["manifest_execution_bound_sha256"]
     assert result["execution_bindings"]["contract_source_sha256"] == result["execution_bindings"]["contract_execution_bound_sha256"]
+    assert result["execution_bindings"]["timeouts_seconds"] == CANONICAL_TIMEOUTS
     assert result["execution_bindings"]["prompt_source_sha256"] == result["execution_bindings"]["prompt_execution_bound_sha256"]
 
 

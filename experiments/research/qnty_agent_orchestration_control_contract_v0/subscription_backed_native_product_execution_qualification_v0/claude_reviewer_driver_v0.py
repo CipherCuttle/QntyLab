@@ -33,6 +33,7 @@ from qntylab.subscription_backed_native_product_execution_qualification_v0 impor
     sha256_bytes,
     strict_json_object,
     utc_now,
+    validate_timeout_map,
     validate_workspace_boundary,
     workspace_snapshot,
 )
@@ -66,8 +67,11 @@ def run_role(
     driver_sha256: str,
     started_marker_sha256: str,
     binary_sha256: str,
-    timeout_seconds: int = 180,
+    timeouts: Mapping[str, Any],
 ) -> dict[str, Any]:
+    timeout_map = validate_timeout_map(timeouts, label="runtime timeouts_seconds")
+    timeout_seconds = timeout_map["INDEPENDENT_REVIEWER"]
+    process_disposal_grace_seconds = timeout_map["process_disposal_grace"]
     workspace, qntylab_root = validate_workspace_boundary(workspace, qntylab_root)
     before = workspace_snapshot(workspace)
     git_before = git_metadata_snapshot(workspace)
@@ -122,11 +126,11 @@ def run_role(
                 os.killpg(process.pid, signal.SIGTERM)
                 termination = "SIGTERM_PROCESS_GROUP_AFTER_TIMEOUT"
                 try:
-                    more_stdout, more_stderr = process.communicate(timeout=10)
+                    more_stdout, more_stderr = process.communicate(timeout=process_disposal_grace_seconds)
                 except subprocess.TimeoutExpired:
                     os.killpg(process.pid, signal.SIGKILL)
                     termination = "SIGKILL_PROCESS_GROUP_AFTER_TIMEOUT"
-                    more_stdout, more_stderr = process.communicate(timeout=10)
+                    more_stdout, more_stderr = process.communicate(timeout=process_disposal_grace_seconds)
                 stdout += more_stdout or b""
                 stderr += more_stderr or b""
                 returncode = process.returncode if isinstance(process.returncode, int) else -1
@@ -191,7 +195,7 @@ def run_role(
         binary_sha256=executed_binary_sha256, cwd=workspace,
         workspace_id=workspace_identity, prompt=prompt, template_sha=prompt_template_sha256,
         driver_sha=driver_sha256, marker_sha=started_marker_sha256, started_at=started_at,
-        finished_at=utc_now(), timeout_seconds=timeout_seconds, timed_out=timed_out,
+        finished_at=utc_now(), timeouts=timeout_map, timed_out=timed_out,
         product_started=product_started, process_exit=process_exit, lifecycle=lifecycle,
         protocol=protocol, effective_policy=effective, workspace=workspace_receipt,
         qntylab_before=qntylab_before, qntylab_after=qntylab_after, gate=gate,
@@ -210,20 +214,21 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--driver-sha256", required=True)
     parser.add_argument("--started-marker-sha256", required=True)
     parser.add_argument("--binary-sha256", required=True)
-    parser.add_argument("--timeout-seconds", type=int, default=180)
+    parser.add_argument("--timeouts-json", required=True)
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
+        timeouts = json.loads(args.timeouts_json)
         receipt = run_role(
             workspace=args.workspace, qntylab_root=args.qntylab_root,
             prompt=args.prompt_file.read_bytes(), workspace_identity=args.workspace_identity,
             prompt_template_sha256=args.prompt_template_sha256,
             driver_sha256=args.driver_sha256, started_marker_sha256=args.started_marker_sha256,
             binary_sha256=args.binary_sha256,
-            timeout_seconds=args.timeout_seconds,
+            timeouts=timeouts,
         )
     except (OSError, QualificationError) as exc:
         print(json.dumps({"status": "FAIL_CLOSED", "error_class": type(exc).__name__}, sort_keys=True))

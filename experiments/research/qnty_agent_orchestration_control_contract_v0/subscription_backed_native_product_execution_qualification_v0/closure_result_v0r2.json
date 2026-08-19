@@ -1,0 +1,61 @@
+{
+  "schema_version": "subscription-backed-native-product-execution-qualification-closure-v0r2",
+  "project_id": "SUBSCRIPTION_BACKED_NATIVE_PRODUCT_EXECUTION_QUALIFICATION_V0R2",
+  "prelive_sha": "d73fa1da442da50a03f9de50bb5671fb0408a83a",
+  "freeze_sha": "da671730720c4cf16b4014312f4d71d9adac9793",
+  "qntyagenteval": "NO_MATCH",
+  "review": {
+    "independent_hostile_review": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "c_h_fix_pass_used": false,
+    "targeted_rereview_used": false
+  },
+  "live": {
+    "batch_attempts": 1,
+    "builder_attempts": 1,
+    "builder_started": true,
+    "builder_status": "FAIL",
+    "builder_changed_paths": [],
+    "builder_fixture_match": false,
+    "builder_unauthorized_writes": [],
+    "reviewer_attempts": 0,
+    "reviewer_started": false,
+    "reviewer_status": "NOT_RUN_BY_FAIL_CLOSED_DEPENDENCY",
+    "verifier_attempts": 0,
+    "verifier_started": false,
+    "verifier_status": "NOT_RUN_BY_FAIL_CLOSED_DEPENDENCY",
+    "failure_class": "RECEIPT_INTEGRITY_FAILURE",
+    "narrowest_direct_failure": "Native Codex Profile A Builder effective policy reported writable_roots=[] instead of the exact synthetic workspace root; contract_match=false and TURN_START_FAILED before fixture mutation.",
+    "api_key_gate": "PASS",
+    "exactly_once": "PASS",
+    "frozen_timeout_contract_binding": "PASS",
+    "process_exit_exact_schema": "PASS",
+    "prompt_binding": "PASS",
+    "manifest_binding": "PASS"
+  },
+  "boundaries": {
+    "v0_mutated": false,
+    "v0r1_mutated": false,
+    "authorization_mutated": false,
+    "dsh_imported": false,
+    "dsh_executed": false,
+    "stage_a_v1_rerun": false,
+    "stage_a_v2_created": false,
+    "stage_a_v2_authorized": false,
+    "stage_a_v2_executed": false,
+    "historical_task_executed": false,
+    "answer_key_accessed": false,
+    "market_data_accessed": false,
+    "scientific_evaluation": false,
+    "qnty_runtime_authorized": false,
+    "trading_authorized": false,
+    "capital_authorized": false,
+    "api_keys_used": false,
+    "merge": "NOT_PERFORMED"
+  },
+  "verdict": "SUBSCRIPTION_BACKED_NATIVE_PRODUCT_EXECUTION_QUALIFICATION_V0R2_FAIL"
+}

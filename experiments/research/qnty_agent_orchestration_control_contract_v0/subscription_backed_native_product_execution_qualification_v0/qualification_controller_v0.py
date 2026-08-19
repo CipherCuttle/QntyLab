@@ -45,6 +45,7 @@ from qntylab.subscription_backed_native_product_execution_qualification_v0 impor
     snapshot_digest,
     strict_json_object,
     utc_now,
+    validate_timeout_map,
     validate_role_receipt,
     workspace_identity,
     workspace_snapshot,
@@ -126,7 +127,7 @@ def validate_prelive_manifest(
         "timeouts_seconds", "qntyagenteval", "review", "frozen_at", "fixture_hashes",
         "product_identity",
     }
-    if set(manifest) != required or manifest["schema_version"] != "subscription-backed-native-product-prelive-freeze-v0":
+    if set(manifest) != required or manifest["schema_version"] != "subscription-backed-native-product-prelive-freeze-v0r2":
         raise QualificationError("prelive manifest shape is invalid")
     if manifest["project_id"] != PROJECT_ID or manifest["canonical_parent_master"] != "5490d3f213bb1dc1b8fde86fe1cd464d09ddbead":
         raise QualificationError("prelive manifest project or parent binding is invalid")
@@ -153,9 +154,11 @@ def validate_prelive_manifest(
         if not isinstance(payload, bytes) or sha256_bytes(payload) != expected:
             raise QualificationError(f"execution-bound source digest mismatch: {relative}")
     contract = strict_json_object(frozen_sources[CONTRACT_REL])
-    if contract.get("project_id") != PROJECT_ID or contract.get("schema_version") != "subscription-backed-native-product-execution-qualification-contract-v0r1":
+    if contract.get("project_id") != PROJECT_ID or contract.get("schema_version") != "subscription-backed-native-product-execution-qualification-contract-v0r2":
         raise QualificationError("execution-bound qualification contract identity is invalid")
-    if contract.get("prompt_paths") != PROMPT_RELS or contract.get("timeouts_seconds") != {"BUILDER": 180, "INDEPENDENT_REVIEWER": 180, "VERIFIER": 180}:
+    contract_timeouts = validate_timeout_map(contract.get("timeouts_seconds"), label="execution-bound contract timeouts_seconds")
+    manifest_timeouts = validate_timeout_map(manifest.get("timeouts_seconds"), label="prelive timeouts_seconds")
+    if contract.get("prompt_paths") != PROMPT_RELS or manifest_timeouts != contract_timeouts:
         raise QualificationError("execution-bound qualification contract semantics are invalid")
     if set(manifest["binary_hashes"]) != REQUIRED_BINARY_PATHS:
         raise QualificationError("prelive frozen product binary path set is not exact")
@@ -167,8 +170,6 @@ def validate_prelive_manifest(
     for binary, digest in manifest["binary_hashes"].items():
         if executable_sha256(Path(binary)) != digest:
             raise QualificationError(f"frozen product binary hash mismatch: {binary}")
-    if manifest["timeouts_seconds"] != {"BUILDER": 180, "INDEPENDENT_REVIEWER": 180, "VERIFIER": 180}:
-        raise QualificationError("prelive role timeouts are not exact")
     if manifest["product_identity"] != {
         "codex": {
             "binary": "/home/swirky/.local/bin/codex", "version": "codex-cli 0.147.0",
@@ -210,12 +211,13 @@ def _marker(
 def _persist_and_validate(
     *, live_root: Path, role: str, receipt: Mapping[str, Any], workspace: Path,
     workspace_id: str, prompt: bytes, template_sha: str, driver_sha: str, marker_sha: str,
-    binary_sha: str, qntylab_root: Path,
+    binary_sha: str, qntylab_root: Path, timeouts: Mapping[str, Any],
 ) -> dict[str, Any]:
     validated = validate_role_receipt(
         receipt, role=role, workspace=workspace, workspace_id=workspace_id,
         prompt_sha=sha256_bytes(prompt), template_sha=template_sha,
         driver_sha=driver_sha, marker_sha=marker_sha, binary_sha=binary_sha,
+        timeouts=timeouts,
     )
     workspace_evidence = validated["workspace"]
     if snapshot_digest(workspace_snapshot(workspace)) != workspace_evidence["after_digest"]:
@@ -274,8 +276,32 @@ def _result(
         and final_paths == [FIXTURE_NAME]
         and all(receipt.get("workspace_identity") == workspace_id for receipt in receipts.values())
     )
+    timeout_binding = False
+    contract_timeouts: dict[str, int] = {}
+    prelive_timeouts: dict[str, int] = {}
+    execution_bound_timeouts: dict[str, int] = {}
+    runtime_timeouts: dict[str, int] = {}
+    try:
+        contract_timeouts = validate_timeout_map(
+            strict_json_object(frozen_sources[CONTRACT_REL]).get("timeouts_seconds"),
+            label="result contract timeouts_seconds",
+        )
+        prelive_timeouts = validate_timeout_map(manifest.get("timeouts_seconds"), label="result prelive timeouts_seconds")
+        execution_bound_timeouts = validate_timeout_map(
+            strict_json_object(frozen_sources[CONTRACT_REL]).get("timeouts_seconds"),
+            label="result execution-bound timeouts_seconds",
+        )
+        runtime_values = [validate_timeout_map(receipt.get("timeouts_seconds"), label="result runtime timeouts_seconds") for receipt in receipts.values()]
+        if runtime_values:
+            runtime_timeouts = runtime_values[0]
+            timeout_binding = (
+                all(value == runtime_timeouts for value in runtime_values)
+                and contract_timeouts == prelive_timeouts == execution_bound_timeouts == runtime_timeouts
+            )
+    except (KeyError, QualificationError, TypeError):
+        timeout_binding = False
     all_role_gates = overall_qualification_pass(receipts, attempts)
-    passed = all_role_gates and frozen_sources_match and frozen_binaries_match and prompts_match and markers_match and workspace_gate
+    passed = all_role_gates and timeout_binding and frozen_sources_match and frozen_binaries_match and prompts_match and markers_match and workspace_gate
     not_run = [role for role in ROLE_FILENAMES if attempts.get(role, 0) == 0]
     result = {
         "schema_version": "subscription-backed-native-product-qualification-result-v0",
@@ -292,6 +318,12 @@ def _result(
             "manifest_execution_bound_sha256": sha256_bytes(frozen_manifest_bytes),
             "contract_source_sha256": sha256_bytes(frozen_sources[CONTRACT_REL]),
             "contract_execution_bound_sha256": sha256_bytes(frozen_sources[CONTRACT_REL]),
+            "timeouts_seconds": dict(prelive_timeouts),
+            "CONTRACT_TIMEOUTS": contract_timeouts,
+            "PRELIVE_TIMEOUTS": prelive_timeouts,
+            "EXECUTION_BOUND_TIMEOUTS": execution_bound_timeouts,
+            "RUNTIME_TIMEOUTS": runtime_timeouts,
+            "FROZEN_TIMEOUT_CONTRACT_BINDING": "PASS" if timeout_binding else "FAIL",
             "prompt_source_sha256": {role: sha256_bytes(frozen_sources[PROMPT_RELS[role]]) for role in PROMPT_RELS},
             "prompt_execution_bound_sha256": {role: sha256_bytes(frozen_sources[PROMPT_RELS[role]]) for role in PROMPT_RELS},
         },
@@ -334,6 +366,7 @@ def execute_batch(
         frozen_sources=frozen_sources,
     )
     contract = strict_json_object(frozen_sources[CONTRACT_REL])
+    execution_timeouts = validate_timeout_map(contract.get("timeouts_seconds"), label="execution-bound runtime timeouts_seconds")
     bootstrap_token = sha256_bytes(canonical_json(manifest["hashes"]))
     if os.environ.get("QNTYLAB_NATIVE_QUALIFICATION_BOOTSTRAP") != bootstrap_token:
         raise QualificationError("verified bootstrap binding is absent")
@@ -376,14 +409,14 @@ def execute_batch(
             role="BUILDER", workspace=workspace, qntylab_root=repo_root, prompt=builder_prompt,
             workspace_identity=workspace_id, prompt_template_sha256=builder_template_sha,
             driver_sha256=builder_driver_sha, started_marker_sha256=marker_sha,
-            timeout_seconds=contract["timeouts_seconds"]["BUILDER"],
+            timeouts=execution_timeouts,
             binary_sha256=codex_binary_sha,
         )
         receipts["BUILDER"] = _persist_and_validate(
             live_root=live_root, role="BUILDER", receipt=raw, workspace=workspace,
             workspace_id=workspace_id, prompt=builder_prompt, template_sha=builder_template_sha,
             driver_sha=builder_driver_sha, marker_sha=marker_sha,
-            binary_sha=codex_binary_sha, qntylab_root=repo_root,
+            binary_sha=codex_binary_sha, qntylab_root=repo_root, timeouts=execution_timeouts,
         )
     except (OSError, QualificationError, KeyError, TypeError):
         write_exclusive_json(live_root / "builder_receipt_error.json", {"role": "BUILDER", "status": "FAIL_CLOSED", "failure_class": "RECEIPT_INTEGRITY_FAILURE", "recorded_at": utc_now()})
@@ -417,14 +450,14 @@ def execute_batch(
             workspace=workspace, qntylab_root=repo_root, prompt=reviewer_prompt,
             workspace_identity=workspace_id, prompt_template_sha256=reviewer_template_sha,
             driver_sha256=reviewer_driver_sha, started_marker_sha256=marker_sha,
-            timeout_seconds=contract["timeouts_seconds"]["INDEPENDENT_REVIEWER"],
+            timeouts=execution_timeouts,
             binary_sha256=claude_binary_sha,
         )
         receipts["INDEPENDENT_REVIEWER"] = _persist_and_validate(
             live_root=live_root, role="INDEPENDENT_REVIEWER", receipt=raw,
             workspace=workspace, workspace_id=workspace_id, prompt=reviewer_prompt,
             template_sha=reviewer_template_sha, driver_sha=reviewer_driver_sha, marker_sha=marker_sha,
-            binary_sha=claude_binary_sha, qntylab_root=repo_root,
+            binary_sha=claude_binary_sha, qntylab_root=repo_root, timeouts=execution_timeouts,
         )
     except (OSError, QualificationError, KeyError, TypeError):
         write_exclusive_json(live_root / "reviewer_receipt_error.json", {"role": "INDEPENDENT_REVIEWER", "status": "FAIL_CLOSED", "failure_class": "RECEIPT_INTEGRITY_FAILURE", "recorded_at": utc_now()})
@@ -457,14 +490,14 @@ def execute_batch(
             role="VERIFIER", workspace=workspace, qntylab_root=repo_root, prompt=verifier_prompt,
             workspace_identity=workspace_id, prompt_template_sha256=verifier_template_sha,
             driver_sha256=verifier_driver_sha, started_marker_sha256=marker_sha,
-            timeout_seconds=contract["timeouts_seconds"]["VERIFIER"],
+            timeouts=execution_timeouts,
             binary_sha256=codex_binary_sha,
         )
         receipts["VERIFIER"] = _persist_and_validate(
             live_root=live_root, role="VERIFIER", receipt=raw, workspace=workspace,
             workspace_id=workspace_id, prompt=verifier_prompt, template_sha=verifier_template_sha,
             driver_sha=verifier_driver_sha, marker_sha=marker_sha,
-            binary_sha=codex_binary_sha, qntylab_root=repo_root,
+            binary_sha=codex_binary_sha, qntylab_root=repo_root, timeouts=execution_timeouts,
         )
     except (OSError, QualificationError, KeyError, TypeError):
         write_exclusive_json(live_root / "verifier_receipt_error.json", {"role": "VERIFIER", "status": "FAIL_CLOSED", "failure_class": "RECEIPT_INTEGRITY_FAILURE", "recorded_at": utc_now()})

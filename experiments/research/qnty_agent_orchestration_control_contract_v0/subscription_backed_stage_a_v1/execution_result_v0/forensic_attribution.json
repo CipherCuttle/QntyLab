@@ -1,0 +1,43 @@
+{
+  "schema_version": "subscription-backed-stage-a-v1-forensic-attribution-v0",
+  "episode_id": "SUBSCRIPTION_BACKED_STAGE_A_V1-1787094263",
+  "proven_episode_execution_defects": [
+    {
+      "id": "RESULT_STATUS_PROPAGATION",
+      "proven": true,
+      "classification": "RESULT_PARSER_ADAPTER_DEFECT",
+      "evidence": "The repair DSH lifecycle ended with stopReason=error and empty product output while the adapter-facing payload status was COMPLETED.",
+      "causal_scope": "EXECUTION_PLUMBING_ONLY"
+    },
+    {
+      "id": "TEST_STAGE_COVERAGE",
+      "proven": true,
+      "classification": "EXECUTION_TEST_STAGE_DEFICIENCY",
+      "evidence": "The ephemeral controller test stage ran project-context and ledger checks but did not execute the full frozen repository-native pytest command set.",
+      "causal_scope": "EXECUTION_PLUMBING_ONLY"
+    }
+  ],
+  "unresolved_treatment_observation": {
+    "write_capability_failure_observed": true,
+    "root_cause": "UNRESOLVED",
+    "possible_causes_not_disambiguated": [
+      "DSH",
+      "CODEX_PRODUCT_BEHAVIOR",
+      "PROFILE_CONFIGURATION",
+      "WRAPPER_CONFIGURATION",
+      "SANDBOX_OR_PERMISSION_PROPAGATION",
+      "EXECUTION_DRIVER_ENVIRONMENT",
+      "OTHER"
+    ],
+    "dsh_causality_proven": false
+  },
+  "mechanical_failure_class": "EXECUTION_PIPELINE_FAIL_CLOSED_WITH_PROVEN_PLUMBING_DEFECTS",
+  "causal_attribution_to_dsh": "INSUFFICIENT_EVIDENCE",
+  "authority_boundary": {
+    "runtime": "NONE",
+    "science": "NONE",
+    "trading": "NONE",
+    "capital": "NONE",
+    "qnty_next_action": "NONE"
+  }
+}

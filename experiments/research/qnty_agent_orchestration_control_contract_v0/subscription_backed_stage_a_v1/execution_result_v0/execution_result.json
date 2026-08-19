@@ -1,0 +1,102 @@
+{
+  "schema_version": "subscription-backed-stage-a-v1-result-recording-v0",
+  "phase": "SUBSCRIPTION_BACKED_STAGE_A_V1_RESULT_RECORDING_V0",
+  "status": "RECORDED_FAIL_CLOSED",
+  "project_id": "SUBSCRIPTION_BACKED_STAGE_A_V1_RESULT_RECORDING_V0",
+  "experiment_id": "SUBSCRIPTION_BACKED_STAGE_A_V1",
+  "episode_id": "SUBSCRIPTION_BACKED_STAGE_A_V1-1787094263",
+  "canonical_master_sha": "0af3e89763d9110da1f520552a99d7781b9b4a94",
+  "source_execution": {
+    "historical_root": "/tmp/subscription-backed-stage-a-v1-execution-pJnHkC",
+    "source_root_is_not_sole_identity": true,
+    "evidence_manifest": "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_stage_a_v1/execution_result_v0/evidence_manifest.json"
+  },
+  "execution": {
+    "episode_consumed": true,
+    "authorized_episode_count": 1,
+    "execution_verdict": "EXECUTION_FAIL_CLOSED",
+    "terminal_reason": "UNRESOLVED_CRITICAL_HIGH_AFTER_SINGLE_TARGETED_REREVIEW",
+    "treatment_dispatched": true,
+    "native_baseline_dispatched": false,
+    "verifier_dispatched": false,
+    "treatment_files_changed": 0,
+    "treatment_receipt_sealed": false,
+    "baseline_receipt_sealed": false,
+    "scorer_released": false,
+    "answer_key_released": false,
+    "empirical_correctness_scoring_performed": false,
+    "human_intervention_count": 0,
+    "capacity_invalidation": "NONE_RECORDED",
+    "authoritative_repository_modified_by_measured_execution": false,
+    "initial_hostile_review_counts": {
+      "critical": 4,
+      "high": 3,
+      "medium": 0,
+      "low": 1
+    },
+    "repair_attempts": 1,
+    "targeted_rereviews": 1,
+    "targeted_rereview_counts": {
+      "critical": 7,
+      "high": 2,
+      "medium": 1,
+      "low": 0
+    },
+    "critical_high_remained": true
+  },
+  "attribution": {
+    "proven_result_status_propagation_defect": true,
+    "proven_execution_test_stage_deficiency": true,
+    "write_capability_failure_observed": true,
+    "write_capability_root_cause": "UNRESOLVED",
+    "dsh_causality_proven": false,
+    "episode_mechanical_failure_class": "EXECUTION_PIPELINE_FAIL_CLOSED_WITH_PROVEN_PLUMBING_DEFECTS",
+    "causal_attribution_to_dsh": "INSUFFICIENT_EVIDENCE",
+    "observed_builder_report": "WRITE_CAPABILITY_UNAVAILABLE_MANAGED_READ_ONLY_FILESYSTEM"
+  },
+  "scientific_interpretation": {
+    "scientific_comparison_completed": false,
+    "dsh_vs_native_comparison_completed": false,
+    "dsh_worse_than_native_established": false,
+    "dsh_better_than_native_established": false,
+    "native_better_than_dsh_established": false,
+    "dsh_noninferiority_established": false,
+    "stage_a_v1_scientific_comparison_result": "NOT_OBTAINED",
+    "not_stage_a_v1_fail": true
+  },
+  "v2": {
+    "status": "NOT_YET_JUSTIFIED_PENDING_NONEXPERIMENTAL_EXECUTION_PLUMBING_QUALIFICATION",
+    "prerequisites_recorded": [
+      "DSH treatment Codex worker writes an isolated synthetic workspace through the intended SubagentRuntime route",
+      "Equivalent native Codex route writes the same synthetic fixture under matching permissions",
+      "Lifecycle ERROR propagates as ERROR or FAIL_CLOSED and never as COMPLETED",
+      "Reviewer, repair, and verifier result parsing is deterministic and tested",
+      "The deterministic TEST stage executes the intended frozen command set",
+      "Product profiles and configuration remain matched",
+      "No pay-per-token API keys or DSH parent LLM are introduced",
+      "Qualification uses synthetic non-scientific tasks and consumes no historical Stage-A episode"
+    ]
+  },
+  "no_rerun_invariant": {
+    "authorized_episode_count": 1,
+    "episode_consumed": true,
+    "second_episode_under_v1_allowed": false,
+    "rescue_rerun_allowed": false,
+    "return_to_armed_allowed": false,
+    "return_to_preregistered_not_executed_allowed": false,
+    "return_to_authorized_unconsumed_allowed": false
+  },
+  "authority": {
+    "runtime_authority": "NONE",
+    "scientific_authority": "NONE",
+    "qnty_next_action": "NONE",
+    "trading_authority": "NONE",
+    "capital_authority": "NONE"
+  },
+  "qntyagenteval": {
+    "applicability": "NO_MATCH",
+    "run": false
+  },
+  "answer_key_accessed": false,
+  "result_recorded": true
+}

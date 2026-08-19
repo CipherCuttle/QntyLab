@@ -14,7 +14,7 @@ import sys
 import time
 from pathlib import Path
 
-SCENARIO = sys.argv[1] if len(sys.argv) > 1 else "no_tool"
+SCENARIO = os.environ.get("FAKE_CODEX_SCENARIO") or (sys.argv[1] if len(sys.argv) > 1 else "no_tool")
 OBSERVED_PATH = os.environ.get("FAKE_APP_SERVER_OBSERVED")
 
 THREAD_ID = "thread-fake-0001"
@@ -93,7 +93,12 @@ def run_turn(params: dict) -> None:
         notify("turn/completed", {"threadId": THREAD_ID, "turn": turn_object("completed")})
         return
 
-    if SCENARIO == "write":
+    if SCENARIO in {"write", "empty_writable_roots", "write_with_approval"}:
+        if SCENARIO == "write_with_approval":
+            request_approval("item/fileChange/requestApproval", {
+                "threadId": THREAD_ID, "turnId": TURN_ID, "itemId": "item-approval",
+                "startedAtMs": 0, "reason": "unexpected approval",
+            })
         emit_write(cwd)
         emit_agent_message("done")
         notify("turn/completed", {"threadId": THREAD_ID, "turn": turn_object("completed")})
@@ -243,6 +248,8 @@ def main() -> None:
             )
             if SCENARIO == "effective_policy_downgrade":
                 effective_sandbox = {"type": "readOnly", "networkAccess": False}
+            if SCENARIO == "empty_writable_roots":
+                effective_sandbox = {"type": "workspaceWrite", "writableRoots": [], "networkAccess": False}
             send({"jsonrpc": "2.0", "id": request_id, "result": {
                 "thread": {"id": THREAD_ID, "ephemeral": params.get("ephemeral") is True},
                 "cwd": params.get("cwd"), "model": "fake-model", "modelProvider": "fake",

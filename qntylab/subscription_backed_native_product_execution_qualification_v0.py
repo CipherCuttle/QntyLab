@@ -78,6 +78,7 @@ RECEIPT_KEYS = {
     "profile",
     "binary_path",
     "binary_version",
+    "binary_sha256",
     "subscription_backed",
     "cwd",
     "workspace_identity",
@@ -101,6 +102,30 @@ RECEIPT_KEYS = {
     "machine_status",
     "failure_class",
 }
+WORKSPACE_RECEIPT_KEYS = {
+    "before_digest", "after_digest", "changed_paths", "git_changed_paths",
+    "git_diff_sha256", "fixture_before", "fixture_after",
+    "git_metadata_before_digest", "git_metadata_after_digest", "unauthorized_writes",
+}
+FIXTURE_OBSERVATION_KEYS = {"present", "sha256", "byte_length", "hex"}
+QNTYLAB_RECEIPT_KEYS = {"before_digest", "after_digest", "mutations"}
+CODEX_PROTOCOL_KEYS = {
+    "argv", "thread_sha256", "turn_sha256", "terminal_count",
+    "terminal_binding_valid", "terminal_status", "approval_request_count",
+    "unsupported_request_count", "agent_output_sha256", "executed_binary_sha256",
+}
+CLAUDE_PROTOCOL_KEYS = {
+    "argv", "stdin_prompt_sha256", "stdout_sha256", "stderr_sha256",
+    "structured_output_present", "executed_binary_sha256",
+}
+CODEX_POLICY_KEYS = {
+    "cwd", "approval_policy", "sandbox_class", "writable_roots",
+    "runtime_workspace_roots", "network_access", "codex_home", "contract_match",
+}
+CLAUDE_POLICY_KEYS = {
+    "permission_mode", "built_in_tools", "mcp", "safe_mode",
+    "session_persistence", "observed_enforcement", "contract_match",
+}
 
 
 class QualificationError(ValueError):
@@ -120,6 +145,22 @@ def sha256_file(path: Path) -> str:
     if path.is_symlink() or not path.is_file():
         raise QualificationError(f"hash target is not a regular file: {path}")
     return sha256_bytes(path.read_bytes())
+
+
+def executable_sha256(path: Path) -> str:
+    descriptor = os.open(Path(path), os.O_RDONLY)
+    try:
+        if not stat.S_ISREG(os.fstat(descriptor).st_mode):
+            raise QualificationError("product executable is not a regular file")
+        digest = hashlib.sha256()
+        while True:
+            chunk = os.read(descriptor, 1024 * 1024)
+            if not chunk:
+                break
+            digest.update(chunk)
+        return digest.hexdigest()
+    finally:
+        os.close(descriptor)
 
 
 def canonical_json(value: Any) -> bytes:
@@ -199,6 +240,23 @@ def reviewer_json_schema() -> dict[str, Any]:
         },
         "required": sorted(REVIEWER_KEYS),
     }
+
+
+def claude_reviewer_argv(binary: str = CLAUDE_BINARY) -> list[str]:
+    """Return the one frozen Claude Code subscription invocation."""
+    return [
+        binary,
+        "--print",
+        "--output-format", "json",
+        "--json-schema", canonical_json(reviewer_json_schema()).decode("utf-8").strip(),
+        "--permission-mode", "plan",
+        "--tools", "",
+        "--safe-mode",
+        "--disable-slash-commands",
+        "--no-session-persistence",
+        "--strict-mcp-config",
+        "--mcp-config", '{"mcpServers":{}}',
+    ]
 
 
 def verifier_json_schema() -> dict[str, Any]:
@@ -355,12 +413,56 @@ def qntylab_snapshot(root: Path) -> dict[str, str]:
     root = Path(root).resolve(strict=True)
     status = _git(root, "status", "--porcelain=v1", "-z", "--untracked-files=all")
     diff = _git(root, "diff", "--binary", "--no-ext-diff", "HEAD", "--")
+    metadata = hashlib.sha256()
+
+    def visit(directory: Path, prefix: Path) -> None:
+        with os.scandir(directory) as entries:
+            for entry in sorted(entries, key=lambda item: item.name):
+                rel = prefix / entry.name
+                if rel.parts[0] == ".git":
+                    continue
+                info = entry.stat(follow_symlinks=False)
+                row = (
+                    rel.as_posix(), stat.S_IFMT(info.st_mode), stat.S_IMODE(info.st_mode),
+                    info.st_size, info.st_mtime_ns, info.st_ctime_ns, info.st_ino,
+                )
+                metadata.update(canonical_json(row))
+                if stat.S_ISDIR(info.st_mode):
+                    visit(Path(entry.path), rel)
+
+    visit(root, Path())
     return {
         "head": _git(root, "rev-parse", "HEAD").decode().strip(),
         "status_sha256": sha256_bytes(status),
         "diff_sha256": sha256_bytes(diff),
-        "combined_sha256": sha256_bytes(status + b"\0" + diff),
+        "metadata_sha256": metadata.hexdigest(),
+        "combined_sha256": sha256_bytes(status + b"\0" + diff + b"\0" + metadata.digest()),
     }
+
+
+def open_verified_executable(path: Path, expected_sha256: str) -> tuple[int, str]:
+    if not isinstance(expected_sha256, str) or len(expected_sha256) != 64:
+        raise QualificationError("expected executable digest is malformed")
+    descriptor = os.open(Path(path), os.O_RDONLY)
+    try:
+        info = os.fstat(descriptor)
+        if not stat.S_ISREG(info.st_mode):
+            raise QualificationError("product executable is not a regular file")
+        digest = hashlib.sha256()
+        while True:
+            chunk = os.read(descriptor, 1024 * 1024)
+            if not chunk:
+                break
+            digest.update(chunk)
+        observed = digest.hexdigest()
+        if observed != expected_sha256:
+            raise QualificationError("product executable digest mismatch")
+        os.lseek(descriptor, 0, os.SEEK_SET)
+        os.set_inheritable(descriptor, True)
+        return descriptor, observed
+    except Exception:
+        os.close(descriptor)
+        raise
 
 
 def render_evidence_prompt(template: bytes, packet: Mapping[str, Any]) -> bytes:
@@ -417,8 +519,9 @@ def require_hashes(root: Path, expected: Mapping[str, str]) -> None:
 class BoundAppServerClient(AppServerClient):
     """#135 transport with process-group disposal and exact raw turn binding."""
 
-    def __init__(self, argv: Sequence[str], cwd: Path, env: Mapping[str, str], recorder: TraceRecorder) -> None:
+    def __init__(self, argv: Sequence[str], cwd: Path, env: Mapping[str, str], recorder: TraceRecorder, *, executable_fd: int) -> None:
         super().__init__(argv, cwd, env, recorder)
+        self.executable_fd = executable_fd
         self.raw_terminals: list[dict[str, Any]] = []
         self.raw_agent_messages: list[dict[str, Any]] = []
 
@@ -427,10 +530,13 @@ class BoundAppServerClient(AppServerClient):
             self._proc = subprocess.Popen(
                 list(self.argv), cwd=str(self.cwd), env=self.env,
                 stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                start_new_session=True,
+                start_new_session=True, executable=f"/proc/self/fd/{self.executable_fd}",
+                pass_fds=(self.executable_fd,),
             )
         except OSError as exc:
             raise QualificationError(f"app-server could not start: {exc}") from exc
+        finally:
+            os.close(self.executable_fd)
         threading.Thread(target=self._read_stdout, daemon=True).start()
         threading.Thread(target=self._drain_stderr, daemon=True).start()
         self.recorder.record("PROCESS", "LIFECYCLE", None, [], {"event": "SPAWNED", "argv": list(self.argv), "cwd": str(self.cwd)})
@@ -515,7 +621,7 @@ def _workspace_receipt(
 
 
 def _base_receipt(
-    *, role: str, version: str, cwd: Path, workspace_id: str, prompt: bytes,
+    *, role: str, version: str, binary_sha256: str, cwd: Path, workspace_id: str, prompt: bytes,
     template_sha: str, driver_sha: str, marker_sha: str, started_at: str,
     finished_at: str, timeout_seconds: int, timed_out: bool, product_started: bool,
     process_exit: Mapping[str, Any], lifecycle: str, protocol: Mapping[str, Any],
@@ -531,6 +637,7 @@ def _base_receipt(
         "profile": profile,
         "binary_path": binary,
         "binary_version": version,
+        "binary_sha256": binary_sha256,
         "subscription_backed": True,
         "cwd": str(Path(cwd).resolve()),
         "workspace_identity": workspace_id,
@@ -577,8 +684,7 @@ def _policy_for_role(role: str, workspace: Path) -> tuple[dict[str, Any], dict[s
 def run_codex_role(
     *, role: str, workspace: Path, qntylab_root: Path, prompt: bytes,
     workspace_id: str, template_sha: str, driver_sha: str, marker_sha: str,
-    binary_version: str = "codex-cli 0.147.0", timeout_seconds: int = 180,
-    argv: Sequence[str] | None = None, environment: Mapping[str, str] | None = None,
+    binary_sha256: str, binary_version: str = "codex-cli 0.147.0", timeout_seconds: int = 180,
 ) -> dict[str, Any]:
     """Execute one exact Codex app-server role and return a sanitized receipt."""
 
@@ -590,11 +696,18 @@ def run_codex_role(
     fixture_before = fixture_observation(workspace)
     qntylab_before = qntylab_snapshot(qntylab_root)
     started_at = utc_now()
-    clean_env, presence = sanitized_environment(environment, additions={"CODEX_HOME": ROLE_BINDINGS[role][1]})
+    clean_env, presence = sanitized_environment(additions={"CODEX_HOME": ROLE_BINDINGS[role][1]})
     gate = api_key_gate(presence)
-    resolved_argv = tuple(argv or (CODEX_BINARY, "app-server", "--stdio"))
+    resolved_argv = (CODEX_BINARY, "app-server", "--stdio")
     recorder = TraceRecorder(route=role)
-    client = BoundAppServerClient(resolved_argv, workspace, clean_env, recorder)
+    executable_fd = -1
+    executed_binary_sha256 = "ABSENT"
+    if gate == "PASS":
+        try:
+            executable_fd, executed_binary_sha256 = open_verified_executable(Path(CODEX_BINARY), binary_sha256)
+        except QualificationError:
+            gate = "FAIL"
+    client = BoundAppServerClient(resolved_argv, workspace, clean_env, recorder, executable_fd=executable_fd)
     product_started = False
     timed_out = False
     lifecycle = "NOT_STARTED"
@@ -607,7 +720,7 @@ def run_codex_role(
         "argv": list(resolved_argv), "thread_sha256": "ABSENT", "turn_sha256": "ABSENT",
         "terminal_count": 0, "terminal_binding_valid": False, "terminal_status": "ABSENT",
         "approval_request_count": 0, "unsupported_request_count": 0,
-        "agent_output_sha256": "ABSENT",
+        "agent_output_sha256": "ABSENT", "executed_binary_sha256": executed_binary_sha256,
     }
     structured: dict[str, Any] = {"role": role, "verdict": "FAIL"}
     deadline = time.monotonic() + timeout_seconds
@@ -706,6 +819,7 @@ def run_codex_role(
         "approval_request_count": len(client.approval_events),
         "unsupported_request_count": len(client.unsupported_server_requests),
         "agent_output_sha256": sha256_bytes(output_text.encode()) if output_text else "ABSENT",
+        "executed_binary_sha256": executed_binary_sha256,
     }
     if role == "VERIFIER" and output_text:
         try:
@@ -725,9 +839,10 @@ def run_codex_role(
         and effective.get("network_access") is False
     )
     if role == "BUILDER":
-        policy_match = policy_common and effective.get("sandbox_class") == "workspaceWrite" and not (roots - {str(workspace)}) and runtime_roots == {str(workspace)}
+        policy_match = policy_common and effective.get("sandbox_class") == "workspaceWrite" and roots == {str(workspace)} and runtime_roots == {str(workspace)}
         role_pass = (
             terminal_valid and terminal_status == "completed" and policy_match and not timed_out
+            and protocol["approval_request_count"] == 0 and protocol["unsupported_request_count"] == 0
             and gate == "PASS" and workspace_receipt["changed_paths"] == [FIXTURE_NAME]
             and workspace_receipt["git_changed_paths"] == [FIXTURE_NAME]
             and workspace_receipt["fixture_after"]["sha256"] == sha256_bytes(FIXTURE_TARGET_BYTES)
@@ -740,6 +855,7 @@ def run_codex_role(
         policy_match = policy_common and effective.get("sandbox_class") == "readOnly" and roots == set() and runtime_roots == {str(workspace)}
         role_pass = (
             terminal_valid and terminal_status == "completed" and policy_match and not timed_out
+            and protocol["approval_request_count"] == 0 and protocol["unsupported_request_count"] == 0
             and gate == "PASS" and workspace_receipt["changed_paths"] == []
             and workspace_receipt["git_changed_paths"] == [FIXTURE_NAME]
             and workspace_receipt["fixture_after"]["sha256"] == sha256_bytes(FIXTURE_TARGET_BYTES)
@@ -754,7 +870,8 @@ def run_codex_role(
     elif failure == "PRODUCT_START_FAILURE" and product_started:
         failure = f"{role}_PRODUCT_FAILURE"
     return _base_receipt(
-        role=role, version=binary_version, cwd=workspace, workspace_id=workspace_id,
+        role=role, version=binary_version, binary_sha256=executed_binary_sha256,
+        cwd=workspace, workspace_id=workspace_id,
         prompt=prompt, template_sha=template_sha, driver_sha=driver_sha, marker_sha=marker_sha,
         started_at=started_at, finished_at=utc_now(), timeout_seconds=timeout_seconds,
         timed_out=timed_out, product_started=product_started, process_exit=process_exit,
@@ -768,6 +885,7 @@ def run_codex_role(
 def validate_role_receipt(
     receipt: Mapping[str, Any], *, role: str, workspace: Path, workspace_id: str,
     prompt_sha: str, template_sha: str, driver_sha: str, marker_sha: str,
+    binary_sha: str,
 ) -> dict[str, Any]:
     data = dict(receipt)
     if set(data) != RECEIPT_KEYS:
@@ -781,6 +899,7 @@ def validate_role_receipt(
         "workspace_identity": workspace_id, "prompt_sha256": prompt_sha,
         "prompt_template_sha256": template_sha, "driver_sha256": driver_sha,
         "started_marker_sha256": marker_sha,
+        "binary_sha256": binary_sha,
     }
     if any(data.get(key) != item for key, item in exact.items()):
         raise QualificationError("role receipt binding mismatch")
@@ -796,6 +915,19 @@ def validate_role_receipt(
     for key in ("process_exit", "protocol", "effective_policy", "workspace", "qntylab_worktree", "structured_verdict"):
         if not isinstance(data.get(key), Mapping):
             raise QualificationError(f"role receipt {key} must be an object")
+    if set(data["workspace"]) != WORKSPACE_RECEIPT_KEYS or set(data["qntylab_worktree"]) != QNTYLAB_RECEIPT_KEYS:
+        raise QualificationError("role receipt mutation evidence keys are not exact")
+    if set(data["workspace"]["fixture_before"]) != FIXTURE_OBSERVATION_KEYS or set(data["workspace"]["fixture_after"]) != FIXTURE_OBSERVATION_KEYS:
+        raise QualificationError("role receipt fixture evidence keys are not exact")
+    expected_protocol = CLAUDE_PROTOCOL_KEYS if role == "INDEPENDENT_REVIEWER" else CODEX_PROTOCOL_KEYS
+    expected_policy = CLAUDE_POLICY_KEYS if role == "INDEPENDENT_REVIEWER" else CODEX_POLICY_KEYS
+    if set(data["protocol"]) != expected_protocol or set(data["effective_policy"]) != expected_policy:
+        raise QualificationError("role receipt protocol or policy keys are not exact")
+    if data["protocol"].get("executed_binary_sha256") != binary_sha:
+        raise QualificationError("role receipt executed binary digest mismatch")
+    expected_argv = claude_reviewer_argv() if role == "INDEPENDENT_REVIEWER" else [CODEX_BINARY, "app-server", "--stdio"]
+    if data["protocol"].get("argv") != expected_argv:
+        raise QualificationError("role receipt argv binding mismatch")
     if data["machine_status"] not in {"PASS", "FAIL"} or data["api_key_gate"] not in {"PASS", "FAIL"}:
         raise QualificationError("role receipt terminal enum is invalid")
     if data["machine_status"] == "PASS":
@@ -805,6 +937,11 @@ def validate_role_receipt(
             raise QualificationError("role PASS contradicts mutation evidence")
         if data["effective_policy"].get("contract_match") is not True:
             raise QualificationError("role PASS contradicts effective policy")
+        if role != "INDEPENDENT_REVIEWER":
+            if data["protocol"].get("terminal_binding_valid") is not True or data["protocol"].get("terminal_status") != "completed":
+                raise QualificationError("Codex PASS contradicts terminal evidence")
+            if data["protocol"].get("approval_request_count") != 0 or data["protocol"].get("unsupported_request_count") != 0:
+                raise QualificationError("Codex PASS contradicts protocol escalation evidence")
         process_exit = data["process_exit"]
         if not all(key in process_exit for key in ("termination", "exit_code", "exit_signal")):
             raise QualificationError("role PASS lacks concrete process exit evidence")
@@ -822,6 +959,8 @@ def validate_role_receipt(
                 raise QualificationError("builder PASS verdict is malformed")
             if data["workspace"].get("changed_paths") != [FIXTURE_NAME] or data["workspace"].get("git_changed_paths") != [FIXTURE_NAME]:
                 raise QualificationError("builder PASS contradicts changed paths")
+            if data["workspace"]["fixture_after"].get("sha256") != sha256_bytes(FIXTURE_TARGET_BYTES):
+                raise QualificationError("builder PASS contradicts fixture bytes")
         elif role == "INDEPENDENT_REVIEWER":
             parse_reviewer_verdict(data["structured_verdict"])
             if data["structured_verdict"].get("verdict") != "PASS" or data["workspace"].get("changed_paths") != []:

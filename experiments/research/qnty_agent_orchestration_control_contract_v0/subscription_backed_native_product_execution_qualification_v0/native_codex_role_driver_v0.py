@@ -28,9 +28,8 @@ def run_role(
     prompt_template_sha256: str,
     driver_sha256: str,
     started_marker_sha256: str,
+    binary_sha256: str,
     timeout_seconds: int = 180,
-    argv: list[str] | None = None,
-    environment: dict[str, str] | None = None,
 ) -> dict:
     return run_codex_role(
         role=role,
@@ -41,9 +40,8 @@ def run_role(
         template_sha=prompt_template_sha256,
         driver_sha=driver_sha256,
         marker_sha=started_marker_sha256,
+        binary_sha256=binary_sha256,
         timeout_seconds=timeout_seconds,
-        argv=argv,
-        environment=environment,
     )
 
 
@@ -57,6 +55,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--prompt-template-sha256", required=True)
     parser.add_argument("--driver-sha256", required=True)
     parser.add_argument("--started-marker-sha256", required=True)
+    parser.add_argument("--binary-sha256", required=True)
     parser.add_argument("--timeout-seconds", type=int, default=180)
     return parser
 
@@ -73,6 +72,7 @@ def main(argv: list[str] | None = None) -> int:
             prompt_template_sha256=args.prompt_template_sha256,
             driver_sha256=args.driver_sha256,
             started_marker_sha256=args.started_marker_sha256,
+            binary_sha256=args.binary_sha256,
             timeout_seconds=args.timeout_seconds,
         )
     except (OSError, QualificationError) as exc:

@@ -9,6 +9,8 @@ from pathlib import Path
 
 import pytest
 
+import qntylab.subscription_backed_native_product_execution_qualification_v0 as core
+
 from qntylab.subscription_backed_native_product_execution_qualification_v0 import (
     FIXTURE_BEFORE_BYTES,
     FIXTURE_TARGET_BYTES,
@@ -19,6 +21,7 @@ from qntylab.subscription_backed_native_product_execution_qualification_v0 impor
     api_key_presence,
     canonical_json,
     fixture_observation,
+    executable_sha256,
     git_metadata_snapshot,
     overall_qualification_pass,
     parse_reviewer_verdict,
@@ -40,7 +43,7 @@ if str(PHASE) not in sys.path:
 
 import claude_reviewer_driver_v0 as claude_driver  # noqa: E402
 import native_codex_role_driver_v0 as codex_driver  # noqa: E402
-import run_qualification_batch_v0 as controller  # noqa: E402
+import qualification_controller_v0 as controller  # noqa: E402
 
 FAKE_CODEX = Path(__file__).parent / "fixtures/fake_codex_app_server_v0.py"
 FAKE_CLAUDE = Path(__file__).parent / "fixtures/fake_claude_code_v0.py"
@@ -67,19 +70,40 @@ def make_workspace(tmp_path: Path, *, target: bool = False) -> Path:
 def codex_receipt(tmp_path: Path, scenario: str, role: str = "BUILDER", *, timeout: int = 5, environment: dict[str, str] | None = None):
     workspace = make_workspace(tmp_path, target=role == "VERIFIER")
     prompt = b"prompt\n"
-    return codex_driver.run_role(
-        role=role,
-        workspace=workspace,
-        qntylab_root=ROOT,
-        prompt=prompt,
-        workspace_identity=workspace_identity(workspace)["identity_sha256"],
-        prompt_template_sha256=sha256_bytes(prompt),
-        driver_sha256="d" * 64,
-        started_marker_sha256="m" * 64,
-        timeout_seconds=timeout,
-        argv=[sys.executable, str(FAKE_CODEX), scenario],
-        environment=environment,
-    )
+    fake = tmp_path / "fake-codex"
+    shutil.copy2(FAKE_CODEX, fake)
+    fake.chmod(0o700)
+    old_binary = core.CODEX_BINARY
+    old_a = core.ROLE_BINDINGS["BUILDER"]
+    old_b = core.ROLE_BINDINGS["VERIFIER"]
+    old_env = {key: os.environ.get(key) for key in (*core.API_KEY_NAMES, "FAKE_CODEX_SCENARIO")}
+    try:
+        core.CODEX_BINARY = str(fake)
+        core.ROLE_BINDINGS["BUILDER"] = (old_a[0], old_a[1], str(fake))
+        core.ROLE_BINDINGS["VERIFIER"] = (old_b[0], old_b[1], str(fake))
+        os.environ["FAKE_CODEX_SCENARIO"] = scenario
+        for key in core.API_KEY_NAMES:
+            os.environ.pop(key, None)
+        if environment:
+            for key in core.API_KEY_NAMES:
+                if key in environment:
+                    os.environ[key] = environment[key]
+        return codex_driver.run_role(
+            role=role, workspace=workspace, qntylab_root=ROOT, prompt=prompt,
+            workspace_identity=workspace_identity(workspace)["identity_sha256"],
+            prompt_template_sha256=sha256_bytes(prompt), driver_sha256="d" * 64,
+            started_marker_sha256="m" * 64, binary_sha256=sha256_file(fake),
+            timeout_seconds=timeout,
+        )
+    finally:
+        core.CODEX_BINARY = old_binary
+        core.ROLE_BINDINGS["BUILDER"] = old_a
+        core.ROLE_BINDINGS["VERIFIER"] = old_b
+        for key, value in old_env.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
 
 
 # BUILDER attacks
@@ -110,21 +134,17 @@ def test_builder_wrong_thread_or_turn_fails(tmp_path: Path, scenario: str) -> No
 def test_builder_timeout_process_failure_and_malformed_app_server_fail(tmp_path: Path) -> None:
     assert codex_receipt(tmp_path / "timeout", "stall", timeout=1)["timed_out"] is True
     assert codex_receipt(tmp_path / "failed", "turn_failed")["machine_status"] == "FAIL"
-    workspace = make_workspace(tmp_path / "malformed")
-    receipt = codex_driver.run_role(
-        role="BUILDER", workspace=workspace, qntylab_root=ROOT, prompt=b"p",
-        workspace_identity=workspace_identity(workspace)["identity_sha256"],
-        prompt_template_sha256=sha256_bytes(b"p"), driver_sha256="d" * 64,
-        started_marker_sha256="m" * 64, timeout_seconds=2,
-        argv=[sys.executable, "-c", "print('not-json')"],
-    )
-    assert receipt["machine_status"] == "FAIL"
+    assert codex_receipt(tmp_path / "malformed", "initialize_reject")["machine_status"] == "FAIL"
 
 
 def test_builder_effective_policy_mismatch_fails(tmp_path: Path) -> None:
     receipt = codex_receipt(tmp_path, "effective_policy_downgrade")
     assert receipt["machine_status"] == "FAIL"
     assert receipt["effective_policy"]["contract_match"] is False
+    assert codex_receipt(tmp_path / "empty-roots", "empty_writable_roots")["machine_status"] == "FAIL"
+    approval = codex_receipt(tmp_path / "approval", "write_with_approval")
+    assert approval["protocol"]["approval_request_count"] == 1
+    assert approval["machine_status"] == "FAIL"
 
 
 def test_builder_wrong_profile_and_api_key_presence_fail_closed(tmp_path: Path) -> None:
@@ -138,7 +158,7 @@ def test_builder_wrong_profile_and_api_key_presence_fail_closed(tmp_path: Path) 
             clean, role="BUILDER", workspace=tmp_path / "profile/workspace",
             workspace_id=clean["workspace_identity"], prompt_sha=clean["prompt_sha256"],
             template_sha=clean["prompt_template_sha256"], driver_sha=clean["driver_sha256"],
-            marker_sha=clean["started_marker_sha256"],
+            marker_sha=clean["started_marker_sha256"], binary_sha=clean["binary_sha256"],
         )
     assert "never-serialize" not in json.dumps(receipt)
 
@@ -156,17 +176,36 @@ def fake_claude_executable(tmp_path: Path) -> Path:
 def reviewer_receipt(tmp_path: Path, scenario: str, *, target: bool = True, timeout: int = 5, api_key: bool = False):
     workspace = make_workspace(tmp_path, target=target)
     fake = fake_claude_executable(tmp_path)
-    environment = {"PATH": os.environ["PATH"], "FAKE_CLAUDE_SCENARIO": scenario}
-    if api_key:
-        environment["ANTHROPIC_API_KEY"] = "never-serialize"
     prompt = b"review evidence"
-    return claude_driver.run_role(
-        workspace=workspace, qntylab_root=ROOT, prompt=prompt,
-        workspace_identity=workspace_identity(workspace)["identity_sha256"],
-        prompt_template_sha256=sha256_bytes(prompt), driver_sha256="c" * 64,
-        started_marker_sha256="m" * 64, timeout_seconds=timeout,
-        argv=claude_driver.frozen_argv(str(fake)), environment=environment,
-    )
+    old_binary = claude_driver.CLAUDE_BINARY
+    old_binding = core.ROLE_BINDINGS["INDEPENDENT_REVIEWER"]
+    old_scenario = os.environ.get("FAKE_CLAUDE_SCENARIO")
+    old_key = os.environ.get("ANTHROPIC_API_KEY")
+    try:
+        claude_driver.CLAUDE_BINARY = str(fake)
+        core.ROLE_BINDINGS["INDEPENDENT_REVIEWER"] = (old_binding[0], old_binding[1], str(fake))
+        os.environ["FAKE_CLAUDE_SCENARIO"] = scenario
+        os.environ.pop("ANTHROPIC_API_KEY", None)
+        if api_key:
+            os.environ["ANTHROPIC_API_KEY"] = "never-serialize"
+        return claude_driver.run_role(
+            workspace=workspace, qntylab_root=ROOT, prompt=prompt,
+            workspace_identity=workspace_identity(workspace)["identity_sha256"],
+            prompt_template_sha256=sha256_bytes(prompt), driver_sha256="c" * 64,
+            started_marker_sha256="m" * 64, binary_sha256=sha256_file(fake),
+            timeout_seconds=timeout,
+        )
+    finally:
+        claude_driver.CLAUDE_BINARY = old_binary
+        core.ROLE_BINDINGS["INDEPENDENT_REVIEWER"] = old_binding
+        if old_scenario is None:
+            os.environ.pop("FAKE_CLAUDE_SCENARIO", None)
+        else:
+            os.environ["FAKE_CLAUDE_SCENARIO"] = old_scenario
+        if old_key is None:
+            os.environ.pop("ANTHROPIC_API_KEY", None)
+        else:
+            os.environ["ANTHROPIC_API_KEY"] = old_key
 
 
 def test_reviewer_valid_pass_and_valid_fail(tmp_path: Path) -> None:
@@ -223,7 +262,7 @@ def test_verifier_malformed_wrong_role_profile_timeout_api_key_and_mutation_fail
             valid, role="VERIFIER", workspace=tmp_path / "role/workspace",
             workspace_id=valid["workspace_identity"], prompt_sha=valid["prompt_sha256"],
             template_sha=valid["prompt_template_sha256"], driver_sha=valid["driver_sha256"],
-            marker_sha=valid["started_marker_sha256"],
+            marker_sha=valid["started_marker_sha256"], binary_sha=valid["binary_sha256"],
         )
     valid_profile = codex_receipt(tmp_path / "profile", "verifier_pass", role="VERIFIER")
     valid_profile["profile"] = "/home/swirky/.codex"
@@ -232,7 +271,7 @@ def test_verifier_malformed_wrong_role_profile_timeout_api_key_and_mutation_fail
             valid_profile, role="VERIFIER", workspace=tmp_path / "profile/workspace",
             workspace_id=valid_profile["workspace_identity"], prompt_sha=valid_profile["prompt_sha256"],
             template_sha=valid_profile["prompt_template_sha256"], driver_sha=valid_profile["driver_sha256"],
-            marker_sha=valid_profile["started_marker_sha256"],
+            marker_sha=valid_profile["started_marker_sha256"], binary_sha=valid_profile["binary_sha256"],
         )
 
 
@@ -304,6 +343,87 @@ def test_frozen_hash_binding_detects_mismatch(tmp_path: Path) -> None:
         require_hashes(tmp_path, {"driver.py": sha256_bytes(b"one")})
 
 
+def test_qntylab_snapshot_detects_ignored_file_mutation_without_reading_contents(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / ".gitignore").write_text("ignored.bin\n")
+    (repo / "tracked.txt").write_text("tracked\n")
+    (repo / "ignored.bin").write_bytes(b"AAAA")
+    _git(repo, "init", "-q", "-b", "main")
+    _git(repo, "-c", "user.name=Tests", "-c", "user.email=tests@invalid", "add", ".gitignore", "tracked.txt")
+    _git(repo, "-c", "user.name=Tests", "-c", "user.email=tests@invalid", "commit", "-q", "-m", "fixture")
+    before = qntylab_snapshot(repo)
+    (repo / "ignored.bin").write_bytes(b"BBBB")
+    after = qntylab_snapshot(repo)
+    assert before["status_sha256"] == after["status_sha256"]
+    assert before["metadata_sha256"] != after["metadata_sha256"]
+    assert before["combined_sha256"] != after["combined_sha256"]
+
+
+def test_prelive_manifest_rejects_omitted_frozen_paths(tmp_path: Path, monkeypatch) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    manifest_path = repo / "prelive.json"
+    manifest = {
+        "schema_version": "subscription-backed-native-product-prelive-freeze-v0",
+        "project_id": core.PROJECT_ID,
+        "canonical_parent_master": "5490d3f213bb1dc1b8fde86fe1cd464d09ddbead",
+        "prelive_sha": "a" * 40, "prelive_tree": "b" * 40,
+        "freeze_record_parent_required": True, "open_critical": 0, "open_high": 0,
+        "hashes": {}, "binary_hashes": {},
+        "timeouts_seconds": {"BUILDER": 180, "INDEPENDENT_REVIEWER": 180, "VERIFIER": 180},
+        "qntyagenteval": "NO_MATCH", "review": {}, "frozen_at": "2026-01-01T00:00:00Z",
+        "fixture_hashes": {"before_sha256": sha256_bytes(FIXTURE_BEFORE_BYTES), "target_sha256": sha256_bytes(FIXTURE_TARGET_BYTES)},
+        "product_identity": {},
+    }
+    manifest_path.write_bytes(canonical_json(manifest))
+
+    def fake_git(_root, *args):
+        joined = " ".join(args)
+        if joined == "rev-parse HEAD":
+            return "c" * 40
+        if joined == "rev-parse HEAD^":
+            return "a" * 40
+        if "^{tree}" in joined:
+            return "b" * 40
+        if args[0] == "ls-files":
+            return "prelive.json"
+        return ""
+
+    monkeypatch.setattr(controller, "_git", fake_git)
+    with pytest.raises(QualificationError, match="source path set"):
+        controller.validate_prelive_manifest(repo, manifest_path)
+
+
+def test_incomplete_and_stale_pass_receipts_are_rejected(tmp_path: Path) -> None:
+    workspace = make_workspace(tmp_path / "workspace", target=True)
+    kwargs = {
+        "workspace": workspace, "qntylab_root": ROOT, "prompt": b"p",
+        "workspace_identity": workspace_identity(workspace)["identity_sha256"],
+        "prompt_template_sha256": "t" * 64, "driver_sha256": "d" * 64,
+        "started_marker_sha256": "m" * 64, "binary_sha256": "b" * 64,
+        "timeout_seconds": 180,
+    }
+    receipt = fake_role_receipt("VERIFIER", kwargs, pass_role=True)
+    incomplete = json.loads(json.dumps(receipt))
+    incomplete["workspace"].pop("fixture_after")
+    with pytest.raises(QualificationError):
+        validate_role_receipt(
+            incomplete, role="VERIFIER", workspace=workspace,
+            workspace_id=kwargs["workspace_identity"], prompt_sha=sha256_bytes(b"p"),
+            template_sha="t" * 64, driver_sha="d" * 64, marker_sha="m" * 64,
+            binary_sha="b" * 64,
+        )
+    (workspace / "fixture.txt").write_bytes(b"WRONG\n")
+    with pytest.raises(QualificationError, match="stale"):
+        controller._persist_and_validate(
+            live_root=tmp_path / "live", role="VERIFIER", receipt=receipt,
+            workspace=workspace, workspace_id=kwargs["workspace_identity"], prompt=b"p",
+            template_sha="t" * 64, driver_sha="d" * 64, marker_sha="m" * 64,
+            binary_sha="b" * 64, qntylab_root=ROOT,
+        )
+
+
 def test_rendered_prompt_binds_exact_evidence() -> None:
     first = render_evidence_prompt(b"template", {"x": 1})
     second = render_evidence_prompt(b"template", {"x": 2})
@@ -326,9 +446,10 @@ def make_controller_repo(tmp_path: Path) -> tuple[Path, Path, dict]:
     _git(repo, "-c", "user.name=Tests", "-c", "user.email=tests@invalid", "commit", "-q", "-m", "fixture")
     manifest = {
         "prelive_sha": "a" * 40,
-        "hashes": {
-            "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/native_codex_role_driver_v0.py": "d" * 64,
-            "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/claude_reviewer_driver_v0.py": "c" * 64,
+        "hashes": {path: "d" * 64 for path in controller.REQUIRED_HASH_PATHS},
+        "binary_hashes": {
+            "/home/swirky/.local/bin/codex": executable_sha256(Path("/home/swirky/.local/bin/codex")),
+            "/usr/bin/claude": executable_sha256(Path("/usr/bin/claude")),
         },
     }
     return repo, manifest_path, manifest
@@ -361,16 +482,39 @@ def fake_role_receipt(role: str, kwargs: dict, *, pass_role: bool, mutate_builde
             "workspace_matches_contract": pass_role, "unauthorized_writes": [],
             "reasons": [] if pass_role else ["rejected"],
         }
+    protocol = (
+        {"argv": core.claude_reviewer_argv(), "stdin_prompt_sha256": sha256_bytes(kwargs["prompt"]),
+         "stdout_sha256": "o" * 64, "stderr_sha256": "e" * 64,
+         "structured_output_present": True, "executed_binary_sha256": kwargs["binary_sha256"]}
+        if role == "INDEPENDENT_REVIEWER" else
+        {"argv": [core.CODEX_BINARY, "app-server", "--stdio"], "thread_sha256": "h" * 64, "turn_sha256": "u" * 64,
+         "terminal_count": 1, "terminal_binding_valid": True, "terminal_status": "completed",
+         "approval_request_count": 0, "unsupported_request_count": 0,
+         "agent_output_sha256": "a" * 64, "executed_binary_sha256": kwargs["binary_sha256"]}
+    )
+    effective = (
+        {"permission_mode": "plan", "built_in_tools": "DISABLED", "mcp": "STRICT_EMPTY_CONFIGURATION",
+         "safe_mode": True, "session_persistence": False, "observed_enforcement": "ARGV_ACCEPTED_AND_ZERO_MUTATION",
+         "contract_match": True}
+        if role == "INDEPENDENT_REVIEWER" else
+        {"cwd": str(workspace), "approval_policy": "never",
+         "sandbox_class": "workspaceWrite" if role == "BUILDER" else "readOnly",
+         "writable_roots": [str(workspace)] if role == "BUILDER" else [],
+         "runtime_workspace_roots": [str(workspace)], "network_access": False,
+         "codex_home": core.PROFILE_A if role == "BUILDER" else core.PROFILE_B,
+         "contract_match": True}
+    )
     return _base_receipt(
-        role=role, version=("2.1.223 (Claude Code)" if role == "INDEPENDENT_REVIEWER" else "codex-cli 0.147.0"), cwd=workspace,
+        role=role, version=("2.1.223 (Claude Code)" if role == "INDEPENDENT_REVIEWER" else "codex-cli 0.147.0"),
+        binary_sha256=kwargs["binary_sha256"], cwd=workspace,
         workspace_id=kwargs["workspace_identity"], prompt=kwargs["prompt"],
         template_sha=kwargs["prompt_template_sha256"], driver_sha=kwargs["driver_sha256"],
         marker_sha=kwargs["started_marker_sha256"], started_at="2026-01-01T00:00:00Z",
         finished_at="2026-01-01T00:00:01Z", timeout_seconds=kwargs["timeout_seconds"],
         timed_out=False, product_started=True,
         process_exit={"disposed": True, "termination": ("EXITED" if role == "INDEPENDENT_REVIEWER" else "ALREADY_EXITED"), "exit_code": 0, "exit_signal": 0},
-        lifecycle="COMPLETED", protocol={"terminal_binding_valid": True},
-        effective_policy={"contract_match": True}, workspace=observed,
+        lifecycle="COMPLETED", protocol=protocol,
+        effective_policy=effective, workspace=observed,
         qntylab_before=qbefore, qntylab_after=qafter, gate="PASS", structured=structured,
         machine_status="PASS" if pass_role else "FAIL",
         failure_class="NONE" if pass_role else f"{role}_PRODUCT_FAILURE",
@@ -380,6 +524,11 @@ def fake_role_receipt(role: str, kwargs: dict, *, pass_role: bool, mutate_builde
 def run_controller_case(tmp_path: Path, monkeypatch, outcomes: dict[str, object]):
     repo, manifest_path, manifest = make_controller_repo(tmp_path)
     monkeypatch.setattr(controller, "validate_prelive_manifest", lambda *_: manifest)
+    monkeypatch.setattr(controller, "require_hashes", lambda *_: None)
+    monkeypatch.setenv(
+        "QNTYLAB_NATIVE_QUALIFICATION_BOOTSTRAP",
+        sha256_bytes(canonical_json(manifest["hashes"])),
+    )
     calls: list[str] = []
 
     def codex_runner(**kwargs):
@@ -402,10 +551,10 @@ def run_controller_case(tmp_path: Path, monkeypatch, outcomes: dict[str, object]
             raise QualificationError("crash")
         return fake_role_receipt(role, kwargs, pass_role=bool(outcome))
 
-    result = controller.execute_batch(
-        repo_root=repo, prelive_manifest_path=manifest_path,
-        codex_runner=codex_runner, claude_runner=claude_runner,
-    )
+    monkeypatch.setattr(controller, "run_codex_driver", codex_runner)
+    monkeypatch.setattr(controller, "run_claude_driver", claude_runner)
+
+    result = controller.execute_batch(repo_root=repo, prelive_manifest_path=manifest_path)
     return result, calls, manifest_path
 
 
@@ -443,15 +592,25 @@ def test_stale_receipt_prompt_driver_workspace_and_role_laundering_rejected(tmp_
         "workspace": workspace, "qntylab_root": ROOT, "prompt": b"p",
         "workspace_identity": workspace_identity(workspace)["identity_sha256"],
         "prompt_template_sha256": "t" * 64, "driver_sha256": "d" * 64,
-        "started_marker_sha256": "m" * 64, "timeout_seconds": 180,
+        "started_marker_sha256": "m" * 64, "binary_sha256": "b" * 64,
+        "timeout_seconds": 180,
     }
     receipt = fake_role_receipt("VERIFIER", kwargs, pass_role=True)
     base = dict(
         receipt=receipt, role="VERIFIER", workspace=workspace,
         workspace_id=kwargs["workspace_identity"], prompt_sha=sha256_bytes(b"p"),
         template_sha="t" * 64, driver_sha="d" * 64, marker_sha="m" * 64,
+        binary_sha="b" * 64,
     )
     validate_role_receipt(**base)
+    wrong_argv = json.loads(json.dumps(receipt))
+    wrong_argv["protocol"]["argv"] = ["fake"]
+    with pytest.raises(QualificationError, match="argv"):
+        validate_role_receipt(**{**base, "receipt": wrong_argv})
+    wrong_executable = json.loads(json.dumps(receipt))
+    wrong_executable["protocol"]["executed_binary_sha256"] = "e" * 64
+    with pytest.raises(QualificationError, match="executed binary"):
+        validate_role_receipt(**{**base, "receipt": wrong_executable})
     for field, value in (
         ("workspace_id", "w" * 64), ("prompt_sha", "p" * 64),
         ("driver_sha", "x" * 64), ("marker_sha", "s" * 64), ("role", "BUILDER"),

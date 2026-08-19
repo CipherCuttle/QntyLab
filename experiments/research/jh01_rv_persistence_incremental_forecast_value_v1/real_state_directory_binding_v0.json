@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "project_id": "JH01_V1_REAL_STATE_DIRECTORY_BINDING_V0",
+  "phase_type": "OPERATIONAL_STATE_LOCATION_BINDING_ONLY",
+  "state": "BOUND_NOT_ACTIVATED",
+  "canonical_base_sha": "746a21b268bb90907e332fedab80edaa54371601",
+  "north_star_selection": "JH01_V1_OUTCOME_BLIND_PROSPECTIVE_INCREMENTAL_FORECAST_VALUE_CONTINUATION",
+  "north_star_decision": {
+    "path": "experiments/research/north_star_reentry_v0/decision.json",
+    "sha256": "9f0cbeef19aba402ce8dff25698f4249b18822bd181ea872f58fa1b1505e7a25",
+    "selected_next_phase": "JH01_V1_OUTCOME_BLIND_PROSPECTIVE_INCREMENTAL_FORECAST_VALUE_CONTINUATION"
+  },
+  "real_operation_authority": {
+    "project_id": "JH01_V1_REAL_PROSPECTIVE_OPERATION_AUTHORIZATION_V0",
+    "path": "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/real_prospective_operation_authorization_v0.json",
+    "sha256": "f2d9a16c8c9d053196b15cfb28817232b6872d5c1b77273fcef97f627e815e3b",
+    "state": "ACTIVE",
+    "activation_authorized": true,
+    "activation_consumed": false,
+    "real_activation_count": 0,
+    "real_forecasts_persisted": 0,
+    "scientific_evaluation_authorized": false,
+    "interim_metrics_authorized": false,
+    "downstream_authority": "NONE"
+  },
+  "binding_type": "LOGICAL_USER_STATE_DIRECTORY",
+  "path_resolution": {
+    "primary_environment_variable": "XDG_STATE_HOME",
+    "fallback": "$HOME/.local/state",
+    "relative_path": "qntylab/jh01_v1_real_prospective_operation_v0"
+  },
+  "state_root_invariants": {
+    "durable": true,
+    "user_scoped": true,
+    "repository_relative": false,
+    "worktree_relative": false,
+    "tmp_relative": false,
+    "outside_all_git_worktrees": true,
+    "same_logical_path_across_branches": true,
+    "same_logical_path_across_worktrees": true,
+    "campaign_specific": true,
+    "single_authoritative_state_root": true
+  },
+  "root_contents": {
+    "ledger_filename": "jh01_v1_operation_events.jsonl",
+    "retention_subdirectory": "retention",
+    "second_ledger": false,
+    "database": false,
+    "remote_synchronization": false
+  },
+  "frozen_jh01_binding": {
+    "wrapper_implementation_identity": "1176037ff0d3102afc67670202154970e4af1491cff1cd19bc9526c9c9d67c41",
+    "qualified_recorder_identity": "4f5e1791be9f17c1871f9b510329a1632412e028d2a84223fa59e83bbe95ec1a",
+    "preregistration_digest": "bdb85130cae75e9f156db9aa1fd955d7f565a3714ae091871d5ac4447c1ec27b",
+    "schedule_digest": "2e50bcd53fe8582f057a58e85029e7863bfae1cb96f5d3799c67de222fa1d87d",
+    "ordered_panel_digest": "e6d1447ff2be57f81eaf943b62218ce9a7b9a6f5bf2d25f9be255cb3f2040cd8",
+    "first_live_origin": "2026-09-15T00:00:00Z",
+    "last_live_origin": "2027-09-14T00:00:00Z",
+    "required_origin_count": 365
+  },
+  "future_resolution_safety": [
+    "Fail closed if the resolved runtime path is inside any Git worktree.",
+    "Fail closed if the resolved runtime path is under /tmp.",
+    "Fail closed if the resolved final directory uses an unexpected symlink.",
+    "Inspect before mutation and fail closed on campaign collision or malformed pre-existing JH01 ledger state.",
+    "Fail closed if a committed activation has a different campaign identity or if a real activation already exists."
+  ],
+  "runtime_directory_created": false,
+  "ledger_created": false,
+  "retention_created": false,
+  "activation_consumed": false,
+  "activation_attempt_count": 0,
+  "activation_prepared_events": 0,
+  "activation_committed_events": 0,
+  "forecast_count": 0,
+  "market_data_accessed": false,
+  "forecast_created": false,
+  "release_created": false,
+  "scientific_evaluation": false,
+  "interim_metrics": false,
+  "state_snapshot": false,
+  "router": false,
+  "qnty": false,
+  "trading": false,
+  "capital": "NONE",
+  "canonicalization_required_before_effect": true,
+  "next_action": "MERGE_STATE_DIRECTORY_BINDING_THEN_EXECUTE_ONE_REAL_JH01_V1_ACTIVATION"
+}

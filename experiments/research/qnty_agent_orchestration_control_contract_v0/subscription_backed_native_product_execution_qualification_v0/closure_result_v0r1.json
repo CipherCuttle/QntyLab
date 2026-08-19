@@ -1,0 +1,68 @@
+{
+  "schema_version": "subscription-backed-native-product-execution-qualification-closure-v0r1",
+  "project_id": "SUBSCRIPTION_BACKED_NATIVE_PRODUCT_EXECUTION_QUALIFICATION_V0R1",
+  "verdict": "SUBSCRIPTION_BACKED_NATIVE_PRODUCT_EXECUTION_QUALIFICATION_V0R1_BLOCKED",
+  "qualification_pass": false,
+  "root_cause_proven": true,
+  "root_cause_class": "PRELIVE_FROZEN_CONTRACT_VALIDATION_INCOMPATIBILITY",
+  "root_cause": "The frozen controller requires the execution-bound timeouts object to contain exactly the three role keys, while the exact frozen qualification contract also contains codex_handshake and process_disposal_grace timeout members. Frozen prelive validation rejected the target before any product process was spawned.",
+  "prelive": {
+    "created": true,
+    "prelive_sha": "e67845e0171ed8f0fbff97685ab40290752550a0",
+    "prelive_tree": "cf8de4709e8622d37bec031a960cc88ae023d771",
+    "implementation_mutated_after_freeze": false
+  },
+  "review": {
+    "independent_hostile_review": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "open_critical": 0,
+    "open_high": 0,
+    "critical_high_fix_pass_used": false,
+    "targeted_rereview_used": false
+  },
+  "external_eval": {
+    "qntyagenteval": "NO_MATCH",
+    "run": false
+  },
+  "live": {
+    "batch_attempts": 0,
+    "builder_live_attempts": 0,
+    "builder_started": false,
+    "builder_status": "NOT_RUN_PRELIVE_CONTRACT_GATE_BLOCKED",
+    "reviewer_live_attempts": 0,
+    "reviewer_started": false,
+    "reviewer_status": "NOT_RUN_PRELIVE_CONTRACT_GATE_BLOCKED",
+    "verifier_live_attempts": 0,
+    "verifier_started": false,
+    "verifier_status": "NOT_RUN_PRELIVE_CONTRACT_GATE_BLOCKED",
+    "process_exit_exact_schema": "PASS",
+    "all_prompt_execution_bindings": "PASS",
+    "manifest_execution_binding": "PASS",
+    "api_key_gate": "NOT_REACHED_LIVE_PRELIVE_GATE_BLOCKED"
+  },
+  "boundaries": {
+    "dsh_imported": false,
+    "dsh_executed": false,
+    "dsh_repaired": false,
+    "v0_mutated": false,
+    "v0_live_batch_rerun": false,
+    "stage_a_v1_rerun": false,
+    "stage_a_v2_created": false,
+    "stage_a_v2_authorized": false,
+    "stage_a_v2_executed": false,
+    "historical_stage_a_task_executed": false,
+    "historical_answer_key_accessed": false,
+    "market_data_accessed": false,
+    "scientific_evaluation": false,
+    "qnty_runtime_authorized": false,
+    "trading_authorized": false,
+    "capital_authorized": false,
+    "api_keys_used": false,
+    "merge": false
+  },
+  "claim_scope": "No native qualification claim. H1 and H2 were repaired and deterministically reviewed, but the frozen target was blocked by a directly observed prelive contract-validation identity gate before product execution."
+}

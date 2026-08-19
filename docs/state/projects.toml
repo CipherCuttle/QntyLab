@@ -3587,7 +3587,7 @@ next_action = "CLOSED_BLOCKED: the one targeted re-review left two High evidence
 [[project]]
 project_id = "SUBSCRIPTION_BACKED_NATIVE_PRODUCT_EXECUTION_QUALIFICATION_V0R1"
 display_name = "Subscription-backed native product execution qualification V0R1 evidence-integrity repair"
-state = "ACTIVE"
+state = "CLOSED_BLOCKED"
 authority_level = "BOUNDED_NONEXPERIMENTAL_NATIVE_PRODUCT_EXECUTION_QUALIFICATION_ONLY"
 phase_type = "NATIVE_PRODUCT_EXECUTION_EVIDENCE_INTEGRITY_REPAIR_AND_QUALIFICATION"
 authoritative_artifacts = [
@@ -3595,6 +3595,7 @@ authoritative_artifacts = [
   "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/qualification_contract.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/independent_hostile_review_v0r1.md",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/prelive_freeze_v0r1.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/closure_result_v0r1.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/native_codex_role_driver_v0.py",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/claude_reviewer_driver_v0.py",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/qualification_controller_v0.py",
@@ -3608,15 +3609,15 @@ predecessor_state = "CLOSED_BLOCKED"
 predecessor_head = "ca06d85e9e2e56e16563b25cf8998ff6f8cd9218"
 predecessor_mutated = false
 authorized_repairs = ["H1_PROCESS_EXIT_EXACT_SCHEMA", "H2_PROMPT_MANIFEST_EXECUTION_BINDING"]
-implementation_authorized = true
-deterministic_tests_authorized = true
-independent_hostile_review_authorized = true
+implementation_authorized = false
+deterministic_tests_authorized = false
+independent_hostile_review_authorized = false
 critical_high_fix_pass_limit = 1
 targeted_rereview_limit = 1
 authorized_live_batches = 1
 authorized_live_invocations_per_role = 1
-synthetic_live_qualification_authorized = true
-result_recording_authorized = true
+synthetic_live_qualification_authorized = false
+result_recording_authorized = false
 dsh_authorized = false
 dsh_repair_authorized = false
 stage_a_v1_rerun_authorized = false
@@ -3633,15 +3634,15 @@ trading_authority = "NONE"
 capital_authority = "NONE"
 auto_merge_authorized = false
 current_max_autonomy = "L0_SHADOW"
-qntyagenteval_applicability = "CHECK_EXISTING_CONTRACT_AT_FINAL_FROZEN_SHA"
+qntyagenteval_applicability = "NO_MATCH"
 qntyagenteval_run = false
 live_batch_attempts = 0
 builder_live_attempts = 0
 reviewer_live_attempts = 0
 verifier_live_attempts = 0
-api_key_gate = "REQUIRED_ABSENCE_ONLY"
-root_cause_proven = false
-root_cause_class = "NOT_YET_REASSESSED_V0R1"
+api_key_gate = "NOT_REACHED_LIVE_PRELIVE_GATE_BLOCKED"
+root_cause_proven = true
+root_cause_class = "PRELIVE_FROZEN_CONTRACT_VALIDATION_INCOMPATIBILITY"
 active_project_after_closure = "NONE"
-experiment_state = "REPAIR_AND_PRELIVE_REVIEW_IN_PROGRESS"
-next_action = "Repair exactly H1 and H2, run deterministic attacks, perform one independent hostile review, use at most one C/H fix pass and one targeted re-review, then freeze and execute at most one synthetic native qualification batch only if all frozen gates pass. No V0 mutation or rerun, DSH, Stage-A V1/V2, scientific evaluation, runtime, Qnty NEXT_ACTION, trading, capital, or merge authority is granted."
+experiment_state = "QUALIFICATION_BLOCKED_PRELIVE_CONTRACT_GATE"
+next_action = "CLOSED_BLOCKED: frozen prelive validation rejected the exact contract timeout object before any product process spawned. Do not repair or review again in this phase, do not run a live batch, and do not create V0R2. Return control for explicit architecture reassessment; no Stage-A V2, runtime, scientific, Qnty NEXT_ACTION, trading, capital, or merge authority is created."

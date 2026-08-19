@@ -1,0 +1,23 @@
+{
+  "active_project_after_closure": "NONE",
+  "closure_status": "CLOSED_NEGATIVE",
+  "d4": "FAIL",
+  "d4_v0_rerun": false,
+  "d4_v0r1_live_attempts": 1,
+  "d4_v0r1_rerun_authorized": false,
+  "failure_mechanism": "DSH_EFFECTIVE_CONFIG_DIVERGENCE",
+  "merge_authorized": false,
+  "open_critical": 0,
+  "open_high": 0,
+  "phase_id": "PINNED_DSH_CODEX_WRITE_PATH_MATERIALIZATION_V0R1",
+  "profile_a_config_modified": false,
+  "root_cause_proven": false,
+  "schema_version": "pinned-dsh-codex-write-path-closure-status-v0r1",
+  "scientific_authority": "NONE",
+  "target_mechanism_exercised": true,
+  "trading_authority": "NONE",
+  "v0_mutated": false,
+  "v2_authorized": false,
+  "v2_created": false,
+  "verdict": "PINNED_DSH_CODEX_WRITE_PATH_V0R1_FAIL"
+}

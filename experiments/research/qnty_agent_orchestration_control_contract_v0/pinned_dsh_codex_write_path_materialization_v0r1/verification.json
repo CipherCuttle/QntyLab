@@ -1,0 +1,30 @@
+{
+  "attempt_log_entries": 1,
+  "attempt_log_sha256": "788343395711aa568aed41d3a3db8b77c737b7cb98bf6b734b33d76e8492ea1a",
+  "checks": {
+    "attempt_count_exactly_one": true,
+    "bridge_exit_code_integer_zero": true,
+    "changed_paths_exact": true,
+    "credential_presence_clean": true,
+    "dsh_parent_llm_none": true,
+    "final_identity_gate": true,
+    "final_runtime_closure_match": true,
+    "fixture_before_preserved": true,
+    "fixture_target_nonmatch_confirmed": true,
+    "lifecycle_schema_valid": true,
+    "materialization_binding_match": true,
+    "marker_persisted": true,
+    "product_config_unchanged": true,
+    "receipt_route_exact": true,
+    "receipt_schema_exact": true,
+    "retry_count_zero": true,
+    "unauthorized_write_count_zero": true
+  },
+  "episode_marker_sha256": "2a915937fff70fb20b49af6bba39c53d69b98b9e5194fd0d3e1fb491e2d0a6a2",
+  "phase_id": "PINNED_DSH_CODEX_WRITE_PATH_MATERIALIZATION_V0R1",
+  "prelive_implementation_unchanged": true,
+  "receipt_sha256": "76d6c8a049ac994a1f1684544b43ac77a58dad4d4c38890fffd104facf4974c9",
+  "runtime_closure_digest": "d354fd326bfba5fd51e4a6076a7573223224628c1d89266ecc66168742d30ec8",
+  "schema_version": "pinned-dsh-codex-write-path-verification-v0r1",
+  "v0_evidence_unchanged": true
+}

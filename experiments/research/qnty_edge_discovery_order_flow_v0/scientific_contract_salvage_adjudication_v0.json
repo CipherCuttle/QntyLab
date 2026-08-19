@@ -1,0 +1,212 @@
+{
+  "artifact_type": "QNTY_EDGE_ORDER_FLOW_V0_SCIENTIFIC_CONTRACT_SALVAGE_ADJUDICATION",
+  "schema_version": "qnty-edge-order-flow-v0-scientific-contract-salvage-adjudication-v1",
+  "project_id": "QNTY_EDGE_ORDER_FLOW_V0_SCIENTIFIC_CONTRACT_SALVAGE_ADJUDICATION_V0",
+  "phase_type": "BOUNDED_OUTCOME_BLIND_SCIENTIFIC_DESIGN_DECISION",
+  "canonical_master": "01329192dc3f121d9fdc81e2f7a421f50257eb36",
+  "canonical_master_source": "origin/master fetched before branch creation",
+  "parent_candidate": "CANDIDATE_ORDER_FLOW_SIGNED_TAKER_NOTIONAL_V0",
+  "historical_v0_disposition": "BLOCKED_UNDER_FROZEN_SOURCE_CONTRACT",
+  "historical_v0_mutated": false,
+  "market_data_accessed": false,
+  "new_source_acquired": false,
+  "source_rematerialization_performed": false,
+  "feature_computed": false,
+  "future_returns_accessed": false,
+  "pnl_computed": false,
+  "scientific_execution_performed": false,
+  "trial_completed_event_created": false,
+  "jigsaw_mutated": false,
+  "qnty_runtime_accessed": false,
+  "router_accessed": false,
+  "trading_or_capital_action": false,
+  "jh01": {
+    "canonical_state_reference": "JH01_V1_REAL_PROSPECTIVE_OPERATION_AUTHORIZATION_V0",
+    "campaign_state": "ARMED_BUT_INACTIVE",
+    "operation_ledger_accessed": false,
+    "operation_ledger_mutated": false,
+    "scientific_evaluation_authorized": false,
+    "basis": "Canonical Git records real_v1_activation_count=0, activation_consumed=false, and no scientific evaluation; the externally armed runtime ledger was intentionally not read or touched in this phase."
+  },
+  "reconciliation": {
+    "order_flow_v0_state": "CLOSED_BLOCKED",
+    "required_asset_period_windows": 60,
+    "input_ready": 46,
+    "blocked": 14,
+    "forensic_state": "CLOSED_PASS",
+    "forensic_A": 0,
+    "forensic_B": 0,
+    "forensic_C": 14,
+    "forensic_D": 0,
+    "all_blocked_rows_genuine_frozen_source_absence": true,
+    "repair_or_rematerialization_authorized": false,
+    "historical_artifact_hashes": {
+      "experiments/specs/qnty_edge_discovery_order_flow_v0_preregistration.json": "34252ccf245c9d963b987e697231d4a33d66c2450d44689b7b737c0686a24979",
+      "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/coverage_census.json": "341dc27351b7a2aba13cee50f1fe37764661baa5bbb06bcf4d15a103b6689a63",
+      "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/source_manifest.json": "45dbfd9d0819f7733abb1b1a22bc53cb6a122f54b6db0fa7cd61b46dd1e4517a",
+      "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/input_snapshot.json": "aef15a18c0e07c74c396a6a3b38692bef58e2a8cd952524269e0817ce645eb4a",
+      "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/input_qualification.json": "fb6dac97dc89cf42e7d03c9e6f875f9fd3f25b9b5cbfbec4440c937f673264ad",
+      "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/materialization_receipt.json": "00e3a4451d9e665e70bc48f7100e21c661dd601613178fa56ee3abc62267ab9c",
+      "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/blocked_window_forensics.json": "a73b72198643bfcec824dd0aa6aa8441442d8b1009558f8b08239c96193348c7",
+      "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/blocked_window_forensics_hostile_review.md": "5efc419fa33ce17a3e588eb0c6c1f08cb793c726ea847eca4e71a8706db8a2f9",
+      "qntylab/qnty_edge_order_flow_v0_readiness.py": "a0ca76f433970222b85e7e7742140839e577b2a0c2100349abfaa2fe668e07be",
+      "qntylab/qnty_edge_order_flow_v0_blocked_window_forensics.py": "473b3465f5b211757608f2ca2d7ee9948a47a199352923cf479ec01057c90a0f"
+    }
+  },
+  "blocked_rows": [
+    {"symbol": "XRPUSDT", "period": "DEV_2022", "group": "A_LONG_LIVED_PROVIDER_PRICE_GAPS"},
+    {"symbol": "LTCUSDT", "period": "DEV_2022", "group": "A_LONG_LIVED_PROVIDER_PRICE_GAPS"},
+    {"symbol": "TRXUSDT", "period": "DEV_2022", "group": "A_LONG_LIVED_PROVIDER_PRICE_GAPS"},
+    {"symbol": "XLMUSDT", "period": "DEV_2022", "group": "A_LONG_LIVED_PROVIDER_PRICE_GAPS"},
+    {"symbol": "SANDUSDT", "period": "DEV_2022", "group": "A_LONG_LIVED_PROVIDER_PRICE_GAPS"},
+    {"symbol": "ONEUSDT", "period": "DEV_2022", "group": "A_LONG_LIVED_PROVIDER_PRICE_GAPS"},
+    {"symbol": "REEFUSDT", "period": "DEV_2025", "group": "C_REEF_FUNDING_TERMINATION"},
+    {"symbol": "API3USDT", "period": "DEV_2022", "group": "B_PRE_ONBOARD_PREFIX_ABSENCE"},
+    {"symbol": "GMTUSDT", "period": "DEV_2022", "group": "B_PRE_ONBOARD_PREFIX_ABSENCE"},
+    {"symbol": "APEUSDT", "period": "DEV_2022", "group": "B_PRE_ONBOARD_PREFIX_ABSENCE"},
+    {"symbol": "OPUSDT", "period": "DEV_2022", "group": "B_PRE_ONBOARD_PREFIX_ABSENCE"},
+    {"symbol": "INJUSDT", "period": "DEV_2022", "group": "B_PRE_ONBOARD_PREFIX_ABSENCE"},
+    {"symbol": "LDOUSDT", "period": "DEV_2022", "group": "B_PRE_ONBOARD_PREFIX_ABSENCE"},
+    {"symbol": "APTUSDT", "period": "DEV_2022", "group": "B_PRE_ONBOARD_PREFIX_ABSENCE"}
+  ],
+  "blocked_row_reconstruction": {
+    "required_ranges": {
+      "DEV_2022": {
+        "price": "2021-12-30T22:00:00Z..2023-01-01T00:00:00Z",
+        "funding": "2022-01-01T00:00:00Z..2023-01-01T00:00:00Z"
+      },
+      "DEV_2025": {
+        "price": "2024-12-30T22:00:00Z..2026-01-01T00:00:00Z",
+        "funding": "2025-01-01T00:00:00Z..2026-01-01T00:00:00Z"
+      }
+    },
+    "groups": {
+      "A_LONG_LIVED_PROVIDER_PRICE_GAPS": {
+        "rows": ["XRPUSDT/DEV_2022", "LTCUSDT/DEV_2022", "TRXUSDT/DEV_2022", "XLMUSDT/DEV_2022", "SANDUSDT/DEV_2022", "ONEUSDT/DEV_2022"],
+        "failure_type": "provider-published price continuity gaps",
+        "provider_evidence": "Binance-owned monthly kline objects and checksums exist, but February 2022 is absent from 2022-02-26T00:00:00Z through 2022-02-28T23:00:00Z (72 hours), and April 2022 is absent from 2022-04-01T00:00:00Z through 2022-04-02T23:00:00Z (48 hours); source boundaries jump 2022-02-25T23:00Z to 2022-03-01T00:00Z and 2022-03-31T23:00Z to 2022-04-03T00:00Z.",
+        "lifecycle_evidence": "Official Binance onboardDate precedes the required price start for every row; the instruments existed, so this is not a listing exclusion.",
+        "structural_absence": true,
+        "availability_determinable_outcome_blind": true,
+        "source_substitution_used": false
+      },
+      "B_PRE_ONBOARD_PREFIX_ABSENCE": {
+        "rows": ["API3USDT/DEV_2022", "GMTUSDT/DEV_2022", "APEUSDT/DEV_2022", "OPUSDT/DEV_2022", "INJUSDT/DEV_2022", "LDOUSDT/DEV_2022", "APTUSDT/DEV_2022"],
+        "failure_type": "instrument not onboard for frozen 2022 prefix",
+        "provider_evidence": "Official Binance exchangeInfo onboardDate follows the frozen required price start; exact pre-onboard monthly kline and funding objects/checksums are absent (including the required 2022-01 objects).",
+        "lifecycle_evidence": "onboardDate values are API3 2022-02-21, GMT 2022-03-14, APE 2022-03-17, OP 2022-06-01, INJ 2022-08-16, LDO 2022-09-21, and APT 2022-10-18; all are after 2021-12-30T22:00Z.",
+        "structural_absence": true,
+        "availability_determinable_outcome_blind": true,
+        "source_substitution_used": false
+      },
+      "C_REEF_FUNDING_TERMINATION": {
+        "rows": ["REEFUSDT/DEV_2025"],
+        "failure_type": "provider funding lifecycle termination within frozen window",
+        "provider_evidence": "Authenticated funding events end at 2025-06-19T08:00:00.003Z; exact July 2025 through January 2026 monthly funding objects/checksums are absent, with no later event available.",
+        "lifecycle_evidence": "Official lifecycle metadata reports deliveryDate 2025-01-22T09:00Z; the funding archive independently terminates mid-window.",
+        "structural_absence": true,
+        "availability_determinable_outcome_blind": true,
+        "source_substitution_used": false
+      }
+    },
+    "classification_rule": "Every row is C. GENUINE_FROZEN_SOURCE_ABSENCE; no row is relabeled A/B/D and no row is repaired, zero-filled, interpolated, substituted, or dropped from historical V0."
+  },
+  "eligibility_firewall": {
+    "eligibility_defined_before_outcomes": true,
+    "observed_blocker_facts_are_outcome_independent": true,
+    "outcome_dependent_exclusion_used": false,
+    "feature_values_used": false,
+    "future_returns_used": false,
+    "performance_used": false,
+    "new_eligibility_rule_proposed": false,
+    "terminal_disposition_reason": "The issue is not that a point-in-time eligibility rule cannot be written. The issue is that the only materially larger rule would define a different, period-shifting estimand dominated by provider/lifecycle availability rather than the intended fixed opportunity set."
+  },
+  "design_options": {
+    "A_COMPLETE_CASE_BALANCED_PANEL": {
+      "eligible_assets": ["BCHUSDT", "ETCUSDT", "LINKUSDT", "CHZUSDT", "CHRUSDT", "ALICEUSDT"],
+      "eligible_asset_count": 6,
+      "eligible_fraction_of_original_panel": 0.3,
+      "eligible_windows": 18,
+      "asset_cost_cells_at_two_frozen_cost_modes": 12,
+      "decision": "REJECT",
+      "reason": "The panel is stable and outcome-blind, but 14 of 20 assets are removed because their historical source/lifecycle properties fail at least one period. This is a severe old-contract survivor and data-quality selection, with insufficient breadth/generalization for the North-Star opportunity set."
+    },
+    "B_PIT_ELIGIBLE_UNIVERSE_BY_PERIOD": {
+      "eligible_windows": 46,
+      "eligible_fraction_of_original_windows": 0.7666666667,
+      "eligible_assets_by_period": {"DEV_2022": 7, "DEV_2024": 20, "DEV_2025": 19},
+      "eligible_asset_cost_cells_at_two_frozen_cost_modes": 92,
+      "decision": "REJECT",
+      "reason": "Eligibility can be authenticated before outcomes, but the usable opportunity set shifts from 7/20 assets in 2022 to 20/20 in 2024 and 19/20 in 2025. Structural price gaps remain among already-listed contracts, recent-listing cohorts are excluded from the 2022 prefix, REEF is lost later, and age/liquidity/venue-history become period confounders. This is not a neutral missing-row policy."
+    },
+    "C_REANCHORED_WINDOWS": {
+      "decision": "REJECT",
+      "reason": "Moving a window after onboarding, after a provider gap, or before REEF delivery changes calendar exposure and regime. No independent scientific reason shows that re-anchoring still tests the original immediate signed-taker-notional mechanism; it is an opportunistic coverage repair and would require new source materialization."
+    },
+    "D_GRAVEYARD_V0_LINEAGE": {
+      "decision": "SELECT",
+      "reason": "D preserves the historical blocked V0, avoids denominator laundering, and recognizes that the valid outcome-blind salvage choices either collapse the intended panel to six assets or change the estimand through severe period-dependent composition."
+    }
+  },
+  "timing_and_economic_contract_review": {
+    "causal_timing_preserved_in_parent": true,
+    "causal_timing": "The parent binds a 24-bar causal median excluding the source bar, a source bar [t-2h,t-1h), decision at target open t, and non-overlapping open-to-open outcome to t+1h.",
+    "signed_taker_notional": "The parent admits sell quote notional only as total quote volume minus taker-buy quote volume after source semantic admission.",
+    "controls": "FLAT_CASH is the primary benchmark; prior 1-hour return continuation is a fixed diagnostic opponent and cannot rescue the candidate.",
+    "cost_and_funding": "The parent freezes 10 bps fee with 0 bps slippage BASELINE, 10 bps fee with 10 bps slippage STRESS, and realized event-time funding.",
+    "minimum_economic_hurdle_for_any_future_contract": "Positive aggregate net return under both frozen cost modes, positive STRESS excess versus FLAT_CASH and the fixed prior-return control, asset breadth of at least 10/20, temporal breadth of at least 2/3 blocks, concentration limits, and STRESS retention of at least 50% of positive BASELINE incremental excess.",
+    "causal_claim_boundary": "Any future result could support predictive association or incremental conditional-action utility only; it could not establish a causal effect of taker flow."
+  },
+  "ten_stack": {
+    "SOCRATIC": "Salvage would reduce uncertainty about one signed-flow formulation only if the sample still represented the intended opportunity set; under A or B, the dominant uncertainty becomes selection and composition rather than flow information.",
+    "DIALECTIC": "The strongest salvage case is B: 46 authenticated windows survive under outcome-blind rules. The strongest graveyard case is that 2022 loses 13/20 rows for lifecycle or structural source reasons and 2025 loses REEF, so the larger denominator is not comparable across periods. Graveyard wins.",
+    "POPPER": "The mechanistic predictive claim would be falsified by no incremental stress-adjusted utility versus prior return/FLAT, weak breadth, or concentration; this phase does not inspect those outcomes and therefore cannot turn missingness into evidence for or against the claim.",
+    "CAUSAL": "Signed flow can be treated as a pre-decision predictor/state variable; the data contract cannot identify a causal impact because flow is endogenous to information, liquidity, and market conditions.",
+    "SYSTEMS": "A clean observer input must distinguish market state from source availability. A result on six survivor assets or a period-shifting panel would be a weak State Observer evidence piece.",
+    "CYBERNETICS": "Salvage would mostly preserve project motion and plumbing; it would not improve the feedback signal if the sample-composition feedback is confounded. Termination is the higher-information control action.",
+    "BAYESIAN": "Prior plausibility of aggressive flow as a state variable is nonzero, but not high enough to justify a new contract whose validity depends on a heavily altered universe after exact frozen-source absence was established.",
+    "MDL": "Signed taker notional is compact relative to a large feature search, but compactness does not overcome the information loss and structural missingness in the admissible sample.",
+    "DOE": "A is cleanest but underpowered and survivor-biased; B has more rows but a changing treatment population; C changes calendar exposure. None provides clean information per unit of scientific risk, so D is the least contaminated design.",
+    "ADVERSARIAL": "An apparent edge could be manufactured by deleting the 14 failures, letting the 2024 full panel dominate, excluding recently listed contracts, dropping REEF after its funding ends, or re-anchoring only rows that remain convenient. The frozen evidence makes each maneuver visible and disallowed."
+  },
+  "decision": {
+    "selected": "D_GRAVEYARD_ORDER_FLOW_V0_AND_MOVE_TO_FUNDING_INCREMENTAL_VALUE",
+    "order_flow_v0_further_rescue": "NO",
+    "scientific_question": "No new Order Flow contract is authorized. The preserved question remains whether outcome-blind normalized signed aggressive taker notional adds predictive or conditional-action information beyond recent-return controls, net of frozen costs and funding semantics.",
+    "eligibility_rule": "NOT_APPLICABLE_FOR_A_NEW_ORDER_FLOW_CONTRACT; any later proposal would require a separate identity and pre-outcome lifecycle/source rule, with no source substitution or post-outcome rescue.",
+    "denominator": "Historical V0 remains 20 assets x 3 periods = 60 windows, 46 INPUT_READY and 14 BLOCKED. No denominator is rewritten. A would be 18 windows/6 assets; B would be 46 windows but with 7/20, 20/20, and 19/20 period composition. Neither is accepted.",
+    "falsification_condition": "Not evaluated because no scientific execution occurred. A future, separately authorized contract must retain the parent economic hurdle and kill on failed stress-adjusted incremental utility, breadth, temporal, concentration, integrity, or timing gates.",
+    "relation_to_action_utility": "No action-utility evidence is produced. The decision prevents a composition-confounded result from being mistaken for a State Observer or trading-action input.",
+    "next_scientific_candidate": "FUNDING_PRESSURE_INCREMENTAL_VALUE_BEYOND_RV_BASELINE",
+    "next_candidate_executed_or_preregistered_here": false,
+    "new_preregistration_created": false
+  },
+  "hostile_review": {
+    "review_count": 1,
+    "review_scope": "post-decision independent hostile review of exclusion, denominator, lifecycle, source, leakage, cost, null, and hidden-rescue risks",
+    "attacks": [
+      "post-hoc exclusion",
+      "denominator laundering",
+      "survivorship and lifecycle bias",
+      "period-specific composition confounding",
+      "re-anchoring after source failure",
+      "source substitution",
+      "same-bar leakage",
+      "cost omission",
+      "weak null",
+      "result-dependent missingness",
+      "hidden V0 rescue under a new name"
+    ],
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "c_h_fix_used": false,
+    "targeted_rereview_used": false,
+    "open_critical": 0,
+    "open_high": 0,
+    "verdict": "PASS",
+    "review_conclusion": "D is conservative and internally consistent: it does not claim that Order Flow has no predictive value; it claims that the available frozen lineage cannot support a clean new contract without accepting a materially different and confounded sample definition."
+  },
+  "verdict": "STOP_ORDER_FLOW_V0_AND_DO_NOT_PREREGISTER_FUNDING_IN_THIS_PHASE"
+}

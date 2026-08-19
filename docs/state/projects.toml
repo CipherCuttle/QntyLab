@@ -2557,6 +2557,63 @@ active_project_after_closure = "NONE"
 next_action = "CLOSED_PASS: all 14 blocked rows classified C. No repair, rematerialization, scientific execution, or downstream authority is authorized; any attempt to reach 60/60 requires separate Git-backed contract authority."
 
 [[project]]
+project_id = "QNTY_EDGE_ORDER_FLOW_V0_SCIENTIFIC_CONTRACT_SALVAGE_ADJUDICATION_V0"
+display_name = "Order-Flow V0 scientific-contract salvage adjudication"
+state = "CLOSED_PASS"
+authority_level = "OUTCOME_BLIND_SCIENTIFIC_DESIGN_DECISION_ONLY"
+phase_type = "BOUNDED_OUTCOME_BLIND_SCIENTIFIC_DESIGN_DECISION"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/specs/qnty_edge_discovery_order_flow_v0_preregistration.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/coverage_census.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/source_manifest.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/input_snapshot.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/input_qualification.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/materialization_receipt.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/blocked_window_forensics.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/blocked_window_forensics_hostile_review.md",
+  "experiments/research/qnty_edge_discovery_order_flow_v0/scientific_contract_salvage_adjudication_v0.json",
+  "experiments/research/candidates.jsonl",
+  "experiments/research/decisions.jsonl"
+]
+canonical_master_sha = "01329192dc3f121d9fdc81e2f7a421f50257eb36"
+parent_candidate_id = "CANDIDATE_ORDER_FLOW_SIGNED_TAKER_NOTIONAL_V0"
+parent_variant_id = "variant_23f758ef7052522d70172239"
+parent_state = "BLOCKED_UNDER_FROZEN_SOURCE_CONTRACT"
+forensic_classification = "14_OF_14_CLASS_C_GENUINE_FROZEN_SOURCE_ABSENCE"
+selected_decision = "D_GRAVEYARD_ORDER_FLOW_V0_AND_MOVE_TO_FUNDING_INCREMENTAL_VALUE"
+forensic_artifact_digest = "04c88bfec30f4eec8d76e8e72c7770fdf33332e5751c07e29cfb009999f83d48"
+adjudication_artifact = "experiments/research/qnty_edge_discovery_order_flow_v0/scientific_contract_salvage_adjudication_v0.json"
+adjudication_artifact_sha256 = "ee27df0c0cdd95119f5eabcc94220e2452904cd2788257716af30a47347b9250"
+ledger_decision_event_id = "event_decision_order_flow_scientific_contract_salvage_graveyard_v0"
+order_flow_v0_further_rescue = "NO"
+next_scientific_candidate = "FUNDING_PRESSURE_INCREMENTAL_VALUE_BEYOND_RV_BASELINE"
+next_candidate_preregistered_here = false
+market_data_accessed = false
+new_source_acquired = false
+source_rematerialization_performed = false
+scientific_features_computed = false
+future_returns_accessed = false
+pnl_computed = false
+scientific_execution_performed = false
+jh01_operation_ledger_accessed = false
+jh01_operation_ledger_mutated = false
+jigsaw_mutated = false
+router_authorized = false
+qnty_authorized = false
+trading_authorized = false
+capital_authority = "NONE"
+hostile_review_count = 1
+hostile_review_verdict = "PASS"
+hostile_review_critical = 0
+hostile_review_high = 0
+targeted_rereview_used = false
+implementation_authorized = false
+active_project_after_closure = "NONE"
+next_action = "CLOSED_PASS: historical Order Flow V0 remains blocked and immutable; no new Order Flow contract or funding preregistration is created here. The next candidate is funding incremental value beyond the RV baseline, requiring a separate phase."
+
+[[project]]
 project_id = "QNTYLAB_CONTEXT_SPINE_ORIENTATION_COMPLETENESS_V0_AUTHORIZATION"
 display_name = "QntyLab Context Spine Orientation Completeness V0 OC-A authorization"
 state = "CLOSED_PASS"

@@ -7,6 +7,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from typing import Any, Mapping
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 if str(REPO_ROOT) not in sys.path:
@@ -29,7 +30,7 @@ def run_role(
     driver_sha256: str,
     started_marker_sha256: str,
     binary_sha256: str,
-    timeout_seconds: int = 180,
+    timeouts: Mapping[str, Any],
 ) -> dict:
     return run_codex_role(
         role=role,
@@ -41,7 +42,7 @@ def run_role(
         driver_sha=driver_sha256,
         marker_sha=started_marker_sha256,
         binary_sha256=binary_sha256,
-        timeout_seconds=timeout_seconds,
+        timeouts=timeouts,
     )
 
 
@@ -56,13 +57,14 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--driver-sha256", required=True)
     parser.add_argument("--started-marker-sha256", required=True)
     parser.add_argument("--binary-sha256", required=True)
-    parser.add_argument("--timeout-seconds", type=int, default=180)
+    parser.add_argument("--timeouts-json", required=True)
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
+        timeouts = json.loads(args.timeouts_json)
         receipt = run_role(
             role=args.role,
             workspace=args.workspace,
@@ -73,7 +75,7 @@ def main(argv: list[str] | None = None) -> int:
             driver_sha256=args.driver_sha256,
             started_marker_sha256=args.started_marker_sha256,
             binary_sha256=args.binary_sha256,
-            timeout_seconds=args.timeout_seconds,
+            timeouts=timeouts,
         )
     except (OSError, QualificationError) as exc:
         print(json.dumps({"status": "FAIL_CLOSED", "error_class": type(exc).__name__}, sort_keys=True))

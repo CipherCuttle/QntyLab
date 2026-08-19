@@ -27,8 +27,15 @@ from qntylab.subscription_backed_codex_app_server_write_path_diagnostic_v0 impor
 )
 
 
-PROJECT_ID = "SUBSCRIPTION_BACKED_NATIVE_PRODUCT_EXECUTION_QUALIFICATION_V0R1"
+PROJECT_ID = "SUBSCRIPTION_BACKED_NATIVE_PRODUCT_EXECUTION_QUALIFICATION_V0R2"
 SCHEMA_VERSION = "subscription-backed-native-product-role-receipt-v0"
+CANONICAL_TIMEOUTS = {
+    "BUILDER": 180,
+    "INDEPENDENT_REVIEWER": 180,
+    "VERIFIER": 180,
+    "codex_handshake": 60,
+    "process_disposal_grace": 10,
+}
 CODEX_BINARY = "/home/swirky/.local/bin/codex"
 CLAUDE_BINARY = "/usr/bin/claude"
 PROFILE_A = "/home/swirky/.codex"
@@ -88,6 +95,7 @@ RECEIPT_KEYS = {
     "started_marker_sha256",
     "started_at",
     "finished_at",
+    "timeouts_seconds",
     "timeout_seconds",
     "timed_out",
     "product_started",
@@ -142,6 +150,28 @@ PROCESS_EXIT_TERMINATIONS = {
 
 class QualificationError(ValueError):
     """A malformed, stale, unsafe, or contradictory qualification artifact."""
+
+
+def validate_timeout_map(value: Any, *, label: str = "timeouts_seconds") -> dict[str, int]:
+    """Require the one exact, positive timeout schema used by this phase."""
+
+    if not isinstance(value, Mapping):
+        raise QualificationError(f"{label} must be an object")
+    if set(value) != set(CANONICAL_TIMEOUTS):
+        raise QualificationError(f"{label} keys are not the exact canonical timeout schema")
+    if any(type(item) is not int or item <= 0 for item in value.values()):
+        raise QualificationError(f"{label} values must be positive integers")
+    if dict(value) != CANONICAL_TIMEOUTS:
+        raise QualificationError(f"{label} values do not match the canonical timeout schema")
+    return dict(CANONICAL_TIMEOUTS)
+
+
+def validate_timeout_value(value: Any, *, label: str) -> int:
+    """Reject malformed runtime timeout arguments before a product can spawn."""
+
+    if type(value) is not int or value <= 0:
+        raise QualificationError(f"{label} must be a positive integer")
+    return value
 
 
 def utc_now() -> str:
@@ -668,7 +698,8 @@ class BoundAppServerClient(AppServerClient):
                 })
         super()._handle_notification(message)
 
-    def close(self, *, grace_seconds: float = 10.0) -> dict[str, Any]:
+    def close(self, *, grace_seconds: int) -> dict[str, Any]:
+        validate_timeout_value(grace_seconds, label="process_disposal_grace")
         if self._proc is None:
             return {"disposed": False, "termination": "NOT_STARTED", "exit_code": -1, "exit_signal": 0,
                     "stderr_bytes": 0, "stderr_sha256": sha256_bytes(b""), "non_json_stdout_lines": 0}
@@ -730,12 +761,13 @@ def _workspace_receipt(
 def _base_receipt(
     *, role: str, version: str, binary_sha256: str, cwd: Path, workspace_id: str, prompt: bytes,
     template_sha: str, driver_sha: str, marker_sha: str, started_at: str,
-    finished_at: str, timeout_seconds: int, timed_out: bool, product_started: bool,
+    finished_at: str, timeouts: Mapping[str, Any], timed_out: bool, product_started: bool,
     process_exit: Mapping[str, Any], lifecycle: str, protocol: Mapping[str, Any],
     effective_policy: Mapping[str, Any], workspace: Mapping[str, Any],
     qntylab_before: Mapping[str, str], qntylab_after: Mapping[str, str],
     gate: str, structured: Mapping[str, Any], machine_status: str, failure_class: str,
 ) -> dict[str, Any]:
+    timeout_map = validate_timeout_map(timeouts, label="runtime timeouts_seconds")
     product, profile, binary = ROLE_BINDINGS[role]
     return {
         "schema_version": SCHEMA_VERSION,
@@ -754,7 +786,8 @@ def _base_receipt(
         "started_marker_sha256": marker_sha,
         "started_at": started_at,
         "finished_at": finished_at,
-        "timeout_seconds": timeout_seconds,
+        "timeouts_seconds": timeout_map,
+        "timeout_seconds": timeout_map[role],
         "timed_out": timed_out,
         "product_started": product_started,
         "process_exit": dict(process_exit),
@@ -791,12 +824,16 @@ def _policy_for_role(role: str, workspace: Path) -> tuple[dict[str, Any], dict[s
 def run_codex_role(
     *, role: str, workspace: Path, qntylab_root: Path, prompt: bytes,
     workspace_id: str, template_sha: str, driver_sha: str, marker_sha: str,
-    binary_sha256: str, binary_version: str = "codex-cli 0.147.0", timeout_seconds: int = 180,
+    binary_sha256: str, timeouts: Mapping[str, Any], binary_version: str = "codex-cli 0.147.0",
 ) -> dict[str, Any]:
     """Execute one exact Codex app-server role and return a sanitized receipt."""
 
     if role not in {"BUILDER", "VERIFIER"}:
         raise QualificationError("run_codex_role accepts only BUILDER or VERIFIER")
+    timeout_map = validate_timeout_map(timeouts, label="runtime timeouts_seconds")
+    timeout_seconds = timeout_map[role]
+    handshake_timeout_seconds = timeout_map["codex_handshake"]
+    process_disposal_grace_seconds = timeout_map["process_disposal_grace"]
     workspace, qntylab_root = validate_workspace_boundary(workspace, qntylab_root)
     before = workspace_snapshot(workspace)
     git_before = git_metadata_snapshot(workspace)
@@ -841,7 +878,7 @@ def run_codex_role(
             lifecycle = "STARTED"
             initialize = client.request(
                 "initialize", {"clientInfo": {"name": "qntylab-native-product-qualification", "version": "0"}},
-                deadline=min(deadline, time.monotonic() + 60),
+                deadline=min(deadline, time.monotonic() + handshake_timeout_seconds),
             )
             if not initialize["ok"]:
                 failure = "RECEIPT_INTEGRITY_FAILURE"
@@ -849,7 +886,10 @@ def run_codex_role(
             else:
                 client.notify("initialized")
                 thread_params, sandbox_policy = _policy_for_role(role, workspace)
-                thread = client.request("thread/start", thread_params, deadline=min(deadline, time.monotonic() + 60))
+                thread = client.request(
+                    "thread/start", thread_params,
+                    deadline=min(deadline, time.monotonic() + handshake_timeout_seconds),
+                )
                 if not thread["ok"]:
                     failure = "RECEIPT_INTEGRITY_FAILURE"
                     lifecycle = "THREAD_START_FAILED"
@@ -903,7 +943,7 @@ def run_codex_role(
         lifecycle = f"FAIL_CLOSED_{type(exc).__name__}"
         failure = "RECEIPT_INTEGRITY_FAILURE" if product_started else "PRODUCT_START_FAILURE"
     finally:
-        process_exit = client.close(grace_seconds=10.0)
+        process_exit = client.close(grace_seconds=process_disposal_grace_seconds)
 
     matching_terminals = [
         item for item in client.raw_terminals
@@ -980,7 +1020,7 @@ def run_codex_role(
         role=role, version=binary_version, binary_sha256=executed_binary_sha256,
         cwd=workspace, workspace_id=workspace_id,
         prompt=prompt, template_sha=template_sha, driver_sha=driver_sha, marker_sha=marker_sha,
-        started_at=started_at, finished_at=utc_now(), timeout_seconds=timeout_seconds,
+        started_at=started_at, finished_at=utc_now(), timeouts=timeout_map,
         timed_out=timed_out, product_started=product_started, process_exit=process_exit,
         lifecycle=lifecycle, protocol=protocol, effective_policy=effective,
         workspace=workspace_receipt, qntylab_before=qntylab_before, qntylab_after=qntylab_after,
@@ -992,13 +1032,14 @@ def run_codex_role(
 def validate_role_receipt(
     receipt: Mapping[str, Any], *, role: str, workspace: Path, workspace_id: str,
     prompt_sha: str, template_sha: str, driver_sha: str, marker_sha: str,
-    binary_sha: str,
+    binary_sha: str, timeouts: Mapping[str, Any],
 ) -> dict[str, Any]:
     data = dict(receipt)
     if set(data) != RECEIPT_KEYS:
         raise QualificationError("role receipt keys are not exact")
     if role not in ROLE_BINDINGS:
         raise QualificationError("expected role is unknown")
+    timeout_map = validate_timeout_map(timeouts, label="expected runtime timeouts_seconds")
     product, profile, binary = ROLE_BINDINGS[role]
     exact = {
         "schema_version": SCHEMA_VERSION, "role": role, "product": product,
@@ -1015,7 +1056,11 @@ def validate_role_receipt(
             raise QualificationError(f"role receipt {key} is not concrete")
     if data["binary_version"] != ROLE_VERSIONS[role]:
         raise QualificationError("role receipt binary version mismatch")
-    if data.get("subscription_backed") is not True or type(data.get("timeout_seconds")) is not int:
+    if (
+        data.get("subscription_backed") is not True
+        or data.get("timeouts_seconds") != timeout_map
+        or data.get("timeout_seconds") != timeout_map[role]
+    ):
         raise QualificationError("role receipt identity or timeout is invalid")
     if type(data.get("timed_out")) is not bool or type(data.get("product_started")) is not bool:
         raise QualificationError("role receipt lifecycle booleans are invalid")

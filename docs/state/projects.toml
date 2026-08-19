@@ -3200,8 +3200,16 @@ authoritative_artifacts = [
   "docs/CURRENT_ROADMAP.md",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_write_path_materialization_v0/closure_status.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_write_path_materialization_v0/targeted_rereview.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_write_path_materialization_v0r1/materialization_contract.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_write_path_materialization_v0r1/materialization_record.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_write_path_materialization_v0r1/runtime_closure_manifest.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_write_path_materialization_v0r1/run_pinned_dsh_d4_v0r1.py",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_write_path_materialization_v0r1/independent_hostile_review.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_write_path_materialization_v0r1/targeted_rereview.md",
   "qntylab/pinned_dsh_codex_write_path_materialization_v0.py",
-  "tests/test_pinned_dsh_codex_write_path_materialization_v0.py"
+  "qntylab/pinned_dsh_codex_write_path_materialization_v0r1.py",
+  "tests/test_pinned_dsh_codex_write_path_materialization_v0.py",
+  "tests/test_pinned_dsh_codex_write_path_materialization_v0r1.py"
 ]
 canonical_master_sha = "b909bb7dddebb17247ac3101e045387f9ecd69e9"
 stack_base_sha = "748f4ed35f181f8d8a65ebe906a5c7089651f0fe"
@@ -3217,6 +3225,17 @@ deterministic_tests_authorized = true
 independent_hostile_review_authorized = true
 critical_high_fix_pass_limit = 1
 targeted_rereview_limit = 1
+independent_hostile_review_count = 1
+independent_review_critical = 0
+independent_review_high = 4
+independent_review_medium = 0
+independent_review_low = 0
+critical_high_fix_pass_used = true
+targeted_rereview_used = true
+targeted_rereview_critical = 0
+targeted_rereview_high = 0
+open_critical = 0
+open_high = 0
 prelive_freeze_required = true
 post_freeze_synthetic_d4_authorized = true
 authorized_live_episode_count = 1
@@ -3240,6 +3259,8 @@ v2_created = false
 v2_authorized = false
 auto_merge_authorized = false
 current_max_autonomy = "L0_SHADOW"
+qntyagenteval_applicability = "NO_MATCH"
+qntyagenteval_run = false
 next_action = "Implement and deterministically test exactly C1/H1/H2/H3/H5 against the immutable V0 predecessor, run exactly one independent read-only hostile review, use at most one Critical/High fix pass and one targeted re-review if required, then freeze before acquiring exactly one crash-safe V0R1 synthetic D4 episode. No V0 retry, predecessor mutation, Stage-A run, historical task, answer-key access, Profile A mutation, DSH source change, scientific evaluation, Qnty runtime, trading, capital, V2, merge, or additional live episode is authorized."
 
 [[project]]

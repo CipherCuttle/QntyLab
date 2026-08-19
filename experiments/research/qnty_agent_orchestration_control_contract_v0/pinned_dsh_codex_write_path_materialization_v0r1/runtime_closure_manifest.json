@@ -1,0 +1,27 @@
+{
+  "digest": "d354fd326bfba5fd51e4a6076a7573223224628c1d89266ecc66168742d30ec8",
+  "entrypoints": [
+    "vendor/cordis/lib/index.js",
+    "packages/subagent/subagent/lib/index.js",
+    "packages/subprocess/subprocess-local/lib/index.js",
+    "packages/subagent/subagent-codex/lib/index.js"
+  ],
+  "files": {
+    "packages/core/agent/lib/index.js": "e7e40c5ca66d9827a5084c5c0c68983f9685842bb9b6d604803d4cb4642bb263",
+    "packages/core/scope/lib/index.js": "2829df71d76e08941457d4dd173eac60783e55354921137c8b75e8b5c0d2ecca",
+    "packages/core/session/lib/index.js": "9270186b579bc8a4c6c53c256e4471d3f134e94308462c6a413a722e9c7556fb",
+    "packages/core/tools/lib/index.js": "47de95d14493dbd22d1a3ade14890fc99d7232db4e363f2190c9063b030dd029",
+    "packages/llm/llm/lib/index.js": "66ef669901973863a474e7bfc172d7cdc9cb13420f92c74104730dd6858afc1d",
+    "packages/sdk/protocol/lib/index.js": "371c38ca3514797d86df5f4bb78a56c40a2637294b83aababe8145bec6a20253",
+    "packages/subagent/subagent-codex/lib/index.js": "2b65fd97f345d346319423a40cb285026c263be565e29e5dce0872e4aa5aa72a",
+    "packages/subagent/subagent/lib/index.js": "510aba14f13d1a9deccf3d81d790be3e7ebcdc4797fcfa584908350d07c529c6",
+    "packages/subprocess/subprocess-local/lib/index.js": "e16ecbcce0fa3d60234a8a1ca3de80fa29d850ba1513bf9e8e6daa186e526ce4",
+    "packages/subprocess/subprocess/lib/index.js": "679e514028454cdef67adeb362e99a18e8efb7ca281857cf7868fc26d4821f6c",
+    "packages/util/timeout/lib/index.js": "744fdb4f79c8d513c6d4014a018949cfb2f02f4dde4621167302c5467c3994ec",
+    "vendor/cordis/lib/index.js": "1729cdbf8ee40b17c8839e06bf96491490548559e11ef7e411271e0754e751c5",
+    "vendor/cosmokit/lib/index.js": "a024ad32ead85dd6708cedd5b56acacb578e048e8f71e78b20ed56053ac7beb4",
+    "vendor/schemastery/lib/index.mjs": "d23d1f48ea69800c68fc8be592f5d1074c9c764b22f35a1d40b84f5eab39ac00"
+  },
+  "pinned_root": "/home/swirky/DevHub/dsh-pinned-materialization-v0",
+  "schema_version": "pinned-dsh-generated-runtime-closure-v0r1"
+}

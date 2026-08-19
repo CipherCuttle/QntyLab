@@ -1,0 +1,96 @@
+{
+  "schema_version": "pinned-dsh-codex-write-path-materialization-contract-v0",
+  "phase_id": "PINNED_DSH_CODEX_WRITE_PATH_MATERIALIZATION_V0",
+  "objective": "Materialize the exact pinned DeepSeek Harness build reproducibly, then execute exactly one D4 synthetic Codex Profile-A write through the pinned DSH Codex provider and determine whether the target mechanism passes, fails, or remains blocked.",
+  "predecessors": {
+    "canonical_master": "b909bb7dddebb17247ac3101e045387f9ecd69e9",
+    "pr134": {"head": "e24b540900ef9fcf48e24e8e53dbf2b18028f5d9", "state": "OPEN_DRAFT_UNMERGED", "immutable": true},
+    "pr135": {"head": "d104342a62bc3e315d3434d16013862de529ca70", "state": "OPEN_DRAFT_UNMERGED", "immutable": true, "closure_review": "PASS"}
+  },
+  "established_not_retested": {
+    "D0_HOST_WRITE": "PASS",
+    "D1_RAW_APP_SERVER_NO_TOOL": "PASS",
+    "D2_RAW_APP_SERVER_WRITE": "PASS",
+    "D3_QNTY_NATIVE_BRIDGE_WRITE": "PASS"
+  },
+  "resolved_gap": {
+    "gate": "D4_PINNED_DSH_CODEX_PROVIDER",
+    "predecessor_result": "INCONCLUSIVE_INFRA",
+    "predecessor_reason": "PINNED_DSH_BUILD_OUTPUT_UNAVAILABLE"
+  },
+  "pinned_dsh": {
+    "repository": "deepseek-ai/deepseek-harness",
+    "commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "tag": "dsh-v0.1.0-rc.7",
+    "package_family": "0.1.0-rc.7",
+    "package_manager": "pnpm@11.7.0",
+    "node_engines": "^22.19.0 || >=24.0.0",
+    "build_target": "build:lib",
+    "install_semantics": "pnpm install --frozen-lockfile",
+    "upgrade_permitted": false,
+    "source_mutation_permitted": false
+  },
+  "required_runtime_artifacts": [
+    "vendor/cordis/lib/index.js",
+    "packages/subagent/subagent/lib/index.js",
+    "packages/subprocess/subprocess-local/lib/index.js",
+    "packages/subagent/subagent-codex/lib/index.js"
+  ],
+  "d4_driver": {
+    "reused_from": "PR135",
+    "relpath": "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_codex_app_server_write_path_diagnostic_v0/pinned_dsh_codex_route_driver_v0.mjs",
+    "blob": "64336748769ed8a4a4bf8a1f2f44d6e493568ab5",
+    "sha256": "e29c1bb891e6ae2040dff1ac240e33dd84f1da34b5fdaa68dd437c097ced5b94",
+    "modified_by_this_phase": false
+  },
+  "product": {
+    "codex_binary": "/home/swirky/.local/bin/codex",
+    "codex_version": "codex-cli 0.147.0",
+    "codex_home": "/home/swirky/.codex",
+    "dsh_parent_llm_provider": "NONE",
+    "dsh_parent_llm_request_count": 0,
+    "pay_per_token_keys_required_absent": ["OPENAI_API_KEY", "ANTHROPIC_API_KEY", "DEEPSEEK_API_KEY", "OPENROUTER_API_KEY"]
+  },
+  "synthetic_workspace": {
+    "fixture_initial": "BEFORE\n",
+    "fixture_target": "AFTER\n",
+    "allowed_changed_paths": ["fixture.txt"],
+    "historical_task": false,
+    "answer_key": false,
+    "qnty_data": false,
+    "production_repository_writes": false
+  },
+  "execution_bounds": {
+    "live_attempts": 1,
+    "retries": 0,
+    "turn_timeout_seconds": 300,
+    "d0_to_d3_rerun": false,
+    "stage_a_v1_rerun": false,
+    "pr134_timeout_forensics": false,
+    "v2_creation": false
+  },
+  "pass_requirements": [
+    "target mechanism exercised",
+    "Codex child process observed at the OS level",
+    "DSH lifecycle stopReason == completed",
+    "fixture.txt bytes == AFTER\\n",
+    "changed_paths == [\"fixture.txt\"]",
+    "unauthorized writes == 0"
+  ],
+  "prose_is_evidence": false,
+  "allowed_verdicts": [
+    "PINNED_DSH_CODEX_WRITE_PATH_PASS",
+    "PINNED_DSH_CODEX_WRITE_PATH_FAIL",
+    "PINNED_DSH_MATERIALIZATION_BLOCKED",
+    "BLOCKED_BY_IDENTITY_DRIFT",
+    "BLOCKED_BY_AUTHORITY_CONFLICT"
+  ],
+  "authority": {
+    "mutation": "THIS_BRANCH_ONLY",
+    "product_execution": "ONE_D4_EPISODE",
+    "commit": "YES",
+    "push_pr": "DRAFT_ONLY",
+    "merge": "NO"
+  }
+}

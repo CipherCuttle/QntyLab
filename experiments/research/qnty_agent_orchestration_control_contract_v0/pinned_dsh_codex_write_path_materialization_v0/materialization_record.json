@@ -1,0 +1,66 @@
+{
+  "after": {
+    "DSH_HEAD_AFTER": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "DSH_TREE_AFTER": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "LOCKFILE_SHA256_AFTER": "f517dc3978d57531cda747df62a2abdde1df5b9f25415fcf1fc5d51f8b7547ea",
+    "TRACKED_SOURCE_MUTATION": "NO",
+    "tracked_modified_count": 0
+  },
+  "before": {
+    "DSH_HEAD_BEFORE": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "DSH_STATUS_BEFORE": "CLEAN_TRACKED",
+    "DSH_TREE_BEFORE": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "LOCKFILE_IDENTITY": {
+      "blob": "bcc517d651dd1e5a606656899f5ffe45a1a7a864",
+      "path": "pnpm-lock.yaml",
+      "sha256": "f517dc3978d57531cda747df62a2abdde1df5b9f25415fcf1fc5d51f8b7547ea"
+    },
+    "NODE_VERSION": "v22.22.0",
+    "PNPM_VERSION": "11.7.0"
+  },
+  "build": {
+    "command": [
+      "pnpm",
+      "run",
+      "build:lib"
+    ],
+    "exit_code": 0,
+    "rationale": "build:lib is the smallest canonical upstream target that emits every runtime entrypoint the frozen D4 driver imports; build:web is not required.",
+    "target": "build:lib",
+    "web_frontend_built": false
+  },
+  "checkout": {
+    "fresh_isolated_checkout": true,
+    "provenance": "local git clone of the pre-existing pinned checkout at /home/swirky/DevHub/dsh-stage-a-provisioning-v0, checked out detached at the pinned commit",
+    "root": "/home/swirky/DevHub/dsh-pinned-materialization-v0",
+    "shared_with_other_phase": false
+  },
+  "install": {
+    "command": [
+      "pnpm",
+      "install",
+      "--frozen-lockfile"
+    ],
+    "exit_code": 0,
+    "lockfile_updated": false,
+    "pnpm_reported_version": "11.7.0",
+    "semantics": "FROZEN_IMMUTABLE"
+  },
+  "materialization_failure_class": null,
+  "materialized": true,
+  "module_import_probe": "ALL_FOUR_MODULES_IMPORT_OK",
+  "phase_id": "PINNED_DSH_CODEX_WRITE_PATH_MATERIALIZATION_V0",
+  "runtime_artifact_hashes": {
+    "CORDIS_LIB_SHA256": "1729cdbf8ee40b17c8839e06bf96491490548559e11ef7e411271e0754e751c5",
+    "SUBAGENT_CODEX_LIB_SHA256": "2b65fd97f345d346319423a40cb285026c263be565e29e5dce0872e4aa5aa72a",
+    "SUBAGENT_LIB_SHA256": "510aba14f13d1a9deccf3d81d790be3e7ebcdc4797fcfa584908350d07c529c6",
+    "SUBPROCESS_LOCAL_LIB_SHA256": "e16ecbcce0fa3d60234a8a1ca3de80fa29d850ba1513bf9e8e6daa186e526ce4"
+  },
+  "runtime_artifact_paths": {
+    "CORDIS_LIB_SHA256": "vendor/cordis/lib/index.js",
+    "SUBAGENT_CODEX_LIB_SHA256": "packages/subagent/subagent-codex/lib/index.js",
+    "SUBAGENT_LIB_SHA256": "packages/subagent/subagent/lib/index.js",
+    "SUBPROCESS_LOCAL_LIB_SHA256": "packages/subprocess/subprocess-local/lib/index.js"
+  },
+  "schema_version": "pinned-dsh-materialization-record-v0"
+}

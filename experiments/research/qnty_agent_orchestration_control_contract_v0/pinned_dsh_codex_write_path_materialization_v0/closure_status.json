@@ -1,0 +1,60 @@
+{
+  "schema_version": "pinned-dsh-codex-write-path-materialization-v0-closure-status-v0",
+  "phase": "PINNED_DSH_CODEX_WRITE_PATH_MATERIALIZATION_V0",
+  "target_sha": "e07ba32812722fdd50702be33dbd1ed6a2c62aa6",
+  "prelive_sha": "9e21d19ba230aafca7f0a6e554e5b23fb5184e97",
+  "execution_state": "CONSUMED",
+  "live_episode": "PRESERVED_IMMUTABLE",
+  "historical_observation": {
+    "live_attempts_observed": 1,
+    "dsh_provider_entered_recorded": true,
+    "codex_child_spawned_recorded": true,
+    "turn_terminal_observed": true,
+    "stop_reason": "error",
+    "timed_out": false,
+    "changed_paths": [],
+    "fixture_target_match": false,
+    "observed_result": "PINNED_DSH_CODEX_WRITE_PATH_FAIL",
+    "result_observation_rewritten": false
+  },
+  "interpretation": {
+    "closure_authority_of_d4_result": false,
+    "closure_verdict": "CLOSED_BLOCKED_BY_EVIDENCE_INTEGRITY",
+    "fabrication_established": false,
+    "dsh_pass_established": false,
+    "fully_verified_exact_byte_dsh_failure_established": false,
+    "exact_root_cause_established": false
+  },
+  "targeted_rereview": {
+    "review_independence": true,
+    "live_product_calls": 0,
+    "result": "FAIL",
+    "pr136_targeted_rereview": "FAIL",
+    "phase_closure_gate": "UNSATISFIED",
+    "open_critical": 1,
+    "open_high": 4,
+    "hypotheses": {
+      "C1_RUNTIME_ARTIFACT_BINDING": "FAIL",
+      "H1_MATERIALIZATION_EVIDENCE": "FAIL",
+      "H2_RECEIPT_INTEGRITY": "FAIL",
+      "H3_SINGLE_EPISODE": "FAIL",
+      "H4_TIMEOUT_CLASSIFICATION": "PASS",
+      "H5_UNPARSEABLE_DRIVER_OUTPUT": "FAIL",
+      "H6_PROCESS_GROUP_TERMINATION": "PASS",
+      "H7_EFFECTIVE_CONFIG_OBSERVABILITY": "PASS"
+    }
+  },
+  "closure": {
+    "status": "CLOSED_BLOCKED_BY_EVIDENCE_INTEGRITY",
+    "d4_v0_rerun_authority": false,
+    "next_phase_authority": "NONE",
+    "v0r1_created": false,
+    "v0r1_authorized": false,
+    "v2_created": false,
+    "v2_authorized": false,
+    "repair_performed": false,
+    "additional_review_performed": false,
+    "merge_performed": false,
+    "retarget_performed": false
+  }
+}

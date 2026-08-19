@@ -1,0 +1,138 @@
+{
+  "authority": {
+    "capital_authority": "NONE",
+    "dsh_scientific_superiority_proven": false,
+    "eligibility": "NONE",
+    "merge_authorized": false,
+    "runtime_authority": "NONE",
+    "scientific_authority": "NONE",
+    "stage_a_v1_rerun_authorized": false,
+    "trading_authority": "NONE",
+    "v2_authorized": false,
+    "v2_created": false
+  },
+  "boundaries": {
+    "answer_key_accessed": false,
+    "authoritative_repository_modified": false,
+    "d0_to_d3_rerun": false,
+    "dsh_parent_llm_provider": "NONE",
+    "dsh_parent_llm_request_count": 0,
+    "frozen_driver_modified": false,
+    "historical_task_executed": false,
+    "human_interventions": 0,
+    "live_attempts": 1,
+    "pr134_mutated": false,
+    "pr135_mutated": false,
+    "retries_used": 0,
+    "stage_a_v1_rerun": false,
+    "tracked_dsh_source_modified": false,
+    "unauthorized_writes": 0,
+    "v2_authorized": false,
+    "v2_created": false
+  },
+  "canonical_master_sha": "b909bb7dddebb17247ac3101e045387f9ecd69e9",
+  "d4": "FAIL",
+  "duration_seconds": 24.9,
+  "evidence": {
+    "all_stop_reasons": [
+      "error"
+    ],
+    "changed_paths": [],
+    "codex_child_spawned": true,
+    "dsh_provider_entered": true,
+    "dsh_stop_reason": "error",
+    "fixture_target_match": false,
+    "receipt_integrity_reasons": [
+      "RECEIPT_STATUS_NOT_COMPLETED"
+    ],
+    "timed_out": false,
+    "turn_started": true,
+    "turn_terminal_observed": true,
+    "unauthorized_writes": []
+  },
+  "explicitly_not_claimed": [
+    "Codex cannot perform this write - directly disproven by PR #135's D2/D3 and never claimed.",
+    "DSH is scientifically inferior - not tested and not established by an execution-plumbing observation.",
+    "The precise cause of the `error` stop reason - the turn's internal failure was not traced to a proven root.",
+    "PR #134's historical 900s stall shares a cause with this - not tested.",
+    "Any change to PR #134's or PR #135's recorded results - both are immutable and untouched."
+  ],
+  "failure_mechanism": "DSH_EFFECTIVE_CONFIG_DIVERGENCE",
+  "failure_mechanism_basis": "Classifier attribution, not a directly observed approval decline. Observed: the pinned DSH provider entered, a real `codex` child was spawned (codex-linux-sandbox --sandbox-policy-cwd <workspace>), the turn reached a terminal end with stopReason=`error`, zero output parts, no driver-level error string, and zero bytes changed. The disposable /tmp workspace is not a trusted project in Profile A, and DSH's provider sends only {cwd, ephemeral} on thread/start -- it never requests the approvalPolicy=never / workspaceWrite policy that the D2/D3 routes sent and verified. The classifier therefore reports configuration divergence rather than attributing an unexplained product error to DSH.",
+  "filesystem": {
+    "fixture_after_class": "BEFORE",
+    "fixture_after_sha256": "be9351741a8155d01fd028d158546f1005e73ceeb0bb2d093335feac4144e450",
+    "fixture_before_class": "BEFORE",
+    "fixture_before_sha256": "be9351741a8155d01fd028d158546f1005e73ceeb0bb2d093335feac4144e450"
+  },
+  "hostile_review": {
+    "class": "INDEPENDENT_HOSTILE_REVIEW",
+    "count": 1,
+    "critical": 1,
+    "high": 7,
+    "low": 3,
+    "medium": 3,
+    "open_critical": 0,
+    "open_high": 0,
+    "targeted_rereview_used": false
+  },
+  "materialization": {
+    "build": "OK",
+    "build_target": "build:lib",
+    "dependency_install": "FROZEN_LOCKFILE_OK",
+    "dsh_commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "dsh_tag": "dsh-v0.1.0-rc.7",
+    "dsh_tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "failure_class": null,
+    "lockfile_unchanged": true,
+    "materialized": true,
+    "node_version": "v22.22.0",
+    "pnpm_version": "11.7.0",
+    "runtime_artifact_hashes": {
+      "CORDIS_LIB_SHA256": "1729cdbf8ee40b17c8839e06bf96491490548559e11ef7e411271e0754e751c5",
+      "SUBAGENT_CODEX_LIB_SHA256": "2b65fd97f345d346319423a40cb285026c263be565e29e5dce0872e4aa5aa72a",
+      "SUBAGENT_LIB_SHA256": "510aba14f13d1a9deccf3d81d790be3e7ebcdc4797fcfa584908350d07c529c6",
+      "SUBPROCESS_LOCAL_LIB_SHA256": "e16ecbcce0fa3d60234a8a1ca3de80fa29d850ba1513bf9e8e6daa186e526ce4"
+    },
+    "tracked_source_mutation": false
+  },
+  "next_action": "No rerun of this D4, PR #134, PR #135, or Stage-A V1 is authorized. The pinned DSH build is now reproducibly materialized and the target mechanism is demonstrably reachable. A separately authorized phase would be needed to determine whether the `error` terminal is caused by the absent approval/sandbox policy on DSH's thread/start, and that phase must not be inferred from this result. No V2, runtime, scientific, Qnty NEXT_ACTION, trading, or capital authority is created.",
+  "phase_id": "PINNED_DSH_CODEX_WRITE_PATH_MATERIALIZATION_V0",
+  "predecessors": {
+    "pr134": {
+      "head": "e24b540900ef9fcf48e24e8e53dbf2b18028f5d9",
+      "mutated": false
+    },
+    "pr135": {
+      "head": "d104342a62bc3e315d3434d16013862de529ca70",
+      "mutated": false
+    }
+  },
+  "prelive_target_sha": "9e21d19ba230aafca7f0a6e554e5b23fb5184e97",
+  "prelive_tree_sha": "d8bf81857178a450d93940d1aaba80c7caf7d6c3",
+  "product_config_modified": false,
+  "profile_observation": {
+    "auth_mode": "chatgpt",
+    "config_sha256_before": "1b0ede03a47c4ddb89bbeb4be727d0ffebfcb73a90a7b2d7f65d548db46f2448",
+    "mcp_servers": [
+      "chrome-devtools",
+      "cloudflare-api",
+      "context7",
+      "linear",
+      "mempalace",
+      "openaiDeveloperDocs",
+      "playwright",
+      "ruflo",
+      "sentry",
+      "supabase"
+    ],
+    "model": "gpt-5.6-luna",
+    "subscription_backed": true,
+    "workspace_trusted": false
+  },
+  "root_cause_class": "DSH_EFFECTIVE_CONFIG_DIVERGENCE_NOT_PROVEN_TO_ROOT",
+  "root_cause_proven": false,
+  "schema_version": "pinned-dsh-codex-write-path-result-v0",
+  "target_mechanism_exercised": true,
+  "verdict": "PINNED_DSH_CODEX_WRITE_PATH_FAIL"
+}

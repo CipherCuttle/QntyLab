@@ -3189,6 +3189,111 @@ experiment_state = "CLOSED_BLOCKED_BY_EVIDENCE_INTEGRITY"
 next_action = "V0 is closed blocked by evidence-integrity defects found in the single allocated targeted re-review: 1 Critical and 4 High remain open. Preserve the historical D4 observation exactly as observed, including PINNED_DSH_CODEX_WRITE_PATH_FAIL, but do not treat it as authoritative exact-byte closure evidence. No D4 retry, D0-D3 retry, Stage-A V1 run, V0R1, V2, repair, runtime authority, scientific authority, Qnty NEXT_ACTION, trading authority, or capital authority is authorized. Any repair requires a separately authorized V0R1 phase."
 
 [[project]]
+project_id = "PINNED_DSH_CODEX_WRITE_PATH_MATERIALIZATION_V0R1"
+display_name = "Pinned DSH Codex write-path materialization V0R1 evidence-integrity repair"
+state = "CLOSED_NEGATIVE"
+authority_level = "APPEND_ONLY_VERIFIED_V0R1_RESULT_RECORDING_ONLY"
+phase_type = "PRODUCT_EXECUTION_WRITE_PATH_EVIDENCE_INTEGRITY_REPAIR"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_write_path_materialization_v0/closure_status.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_write_path_materialization_v0/targeted_rereview.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_write_path_materialization_v0r1/materialization_contract.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_write_path_materialization_v0r1/materialization_record.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_write_path_materialization_v0r1/runtime_closure_manifest.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_write_path_materialization_v0r1/run_pinned_dsh_d4_v0r1.py",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_write_path_materialization_v0r1/independent_hostile_review.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_write_path_materialization_v0r1/targeted_rereview.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_write_path_materialization_v0r1/prelive_freeze.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_write_path_materialization_v0r1/d4_episode_started.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_write_path_materialization_v0r1/d4_attempts.jsonl",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_write_path_materialization_v0r1/d4_receipt.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_write_path_materialization_v0r1/result.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_write_path_materialization_v0r1/verification.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_write_path_materialization_v0r1/closure_status.json",
+  "qntylab/pinned_dsh_codex_write_path_materialization_v0.py",
+  "qntylab/pinned_dsh_codex_write_path_materialization_v0r1.py",
+  "tests/test_pinned_dsh_codex_write_path_materialization_v0.py",
+  "tests/test_pinned_dsh_codex_write_path_materialization_v0r1.py"
+]
+canonical_master_sha = "b909bb7dddebb17247ac3101e045387f9ecd69e9"
+stack_base_sha = "748f4ed35f181f8d8a65ebe906a5c7089651f0fe"
+predecessor_project_id = "PINNED_DSH_CODEX_WRITE_PATH_MATERIALIZATION_V0"
+predecessor_state = "CLOSED_BLOCKED"
+predecessor_closure_status = "CLOSED_BLOCKED_BY_EVIDENCE_INTEGRITY"
+source_conflict = false
+architecture_change = false
+architecture_relevance = "NOT_REQUIRED_WITHIN_EXISTING_ADR_0007_AND_ADR_0008_BOUNDARY"
+implementation_authorized = false
+authorized_repairs = ["C1", "H1", "H2", "H3", "H5"]
+deterministic_tests_authorized = true
+independent_hostile_review_authorized = true
+critical_high_fix_pass_limit = 1
+targeted_rereview_limit = 1
+independent_hostile_review_count = 1
+independent_review_critical = 0
+independent_review_high = 4
+independent_review_medium = 0
+independent_review_low = 0
+critical_high_fix_pass_used = true
+targeted_rereview_used = true
+targeted_rereview_critical = 0
+targeted_rereview_high = 0
+open_critical = 0
+open_high = 0
+prelive_freeze_required = true
+prelive_sha = "af0c27823d46315dfbe1d01a85ddaa72a77fa4a7"
+prelive_tree = "ed4df8bd596f696fadbbe0cb68259ebd26abf8a5"
+execution_state = "CONSUMED"
+v0r1_live_attempts = 1
+v0r1_retries_used = 0
+episode_marker_acquired = true
+final_runtime_closure_match = true
+materialization_binding_match = true
+target_mechanism_exercised = true
+dsh_provider_entered = true
+codex_child_spawned = true
+turn_started = true
+turn_terminal_observed = true
+stop_reason = "error"
+timed_out = false
+changed_paths = []
+fixture_target_match = false
+unauthorized_write_count = 0
+observed_result = "FAIL"
+observed_failure_mechanism = "DSH_EFFECTIVE_CONFIG_DIVERGENCE"
+root_cause_proven = false
+closure_status = "CLOSED_NEGATIVE"
+post_freeze_synthetic_d4_authorized = false
+authorized_live_episode_count = 1
+v0r1_live_episode_is_v0_retry = false
+v0_mutation_authorized = false
+v0_rerun_authorized = false
+d0_d3_rerun_authorized = false
+stage_a_v1_rerun_authorized = false
+historical_task_execution_authorized = false
+answer_key_access_authorized = false
+profile_a_config_mutation_authorized = false
+dsh_source_mutation_authorized = false
+dsh_upgrade_authorized = false
+qnty_runtime_authorized = false
+scientific_execution_authorized = false
+scientific_evaluation_authorized = false
+qnty_next_action_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+v2_created = false
+v2_authorized = false
+auto_merge_authorized = false
+current_max_autonomy = "L0_SHADOW"
+qntyagenteval_applicability = "NO_MATCH"
+qntyagenteval_run = false
+active_project_after_closure = "NONE"
+next_action = "V0R1 is closed after its single crash-safe live D4 episode. The exact pinned DSH route entered, a real Codex child spawned, and a terminal stopReason=error was observed without timeout or filesystem change. Machine classification is D4=FAIL with DSH_EFFECTIVE_CONFIG_DIVERGENCE; direct root cause is not proven. No retry, implementation mutation, V0 rerun, Stage-A run, historical task, Profile A mutation, DSH change, scientific/runtime/trading/capital authority, V2, merge, or additional live episode is authorized."
+
+[[project]]
 project_id = "SUBSCRIPTION_BACKED_STAGE_A_V1_RESULT_RECORDING_V0"
 display_name = "Subscription-backed Stage-A V1 result recording V0"
 state = "CLOSED_PASS"

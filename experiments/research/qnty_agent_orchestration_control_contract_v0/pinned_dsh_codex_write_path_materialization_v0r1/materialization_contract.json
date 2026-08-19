@@ -1,0 +1,79 @@
+{
+  "authority": {
+    "answer_key_access": false,
+    "dsh_source_mutation": false,
+    "historical_task_execution": false,
+    "live_d4_after_freeze": 1,
+    "merge": false,
+    "profile_a_config_mutation": false,
+    "qnty_runtime": false,
+    "scientific_evaluation": false,
+    "stage_a_v1": false,
+    "trading_or_capital": false,
+    "v0_rerun": false,
+    "v2": false
+  },
+  "episode_contract": {
+    "attempts": 1,
+    "consumed_marker": "d4_episode_started.json",
+    "hard_timeout_seconds": 300,
+    "marker_created_exclusively_before_product_spawn": true,
+    "marker_never_removed_after_failure_or_crash": true,
+    "retries": 0
+  },
+  "findings_repaired": [
+    "C1_RUNTIME_ARTIFACT_EXECUTION_BINDING",
+    "H1_MATERIALIZATION_RECORD_BINDING",
+    "H2_RECEIPT_INTEGRITY",
+    "H3_CRASH_SAFE_EXACTLY_ONE_LIVE_EPISODE",
+    "H5_UNRELATED_JSON_RECEIPT_PROVENANCE"
+  ],
+  "pinned_dsh": {
+    "build_target": "build:lib",
+    "commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "node_range": "^22.19.0 || >=24.0.0",
+    "package_manager": "pnpm@11.7.0",
+    "repository": "deepseek-ai/deepseek-harness",
+    "tag": "dsh-v0.1.0-rc.7",
+    "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188"
+  },
+  "phase_id": "PINNED_DSH_CODEX_WRITE_PATH_MATERIALIZATION_V0R1",
+  "predecessor": {
+    "head": "748f4ed35f181f8d8a65ebe906a5c7089651f0fe",
+    "immutable": true,
+    "phase_id": "PINNED_DSH_CODEX_WRITE_PATH_MATERIALIZATION_V0",
+    "status": "CLOSED_BLOCKED_BY_EVIDENCE_INTEGRITY"
+  },
+  "product": {
+    "codex_binary": "/home/swirky/.local/bin/codex",
+    "codex_home": "/home/swirky/.codex",
+    "codex_version": "codex-cli 0.147.0",
+    "dsh_parent_llm_provider": "NONE",
+    "dsh_parent_llm_request_count": 0,
+    "pay_per_token_credentials_required_absent": [
+      "OPENAI_API_KEY",
+      "ANTHROPIC_API_KEY",
+      "DEEPSEEK_API_KEY",
+      "OPENROUTER_API_KEY"
+    ]
+  },
+  "review_contract": {
+    "critical_high_fix_pass_limit": 1,
+    "independent_hostile_review_count": 1,
+    "live_product_calls_during_review": 0,
+    "targeted_rereview_limit": 1
+  },
+  "runtime_closure": {
+    "digest": "d354fd326bfba5fd51e4a6076a7573223224628c1d89266ecc66168742d30ec8",
+    "file_count": 14,
+    "final_gate_required": true,
+    "manifest": "runtime_closure_manifest.json",
+    "post_gate_concurrent_hostile_filesystem_guarantee_claimed": false
+  },
+  "schema_version": "pinned-dsh-codex-write-path-materialization-contract-v0r1",
+  "synthetic_workspace": {
+    "allowed_changed_paths": ["fixture.txt"],
+    "fixture_initial_bytes": "BEFORE\n",
+    "fixture_target_bytes": "AFTER\n"
+  }
+}

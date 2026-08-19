@@ -1,0 +1,559 @@
+{
+  "attempts": 1,
+  "authority": {
+    "capital_authority": "NONE",
+    "merge_authorized": false,
+    "qnty_next_action_authority": "NONE",
+    "runtime_authority": "NONE",
+    "scientific_authority": "NONE",
+    "stage_a_v1_rerun_authorized": false,
+    "trading_authority": "NONE",
+    "v2_authorized": false,
+    "v2_created": false
+  },
+  "classification": {
+    "all_stop_reasons": [
+      "error"
+    ],
+    "changed_paths": [],
+    "codex_child_spawned": true,
+    "d4": "FAIL",
+    "dsh_provider_entered": true,
+    "dsh_stop_reason": "error",
+    "failure_mechanism": "DSH_EFFECTIVE_CONFIG_DIVERGENCE",
+    "fixture_target_match": false,
+    "profile_observation": {
+      "auth_api_key_slot_populated": false,
+      "auth_key_names": [
+        "OPENAI_API_KEY",
+        "auth_mode",
+        "last_refresh",
+        "tokens"
+      ],
+      "auth_mode": "chatgpt",
+      "codex_home": "/home/swirky/.codex",
+      "config_present": true,
+      "config_sha256_before": "1b0ede03a47c4ddb89bbeb4be727d0ffebfcb73a90a7b2d7f65d548db46f2448",
+      "mcp_servers": [
+        "chrome-devtools",
+        "cloudflare-api",
+        "context7",
+        "linear",
+        "mempalace",
+        "openaiDeveloperDocs",
+        "playwright",
+        "ruflo",
+        "sentry",
+        "supabase"
+      ],
+      "model": "gpt-5.6-luna",
+      "policy_note": "DSH's codex provider sends only {cwd, ephemeral} on thread/start; no approvalPolicy or sandboxPolicy is requested on this route.",
+      "subscription_backed": true,
+      "workspace": "/tmp/qntylab-pinned-dsh-d4-v0r1-bmd8bjay/d4",
+      "workspace_trusted": false
+    },
+    "reason": "DSH_EFFECTIVE_CONFIG_DIVERGENCE",
+    "receipt_integrity_reasons": [
+      "RECEIPT_STATUS_NOT_COMPLETED",
+      "LIFECYCLE_NOT_ALL_COMPLETED"
+    ],
+    "target_mechanism_exercised": true,
+    "timed_out": false,
+    "turn_started": true,
+    "turn_terminal_observed": true,
+    "unauthorized_writes": []
+  },
+  "episode_marker": {
+    "acquired": true,
+    "path": "/home/swirky/DevHub/worktrees/QntyLab-pinned-dsh-codex-write-path-materialization-v0r1/experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_write_path_materialization_v0r1/d4_episode_started.json",
+    "sha256": "2a915937fff70fb20b49af6bba39c53d69b98b9e5194fd0d3e1fb491e2d0a6a2"
+  },
+  "final_execution_gate": {
+    "materialization_binding": {
+      "lockfile_sha256_observed": "f517dc3978d57531cda747df62a2abdde1df5b9f25415fcf1fc5d51f8b7547ea",
+      "passed": true,
+      "reasons": [],
+      "record_sha256": "b90666de4cc7794864b778a93e1eea1219e11aaccce08d139514dbfd9d1397a7"
+    },
+    "passed": true,
+    "root": "/home/swirky/DevHub/dsh-pinned-materialization-v0",
+    "runtime_closure": {
+      "digest": "d354fd326bfba5fd51e4a6076a7573223224628c1d89266ecc66168742d30ec8",
+      "entrypoints": [
+        "vendor/cordis/lib/index.js",
+        "packages/subagent/subagent/lib/index.js",
+        "packages/subprocess/subprocess-local/lib/index.js",
+        "packages/subagent/subagent-codex/lib/index.js"
+      ],
+      "files": {
+        "packages/core/agent/lib/index.js": "e7e40c5ca66d9827a5084c5c0c68983f9685842bb9b6d604803d4cb4642bb263",
+        "packages/core/scope/lib/index.js": "2829df71d76e08941457d4dd173eac60783e55354921137c8b75e8b5c0d2ecca",
+        "packages/core/session/lib/index.js": "9270186b579bc8a4c6c53c256e4471d3f134e94308462c6a413a722e9c7556fb",
+        "packages/core/tools/lib/index.js": "47de95d14493dbd22d1a3ade14890fc99d7232db4e363f2190c9063b030dd029",
+        "packages/llm/llm/lib/index.js": "66ef669901973863a474e7bfc172d7cdc9cb13420f92c74104730dd6858afc1d",
+        "packages/sdk/protocol/lib/index.js": "371c38ca3514797d86df5f4bb78a56c40a2637294b83aababe8145bec6a20253",
+        "packages/subagent/subagent-codex/lib/index.js": "2b65fd97f345d346319423a40cb285026c263be565e29e5dce0872e4aa5aa72a",
+        "packages/subagent/subagent/lib/index.js": "510aba14f13d1a9deccf3d81d790be3e7ebcdc4797fcfa584908350d07c529c6",
+        "packages/subprocess/subprocess-local/lib/index.js": "e16ecbcce0fa3d60234a8a1ca3de80fa29d850ba1513bf9e8e6daa186e526ce4",
+        "packages/subprocess/subprocess/lib/index.js": "679e514028454cdef67adeb362e99a18e8efb7ca281857cf7868fc26d4821f6c",
+        "packages/util/timeout/lib/index.js": "744fdb4f79c8d513c6d4014a018949cfb2f02f4dde4621167302c5467c3994ec",
+        "vendor/cordis/lib/index.js": "1729cdbf8ee40b17c8839e06bf96491490548559e11ef7e411271e0754e751c5",
+        "vendor/cosmokit/lib/index.js": "a024ad32ead85dd6708cedd5b56acacb578e048e8f71e78b20ed56053ac7beb4",
+        "vendor/schemastery/lib/index.mjs": "d23d1f48ea69800c68fc8be592f5d1074c9c764b22f35a1d40b84f5eab39ac00"
+      },
+      "root": "/home/swirky/DevHub/dsh-pinned-materialization-v0",
+      "schema_version": "pinned-dsh-generated-runtime-closure-v0r1"
+    },
+    "runtime_closure_match": true
+  },
+  "final_identity_gate": {
+    "codex": {
+      "binary": "/home/swirky/.local/bin/codex",
+      "codex_home": "/home/swirky/.codex",
+      "codex_home_present": true,
+      "matches": true,
+      "present": true,
+      "version_expected": "codex-cli 0.147.0",
+      "version_observed": "codex-cli 0.147.0"
+    },
+    "driver": {
+      "expected_blob": "64336748769ed8a4a4bf8a1f2f44d6e493568ab5",
+      "expected_sha256": "e29c1bb891e6ae2040dff1ac240e33dd84f1da34b5fdaa68dd437c097ced5b94",
+      "matches": true,
+      "path": "/home/swirky/DevHub/worktrees/QntyLab-pinned-dsh-codex-write-path-materialization-v0r1/experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_codex_app_server_write_path_diagnostic_v0/pinned_dsh_codex_route_driver_v0.mjs",
+      "present": true,
+      "sha256": "e29c1bb891e6ae2040dff1ac240e33dd84f1da34b5fdaa68dd437c097ced5b94"
+    },
+    "dsh": {
+      "commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+      "matches": true,
+      "present": true,
+      "root": "/home/swirky/DevHub/dsh-pinned-materialization-v0",
+      "tag": "dsh-v0.1.0-rc.7",
+      "tracked_modified_count": 0,
+      "tracked_modified_paths": [],
+      "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188"
+    },
+    "keys": {
+      "passed": true,
+      "presence": {
+        "ANTHROPIC_API_KEY": false,
+        "DEEPSEEK_API_KEY": false,
+        "OPENAI_API_KEY": false,
+        "OPENROUTER_API_KEY": false
+      }
+    },
+    "passed": true,
+    "reasons": []
+  },
+  "generated_at": "2026-08-19T13:29:21.549473Z",
+  "initial_evidence": {
+    "api_key_gate": {
+      "passed": true,
+      "presence": {
+        "ANTHROPIC_API_KEY": false,
+        "DEEPSEEK_API_KEY": false,
+        "OPENAI_API_KEY": false,
+        "OPENROUTER_API_KEY": false
+      }
+    },
+    "codex_identity": {
+      "binary": "/home/swirky/.local/bin/codex",
+      "codex_home": "/home/swirky/.codex",
+      "codex_home_present": true,
+      "matches": true,
+      "present": true,
+      "version_expected": "codex-cli 0.147.0",
+      "version_observed": "codex-cli 0.147.0"
+    },
+    "driver_identity": {
+      "expected_blob": "64336748769ed8a4a4bf8a1f2f44d6e493568ab5",
+      "expected_sha256": "e29c1bb891e6ae2040dff1ac240e33dd84f1da34b5fdaa68dd437c097ced5b94",
+      "matches": true,
+      "path": "/home/swirky/DevHub/worktrees/QntyLab-pinned-dsh-codex-write-path-materialization-v0r1/experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_codex_app_server_write_path_diagnostic_v0/pinned_dsh_codex_route_driver_v0.mjs",
+      "present": true,
+      "sha256": "e29c1bb891e6ae2040dff1ac240e33dd84f1da34b5fdaa68dd437c097ced5b94"
+    },
+    "dsh_identity": {
+      "commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+      "matches": true,
+      "present": true,
+      "root": "/home/swirky/DevHub/dsh-pinned-materialization-v0",
+      "tag": "dsh-v0.1.0-rc.7",
+      "tracked_modified_count": 0,
+      "tracked_modified_paths": [],
+      "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188"
+    },
+    "identity_gate": {
+      "passed": true,
+      "reasons": []
+    },
+    "materialization_binding": {
+      "lockfile_sha256_observed": "f517dc3978d57531cda747df62a2abdde1df5b9f25415fcf1fc5d51f8b7547ea",
+      "passed": true,
+      "reasons": [],
+      "record_sha256": "b90666de4cc7794864b778a93e1eea1219e11aaccce08d139514dbfd9d1397a7"
+    },
+    "node_version": "v22.22.0",
+    "passed": true,
+    "pnpm_version": "11.7.0",
+    "runtime_closure": {
+      "digest": "d354fd326bfba5fd51e4a6076a7573223224628c1d89266ecc66168742d30ec8",
+      "entrypoints": [
+        "vendor/cordis/lib/index.js",
+        "packages/subagent/subagent/lib/index.js",
+        "packages/subprocess/subprocess-local/lib/index.js",
+        "packages/subagent/subagent-codex/lib/index.js"
+      ],
+      "files": {
+        "packages/core/agent/lib/index.js": "e7e40c5ca66d9827a5084c5c0c68983f9685842bb9b6d604803d4cb4642bb263",
+        "packages/core/scope/lib/index.js": "2829df71d76e08941457d4dd173eac60783e55354921137c8b75e8b5c0d2ecca",
+        "packages/core/session/lib/index.js": "9270186b579bc8a4c6c53c256e4471d3f134e94308462c6a413a722e9c7556fb",
+        "packages/core/tools/lib/index.js": "47de95d14493dbd22d1a3ade14890fc99d7232db4e363f2190c9063b030dd029",
+        "packages/llm/llm/lib/index.js": "66ef669901973863a474e7bfc172d7cdc9cb13420f92c74104730dd6858afc1d",
+        "packages/sdk/protocol/lib/index.js": "371c38ca3514797d86df5f4bb78a56c40a2637294b83aababe8145bec6a20253",
+        "packages/subagent/subagent-codex/lib/index.js": "2b65fd97f345d346319423a40cb285026c263be565e29e5dce0872e4aa5aa72a",
+        "packages/subagent/subagent/lib/index.js": "510aba14f13d1a9deccf3d81d790be3e7ebcdc4797fcfa584908350d07c529c6",
+        "packages/subprocess/subprocess-local/lib/index.js": "e16ecbcce0fa3d60234a8a1ca3de80fa29d850ba1513bf9e8e6daa186e526ce4",
+        "packages/subprocess/subprocess/lib/index.js": "679e514028454cdef67adeb362e99a18e8efb7ca281857cf7868fc26d4821f6c",
+        "packages/util/timeout/lib/index.js": "744fdb4f79c8d513c6d4014a018949cfb2f02f4dde4621167302c5467c3994ec",
+        "vendor/cordis/lib/index.js": "1729cdbf8ee40b17c8839e06bf96491490548559e11ef7e411271e0754e751c5",
+        "vendor/cosmokit/lib/index.js": "a024ad32ead85dd6708cedd5b56acacb578e048e8f71e78b20ed56053ac7beb4",
+        "vendor/schemastery/lib/index.mjs": "d23d1f48ea69800c68fc8be592f5d1074c9c764b22f35a1d40b84f5eab39ac00"
+      },
+      "root": "/home/swirky/DevHub/dsh-pinned-materialization-v0",
+      "schema_version": "pinned-dsh-generated-runtime-closure-v0r1"
+    },
+    "runtime_closure_frozen_match": true
+  },
+  "live_attempt": {
+    "changed_paths": [],
+    "descendant_samples_taken": 449,
+    "driver_argv": [
+      "node",
+      "/home/swirky/DevHub/worktrees/QntyLab-pinned-dsh-codex-write-path-materialization-v0r1/experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_codex_app_server_write_path_diagnostic_v0/pinned_dsh_codex_route_driver_v0.mjs"
+    ],
+    "ended_at": "2026-08-19T13:29:21.547825Z",
+    "fixture_after": {
+      "byte_length": 7,
+      "class": "BEFORE",
+      "present": true,
+      "sha256": "be9351741a8155d01fd028d158546f1005e73ceeb0bb2d093335feac4144e450"
+    },
+    "fixture_before": {
+      "byte_length": 7,
+      "class": "BEFORE",
+      "present": true,
+      "sha256": "be9351741a8155d01fd028d158546f1005e73ceeb0bb2d093335feac4144e450"
+    },
+    "hard_timeout_seconds": 300.0,
+    "observed_descendant_processes": [
+      {
+        "argv": [
+          "/home/swirky/.codex/packages/standalone/releases/0.147.0-x86_64-unknown-linux-musl/bin/codex-code-mode-host"
+        ],
+        "depth": 2,
+        "first_seen": "2026-08-19T13:29:02.161157Z"
+      },
+      {
+        "argv": [
+          "/home/swirky/.nvm/versions/node/v22.22.0/bin/node",
+          "/home/swirky/.npm/_npx/15c61037b1978c83/node_modules/chrome-devtools-mcp/build/src/telemetry/watchdog/main.js",
+          "--parent-pid=2049211",
+          "--app-version=1.7.0",
+          "--os-type=3"
+        ],
+        "depth": 5,
+        "first_seen": "2026-08-19T13:28:54.014021Z"
+      },
+      {
+        "argv": [
+          "/usr/bin/zsh",
+          "-c",
+          "set -e; . \"/home/swirky/.codex/shell_snapshots/01a01a35-dce5-7df3-99d0-829f7045a6a7.tmp-1787146132806011683\""
+        ],
+        "depth": 2,
+        "first_seen": "2026-08-19T13:28:53.308556Z"
+      },
+      {
+        "argv": [
+          "/usr/bin/zsh",
+          "-lc",
+          "if [[ -n \"$ZDOTDIR\" ]]; then\n  rc=\"$ZDOTDIR/.zshrc\"\nelse\n  rc=\"$HOME/.zshrc\"\nfi\n[[ -r \"$rc\" ]] && . \"$rc\"\nprint '# Snapshot file'\nprint '# Unset all aliases to avoid conflicts with functions'\nprint 'unalias -a 2>/dev/null || true'\nprint '# Functions'\nfunctions\nprint ''\nsetopt_count=$(setopt | wc -l | tr -d ' ')\nprint \"# setopts $setopt_count\"\nsetopt | sed 's/^/setopt /'\nprint ''\nalias_count=$(alias -L | wc -l | tr -d ' ')\nprint \"# aliases $alias_count\"\nalias -L\nprint ''\nexport_lines=$(export -p | awk '\n/^(export|declare -x|typeset -x) / {\n  line=$0\n  name=line\n  sub(/^(export|declare -x|typeset -x) /, \"\", name)\n  if (name ~ /^-[A-Za-z]*r[A-Za-z]* /) {\n    next\n  }\n  if (name ~ /^-[A-Za-z]*T[A-Za-z]* /) {\n    sub(/^-[A-Za-z]*T[A-Za-z]* /, \"\", name)\n    sub(/ [A-Za-z_][A-Za-z0-9_]*=.*/, \"\", name)\n  }\n  sub(/=.*/, \"\", name)\n  if (name ~ /^(PWD|OLDPWD)$/) {\n    next\n  }\n  if (name ~ /^[A-Za-z_][A-Za-z0-9_]*$/) {\n    print line\n  }\n}')\nexport_count=$(printf '%s\\n' \"$export_lines\" | sed '/^$/d' | wc -l | tr -d ' ')\nprint \"# exports $export_count\"\nif [[ -n \"$export_lines\" ]]; then\n  print -r -- \"$export_lines\"\nfi\n"
+        ],
+        "depth": 2,
+        "first_seen": "2026-08-19T13:28:52.829432Z"
+      },
+      {
+        "argv": [
+          "bwrap",
+          "--new-session",
+          "--die-with-parent",
+          "--ro-bind",
+          "/",
+          "/",
+          "--dev",
+          "/dev",
+          "--unshare-user",
+          "--unshare-pid",
+          "--unshare-net",
+          "--proc",
+          "/proc",
+          "--argv0",
+          "codex-linux-sandbox",
+          "--",
+          "/home/swirky/.codex/packages/standalone/releases/0.147.0-x86_64-unknown-linux-musl/bin/codex",
+          "--sandbox-policy-cwd",
+          "/tmp/qntylab-pinned-dsh-d4-v0r1-bmd8bjay/d4",
+          "--command-cwd",
+          "/tmp/qntylab-pinned-dsh-d4-v0r1-bmd8bjay/d4",
+          "--permission-profile",
+          "{\"type\":\"managed\",\"file_system\":{\"type\":\"restricted\",\"entries\":[{\"path\":{\"type\":\"special\",\"value\":{\"kind\":\"root\"}},\"access\":\"read\"}]},\"network\":\"restricted\"}",
+          "--apply-seccomp-then-exec",
+          "--",
+          "/home/swirky/.codex/packages/standalone/releases/0.147.0-x86_64-unknown-linux-musl/bin/codex",
+          "--codex-run-as-fs-helper"
+        ],
+        "depth": 2,
+        "first_seen": "2026-08-19T13:29:06.044409Z"
+      },
+      {
+        "argv": [
+          "chrome-devtools-mcp"
+        ],
+        "depth": 4,
+        "first_seen": "2026-08-19T13:28:53.574974Z"
+      },
+      {
+        "argv": [
+          "codex",
+          "app-server",
+          "--stdio"
+        ],
+        "depth": 1,
+        "first_seen": "2026-08-19T13:28:52.152757Z"
+      },
+      {
+        "argv": [
+          "node",
+          "/home/swirky/.npm/_npx/9833c18b2d85bc59/node_modules/.bin/playwright-mcp"
+        ],
+        "depth": 4,
+        "first_seen": "2026-08-19T13:28:53.654968Z"
+      },
+      {
+        "argv": [
+          "node",
+          "/home/swirky/.npm/_npx/eea2bd7412d4593b/node_modules/.bin/context7-mcp"
+        ],
+        "depth": 4,
+        "first_seen": "2026-08-19T13:28:53.654957Z"
+      },
+      {
+        "argv": [
+          "node",
+          "/home/swirky/.nvm/versions/node/v22.22.0/bin/npx",
+          "-y",
+          "@playwright/mcp@latest"
+        ],
+        "depth": 2,
+        "first_seen": "2026-08-19T13:28:52.964317Z"
+      },
+      {
+        "argv": [
+          "node",
+          "/home/swirky/.nvm/versions/node/v22.22.0/bin/npx",
+          "-y",
+          "chrome-devtools-mcp@latest"
+        ],
+        "depth": 2,
+        "first_seen": "2026-08-19T13:28:52.964320Z"
+      },
+      {
+        "argv": [
+          "node",
+          "/home/swirky/.nvm/versions/node/v22.22.0/bin/npx",
+          "-y",
+          "ruflo@latest",
+          "mcp",
+          "start"
+        ],
+        "depth": 2,
+        "first_seen": "2026-08-19T13:28:52.964326Z"
+      },
+      {
+        "argv": [
+          "npm"
+        ],
+        "depth": 2,
+        "first_seen": "2026-08-19T13:28:52.964323Z"
+      },
+      {
+        "argv": [
+          "npm exec @playwright/mcp@latest"
+        ],
+        "depth": 2,
+        "first_seen": "2026-08-19T13:28:53.037038Z"
+      },
+      {
+        "argv": [
+          "npm exec @upstash/context7-mcp"
+        ],
+        "depth": 2,
+        "first_seen": "2026-08-19T13:28:53.037045Z"
+      },
+      {
+        "argv": [
+          "npm exec chrome-devtools-mcp@latest"
+        ],
+        "depth": 2,
+        "first_seen": "2026-08-19T13:28:53.171018Z"
+      },
+      {
+        "argv": [
+          "npm exec ruflo@latest mcp start"
+        ],
+        "depth": 2,
+        "first_seen": "2026-08-19T13:28:53.037049Z"
+      },
+      {
+        "argv": [
+          "sh",
+          "-c",
+          "chrome-devtools-mcp"
+        ],
+        "depth": 3,
+        "first_seen": "2026-08-19T13:28:53.574972Z"
+      },
+      {
+        "argv": [
+          "sh",
+          "-c",
+          "context7-mcp"
+        ],
+        "depth": 3,
+        "first_seen": "2026-08-19T13:28:53.654951Z"
+      },
+      {
+        "argv": [
+          "sh",
+          "-c",
+          "playwright-mcp"
+        ],
+        "depth": 3,
+        "first_seen": "2026-08-19T13:28:53.654963Z"
+      },
+      {
+        "argv": [
+          "tail",
+          "-1"
+        ],
+        "depth": 5,
+        "first_seen": "2026-08-19T13:28:53.037063Z"
+      }
+    ],
+    "receipt": {
+      "apiKeyPresence": {
+        "ANTHROPIC_API_KEY": false,
+        "DEEPSEEK_API_KEY": false,
+        "OPENAI_API_KEY": false,
+        "OPENROUTER_API_KEY": false
+      },
+      "bridgeExitCode": 0,
+      "endedAt": "2026-08-19T13:29:21.527Z",
+      "error": null,
+      "lifecycle": {
+        "ends": [
+          {
+            "stopReason": "error"
+          }
+        ]
+      },
+      "observed": {
+        "childEnvKeys": [
+          "CODEX_HOME",
+          "PATH"
+        ],
+        "codexHome": "/home/swirky/.codex",
+        "dshRoot": "/home/swirky/DevHub/dsh-pinned-materialization-v0",
+        "pathPrefix": "/home/swirky/.local/bin",
+        "promptSha256": "5998d2259d56942c071536866262fa7a7b72c1780ae41137b8e0de1aafef8683",
+        "providerName": "codex",
+        "requestedCwd": "/tmp/qntylab-pinned-dsh-d4-v0r1-bmd8bjay/d4"
+      },
+      "output": "NO_AGENT_OUTPUT",
+      "outputPartCount": 0,
+      "parentLlmProvider": "NONE",
+      "parentLlmRequestCount": 0,
+      "processes": [
+        {
+          "signal": "SIGTERM"
+        }
+      ],
+      "route": "D4_PINNED_DSH_CODEX_PROVIDER",
+      "startedAt": "2026-08-19T13:28:52.081Z",
+      "status": "FAIL_CLOSED",
+      "stderrSha256": "edcf57d7d83b3453d58d557e1b1f8868446d9d0f6a1fa95a443a1862ad3d0abb",
+      "stdoutSha256": "f64479c55179ad4089ea3fb63ba090f09d5913b623d6a312397c0cf92199fe10",
+      "timedOut": false
+    },
+    "started_at": "2026-08-19T13:28:51.574173Z",
+    "transport": {
+      "api_key_presence": {
+        "ANTHROPIC_API_KEY": false,
+        "DEEPSEEK_API_KEY": false,
+        "OPENAI_API_KEY": false,
+        "OPENROUTER_API_KEY": false
+      },
+      "bridge_exit_code": 0,
+      "receipt_parse_reason": null,
+      "receipt_parse_state": "D4_ROUTE_OBJECT_FOUND",
+      "state": "DRIVER_EXITED",
+      "stderr_sha256": "edcf57d7d83b3453d58d557e1b1f8868446d9d0f6a1fa95a443a1862ad3d0abb",
+      "stdout_sha256": "f64479c55179ad4089ea3fb63ba090f09d5913b623d6a312397c0cf92199fe10",
+      "wall_clock_exceeded": false
+    }
+  },
+  "materialization_record_sha256": "b90666de4cc7794864b778a93e1eea1219e11aaccce08d139514dbfd9d1397a7",
+  "max_live_attempts": 1,
+  "one_episode_crash_safe": true,
+  "phase_id": "PINNED_DSH_CODEX_WRITE_PATH_MATERIALIZATION_V0R1",
+  "product_config_modified": false,
+  "product_config_sha256_after": "1b0ede03a47c4ddb89bbeb4be727d0ffebfcb73a90a7b2d7f65d548db46f2448",
+  "profile_observation": {
+    "auth_api_key_slot_populated": false,
+    "auth_key_names": [
+      "OPENAI_API_KEY",
+      "auth_mode",
+      "last_refresh",
+      "tokens"
+    ],
+    "auth_mode": "chatgpt",
+    "codex_home": "/home/swirky/.codex",
+    "config_present": true,
+    "config_sha256_before": "1b0ede03a47c4ddb89bbeb4be727d0ffebfcb73a90a7b2d7f65d548db46f2448",
+    "mcp_servers": [
+      "chrome-devtools",
+      "cloudflare-api",
+      "context7",
+      "linear",
+      "mempalace",
+      "openaiDeveloperDocs",
+      "playwright",
+      "ruflo",
+      "sentry",
+      "supabase"
+    ],
+    "model": "gpt-5.6-luna",
+    "policy_note": "DSH's codex provider sends only {cwd, ephemeral} on thread/start; no approvalPolicy or sandboxPolicy is requested on this route.",
+    "subscription_backed": true,
+    "workspace": "/tmp/qntylab-pinned-dsh-d4-v0r1-bmd8bjay/d4",
+    "workspace_trusted": false
+  },
+  "retries_used": 0,
+  "route_marker": "D4_PINNED_DSH_CODEX_PROVIDER",
+  "runtime_bytes_verified_at_final_execution_gate": true,
+  "schema_version": "pinned-dsh-codex-write-path-d4-receipt-v0r1",
+  "source_materialization_record_sha256": "5ff19d10774c28d813c0f90d4daf26d15724f6f68e61eb03bcefdebb739bd3bc",
+  "verdict": "PINNED_DSH_CODEX_WRITE_PATH_V0R1_FAIL"
+}

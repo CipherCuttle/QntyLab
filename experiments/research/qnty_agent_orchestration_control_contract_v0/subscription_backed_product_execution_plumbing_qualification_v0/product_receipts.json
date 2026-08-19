@@ -1,0 +1,43 @@
+{
+  "schema_version": "subscription-backed-product-execution-plumbing-product-receipts-v0",
+  "receipt_policy": "sanitized; raw private logs and credentials omitted",
+  "live_batch_started": true,
+  "live_batch_completed": false,
+  "termination": "USER_INTERRUPTED_AFTER_NATIVE_REPAIR_STALL",
+  "observed_progress": [
+    "DSH_BUILDER_INVOCATION",
+    "NATIVE_BUILDER_INVOCATION",
+    "REAL_TEST_STAGE_INVOCATION",
+    "DSH_REVIEWER_INVOCATION",
+    "NATIVE_REVIEWER_INVOCATION",
+    "DSH_REPAIR_INVOCATION",
+    "NATIVE_REPAIR_INVOCATION_STALLED"
+  ],
+  "arms": {
+    "DSH": {
+      "builder": {"write_pass": "NO", "files_changed": [], "evidence": "workspace remained BEFORE/BROKEN; raw bridge receipt was not sealed before batch interruption"},
+      "reviewer": {"parse_pass": "NOT_ESTABLISHED", "receipt": "NOT_SEALED"},
+      "repair": {"write_pass": "NOT_ESTABLISHED", "receipt": "NOT_SEALED"},
+      "verifier": {"parse_pass": "NOT_RUN", "receipt": "NOT_SEALED"},
+      "product_errors": "NOT_ESTABLISHED",
+      "rate_limit_events": "NOT_ESTABLISHED"
+    },
+    "NATIVE": {
+      "builder": {"write_pass": "NO", "files_changed": [], "termination": "900_SECOND_BRIDGE_TIMEOUT", "evidence": "workspace remained BEFORE/BROKEN"},
+      "reviewer": {"parse_pass": "NOT_ESTABLISHED", "receipt": "NOT_SEALED"},
+      "repair": {"write_pass": "NO", "termination": "STALL_INTERRUPTED_BEFORE_RECEIPT", "receipt": "NOT_SEALED"},
+      "verifier": {"parse_pass": "NOT_RUN", "receipt": "NOT_SEALED"},
+      "product_errors": "NOT_ESTABLISHED",
+      "rate_limit_events": "NOT_ESTABLISHED"
+    }
+  },
+  "workspace_observation": {
+    "dsh_final_expected_files": false,
+    "native_final_expected_files": false,
+    "unauthorized_product_writes_observed": 0,
+    "only_extra_files": "pytest __pycache__ artifacts from the real test command"
+  },
+  "credential_gate": {"OPENAI_API_KEY": false, "ANTHROPIC_API_KEY": false, "DEEPSEEK_API_KEY": false, "OPENROUTER_API_KEY": false},
+  "dsh_parent_llm_provider": "NONE",
+  "dsh_parent_llm_request_count": 0
+}

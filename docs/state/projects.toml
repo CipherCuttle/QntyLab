@@ -3924,3 +3924,49 @@ trading_authorized = false
 capital_authorized = false
 api_keys_used = false
 next_action = "STOP NATIVE QUALIFICATION PLUMBING. Preserve the consumed V0R2 live evidence and closure wording; writableRoots=[] and contract_match=false are not supported as causal explanations of TURN_START_FAILED. The canonical qualification result is BLOCKED because no successful Builder turn was established and Reviewer/Verifier were not run. PR #135 already provides positive native Codex write-path evidence. Do not rerun, rescue V0R2, create V0R3, create or authorize Stage-A V2, access market data, perform scientific evaluation, invoke Qnty runtime, trade, use capital, or merge. Return control for a separate North-Star / Stage-A decision."
+
+[[project]]
+project_id = "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_PREREGISTRATION_V0"
+display_name = "Funding-pressure incremental forecast-value preregistration V0"
+state = "CLOSED_PASS"
+authority_level = "OUTCOME_BLIND_EXPLORATORY_PREREGISTRATION_ONLY"
+phase_type = "SCIENTIFIC_DESIGN_AND_PREREGISTRATION_ONLY"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/preregistration.json",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/design_note.md",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/hostile_review.md",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/ledger_candidate_proposal.json",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/ledger_decision.json",
+  "qntylab/jigsaw_funding_pressure_incremental_forecast_value_prereg_v0.py",
+  "tests/test_jigsaw_funding_pressure_incremental_forecast_value_prereg_v0.py",
+  "experiments/research/candidates.jsonl",
+  "experiments/research/decisions.jsonl"
+]
+canonical_master_sha = "059a5b1fd00b74158e3cb2bd6abf956f0985dbd6"
+parent_project_id = "JIGSAW_FUNDING_PRESSURE_VOLATILITY_FROZEN_RESULT_RECORDING_V0"
+parent_candidate_id = "CANDIDATE_FUNDING_PRESSURE_INCREMENTAL_RV_FORECAST_VALUE_V0"
+selected_architecture = "A_EXPLORATORY_610_INCREMENTAL_FORECAST_TEST"
+prior_outcome_exposure = true
+independent_confirmation_claimed = false
+materiality_gate = "NONE_JUSTIFIABLE"
+execution_authorized = false
+market_data_accessed = false
+new_funding_acquired = false
+new_outcomes_accessed = false
+scientific_execution_performed = false
+order_flow_reopened = false
+jh01_operation_ledger_accessed = false
+router_authorized = false
+qnty_authorized = false
+trading_authorized = false
+capital_authority = "NONE"
+implementation_authorized = false
+active_project_after_closure = "NONE"
+hostile_review_count = 1
+hostile_review_verdict = "PASS"
+hostile_review_critical = 0
+hostile_review_high = 0
+targeted_rereview_used = false
+next_action = "CLOSED_PASS: preregistration is frozen at A_EXPLORATORY_610_INCREMENTAL_FORECAST_TEST and remains PREREGISTERED_NOT_EXECUTED. Any evaluation requires separate Git-backed authorization; no execution, data acquisition, outcome access, Order Flow reopening, JH01 ledger access, Router, Qnty, trading, or capital authority follows."

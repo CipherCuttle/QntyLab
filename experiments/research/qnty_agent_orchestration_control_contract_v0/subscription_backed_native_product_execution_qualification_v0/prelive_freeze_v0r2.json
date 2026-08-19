@@ -1,0 +1,71 @@
+{
+  "binary_hashes": {
+    "/home/swirky/.local/bin/codex": "cb0a15567e9a60a5820d54b0f6ae86d504dc3805c1eab21a47f70e3eb7b73a40",
+    "/usr/bin/claude": "98226474f802e3094d6a86c5ade8883c16206d0fcb5c400b7401c800063e99d7"
+  },
+  "canonical_parent_master": "5490d3f213bb1dc1b8fde86fe1cd464d09ddbead",
+  "fixture_hashes": {
+    "before_sha256": "be9351741a8155d01fd028d158546f1005e73ceeb0bb2d093335feac4144e450",
+    "target_sha256": "f72c713b7b432dd18949ca10f1be6dbcf493479945653609d1c715b2d8d74356"
+  },
+  "freeze_record_parent_required": true,
+  "frozen_at": "2026-08-19T16:30:19Z",
+  "hashes": {
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/claude_reviewer_driver_v0.py": "34527448cbbb0b66834a0cb633c1a9c083dc6de600723ea846276f1bd9864c95",
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/native_codex_role_driver_v0.py": "c1ef3880e5ea87a16cd74a2c11a5c56bf1ee47b068e0f97553af061f768e613e",
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/prompts/builder.txt": "1f6aee38a3b1c12a255a24e501ceaf40353f2ff6d26b557e4cfbda418fcbaae4",
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/prompts/reviewer.txt": "d09e73ff2fe8c04d408faf0d17b5451e7a9d2e445367a8c9ac9398db0e340393",
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/prompts/verifier.txt": "5ad3fd2a356ae04435d486128c79bb4c60ef9773f23d7dc5427de17cb45912c0",
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/qualification_contract.json": "9910d4ae6ec341ff829969e3fcd0b1012798aeea87fcc41a63d73d1a3f734414",
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/qualification_controller_v0.py": "9e3cda86d45a6f7bf74ff7b0dd0dcd6e5ca8693bf92c4e1e3e7e5000c6cf537e",
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/run_qualification_batch_v0.py": "8ce3fbc60b58dd9d38b2d74a5861a07718c5bb4debe9375a48ebb97ffb12f0f4",
+    "qntylab/__init__.py": "140c007e66d933a0f2ef22600d890715025903e48d1a7101e9b7469349811f44",
+    "qntylab/subscription_backed_codex_app_server_write_path_diagnostic_v0.py": "6fef9c8c369e278c1133e5c5f772a942690bb63ed0f91e2ec5fe1c1e0edc11b0",
+    "qntylab/subscription_backed_native_product_execution_qualification_v0.py": "cc18d78782ba46152042bfbcb6f2dddeba2bd5a03e69552d1f98da48a2151160",
+    "qntylab/subscription_backed_product_execution_plumbing_v0.py": "8a3e5e0cf02b480fac80fcdc9423bd93a85184afce5be014a5faba9cbb99ed54"
+  },
+  "open_critical": 0,
+  "open_high": 0,
+  "prelive_sha": "d73fa1da442da50a03f9de50bb5671fb0408a83a",
+  "prelive_tree": "fa4b5ae62d2e246ea337c92af3220b226f12f5a7",
+  "product_identity": {
+    "claude": {
+      "authentication_mode": "FIRST_PARTY_CLAUDE_AI_PRO_SUBSCRIPTION",
+      "binary": "/usr/bin/claude",
+      "subscription_backed": true,
+      "version": "2.1.223 (Claude Code)"
+    },
+    "codex": {
+      "authentication_mode": "CHATGPT_LOGIN",
+      "binary": "/home/swirky/.local/bin/codex",
+      "profile_a": "/home/swirky/.codex",
+      "profile_b": "/home/swirky/.codex-pro2",
+      "subscription_backed": true,
+      "version": "codex-cli 0.147.0"
+    }
+  },
+  "project_id": "SUBSCRIPTION_BACKED_NATIVE_PRODUCT_EXECUTION_QUALIFICATION_V0R2",
+  "qntyagenteval": "NO_MATCH",
+  "review": {
+    "critical_high_fix_pass_used": false,
+    "independent_hostile_review": {
+      "critical": 0,
+      "high": 0,
+      "low": 0,
+      "medium": 0
+    },
+    "open_critical": 0,
+    "open_high": 0,
+    "process_exit_schema_digest": "b79f58eb67b9052f9deaf6ca89a4f998fe8d4b295f33289c97167bd97cc8f870",
+    "targeted_rereview_used": false,
+    "timeout_schema_digest": "f1c73f48df2e46ccb36d1b7c752355906c98bce8e7bfdbbc6e133bb1e3987de7"
+  },
+  "schema_version": "subscription-backed-native-product-prelive-freeze-v0r2",
+  "timeouts_seconds": {
+    "BUILDER": 180,
+    "INDEPENDENT_REVIEWER": 180,
+    "VERIFIER": 180,
+    "codex_handshake": 60,
+    "process_disposal_grace": 10
+  }
+}

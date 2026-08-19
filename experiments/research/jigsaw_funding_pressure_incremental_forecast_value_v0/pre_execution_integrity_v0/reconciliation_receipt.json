@@ -1,0 +1,262 @@
+{
+  "artifact_type": "FUNDING_INCREMENTAL_PRE_EXECUTION_INTEGRITY_RECONCILIATION",
+  "authority_level": "OUTCOME_BLIND_PRE_EXECUTION_INTEGRITY_VERIFICATION_ONLY",
+  "capital_authority": "NONE",
+  "data_acquisition_authorized": false,
+  "downstream_authority": "NONE",
+  "historical_provenance": {
+    "authentication_source": "IMMUTABLE_GIT_BLOB_AT_FROZEN_BASELINE_ANCESTORS",
+    "current_materializer_laundered_into_history": false,
+    "frozen_baseline_digest": "sha256:902be2246b64d133e0f22dd71c04eba344d12ead659e5f57c69183ab92f878d9",
+    "frozen_baseline_mutated": false,
+    "historical_materializer_identity_authenticated": true,
+    "materializers": [
+      {
+        "authenticated_against": [
+          "98e9dbcbec5dab18f7498cf4c5df77e14a8d5569",
+          "3e54cb86cdc43c76c1cbf72acc4dfebecb6b10fa"
+        ],
+        "current_worktree_sha256": "e2b9c7d99aa8f1743e2b93603551b53e7981b732a4c2c4c1e088bc19d3b87cbc",
+        "diverged_from_current_worktree": false,
+        "frozen_historical_sha256": "e2b9c7d99aa8f1743e2b93603551b53e7981b732a4c2c4c1e088bc19d3b87cbc",
+        "relative_path": "qntylab/binance_um_funding_settlement.py"
+      },
+      {
+        "authenticated_against": [
+          "98e9dbcbec5dab18f7498cf4c5df77e14a8d5569",
+          "3e54cb86cdc43c76c1cbf72acc4dfebecb6b10fa"
+        ],
+        "current_worktree_sha256": "10ec8bad1290cc102db835fa6cce49d501dd629c42e9e48c4084e74a853757d8",
+        "diverged_from_current_worktree": true,
+        "frozen_historical_sha256": "e5a333f3ce08bb95fa7ef6144fffc672cf14ddf2226dc74817db62beb987cdfa",
+        "relative_path": "qntylab/binance_um_kline_1h.py"
+      }
+    ]
+  },
+  "implementation_identity": {
+    "artifact_digests": {
+      "implementation_v0/execution_semantics_v0.json": "66000949a064fb913b2a61bcf716304ff324bb58e56602471a726fcbb1a7ccc4",
+      "implementation_v0/implementation_authority.json": "ec4862896d7065ee5957f2fc3fbb8abce30ccd1cdee7cae2046a801d5032c296",
+      "implementation_v0/implementation_manifest.json": "748c74c2cf039dab287a4b336f0443180202cc3545d1100d6ddc9532887b5fd3",
+      "implementation_v0/origin_schedule.json": "220eda6dc41b66820d6e1de31ed4023dcd11ec75ee713ea9d8fa9d1e74233d3a",
+      "implementation_v0/source_binding.json": "9961d086b4c029f52d7840f1abfe200c0d37c6ff7368b81a14b067ae237db7ba",
+      "implementation_v0/synthetic_validation.json": "a882cfecc07bc6fc3bbb3d3f6a693e557918dac4d8795e7bc0d155c82d7011aa",
+      "preregistration.json": "42b96afae80e55611bcd9786169050520525fbc5534b9f94c72ed867380ba9cf"
+    },
+    "evaluation_origin_count": 244,
+    "execution_semantics_sha256": "66000949a064fb913b2a61bcf716304ff324bb58e56602471a726fcbb1a7ccc4",
+    "executor_sha256": "b894d4d9316bed6f8c4f7171b32692aff7b1f0eb32abd686a33fdb38425a7490",
+    "executor_test_sha256": "7de2bd14b2997b5aee9f8820b54a1819b8423da5b55d362a8ab7b0bb95bb6d30",
+    "foundation_v0_sha256": "834964137e4f2b77ab12a1d454f8ba8da9d71330e0806d00d1d2e26f113c980c",
+    "frozen_implementation_sha": "f6f12994d65c3dfeaf7839de560e58ad99547c62",
+    "governing_preregistration_digest": "d7ec718ab14e73d2aea24749a22caa2921fd81b8a336e2f2eaffb30ae1e992ef",
+    "implementation_authority_sha256": "ec4862896d7065ee5957f2fc3fbb8abce30ccd1cdee7cae2046a801d5032c296",
+    "implementation_identity_bound": true,
+    "implementation_manifest_sha256": "748c74c2cf039dab287a4b336f0443180202cc3545d1100d6ddc9532887b5fd3",
+    "origin_schedule_sha256": "220eda6dc41b66820d6e1de31ed4023dcd11ec75ee713ea9d8fa9d1e74233d3a",
+    "source_binding_sha256": "9961d086b4c029f52d7840f1abfe200c0d37c6ff7368b81a14b067ae237db7ba",
+    "source_digests": {
+      "qntylab/jigsaw_funding_pressure_execution_foundation_v0.py": "834964137e4f2b77ab12a1d454f8ba8da9d71330e0806d00d1d2e26f113c980c",
+      "qntylab/jigsaw_funding_pressure_execution_v2.py": "d603e747952d31d1fa87df463b9c739bc495a4e94597c2be0f93c02c678fbbc6",
+      "qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py": "b894d4d9316bed6f8c4f7171b32692aff7b1f0eb32abd686a33fdb38425a7490",
+      "tests/test_jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py": "7de2bd14b2997b5aee9f8820b54a1819b8423da5b55d362a8ab7b0bb95bb6d30"
+    },
+    "synthetic_validation_sha256": "a882cfecc07bc6fc3bbb3d3f6a693e557918dac4d8795e7bc0d155c82d7011aa",
+    "v2_sha256": "d603e747952d31d1fa87df463b9c739bc495a4e94597c2be0f93c02c678fbbc6"
+  },
+  "next_action": "Separately create an exact one-shot scientific execution authorization bound to the frozen preregistration digest d7ec718ab14e73d2aea24749a22caa2921fd81b8a336e2f2eaffb30ae1e992ef, the frozen executor b894d4d9316bed6f8c4f7171b32692aff7b1f0eb32abd686a33fdb38425a7490, the authenticated historical evidence identity, the exact 20-member ordered panel, the 244-origin schedule, and the frozen numerical runtime contract. This reconciliation does not create, imply, or contain that authorization.",
+  "numerical_runtime_preflight": {
+    "evaluation_origins_consumed": 0,
+    "frozen_algorithm_modified": false,
+    "frozen_synthetic_result_digest": "sha256:1fca55ebdbe5c4d5b835cb65f87930755d231449c924eae912b522bd04b53ea2",
+    "hostile_ambient_contexts_absorbed": 24,
+    "hostile_ambient_contexts_tested": 24,
+    "m01_discharged": true,
+    "mode": "SYNTHETIC_VALIDATION",
+    "real_outcome_accessed": false,
+    "replay_stable": true,
+    "runtime_contract": {
+      "Emax": 999999,
+      "Emin": -999999,
+      "algorithm_modified": false,
+      "capitals": 1,
+      "clamp": 0,
+      "constructed_from": "MODULE_LITERALS_NOT_DECIMAL_DEFAULTCONTEXT",
+      "context_identity": "DECIMAL_PREC_28_ROUND_HALF_EVEN_DEFAULT_TRAPS_LITERAL",
+      "frozen_executor_sha256": "b894d4d9316bed6f8c4f7171b32692aff7b1f0eb32abd686a33fdb38425a7490",
+      "prec": 28,
+      "rationale": "The frozen executor computes every contract-visible quantity in exact rational arithmetic or inside an explicit localcontext. Its only ambient-context arithmetic is the M-01 precision guard, which sizes working precision on top of a fixed 30-digit margin. Pinning the ambient context makes the guard's size, and any ambient trap behaviour, an input of the frozen runtime rather than of the caller.",
+      "rounding": "ROUND_HALF_EVEN",
+      "traps": [
+        "InvalidOperation",
+        "DivisionByZero",
+        "Overflow"
+      ]
+    },
+    "silent_divergences": 0,
+    "synthetic_runtime_preflight": "PASS",
+    "unwrapped_behaviour": [
+      {
+        "ambient_context": "prec=1,rounding=ROUND_UP",
+        "outcome": "IDENTICAL"
+      },
+      {
+        "ambient_context": "prec=1,rounding=ROUND_FLOOR",
+        "outcome": "IDENTICAL"
+      },
+      {
+        "ambient_context": "prec=1,rounding=ROUND_CEILING",
+        "outcome": "IDENTICAL"
+      },
+      {
+        "ambient_context": "prec=1,rounding=ROUND_05UP",
+        "outcome": "IDENTICAL"
+      },
+      {
+        "ambient_context": "prec=2,rounding=ROUND_UP",
+        "outcome": "IDENTICAL"
+      },
+      {
+        "ambient_context": "prec=2,rounding=ROUND_FLOOR",
+        "outcome": "IDENTICAL"
+      },
+      {
+        "ambient_context": "prec=2,rounding=ROUND_CEILING",
+        "outcome": "IDENTICAL"
+      },
+      {
+        "ambient_context": "prec=2,rounding=ROUND_05UP",
+        "outcome": "IDENTICAL"
+      },
+      {
+        "ambient_context": "prec=7,rounding=ROUND_UP",
+        "outcome": "IDENTICAL"
+      },
+      {
+        "ambient_context": "prec=7,rounding=ROUND_FLOOR",
+        "outcome": "IDENTICAL"
+      },
+      {
+        "ambient_context": "prec=7,rounding=ROUND_CEILING",
+        "outcome": "IDENTICAL"
+      },
+      {
+        "ambient_context": "prec=7,rounding=ROUND_05UP",
+        "outcome": "IDENTICAL"
+      },
+      {
+        "ambient_context": "prec=300,rounding=ROUND_UP",
+        "outcome": "IDENTICAL"
+      },
+      {
+        "ambient_context": "prec=300,rounding=ROUND_FLOOR",
+        "outcome": "IDENTICAL"
+      },
+      {
+        "ambient_context": "prec=300,rounding=ROUND_CEILING",
+        "outcome": "IDENTICAL"
+      },
+      {
+        "ambient_context": "prec=300,rounding=ROUND_05UP",
+        "outcome": "IDENTICAL"
+      },
+      {
+        "ambient_context": "prec=9,trap=Inexact",
+        "outcome": "FAILED_CLOSED:Inexact"
+      },
+      {
+        "ambient_context": "prec=9,trap=Rounded",
+        "outcome": "FAILED_CLOSED:Rounded"
+      },
+      {
+        "ambient_context": "prec=9,trap=Subnormal",
+        "outcome": "IDENTICAL"
+      },
+      {
+        "ambient_context": "prec=9,trap=Clamped",
+        "outcome": "IDENTICAL"
+      },
+      {
+        "ambient_context": "prec=9,trap=Underflow",
+        "outcome": "IDENTICAL"
+      },
+      {
+        "ambient_context": "prec=9,trap=FloatOperation",
+        "outcome": "IDENTICAL"
+      },
+      {
+        "ambient_context": "prec=9,Emin=-5,Emax=5",
+        "outcome": "IDENTICAL"
+      },
+      {
+        "ambient_context": "prec=1,all-nuisance-traps",
+        "outcome": "FAILED_CLOSED:Inexact"
+      }
+    ]
+  },
+  "outcome_firewall": {
+    "authorized_execution_modes": [
+      "SYNTHETIC_VALIDATION"
+    ],
+    "data_acquisition_performed": false,
+    "evaluation_origins_consumed": 0,
+    "frozen_evidence_mutated": false,
+    "jh01_modified": false,
+    "network_access_performed": false,
+    "order_flow_modified": false,
+    "preregistration_mutated": false,
+    "real_clark_west_computed": false,
+    "real_evaluation_outcome_access_performed": false,
+    "real_forecasts_computed": 0,
+    "real_mse_computed": false,
+    "real_p_value_computed": false,
+    "real_scientific_execution_performed": false,
+    "scientific_result_created": false,
+    "scientific_result_persisted": false
+  },
+  "panel_binding": {
+    "bound_to_preregistration_digest": "d7ec718ab14e73d2aea24749a22caa2921fd81b8a336e2f2eaffb30ae1e992ef",
+    "compared_sources": [
+      "implementation_v0.source_binding.exact_panel",
+      "jigsaw_funding_pressure_execution_v2.PANEL",
+      "jigsaw_funding_pressure_provenance_v0.PANEL",
+      "preregistration.feature_contract.panel"
+    ],
+    "exact_ordered_panel": [
+      "BCHUSDT",
+      "XRPUSDT",
+      "LTCUSDT",
+      "TRXUSDT",
+      "ETCUSDT",
+      "LINKUSDT",
+      "XLMUSDT",
+      "CHZUSDT",
+      "SANDUSDT",
+      "REEFUSDT",
+      "CHRUSDT",
+      "ALICEUSDT",
+      "ONEUSDT",
+      "API3USDT",
+      "GMTUSDT",
+      "APEUSDT",
+      "OPUSDT",
+      "INJUSDT",
+      "LDOUSDT",
+      "APTUSDT"
+    ],
+    "m02_discharged": true,
+    "panel_binding_established": true,
+    "panel_extras": 0,
+    "panel_member_count": 20,
+    "panel_omissions": 0,
+    "panel_order_mismatch": false,
+    "panel_substitution": false
+  },
+  "phase_id": "FUNDING_INCREMENTAL_PRE_EXECUTION_INTEGRITY_RECONCILIATION_V0",
+  "project_id": "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_PRE_EXECUTION_INTEGRITY_V0",
+  "qnty_authority": "NONE",
+  "real_evaluation_outcome_access_authorized": false,
+  "router_authority": "NONE",
+  "scientific_execution_authorized": false,
+  "trading_authority": "NONE"
+}

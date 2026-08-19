@@ -1,0 +1,84 @@
+{
+  "artifact_type": "FUNDING_INCREMENTAL_PRE_EXECUTION_INTEGRITY_ROOT_CAUSE",
+  "phase_id": "FUNDING_INCREMENTAL_PRE_EXECUTION_INTEGRITY_RECONCILIATION_V0",
+  "defect": "Canonical master failed the historical funding provenance baseline's materializer byte check.",
+  "failing_tests_before_repair": [
+    "tests/test_jigsaw_funding_pressure_provenance_v0.py::test_verify_baseline_end_to_end_orchestration",
+    "tests/test_jigsaw_funding_pressure_execution_foundation_v0.py::test_load_verified_frozen_evidence_end_to_end_structural"
+  ],
+  "failing_assertion": "materializer byte mismatch: qntylab/binance_um_kline_1h.py",
+  "shared_materializer": "qntylab/binance_um_kline_1h.py",
+  "frozen_historical_sha256": "e5a333f3ce08bb95fa7ef6144fffc672cf14ddf2226dc74817db62beb987cdfa",
+  "frozen_historical_blob": "e6d6b906b0ec6394c34d8d52945731227c62e19d",
+  "current_head_sha256": "10ec8bad1290cc102db835fa6cce49d501dd629c42e9e48c4084e74a853757d8",
+  "current_head_blob": "63c4f079bfe7a6244be0e29323ffa87daa65d3f5",
+  "introducing_commit": "2167a3b",
+  "changing_commit": "d1a327a902b410e806cffd7ef90fa2b7719fb3c6",
+  "changing_commit_subject": "qnty edge: add outcome-free order flow readiness",
+  "changing_commit_author_date": "2026-08-16T02:05:46+02:00",
+  "changing_commit_parent": "a9e02465da3eb82f31ecf63c1153a1d46190900b",
+  "materializer_sha256_at_changing_commit_parent": "e5a333f3ce08bb95fa7ef6144fffc672cf14ddf2226dc74817db62beb987cdfa",
+  "what_changed": {
+    "summary": "Order Flow V0 readiness widened the shared USD-M 1h kline materializer from a 6-field to a 12-field row schema and added the corresponding validation.",
+    "fields_added": [
+      "open_time",
+      "close_time",
+      "quote_volume",
+      "trade_count",
+      "taker_buy_base_volume",
+      "taker_buy_quote_volume"
+    ],
+    "legacy_schema_retained_as": "LEGACY_FIELDS",
+    "validation_added": [
+      "close_ms >= 0",
+      "trade_count >= 0",
+      "quote_volume / taker_buy_base_volume / taker_buy_quote_volume finite and non-negative",
+      "taker_buy_quote_volume <= quote_volume",
+      "taker_buy_base_volume <= volume"
+    ],
+    "related_to_funding_experiment": false,
+    "frozen_funding_evidence_regenerated": false
+  },
+  "why_the_verifier_failed": "provenance_baseline_v0.materializer_files entries were checked against CURRENT WORKTREE bytes. That semantics asserts 'the materializer at HEAD is whatever produced the frozen evidence', which becomes false the moment the shared materializer is developed further for unrelated work.",
+  "rejected_repairs": [
+    {
+      "repair": "Replace the frozen historical hash with the current worktree hash.",
+      "rejected_because": "Launders current code identity into the historical producer record and destroys the provenance claim. Explicitly forbidden absent evidence that the baseline intends 'whatever the materializer is at HEAD'; no such evidence exists."
+    },
+    {
+      "repair": "Regenerate the frozen funding evidence with the new materializer.",
+      "rejected_because": "Mutates frozen historical evidence bytes and would require data acquisition; both outside this phase's authority and outside any phase's interest in preserving history."
+    },
+    {
+      "repair": "Revert or narrow qntylab/binance_um_kline_1h.py so the funding tests go green.",
+      "rejected_because": "Alters Order Flow V0 behaviour to satisfy an unrelated funding check. Explicitly forbidden."
+    },
+    {
+      "repair": "Skip or soften the materializer check.",
+      "rejected_because": "Removes the producer-identity guarantee entirely; a fail-open weakening of a frozen invariant."
+    }
+  ],
+  "selected_repair": "Authenticate the historical materializer identity from immutable Git blob identity at the frozen baseline's own required_git_ancestors, never from the working tree.",
+  "selected_repair_scope": [
+    "qntylab/jigsaw_funding_pressure_provenance_v0.py"
+  ],
+  "why_this_is_the_narrowest_repository_compatible_invariant": "The frozen baseline already names two immutable anchor commits in required_git_ancestors, both already proven to be ancestors of the candidate commit by verify_git_ancestry, and both already protected by the baseline's own self-digest. Both anchors contain exactly the frozen materializer bytes. No new frozen data is required, no frozen artifact is edited, no Order Flow code is touched, and later unrelated development of the shared materializer no longer forces a rewrite of history.",
+  "historical_anchors": [
+    {
+      "commit": "98e9dbcbec5dab18f7498cf4c5df77e14a8d5569",
+      "role": "preregistration_merge_sha",
+      "qntylab/binance_um_kline_1h.py": "e5a333f3ce08bb95fa7ef6144fffc672cf14ddf2226dc74817db62beb987cdfa",
+      "qntylab/binance_um_funding_settlement.py": "e2b9c7d99aa8f1743e2b93603551b53e7981b732a4c2c4c1e088bc19d3b87cbc"
+    },
+    {
+      "commit": "3e54cb86cdc43c76c1cbf72acc4dfebecb6b10fa",
+      "role": "pit_v1_merge_sha",
+      "qntylab/binance_um_kline_1h.py": "e5a333f3ce08bb95fa7ef6144fffc672cf14ddf2226dc74817db62beb987cdfa",
+      "qntylab/binance_um_funding_settlement.py": "e2b9c7d99aa8f1743e2b93603551b53e7981b732a4c2c4c1e088bc19d3b87cbc"
+    }
+  ],
+  "frozen_evidence_mutated": false,
+  "frozen_provenance_baseline_digest": "sha256:902be2246b64d133e0f22dd71c04eba344d12ead659e5f57c69183ab92f878d9",
+  "order_flow_modified": false,
+  "outcome_accessed": false
+}

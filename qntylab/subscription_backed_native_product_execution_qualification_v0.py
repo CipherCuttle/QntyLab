@@ -27,7 +27,7 @@ from qntylab.subscription_backed_codex_app_server_write_path_diagnostic_v0 impor
 )
 
 
-PROJECT_ID = "SUBSCRIPTION_BACKED_NATIVE_PRODUCT_EXECUTION_QUALIFICATION_V0"
+PROJECT_ID = "SUBSCRIPTION_BACKED_NATIVE_PRODUCT_EXECUTION_QUALIFICATION_V0R1"
 SCHEMA_VERSION = "subscription-backed-native-product-role-receipt-v0"
 CODEX_BINARY = "/home/swirky/.local/bin/codex"
 CLAUDE_BINARY = "/usr/bin/claude"
@@ -125,6 +125,18 @@ CODEX_POLICY_KEYS = {
 CLAUDE_POLICY_KEYS = {
     "permission_mode", "built_in_tools", "mcp", "safe_mode",
     "session_persistence", "observed_enforcement", "contract_match",
+}
+
+PROCESS_EXIT_COMMON_KEYS = {"disposed", "termination", "exit_code", "exit_signal"}
+PROCESS_EXIT_KEYS = {
+    "INDEPENDENT_REVIEWER": PROCESS_EXIT_COMMON_KEYS,
+    "BUILDER": PROCESS_EXIT_COMMON_KEYS | {"stderr_bytes", "stderr_sha256", "non_json_stdout_lines"},
+    "VERIFIER": PROCESS_EXIT_COMMON_KEYS | {"stderr_bytes", "stderr_sha256", "non_json_stdout_lines"},
+}
+PROCESS_EXIT_TERMINATIONS = {
+    "INDEPENDENT_REVIEWER": {"NOT_STARTED", "EXITED", "SIGTERM_PROCESS_GROUP_AFTER_TIMEOUT", "SIGKILL_PROCESS_GROUP_AFTER_TIMEOUT"},
+    "BUILDER": {"NOT_STARTED", "ALREADY_EXITED", "SIGTERM_PROCESS_GROUP", "SIGKILL_PROCESS_GROUP"},
+    "VERIFIER": {"NOT_STARTED", "ALREADY_EXITED", "SIGTERM_PROCESS_GROUP", "SIGKILL_PROCESS_GROUP"},
 }
 
 
@@ -468,6 +480,101 @@ def open_verified_executable(path: Path, expected_sha256: str) -> tuple[int, str
 def render_evidence_prompt(template: bytes, packet: Mapping[str, Any]) -> bytes:
     packet_bytes = canonical_json(packet)
     return template + b"\n" + sha256_bytes(packet_bytes).encode("ascii") + b"\n" + packet_bytes
+
+
+def process_exit_schema() -> dict[str, Any]:
+    return {
+        "schema_version": "subscription-backed-native-product-process-exit-v0r1",
+        "roles": {
+            role: {
+                "required_keys": sorted(PROCESS_EXIT_KEYS[role]),
+                "allowed_terminations": sorted(PROCESS_EXIT_TERMINATIONS[role]),
+                "strict_integer_fields": [
+                    "exit_code", "exit_signal",
+                    *([] if role == "INDEPENDENT_REVIEWER" else ["stderr_bytes", "non_json_stdout_lines"]),
+                ],
+                "strict_boolean_fields": ["disposed"],
+            }
+            for role in sorted(PROCESS_EXIT_KEYS)
+        },
+        "unknown_keys": "REJECTED",
+        "null_concrete_values": "REJECTED",
+        "bool_integer_coercion": "REJECTED",
+        "contradictory_terminal_state": "REJECTED",
+    }
+
+
+def process_exit_schema_digest() -> str:
+    return sha256_bytes(canonical_json(process_exit_schema()))
+
+
+def validate_process_exit(
+    value: Mapping[str, Any], *, role: str, timed_out: bool, product_started: bool,
+    machine_status: str,
+) -> dict[str, Any]:
+    """Validate the exact role-specific process-exit receipt schema."""
+    if role not in PROCESS_EXIT_KEYS or not isinstance(value, Mapping):
+        raise QualificationError("process_exit must be an object for the expected role")
+    data = dict(value)
+    if set(data) != PROCESS_EXIT_KEYS[role]:
+        raise QualificationError("process_exit keys are not exact")
+    if type(data["disposed"]) is not bool:
+        raise QualificationError("process_exit.disposed must be a boolean")
+    if not isinstance(data["termination"], str) or data["termination"] not in PROCESS_EXIT_TERMINATIONS[role]:
+        raise QualificationError("process_exit.termination is invalid")
+    if type(data["exit_code"]) is not int or type(data["exit_signal"]) is not int:
+        raise QualificationError("process_exit exit values must be integers")
+    if data["exit_code"] < -1 or data["exit_signal"] < 0:
+        raise QualificationError("process_exit exit values are out of range")
+    if role != "INDEPENDENT_REVIEWER":
+        if type(data["stderr_bytes"]) is not int or data["stderr_bytes"] < 0:
+            raise QualificationError("process_exit.stderr_bytes must be a non-negative integer")
+        if not isinstance(data["stderr_sha256"], str) or len(data["stderr_sha256"]) != 64:
+            raise QualificationError("process_exit.stderr_sha256 is malformed")
+        if any(character not in "0123456789abcdef" for character in data["stderr_sha256"]):
+            raise QualificationError("process_exit.stderr_sha256 is not hexadecimal")
+        if type(data["non_json_stdout_lines"]) is not int or data["non_json_stdout_lines"] < 0:
+            raise QualificationError("process_exit.non_json_stdout_lines must be a non-negative integer")
+
+    termination = data["termination"]
+    if not product_started:
+        if data != {
+            **({"disposed": False, "termination": "NOT_STARTED", "exit_code": -1, "exit_signal": 0}),
+            **({"stderr_bytes": 0, "stderr_sha256": sha256_bytes(b""), "non_json_stdout_lines": 0} if role != "INDEPENDENT_REVIEWER" else {}),
+        }:
+            raise QualificationError("unstarted process_exit is contradictory")
+    elif data["disposed"] is not True:
+        raise QualificationError("started product process_exit must be disposed")
+
+    if data["exit_signal"] == 0 and data["exit_code"] < 0:
+        raise QualificationError("normal process_exit cannot have a negative exit code")
+    if data["exit_signal"] > 0 and data["exit_code"] != -1:
+        raise QualificationError("signaled process_exit must not also have an exit code")
+    expected_signal = {
+        "SIGTERM_PROCESS_GROUP": signal.SIGTERM,
+        "SIGKILL_PROCESS_GROUP": signal.SIGKILL,
+        "SIGTERM_PROCESS_GROUP_AFTER_TIMEOUT": signal.SIGTERM,
+        "SIGKILL_PROCESS_GROUP_AFTER_TIMEOUT": signal.SIGKILL,
+    }.get(termination, 0)
+    if data["exit_signal"] != expected_signal:
+        raise QualificationError("process_exit termination and signal contradict each other")
+    if timed_out != (termination in {"SIGTERM_PROCESS_GROUP_AFTER_TIMEOUT", "SIGKILL_PROCESS_GROUP_AFTER_TIMEOUT"}):
+        raise QualificationError("process_exit timeout state contradicts termination")
+    if machine_status == "PASS":
+        if data["disposed"] is not True or timed_out:
+            raise QualificationError("role PASS contradicts exact process_exit")
+        if role == "INDEPENDENT_REVIEWER":
+            if termination != "EXITED" or data["exit_code"] != 0 or data["exit_signal"] != 0:
+                raise QualificationError("reviewer PASS requires a normal EXITED process_exit")
+        elif termination == "ALREADY_EXITED":
+            if data["exit_code"] != 0 or data["exit_signal"] != 0:
+                raise QualificationError("Codex PASS ALREADY_EXITED process_exit is nonzero")
+        elif termination == "SIGTERM_PROCESS_GROUP":
+            if data["exit_code"] != -1 or data["exit_signal"] != signal.SIGTERM:
+                raise QualificationError("Codex PASS SIGTERM process_exit is contradictory")
+        else:
+            raise QualificationError("Codex PASS requires a completed disposable process_exit")
+    return data
 
 
 def write_exclusive_json(path: Path, value: Mapping[str, Any]) -> str:
@@ -930,6 +1037,10 @@ def validate_role_receipt(
         raise QualificationError("role receipt argv binding mismatch")
     if data["machine_status"] not in {"PASS", "FAIL"} or data["api_key_gate"] not in {"PASS", "FAIL"}:
         raise QualificationError("role receipt terminal enum is invalid")
+    validate_process_exit(
+        data["process_exit"], role=role, timed_out=data["timed_out"],
+        product_started=data["product_started"], machine_status=data["machine_status"],
+    )
     if data["machine_status"] == "PASS":
         if data["timed_out"] or not data["product_started"] or data["api_key_gate"] != "PASS" or data["lifecycle"] != "COMPLETED" or data["failure_class"] != "NONE":
             raise QualificationError("role PASS contradicts lifecycle")
@@ -943,8 +1054,6 @@ def validate_role_receipt(
             if data["protocol"].get("approval_request_count") != 0 or data["protocol"].get("unsupported_request_count") != 0:
                 raise QualificationError("Codex PASS contradicts protocol escalation evidence")
         process_exit = data["process_exit"]
-        if not all(key in process_exit for key in ("termination", "exit_code", "exit_signal")):
-            raise QualificationError("role PASS lacks concrete process exit evidence")
         if role == "INDEPENDENT_REVIEWER":
             process_ok = process_exit.get("termination") == "EXITED" and process_exit.get("exit_code") == 0 and process_exit.get("exit_signal") == 0
         else:

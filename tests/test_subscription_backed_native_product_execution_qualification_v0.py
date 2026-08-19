@@ -44,6 +44,7 @@ if str(PHASE) not in sys.path:
 import claude_reviewer_driver_v0 as claude_driver  # noqa: E402
 import native_codex_role_driver_v0 as codex_driver  # noqa: E402
 import qualification_controller_v0 as controller  # noqa: E402
+import run_qualification_batch_v0 as bootstrap  # noqa: E402
 
 FAKE_CODEX = Path(__file__).parent / "fixtures/fake_codex_app_server_v0.py"
 FAKE_CLAUDE = Path(__file__).parent / "fixtures/fake_claude_code_v0.py"
@@ -392,7 +393,9 @@ def test_prelive_manifest_rejects_omitted_frozen_paths(tmp_path: Path, monkeypat
 
     monkeypatch.setattr(controller, "_git", fake_git)
     with pytest.raises(QualificationError, match="source path set"):
-        controller.validate_prelive_manifest(repo, manifest_path)
+        controller.validate_prelive_manifest(
+            repo, manifest_path, manifest_bytes=canonical_json(manifest), frozen_sources={},
+        )
 
 
 def test_incomplete_and_stale_pass_receipts_are_rejected(tmp_path: Path) -> None:
@@ -430,10 +433,98 @@ def test_rendered_prompt_binds_exact_evidence() -> None:
     assert first != second and sha256_bytes(first) != sha256_bytes(second)
 
 
+@pytest.mark.parametrize("member", sorted(core.PROCESS_EXIT_KEYS["VERIFIER"]))
+def test_process_exit_missing_any_required_member_fails_closed(tmp_path: Path, member: str) -> None:
+    workspace = make_workspace(tmp_path, target=True)
+    kwargs = {
+        "workspace": workspace, "qntylab_root": ROOT, "prompt": b"p",
+        "workspace_identity": workspace_identity(workspace)["identity_sha256"],
+        "prompt_template_sha256": "t" * 64, "driver_sha256": "d" * 64,
+        "started_marker_sha256": "m" * 64, "binary_sha256": "b" * 64,
+        "timeout_seconds": 180,
+    }
+    receipt = fake_role_receipt("VERIFIER", kwargs, pass_role=True)
+    del receipt["process_exit"][member]
+    with pytest.raises(QualificationError, match="process_exit"):
+        validate_role_receipt(
+            receipt, role="VERIFIER", workspace=workspace,
+            workspace_id=kwargs["workspace_identity"], prompt_sha=sha256_bytes(b"p"),
+            template_sha="t" * 64, driver_sha="d" * 64, marker_sha="m" * 64,
+            binary_sha="b" * 64,
+        )
+
+
+@pytest.mark.parametrize(
+    "member,value",
+    [
+        ("disposed", 1), ("termination", None), ("exit_code", True),
+        ("exit_signal", "0"), ("stderr_bytes", False),
+        ("stderr_sha256", None), ("non_json_stdout_lines", False),
+    ],
+)
+def test_process_exit_wrong_types_and_extra_members_fail_closed(tmp_path: Path, member: str, value: object) -> None:
+    workspace = make_workspace(tmp_path, target=True)
+    kwargs = {
+        "workspace": workspace, "qntylab_root": ROOT, "prompt": b"p",
+        "workspace_identity": workspace_identity(workspace)["identity_sha256"],
+        "prompt_template_sha256": "t" * 64, "driver_sha256": "d" * 64,
+        "started_marker_sha256": "m" * 64, "binary_sha256": "b" * 64,
+        "timeout_seconds": 180,
+    }
+    receipt = fake_role_receipt("VERIFIER", kwargs, pass_role=True)
+    receipt["process_exit"][member] = value
+    with pytest.raises(QualificationError, match="process_exit"):
+        validate_role_receipt(
+            receipt, role="VERIFIER", workspace=workspace,
+            workspace_id=kwargs["workspace_identity"], prompt_sha=sha256_bytes(b"p"),
+            template_sha="t" * 64, driver_sha="d" * 64, marker_sha="m" * 64,
+            binary_sha="b" * 64,
+        )
+    extra = json.loads(json.dumps(fake_role_receipt("VERIFIER", kwargs, pass_role=True)))
+    extra["process_exit"]["unexpected"] = True
+    with pytest.raises(QualificationError, match="process_exit"):
+        validate_role_receipt(
+            extra, role="VERIFIER", workspace=workspace,
+            workspace_id=kwargs["workspace_identity"], prompt_sha=sha256_bytes(b"p"),
+            template_sha="t" * 64, driver_sha="d" * 64, marker_sha="m" * 64,
+            binary_sha="b" * 64,
+        )
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        lambda receipt: receipt["process_exit"].update(disposed=False),
+        lambda receipt: receipt["process_exit"].update(termination="ALREADY_EXITED", exit_code=1),
+        lambda receipt: receipt["process_exit"].update(termination="SIGTERM_PROCESS_GROUP", exit_code=0, exit_signal=0),
+        lambda receipt: receipt.update(timed_out=True),
+        lambda receipt: receipt.update(product_started=False),
+    ],
+)
+def test_process_exit_contradictory_pass_evidence_fails_closed(tmp_path: Path, mutation) -> None:
+    workspace = make_workspace(tmp_path, target=True)
+    kwargs = {
+        "workspace": workspace, "qntylab_root": ROOT, "prompt": b"p",
+        "workspace_identity": workspace_identity(workspace)["identity_sha256"],
+        "prompt_template_sha256": "t" * 64, "driver_sha256": "d" * 64,
+        "started_marker_sha256": "m" * 64, "binary_sha256": "b" * 64,
+        "timeout_seconds": 180,
+    }
+    receipt = fake_role_receipt("VERIFIER", kwargs, pass_role=True)
+    mutation(receipt)
+    with pytest.raises(QualificationError, match="process_exit|lifecycle"):
+        validate_role_receipt(
+            receipt, role="VERIFIER", workspace=workspace,
+            workspace_id=kwargs["workspace_identity"], prompt_sha=sha256_bytes(b"p"),
+            template_sha="t" * 64, driver_sha="d" * 64, marker_sha="m" * 64,
+            binary_sha="b" * 64,
+        )
+
+
 # CONTROLLER attacks
 
 
-def make_controller_repo(tmp_path: Path) -> tuple[Path, Path, dict]:
+def make_controller_repo(tmp_path: Path) -> tuple[Path, Path, dict, dict[str, bytes]]:
     repo = tmp_path / "repo"
     prompt_root = repo / "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/prompts"
     prompt_root.mkdir(parents=True)
@@ -444,15 +535,19 @@ def make_controller_repo(tmp_path: Path) -> tuple[Path, Path, dict]:
     _git(repo, "init", "-q", "-b", "main")
     _git(repo, "-c", "user.name=Tests", "-c", "user.email=tests@invalid", "add", ".")
     _git(repo, "-c", "user.name=Tests", "-c", "user.email=tests@invalid", "commit", "-q", "-m", "fixture")
+    frozen_sources = {
+        path: ((ROOT / path).read_bytes() if path in (set(controller.PROMPT_RELS.values()) | {controller.CONTRACT_REL}) else b"")
+        for path in controller.REQUIRED_HASH_PATHS
+    }
     manifest = {
         "prelive_sha": "a" * 40,
-        "hashes": {path: "d" * 64 for path in controller.REQUIRED_HASH_PATHS},
+        "hashes": {path: sha256_bytes(payload) for path, payload in frozen_sources.items()},
         "binary_hashes": {
             "/home/swirky/.local/bin/codex": executable_sha256(Path("/home/swirky/.local/bin/codex")),
             "/usr/bin/claude": executable_sha256(Path("/usr/bin/claude")),
         },
     }
-    return repo, manifest_path, manifest
+    return repo, manifest_path, manifest, frozen_sources
 
 
 def fake_role_receipt(role: str, kwargs: dict, *, pass_role: bool, mutate_builder: bool = True) -> dict:
@@ -512,7 +607,12 @@ def fake_role_receipt(role: str, kwargs: dict, *, pass_role: bool, mutate_builde
         marker_sha=kwargs["started_marker_sha256"], started_at="2026-01-01T00:00:00Z",
         finished_at="2026-01-01T00:00:01Z", timeout_seconds=kwargs["timeout_seconds"],
         timed_out=False, product_started=True,
-        process_exit={"disposed": True, "termination": ("EXITED" if role == "INDEPENDENT_REVIEWER" else "ALREADY_EXITED"), "exit_code": 0, "exit_signal": 0},
+        process_exit=(
+            {"disposed": True, "termination": "EXITED", "exit_code": 0, "exit_signal": 0}
+            if role == "INDEPENDENT_REVIEWER" else
+            {"disposed": True, "termination": "ALREADY_EXITED", "exit_code": 0, "exit_signal": 0,
+             "stderr_bytes": 0, "stderr_sha256": sha256_bytes(b""), "non_json_stdout_lines": 0}
+        ),
         lifecycle="COMPLETED", protocol=protocol,
         effective_policy=effective, workspace=observed,
         qntylab_before=qbefore, qntylab_after=qafter, gate="PASS", structured=structured,
@@ -522,9 +622,8 @@ def fake_role_receipt(role: str, kwargs: dict, *, pass_role: bool, mutate_builde
 
 
 def run_controller_case(tmp_path: Path, monkeypatch, outcomes: dict[str, object]):
-    repo, manifest_path, manifest = make_controller_repo(tmp_path)
-    monkeypatch.setattr(controller, "validate_prelive_manifest", lambda *_: manifest)
-    monkeypatch.setattr(controller, "require_hashes", lambda *_: None)
+    repo, manifest_path, manifest, frozen_sources = make_controller_repo(tmp_path)
+    monkeypatch.setattr(controller, "validate_prelive_manifest", lambda *_, **__: manifest)
     monkeypatch.setenv(
         "QNTYLAB_NATIVE_QUALIFICATION_BOOTSTRAP",
         sha256_bytes(canonical_json(manifest["hashes"])),
@@ -554,7 +653,10 @@ def run_controller_case(tmp_path: Path, monkeypatch, outcomes: dict[str, object]
     monkeypatch.setattr(controller, "run_codex_driver", codex_runner)
     monkeypatch.setattr(controller, "run_claude_driver", claude_runner)
 
-    result = controller.execute_batch(repo_root=repo, prelive_manifest_path=manifest_path)
+    result = controller.execute_batch(
+        repo_root=repo, prelive_manifest_path=manifest_path,
+        manifest_bytes=canonical_json(manifest), frozen_sources=frozen_sources,
+    )
     return result, calls, manifest_path
 
 
@@ -630,3 +732,54 @@ def test_result_never_passes_without_all_three_machine_passes() -> None:
         bad[role]["machine_status"] = "FAIL"
         assert overall_qualification_pass(bad, attempts) is False
     assert overall_qualification_pass(good, {**attempts, "VERIFIER": 0}) is False
+
+
+def test_execution_uses_bound_prompt_and_manifest_bytes_after_swap_restore(tmp_path: Path, monkeypatch) -> None:
+    repo, manifest_path, manifest, frozen_sources = make_controller_repo(tmp_path)
+    external_manifest_path = tmp_path / "external-freeze" / "prelive_freeze.json"
+    external_manifest_path.parent.mkdir()
+    external_manifest_path.write_bytes(canonical_json(manifest))
+    manifest_path = external_manifest_path
+    monkeypatch.setattr(controller, "validate_prelive_manifest", lambda *_, **__: manifest)
+    monkeypatch.setenv("QNTYLAB_NATIVE_QUALIFICATION_BOOTSTRAP", sha256_bytes(canonical_json(manifest["hashes"])))
+    seen: list[tuple[str, bytes]] = []
+
+    def invoke(role: str, **kwargs):
+        prompt_path = ROOT / controller.PROMPT_RELS[role]
+        original_prompt_path = prompt_path.read_bytes()
+        original_manifest = manifest_path.read_bytes()
+        prompt_path.write_bytes(b"ATTACKER_PROMPT\n")
+        manifest_path.write_bytes(b"ATTACKER_MANIFEST\n")
+        try:
+            seen.append((role, kwargs["prompt"]))
+            assert kwargs["prompt"] != b"ATTACKER_PROMPT\n"
+            return fake_role_receipt(role, kwargs, pass_role=True)
+        finally:
+            prompt_path.write_bytes(original_prompt_path)
+            manifest_path.write_bytes(original_manifest)
+
+    def invoke_codex(**kwargs):
+        payload = dict(kwargs)
+        role = payload.pop("role")
+        return invoke(role, **payload)
+
+    monkeypatch.setattr(controller, "run_codex_driver", invoke_codex)
+    monkeypatch.setattr(controller, "run_claude_driver", lambda **kwargs: invoke("INDEPENDENT_REVIEWER", **kwargs))
+    result = controller.execute_batch(
+        repo_root=repo, prelive_manifest_path=manifest_path,
+        manifest_bytes=canonical_json(manifest), frozen_sources=frozen_sources,
+    )
+    assert result["qualification_pass"] is True
+    assert [role for role, _ in seen] == ["BUILDER", "INDEPENDENT_REVIEWER", "VERIFIER"]
+    assert result["execution_bindings"]["manifest_source_sha256"] == result["execution_bindings"]["manifest_execution_bound_sha256"]
+    assert result["execution_bindings"]["contract_source_sha256"] == result["execution_bindings"]["contract_execution_bound_sha256"]
+    assert result["execution_bindings"]["prompt_source_sha256"] == result["execution_bindings"]["prompt_execution_bound_sha256"]
+
+
+def test_bootstrap_rejects_symlink_source(tmp_path: Path) -> None:
+    target = tmp_path / "target"
+    target.write_bytes(b"bytes")
+    link = tmp_path / "link"
+    link.symlink_to(target)
+    with pytest.raises(bootstrap.BootstrapError):
+        bootstrap._read_regular(link)

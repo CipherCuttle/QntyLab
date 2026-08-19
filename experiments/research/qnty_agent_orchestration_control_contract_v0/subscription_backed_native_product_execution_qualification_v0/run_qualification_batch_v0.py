@@ -61,7 +61,7 @@ def _read_regular(path: Path) -> bytes:
         os.close(descriptor)
 
 
-def _verified_sources(manifest_path: Path) -> tuple[dict, dict[str, bytes]]:
+def _verified_sources(manifest_path: Path) -> tuple[dict, bytes, dict[str, bytes]]:
     if _git("status", "--porcelain=v1", "--untracked-files=all"):
         raise BootstrapError("QntyLab must be clean before loading execution source")
     raw = _read_regular(manifest_path)
@@ -97,7 +97,7 @@ def _verified_sources(manifest_path: Path) -> tuple[dict, dict[str, bytes]]:
             os.close(descriptor)
         if digest.hexdigest() != expected:
             raise BootstrapError("frozen binary digest mismatch")
-    return manifest, sources
+    return manifest, raw, sources
 
 
 def _load_exact(name: str, relative: str, payload: bytes) -> types.ModuleType:
@@ -116,7 +116,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--prelive-manifest", type=Path, required=True)
     args = parser.parse_args(argv)
     try:
-        manifest, sources = _verified_sources(args.prelive_manifest)
+        manifest, manifest_bytes, sources = _verified_sources(args.prelive_manifest)
         if str(REPO_ROOT) not in sys.path:
             sys.path.insert(0, str(REPO_ROOT))
         loaded: dict[str, types.ModuleType] = {}
@@ -126,7 +126,14 @@ def main(argv: list[str] | None = None) -> int:
         os.environ["QNTYLAB_NATIVE_QUALIFICATION_BOOTSTRAP"] = hashlib.sha256(
             (json.dumps(manifest["hashes"], sort_keys=True, separators=(",", ":")) + "\n").encode("utf-8")
         ).hexdigest()
-        return int(controller.main(["--prelive-manifest", str(args.prelive_manifest)]))
+        result = controller.execute_batch(
+            repo_root=REPO_ROOT,
+            prelive_manifest_path=args.prelive_manifest,
+            manifest_bytes=manifest_bytes,
+            frozen_sources=sources,
+        )
+        print(json.dumps(result, sort_keys=True, separators=(",", ":")))
+        return 0 if result["qualification_pass"] else 1
     except (BootstrapError, OSError, ValueError) as exc:
         print(json.dumps({"status": "FAIL_CLOSED_BOOTSTRAP", "error_class": type(exc).__name__}, sort_keys=True))
         return 2

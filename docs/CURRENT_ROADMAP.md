@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- None.
+- `Subscription-backed native product execution qualification V0R1 evidence-integrity repair` — `ACTIVE`. Repair exactly H1 and H2, run deterministic attacks, perform one independent hostile review, use at most one C/H fix pass and one targeted re-review, then freeze and execute at most one synthetic native qualification batch only if all frozen gates pass. No V0 mutation or rerun, DSH, Stage-A V1/V2, scientific evaluation, runtime, Qnty NEXT_ACTION, trading, capital, or merge authority is granted.
 
 ## Queued — not authorized
 

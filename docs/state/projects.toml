@@ -3646,3 +3646,86 @@ root_cause_class = "PRELIVE_FROZEN_CONTRACT_VALIDATION_INCOMPATIBILITY"
 active_project_after_closure = "NONE"
 experiment_state = "QUALIFICATION_BLOCKED_PRELIVE_CONTRACT_GATE"
 next_action = "CLOSED_BLOCKED: frozen prelive validation rejected the exact contract timeout object before any product process spawned. Do not repair or review again in this phase, do not run a live batch, and do not create V0R2. Return control for explicit architecture reassessment; no Stage-A V2, runtime, scientific, Qnty NEXT_ACTION, trading, capital, or merge authority is created."
+
+[[project]]
+project_id = "SUBSCRIPTION_BACKED_NATIVE_PRODUCT_EXECUTION_QUALIFICATION_V0R2_AUTHORIZATION_V0"
+display_name = "Subscription-backed native product execution qualification V0R2 authorization"
+state = "CLOSED_PASS"
+authority_level = "GOVERNANCE_AUTHORIZATION_ONLY"
+phase_type = "GOVERNANCE_ONLY"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/qualification_contract.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/prelive_freeze_v0r1.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/closure_result_v0r1.json",
+]
+canonical_parent_master = "5490d3f213bb1dc1b8fde86fe1cd464d09ddbead"
+source_conflict = false
+predecessor_project_id = "SUBSCRIPTION_BACKED_NATIVE_PRODUCT_EXECUTION_QUALIFICATION_V0R1"
+predecessor_head = "41dd349fffb8fcb786cd48ced08c5a2b1a874ac4"
+predecessor_state = "CLOSED_BLOCKED"
+predecessor_mutated = false
+architecture_reassessment_completed = true
+architecture_reassessment_basis = [
+  "V0R1_H1_PROCESS_EXIT_EXACT_SCHEMA_PASS",
+  "V0R1_H2_PROMPT_MANIFEST_BYTE_BINDING_PASS",
+  "V0R1_DETERMINISTIC_TESTS_PASS",
+  "V0R1_INDEPENDENT_REVIEW_ZERO_CRITICAL_ZERO_HIGH",
+  "V0R1_PRELIVE_FREEZE_CREATED",
+  "V0R1_NO_LIVE_PRODUCT_PROCESS_SPAWNED",
+]
+v0r2_creation_authorized = true
+v0r2_project_id = "SUBSCRIPTION_BACKED_NATIVE_PRODUCT_EXECUTION_QUALIFICATION_V0R2"
+authorized_root_defect = "PRELIVE_FROZEN_CONTRACT_VALIDATION_INCOMPATIBILITY"
+authorized_repairs = [
+  "ONE_EXACT_FIVE_KEY_TIMEOUT_SCHEMA",
+  "CONTRACT_PRELIVE_RUNTIME_TIMEOUT_BINDING",
+  "REMOVE_AUTHORITATIVE_HARDCODED_HANDSHAKE_FALLBACK",
+  "REMOVE_AUTHORITATIVE_HARDCODED_DISPOSAL_GRACE_FALLBACK",
+]
+authorized_timeout_schema = { BUILDER = 180, INDEPENDENT_REVIEWER = 180, VERIFIER = 180, codex_handshake = 60, process_disposal_grace = 10 }
+later_v0r2_implementation_authorized = true
+later_v0r2_deterministic_tests_authorized = true
+later_v0r2_independent_review_authorized = true
+later_v0r2_critical_high_fix_pass_limit = 1
+later_v0r2_targeted_rereview_limit = 1
+later_v0r2_live_batches_authorized = 1
+later_v0r2_live_invocations_per_role = 1
+implementation_authorized = false
+deterministic_tests_authorized = false
+independent_hostile_review_authorized = false
+v0_mutation_authorized = false
+v0r1_mutation_authorized = false
+v0_mutated = false
+v0r1_mutated = false
+v0r3_authorized = false
+implementation_bytes_changed = false
+dsh_authorized = false
+dsh_v0r2_authorized = false
+stage_a_v1_rerun_authorized = false
+stage_a_v2_creation_authorized = false
+stage_a_v2_execution_authorized = false
+historical_stage_a_task_authorized = false
+historical_answer_key_access_authorized = false
+market_data_authorized = false
+scientific_execution_authorized = false
+qnty_runtime_authorized = false
+runtime_implementation_authorized = false
+result_recording_authorized = false
+qnty_next_action_authority = "NONE"
+scientific_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+auto_merge_authorized = false
+current_max_autonomy = "L0_SHADOW"
+qntyagenteval_run = false
+governance_phase_subscription_product_calls = 0
+governance_phase_live_batch_attempts = 0
+governance_phase_builder_attempts = 0
+governance_phase_reviewer_attempts = 0
+governance_phase_verifier_attempts = 0
+active_project_after_closure = "NONE"
+experiment_state = "GOVERNANCE_AUTHORIZATION_CLOSED"
+next_action = "A separate V0R2 implementation phase is authorized to repair exactly PRELIVE_FROZEN_CONTRACT_VALIDATION_INCOMPATIBILITY by binding one exact five-key timeout schema across the qualification contract, prelive freeze, execution-bound bytes, and runtime consumption. It may perform deterministic tests, one independent hostile review, at most one Critical/High repair pass and one targeted rereview if required, then at most one new synthetic native qualification batch only after a clean prelive freeze. No V0 or V0R1 rerun or mutation. No V0R3 is pre-authorized. No Stage-A V2 or scientific, runtime, trading, capital, Qnty NEXT_ACTION, or automatic-merge authority is created."

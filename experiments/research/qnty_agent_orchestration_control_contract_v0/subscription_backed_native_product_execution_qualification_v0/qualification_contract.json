@@ -98,7 +98,7 @@
       "--stdio"
     ]
   },
-  "project_id": "SUBSCRIPTION_BACKED_NATIVE_PRODUCT_EXECUTION_QUALIFICATION_V0",
+  "project_id": "SUBSCRIPTION_BACKED_NATIVE_PRODUCT_EXECUTION_QUALIFICATION_V0R1",
   "prompt_paths": {
     "BUILDER": "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/prompts/builder.txt",
     "INDEPENDENT_REVIEWER": "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/prompts/reviewer.txt",
@@ -170,7 +170,7 @@
       "profile": "/home/swirky/.codex-pro2"
     }
   },
-  "schema_version": "subscription-backed-native-product-execution-qualification-contract-v0",
+  "schema_version": "subscription-backed-native-product-execution-qualification-contract-v0r1",
   "synthetic_task": {
     "allowed_changed_paths": [
       "fixture.txt"

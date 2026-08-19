@@ -40,10 +40,10 @@ from qntylab.subscription_backed_native_product_execution_qualification_v0 impor
     qntylab_snapshot,
     read_json_file,
     render_evidence_prompt,
-    require_hashes,
     sha256_bytes,
     sha256_file,
     snapshot_digest,
+    strict_json_object,
     utc_now,
     validate_role_receipt,
     workspace_identity,
@@ -72,6 +72,12 @@ REQUIRED_HASH_PATHS = {
     f"{PHASE_REL}/prompts/verifier.txt",
 }
 REQUIRED_BINARY_PATHS = {"/home/swirky/.local/bin/codex", "/usr/bin/claude"}
+CONTRACT_REL = f"{PHASE_REL}/qualification_contract.json"
+PROMPT_RELS = {
+    "BUILDER": f"{PHASE_REL}/prompts/builder.txt",
+    "INDEPENDENT_REVIEWER": f"{PHASE_REL}/prompts/reviewer.txt",
+    "VERIFIER": f"{PHASE_REL}/prompts/verifier.txt",
+}
 
 
 def _git(root: Path, *args: str) -> str:
@@ -98,14 +104,22 @@ def build_workspace() -> Path:
     return workspace
 
 
-def validate_prelive_manifest(repo_root: Path, manifest_path: Path) -> dict[str, Any]:
+def validate_prelive_manifest(
+    repo_root: Path, manifest_path: Path, *, manifest_bytes: bytes,
+    frozen_sources: Mapping[str, bytes],
+) -> dict[str, Any]:
     repo_root = Path(repo_root).resolve(strict=True)
-    manifest_path = Path(manifest_path).resolve(strict=True)
+    raw_manifest_path = Path(manifest_path)
+    if raw_manifest_path.is_symlink():
+        raise QualificationError("prelive manifest path may not be a symlink")
+    manifest_path = raw_manifest_path.resolve(strict=True)
     try:
         relative = manifest_path.relative_to(repo_root).as_posix()
     except ValueError as exc:
         raise QualificationError("prelive manifest is outside QntyLab") from exc
-    manifest = read_json_file(manifest_path)
+    if not isinstance(manifest_bytes, bytes):
+        raise QualificationError("prelive manifest bytes must be supplied by the verified bootstrap")
+    manifest = strict_json_object(manifest_bytes)
     required = {
         "schema_version", "project_id", "canonical_parent_master", "prelive_sha", "prelive_tree",
         "freeze_record_parent_required", "open_critical", "open_high", "hashes", "binary_hashes",
@@ -132,6 +146,17 @@ def validate_prelive_manifest(repo_root: Path, manifest_path: Path) -> dict[str,
         raise QualificationError("prelive manifest must be committed in a distinct freeze record")
     if set(manifest["hashes"]) != REQUIRED_HASH_PATHS:
         raise QualificationError("prelive frozen source path set is not exact")
+    if set(frozen_sources) != REQUIRED_HASH_PATHS:
+        raise QualificationError("execution-bound source path set is not exact")
+    for relative, expected in manifest["hashes"].items():
+        payload = frozen_sources.get(relative)
+        if not isinstance(payload, bytes) or sha256_bytes(payload) != expected:
+            raise QualificationError(f"execution-bound source digest mismatch: {relative}")
+    contract = strict_json_object(frozen_sources[CONTRACT_REL])
+    if contract.get("project_id") != PROJECT_ID or contract.get("schema_version") != "subscription-backed-native-product-execution-qualification-contract-v0r1":
+        raise QualificationError("execution-bound qualification contract identity is invalid")
+    if contract.get("prompt_paths") != PROMPT_RELS or contract.get("timeouts_seconds") != {"BUILDER": 180, "INDEPENDENT_REVIEWER": 180, "VERIFIER": 180}:
+        raise QualificationError("execution-bound qualification contract semantics are invalid")
     if set(manifest["binary_hashes"]) != REQUIRED_BINARY_PATHS:
         raise QualificationError("prelive frozen product binary path set is not exact")
     if manifest["fixture_hashes"] != {
@@ -139,7 +164,6 @@ def validate_prelive_manifest(repo_root: Path, manifest_path: Path) -> dict[str,
         "target_sha256": sha256_bytes(FIXTURE_TARGET_BYTES),
     }:
         raise QualificationError("prelive fixture hashes are not exact")
-    require_hashes(repo_root, manifest["hashes"])
     for binary, digest in manifest["binary_hashes"].items():
         if executable_sha256(Path(binary)) != digest:
             raise QualificationError(f"frozen product binary hash mismatch: {binary}")
@@ -212,14 +236,19 @@ def _result(
     *, live_root: Path, manifest: Mapping[str, Any], workspace: Path,
     workspace_id: str, receipts: Mapping[str, Mapping[str, Any]],
     attempts: Mapping[str, int], failure_class: str,
+    frozen_manifest_bytes: bytes, frozen_sources: Mapping[str, bytes],
 ) -> dict[str, Any]:
+    frozen_sources_match = (
+        isinstance(frozen_manifest_bytes, bytes)
+        and set(frozen_sources) == set(manifest.get("hashes", {}))
+        and all(isinstance(payload, bytes) and sha256_bytes(payload) == digest for digest_path, digest in manifest.get("hashes", {}).items() for payload in [frozen_sources.get(digest_path)])
+    )
     try:
-        require_hashes(Path(manifest["repository_root"]), manifest["hashes"])
-        frozen_sources_match = all(executable_sha256(Path(binary)) == digest for binary, digest in manifest["binary_hashes"].items())
+        frozen_binaries_match = all(executable_sha256(Path(binary)) == digest for binary, digest in manifest["binary_hashes"].items())
     except (KeyError, OSError, QualificationError):
-        frozen_sources_match = False
+        frozen_binaries_match = False
     prompt_paths = {f"{PHASE_REL}/prompts/{name}.txt" for name in ("builder", "reviewer", "verifier")}
-    prompts_match = frozen_sources_match and all(path in manifest["hashes"] for path in prompt_paths)
+    prompts_match = frozen_sources_match and all(path in frozen_sources for path in prompt_paths)
     markers_match = (live_root / "batch_started.json").is_file()
     for role, (marker_name, receipt_name) in ROLE_FILENAMES.items():
         marker_path = live_root / marker_name
@@ -246,7 +275,7 @@ def _result(
         and all(receipt.get("workspace_identity") == workspace_id for receipt in receipts.values())
     )
     all_role_gates = overall_qualification_pass(receipts, attempts)
-    passed = all_role_gates and frozen_sources_match and prompts_match and markers_match and workspace_gate
+    passed = all_role_gates and frozen_sources_match and frozen_binaries_match and prompts_match and markers_match and workspace_gate
     not_run = [role for role in ROLE_FILENAMES if attempts.get(role, 0) == 0]
     result = {
         "schema_version": "subscription-backed-native-product-qualification-result-v0",
@@ -258,11 +287,19 @@ def _result(
         "role_status": {role: receipts[role]["machine_status"] if role in receipts else "NOT_RUN_BY_FAIL_CLOSED_DEPENDENCY" for role in ROLE_FILENAMES},
         "not_run_by_fail_closed_dependency": not_run,
         "workspace_identity": workspace_id,
+        "execution_bindings": {
+            "manifest_source_sha256": sha256_bytes(frozen_manifest_bytes),
+            "manifest_execution_bound_sha256": sha256_bytes(frozen_manifest_bytes),
+            "contract_source_sha256": sha256_bytes(frozen_sources[CONTRACT_REL]),
+            "contract_execution_bound_sha256": sha256_bytes(frozen_sources[CONTRACT_REL]),
+            "prompt_source_sha256": {role: sha256_bytes(frozen_sources[PROMPT_RELS[role]]) for role in PROMPT_RELS},
+            "prompt_execution_bound_sha256": {role: sha256_bytes(frozen_sources[PROMPT_RELS[role]]) for role in PROMPT_RELS},
+        },
         "final_fixture": final_fixture,
         "final_changed_paths": final_paths,
         "final_diff_sha256": sha256_bytes(git_diff_bytes(workspace)),
         "api_key_gate": "PASS" if all((receipt.get("api_key_gate") == "PASS" for receipt in receipts.values())) and api_key_gate(api_key_presence()) == "PASS" else "FAIL",
-        "all_frozen_driver_hashes_match": frozen_sources_match,
+        "all_frozen_driver_hashes_match": frozen_sources_match and frozen_binaries_match,
         "all_prompt_hashes_match": prompts_match,
         "workspace_identity_match": workspace_gate,
         "exactly_once_gates": "PASS" if markers_match else "FAIL",
@@ -285,14 +322,21 @@ def _result(
 
 
 def execute_batch(
-    *, repo_root: Path, prelive_manifest_path: Path,
+    *, repo_root: Path, prelive_manifest_path: Path, manifest_bytes: bytes | None = None,
+    frozen_sources: Mapping[str, bytes] | None = None,
 ) -> dict[str, Any]:
     repo_root = Path(repo_root).resolve(strict=True)
-    manifest = validate_prelive_manifest(repo_root, prelive_manifest_path)
+    if not isinstance(manifest_bytes, bytes) or frozen_sources is None:
+        raise QualificationError("execution-bound manifest and sources are required")
+    frozen_sources = dict(frozen_sources)
+    manifest = validate_prelive_manifest(
+        repo_root, prelive_manifest_path, manifest_bytes=manifest_bytes,
+        frozen_sources=frozen_sources,
+    )
+    contract = strict_json_object(frozen_sources[CONTRACT_REL])
     bootstrap_token = sha256_bytes(canonical_json(manifest["hashes"]))
     if os.environ.get("QNTYLAB_NATIVE_QUALIFICATION_BOOTSTRAP") != bootstrap_token:
         raise QualificationError("verified bootstrap binding is absent")
-    manifest["repository_root"] = str(repo_root)
     if api_key_gate(api_key_presence()) != "PASS":
         raise QualificationError("API key gate failed before batch start")
     live_root = Path(prelive_manifest_path).parent / "live_batch_v0"
@@ -316,8 +360,7 @@ def execute_batch(
     failure_class = "RECEIPT_INTEGRITY_FAILURE"
     hashes = manifest["hashes"]
 
-    builder_template_path = repo_root / "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/prompts/builder.txt"
-    builder_prompt = builder_template_path.read_bytes()
+    builder_prompt = frozen_sources[PROMPT_RELS["BUILDER"]]
     builder_template_sha = sha256_bytes(builder_prompt)
     builder_driver_rel = "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/native_codex_role_driver_v0.py"
     builder_driver_sha = hashes[builder_driver_rel]
@@ -332,7 +375,8 @@ def execute_batch(
         raw = run_codex_driver(
             role="BUILDER", workspace=workspace, qntylab_root=repo_root, prompt=builder_prompt,
             workspace_identity=workspace_id, prompt_template_sha256=builder_template_sha,
-            driver_sha256=builder_driver_sha, started_marker_sha256=marker_sha, timeout_seconds=180,
+            driver_sha256=builder_driver_sha, started_marker_sha256=marker_sha,
+            timeout_seconds=contract["timeouts_seconds"]["BUILDER"],
             binary_sha256=codex_binary_sha,
         )
         receipts["BUILDER"] = _persist_and_validate(
@@ -343,9 +387,9 @@ def execute_batch(
         )
     except (OSError, QualificationError, KeyError, TypeError):
         write_exclusive_json(live_root / "builder_receipt_error.json", {"role": "BUILDER", "status": "FAIL_CLOSED", "failure_class": "RECEIPT_INTEGRITY_FAILURE", "recorded_at": utc_now()})
-        return _result(live_root=live_root, manifest=manifest, workspace=workspace, workspace_id=workspace_id, receipts=receipts, attempts=attempts, failure_class="RECEIPT_INTEGRITY_FAILURE")
+        return _result(live_root=live_root, manifest=manifest, workspace=workspace, workspace_id=workspace_id, receipts=receipts, attempts=attempts, failure_class="RECEIPT_INTEGRITY_FAILURE", frozen_manifest_bytes=manifest_bytes, frozen_sources=frozen_sources)
     if receipts["BUILDER"]["machine_status"] != "PASS":
-        return _result(live_root=live_root, manifest=manifest, workspace=workspace, workspace_id=workspace_id, receipts=receipts, attempts=attempts, failure_class=receipts["BUILDER"]["failure_class"])
+        return _result(live_root=live_root, manifest=manifest, workspace=workspace, workspace_id=workspace_id, receipts=receipts, attempts=attempts, failure_class=receipts["BUILDER"]["failure_class"], frozen_manifest_bytes=manifest_bytes, frozen_sources=frozen_sources)
 
     reviewer_packet = {
         "schema_version": "subscription-backed-native-reviewer-evidence-v0",
@@ -356,8 +400,7 @@ def execute_batch(
         "fixture": fixture_observation(workspace),
     }
     write_exclusive_json(live_root / "reviewer_evidence_packet.json", reviewer_packet)
-    reviewer_template_path = repo_root / "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/prompts/reviewer.txt"
-    reviewer_template = reviewer_template_path.read_bytes()
+    reviewer_template = frozen_sources[PROMPT_RELS["INDEPENDENT_REVIEWER"]]
     reviewer_prompt = render_evidence_prompt(reviewer_template, reviewer_packet)
     reviewer_template_sha = sha256_bytes(reviewer_template)
     reviewer_driver_rel = "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/claude_reviewer_driver_v0.py"
@@ -373,7 +416,8 @@ def execute_batch(
         raw = run_claude_driver(
             workspace=workspace, qntylab_root=repo_root, prompt=reviewer_prompt,
             workspace_identity=workspace_id, prompt_template_sha256=reviewer_template_sha,
-            driver_sha256=reviewer_driver_sha, started_marker_sha256=marker_sha, timeout_seconds=180,
+            driver_sha256=reviewer_driver_sha, started_marker_sha256=marker_sha,
+            timeout_seconds=contract["timeouts_seconds"]["INDEPENDENT_REVIEWER"],
             binary_sha256=claude_binary_sha,
         )
         receipts["INDEPENDENT_REVIEWER"] = _persist_and_validate(
@@ -384,9 +428,9 @@ def execute_batch(
         )
     except (OSError, QualificationError, KeyError, TypeError):
         write_exclusive_json(live_root / "reviewer_receipt_error.json", {"role": "INDEPENDENT_REVIEWER", "status": "FAIL_CLOSED", "failure_class": "RECEIPT_INTEGRITY_FAILURE", "recorded_at": utc_now()})
-        return _result(live_root=live_root, manifest=manifest, workspace=workspace, workspace_id=workspace_id, receipts=receipts, attempts=attempts, failure_class="RECEIPT_INTEGRITY_FAILURE")
+        return _result(live_root=live_root, manifest=manifest, workspace=workspace, workspace_id=workspace_id, receipts=receipts, attempts=attempts, failure_class="RECEIPT_INTEGRITY_FAILURE", frozen_manifest_bytes=manifest_bytes, frozen_sources=frozen_sources)
     if receipts["INDEPENDENT_REVIEWER"]["machine_status"] != "PASS":
-        return _result(live_root=live_root, manifest=manifest, workspace=workspace, workspace_id=workspace_id, receipts=receipts, attempts=attempts, failure_class=receipts["INDEPENDENT_REVIEWER"]["failure_class"])
+        return _result(live_root=live_root, manifest=manifest, workspace=workspace, workspace_id=workspace_id, receipts=receipts, attempts=attempts, failure_class=receipts["INDEPENDENT_REVIEWER"]["failure_class"], frozen_manifest_bytes=manifest_bytes, frozen_sources=frozen_sources)
 
     verifier_packet = {
         "schema_version": "subscription-backed-native-verifier-evidence-v0",
@@ -398,8 +442,7 @@ def execute_batch(
         "fixture": fixture_observation(workspace),
     }
     write_exclusive_json(live_root / "verifier_evidence_packet.json", verifier_packet)
-    verifier_template_path = repo_root / "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/prompts/verifier.txt"
-    verifier_template = verifier_template_path.read_bytes()
+    verifier_template = frozen_sources[PROMPT_RELS["VERIFIER"]]
     verifier_prompt = render_evidence_prompt(verifier_template, verifier_packet)
     verifier_template_sha = sha256_bytes(verifier_template)
     verifier_driver_sha = builder_driver_sha
@@ -413,7 +456,8 @@ def execute_batch(
         raw = run_codex_driver(
             role="VERIFIER", workspace=workspace, qntylab_root=repo_root, prompt=verifier_prompt,
             workspace_identity=workspace_id, prompt_template_sha256=verifier_template_sha,
-            driver_sha256=verifier_driver_sha, started_marker_sha256=marker_sha, timeout_seconds=180,
+            driver_sha256=verifier_driver_sha, started_marker_sha256=marker_sha,
+            timeout_seconds=contract["timeouts_seconds"]["VERIFIER"],
             binary_sha256=codex_binary_sha,
         )
         receipts["VERIFIER"] = _persist_and_validate(
@@ -424,22 +468,17 @@ def execute_batch(
         )
     except (OSError, QualificationError, KeyError, TypeError):
         write_exclusive_json(live_root / "verifier_receipt_error.json", {"role": "VERIFIER", "status": "FAIL_CLOSED", "failure_class": "RECEIPT_INTEGRITY_FAILURE", "recorded_at": utc_now()})
-        return _result(live_root=live_root, manifest=manifest, workspace=workspace, workspace_id=workspace_id, receipts=receipts, attempts=attempts, failure_class="RECEIPT_INTEGRITY_FAILURE")
+        return _result(live_root=live_root, manifest=manifest, workspace=workspace, workspace_id=workspace_id, receipts=receipts, attempts=attempts, failure_class="RECEIPT_INTEGRITY_FAILURE", frozen_manifest_bytes=manifest_bytes, frozen_sources=frozen_sources)
     failure_class = receipts["VERIFIER"]["failure_class"] if receipts["VERIFIER"]["machine_status"] != "PASS" else "NONE"
-    return _result(live_root=live_root, manifest=manifest, workspace=workspace, workspace_id=workspace_id, receipts=receipts, attempts=attempts, failure_class=failure_class)
+    return _result(live_root=live_root, manifest=manifest, workspace=workspace, workspace_id=workspace_id, receipts=receipts, attempts=attempts, failure_class=failure_class, frozen_manifest_bytes=manifest_bytes, frozen_sources=frozen_sources)
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--prelive-manifest", type=Path, required=True)
     args = parser.parse_args(argv)
-    try:
-        result = execute_batch(repo_root=REPO_ROOT, prelive_manifest_path=args.prelive_manifest)
-    except QualificationError as exc:
-        print(json.dumps({"status": "FAIL_CLOSED_BEFORE_OR_DURING_BATCH", "error_class": type(exc).__name__}, sort_keys=True))
-        return 2
-    print(json.dumps(result, sort_keys=True, separators=(",", ":")))
-    return 0 if result["qualification_pass"] else 1
+    print(json.dumps({"status": "FAIL_CLOSED_BOOTSTRAP_REQUIRED", "error_class": "QualificationError"}, sort_keys=True))
+    return 2
 
 
 if __name__ == "__main__":

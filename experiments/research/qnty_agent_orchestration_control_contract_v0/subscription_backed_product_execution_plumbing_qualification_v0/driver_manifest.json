@@ -1,0 +1,15 @@
+{
+  "schema_version": "subscription-backed-product-execution-plumbing-driver-manifest-v0",
+  "qualification_candidate_frozen": true,
+  "dsh_commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+  "dsh_tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+  "dsh_tag": "dsh-v0.1.0-rc.7",
+  "codex": {"binary": "/home/swirky/.local/bin/codex", "version": "codex-cli 0.147.0", "profile_a": "/home/swirky/.codex", "profile_b": "/home/swirky/.codex-pro2"},
+  "claude": {"binary": "/usr/bin/claude", "version": "2.1.223", "auth_class": "FIRST_PARTY_CLAUDE_PRODUCT_SUBSCRIPTION"},
+  "routes": {"dsh": "SubagentRuntime -> pinned product providers", "native": "direct official product transports"},
+  "workspace_policy": {"cwd_equals_scope": true, "sandbox": "workspace-write", "network": "disabled", "extra_roots": false, "approval": "never"},
+  "environment_policy": "four pay-per-token API keys and GitHub credentials removed without reading values",
+  "parent_llm": {"provider": "NONE", "request_count": 0},
+  "synthetic_root": "outside QntyLab; path intentionally not retained as canonical evidence",
+  "historical_task_or_answer_key": "not accessed"
+}

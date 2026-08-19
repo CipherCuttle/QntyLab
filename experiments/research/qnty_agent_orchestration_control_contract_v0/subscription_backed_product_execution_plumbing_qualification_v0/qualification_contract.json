@@ -1,0 +1,58 @@
+{
+  "schema_version": "subscription-backed-product-execution-plumbing-qualification-v0",
+  "project_id": "SUBSCRIPTION_BACKED_PRODUCT_EXECUTION_PLUMBING_QUALIFICATION_V0",
+  "phase": "BOUNDED_NONEXPERIMENTAL_PRODUCT_EXECUTION_QUALIFICATION_ONLY",
+  "scientific_episode": false,
+  "historical_stage_a_task": false,
+  "v2_authorized": false,
+  "runtime_integration_authorized": false,
+  "trading_authority": "NONE",
+  "capital_authority": "NONE",
+  "frozen_candidate": {
+    "plumbing_source": "qntylab/subscription_backed_product_execution_plumbing_v0.py",
+    "plumbing_source_sha256": "8a3e5e0cf02b480fac80fcdc9423bd93a85184afce5be014a5faba9cbb99ed54",
+    "test_suite": "tests/test_subscription_backed_product_execution_plumbing_v0.py",
+    "test_suite_sha256": "41b9a37f04d6a5088dc81b219bf26c705450222dbad90ee0699b71c1d1789eb6",
+    "synthetic_fixture_digest": "e804e68c970475de7fd5fc6ff3ba296fbd1ee9d3ab2cc8ede0ade0e4157e67d0",
+    "builder_prompt_sha256": "fffb99cf6d3d4ca05c15261f2bbf6715457741c267f7c7fe2929bdf2e6627718",
+    "repair_prompt_sha256": "ebc4b63b9e217567dbe097350f8a36e7d1c40586ea326e52491377e7cac8ad5f",
+    "reviewer_prompt_sha256": "1c983a633f3c420f2aa8a281a5d62d6e477983e4f76b718b054f30a629d30e0a",
+    "verifier_prompt_sha256": "15050291e0fe53e6db84924bc92ab759779c854802efe5d711026592e3dbbc3e"
+  },
+  "product_identity": {
+    "dsh_commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "dsh_tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "dsh_tag": "dsh-v0.1.0-rc.7",
+    "dsh_package": "@deepseek-ai/dsh@0.1.0-rc.7",
+    "codex_binary": "/home/swirky/.local/bin/codex",
+    "codex_version": "codex-cli 0.147.0",
+    "claude_binary": "/usr/bin/claude",
+    "claude_version": "2.1.223",
+    "codex_profile_a": "/home/swirky/.codex",
+    "codex_profile_b": "/home/swirky/.codex-pro2",
+    "parent_llm_provider": "NONE",
+    "parent_llm_request_count": 0
+  },
+  "routes": {
+    "dsh": "Pinned SubagentRuntime -> subagent-codex/subagent-claude-code",
+    "native": "Direct official Codex app-server / Claude stream-json",
+    "only_intended_difference": "transport ownership/path",
+    "cwd_binding": "exact synthetic workspace",
+    "workspace_policy": "workspace-write only; network disabled; no extra roots",
+    "approval_policy": "never",
+    "environment_policy": "remove four pay-per-token API keys and GitHub credentials"
+  },
+  "live_batch_order": [
+    "DSH_BUILDER",
+    "NATIVE_BUILDER",
+    "REAL_TEST_STAGE",
+    "DSH_REVIEWER",
+    "NATIVE_REVIEWER",
+    "DSH_REPAIR",
+    "NATIVE_REPAIR",
+    "REAL_TEST_STAGE_AFTER_REPAIR",
+    "DSH_VERIFIER",
+    "NATIVE_VERIFIER",
+    "SANITIZED_RECEIPTS"
+  ]
+}

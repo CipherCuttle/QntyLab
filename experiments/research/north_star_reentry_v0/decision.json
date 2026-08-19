@@ -1,0 +1,329 @@
+{
+  "schema_version": "north-star-reentry-decision-v0",
+  "phase": "QNTYLAB_NORTH_STAR_REENTRY_AND_NEXT_SCIENTIFIC_PHASE_SELECTION_V0",
+  "selection_status": "COMPLETE",
+  "canonical_head_sha": "85f0cf0c496edfdcfa69b25679fea7f476dacd6d",
+  "master_drift": "NO",
+  "active_project_at_start": "none",
+  "project_context_authority": {
+    "active_project": "none",
+    "permitted_next_action": "No project implementation is currently authorized.",
+    "queued_not_authorized": [
+      "PROSPECTIVE_SHADOW", "QNTY_HANDOFF", "REACTIVE_JIGSAW_V0",
+      "ROUTER_DATASET_CONTRACT", "ROUTER_FIXTURE_V0",
+      "SEALED_TEMPORAL_EVALUATION", "STATE_SNAPSHOT_V0",
+      "STATE_TRANSITION / CHANGE_POINT WORK"
+    ]
+  },
+  "reuse_preflight": {
+    "reuse_preflight": "REQUIRED",
+    "project_code_reference_matches": [
+      {"project_id": "JH01_RV_PERSISTENCE_INCREMENTAL_FORECAST_VALUE_PREREG_V1", "project_state": "CLOSED_PASS", "paths": ["qntylab/jh01_rv_persistence_incremental_forecast_value_prereg_v1.py"]},
+      {"project_id": "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_SOURCE_INPUT_AND_OPEN_EXECUTION_READINESS_R1", "project_state": "CLOSED_BLOCKED", "paths": ["qntylab/qnty_edge_order_flow_v0_readiness.py", "qntylab/binance_um_kline_1h.py"]},
+      {"project_id": "JIGSAW_TERMINAL_RESEARCH_EVIDENCE_EXTRACTION_IMPLEMENTATION_V0", "project_state": "CLOSED_PASS", "paths": ["qntylab/jfp03_terminal_evidence.py"]},
+      {"project_id": "JH01_RV_PERSISTENCE_TEMPORAL_REPLICATION_JIGSAW_EVIDENCE_IMPLEMENTATION_V0", "project_state": "CLOSED_PASS", "paths": ["qntylab/jigsaw_synthesis.py", "qntylab/research_ledger.py"]}
+    ],
+    "projection_truncated": "YES",
+    "bounded_search": [
+      "python -m qntylab.project_context brief",
+      "python -m qntylab.project_context spine",
+      "rg --files qntylab tests | rg 'jigsaw|jh01|order.flow|funding|dispersion|router|state|afi|jfp'"
+    ],
+    "broad_content_search": "NOT_RUN_PLAUSIBLE_FILENAME_MATCH_INSPECTED",
+    "candidates_inspected": [
+      "qntylab/jigsaw_index.py", "qntylab/jigsaw_synthesis.py",
+      "qntylab/jh01_rv_persistence_incremental_forecast_value_prereg_v1.py",
+      "qntylab/qnty_edge_order_flow_v0_readiness.py",
+      "qntylab/jigsaw_trend_condition_dependence_v0.py",
+      "qntylab/jfp03_terminal_evidence.py"
+    ],
+    "disposition": "EXTEND_EXISTING_EARNED_EVIDENCE_WITH_FROZEN_JH01_V1_PROSPECTIVE_QUESTION"
+  },
+  "scientific_evidence_inventory": [
+    {
+      "family": "JH01 RV persistence discovery plus temporal replication",
+      "category": "predictive state evidence",
+      "mechanism": "Realized-volatility clustering/persistence.",
+      "question_already_answered": "Positive association was observed twice in disjoint windows; causal, independent, incremental, and economic claims remain unanswered.",
+      "result": "Discovery beta 0.504797, HAC 95% CI [0.426264,0.583331], Holm p 8.64e-36, n=580. Replication beta 0.400684, HAC 95% CI [0.313329,0.488039], p 2.47e-19, n=365.",
+      "evidence_strength": "moderate exploratory association with temporal replication",
+      "temporal_status": "later window disjoint; no independent replication",
+      "independence_status": "INDEPENDENCE_NOT_ESTABLISHED",
+      "known_failure_mode": "Same estimator and panel family; temporal separation does not establish DGP or methodological independence.",
+      "known_data_blocker": "V0 first origin elapsed without persisted forecasts; V1 is the valid continuation.",
+      "relation_to_action_utility": "Potential state input, not action ordering or net utility.",
+      "next_unanswered_question": "Does fitted RV persistence improve forecasts beyond literal naive persistence and a secondary HAR-style benchmark?",
+      "next_phase_already_authorized": true,
+      "expected_information_gain": "high"
+    },
+    {
+      "family": "JH02 dispersion to RV",
+      "category": "predictive state evidence",
+      "mechanism": "Cross-sectional dispersion as a volatility-state proxy.",
+      "question_already_answered": "Positive association within one frozen history; it does not rescue the different dispersion-to-CS-momentum result.",
+      "result": "Beta 0.160462, HAC 95% CI [0.036318,0.284605], Holm p=0.033894, n=580.",
+      "evidence_strength": "single-sample positive association",
+      "temporal_status": "single fixed window",
+      "independence_status": "shared frozen history; prior exposure YES",
+      "known_failure_mode": "No out-of-time or incremental benchmark test.",
+      "known_data_blocker": "None for frozen result; broader action utility is unearned.",
+      "relation_to_action_utility": "Potential volatility state, not action ordering.",
+      "next_unanswered_question": "Whether dispersion adds information beyond RV persistence in a new frozen action question.",
+      "next_phase_already_authorized": false,
+      "expected_information_gain": "medium"
+    },
+    {
+      "family": "JH03 breadth and JH04 drawdown to return",
+      "category": "negative/null evidence",
+      "mechanism": "Breadth/drawdown as return or reversal state proxies.",
+      "question_already_answered": "Frozen positive directions were not established; results are inconclusive, not absence evidence.",
+      "result": "JH03 beta -0.00007295, Holm p=1.0; JH04 beta 0.00098685, Holm p=1.0; both n=580.",
+      "evidence_strength": "weak/inconclusive single-sample evidence",
+      "temporal_status": "single fixed window",
+      "independence_status": "shared frozen history",
+      "known_failure_mode": "Low precision; no action comparison beyond frozen propositions.",
+      "known_data_blocker": "None.",
+      "relation_to_action_utility": "No trend-versus-reversal-versus-flat ordering established.",
+      "next_unanswered_question": "Only a distinct, independently justified conditional-utility question; no rescue.",
+      "next_phase_already_authorized": false,
+      "expected_information_gain": "low-to-medium"
+    },
+    {
+      "family": "Trend condition dependence and external replication",
+      "category": "condition-dependent action-utility evidence",
+      "mechanism": "Fixed H003 trend utility may differ across drawdown states.",
+      "question_already_answered": "Narrow retrospective association was externally replicated under a frozen protocol.",
+      "result": "Original stress HIGH-minus-LOW +0.0023699, 95% interval [-0.0006768,0.0057398]. External stress +0.000438; 9/19 usable assets same direction, bootstrap sign uncertain; EXTERNAL_REPLICATION_MIXED.",
+      "evidence_strength": "narrow positive discovery, mixed replication",
+      "temporal_status": "retrospective plus frozen 2025-01..2026-06 external cohort",
+      "independence_status": "external assets, not independent DGP/methodology proof",
+      "known_failure_mode": "Breadth, temporal consistency, top-five robustness, and bootstrap criteria failed.",
+      "known_data_blocker": "None; specified replication consumed.",
+      "relation_to_action_utility": "Direct but weak; no Router or sleeve authority.",
+      "next_unanswered_question": "Return to new Jigsaw discovery; do not rerun consumed replication.",
+      "next_phase_already_authorized": false,
+      "expected_information_gain": "low"
+    },
+    {
+      "family": "Funding-pressure volatility",
+      "category": "execution/cost/funding and negative/null evidence",
+      "mechanism": "Funding pressure as a perpetual crowding/carry state.",
+      "question_already_answered": "Simple HIGH-minus-LOW directional proposition was not supported.",
+      "result": "Observed contrast -0.000200365; NOT_SUPPORTED_UNDER_FROZEN_SPECIFICATION. No incremental RV/HAR benchmark or economic hurdle was preregistered.",
+      "evidence_strength": "frozen directional null/falsification",
+      "temporal_status": "single historical window",
+      "independence_status": "single source/history",
+      "known_failure_mode": "Do not reverse the sign; no incremental or economic inference.",
+      "known_data_blocker": "New outcome-blind materialization/design required for the remaining question.",
+      "relation_to_action_utility": "Potential input only after incremental value and cost-aware utility are tested.",
+      "next_unanswered_question": "Does funding/basis/carry add information beyond lagged RV/HAR for volatility or action utility?",
+      "next_phase_already_authorized": false,
+      "expected_information_gain": "medium-high"
+    },
+    {
+      "family": "Signed-taker-notional order flow",
+      "category": "blocked-but-mechanistically-promising evidence",
+      "mechanism": "Aggressive signed taker notional may predict return/volatility or action utility net of costs.",
+      "question_already_answered": "No scientific result; only outcome-free readiness checks.",
+      "result": "60 windows blocked: 40 missing DEV_2022 price/open coverage and 20 missing DEV_2024 taker-buy quote fields; DEV_2025 price/funding coverage unresolved. Source partition passed; coverage failed.",
+      "evidence_strength": "mechanistic prior, no result",
+      "temporal_status": "historical candidate not executed",
+      "independence_status": "not applicable",
+      "known_failure_mode": "Source substitutions can change the feature; open-to-open and signed-field bindings must hold.",
+      "known_data_blocker": "Canonical source/input coverage and provenance binding for DEV_2022/2024/2025.",
+      "relation_to_action_utility": "High direct relevance; frozen FLAT/prior-return controls and cost/funding semantics exist.",
+      "next_unanswered_question": "Does signed taker notional add predictive/action utility beyond recent return and realistic costs?",
+      "next_phase_already_authorized": false,
+      "expected_information_gain": "high if cleanly executable"
+    },
+    {
+      "family": "Cross-sectional dispersion conditional utility",
+      "category": "condition-dependent action-utility evidence",
+      "mechanism": "Dispersion may change cross-sectional momentum utility versus FLAT.",
+      "question_already_answered": "Yes; PIT warm-up was resolved and the frozen family failed.",
+      "result": "Only 1/4 variants met the negative stress direction versus required 3/4; KILLED/GRAVEYARDED.",
+      "evidence_strength": "clean negative/null family result",
+      "temporal_status": "DEV_2024 frozen execution after 365-day warm-up",
+      "independence_status": "single frozen family/history",
+      "known_failure_mode": "No exact-variant rescue or reparameterization.",
+      "known_data_blocker": "Former 365-day warm-up blocker resolved.",
+      "relation_to_action_utility": "Directly tested and failed for this action family.",
+      "next_unanswered_question": "Only a distinct mechanistic action question, not this rescue.",
+      "next_phase_already_authorized": false,
+      "expected_information_gain": "low"
+    },
+    {
+      "family": "JFP03 AFI and fast prospective generations",
+      "category": "computability/applicability evidence",
+      "mechanism": "AFI/fast-lane flow and forecast signal candidates.",
+      "question_already_answered": "AFI computability failed in frozen scope; JFPV2 had one support and one no-support measurement result; JFPV3 has no prospective collection.",
+      "result": "One authenticated denominator violation among 43,848 rows (total_quote_volume=0 at 2024-10-28T21:00Z); no AFI estimate exists. JFP03 one-shot is consumed BLOCKED_CANDIDATE.",
+      "evidence_strength": "strong computability failure; no AFI value result",
+      "temporal_status": "frozen historical/branch-local records",
+      "independence_status": "not applicable or not established",
+      "known_failure_mode": "Do not launder computability failure into a predictive null or rescue the same candidate.",
+      "known_data_blocker": "Authenticated frozen failure; no source reacquisition/rerun authority.",
+      "relation_to_action_utility": "No earned action-utility requirement.",
+      "next_unanswered_question": "Only a genuinely new, independently valuable valid-contract candidate.",
+      "next_phase_already_authorized": false,
+      "expected_information_gain": "low for same candidate"
+    }
+  ],
+  "candidate_portfolio": [
+    {
+      "candidate": "JH01 V1 outcome-blind prospective incremental forecast-value continuation",
+      "status": "LIVE_AND_TIME_SENSITIVE",
+      "north_star_relevance": "high", "mechanism_quality": "medium-high",
+      "expected_information_gain": "high", "action_utility_relevance": "medium/foundational",
+      "incrementality": "high", "data_readiness": "qualified and authorized",
+      "implementation_cost": "already bounded", "data_acquisition_cost": "prospective only",
+      "contamination_risk": "low", "time_sensitivity": "critical",
+      "rabbit_hole_risk": "low", "disposition": "SELECT"
+    },
+    {
+      "candidate": "Order Flow source unblock then signed-taker-notional experiment",
+      "status": "LIVE_BUT_BLOCKED", "north_star_relevance": "very high",
+      "mechanism_quality": "high", "expected_information_gain": "high if executable",
+      "action_utility_relevance": "very high", "incrementality": "high",
+      "data_readiness": "60-window coverage block", "implementation_cost": "medium",
+      "data_acquisition_cost": "high", "contamination_risk": "medium-high",
+      "time_sensitivity": "low", "rabbit_hole_risk": "high",
+      "disposition": "RUNNER_UP_1"
+    },
+    {
+      "candidate": "Funding/basis/carry incremental value beyond RV baseline",
+      "status": "NEW_QUESTION_REQUIRED", "north_star_relevance": "high",
+      "mechanism_quality": "high", "expected_information_gain": "medium-high",
+      "action_utility_relevance": "medium-high", "incrementality": "high",
+      "data_readiness": "new contract required", "implementation_cost": "medium",
+      "data_acquisition_cost": "medium", "contamination_risk": "medium",
+      "time_sensitivity": "low", "rabbit_hole_risk": "medium",
+      "disposition": "RUNNER_UP_2"
+    },
+    {
+      "candidate": "Trend-condition external replication continuation",
+      "status": "CONSUMED_MIXED", "north_star_relevance": "medium-high",
+      "mechanism_quality": "medium", "expected_information_gain": "low",
+      "action_utility_relevance": "high", "incrementality": "consumed",
+      "data_readiness": "consumed", "implementation_cost": "consumed",
+      "data_acquisition_cost": "medium", "contamination_risk": "high",
+      "time_sensitivity": "low", "rabbit_hole_risk": "high",
+      "disposition": "ELIMINATE_CONSUMED"
+    },
+    {
+      "candidate": "Cross-sectional-dispersion warm-up plus execution",
+      "status": "CONSUMED_KILLED", "north_star_relevance": "medium",
+      "mechanism_quality": "medium", "expected_information_gain": "low",
+      "action_utility_relevance": "high but failed", "incrementality": "not tested",
+      "data_readiness": "warm-up resolved", "implementation_cost": "consumed",
+      "data_acquisition_cost": "consumed", "contamination_risk": "high",
+      "time_sensitivity": "low", "rabbit_hole_risk": "high",
+      "disposition": "ELIMINATE_CONSUMED"
+    },
+    {
+      "candidate": "Minimal conditional action-utility experiment",
+      "status": "NOT_YET_EARNED", "north_star_relevance": "very high",
+      "mechanism_quality": "unknown until frozen", "expected_information_gain": "uncertain",
+      "action_utility_relevance": "very high", "incrementality": "new design required",
+      "data_readiness": "insufficient earned sleeves/states", "implementation_cost": "medium-high",
+      "data_acquisition_cost": "unknown", "contamination_risk": "high",
+      "time_sensitivity": "low", "rabbit_hole_risk": "very high",
+      "disposition": "DEFER"
+    },
+    {
+      "candidate": "ROUTER_DATASET_CONTRACT",
+      "status": "QUEUED_NOT_AUTHORIZED", "north_star_relevance": "downstream only",
+      "mechanism_quality": "not applicable", "expected_information_gain": "low now",
+      "action_utility_relevance": "later", "incrementality": "not a science question",
+      "data_readiness": "insufficient maturity", "implementation_cost": "low-medium",
+      "data_acquisition_cost": "unknown", "contamination_risk": "high",
+      "time_sensitivity": "none", "rabbit_hole_risk": "very high",
+      "disposition": "ELIMINATE_AS_INFRASTRUCTURE"
+    }
+  ],
+  "eliminated_as_already_consumed": [
+    "Trend external replication: EXTERNAL_REPLICATION_MIXED and consumed.",
+    "Cross-sectional dispersion: warm-up resolved, exact family KILLED 1/4.",
+    "JIGSAW_HARVEST_V0: consumed and retired.",
+    "JFP03 one-shot: consumed BLOCKED_CANDIDATE; no rerun/rescue."
+  ],
+  "eliminated_as_low_information_value": [
+    "ROUTER_DATASET_CONTRACT: architecture downstream, not an information-bearing question.",
+    "STATE_SNAPSHOT_V0: no exact earned inclusion set; current pieces are weak/redundant/non-action-specific.",
+    "Same-question trend/dispersion rescues: consumed or failed and prohibited."
+  ],
+  "finalists": [
+    "JH01 V1 outcome-blind prospective incremental forecast-value continuation",
+    "Order Flow source unblock then signed-taker-notional experiment",
+    "Funding/basis/carry incremental-value experiment beyond RV baseline"
+  ],
+  "ten_stack_red_team": {
+    "socratic": "The uncertainty is whether repeated RV persistence adds information beyond literal persistence; current evidence cannot answer it.",
+    "dialectic": "JH01 has the cleanest perishable discriminator and existing authority; Order Flow is more action-direct but data-blocked; Funding is mechanistically strong but needs a new contract and has no deadline.",
+    "popper": "JH01 fails if valid 365-origin C_JH01 does not beat B1 by >=5% MSE with adjusted-MSPE HAC p<=0.05; integrity failure blocks classification.",
+    "causal": "JH01 is predictive forecast value, not causality or economic edge. Order Flow/Funding would initially be predictive association/action-utility evidence, not causal proof.",
+    "systems": "JH01 yields a reusable forecast-state requirement; it does not justify Router/State Snapshot. Order Flow would yield a more direct action-utility piece only after coverage repair.",
+    "cybernetics": "JH01 improves feedback toward decisions by testing whether a known state estimate improves forecasts; it is not infrastructure-only work.",
+    "bayesian": "Repeated positive persistence raises belief in persistence, not automatically in incremental fitted-model value; the selected test is therefore belief-changing but bounded.",
+    "mdl": "JH01 is one compact extra-parameter test against literal persistence; Router/State Snapshot would add representation before redundancy is resolved.",
+    "doe": "The cheapest clean discriminator is the already-frozen one-comparison V1 design with existing panel, schedule, benchmark, and recorder.",
+    "adversarial": "Missed origins, pre-origin persistence, held-out access, drift, interim metrics, and forecast-to-edge laundering are explicit kill risks and remain prohibited.",
+    "critical_findings": [], "high_findings": [],
+    "medium_findings": ["JH01 is upstream of E[U(a)|X] and cannot be described as action-utility evidence until a separate cost-aware action question is earned."],
+    "low_findings": ["The prospective campaign is operationally demanding, but its scope is already bounded by the exact one-campaign schedule."],
+    "c_h_fix_pass_used": false, "targeted_rereview_used": false
+  },
+  "decision": {
+    "selected_next_phase": "JH01_V1_OUTCOME_BLIND_PROSPECTIVE_INCREMENTAL_FORECAST_VALUE_CONTINUATION",
+    "why_this_wins": "It tests the strongest repeated state relation against the simplest persistence benchmark, with a fixed outcome-blind protocol and a perishable 2026-09-15 first origin. Exact campaign authority and recorder already exist, so no speculative plumbing is needed now.",
+    "primary_scientific_question": "Does frozen fitted JH01 RV24 persistence improve outcome-unseen 24-hour RV forecasts materially beyond literal naive persistence, with HAR-style reporting secondary?",
+    "null_falsification_condition": "No lower C_JH01 MSE, relative MSE reduction below 5%, or adjusted-MSPE HAC p>0.05; any source/timing/persistence/coverage integrity failure blocks classification and stops the campaign.",
+    "mechanism": "Volatility clustering may make current RV informative about near-future RV; test whether fitted persistence adds information beyond using current RV literally.",
+    "expected_information_gain": "high and decision-changing for whether RV persistence is redundant state description or a useful forecast primitive",
+    "relation_to_E_U_action_given_X": "Indirect but foundational: tests one earned observable state component. It does not estimate TREND/REVERSAL/FLAT utility ordering or authorize routing.",
+    "why_not_runner_up_1": "Order Flow is more action-direct, but all 60 windows remain coverage-blocked and require high-risk source/provenance repair. It has no time pressure or scientific result; JH01 has a clean frozen discriminator and unconsumed authority.",
+    "why_not_runner_up_2": "Funding incremental value is strong and correctly remains open after the old directional null, but requires a new preregistration/input qualification and is not time-sensitive; selecting it would forfeit the fixed JH01 opportunity without a stronger information argument.",
+    "minimum_required_new_infrastructure": "None for selection. Later work reuses the exact qualified wrapper/recorder; no Router, State Snapshot, Qnty, or scientific evaluator implementation is authorized here.",
+    "data_required": "Existing frozen 20-symbol Binance USD-M perpetual 1h source contract and outcome-blind per-origin inputs; no market data is accessed in this phase.",
+    "prospective_or_historical": "PROSPECTIVE_OUTCOME_BLIND_COLLECTION; final evaluation only after 365 origins",
+    "contamination_controls": [
+      "Reuse preregistration digest bdb85130cae75e9f156db9aa1fd955d7f565a3714ae091871d5ac4447c1ec27b.",
+      "Fixed 2026-09-15 first origin and exactly 365 daily origins; no skip/substitute/moved date/second campaign.",
+      "Persist forecast before outcome availability; strict source cutoff <= origin; no open/partial future bars.",
+      "Fixed C_JH01/B1/B0/B3 models and primary MSE/5%/Clark-West-HAC gates.",
+      "No interim metrics, rankings, p-values, or held-out outcome outputs.",
+      "Stop on missing/duplicate/reordered origin, digest mismatch, or authority violation."
+    ],
+    "stop_condition": "Stop permanently on any frozen kill condition or missed origin; no backfill, rescue, date/model/benchmark/metric change, or blocked-result reinterpretation.",
+    "north_star_relevance": "HIGH", "infrastructure_burden": "LOW_INCREMENTAL_BURDEN",
+    "time_sensitivity": "CRITICAL"
+  },
+  "authority_reconciliation": {
+    "authority_disposition": "REUSE_EXISTING",
+    "existing_authority_project": "JH01_V1_REAL_PROSPECTIVE_OPERATION_AUTHORIZATION_V0",
+    "authority_artifact": "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/real_prospective_operation_authorization_v0.json",
+    "authority_artifact_state": "ACTIVE_UNCONSUMED",
+    "authority_artifact_sha256": "f2d9a16c8c9d053196b15cfb28817232b6872d5c1b77273fcef97f627e815e3b",
+    "canonical_sha": "85f0cf0c496edfdcfa69b25679fea7f476dacd6d",
+    "scope": "Exactly one JH01 V1 campaign, 365 daily origins 2026-09-15..2027-09-14, fixed 20-symbol panel/source contract, qualified immutable-release recorder; operational collection only.",
+    "remaining_budget": "real_activation_count 0 of 1; real_forecasts_persisted 0 of 365",
+    "one_shot_constraints": ["canonicalization_required_before_effect", "no moved/replacement origin", "no second campaign", "no new model/panel/target/backend/verifier/source/metric", "scientific_evaluation_authorized=false", "interim_metrics_authorized=false", "downstream_authority=NONE"],
+    "new_authorization_project": null,
+    "scientific_execution_authorized_now": "NO"
+  },
+  "review": {
+    "review_type": "ONE_INDEPENDENT_READ_ONLY_HOSTILE_REVIEW",
+    "critical": 0, "high": 0, "medium": 1, "low": 1,
+    "c_h_fix_pass_used": false, "targeted_rereview_used": false,
+    "open_critical": 0, "open_high": 0,
+    "review_conclusion": "Selection maximizes bounded decision-changing information under the deadline, reuses infrastructure, does not repeat consumed work, is falsifiable, and grants no downstream authority. The medium finding is a scope limitation, not a blocker."
+  },
+  "boundaries": {
+    "DSH": "NO", "V0R3": "NO", "agent_orchestration_work": "NO",
+    "market_data_accessed": "NO", "scientific_execution": "NO",
+    "state_snapshot_implemented": "NO", "router_implemented": "NO",
+    "qnty_runtime": "NO", "trading": "NO", "capital": "NO",
+    "stage_a_v2": "NOT_AUTOMATICALLY_AUTHORIZED"
+  },
+  "verdict": "SELECT_JH01_V1_AND_STOP_AFTER_GOVERNANCE_SELECTION; DO_NOT_EXECUTE_THE_SCIENTIFIC_CAMPAIGN_IN_THIS_PHASE"
+}

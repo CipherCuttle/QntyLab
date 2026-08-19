@@ -1,0 +1,168 @@
+{
+  "schema_version": "subscription-backed-native-product-execution-qualification-closure-interpretation-correction-v0r2",
+  "project_id": "SUBSCRIPTION_BACKED_NATIVE_PRODUCT_EXECUTION_QUALIFICATION_V0R2",
+  "correction_scope": "ONE_BOUNDED_APPEND_ONLY_CLOSURE_EVIDENCE_CORRECTION_ON_ALREADY_CONSUMED_PHASE",
+  "source_head": "d0c39ca626da584f45d6c009c864098285c52f78",
+  "historical_live_batch_immutable": true,
+  "observed": {
+    "batch_attempts": 1,
+    "builder_attempts": 1,
+    "reviewer_attempts": 0,
+    "verifier_attempts": 0,
+    "builder_product_process_started": true,
+    "api_key_gate": "PASS",
+    "initialize_succeeded": true,
+    "thread_start_succeeded": true,
+    "thread_identity_obtained": true,
+    "effective_cwd_matched_synthetic_workspace": true,
+    "approval_policy": "never",
+    "sandbox_class": "workspaceWrite",
+    "network_access": false,
+    "runtime_workspace_roots": [
+      "/tmp/qntylab-native-product-qualification-v0-eubfqgip"
+    ],
+    "legacy_writable_roots": [],
+    "turn_start_succeeded": false,
+    "turn_terminal_observed": false,
+    "lifecycle": "TURN_START_FAILED",
+    "fixture_before": "BEFORE\\n",
+    "fixture_after": "BEFORE\\n",
+    "fixture_mutated": false,
+    "changed_paths": [],
+    "reviewer_ran": false,
+    "verifier_ran": false,
+    "historical_live_result_verdict": "NATIVE_PRODUCT_EXECUTION_QUALIFICATION_BLOCKED",
+    "historical_closure_result_verdict": "SUBSCRIPTION_BACKED_NATIVE_PRODUCT_EXECUTION_QUALIFICATION_V0R2_FAIL"
+  },
+  "derived_from_frozen_code": {
+    "ordering": [
+      "initialize request is sent",
+      "thread/start request is sent and its effective policy is read",
+      "turn/start request is sent",
+      "a non-OK turn/start response sets lifecycle to TURN_START_FAILED",
+      "effective policy contract_match is computed later during receipt construction"
+    ],
+    "v0r2_initialize_request": {
+      "method": "initialize",
+      "params": {
+        "clientInfo": {
+          "name": "qntylab-native-product-qualification",
+          "version": "0"
+        }
+      }
+    },
+    "v0r2_thread_start_request": {
+      "method": "thread/start",
+      "params_for_builder": {
+        "approvalPolicy": "never",
+        "cwd": "<synthetic workspace>",
+        "ephemeral": true,
+        "sandbox": "workspace-write"
+      }
+    },
+    "v0r2_turn_start_request": {
+      "method": "turn/start",
+      "param_keys": [
+        "threadId",
+        "cwd",
+        "approvalPolicy",
+        "sandboxPolicy",
+        "runtimeWorkspaceRoots",
+        "input"
+      ],
+      "runtimeWorkspaceRoots": [
+        "<synthetic workspace>"
+      ]
+    },
+    "turn_start_failure_ordering_proven": true,
+    "writable_roots_empty_causal_claim": "NOT_SUPPORTED",
+    "contract_match_false_causal_claim": "NOT_SUPPORTED",
+    "workspace_identity_match_meaning": "The source names this field workspace_identity_match, but computes it as the composite workspace_gate: final fixture must be AFTER, final changed paths must be [fixture.txt], and every recorded role receipt must carry the immutable workspace identity.",
+    "workspace_identity_creation_meaning": "workspace_identity is SHA-256 over canonical identity fields containing resolved_path, initial_head, initial_workspace_digest, and initial_git_metadata_digest.",
+    "canonical_terminal_classification_from_controller": "NATIVE_PRODUCT_EXECUTION_QUALIFICATION_BLOCKED",
+    "builder_role_classification": "FAIL",
+    "downstream_rule": "A non-PASS Builder receipt returns the batch result before Reviewer and Verifier markers are created."
+  },
+  "historical_precedent": {
+    "pr": 135,
+    "project_id": "SUBSCRIPTION_BACKED_CODEX_APP_SERVER_WRITE_PATH_DIAGNOSTIC_V0",
+    "merged_head": "d104342a62bc3e315d3434d16013862de529ca70",
+    "legacy_writable_roots": [],
+    "runtime_workspace_roots": "contained the disposable workspace",
+    "sandbox_class": "workspaceWrite",
+    "d2_fixture_result": "fixture.txt changed to AFTER",
+    "d3_fixture_result": "fixture.txt changed to AFTER",
+    "pr135_legacy_writable_roots_precedent": "ESTABLISHED",
+    "legacy_writable_roots_empty_implies_no_write_capability": false,
+    "narrow_supported_claim": "For pinned Codex 0.147.0 in the observed app-server configuration, legacy ThreadStartResponse sandbox.writableRoots=[] coexisted with a successfully writable cwd when runtimeWorkspaceRoots contained that workspace.",
+    "evidence_paths": [
+      "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_codex_app_server_write_path_diagnostic_v0/diagnostic_contract.json",
+      "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_codex_app_server_write_path_diagnostic_v0/result.json",
+      "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_codex_app_server_write_path_diagnostic_v0/sanitized_rpc_trace.jsonl"
+    ]
+  },
+  "inferred_hypothesis": {
+    "static_root_cause_proven": false,
+    "root_cause_hypothesis": "TURN_START_EXPERIMENTAL_CAPABILITY_NEGOTIATION_MISMATCH",
+    "root_cause_class_or_hypothesis": "TURN_START_EXPERIMENTAL_CAPABILITY_NEGOTIATION_MISMATCH",
+    "hypothesis_confidence": "HIGH",
+    "basis": [
+      "V0R2 sends runtimeWorkspaceRoots at turn/start.",
+      "V0R2 initialize sends clientInfo only and contains no repository-proven capability negotiation for that field.",
+      "The committed #135 passing request shape does not send runtimeWorkspaceRoots at turn/start while its response exposes runtimeWorkspaceRoots and its D2/D3 fixtures change to AFTER.",
+      "The repository does not contain the exact pinned-0.147.0 schema rule or rejection response proving that this mismatch is the deterministic rejection mechanism."
+    ],
+    "exact_rejection_mechanism_observed": false,
+    "no_live_diagnosis_performed": true
+  },
+  "classification_reconciliation": {
+    "live_result_classification": "NATIVE_PRODUCT_EXECUTION_QUALIFICATION_BLOCKED",
+    "closure_result_classification": "SUBSCRIPTION_BACKED_NATIVE_PRODUCT_EXECUTION_QUALIFICATION_V0R2_FAIL",
+    "canonical_terminal_classification": "NATIVE_PRODUCT_EXECUTION_QUALIFICATION_BLOCKED",
+    "reconciliation": "Preserve both historical artifacts byte-for-byte. Under the frozen controller/state machine, the Builder role is FAIL, but failure before a successful Builder turn and before Reviewer/Verifier execution yields a BLOCKED qualification result; the closure FAIL label is retained as historical closure wording, not treated as the canonical result classification."
+  },
+  "workspace_identity": {
+    "workspace_identity_match": false,
+    "workspace_identity_match_false_explained": "YES",
+    "workspace_identity_match_meaning": "Composite workspace_gate, not a direct assertion that the workspace path or immutable creation identity differed.",
+    "false_because": [
+      "final fixture digest remained BEFORE rather than the required AFTER digest",
+      "final changed paths remained [] rather than [fixture.txt]"
+    ],
+    "receipt_identity_equality_was_failure_cause": false,
+    "workspace_identity_match_causal_to_turn_failure": "NO",
+    "same_workspace_path_observed": true,
+    "no_fixture_mutation_observed": true
+  },
+  "preservation": {
+    "implementation_bytes_changed": false,
+    "test_code_changed": false,
+    "prompt_bytes_changed": false,
+    "contract_bytes_changed": false,
+    "prelive_artifact_changed": false,
+    "live_receipt_changed": false,
+    "live_result_changed": false,
+    "started_marker_changed": false,
+    "live_rerun_authorized": false,
+    "v0r3_authorized": false,
+    "stage_a_v2_authorized_by_this_correction": false
+  },
+  "next_action": {
+    "canonical": "STOP NATIVE QUALIFICATION PLUMBING",
+    "no_v0r3": true,
+    "no_rerun": true,
+    "no_attempt_to_rescue_consumed_v0r2_episode": true,
+    "qualification_program_gates_north_star_research": false,
+    "return_control_for": "SEPARATE_NORTH_STAR_STAGE_A_DECISION",
+    "stage_a_v2_authorized_by_this_correction": false,
+    "scope_note": "The native subscription-backed Codex write capability already has positive historical evidence from PR #135. V0R2 remains a terminal failed/blocked three-role qualification with Reviewer and Verifier untested in that episode."
+  },
+  "evidence_paths": [
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/live_batch_v0/result.json",
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/live_batch_v0/builder_receipt.json",
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/qualification_contract.json",
+    "qntylab/subscription_backed_native_product_execution_qualification_v0.py",
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_codex_app_server_write_path_diagnostic_v0/diagnostic_contract.json",
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_codex_app_server_write_path_diagnostic_v0/result.json"
+  ]
+}

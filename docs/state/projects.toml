@@ -3743,6 +3743,7 @@ authoritative_artifacts = [
   "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/independent_hostile_review_v0r2.md",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/prelive_freeze_v0r2.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/closure_result_v0r2.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/closure_interpretation_correction_v0r2.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/live_batch_v0/result.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/live_batch_v0/builder_receipt.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_native_product_execution_qualification_v0/native_codex_role_driver_v0.py",
@@ -3794,10 +3795,11 @@ initial_review_medium = 0
 initial_review_low = 0
 open_critical = 0
 open_high = 0
-root_cause_proven = true
-root_cause_class = "PRELIVE_FROZEN_CONTRACT_VALIDATION_INCOMPATIBILITY"
+root_cause_proven = false
+root_cause_class = "TURN_START_EXPERIMENTAL_CAPABILITY_NEGOTIATION_MISMATCH"
+root_cause_hypothesis_confidence = "HIGH"
 active_project_after_closure = "NONE"
-experiment_state = "QUALIFICATION_FAILED_NATIVE_PRODUCT_STACK"
+experiment_state = "QUALIFICATION_BLOCKED_TURN_START_FAILURE"
 implementation_authority = "CLOSED"
 deterministic_test_result = "PASS"
 frozen_timeout_contract_binding = "PASS"
@@ -3828,4 +3830,4 @@ qnty_runtime_authorized = false
 trading_authorized = false
 capital_authorized = false
 api_keys_used = false
-next_action = "CLOSED_BLOCKED: the frozen timeout contract binding passed deterministic and prelive gates, but the one authorized native batch failed in the Builder product stack because Profile A reported no writable workspace root and contract_match=false before fixture mutation. Do not rerun, repair, review, create V0R3, create Stage-A V2, access market data, perform scientific evaluation, invoke Qnty runtime, trade, use capital, or merge; any future work requires separate authority."
+next_action = "STOP NATIVE QUALIFICATION PLUMBING. Preserve the consumed V0R2 live evidence and closure wording; writableRoots=[] and contract_match=false are not supported as causal explanations of TURN_START_FAILED. The canonical qualification result is BLOCKED because no successful Builder turn was established and Reviewer/Verifier were not run. PR #135 already provides positive native Codex write-path evidence. Do not rerun, rescue V0R2, create V0R3, create or authorize Stage-A V2, access market data, perform scientific evaluation, invoke Qnty runtime, trade, use capital, or merge. Return control for a separate North-Star / Stage-A decision."

@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- None.
+- `Subscription-backed native product execution qualification V0` — `ACTIVE`. Implement, deterministically test, independently review, freeze, and execute at most one three-role synthetic native subscription-backed qualification batch using Codex Profile A as BUILDER, Claude Code subscription as INDEPENDENT_REVIEWER, and Codex Profile B as VERIFIER; record and verify the fail-closed result, then open a draft PR and stop. No DSH, Stage-A, historical task or answer key, market data, scientific evaluation, Qnty runtime, trading, capital, or merge authority is granted.
 
 ## Queued — not authorized
 

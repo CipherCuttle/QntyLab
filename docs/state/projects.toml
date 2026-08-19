@@ -3496,3 +3496,52 @@ targeted_governance_rereview_used = true
 active_project_after_closure = "NONE"
 experiment_state = "DIAGNOSTIC_INCONCLUSIVE_WITH_TRACE"
 next_action = "Do not rerun this ladder, PR #134's batch, or Stage-A V1. The subscription-backed native write path is demonstrated working under explicit per-turn approvalPolicy=never and sandboxPolicy=workspaceWrite through D3, so absent native write capability is not supported by evidence. D4 was never exercised; diagnosing the pinned DSH Codex route requires a separately authorized bounded phase that first builds the pinned DSH worktree. No V2, runtime, scientific, Qnty NEXT_ACTION, trading, or capital authority is created."
+
+[[project]]
+project_id = "SUBSCRIPTION_BACKED_NATIVE_PRODUCT_EXECUTION_QUALIFICATION_V0"
+display_name = "Subscription-backed native product execution qualification V0"
+state = "ACTIVE"
+authority_level = "BOUNDED_NONEXPERIMENTAL_NATIVE_PRODUCT_EXECUTION_QUALIFICATION_ONLY"
+phase_type = "NATIVE_PRODUCT_EXECUTION_PLUMBING_QUALIFICATION"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+]
+canonical_parent_master = "5490d3f213bb1dc1b8fde86fe1cd464d09ddbead"
+source_conflict = false
+architecture_change = false
+architecture_relevance = "NOT_REQUIRED_WITHIN_EXISTING_ADR_0007_AND_ADR_0008_BOUNDARY"
+predecessor_project_ids = [
+  "SUBSCRIPTION_BACKED_PRODUCT_EXECUTION_PLUMBING_QUALIFICATION_V0",
+  "SUBSCRIPTION_BACKED_CODEX_APP_SERVER_WRITE_PATH_DIAGNOSTIC_V0",
+  "PINNED_DSH_CODEX_WRITE_PATH_MATERIALIZATION_V0R1",
+]
+authorized_products = ["CODEX_PROFILE_A", "CLAUDE_CODE_SUBSCRIPTION", "CODEX_PROFILE_B"]
+authorized_roles = ["BUILDER", "INDEPENDENT_REVIEWER", "VERIFIER"]
+authorized_live_batches = 1
+authorized_live_invocations_per_role = 1
+implementation_authorized = true
+deterministic_tests_authorized = true
+independent_hostile_review_authorized = true
+critical_high_fix_pass_limit = 1
+targeted_rereview_limit = 1
+synthetic_live_qualification_authorized = true
+result_recording_authorized = true
+dsh_authorized = false
+dsh_repair_authorized = false
+stage_a_v1_rerun_authorized = false
+stage_a_v2_creation_authorized = false
+stage_a_v2_execution_authorized = false
+historical_stage_a_task_authorized = false
+historical_answer_key_access_authorized = false
+market_data_authorized = false
+scientific_execution_authorized = false
+runtime_implementation_authorized = false
+qnty_next_action_authority = "NONE"
+scientific_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+auto_merge_authorized = false
+current_max_autonomy = "L0_SHADOW"
+next_action = "Implement, deterministically test, independently review, freeze, and execute at most one three-role synthetic native subscription-backed qualification batch using Codex Profile A as BUILDER, Claude Code subscription as INDEPENDENT_REVIEWER, and Codex Profile B as VERIFIER; record and verify the fail-closed result, then open a draft PR and stop. No DSH, Stage-A, historical task or answer key, market data, scientific evaluation, Qnty runtime, trading, capital, or merge authority is granted."

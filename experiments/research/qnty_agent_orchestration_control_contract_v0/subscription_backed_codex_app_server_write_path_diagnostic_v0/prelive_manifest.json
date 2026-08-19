@@ -1,0 +1,56 @@
+{
+  "app_server_argv": [
+    "/home/swirky/.local/bin/codex",
+    "app-server",
+    "--stdio"
+  ],
+  "base_commit": "e24b540900ef9fcf48e24e8e53dbf2b18028f5d9",
+  "bridge_sha256": "20e9f3d9735209bfaea4b0c61b50e8cead6fea63903a4975197d9f8fc77df88f",
+  "canonical_master_sha": "b909bb7dddebb17247ac3101e045387f9ecd69e9",
+  "codex_binary": "/home/swirky/.local/bin/codex",
+  "codex_home": "/home/swirky/.codex",
+  "codex_version": "codex-cli 0.147.0",
+  "deterministic_tests": {
+    "passed": 39,
+    "suite": "tests/test_subscription_backed_codex_app_server_write_path_diagnostic_v0.py"
+  },
+  "dsh_driver_argv": [
+    "node",
+    "/home/swirky/DevHub/worktrees/QntyLab-codex-app-server-write-path-diagnostic-v0/experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_codex_app_server_write_path_diagnostic_v0/pinned_dsh_codex_route_driver_v0.mjs"
+  ],
+  "dsh_driver_sha256": "e29c1bb891e6ae2040dff1ac240e33dd84f1da34b5fdaa68dd437c097ced5b94",
+  "fixture_after_sha256": "f72c713b7b432dd18949ca10f1be6dbcf493479945653609d1c715b2d8d74356",
+  "fixture_before_sha256": "be9351741a8155d01fd028d158546f1005e73ceeb0bb2d093335feac4144e450",
+  "frozen_before_any_live_product_call": true,
+  "hostile_review": {
+    "count": 1,
+    "critical": 0,
+    "high": 5,
+    "low": 1,
+    "medium": 2,
+    "open_critical": 0,
+    "open_high": 0,
+    "targeted_rereview_used": true
+  },
+  "native_bridge_argv": [
+    "<python3>",
+    "/home/swirky/DevHub/worktrees/QntyLab-codex-app-server-write-path-diagnostic-v0/experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_codex_app_server_write_path_diagnostic_v0/qntylab_native_codex_app_server_bridge_v0.py"
+  ],
+  "no_tool_prompt_sha256": "2cd4864f29021651068dfb13d4a0b1f3e66d6a5b14137e36350f27b69f4cd2cc",
+  "prompt_sha256": "5998d2259d56942c071536866262fa7a7b72c1780ae41137b8e0de1aafef8683",
+  "schema_version": "codex-app-server-write-path-prelive-manifest-v0",
+  "source_sha256": {
+    "qntylab/subscription_backed_codex_app_server_write_path_diagnostic_v0.py": "6fef9c8c369e278c1133e5c5f772a942690bb63ed0f91e2ec5fe1c1e0edc11b0",
+    "tests/fixtures/fake_codex_app_server_v0.py": "8b16e371d77e9028fe10bc722c1d18ff7aabc35e22e7054b997c736327c7fb73",
+    "tests/test_subscription_backed_codex_app_server_write_path_diagnostic_v0.py": "f350d0e65867d3b3e809cc18fd4bbb1fe6991ee36009a32d9518b02bd4743471",
+    "\u2026/diagnostic_contract.json": "fd40b3f7ea072f3678fa0e751864d4ef25e8e180382106b3d83ff7faef0f2744",
+    "\u2026/pinned_dsh_codex_route_driver_v0.mjs": "e29c1bb891e6ae2040dff1ac240e33dd84f1da34b5fdaa68dd437c097ced5b94",
+    "\u2026/qntylab_native_codex_app_server_bridge_v0.py": "20e9f3d9735209bfaea4b0c61b50e8cead6fea63903a4975197d9f8fc77df88f",
+    "\u2026/run_diagnostic_ladder_v0.py": "248488d97af0fcb524f757f09649c4907432f83d69c6e5ea36e80d4bb003f8fc"
+  },
+  "timeout_policy": {
+    "bridge_seconds": 360.0,
+    "handshake_seconds": 60.0,
+    "turn_seconds": 300.0
+  }
+}

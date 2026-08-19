@@ -1,0 +1,28 @@
+{
+  "schema_version": "subscription-backed-stage-a-v1-preserved-evidence-manifest-v0",
+  "episode_id": "SUBSCRIPTION_BACKED_STAGE_A_V1-1787094263",
+  "source_execution_root": "/tmp/subscription-backed-stage-a-v1-execution-pJnHkC",
+  "source_root_is_historical_locator_only": true,
+  "answer_key_material_accessed": false,
+  "sealed_answer_references_required": false,
+  "artifacts": [
+    {"path": "execution_summary.md", "sha256": "bc7a8a9b21babb5a110d0b57e017f61ab24d9661988044a2f54fa000ff756698", "role": "terminal_summary"},
+    {"path": "evidence_hashes.json", "sha256": "d34397c7f306a99111355823bdb3042f086e9f740669bd0bae2c573a943da619", "role": "preserved_hash_index"},
+    {"path": "driver_manifest.json", "sha256": "7bbe1876345b83e7e67e9f7869ea6130a037d7f6a0c4016278eed1364eebebc6", "role": "frozen_driver_manifest"},
+    {"path": "episode_manifest.json", "sha256": "b9b5fa5f8648f30bf8f5bfec8cfcee7773bf22b94f310cb20bb00d340d577709", "role": "episode_state_and_release_gates"},
+    {"path": "diagnostics.json", "sha256": "c904bd63f25ffc0e8a52e6366fd4b3a75c477878bbcd7300d36f1c1642cc517a", "role": "diagnostics"},
+    {"path": "evidence/episode_state.json", "sha256": "75acd417b3fb63aa5667ed85dd0ec6375061934a1c2c774195b4e3964e737e33", "role": "consumed_state"},
+    {"path": "evidence/execution_fail_closed.json", "sha256": "a858b46e4e84a5a8c229a3c16ad61dbbe147b8afec105c36420e5ed8afc1ba68", "role": "terminal_fail_closed_evidence"},
+    {"path": "evidence/predispatch_firewall.json", "sha256": "f4475385cfd5deb23199d93f403f1ee481a6400dce375bab502fe4bae1d70534", "role": "answer_key_firewall"},
+    {"path": "receipts/treatment_receipt.json", "sha256": "90bfd5e116f8fabd2592edd3c2555ce812e06ef83faa29bb47a957588c930670", "role": "unsealed_treatment_receipt"},
+    {"path": "receipts/baseline_receipt.json", "sha256": "069c1367b0657862576a0c9ba67a2269204e6a19c6d7da8bf112f9a618151c58", "role": "not_dispatched_baseline_receipt"},
+    {"path": "scorer_result.json", "sha256": "b02165d5926e63f41b131449aee8d631d827220ae758233bb343ec5b0a557c8f", "role": "scorer_not_released"},
+    {"path": "intervention_events.jsonl", "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "role": "zero_intervention_log"},
+    {"path": "logs/dsh_treatment_builder_initial_0.json", "sha256": "5258330060ea9470b49fbd6b3f757bfbdd06c4e55e0b163d65a9e4f0f22bdb5c", "role": "builder_trace"},
+    {"path": "logs/dsh_treatment_builder_repair_0.json", "sha256": "11e0ff419cb53ec28e630d05cd6614051030437937b0b0098862b7289ce55267", "role": "repair_trace"},
+    {"path": "logs/dsh_treatment_controller_test.json", "sha256": "2b17577a408fb49b78a0ce5c54477119453dec304ca226ea488ca9f7dbdc9e38", "role": "controller_test_trace"},
+    {"path": "logs/dsh_treatment_hostile_reviewer_initial_0.json", "sha256": "2d151a46af115b4b28f4a7e7599f5f1466ca85c69fec73af59c8c0b350511053", "role": "initial_review_trace"},
+    {"path": "logs/dsh_treatment_hostile_reviewer_targeted_rereview_0.json", "sha256": "91d6e0961b303a4833e1da87aa6218c27d18798986f11cd237fc9333163b12d0", "role": "targeted_rereview_trace"},
+    {"path": "logs/dsh_treatment_open_ch_findings.json", "sha256": "357ba66adcec9800bfd63ed56cdf8eedbb39dc032680e3b538c2ea6f5bfbe8ad", "role": "open_findings_trace"}
+  ]
+}

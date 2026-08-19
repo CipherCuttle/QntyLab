@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- `Pinned DSH Codex write-path materialization V0R1 evidence-integrity repair` — `ACTIVE`. Implement and deterministically test exactly C1/H1/H2/H3/H5 against the immutable V0 predecessor, run exactly one independent read-only hostile review, use at most one Critical/High fix pass and one targeted re-review if required, then freeze before acquiring exactly one crash-safe V0R1 synthetic D4 episode. No V0 retry, predecessor mutation, Stage-A run, historical task, answer-key access, Profile A mutation, DSH source change, scientific evaluation, Qnty runtime, trading, capital, V2, merge, or additional live episode is authorized.
+- `Pinned DSH Codex write-path materialization V0R1 evidence-integrity repair` — `ACTIVE`. The reviewed V0R1 implementation is frozen at af0c27823d46315dfbe1d01a85ddaa72a77fa4a7 with zero open Critical/High findings. Re-run final identity/evidence gates, atomically acquire the durable V0R1 episode marker, execute exactly one synthetic pinned-DSH D4 with no retry, then record and verify the result. No implementation mutation, V0 retry, predecessor mutation, Stage-A run, historical task, answer-key access, Profile A mutation, DSH source change, scientific evaluation, Qnty runtime, trading, capital, V2, merge, or additional live episode is authorized.
 
 ## Queued — not authorized
 

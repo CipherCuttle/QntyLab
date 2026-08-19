@@ -1,0 +1,19 @@
+{
+  "event_id": "event_decision_funding_incremental_v0_7742acb7724a030bc5c22562",
+  "event_type": "DECISION_RECORDED",
+  "candidate_id": "CANDIDATE_FUNDING_PRESSURE_INCREMENTAL_RV_FORECAST_VALUE_V0",
+  "family_id": "FAMILY_JIGSAW_FUNDING_PRESSURE_INCREMENTAL_RV_FORECAST_VALUE_V0",
+  "variant_id": "variant_389ac33409cb6b8ef51900f0",
+  "status": "BLOCKED",
+  "scope": "EXACT_VARIANT",
+  "reason_codes": ["PREREGISTRATION_FROZEN", "PRIOR_OUTCOME_EXPOSURE_EXPLICIT", "NO_EXECUTION_AUTHORITY", "NO_OUTCOME_ACCESS", "QNTYAGENTEVAL_NO_MATCH"],
+  "decision_note": "The funding-pressure incremental forecast-value contract is frozen as one prior-exposed exploratory A architecture. It binds the immutable prior funding feature/outcome contract, exact negative HIGH-minus-LOW adjudication, the existing 20-member panel and source identity, one HAR-RV 1/7/30 primary baseline, one continuous funding percentile augmentation, a 244-origin causal expanding comparison, MSE, Clark-West adjusted-MSPE one-sided HAC(5), and no-justifiable-materiality handling. No market data, new funding, held-out outcomes, forecast, model fit, statistical estimate, QntyAgentEval run, Order Flow input, JH01 operation ledger, or downstream authority was accessed. This is not a scientific result and does not claim independent confirmation.",
+  "evidence_paths": ["experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/preregistration.json", "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/design_note.md", "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/hostile_review.md"],
+  "evidence_sha256": {
+    "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/preregistration.json": "42b96afae80e55611bcd9786169050520525fbc5534b9f94c72ed867380ba9cf",
+    "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/design_note.md": "4ce07951b13f1862f12666bbc55a7ac4162276ccdb3fd4cb182d7148e5a3200b",
+    "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/hostile_review.md": "b2dc306253b0bcbd9f5924e747333f7cb31cca12c70a3e098db4ee86737b56c7"
+  },
+  "revisit_condition": "Only a separate Git-backed evaluation authorization may assess the frozen A protocol. Do not convert the prior-exposed 610 observations into sealed or confirmatory evidence, change the primary predictor/baseline/horizon/loss/HAC/materiality rule, access the JH01 operation ledger, reopen Order Flow, or create Router/Qnty/trading authority.",
+  "recorded_at_utc": "2026-08-19T00:00:01Z"
+}

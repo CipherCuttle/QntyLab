@@ -1,0 +1,237 @@
+{
+  "schema_version": "qntylab-funding-incremental-forecast-preregistration-v0",
+  "project_id": "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_PREREGISTRATION_V0",
+  "experiment_id": "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_PREREGISTRATION_V0",
+  "candidate_id": "CANDIDATE_FUNDING_PRESSURE_INCREMENTAL_RV_FORECAST_VALUE_V0",
+  "phase": "SCIENTIFIC_DESIGN_AND_PREREGISTRATION_ONLY",
+  "status": "PREREGISTERED_NOT_EXECUTED",
+  "authority_level": "OUTCOME_BLIND_EXPLORATORY_PREREGISTRATION_ONLY",
+  "implementation_execution_authorized": false,
+  "preregistration_digest": "d7ec718ab14e73d2aea24749a22caa2921fd81b8a336e2f2eaffb30ae1e992ef",
+  "scientific_question": "Given only information known at daily decision time t, does the frozen continuous funding-pressure ECDF percentile add predictive information for subsequent market-wide RV24 beyond a fixed compact HAR-RV persistence baseline?",
+  "claim_boundary": "A PASS can establish only exploratory incremental predictive information within a prior-exposed historical follow-up. It cannot establish causality, inverse funding effects, economic significance, trading edge, State Observer promotion, Router authority, Qnty authority, or trading authority.",
+  "parent_binding": {
+    "historical_experiment": "JIGSAW_FUNDING_PRESSURE_VOLATILITY_V0",
+    "historical_preregistration": "JIGSAW_FUNDING_PRESSURE_VOLATILITY_PREREGISTRATION_V0",
+    "historical_disposition": "NOT_SUPPORTED_UNDER_FROZEN_SPECIFICATION",
+    "historical_adjudication": "NO_POSITIVE_HIGH_MINUS_LOW_DIRECTIONAL_CONTRAST",
+    "historical_primary_proposition": "mean(RV24 | HIGH funding pressure) - mean(RV24 | LOW funding pressure) > 0",
+    "observed_contrast": "-0.0002003650803348647161725358990165653289511751324777",
+    "historical_daily_decisions": 610,
+    "historical_window": "2023-10-19T00:00:00Z..2025-06-19T00:00:00Z",
+    "reverse_directional_hypothesis": "NO",
+    "sign_reversal_rescue": "PROHIBITED",
+    "historical_result_does_not_establish": ["inverse_effect", "causality", "statistical_significance", "economic_significance", "incremental_forecast_value", "strategy_authority", "router_authority", "qnty_authority"]
+  },
+  "feature_contract": {
+    "feature_id": "FUNDING_PRESSURE",
+    "feature_version": "funding-pressure-pit-panel-median-absolute-latest-settlement-v0",
+    "primary_predictor": "CONTINUOUS_FUNDING_PRESSURE_ECDF_PERCENTILE",
+    "representation": "CONTINUOUS",
+    "formula": "pressure_t = median_i(abs(latest_known_settlement_rate_i)); percentile_t = count(v <= pressure_t) / count(v) over the prior 365 daily pressure observations plus current pressure_t",
+    "formula_digest": "sha256:c0e23ef865e746ec125455d2af4daddbf24b9f4b970809b52f693ccdee9c41f1",
+    "source": "BINANCE_USDM_FUNDING_SETTLEMENT_MATERIALIZER_V0",
+    "settlement_semantics": "Exact source funding_time_ms; finalized event known at funding_time_ms; latest eligible event satisfies funding_time <= t and t - 24h < funding_time.",
+    "aggregation": "MEDIAN(abs(funding_rate)) across the exact frozen 20-member panel",
+    "normalization": "365 prior daily observations plus current observation; inclusive <= ECDF; percentile is a fraction in [0,1]",
+    "panel": ["BCHUSDT", "XRPUSDT", "LTCUSDT", "TRXUSDT", "ETCUSDT", "LINKUSDT", "XLMUSDT", "CHZUSDT", "SANDUSDT", "REEFUSDT", "CHRUSDT", "ALICEUSDT", "ONEUSDT", "API3USDT", "GMTUSDT", "APEUSDT", "OPUSDT", "INJUSDT", "LDOUSDT", "APTUSDT"],
+    "state_bins_used_as_primary": false,
+    "sign_reversal_rescue": "PROHIBITED",
+    "new_transforms_added": [],
+    "excluded_new_features": ["signed_funding", "funding_acceleration", "funding_shock", "funding_dispersion", "basis", "carry", "open_interest", "liquidations", "venue_spreads", "new_thresholds", "multiple_transforms"]
+  },
+  "outcome_contract": {
+    "outcome_id": "FUTURE_MARKET_WIDE_REALIZED_VOLATILITY",
+    "outcome_version": "equal-weight-20-panel-hourly-simple-return-rv-24h-v0",
+    "formula": "RV24_t = sqrt((1/24) * sum_{h=1}^{24}(mean_i(close_i[t+h]/close_i[t+h-1]-1))^2)",
+    "formula_digest": "sha256:b551dfade01104c63c5909b8d2b185c9513a4a84845edf534575cfb4818ec3ad",
+    "forward_horizon_hours": 24,
+    "decision_time": "00:00:00Z",
+    "target_transformation": "NONE_UNTRANSFORMED_RV24",
+    "annualization": "NONE",
+    "panel_aggregation": "EQUAL_WEIGHTED_20_SYMBOL_MARKET_RETURN_THEN_RV",
+    "timestamp_alignment": "Feature information is known through t; outcome uses exactly the next 24 completed hourly intervals after t.",
+    "missingness": "FAIL_CLOSED_NO_IMPUTATION_OR_GAP_BRIDGING",
+    "overlap": "NON_OVERLAPPING_DAILY_OUTCOMES"
+  },
+  "evaluation_architectures": {
+    "A": {
+      "name": "EXPLORATORY_610_INCREMENTAL_FORECAST_TEST",
+      "classification": "EXPLORATORY_FOLLOW_UP_WITH_PRIOR_OUTCOME_EXPOSURE",
+      "decision": "SELECT",
+      "pros": ["uses existing frozen provenance", "low calendar and operational cost", "answers whether the feature adds information beyond persistence"],
+      "cons": ["historical outcomes and the old aggregate result are already exposed", "cannot support independent confirmation or sealed-evaluation claims"]
+    },
+    "B": {
+      "name": "DEVELOPMENT_610_PLUS_DISJOINT_SEALED_EVALUATION",
+      "decision": "REJECT",
+      "outcome_blind_feasibility": "NOT_ESTABLISHED",
+      "reasons": ["canonical funding coverage ends 2025-06-19", "REEF funding lifecycle terminates within the later candidate period", "no later 20-member funding and OHLCV input is Git-bound", "later panel continuity and warm-up cannot be certified without new acquisition", "current-listing substitution and survivor selection are prohibited"]
+    },
+    "C": {
+      "name": "DEVELOPMENT_610_PLUS_PROSPECTIVE_EVALUATION",
+      "decision": "REJECT",
+      "marginal_information_value": "LOWER_THAN_A_PER_COST_AND_DUPLICATES_JH01_PURPOSE",
+      "reasons": ["requires a new long-lived funding recorder", "JH01 V1 is a separate ARMED_BUT_INACTIVE prospective campaign", "waiting for or operating alongside JH01 does not justify duplicating a long prospective calendar burden in this phase"]
+    },
+    "D": {
+      "name": "KILL_FUNDING_INCREMENTAL_LINE",
+      "decision": "REJECTED_BECAUSE_A_IS_A_BOUNDED_LOW_COST_DISCRIMINATOR",
+      "reason": "A can answer the narrow exploratory question without disguising prior exposure as confirmation; a design kill is not warranted before that bounded discriminator exists."
+    },
+    "selected": "A_EXPLORATORY_610_INCREMENTAL_FORECAST_TEST"
+  },
+  "selected_architecture": {
+    "id": "A_EXPLORATORY_610_INCREMENTAL_FORECAST_TEST",
+    "evaluation_class": "EXPLORATORY",
+    "prior_outcome_exposure": true,
+    "independent_confirmation": false,
+    "sealed_evaluation": false,
+    "prospective_evaluation": false,
+    "development_range": "2023-10-19T00:00:00Z..2024-10-17T00:00:00Z",
+    "evaluation_range": "2024-10-19T00:00:00Z..2025-06-19T00:00:00Z",
+    "excluded_boundary_origin": "2024-10-18T00:00:00Z",
+    "required_evaluation_origins": 244,
+    "classification_rule": "A retrospective causal rolling forecast is exploratory because the historical outcomes and old aggregate funding result were already exposed; it is not outcome-unseen, sealed, unseen, or prospective evidence."
+  },
+  "model_contract": {
+    "primary_baseline": {
+      "model_id": "BASELINE_1_HAR_RV_1_7_30",
+      "formula": "M0_t = alpha_t + beta_d,t*RV24_prior_t + beta_w,t*mean(RV24_prior_{t..t-6}) + beta_m,t*mean(RV24_prior_{t..t-29})",
+      "estimation": "OLS_WITH_INTERCEPT_AT_EACH_REFIT",
+      "windows": [1, 7, 30],
+      "aggregation": "MEAN_OF_DAILY_PRIOR_RV24_VALUES",
+      "role": "PRIMARY_BASELINE"
+    },
+    "augmented_model": {
+      "model_id": "M1_HAR_RV_1_7_30_PLUS_FUNDING_PERCENTILE",
+      "formula": "M1_t = M0_t + gamma_t*CONTINUOUS_FUNDING_PRESSURE_ECDF_PERCENTILE_t",
+      "estimation": "OLS_WITH_INTERCEPT_AT_EACH_REFIT",
+      "added_predictors": ["exactly_one_continuous_funding_pressure_ecdf_percentile"],
+      "interactions": false,
+      "polynomial_terms": false,
+      "regularization": false,
+      "role": "PRIMARY_AUGMENTED_MODEL"
+    },
+    "secondary_contextual_baseline": {
+      "model_id": "BASELINE_0_NAIVE_RV24_PERSISTENCE",
+      "formula": "forecast_t = RV24_prior_t",
+      "inferential_role": "DESCRIPTIVE_ONLY_NO_RESCUE",
+      "reported": true
+    },
+    "feature_search": false,
+    "model_search": false,
+    "lag_search": false
+  },
+  "evaluation_contract": {
+    "training_scheme": "EXPANDING_WINDOW",
+    "minimum_training_origins": 365,
+    "feature_warmup": "At least 30 complete prior daily RV24 values for the monthly HAR component; no post-freeze warm-up adjustment.",
+    "training_target_cutoff": "TARGET_COMPLETION_TIME < FORECAST_ORIGIN",
+    "first_forecast_origin": "2024-10-19T00:00:00Z",
+    "last_forecast_origin": "2025-06-19T00:00:00Z",
+    "required_evaluation_origins": 244,
+    "refit_cadence": "EVERY_DAILY_ORIGIN",
+    "decision_frequency": "P1D_AT_00:00:00Z",
+    "feature_cutoff": "All funding and OHLCV inputs have safe-known timestamps <= t; no future or partial bar is allowed.",
+    "forecast_bounds": "NONNEGATIVE_FLOOR_ZERO_AFTER_FORECASTING_IDENTICALLY_FOR_M0_AND_M1",
+    "missingness": "FAIL_CLOSED_ANY_MISSING_ROW_BLOCKS_VALID_EVALUATION",
+    "no_random_split": true,
+    "no_shuffled_cross_validation": true
+  },
+  "testing_contract": {
+    "primary_loss": "MSE_ON_UNTRANSFORMED_RV24",
+    "relative_mse_improvement": "(MSE_M0 - MSE_M1) / MSE_M0",
+    "primary_test": {
+      "method": "CLARK_WEST_ADJUSTED_MSPE_ONE_SIDED_HAC",
+      "alternative": "M1_LOWER_FORECAST_LOSS_THAN_M0",
+      "adjusted_difference": "d_t = e0_t^2 - e1_t^2 + (f0_t - f1_t)^2; positive favors M1",
+      "hac": "BARTLETT_NEWEY_WEST_FIXED_LAG_5",
+      "alpha": 0.05
+    },
+    "multiple_testing": "ONE_PRIMARY_COMPARISON_AND_ONE_PRIMARY_LOSS; BASELINE_0 IS CONTEXT ONLY AND HAS NO RESCUE AUTHORITY",
+    "materiality_gate": "NONE_JUSTIFIABLE",
+    "materiality_reason": "No deployment, capital, or action-utility context supplies an independent practical threshold for this prior-exposed exploratory discriminator. Report relative MSE improvement descriptively; do not call it material, economic, or actionable."
+  },
+  "pass_fail": {
+    "pass_condition": "Valid 244-origin evaluation; MSE_M1 < MSE_M0; and one-sided Clark-West adjusted-MSPE HAC p <= 0.05. Because MATERIALITY_GATE is NONE_JUSTIFIABLE, PASS is limited to exploratory incremental predictive information and is not a materiality or action-utility claim.",
+    "fail_condition": "FUNDING_PRESSURE_INCREMENTAL_VALUE_NOT_ESTABLISHED if any valid primary direction or statistical gate fails; failure ends this funding-pressure incremental-value lineage with no within-lineage rescue.",
+    "blocked_condition": "BLOCKED if source, panel, timing, point-in-time, missingness, digest, or execution-boundary integrity fails before a valid evaluation.",
+    "post_result_rescue": "PROHIBITED",
+    "future_new_hypothesis_boundary": "Signed funding, inverse direction, new ECDF thresholds, shocks, acceleration, basis, open interest, liquidations, alternate horizons, alternate RV estimators, subsets, or later-period selection require separate hypotheses and separate preregistration."
+  },
+  "contamination_contract": {
+    "old_610_classification": "PRIOR_EXPOSED_DEVELOPMENT_AND_EXPLORATORY_ONLY",
+    "development_range": "2023-10-19T00:00:00Z..2024-10-17T00:00:00Z",
+    "evaluation_range": "2024-10-19T00:00:00Z..2025-06-19T00:00:00Z",
+    "sealed_range": "NONE",
+    "prospective_range": "NONE",
+    "independent_confirmation_claimed": false,
+    "outcome_dependent_selection": false,
+    "model_search": false,
+    "feature_search": false,
+    "lag_search": false,
+    "threshold_search": false,
+    "panel_survivorship_risk": "PRESERVED_AND_EXPLICIT; frozen 20-member panel only, no later substitution or survivor conditioning",
+    "post_result_rescue_search": "PROHIBITED"
+  },
+  "ten_stack": {
+    "SOCRATIC": "This tests whether funding adds information beyond volatility persistence; the old HIGH-minus-LOW contrast did not test that question.",
+    "DIALECTIC": "Continue because a null directional contrast can coexist with conditional forecast content; stop because the old result lowers the prior and the new sample is outcome-exposed. A is retained only as a bounded exploratory discriminator.",
+    "POPPER": "Funding is not established as an incremental RV-state variable if M1 fails to lower MSE or fails the one-sided adjusted-MSPE HAC gate.",
+    "CAUSAL": "Any positive result remains predictive association/incremental forecast evidence; it does not identify a causal funding effect.",
+    "SYSTEMS": "A PASS could make funding a stronger upstream State Observer candidate, but no observer implementation or Router construction is authorized by this contract.",
+    "CYBERNETICS": "The test reduces uncertainty relevant to later state selection only at the feature-qualification layer; it does not authorize a feedback controller or action.",
+    "BAYESIAN": "The negative HIGH-minus-LOW contrast reduces the prior probability of a simple monotone funding-volatility story, so only a distinct incremental forecast result can update the funding line.",
+    "MDL": "One continuous ECDF percentile is the compact retained representation; adding transforms or bins would increase degrees of freedom without a new mechanism.",
+    "DOE": "A has the highest information gain per cost among the four admissible options because B is not feasibility-certified, C duplicates JH01-scale prospective burden, and D discards a bounded discriminator.",
+    "ADVERSARIAL": "Positive results must not be manufactured by reversing sign, using old outcomes as pristine confirmation, weakening the baseline, shopping lags/transforms/thresholds, changing the panel, or claiming causality/action utility."
+  },
+  "qntyagenteval": {
+    "applicability": "NO_MATCH",
+    "run": false,
+    "basis": "Canonical project context reports QntyAgentEval adapter not implemented; no compatible frozen evaluator contract exists for this static preregistration."
+  },
+  "source_binding": {
+    "immutable_artifacts": {
+      "experiments/research/jigsaw_funding_pressure_volatility_v0/preregistration.json": "b6eb3520b6729219bb3753f3862f8361595cef0bf9ee2eec13faf8cc66643d23",
+      "experiments/research/jigsaw_funding_pressure_volatility_v0/execution_result.json": "47edb15fb7ec69cdc4392f515c246958055da76751897aa43fe97d1cc9e489ee",
+      "experiments/research/jigsaw_funding_pressure_volatility_v0/result.json": "21d6f4c03e9acff57bf5e8a44d0a62e3ecd795c2ca9618aae707d417c5bf7bd0",
+      "experiments/research/jigsaw_funding_pressure_volatility_v0/materialization_index.json": "5fe1a6d7eff998e58b1b4d055806ea2b2bfbe60a2c2ff957618a3f7eff67b596",
+      "experiments/research/qnty_edge_discovery_order_flow_v0/scientific_contract_salvage_adjudication_v0.json": "ee27df0c0cdd95119f5eabcc94220e2452904cd2788257716af30a47347b9250",
+      "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/preregistration.json": "4990688b640ad34f6f022431766bdd9539f75c9fb8bb278bdf9ae3637db09a0a",
+      "experiments/research/jh01_rv_persistence_temporal_replication_v0/result.json": "e2be973dc5741cfb05768753a664a44194650f0758984cc7ca0caecf9532f7f8"
+    },
+    "funding_preregistration_contract_digest": "sha256:749641cbee99bc769a6095e2a5877e4ccf1c46db0a82860885eedc06734cd2d6",
+    "funding_materialization_index_digest": "sha256:ceb12a1686f96f328ef54d5bafc184b848fa40ff7a2c71e28dc434a4854486c1",
+    "funding_evidence_set_digest": "sha256:3677e5aeafd17c47e4951b2095d6247c8fb7cd3fb603cc70d5ea5658fd768faa"
+  },
+  "outcome_blindness": {
+    "new_market_data_acquired": false,
+    "new_funding_acquired": false,
+    "new_held_out_outcomes_accessed": false,
+    "forecast_models_fitted": false,
+    "forecast_errors_computed": false,
+    "mse_computed": false,
+    "clark_west_computed": false,
+    "hac_computed": false,
+    "p_values_computed": false,
+    "scientific_execution_performed": false,
+    "result_artifact_created": false,
+    "trial_completed_event_created": false,
+    "jigsaw_mutated": false,
+    "order_flow_reopened": false,
+    "jh01_operation_ledger_accessed": false
+  },
+  "authority": {
+    "execution_authority": "NONE",
+    "outcome_access_authority": "NONE",
+    "router_authority": "NONE",
+    "qnty_authority": "NONE",
+    "trading_authority": "NONE",
+    "capital_authority": "NONE",
+    "causal_authority": "NONE",
+    "promotion_authority": "NONE"
+  },
+  "kill_conditions": ["SOURCE_BINDING_MISMATCH", "PRIOR_EXPOSURE_MISCLASSIFIED", "TRAINING_TEST_OVERLAP", "FUTURE_BAR_USED_AT_FORECAST_ORIGIN", "LABEL_AVAILABILITY_LEAKAGE", "MISSING_OR_SUBSTITUTED_PANEL_MEMBER", "REEF_OR_PANEL_LIFECYCLE_CONTAMINATION", "BENCHMARK_INFORMATION_SET_MISMATCH", "HAR_LAG_SEARCH", "FUNDING_FEATURE_SEARCH", "MODEL_SEARCH", "THRESHOLD_SEARCH", "UNAUTHORIZED_EXECUTION", "POST_RESULT_RESCUE_SEARCH", "SIGN_REVERSAL_RESCUE", "PROTOCOL_DIGEST_MISMATCH", "ORDER_FLOW_REOPENED", "JH01_LEDGER_ACCESSED", "DOWNSTREAM_AUTHORITY_CREATED"]
+}

@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- None.
+- `Funding-pressure incremental forecast-value implementation V0` — `ACTIVE`. IMPLEMENT THE FROZEN FUNDING-PRESSURE INCREMENTAL FORECAST EXECUTOR USING SYNTHETIC VALIDATION ONLY; FREEZE IMPLEMENTATION IDENTITY; DO NOT ACCESS REAL EVALUATION OUTCOMES OR PERFORM SCIENTIFIC EXECUTION.
 
 ## Queued — not authorized
 

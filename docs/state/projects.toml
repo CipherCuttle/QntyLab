@@ -2086,6 +2086,42 @@ active_project_after_closure = "NONE"
 next_action = "CLOSED_PASS: the exact real-operation authority artifact exists but has not been exercised. Canonicalize this governance candidate before exactly one later REAL_PROSPECTIVE activation; no activation, real market-data access, forecast, release, scientific evaluation, or downstream authority occurred in this phase."
 
 [[project]]
+project_id = "JH01_V1_REAL_STATE_DIRECTORY_BINDING_V0"
+display_name = "JH01 V1 real prospective operation state-directory binding"
+state = "CLOSED_PASS"
+authority_level = "OPERATIONAL_STATE_LOCATION_BINDING_ONLY"
+phase_type = "GOVERNANCE_ONLY"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/real_state_directory_binding_v0.json",
+  "experiments/research/north_star_reentry_v0/decision.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/real_prospective_operation_authorization_v0.json",
+  "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/preregistration.json",
+  "qntylab/jh01_v1_prospective_operation_v0.py",
+  "qntylab/jh01_v1_prospective_recorder_implementation_v0.py",
+]
+canonical_master_sha = "746a21b268bb90907e332fedab80edaa54371601"
+north_star_selection = "JH01_V1_OUTCOME_BLIND_PROSPECTIVE_INCREMENTAL_FORECAST_VALUE_CONTINUATION"
+real_operation_authority_project_id = "JH01_V1_REAL_PROSPECTIVE_OPERATION_AUTHORIZATION_V0"
+binding_type = "LOGICAL_USER_STATE_DIRECTORY"
+primary_environment_variable = "XDG_STATE_HOME"
+fallback_state_home = "$HOME/.local/state"
+relative_state_path = "qntylab/jh01_v1_real_prospective_operation_v0"
+ledger_filename = "jh01_v1_operation_events.jsonl"
+runtime_directory_created = false
+activation_attempt_count = 0
+activation_consumed = false
+market_data_accessed = false
+forecast_created = false
+scientific_evaluation = false
+interim_metrics = false
+downstream_authority = "NONE"
+implementation_authorized = false
+canonicalization_required_before_effect = true
+next_action = "CLOSED_PASS: portable user-scoped JH01 V1 operation state binding is recorded without creating runtime state or consuming activation. Merge this binding, then execute exactly one real activation under the existing authority."
+
+[[project]]
 project_id = "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_EXECUTION"
 display_name = "Order-Flow V0 historical execution authorization readiness"
 state = "CLOSED_BLOCKED"

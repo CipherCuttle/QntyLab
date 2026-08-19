@@ -3970,3 +3970,52 @@ hostile_review_critical = 0
 hostile_review_high = 0
 targeted_rereview_used = false
 next_action = "CLOSED_PASS: preregistration is frozen at A_EXPLORATORY_610_INCREMENTAL_FORECAST_TEST and remains PREREGISTERED_NOT_EXECUTED. Any evaluation requires separate Git-backed authorization; no execution, data acquisition, outcome access, Order Flow reopening, JH01 ledger access, Router, Qnty, trading, or capital authority follows."
+
+[[project]]
+project_id = "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_EXECUTION_IMPLEMENTATION_V0"
+display_name = "Funding-pressure incremental forecast-value implementation V0"
+state = "ACTIVE"
+authority_level = "SOURCE_BOUND_IMPLEMENTATION_AND_SYNTHETIC_VALIDATION_ONLY"
+phase_type = "SOURCE_BOUND_IMPLEMENTATION_FREEZE"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/preregistration.json",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/design_note.md",
+  "qntylab/jigsaw_funding_pressure_execution_v2.py",
+  "qntylab/jigsaw_funding_pressure_execution_foundation_v0.py"
+]
+governing_preregistration_project_id = "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_PREREGISTRATION_V0"
+governing_candidate_id = "CANDIDATE_FUNDING_PRESSURE_INCREMENTAL_RV_FORECAST_VALUE_V0"
+governing_preregistration_digest = "d7ec718ab14e73d2aea24749a22caa2921fd81b8a336e2f2eaffb30ae1e992ef"
+selected_architecture = "A_EXPLORATORY_610_INCREMENTAL_FORECAST_TEST"
+implementation_authorized = true
+synthetic_validation_authorized = true
+independent_hostile_review_authorized = true
+critical_high_fix_pass_limit = 1
+targeted_rereview_limit = 1
+real_evidence_execution_authorized = false
+scientific_execution_authorized = false
+outcome_access_authorized = false
+market_data_access_authorized = false
+funding_acquisition_authorized = false
+scientific_result_recording_authorized = false
+trial_completion_authorized = false
+state_snapshot_authorized = false
+router_authorized = false
+qnty_authorized = false
+trading_authorized = false
+promotion_authorized = false
+capital_authority = "NONE"
+downstream_authority = "NONE"
+implementation_scope = [
+  "preregistered funding incremental forecast executor",
+  "deterministic synthetic tests",
+  "canonical low-level funding and RV calculation reuse",
+  "implementation freeze and source binding",
+  "one independent hostile implementation review",
+  "one bounded Critical/High repair pass",
+  "one targeted rereview only if Critical/High repair is required",
+  "one implementation draft PR"
+]
+next_action = "IMPLEMENT THE FROZEN FUNDING-PRESSURE INCREMENTAL FORECAST EXECUTOR USING SYNTHETIC VALIDATION ONLY; FREEZE IMPLEMENTATION IDENTITY; DO NOT ACCESS REAL EVALUATION OUTCOMES OR PERFORM SCIENTIFIC EXECUTION."

@@ -1,0 +1,182 @@
+{
+  "attempts_per_stage": 1,
+  "authority": {
+    "capital": "NONE",
+    "merge": "NOT_AUTHORIZED",
+    "runtime": "NONE",
+    "scientific": "NONE",
+    "trading": "NONE",
+    "v2_authorized": false,
+    "v2_created": false
+  },
+  "environment_policy": {
+    "additions": [
+      "CODEX_HOME"
+    ],
+    "presence_recorded_as": "boolean only",
+    "removed_names": [
+      "OPENAI_API_KEY",
+      "ANTHROPIC_API_KEY",
+      "DEEPSEEK_API_KEY",
+      "OPENROUTER_API_KEY",
+      "GITHUB_TOKEN",
+      "GH_TOKEN"
+    ],
+    "values_read": false
+  },
+  "fixture": {
+    "after_bytes_literal": "AFTER\\n",
+    "after_sha256": "f72c713b7b432dd18949ca10f1be6dbcf493479945653609d1c715b2d8d74356",
+    "before_bytes_literal": "BEFORE\\n",
+    "before_sha256": "be9351741a8155d01fd028d158546f1005e73ceeb0bb2d093335feac4144e450",
+    "classification": "exact bytes, tolerating one optional trailing newline; recorded as exact digest and byte length",
+    "name": "fixture.txt",
+    "reset_policy": "FRESH_BYTE_IDENTICAL_WORKSPACE_PER_ROUTE_NEVER_IN_PLACE_RESTORE",
+    "workspace_path_class": "fresh mkdtemp under the system temp root, outside QntyLab, destroyed after each route"
+  },
+  "ladder": [
+    "D0_HOST_FILESYSTEM",
+    "D1_RAW_APP_SERVER_BASELINE",
+    "D2_RAW_APP_SERVER_WRITE",
+    "D3_QNTY_NATIVE_BRIDGE",
+    "D4_PINNED_DSH_CODEX_PROVIDER"
+  ],
+  "native_bridge_identity_note": "PR #134 executed an ephemeral native bridge whose bytes were never frozen and are unrecoverable. The D3 bridge in this phase is committed, hashed source and is the frozen native-bridge identity for this diagnostic, not a byte-recovery of the predecessor's helper. D3 therefore tests the QntyLab native-bridge wrapper (external subprocess execution, environment sanitation, last-JSON-line receipt transport, lifecycle normalization) around the same transport used by D2, so the wrapper is the only variable changed between the two routes.",
+  "not_this_phase": [
+    "repair or rerun of PR #134",
+    "rerun of SUBSCRIPTION_BACKED_PRODUCT_EXECUTION_PLUMBING_QUALIFICATION_V0",
+    "rerun or rescue of Stage-A V1",
+    "Stage-A V2",
+    "DSH-vs-native quality comparison",
+    "runtime integration",
+    "scientific execution",
+    "trading or capital authority"
+  ],
+  "observability": {
+    "allowed": [
+      "timestamps",
+      "method names",
+      "parameter key names",
+      "hashed prompt",
+      "hashed thread/turn ids",
+      "item types",
+      "statuses",
+      "approval decision class",
+      "sandbox policy class",
+      "cwd",
+      "writable-root path",
+      "process exit code/signal",
+      "file digests"
+    ],
+    "forbidden": [
+      "auth tokens",
+      "cookies",
+      "bearer headers",
+      "raw credential files",
+      "assistant prose",
+      "raw stderr",
+      "historical answer-key material"
+    ],
+    "product_error_text": "truncated to 300 chars and credential-scrubbed before recording"
+  },
+  "phase": "BOUNDED_MECHANICAL_WRITE_PATH_DIAGNOSTIC_ONLY",
+  "pinned_protocol": {
+    "client_notifications_used": [
+      "initialized"
+    ],
+    "client_requests_used": [
+      "initialize",
+      "thread/start",
+      "turn/start"
+    ],
+    "prompt_illustration_correction": "The phase prompt illustrated thread/start with sandbox=\"workspaceWrite\". The pinned 0.147 schema defines that field as the SandboxMode enum, whose supported equivalent is \"workspace-write\". The turn-level sandboxPolicy tag is \"workspaceWrite\". The diagnostic sends the schema-validated values.",
+    "sandbox_mode_enum": [
+      "read-only",
+      "workspace-write",
+      "danger-full-access"
+    ],
+    "source": "codex app-server generate-json-schema --experimental (emitted by the pinned 0.147.0 binary itself)",
+    "terminal_notification": "turn/completed",
+    "thread_start_sandbox_field": "sandbox: SandboxMode enum",
+    "turn_start_sandbox_field": "sandboxPolicy: tagged SandboxPolicy object",
+    "turn_status_enum": [
+      "completed",
+      "interrupted",
+      "failed",
+      "inProgress"
+    ],
+    "workspace_write_policy_tag": "workspaceWrite"
+  },
+  "predecessor": {
+    "head": "e24b540900ef9fcf48e24e8e53dbf2b18028f5d9",
+    "mutated": false,
+    "pr": 134,
+    "safe_interpretation": [
+      "LIVE_WRITE_GATE_NOT_ESTABLISHED",
+      "WRITE_CAPABILITY_ROOT_CAUSE_UNRESOLVED"
+    ],
+    "state": "OPEN_DRAFT_UNMERGED"
+  },
+  "product_identity": {
+    "codex_binary": "/home/swirky/.local/bin/codex",
+    "codex_home_profile_a": "/home/swirky/.codex",
+    "codex_version": "codex-cli 0.147.0",
+    "dsh_commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "dsh_package": "@deepseek-ai/dsh@0.1.0-rc.7",
+    "dsh_parent_llm_provider": "NONE",
+    "dsh_parent_llm_request_count": 0,
+    "dsh_tag": "dsh-v0.1.0-rc.7",
+    "dsh_tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188"
+  },
+  "project_id": "SUBSCRIPTION_BACKED_CODEX_APP_SERVER_WRITE_PATH_DIAGNOSTIC_V0",
+  "prompts": {
+    "no_tool_expected_text": "APP_SERVER_OK",
+    "no_tool_prompt_sha256": "2cd4864f29021651068dfb13d4a0b1f3e66d6a5b14137e36350f27b69f4cd2cc",
+    "write_prompt_sha256": "5998d2259d56942c071536866262fa7a7b72c1780ae41137b8e0de1aafef8683"
+  },
+  "question": "At what exact layer does a trivial subscription-backed Codex Profile-A workspace write first diverge from a known-good execution path?",
+  "requests_sent": {
+    "thread/start": {
+      "approvalPolicy": "never",
+      "cwd": "<workspace>",
+      "ephemeral": true,
+      "sandbox": "workspace-write"
+    },
+    "turn/start": {
+      "approvalPolicy": "never",
+      "cwd": "<workspace>",
+      "input": [
+        {
+          "text": "<frozen prompt>",
+          "type": "text"
+        }
+      ],
+      "sandboxPolicy": {
+        "networkAccess": false,
+        "type": "workspaceWrite",
+        "writableRoots": [
+          "<workspace>"
+        ]
+      },
+      "threadId": "<thread>"
+    }
+  },
+  "retries_allowed": 0,
+  "schema_version": "codex-app-server-write-path-diagnostic-contract-v0",
+  "stop_rule": "STOP_AT_FIRST_PASS_TO_FAIL_DIVERGENCE",
+  "timeout_policy": {
+    "bridge_seconds": 360.0,
+    "dispose_grace_seconds": 10.0,
+    "handshake_seconds": 60.0,
+    "turn_seconds": 300.0
+  },
+  "unattended_policy": {
+    "any other server request": "explicit JSON-RPC -32601, recorded, never silently swallowed",
+    "applyPatchApproval|execCommandApproval": "decision={denied:{rejection:...}}",
+    "currentTime/read": "answered with host time",
+    "item/commandExecution/requestApproval": "decision=decline (or cancel when decline is not offered)",
+    "item/fileChange/requestApproval": "decision=decline",
+    "item/permissions/requestApproval": "permissions={} scope=turn (grant nothing)",
+    "principle": "NON_ESCALATING: the diagnostic never grants a capability the declared policy did not already provide"
+  }
+}

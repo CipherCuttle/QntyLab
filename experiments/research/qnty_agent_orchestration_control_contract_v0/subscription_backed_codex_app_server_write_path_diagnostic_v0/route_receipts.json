@@ -1,0 +1,832 @@
+{
+  "gates": {
+    "D0": "PASS",
+    "D1": "PASS",
+    "D2": "PASS",
+    "D3": "PASS",
+    "D4": "INCONCLUSIVE_INFRA"
+  },
+  "generated_at": "2026-08-19T01:48:12.726222Z",
+  "product_identity": {
+    "api_key_gate": true,
+    "api_key_presence": {
+      "ANTHROPIC_API_KEY": false,
+      "DEEPSEEK_API_KEY": false,
+      "OPENAI_API_KEY": false,
+      "OPENROUTER_API_KEY": false
+    },
+    "codex_binary": "/home/swirky/.local/bin/codex",
+    "codex_home": "/home/swirky/.codex",
+    "codex_version_expected": "codex-cli 0.147.0",
+    "codex_version_matches": true,
+    "codex_version_observed": "codex-cli 0.147.0",
+    "dsh_matches": true,
+    "dsh_observed": {
+      "commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+      "tag": "dsh-v0.1.0-rc.7",
+      "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188"
+    }
+  },
+  "receipts": {
+    "D0": {
+      "changed_paths": [
+        "fixture.txt"
+      ],
+      "ended_at": "2026-08-19T01:47:41.059288Z",
+      "fixture_after": {
+        "byte_length": 6,
+        "class": "AFTER",
+        "present": true,
+        "sha256": "f72c713b7b432dd18949ca10f1be6dbcf493479945653609d1c715b2d8d74356"
+      },
+      "fixture_before": {
+        "byte_length": 7,
+        "class": "BEFORE",
+        "present": true,
+        "sha256": "be9351741a8155d01fd028d158546f1005e73ceeb0bb2d093335feac4144e450"
+      },
+      "passed": true,
+      "route": "D0_HOST_FILESYSTEM",
+      "started_at": "2026-08-19T01:47:41.047890Z",
+      "workspace_destroyed": true,
+      "workspace_path_class": "/tmp/qntylab-write-path-diagnostic-lbm33llj"
+    },
+    "D1": {
+      "agent_messages": [
+        {
+          "matches_no_tool_control": true,
+          "text_length": 13,
+          "text_sha256": "774b0203c2a5a0c819c694d19a36ac7080b9697d1d9eeeb125b4da08f6c6e130"
+        }
+      ],
+      "approval_requests": [],
+      "argv": [
+        "/home/swirky/.local/bin/codex",
+        "app-server",
+        "--stdio"
+      ],
+      "classification": {
+        "auth_failure_inferred_from_error_text": false,
+        "mechanism": "TURN_COMPLETED_WITHOUT_ANY_WRITE_TOOL_ITEM",
+        "terminal_class": "COMPLETED_NO_WRITE"
+      },
+      "codex_home_requested": "/home/swirky/.codex",
+      "command_execution_observed": false,
+      "control_passed": true,
+      "cwd": "/tmp/qntylab-write-path-diagnostic-lbm33llj/d1",
+      "declared_policy": {
+        "approval_policy": "never",
+        "cwd": "/tmp/qntylab-write-path-diagnostic-lbm33llj/d1",
+        "network_access": false,
+        "thread_sandbox_mode": "workspace-write",
+        "thread_start_keys": [
+          "approvalPolicy",
+          "cwd",
+          "ephemeral",
+          "sandbox"
+        ],
+        "turn_approval_policy": "never",
+        "turn_sandbox_class": "workspaceWrite",
+        "turn_start_keys": [
+          "approvalPolicy",
+          "cwd",
+          "input",
+          "sandboxPolicy",
+          "threadId"
+        ],
+        "writable_roots": [
+          "/tmp/qntylab-write-path-diagnostic-lbm33llj/d1"
+        ]
+      },
+      "effective_policy": {
+        "effective_approval_policy": "never",
+        "effective_cwd": "/tmp/qntylab-write-path-diagnostic-lbm33llj/d1",
+        "effective_network_access": false,
+        "effective_permission_profile": null,
+        "effective_runtime_workspace_roots": [
+          "/tmp/qntylab-write-path-diagnostic-lbm33llj/d1"
+        ],
+        "effective_sandbox_class": "workspaceWrite",
+        "effective_writable_roots": [],
+        "model": "gpt-5.6-luna",
+        "model_provider": "openai",
+        "thread_ephemeral": true
+      },
+      "ended_at": "2026-08-19T01:47:46.662992Z",
+      "environment": {
+        "api_key_presence": {
+          "ANTHROPIC_API_KEY": false,
+          "DEEPSEEK_API_KEY": false,
+          "GH_TOKEN": false,
+          "GITHUB_TOKEN": false,
+          "OPENAI_API_KEY": false,
+          "OPENROUTER_API_KEY": false
+        },
+        "inherited_name_count": 109,
+        "inherited_names_sha256": "6ef820b657ef9eb9d177753210cebb83ac836799b803e660dc9edf18e6f0949b",
+        "removed_names": [
+          "OPENAI_API_KEY",
+          "ANTHROPIC_API_KEY",
+          "DEEPSEEK_API_KEY",
+          "OPENROUTER_API_KEY",
+          "GITHUB_TOKEN",
+          "GH_TOKEN"
+        ]
+      },
+      "error_notifications": [],
+      "filesystem": {
+        "after_digest": "ca97299074625491f8b0bde3f4e5cf88129d2a1347a1995f6351193764012721",
+        "before_digest": "ca97299074625491f8b0bde3f4e5cf88129d2a1347a1995f6351193764012721",
+        "changed_paths": [],
+        "effect_observed": false,
+        "fixture_after": {
+          "byte_length": 7,
+          "class": "BEFORE",
+          "present": true,
+          "sha256": "be9351741a8155d01fd028d158546f1005e73ceeb0bb2d093335feac4144e450"
+        },
+        "fixture_before": {
+          "byte_length": 7,
+          "class": "BEFORE",
+          "present": true,
+          "sha256": "be9351741a8155d01fd028d158546f1005e73ceeb0bb2d093335feac4144e450"
+        }
+      },
+      "handshake": {
+        "effective_codex_home": "/home/swirky/.codex",
+        "platform_os": "linux",
+        "user_agent_present": true
+      },
+      "items": [
+        {
+          "item_type": "userMessage",
+          "method": "item/started",
+          "status": null
+        },
+        {
+          "item_type": "userMessage",
+          "method": "item/completed",
+          "status": null
+        },
+        {
+          "item_type": "agentMessage",
+          "method": "item/started",
+          "status": null
+        },
+        {
+          "item_type": "agentMessage",
+          "matches_no_tool_control": true,
+          "method": "item/completed",
+          "status": null,
+          "text_length": 13,
+          "text_sha256": "774b0203c2a5a0c819c694d19a36ac7080b9697d1d9eeeb125b4da08f6c6e130"
+        }
+      ],
+      "policy_parity": {
+        "all_match": false,
+        "approval_policy_matches": true,
+        "codex_home_effective": "/home/swirky/.codex",
+        "codex_home_matches": true,
+        "codex_home_requested": "/home/swirky/.codex",
+        "cwd_matches": true,
+        "sandbox_class_matches": true,
+        "thread_ephemeral": true,
+        "writable_root_covers_workspace": false
+      },
+      "process": {
+        "disposed": true,
+        "exit_code": null,
+        "exit_signal": 15,
+        "non_json_stdout_lines": 0,
+        "stderr_bytes": 4572,
+        "stderr_sha256": "23045f19c7613c3667ff388bd26d7ff4663d778f66bc76a8a53d24defc407887",
+        "termination": "SIGTERM"
+      },
+      "prompt_sha256": "2cd4864f29021651068dfb13d4a0b1f3e66d6a5b14137e36350f27b69f4cd2cc",
+      "protocol_failure_stage": null,
+      "route": "D1_RAW_APP_SERVER_BASELINE",
+      "started_at": "2026-08-19T01:47:41.070121Z",
+      "startup_error": null,
+      "timeout_policy": {
+        "handshake_seconds": 60.0,
+        "timed_out": false,
+        "timeout_stage": null,
+        "turn_seconds": 300.0
+      },
+      "turn": {
+        "error_message": null,
+        "status": "completed",
+        "terminal_observed": true
+      },
+      "unsupported_server_requests": [],
+      "write_attempt_observed": false
+    },
+    "D2": {
+      "agent_messages": [
+        {
+          "matches_no_tool_control": false,
+          "text_length": 60,
+          "text_sha256": "a7d469902d5ab57cf417c425ec54414f5dcc98386cd5658cd944ed66021bb6e1"
+        },
+        {
+          "matches_no_tool_control": false,
+          "text_length": 60,
+          "text_sha256": "7292e8fb8c3508400b3cd5e3a382112e8b888b56475554f87ca7dca193d3fecf"
+        }
+      ],
+      "approval_requests": [],
+      "argv": [
+        "/home/swirky/.local/bin/codex",
+        "app-server",
+        "--stdio"
+      ],
+      "classification": {
+        "auth_failure_inferred_from_error_text": false,
+        "mechanism": "FILESYSTEM_BYTES_CHANGED_TO_TARGET",
+        "terminal_class": "COMPLETED_WITH_WRITE"
+      },
+      "codex_home_requested": "/home/swirky/.codex",
+      "command_execution_observed": true,
+      "cwd": "/tmp/qntylab-write-path-diagnostic-lbm33llj/d2",
+      "declared_policy": {
+        "approval_policy": "never",
+        "cwd": "/tmp/qntylab-write-path-diagnostic-lbm33llj/d2",
+        "network_access": false,
+        "thread_sandbox_mode": "workspace-write",
+        "thread_start_keys": [
+          "approvalPolicy",
+          "cwd",
+          "ephemeral",
+          "sandbox"
+        ],
+        "turn_approval_policy": "never",
+        "turn_sandbox_class": "workspaceWrite",
+        "turn_start_keys": [
+          "approvalPolicy",
+          "cwd",
+          "input",
+          "sandboxPolicy",
+          "threadId"
+        ],
+        "writable_roots": [
+          "/tmp/qntylab-write-path-diagnostic-lbm33llj/d2"
+        ]
+      },
+      "effective_policy": {
+        "effective_approval_policy": "never",
+        "effective_cwd": "/tmp/qntylab-write-path-diagnostic-lbm33llj/d2",
+        "effective_network_access": false,
+        "effective_permission_profile": null,
+        "effective_runtime_workspace_roots": [
+          "/tmp/qntylab-write-path-diagnostic-lbm33llj/d2"
+        ],
+        "effective_sandbox_class": "workspaceWrite",
+        "effective_writable_roots": [],
+        "model": "gpt-5.6-luna",
+        "model_provider": "openai",
+        "thread_ephemeral": true
+      },
+      "ended_at": "2026-08-19T01:47:59.901571Z",
+      "environment": {
+        "api_key_presence": {
+          "ANTHROPIC_API_KEY": false,
+          "DEEPSEEK_API_KEY": false,
+          "GH_TOKEN": false,
+          "GITHUB_TOKEN": false,
+          "OPENAI_API_KEY": false,
+          "OPENROUTER_API_KEY": false
+        },
+        "inherited_name_count": 109,
+        "inherited_names_sha256": "6ef820b657ef9eb9d177753210cebb83ac836799b803e660dc9edf18e6f0949b",
+        "removed_names": [
+          "OPENAI_API_KEY",
+          "ANTHROPIC_API_KEY",
+          "DEEPSEEK_API_KEY",
+          "OPENROUTER_API_KEY",
+          "GITHUB_TOKEN",
+          "GH_TOKEN"
+        ]
+      },
+      "error_notifications": [],
+      "filesystem": {
+        "after_digest": "6fa1c2d84240ad96c4ffaa9502445b4947d052470898597370710ae8165d234d",
+        "before_digest": "ca97299074625491f8b0bde3f4e5cf88129d2a1347a1995f6351193764012721",
+        "changed_paths": [
+          "fixture.txt"
+        ],
+        "effect_observed": true,
+        "fixture_after": {
+          "byte_length": 6,
+          "class": "AFTER",
+          "present": true,
+          "sha256": "f72c713b7b432dd18949ca10f1be6dbcf493479945653609d1c715b2d8d74356"
+        },
+        "fixture_before": {
+          "byte_length": 7,
+          "class": "BEFORE",
+          "present": true,
+          "sha256": "be9351741a8155d01fd028d158546f1005e73ceeb0bb2d093335feac4144e450"
+        }
+      },
+      "handshake": {
+        "effective_codex_home": "/home/swirky/.codex",
+        "platform_os": "linux",
+        "user_agent_present": true
+      },
+      "items": [
+        {
+          "item_type": "userMessage",
+          "method": "item/started",
+          "status": null
+        },
+        {
+          "item_type": "userMessage",
+          "method": "item/completed",
+          "status": null
+        },
+        {
+          "item_type": "reasoning",
+          "method": "item/started",
+          "status": null
+        },
+        {
+          "item_type": "reasoning",
+          "method": "item/completed",
+          "status": null
+        },
+        {
+          "item_type": "agentMessage",
+          "method": "item/started",
+          "status": null
+        },
+        {
+          "item_type": "agentMessage",
+          "matches_no_tool_control": false,
+          "method": "item/completed",
+          "status": null,
+          "text_length": 60,
+          "text_sha256": "a7d469902d5ab57cf417c425ec54414f5dcc98386cd5658cd944ed66021bb6e1"
+        },
+        {
+          "command_program": null,
+          "cwd": "/tmp/qntylab-write-path-diagnostic-lbm33llj/d2",
+          "exit_code": null,
+          "item_type": "commandExecution",
+          "method": "item/started",
+          "status": "inProgress"
+        },
+        {
+          "command_program": null,
+          "cwd": "/tmp/qntylab-write-path-diagnostic-lbm33llj/d2",
+          "exit_code": 0,
+          "item_type": "commandExecution",
+          "method": "item/completed",
+          "status": "completed"
+        },
+        {
+          "item_type": "reasoning",
+          "method": "item/started",
+          "status": null
+        },
+        {
+          "item_type": "reasoning",
+          "method": "item/completed",
+          "status": null
+        },
+        {
+          "change_count": 1,
+          "item_type": "fileChange",
+          "method": "item/started",
+          "status": "inProgress"
+        },
+        {
+          "change_count": 1,
+          "item_type": "fileChange",
+          "method": "item/completed",
+          "status": "completed"
+        },
+        {
+          "item_type": "reasoning",
+          "method": "item/started",
+          "status": null
+        },
+        {
+          "item_type": "reasoning",
+          "method": "item/completed",
+          "status": null
+        },
+        {
+          "item_type": "agentMessage",
+          "method": "item/started",
+          "status": null
+        },
+        {
+          "item_type": "agentMessage",
+          "matches_no_tool_control": false,
+          "method": "item/completed",
+          "status": null,
+          "text_length": 60,
+          "text_sha256": "7292e8fb8c3508400b3cd5e3a382112e8b888b56475554f87ca7dca193d3fecf"
+        }
+      ],
+      "policy_parity": {
+        "all_match": false,
+        "approval_policy_matches": true,
+        "codex_home_effective": "/home/swirky/.codex",
+        "codex_home_matches": true,
+        "codex_home_requested": "/home/swirky/.codex",
+        "cwd_matches": true,
+        "sandbox_class_matches": true,
+        "thread_ephemeral": true,
+        "writable_root_covers_workspace": false
+      },
+      "process": {
+        "disposed": true,
+        "exit_code": null,
+        "exit_signal": 15,
+        "non_json_stdout_lines": 0,
+        "stderr_bytes": 3048,
+        "stderr_sha256": "d0358dc911994bf5841bcbf9347d9c955cdd886418cfceb475d4121765787fa7",
+        "termination": "SIGTERM"
+      },
+      "prompt_sha256": "5998d2259d56942c071536866262fa7a7b72c1780ae41137b8e0de1aafef8683",
+      "protocol_failure_stage": null,
+      "route": "D2_RAW_APP_SERVER_WRITE",
+      "route_passed": true,
+      "started_at": "2026-08-19T01:47:46.683621Z",
+      "startup_error": null,
+      "timeout_policy": {
+        "handshake_seconds": 60.0,
+        "timed_out": false,
+        "timeout_stage": null,
+        "turn_seconds": 300.0
+      },
+      "turn": {
+        "error_message": null,
+        "status": "completed",
+        "terminal_observed": true
+      },
+      "unsupported_server_requests": [],
+      "write_attempt_observed": true
+    },
+    "D3": {
+      "api_key_presence": {
+        "ANTHROPIC_API_KEY": false,
+        "DEEPSEEK_API_KEY": false,
+        "GH_TOKEN": false,
+        "GITHUB_TOKEN": false,
+        "OPENAI_API_KEY": false,
+        "OPENROUTER_API_KEY": false
+      },
+      "bridge_argv": [
+        "/usr/bin/python3",
+        "/home/swirky/DevHub/worktrees/QntyLab-codex-app-server-write-path-diagnostic-v0/experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_codex_app_server_write_path_diagnostic_v0/qntylab_native_codex_app_server_bridge_v0.py"
+      ],
+      "bridge_exit_code": 0,
+      "bridge_path": "/home/swirky/DevHub/worktrees/QntyLab-codex-app-server-write-path-diagnostic-v0/experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_codex_app_server_write_path_diagnostic_v0/qntylab_native_codex_app_server_bridge_v0.py",
+      "bridge_sha256": "20e9f3d9735209bfaea4b0c61b50e8cead6fea63903a4975197d9f8fc77df88f",
+      "declared_invocation": {
+        "approval_mode": "never",
+        "cwd": "/tmp/qntylab-write-path-diagnostic-lbm33llj/d3",
+        "environment_policy": "API_KEYS_REMOVED_GITHUB_CREDENTIALS_REMOVED",
+        "parent_llm_provider": "NONE",
+        "parent_llm_request_count": 0,
+        "product": "CODEX_PROFILE_A",
+        "profile": "/home/swirky/.codex",
+        "prompt_sha256": "5998d2259d56942c071536866262fa7a7b72c1780ae41137b8e0de1aafef8683",
+        "route": "NATIVE",
+        "sandbox_mode": "workspace-write",
+        "workspace_scope": "/tmp/qntylab-write-path-diagnostic-lbm33llj/d3"
+      },
+      "ended_at": "2026-08-19T01:48:12.688300Z",
+      "filesystem": {
+        "changed_paths": [
+          "fixture.txt"
+        ],
+        "effect_observed": true,
+        "fixture_after": {
+          "byte_length": 6,
+          "class": "AFTER",
+          "present": true,
+          "sha256": "f72c713b7b432dd18949ca10f1be6dbcf493479945653609d1c715b2d8d74356"
+        },
+        "fixture_before": {
+          "byte_length": 7,
+          "class": "BEFORE",
+          "present": true,
+          "sha256": "be9351741a8155d01fd028d158546f1005e73ceeb0bb2d093335feac4144e450"
+        }
+      },
+      "inner_route_receipt": {
+        "agent_messages": [
+          {
+            "matches_no_tool_control": false,
+            "text_length": 61,
+            "text_sha256": "1077da6decf6945551bd16321874b3fa41dcd6efae5244749818959ee01c2478"
+          },
+          {
+            "matches_no_tool_control": false,
+            "text_length": 0,
+            "text_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ],
+        "approval_requests": [],
+        "argv": [
+          "/home/swirky/.local/bin/codex",
+          "app-server",
+          "--stdio"
+        ],
+        "classification": {
+          "auth_failure_inferred_from_error_text": false,
+          "mechanism": "FILESYSTEM_BYTES_CHANGED_TO_TARGET",
+          "terminal_class": "COMPLETED_WITH_WRITE"
+        },
+        "codex_home_requested": "/home/swirky/.codex",
+        "command_execution_observed": true,
+        "cwd": "/tmp/qntylab-write-path-diagnostic-lbm33llj/d3",
+        "declared_policy": {
+          "approval_policy": "never",
+          "cwd": "/tmp/qntylab-write-path-diagnostic-lbm33llj/d3",
+          "network_access": false,
+          "thread_sandbox_mode": "workspace-write",
+          "thread_start_keys": [
+            "approvalPolicy",
+            "cwd",
+            "ephemeral",
+            "sandbox"
+          ],
+          "turn_approval_policy": "never",
+          "turn_sandbox_class": "workspaceWrite",
+          "turn_start_keys": [
+            "approvalPolicy",
+            "cwd",
+            "input",
+            "sandboxPolicy",
+            "threadId"
+          ],
+          "writable_roots": [
+            "/tmp/qntylab-write-path-diagnostic-lbm33llj/d3"
+          ]
+        },
+        "effective_policy": {
+          "effective_approval_policy": "never",
+          "effective_cwd": "/tmp/qntylab-write-path-diagnostic-lbm33llj/d3",
+          "effective_network_access": false,
+          "effective_permission_profile": null,
+          "effective_runtime_workspace_roots": [
+            "/tmp/qntylab-write-path-diagnostic-lbm33llj/d3"
+          ],
+          "effective_sandbox_class": "workspaceWrite",
+          "effective_writable_roots": [],
+          "model": "gpt-5.6-luna",
+          "model_provider": "openai",
+          "thread_ephemeral": true
+        },
+        "ended_at": "2026-08-19T01:48:12.677241Z",
+        "environment": {
+          "api_key_presence": {
+            "ANTHROPIC_API_KEY": false,
+            "DEEPSEEK_API_KEY": false,
+            "GH_TOKEN": false,
+            "GITHUB_TOKEN": false,
+            "OPENAI_API_KEY": false,
+            "OPENROUTER_API_KEY": false
+          },
+          "inherited_name_count": 112,
+          "inherited_names_sha256": "b6486fd9b8ac3901e04b0734d70a9b97cdf170c4c15a0d2c48c1a59c17c61d1a",
+          "removed_names": [
+            "OPENAI_API_KEY",
+            "ANTHROPIC_API_KEY",
+            "DEEPSEEK_API_KEY",
+            "OPENROUTER_API_KEY",
+            "GITHUB_TOKEN",
+            "GH_TOKEN"
+          ]
+        },
+        "error_notifications": [],
+        "filesystem": {
+          "after_digest": "6fa1c2d84240ad96c4ffaa9502445b4947d052470898597370710ae8165d234d",
+          "before_digest": "ca97299074625491f8b0bde3f4e5cf88129d2a1347a1995f6351193764012721",
+          "changed_paths": [
+            "fixture.txt"
+          ],
+          "effect_observed": true,
+          "fixture_after": {
+            "byte_length": 6,
+            "class": "AFTER",
+            "present": true,
+            "sha256": "f72c713b7b432dd18949ca10f1be6dbcf493479945653609d1c715b2d8d74356"
+          },
+          "fixture_before": {
+            "byte_length": 7,
+            "class": "BEFORE",
+            "present": true,
+            "sha256": "be9351741a8155d01fd028d158546f1005e73ceeb0bb2d093335feac4144e450"
+          }
+        },
+        "handshake": {
+          "effective_codex_home": "/home/swirky/.codex",
+          "platform_os": "linux",
+          "user_agent_present": true
+        },
+        "items": [
+          {
+            "item_type": "userMessage",
+            "method": "item/started",
+            "status": null
+          },
+          {
+            "item_type": "userMessage",
+            "method": "item/completed",
+            "status": null
+          },
+          {
+            "item_type": "reasoning",
+            "method": "item/started",
+            "status": null
+          },
+          {
+            "item_type": "reasoning",
+            "method": "item/completed",
+            "status": null
+          },
+          {
+            "item_type": "agentMessage",
+            "method": "item/started",
+            "status": null
+          },
+          {
+            "item_type": "agentMessage",
+            "matches_no_tool_control": false,
+            "method": "item/completed",
+            "status": null,
+            "text_length": 61,
+            "text_sha256": "1077da6decf6945551bd16321874b3fa41dcd6efae5244749818959ee01c2478"
+          },
+          {
+            "command_program": null,
+            "cwd": "/tmp/qntylab-write-path-diagnostic-lbm33llj/d3",
+            "exit_code": null,
+            "item_type": "commandExecution",
+            "method": "item/started",
+            "status": "inProgress"
+          },
+          {
+            "command_program": null,
+            "cwd": "/tmp/qntylab-write-path-diagnostic-lbm33llj/d3",
+            "exit_code": 0,
+            "item_type": "commandExecution",
+            "method": "item/completed",
+            "status": "completed"
+          },
+          {
+            "item_type": "reasoning",
+            "method": "item/started",
+            "status": null
+          },
+          {
+            "item_type": "reasoning",
+            "method": "item/completed",
+            "status": null
+          },
+          {
+            "change_count": 1,
+            "item_type": "fileChange",
+            "method": "item/started",
+            "status": "inProgress"
+          },
+          {
+            "change_count": 1,
+            "item_type": "fileChange",
+            "method": "item/completed",
+            "status": "completed"
+          },
+          {
+            "item_type": "agentMessage",
+            "method": "item/started",
+            "status": null
+          },
+          {
+            "item_type": "agentMessage",
+            "matches_no_tool_control": false,
+            "method": "item/completed",
+            "status": null,
+            "text_length": 0,
+            "text_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ],
+        "policy_parity": {
+          "all_match": false,
+          "approval_policy_matches": true,
+          "codex_home_effective": "/home/swirky/.codex",
+          "codex_home_matches": true,
+          "codex_home_requested": "/home/swirky/.codex",
+          "cwd_matches": true,
+          "sandbox_class_matches": true,
+          "thread_ephemeral": true,
+          "writable_root_covers_workspace": false
+        },
+        "process": {
+          "disposed": true,
+          "exit_code": null,
+          "exit_signal": 15,
+          "non_json_stdout_lines": 0,
+          "stderr_bytes": 4572,
+          "stderr_sha256": "ae2a2946859843d7e99048758633ac06eed3989f0130e9050e6492d61146c191",
+          "termination": "SIGTERM"
+        },
+        "prompt_sha256": "5998d2259d56942c071536866262fa7a7b72c1780ae41137b8e0de1aafef8683",
+        "protocol_failure_stage": null,
+        "route": "D3_QNTY_NATIVE_BRIDGE",
+        "started_at": "2026-08-19T01:47:59.974476Z",
+        "startup_error": null,
+        "timeout_policy": {
+          "handshake_seconds": 60.0,
+          "timed_out": false,
+          "timeout_stage": null,
+          "turn_seconds": 300.0
+        },
+        "turn": {
+          "error_message": null,
+          "status": "completed",
+          "terminal_observed": true
+        },
+        "unsupported_server_requests": [],
+        "write_attempt_observed": true
+      },
+      "normalized": {
+        "error": null,
+        "normal_disposal": true,
+        "status": "COMPLETED",
+        "stop_reason": "completed"
+      },
+      "passed": true,
+      "route": "D3_QNTY_NATIVE_BRIDGE",
+      "started_at": "2026-08-19T01:47:59.919358Z"
+    },
+    "D4": {
+      "declared_invocation": {
+        "approval_mode": "never",
+        "cwd": "/tmp/qntylab-write-path-diagnostic-lbm33llj/d4",
+        "environment_policy": "API_KEYS_REMOVED_GITHUB_CREDENTIALS_REMOVED",
+        "parent_llm_provider": "NONE",
+        "parent_llm_request_count": 0,
+        "product": "CODEX_PROFILE_A",
+        "profile": "/home/swirky/.codex",
+        "prompt_sha256": "5998d2259d56942c071536866262fa7a7b72c1780ae41137b8e0de1aafef8683",
+        "route": "DSH",
+        "sandbox_mode": "workspace-write",
+        "workspace_scope": "/tmp/qntylab-write-path-diagnostic-lbm33llj/d4"
+      },
+      "driver_argv": [
+        "node",
+        "/home/swirky/DevHub/worktrees/QntyLab-codex-app-server-write-path-diagnostic-v0/experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_codex_app_server_write_path_diagnostic_v0/pinned_dsh_codex_route_driver_v0.mjs"
+      ],
+      "driver_exit_code": 1,
+      "driver_path": "/home/swirky/DevHub/worktrees/QntyLab-codex-app-server-write-path-diagnostic-v0/experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_codex_app_server_write_path_diagnostic_v0/pinned_dsh_codex_route_driver_v0.mjs",
+      "driver_sha256": "e29c1bb891e6ae2040dff1ac240e33dd84f1da34b5fdaa68dd437c097ced5b94",
+      "dsh_receipt": {
+        "apiKeyPresence": {
+          "ANTHROPIC_API_KEY": false,
+          "DEEPSEEK_API_KEY": false,
+          "GH_TOKEN": false,
+          "GITHUB_TOKEN": false,
+          "OPENAI_API_KEY": false,
+          "OPENROUTER_API_KEY": false
+        },
+        "bridgeExitCode": 1,
+        "error": "pinned dsh module resolution failed: Cannot find module '/home/swirky/DevHub/dsh-stage-a-provisioning-v0/vendor/cordis/lib/index.js' imported from /home/swirky/DevHub/worktrees/QntyLab-codex-app-server-write-path-diagnostic-v0/experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_codex_app_server_write_path_diagnostic_v0/pinned_dsh_codex_route_driver_v0.mjs",
+        "inconclusiveInfra": "PINNED_DSH_BUILD_OUTPUT_UNAVAILABLE",
+        "output": "",
+        "parentLlmProvider": "NONE",
+        "parentLlmRequestCount": 0,
+        "route": "D4_PINNED_DSH_CODEX_PROVIDER",
+        "status": "FAIL_CLOSED"
+      },
+      "ended_at": "2026-08-19T01:48:12.725006Z",
+      "filesystem": {
+        "changed_paths": [],
+        "effect_observed": false,
+        "fixture_after": {
+          "byte_length": 7,
+          "class": "BEFORE",
+          "present": true,
+          "sha256": "be9351741a8155d01fd028d158546f1005e73ceeb0bb2d093335feac4144e450"
+        },
+        "fixture_before": {
+          "byte_length": 7,
+          "class": "BEFORE",
+          "present": true,
+          "sha256": "be9351741a8155d01fd028d158546f1005e73ceeb0bb2d093335feac4144e450"
+        }
+      },
+      "inconclusive_infra": "PINNED_DSH_BUILD_OUTPUT_UNAVAILABLE",
+      "parent_llm_provider": "NONE",
+      "parent_llm_request_count": 0,
+      "passed": false,
+      "route": "D4_PINNED_DSH_CODEX_PROVIDER",
+      "started_at": "2026-08-19T01:48:12.701624Z"
+    }
+  },
+  "schema_version": "codex-app-server-write-path-route-receipts-v0"
+}

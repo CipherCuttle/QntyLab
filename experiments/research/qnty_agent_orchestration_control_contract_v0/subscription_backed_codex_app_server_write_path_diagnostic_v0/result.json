@@ -1,0 +1,190 @@
+{
+  "authority": {
+    "capital_authority": "NONE",
+    "merge_authorized": false,
+    "qnty_next_action": "NONE",
+    "runtime_authority": "NONE",
+    "scientific_authority": "NONE",
+    "trading_authority": "NONE",
+    "v2_authorized": false
+  },
+  "boundaries": {
+    "answer_key_accessed": false,
+    "api_key_gate": "PASS",
+    "attempts_per_stage": 1,
+    "authoritative_repository_modified_outside_this_branch": false,
+    "dsh_parent_llm_provider": "NONE",
+    "dsh_parent_llm_request_count": 0,
+    "historical_stage_a_task_executed": false,
+    "human_interventions": 0,
+    "pr134_mutated": false,
+    "product_config_modified": false,
+    "retries_used": 0,
+    "sandbox_weakened_to_obtain_pass": false,
+    "unauthorized_writes_outside_disposable_workspaces": 0,
+    "v1_episode_mutated": false,
+    "v2_authorized": false,
+    "v2_created": false
+  },
+  "canonical_master_sha": "b909bb7dddebb17247ac3101e045387f9ecd69e9",
+  "deterministic_tests": {
+    "diagnostic_suite_passed": 39,
+    "scoped_regression_passed": 108
+  },
+  "explicitly_not_claimed": [
+    "Codex cannot write - directly disproven here, and never claimed.",
+    "DSH caused V1 - not tested; D4 was never exercised.",
+    "The predecessor's native stall and any DSH behaviour share a root cause - not tested.",
+    "PR #134's recorded result is changed - it is immutable and untouched.",
+    "Any causal mechanism for the predecessor's 900s stall - see the hypothesis below, which is unproven."
+  ],
+  "falsified_hypotheses": {
+    "H1_timeout_is_not_write_denial_proof": {
+      "evidence": "Under explicit per-turn approvalPolicy=never and sandboxPolicy=workspaceWrite, both the raw app-server route and the QntyLab native bridge route completed the identical fixture write in 13.2s and 12.8s respectively, against the predecessor's 900s timeout with no write.",
+      "status": "SUPPORTED_BY_THIS_DIAGNOSTIC"
+    },
+    "native_write_capability_absent": {
+      "statement": "Subscription-backed Codex Profile A did perform the trivial workspace write through both the raw app-server and the QntyLab native bridge. No evidence of absent write capability was observed.",
+      "status": "NOT_SUPPORTED"
+    }
+  },
+  "first_divergence": "INCONCLUSIVE_INFRA",
+  "first_divergence_note": "No PASS -> FAIL divergence was observed anywhere on the ladder. `NONE` is deliberately not claimed, because `NONE` asserts that every write path passed and D4 was never exercised.",
+  "gates": {
+    "D0": "PASS",
+    "D1": "PASS",
+    "D2": "PASS",
+    "D3": "PASS",
+    "D4": "INCONCLUSIVE_INFRA"
+  },
+  "hostile_review": {
+    "class": "IN_PHASE_ADVERSARIAL_REVIEW",
+    "count": 1,
+    "critical": 0,
+    "high": 5,
+    "low": 1,
+    "medium": 2,
+    "open_critical": 0,
+    "open_high": 0,
+    "targeted_rereview_used": true
+  },
+  "next_action": "No rerun of this ladder, PR #134's batch, or Stage-A V1 is authorized. The subscription-backed native write path is demonstrated working under explicit per-turn policy through D3. D4 remains unexercised: a future separately authorized bounded phase would need to build the pinned DSH worktree before the pinned DSH Codex route can be diagnosed. No V2, runtime, scientific, Qnty NEXT_ACTION, trading, or capital authority is created by this result.",
+  "observations": {
+    "approval_request_observed": false,
+    "effective_approval_policy": "never",
+    "effective_codex_home": "/home/swirky/.codex",
+    "effective_cwd_matches_requested": true,
+    "effective_runtime_workspace_roots": "contained the disposable workspace on every route",
+    "effective_sandbox_class": "workspaceWrite",
+    "filesystem_effect_observed": true,
+    "legacy_sandbox_writable_roots": [],
+    "permission_request_observed": false,
+    "policy_parity_all_match_flag": false,
+    "policy_parity_note": "`writable_root_covers_workspace` is False on every route because the ThreadStartResponse legacy `sandbox` field reported `writableRoots: []` while `runtimeWorkspaceRoots` carried the workspace. The observed write proves the workspace was in fact writable, so the strict parity flag is a reporting artifact of the legacy field and not an observed policy divergence.",
+    "rpc_policy_observed": true,
+    "turn_terminal_observed": true,
+    "write_attempt_observed": true
+  },
+  "predecessor": {
+    "branch_mutated": false,
+    "head": "e24b540900ef9fcf48e24e8e53dbf2b18028f5d9",
+    "mutated": false,
+    "pr": 134,
+    "result_reinterpreted": false,
+    "state": "OPEN_DRAFT_UNMERGED"
+  },
+  "prelive_target_sha": "9ccb9c20f59216d93e9998ea6e6ddb45b773f82c",
+  "prelive_tree_sha": "f99a219c4fe199d2915dc4ec93eec2ca65f03dcf",
+  "product_identity": {
+    "codex_binary": "/home/swirky/.local/bin/codex",
+    "codex_home": "/home/swirky/.codex",
+    "codex_version": "codex-cli 0.147.0",
+    "codex_version_matches": true,
+    "dsh_commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "dsh_identity_matches": true,
+    "dsh_tag": "dsh-v0.1.0-rc.7",
+    "dsh_tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "model_observed": "gpt-5.6-luna",
+    "model_provider_observed": "openai"
+  },
+  "project_id": "SUBSCRIPTION_BACKED_CODEX_APP_SERVER_WRITE_PATH_DIAGNOSTIC_V0",
+  "qntyagenteval": {
+    "applicability": "NO_MATCH",
+    "run": false
+  },
+  "root_cause_class": "NOT_ESTABLISHED_NO_DIVERGENCE_OBSERVED_THROUGH_D3",
+  "root_cause_proven": false,
+  "routes": {
+    "D0_HOST_FILESYSTEM": {
+      "duration_seconds": 0.0,
+      "evidence": "fixture.txt BEFORE(7 bytes) -> AFTER(6 bytes); only fixture.txt changed; workspace destroyed, not restored",
+      "result": "PASS"
+    },
+    "D1_RAW_APP_SERVER_BASELINE": {
+      "duration_seconds": 5.6,
+      "evidence": "valid initialize/thread-start/turn-start, terminal turn/completed, exact APP_SERVER_OK answer, zero mutation",
+      "final_answer_exact_match": true,
+      "result": "PASS",
+      "terminal_class": "COMPLETED_NO_WRITE",
+      "turn_status": "completed",
+      "workspace_changed_paths": []
+    },
+    "D2_RAW_APP_SERVER_WRITE": {
+      "approval_requests_observed": 0,
+      "changed_paths": [
+        "fixture.txt"
+      ],
+      "command_execution_observed": true,
+      "duration_seconds": 13.2,
+      "error_notifications": 0,
+      "fixture_after_sha256": "f72c713b7b432dd18949ca10f1be6dbcf493479945653609d1c715b2d8d74356",
+      "fixture_before_sha256": "be9351741a8155d01fd028d158546f1005e73ceeb0bb2d093335feac4144e450",
+      "mechanism": "FILESYSTEM_BYTES_CHANGED_TO_TARGET",
+      "permission_requests_observed": 0,
+      "process_disposal": "SIGTERM",
+      "result": "PASS",
+      "terminal_class": "COMPLETED_WITH_WRITE",
+      "timed_out": false,
+      "turn_status": "completed",
+      "write_tool_item_observed": true
+    },
+    "D3_QNTY_NATIVE_BRIDGE": {
+      "approval_requests_observed": 0,
+      "bridge_exit_code": 0,
+      "bridge_sha256": "20e9f3d9735209bfaea4b0c61b50e8cead6fea63903a4975197d9f8fc77df88f",
+      "changed_paths": [
+        "fixture.txt"
+      ],
+      "duration_seconds": 12.8,
+      "evidence": "the #134 native-bridge wrapper (external subprocess, env sanitation, last-JSON-line receipt, lifecycle normalization) transported the write and normalized it as COMPLETED",
+      "normal_disposal": true,
+      "normalized_status": "COMPLETED",
+      "normalized_stop_reason": "completed",
+      "result": "PASS",
+      "terminal_class": "COMPLETED_WITH_WRITE",
+      "turn_status": "completed"
+    },
+    "D4_PINNED_DSH_CODEX_PROVIDER": {
+      "codex_child_spawned": false,
+      "detail": "pinned DSH module resolution failed: vendor/cordis/lib/index.js absent; lib/ is gitignored and the pinned worktree is unbuilt",
+      "note": "Per the phase stop rule an infrastructure failure occurring before the target mechanism is exercised is recorded as INCONCLUSIVE_INFRA and not silently retried inside the same phase.",
+      "reason": "PINNED_DSH_BUILD_OUTPUT_UNAVAILABLE",
+      "result": "INCONCLUSIVE_INFRA",
+      "retry_taken": false,
+      "target_mechanism_exercised": false
+    }
+  },
+  "schema_version": "codex-app-server-write-path-diagnostic-result-v0",
+  "status": "RECORDED_DIAGNOSTIC_INCONCLUSIVE_WITH_TRACE",
+  "unproven_hypothesis_for_predecessor_stall": {
+    "hypothesis": "The predecessor's native route sent cwd at thread/start with no explicit per-turn approval or sandbox policy, so a fresh disposable workspace - untrusted under Codex Profile A's per-project trust model, which sets no global approval_policy or sandbox_mode - would default to an approval-requiring policy and could stall awaiting an approval its bridge never answered.",
+    "status": "UNPROVEN",
+    "supporting_but_not_sufficient": [
+      "PR #134 forensic note: 'direct app-server thread/start cwd only; no explicit turn sandbox policy'.",
+      "Codex Profile A config.toml declares no global approval_policy or sandbox_mode; trust is per-project and a fresh /tmp workspace is untrusted.",
+      "Zero approval requests were observed here, which is consistent with the explicit approvalPolicy=never actually taking effect."
+    ],
+    "why_unproven": "The no-explicit-policy variant was not executed. This phase authorizes one bounded ladder and forbids additional episodes, so the hypothesis is recorded for a future separately authorized phase rather than tested here."
+  },
+  "verdict": "DIAGNOSTIC_INCONCLUSIVE_WITH_TRACE"
+}

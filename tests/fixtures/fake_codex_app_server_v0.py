@@ -14,7 +14,7 @@ import sys
 import time
 from pathlib import Path
 
-SCENARIO = sys.argv[1] if len(sys.argv) > 1 else "no_tool"
+SCENARIO = os.environ.get("FAKE_CODEX_SCENARIO") or (sys.argv[1] if len(sys.argv) > 1 else "no_tool")
 OBSERVED_PATH = os.environ.get("FAKE_APP_SERVER_OBSERVED")
 
 THREAD_ID = "thread-fake-0001"
@@ -93,9 +93,67 @@ def run_turn(params: dict) -> None:
         notify("turn/completed", {"threadId": THREAD_ID, "turn": turn_object("completed")})
         return
 
-    if SCENARIO == "write":
+    if SCENARIO in {"write", "empty_writable_roots", "write_with_approval"}:
+        if SCENARIO == "write_with_approval":
+            request_approval("item/fileChange/requestApproval", {
+                "threadId": THREAD_ID, "turnId": TURN_ID, "itemId": "item-approval",
+                "startedAtMs": 0, "reason": "unexpected approval",
+            })
         emit_write(cwd)
         emit_agent_message("done")
+        notify("turn/completed", {"threadId": THREAD_ID, "turn": turn_object("completed")})
+        return
+
+    if SCENARIO == "wrong_bytes":
+        Path(cwd, "fixture.txt").write_bytes(b"WRONG\n")
+        notify("turn/completed", {"threadId": THREAD_ID, "turn": turn_object("completed")})
+        return
+
+    if SCENARIO == "extra_write":
+        emit_write(cwd)
+        Path(cwd, "extra.txt").write_bytes(b"UNAUTHORIZED\n")
+        notify("turn/completed", {"threadId": THREAD_ID, "turn": turn_object("completed")})
+        return
+
+    if SCENARIO == "deleted_file":
+        Path(cwd, "fixture.txt").unlink()
+        notify("turn/completed", {"threadId": THREAD_ID, "turn": turn_object("completed")})
+        return
+
+    if SCENARIO == "wrong_thread":
+        notify("turn/completed", {"threadId": "thread-wrong", "turn": turn_object("completed")})
+        return
+
+    if SCENARIO == "wrong_turn":
+        wrong = turn_object("completed")
+        wrong["id"] = "turn-wrong"
+        notify("turn/completed", {"threadId": THREAD_ID, "turn": wrong})
+        return
+
+    if params.get("outputSchema") is not None:
+        if SCENARIO == "verifier_mutation":
+            Path(cwd, "verifier-write.txt").write_bytes(b"forbidden\n")
+        if SCENARIO == "verifier_malformed":
+            emit_agent_message("PASS")
+        elif SCENARIO == "verifier_wrong_role":
+            emit_agent_message(json.dumps({
+                "role": "BUILDER", "verdict": "PASS",
+                "builder_result_valid": True, "reviewer_result_consistent": True,
+                "workspace_matches_contract": True, "unauthorized_writes": [], "reasons": [],
+            }, separators=(",", ":")))
+        elif SCENARIO == "verifier_fail":
+            emit_agent_message(json.dumps({
+                "role": "VERIFIER", "verdict": "FAIL",
+                "builder_result_valid": False, "reviewer_result_consistent": True,
+                "workspace_matches_contract": True, "unauthorized_writes": [],
+                "reasons": ["builder evidence is invalid"],
+            }, separators=(",", ":")))
+        else:
+            emit_agent_message(json.dumps({
+                "role": "VERIFIER", "verdict": "PASS",
+                "builder_result_valid": True, "reviewer_result_consistent": True,
+                "workspace_matches_contract": True, "unauthorized_writes": [], "reasons": [],
+            }, separators=(",", ":")))
         notify("turn/completed", {"threadId": THREAD_ID, "turn": turn_object("completed")})
         return
 
@@ -190,13 +248,15 @@ def main() -> None:
             )
             if SCENARIO == "effective_policy_downgrade":
                 effective_sandbox = {"type": "readOnly", "networkAccess": False}
+            if SCENARIO == "empty_writable_roots":
+                effective_sandbox = {"type": "workspaceWrite", "writableRoots": [], "networkAccess": False}
             send({"jsonrpc": "2.0", "id": request_id, "result": {
                 "thread": {"id": THREAD_ID, "ephemeral": params.get("ephemeral") is True},
                 "cwd": params.get("cwd"), "model": "fake-model", "modelProvider": "fake",
                 "approvalPolicy": params.get("approvalPolicy", "on-request"),
                 "approvalsReviewer": "user",
                 "sandbox": effective_sandbox,
-                "runtimeWorkspaceRoots": [],
+                "runtimeWorkspaceRoots": [params.get("cwd")],
             }})
             notify("thread/started", {"threadId": THREAD_ID, "thread": {"id": THREAD_ID}})
         elif method == "turn/start":

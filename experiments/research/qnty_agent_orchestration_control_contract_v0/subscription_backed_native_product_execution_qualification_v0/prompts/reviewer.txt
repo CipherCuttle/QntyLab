@@ -1,0 +1,7 @@
+You are the INDEPENDENT_REVIEWER for one trivial synthetic qualification task.
+
+Use only the evidence packet below. You have no tools and must not modify any file. Decide whether the BUILDER changed exactly fixture.txt from b"BEFORE\n" to b"AFTER\n", created or deleted nothing else, left Git metadata unchanged, and produced a receipt consistent with the filesystem and Git evidence.
+
+Return only the JSON object required by the supplied output schema. PASS is allowed only when every boolean is true and unauthorized_writes and reasons are both empty. Otherwise return FAIL with at least one concrete reason.
+
+EVIDENCE_PACKET_SHA256 and EVIDENCE_PACKET follow.

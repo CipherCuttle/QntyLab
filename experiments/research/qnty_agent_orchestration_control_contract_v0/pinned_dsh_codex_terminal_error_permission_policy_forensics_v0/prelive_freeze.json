@@ -1,0 +1,36 @@
+{
+  "codex_identity": {
+    "binary": "/home/swirky/.local/bin/codex",
+    "binary_sha256": "cb0a15567e9a60a5820d54b0f6ae86d504dc3805c1eab21a47f70e3eb7b73a40",
+    "home": "/home/swirky/.codex",
+    "version": "codex-cli 0.147.0"
+  },
+  "dsh_identity": {
+    "commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "repository": "deepseek-ai/deepseek-harness",
+    "tag": "dsh-v0.1.0-rc.7",
+    "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188"
+  },
+  "fake_diff_sha256": "79bd558c18ea28be32aeb7d5b4808d8fbec62109be8fd14d55922b8f96abb264",
+  "frozen_at": "PRELIVE_FREEZE_TIME_RECORDED_AT_COMMIT",
+  "frozen_candidate_head": "9c23abd3c49e7e9d0632d42c8c008faf1f093bdf",
+  "frozen_dsh_driver_sha256": "e29c1bb891e6ae2040dff1ac240e33dd84f1da34b5fdaa68dd437c097ced5b94",
+  "immutable_after_commit": true,
+  "implementation_source_sha256": "67e96bd948924c60c084af51a9c7b9d26e2500214598dc0a7bfb35e96049f09e",
+  "intervention_patch_sha256": "5ac45f37e80e55d7a80223b77cde293ba29bfc4b1d51451b06803846d8b87d61",
+  "live_attempts_authorized": 1,
+  "live_attempts_consumed": 0,
+  "phase_id": "PINNED_DSH_CODEX_TERMINAL_ERROR_PERMISSION_POLICY_FORENSICS_V0",
+  "prelive_gate": "PASS",
+  "prompt_sha256": "5998d2259d56942c071536866262fa7a7b72c1780ae41137b8e0de1aafef8683",
+  "request_delta": [
+    {
+      "after": "never",
+      "before": "<ABSENT>",
+      "method": "thread/start",
+      "path": "params.approvalPolicy"
+    }
+  ],
+  "request_delta_digest": "ba849143fe62f05476ee0135efcbe9ac0649aeb530bce64b0c6944b0c723cebc",
+  "schema_version": "pinned-dsh-permission-policy-prelive-freeze-v0"
+}

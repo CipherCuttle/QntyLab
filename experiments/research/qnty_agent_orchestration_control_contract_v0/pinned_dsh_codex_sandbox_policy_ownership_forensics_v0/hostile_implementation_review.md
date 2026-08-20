@@ -21,8 +21,14 @@ Checks completed:
 
 Findings:
 
+Initial High: C configuration could recursively replace the frozen B request
+constructor. Repaired by retaining the original B constructor before applying
+the C override; no treatment bytes changed.
+
+Targeted rereview after that repair: PASS.
+
 Critical: 0
-High: 0
+High after repair: 0
 Medium: 0
 Low: 0
 

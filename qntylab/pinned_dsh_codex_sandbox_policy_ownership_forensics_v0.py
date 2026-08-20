@@ -18,10 +18,11 @@ ARTIFACT_DIR = ROOT / "experiments/research/qnty_agent_orchestration_control_con
 PATCH = ARTIFACT_DIR / "intervention_c.patch"
 QUALIFICATION = ARTIFACT_DIR / "request_qualification.json"
 HOSTILE_REVIEW = ARTIFACT_DIR / "hostile_implementation_review.md"
+B_REQUESTS = controller.intervention_b_requests
 
 
 def intervention_c_requests(workspace: str = "<workspace>", thread_id: str = "<thread-id>") -> list[dict[str, Any]]:
-    value = copy.deepcopy(controller.intervention_b_requests(workspace, thread_id))
+    value = copy.deepcopy(B_REQUESTS(workspace, thread_id))
     value[1]["params"]["sandbox"] = "workspace-write"
     return value
 
@@ -31,7 +32,7 @@ def c_total_delta() -> list[dict[str, Any]]:
 
 
 def b_to_c_delta() -> list[dict[str, Any]]:
-    return controller.semantic_request_delta(controller.intervention_b_requests(), intervention_c_requests())
+    return controller.semantic_request_delta(B_REQUESTS(), intervention_c_requests())
 
 
 def fake_c_capture(requests: list[dict[str, Any]]) -> dict[str, Any]:

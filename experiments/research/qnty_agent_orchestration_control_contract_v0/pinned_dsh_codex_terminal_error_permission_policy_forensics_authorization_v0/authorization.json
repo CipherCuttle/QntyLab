@@ -1,0 +1,72 @@
+{
+  "artifact_type": "PINNED_DSH_CODEX_TERMINAL_ERROR_PERMISSION_POLICY_FORENSICS_AUTHORIZATION",
+  "schema_version": "pinned-dsh-permission-policy-forensics-authorization-v0",
+  "phase_id": "PINNED_DSH_CODEX_TERMINAL_ERROR_PERMISSION_POLICY_FORENSICS_AUTHORIZATION_V0",
+  "phase_state": "CLOSED_PASS",
+  "authorization_state": "AUTHORIZED_IF_CANONICAL",
+  "authority_effective_only_if_canonical": true,
+  "canonical_master": "502a4e02993f1d23f3cb91bc0d70044ebccaa79c",
+  "previous_baseline": "60cec2646d4d6602e0ad33d0d4fc84edc2f272b9",
+  "baseline_relation": "PREVIOUS_BASELINE_IS_ANCESTOR",
+  "intervening_change": {
+    "commit": "502a4e02993f1d23f3cb91bc0d70044ebccaa79c",
+    "pr": 150,
+    "relevance": "NON_CONFLICTING_GOVERNANCE_ADVANCEMENT"
+  },
+  "scope": {
+    "implementation_phase": "PINNED_DSH_CODEX_TERMINAL_ERROR_PERMISSION_POLICY_FORENSICS_V0",
+    "historical_predecessor": "PR #137 pinned DSH D4, already consumed",
+    "historical_a_rerun": false,
+    "live_intervention_b_canaries": 1,
+    "retry_count": 0
+  },
+  "causal_intervention": {
+    "class": "CONTROLLED_SINGLE_VARIABLE_INTERVENTION_AGAINST_FROZEN_PREDECESSOR",
+    "before": "Historical exact pinned DSH request shape",
+    "after": "Historical exact pinned DSH request shape plus thread/start.params.approvalPolicy=never",
+    "allowed_wire_delta": [
+      {
+        "method": "thread/start",
+        "path": "params.approvalPolicy",
+        "before": "<ABSENT>",
+        "after": "never"
+      }
+    ],
+    "forbidden_additions": ["sandbox", "sandboxPolicy", "runtimeWorkspaceRoots", "experimentalApi=true", "permissions", "alternate_model", "alternate_codex", "alternate_dsh", "prompt_change", "retry_logic"]
+  },
+  "dsh_identity": {
+    "repository": "deepseek-ai/deepseek-harness",
+    "commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "tag": "dsh-v0.1.0-rc.7",
+    "package_version": "0.1.0-rc.7",
+    "floating_source_forbidden": true,
+    "source_mutation_rule": "Only the explicitly recorded one-field intervention patch may differ in the disposable canary copy; the frozen checkout is never modified."
+  },
+  "codex_identity": {
+    "version": "codex-cli 0.147.0",
+    "home": "/home/swirky/.codex",
+    "subscription_backed": true,
+    "pay_per_token_credentials": false,
+    "version_change_forbidden": true
+  },
+  "authority_ceiling": {
+    "scientific": "NONE",
+    "qnty_runtime": "NONE",
+    "qnty_next_action": "NONE",
+    "trading": "NONE",
+    "capital": "NONE",
+    "auto_merge": false,
+    "stage_a": false,
+    "v0r3": false
+  },
+  "predecessor_integrity": {
+    "pr137_result_mutation": false,
+    "pr141_result_mutation": false,
+    "native_d3_result_mutation": false,
+    "frozen_dsh_driver_mutation": false,
+    "historical_stage_a_task": false,
+    "answer_key_access": false,
+    "market_data_access": false
+  }
+}

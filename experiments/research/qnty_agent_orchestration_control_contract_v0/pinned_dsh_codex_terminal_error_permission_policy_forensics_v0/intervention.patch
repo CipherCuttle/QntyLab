@@ -1,0 +1,22 @@
+diff --git a/packages/subagent/subagent-codex/src/wire.ts b/packages/subagent/subagent-codex/src/wire.ts
+--- a/packages/subagent/subagent-codex/src/wire.ts
++++ b/packages/subagent/subagent-codex/src/wire.ts
+@@ -154,6 +154,7 @@ export class CodexAppServerWire {
+     const response = object(await this.guarded(this.transport.request('thread/start', {
+       cwd,
+       ephemeral: true,
++      approvalPolicy: 'never',
+     }, signal), signal), 'thread/start response')
+     const thread = object(response.thread, 'thread/start thread')
+     const id = string(thread.id, 'thread/start thread id')
+diff --git a/packages/subagent/subagent-codex/lib/index.js b/packages/subagent/subagent-codex/lib/index.js
+--- a/packages/subagent/subagent-codex/lib/index.js
++++ b/packages/subagent/subagent-codex/lib/index.js
+@@ -126,5 +126,6 @@ var CodexAppServerWire = class {
+ 	async startThread(cwd, signal) {
+ 		const thread = object(object(await this.guarded(this.transport.request("thread/start", {
+ 			cwd,
+-			ephemeral: true
++			ephemeral: true,
++			approvalPolicy: "never"
+ 		}, signal), signal), "thread/start response").thread, "thread/start thread");

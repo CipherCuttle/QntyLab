@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- None.
+- `Pinned DSH Codex clean C replication V0` — `ACTIVE`. Complete the immediate prelive gates, then consume exactly one D exposure. Stop after recording the result; no retry or additional canary is authorized.
 
 ## Queued — not authorized
 

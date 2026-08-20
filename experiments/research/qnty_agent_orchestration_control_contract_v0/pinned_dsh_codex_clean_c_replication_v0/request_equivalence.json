@@ -1,0 +1,91 @@
+{
+  "c_request": [
+    {
+      "method": "initialize",
+      "params": {
+        "capabilities": {
+          "experimentalApi": false,
+          "requestAttestation": false
+        },
+        "clientInfo": {
+          "name": "deepseek-harness",
+          "title": "DeepSeek Harness",
+          "version": "0.0.1"
+        }
+      }
+    },
+    {
+      "method": "thread/start",
+      "params": {
+        "approvalPolicy": "never",
+        "cwd": "<workspace>",
+        "ephemeral": true,
+        "sandbox": "workspace-write"
+      }
+    },
+    {
+      "method": "turn/start",
+      "params": {
+        "input": [
+          {
+            "text": "In this disposable diagnostic repository, replace the exact contents of\nfixture.txt with:\n\nAFTER\n\nDo not modify any other file.\nDo not ask questions.\nDo not perform unrelated work.\nStop after making that filesystem change.\n",
+            "text_elements": [],
+            "type": "text"
+          }
+        ],
+        "threadId": "<thread-id>"
+      }
+    }
+  ],
+  "c_request_digest": "26b4f3cadef2d03ed9b0a8f2bc4b30e99bc1a970daca1a26a333dec1eeafd44b",
+  "c_to_d_product_request_delta_count": 0,
+  "comparison_stages": [
+    "initialize",
+    "thread/start",
+    "turn/start"
+  ],
+  "d_request": [
+    {
+      "method": "initialize",
+      "params": {
+        "capabilities": {
+          "experimentalApi": false,
+          "requestAttestation": false
+        },
+        "clientInfo": {
+          "name": "deepseek-harness",
+          "title": "DeepSeek Harness",
+          "version": "0.0.1"
+        }
+      }
+    },
+    {
+      "method": "thread/start",
+      "params": {
+        "approvalPolicy": "never",
+        "cwd": "<workspace>",
+        "ephemeral": true,
+        "sandbox": "workspace-write"
+      }
+    },
+    {
+      "method": "turn/start",
+      "params": {
+        "input": [
+          {
+            "text": "In this disposable diagnostic repository, replace the exact contents of\nfixture.txt with:\n\nAFTER\n\nDo not modify any other file.\nDo not ask questions.\nDo not perform unrelated work.\nStop after making that filesystem change.\n",
+            "text_elements": [],
+            "type": "text"
+          }
+        ],
+        "threadId": "<thread-id>"
+      }
+    }
+  ],
+  "d_request_digest": "26b4f3cadef2d03ed9b0a8f2bc4b30e99bc1a970daca1a26a333dec1eeafd44b",
+  "pass": true,
+  "phase_id": "PINNED_DSH_CODEX_CLEAN_C_REPLICATION_V0",
+  "required_delta_count": 0,
+  "schema_version": "pinned-dsh-clean-c-request-equivalence-v0",
+  "semantic_diff": []
+}

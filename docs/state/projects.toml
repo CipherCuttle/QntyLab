@@ -4894,3 +4894,56 @@ historical_reclassification_authorized = false
 implementation_authorized = false
 active_project_after_closure = "NONE"
 next_action = "Stop. Preserve PR #158 as INCONCLUSIVE_INFRA; no canary, product rerun, or Profile A mutation is authorized by this phase."
+
+[[project]]
+project_id = "PINNED_DSH_CODEX_CLEAN_C_REPLICATION_V0"
+display_name = "Pinned DSH Codex clean C replication V0"
+state = "ACTIVE"
+phase_type = "ONE_FINAL_C_REPLICATION_CANARY"
+authority_level = "EXACT_C_PRODUCT_TREATMENT_WITH_PROFILE_OBSERVATION_ONLY"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "qntylab/pinned_dsh_codex_clean_c_replication_v0.py",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_clean_c_replication_v0/request_equivalence.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_clean_c_replication_v0/hostile_implementation_review.md",
+  "tests/test_pinned_dsh_codex_clean_c_replication_v0.py",
+]
+governing_authorization_pr = 161
+governing_authorization_merge_sha = "e0c74578d86816d6edd7afd5d60b099bbd7d4fc1"
+authorization_effective = "AFTER_CANONICAL_MERGE_ONLY"
+implementation_authorized = true
+implementation_commit = "PENDING_PRELIVE_COMMIT"
+prelive_freeze_commit = "PENDING_FREEZE_COMMIT"
+dsh_repository = "deepseek-ai/deepseek-harness"
+dsh_commit = "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca"
+dsh_tree = "3bc8f89fe494a4755c188be354add4e8b1e7b188"
+dsh_tag = "dsh-v0.1.0-rc.7"
+codex_version = "codex-cli 0.147.0"
+prompt_sha256 = "5998d2259d56942c071536866262fa7a7b72c1780ae41137b8e0de1aafef8683"
+approval_policy = "never"
+sandbox = "workspace-write"
+c_to_d_product_request_delta_count = 0
+fixture_before_sha256 = "be9351741a8155d01fd028d158546f1005e73ceeb0bb2d093335feac4144e450"
+fixture_after_sha256_expected = "f72c713b7b432dd18949ca10f1be6dbcf493479945653609d1c715b2d8d74356"
+authorization_profile_hash = "cb07d9468bb9f7e21b3cc507b20f31a6bffbc8328ef5b250bd7f9a12141ab6c7"
+d_live_exposures_authorized = 1
+d_retries_authorized = 0
+product_invocations = 0
+live_canaries_consumed = 0
+retry_count = 0
+profile_a_mutation_authorized = false
+profile_restoration_authorized = false
+codex_home_mutation_authorized = false
+raw_profile_snapshot_policy = "EPHEMERAL_LOCAL_ONLY"
+consumption_marker_required = true
+consumption_marker_irrevocable = true
+qnty_agent_eval = "NO_MATCH"
+scientific_execution_authorized = false
+qnty_runtime_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+downstream_authority = "NONE"
+historical_reclassification_authorized = false
+active_project_after_closure = "NONE"
+next_action = "Complete the immediate prelive gates, then consume exactly one D exposure. Stop after recording the result; no retry or additional canary is authorized."

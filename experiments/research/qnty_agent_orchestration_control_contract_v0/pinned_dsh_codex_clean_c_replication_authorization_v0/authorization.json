@@ -1,0 +1,304 @@
+{
+  "artifact_type": "PINNED_DSH_CODEX_CLEAN_C_REPLICATION_AUTHORIZATION",
+  "schema_version": "v0",
+  "phase_id": "PINNED_DSH_CODEX_CLEAN_C_REPLICATION_AUTHORIZATION_V0",
+  "phase_state": "CLOSED_PASS",
+  "authorization_state": "AUTHORIZED_IF_CANONICAL",
+  "authorization_effective": "AFTER_CANONICAL_MERGE_ONLY",
+  "authorized_operation": "ONE_FINAL_C_REPLICATION_CANARY_WITH_READ_ONLY_PROFILE_OBSERVATION",
+  "authorization_scope": "Authorize one later live confirmation exposure that reproduces C exactly while preserving ephemeral raw Profile A before/after snapshots and sanitized evidence.",
+  "canonical_merge_gate": {
+    "required_origin_master": "74b6bae8fcf7f08af7b1c7ecdd740925a0eef5c5",
+    "required_governing_pr160_merge": "74b6bae8fcf7f08af7b1c7ecdd740925a0eef5c5",
+    "canonical_verified_at_authorization": true,
+    "effective_only_when_ancestor_of_canonical_master": true,
+    "if_not_canonical": "PRELIVE_BLOCKED"
+  },
+  "governing_predecessor_forensics": {
+    "pr": 160,
+    "merge_sha": "74b6bae8fcf7f08af7b1c7ecdd740925a0eef5c5",
+    "classification": "PARTIAL_CONFOUNDER",
+    "classification_immutable": true,
+    "content_recovery": "PARTIAL_DIFF_RECOVERED",
+    "profile_a_mutation_causal_relevance": "UNKNOWN",
+    "root_cause_claim_strength": "NOT_PROVEN",
+    "additional_canary_needed": "UNDECIDED",
+    "profile_hash_at_forensic_closure": "cb07d9468bb9f7e21b3cc507b20f31a6bffbc8328ef5b250bd7f9a12141ab6c7",
+    "profile_mutated_by_forensic_phase": false,
+    "dsh_invoked": false,
+    "codex_invoked": false,
+    "live_product_invocations": 0,
+    "canaries_consumed": 0,
+    "qnty_agent_eval": "NO_MATCH"
+  },
+  "c_predecessor": {
+    "pr": 158,
+    "merge_sha": "89952634622f2480eebb8f695360379272bd01ea",
+    "classification": "INCONCLUSIVE_INFRA",
+    "classification_immutable": true,
+    "consumed": true,
+    "product_invocations": 1,
+    "retries": 0,
+    "approval_policy_requested": "never",
+    "sandbox_requested": "workspace-write",
+    "effective_sandbox": "workspaceWrite",
+    "turn_started": true,
+    "terminal_status": "completed",
+    "child_exit": 0,
+    "timeout": false,
+    "write_attempt": true,
+    "write_success": true,
+    "fixture_before_sha256": "be9351741a8155d01fd028d158546f1005e73ce0bb2d093335feac4144e450",
+    "fixture_after_sha256": "f72c713b7b432dd18949ca10f1be6dbcf493479945653609d1c715b2d8d74356",
+    "changed_paths": ["fixture.txt"],
+    "unauthorized_writes": [],
+    "read_only_message_observed": false,
+    "sandbox_denial_observed": false,
+    "approval_request_observed": false,
+    "jsonrpc_32600": {
+      "code": -32600,
+      "message": "no active turn to interrupt",
+      "event_ordinal": 93,
+      "stage": "terminal/other",
+      "fatal": "NO",
+      "interpretation": "NON_FATAL_POST_EXECUTION_ERROR; NOT A FAILED-WRITE EXPLANATION"
+    },
+    "profile_a_hash_before": "955cec088237c2ca3f2a704ab67ad2d805c0916feb74dec6fec0eb6c5b04eef0",
+    "profile_a_hash_after": "cb07d9468bb9f7e21b3cc507b20f31a6bffbc8328ef5b250bd7f9a12141ab6c7"
+  },
+  "frozen_product_identities": {
+    "dsh": {
+      "repository": "deepseek-ai/deepseek-harness",
+      "commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+      "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+      "tag": "dsh-v0.1.0-rc.7"
+    },
+    "codex": {
+      "product": "codex-cli",
+      "version": "0.147.0",
+      "binary_sha256": "cb0a15567e9a60a5820d54b0f6ae86d504dc3805c1eab21a47f70e3eb7b73a40"
+    },
+    "prompt_sha256": "5998d2259d56942c071536866262fa7a7b72c1780ae41137b8e0de1aafef8683"
+  },
+  "frozen_c_request": {
+    "request_shape_digest": "26b4f3cadef2d03ed9b0a8f2bc4b30e99bc1a970daca1a26a333dec1eeafd44b",
+    "request_delta_from_b": [
+      {
+        "method": "thread/start",
+        "path": "params.sandbox",
+        "before": "<ABSENT>",
+        "after": "workspace-write"
+      }
+    ],
+    "request_delta_from_b_count": 1,
+    "product_semantics": {
+      "approvalPolicy": "never",
+      "sandbox": "workspace-write",
+      "prompt_sha256": "5998d2259d56942c071536866262fa7a7b72c1780ae41137b8e0de1aafef8683",
+      "all_other_request_and_product_semantics": "EXACTLY_FROZEN_FROM_CANONICAL_C"
+    },
+    "canonical_request_delta_digest": "07a90ad951a2671b6202ce3441384428c1b704ba87beab1fb6b3b323039494dd"
+  },
+  "frozen_d_request": {
+    "product_semantics": {
+      "approvalPolicy": "never",
+      "sandbox": "workspace-write",
+      "prompt_sha256": "5998d2259d56942c071536866262fa7a7b72c1780ae41137b8e0de1aafef8683",
+      "all_other_request_and_product_semantics": "EXACTLY_EQUAL_TO_FROZEN_C"
+    },
+    "c_to_d_product_request_delta_count": 0,
+    "delta_count_is_load_bearing": true,
+    "any_nonzero_delta": "PRELIVE_BLOCKED"
+  },
+  "authorization_profile_baseline": {
+    "path": "~/.codex/config.toml",
+    "authorization_profile_hash": "cb07d9468bb9f7e21b3cc507b20f31a6bffbc8328ef5b250bd7f9a12141ab6c7",
+    "expected_profile_hash_from_pr160": "cb07d9468bb9f7e21b3cc507b20f31a6bffbc8328ef5b250bd7f9a12141ab6c7",
+    "profile_baseline_match": true,
+    "safe_stat": {
+      "mode": "600",
+      "regular_file": true,
+      "size_bytes": 4157
+    },
+    "raw_content_recorded": false,
+    "baseline_drift_action": "BLOCK_AUTHORIZATION; DO NOT RESTORE OR FIX PROFILE"
+  },
+  "authorization_phase_profile_immutability": {
+    "profile_hash_start": "cb07d9468bb9f7e21b3cc507b20f31a6bffbc8328ef5b250bd7f9a12141ab6c7",
+    "profile_hash_end_observed_before_commit": "cb07d9468bb9f7e21b3cc507b20f31a6bffbc8328ef5b250bd7f9a12141ab6c7",
+    "profile_mutated_by_authorization_phase": false,
+    "equality_required": true
+  },
+  "later_live_budget": {
+    "d_live_exposures_authorized": 1,
+    "d_retries_authorized": 0,
+    "is_new_confirmation_exposure": true,
+    "is_c_rerun": false,
+    "consumed_marker": {
+      "write_timing": "IMMEDIATELY_BEFORE_ACTUAL_PRODUCT_INVOCATION",
+      "independent": true,
+      "irrevocable": true,
+      "outcomes_that_consume": ["SUCCESS", "FAILURE", "TIMEOUT", "CRASH", "INFRASTRUCTURE_FAILURE"],
+      "retry_after_marker": false
+    }
+  },
+  "observation_only_delta": {
+    "is_product_treatment": false,
+    "c_to_d_product_request_delta_count": 0,
+    "profile_path": "~/.codex/config.toml",
+    "before": ["READ_RAW_BYTES", "SHA256", "SAFE_FILESYSTEM_METADATA", "EPHEMERAL_RAW_SNAPSHOT"],
+    "after": ["READ_RAW_BYTES", "SHA256", "SAFE_FILESYSTEM_METADATA", "EPHEMERAL_RAW_SNAPSHOT"],
+    "raw_snapshot_policy": "EPHEMERAL_LOCAL_ONLY",
+    "ephemeral_location": "PRIVATE_RESTRICTED_TEMP_OUTSIDE_GIT",
+    "raw_bytes_may_be_printed": false,
+    "raw_bytes_may_be_committed": false,
+    "raw_bytes_may_be_serialized": false,
+    "raw_bytes_may_be_sent_to_model": false,
+    "remove_ephemeral_copies_after_sanitized_evidence": true,
+    "persisted_fields_only": ["sha256", "size", "safe_metadata", "redacted_semantic_toml_diff", "classification"],
+    "optional_event_watcher": "OPTIONAL_OBSERVATIONAL_ONLY; NOT REQUIRED FOR CLEAN_CONFIRMATION_PASS; MUST NOT MODIFY PROFILE"
+  },
+  "later_prelive_gates": {
+    "profile_hash_prelive_must_equal_authorization_hash": true,
+    "request_delta_count_must_equal_zero": true,
+    "identity_must_match_exactly": true,
+    "prompt_must_match_exactly": true,
+    "credential_gate": "OPENAI_API_KEY, ANTHROPIC_API_KEY, DEEPSEEK_API_KEY ABSENT BY PRESENCE-ONLY CHECK",
+    "route": "SUBSCRIPTION_BACKED_ONLY",
+    "worktree_must_be_clean": true,
+    "if_gate_fails": "PRELIVE_BLOCKED; MARKER ABSENT; PRODUCT INVOCATION 0; CAUSAL UPDATE NONE"
+  },
+  "frozen_outcome_classes": {
+    "CLEAN_CONFIRMATION_PASS": {
+      "requires_all": [
+        "product invocation count = 1",
+        "exact pinned DSH identity",
+        "exact pinned Codex identity",
+        "exact prompt/task identity",
+        "C_TO_D_PRODUCT_REQUEST_DELTA_COUNT = 0",
+        "approvalPolicy = never",
+        "sandbox = workspace-write",
+        "effective sandbox = workspaceWrite if observable",
+        "turn started = YES",
+        "turn terminal completed = YES",
+        "timeout = NO",
+        "expected fixture write occurred = YES",
+        "changed paths = [fixture.txt]",
+        "unauthorized writes = []",
+        "read-only message = NO",
+        "sandbox denial = NO",
+        "approval request = NO",
+        "PROFILE_SHA256_BEFORE = PROFILE_SHA256_AFTER"
+      ],
+      "interpretation": "CLEAN_REPLICATION_CONFIRMS_WRITE_CAPABILITY",
+      "causal_update": "SANDBOX_OWNERSHIP_STRONGLY_CAUSALLY_SUPPORTED",
+      "exact_historical_root_cause": "NOT_AUTOMATICALLY_PROVEN",
+      "profile_mutation_disqualifies": true
+    },
+    "PROFILE_MUTATED_RECORDED": {
+      "condition": "PROFILE_SHA256_BEFORE != PROFILE_SHA256_AFTER",
+      "interpretation": "NOT_CLEAN_CONFIRMATION",
+      "required_action": "SANITIZED_DIFF_AND_TIMING_IF_AVAILABLE; STOP; NO RETRY"
+    },
+    "WRITE_FAILURE_WITH_STABLE_PROFILE": {
+      "condition": "PROFILE_SHA256_BEFORE = PROFILE_SHA256_AFTER AND EXPECTED_WRITE = NO",
+      "interpretation": "C_WRITE_SUCCESS_NOT_CLEANLY_REPRODUCED; CAUSALITY_UNRESOLVED",
+      "required_action": "STOP; NO RETRY"
+    },
+    "INCONCLUSIVE_INFRA": {
+      "condition": "CONSUMED_EXPOSURE_INVALIDATED_BY_INDEPENDENT_INFRASTRUCTURE_FAILURE",
+      "interpretation": "NO_CAUSAL_UPDATE",
+      "required_action": "STOP; NO RETRY"
+    },
+    "PRELIVE_BLOCKED": {
+      "condition": "ANY_PRELIVE_GATE_FAILURE",
+      "interpretation": "NO_PRODUCT_INVOCATION; NO_CAUSAL_UPDATE",
+      "required_action": "MARKER_ABSENT; DO NOT_RESTORE_PROFILE"
+    }
+  },
+  "jsonrpc_32600_policy": {
+    "preserve_if_observed": true,
+    "code": -32600,
+    "message": "no active turn to interrupt",
+    "mere_presence_is_failure": false,
+    "record": ["event ordinal", "lifecycle stage", "sanitized message", "fatality", "ordering relative to terminal/write"]
+  },
+  "governance_boundary": {
+    "authorization_phase_live_product_invocations": 0,
+    "authorization_phase_dsh_invocations": 0,
+    "authorization_phase_codex_invocations": 0,
+    "authorization_phase_canaries": 0,
+    "later_live_product_invocations_authorized": 1,
+    "later_canaries_authorized": 1,
+    "later_retries_authorized": 0,
+    "profile_a_mutation_authorized": false,
+    "profile_restoration_authorized": false,
+    "codex_home_mutation_authorized": false,
+    "treatment_mutation_authorized": false,
+    "trust_mutation_authorized": false,
+    "sandbox_mutation_authorized": false,
+    "approval_policy_mutation_authorized": false,
+    "writable_roots_mutation_authorized": false,
+    "runtime_workspace_roots_mutation_authorized": false,
+    "alternate_codex_home_authorized": false,
+    "alternate_profile_authorized": false,
+    "rerun_b_authorized": false,
+    "rerun_c_authorized": false,
+    "api_keys_authorized": false,
+    "pay_per_token_authorized": false,
+    "parent_model_requests": 0,
+    "scientific_execution_authorized": false,
+    "qnty_runtime_authority": "NONE",
+    "trading_authority": "NONE",
+    "capital_authority": "NONE",
+    "historical_reclassification_authorized": false,
+    "downstream_authority": "NONE",
+    "merge_authorized": false,
+    "prohibited_operations": [
+      "DSH invocation during authorization",
+      "Codex invocation during authorization",
+      "live canary during authorization",
+      "B rerun",
+      "C rerun",
+      "changing Profile A, CODEX_HOME, trust, sandbox, approvals, writable roots, runtime roots, prompt, model, versions, or treatment",
+      "config restoration or normalization",
+      "API keys or pay-per-token routes",
+      "scientific execution, Qnty runtime, trading, or capital",
+      "historical Stage-A answer key or downstream authority"
+    ]
+  },
+  "secret_safety": {
+    "raw_profile_snapshot_git_persistence": false,
+    "raw_profile_snapshot_serialization": false,
+    "raw_profile_snapshot_model_transfer": false,
+    "secret_values_recorded": false,
+    "secret_values_authorized": false,
+    "api_keys_authorized": false,
+    "credentials_authorized": false,
+    "auth_cookies_authorized": false,
+    "bearer_values_authorized": false,
+    "subscription_secrets_authorized": false,
+    "redaction_required_before_serialization": true,
+    "safe_recording": "Hashes, sizes, safe metadata, key paths, presence, value classes, and redacted non-secret values only."
+  },
+  "review": {
+    "independent_hostile_review_required": true,
+    "review_count": 1,
+    "targeted_rereview_only_if_critical_or_high_repair": true,
+    "review_topics": [
+      "hidden C-to-D treatment delta",
+      "observation versus treatment boundary",
+      "raw Profile A or secret leakage",
+      "baseline drift and restoration loopholes",
+      "alternate CODEX_HOME/profile loopholes",
+      "multiple invocation or retry loopholes",
+      "profile mutation disqualifying clean pass",
+      "fixture mutation proof",
+      "concurrent process confounding",
+      "-32600 overinterpretation",
+      "exact-root-cause overclaim"
+    ]
+  },
+  "qnty_agent_eval": "NO_MATCH",
+  "active_project_after_closure": "NONE"
+}

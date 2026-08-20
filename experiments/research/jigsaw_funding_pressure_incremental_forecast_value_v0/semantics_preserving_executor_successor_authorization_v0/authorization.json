@@ -1,0 +1,92 @@
+{
+  "artifact_type": "FUNDING_INCREMENTAL_SEMANTICS_PRESERVING_EXECUTOR_SUCCESSOR_IMPLEMENTATION_AUTHORIZATION",
+  "schema_version": "funding-incremental-semantics-preserving-executor-successor-authorization-v0",
+  "phase_id": "FUNDING_INCREMENTAL_SEMANTICS_PRESERVING_EXECUTOR_SUCCESSOR_IMPLEMENTATION_AUTHORIZATION_V0",
+  "project_id": "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_SEMANTICS_PRESERVING_EXECUTOR_SUCCESSOR_IMPLEMENTATION_AUTHORIZATION_V0",
+  "state": "CLOSED_BLOCKED",
+  "authorization_created": false,
+  "later_implementation_phases_authorized": 0,
+  "scientific_execution_authorized": false,
+  "explicit_scientific_execution_authority": "NONE",
+  "canonical_reconciliation": {
+    "canonical_master": "502a4e02993f1d23f3cb91bc0d70044ebccaa79c",
+    "pr150_merge_sha": "502a4e02993f1d23f3cb91bc0d70044ebccaa79c",
+    "pr150_merge_parents": [
+      "60cec2646d4d6602e0ad33d0d4fc84edc2f272b9",
+      "8b7adae4d584d009a9f163fc3b5703178f8720e5"
+    ],
+    "pr150_state": "MERGED",
+    "pr150_root_cause": "FROZEN_INCREMENTAL_CORE_NOT_REUSABLE_FROM_EXTERNAL_REAL_CONSUMER",
+    "pr149_root_cause": "REAL_EXECUTION_CONSUMER_PATH_NOT_MECHANICALLY_ESTABLISHED",
+    "predecessor_closures_consumed": [147, 148, 149, 150]
+  },
+  "frozen_bindings": {
+    "preregistration_status": "PREREGISTERED_NOT_EXECUTED",
+    "preregistration_digest": "d7ec718ab14e73d2aea24749a22caa2921fd81b8a336e2f2eaffb30ae1e992ef",
+    "preregistration_file_sha256": "42b96afae80e55611bcd9786169050520525fbc5534b9f94c72ed867380ba9cf",
+    "historical_implementation_candidate": "f6f12994d65c3dfeaf7839de560e58ad99547c62",
+    "historical_executor_sha256": "b894d4d9316bed6f8c4f7171b32692aff7b1f0eb32abd686a33fdb38425a7490",
+    "successor_implementation_identity": "NEW_IF_LATER_AUTHORIZED",
+    "historical_source_mutated": false,
+    "preregistered_scientific_semantics_changed": false,
+    "historical_provenance_baseline": "sha256:902be2246b64d133e0f22dd71c04eba344d12ead659e5f57c69183ab92f878d9",
+    "v2_source_sha256": "d603e747952d31d1fa87df463b9c739bc495a4e94597c2be0f93c02c678fbbc6",
+    "foundation_source_sha256": "834964137e4f2b77ab12a1d454f8ba8da9d71330e0806d00d1d2e26f113c980c",
+    "frozen_synthetic_result_digest": "sha256:1fca55ebdbe4c5d5b835cb65f87930755d231449c924eae912b522bd04b53ea2"
+  },
+  "frozen_contract": {
+    "panel": [
+      "BCHUSDT", "XRPUSDT", "LTCUSDT", "TRXUSDT", "ETCUSDT",
+      "LINKUSDT", "XLMUSDT", "CHZUSDT", "SANDUSDT", "REEFUSDT",
+      "CHRUSDT", "ALICEUSDT", "ONEUSDT", "API3USDT", "GMTUSDT",
+      "APEUSDT", "OPUSDT", "INJUSDT", "LDOUSDT", "APTUSDT"
+    ],
+    "development_origins": 365,
+    "evaluation_origins": 244,
+    "forecast_rows": 609,
+    "excluded_boundary_origin": "2024-10-18T00:00:00Z",
+    "strict_training_cutoff": "TARGET_COMPLETION_TIME < FORECAST_ORIGIN",
+    "har_lag_windows": [1, 7, 30],
+    "hac_lag": 5,
+    "alpha": "0.05",
+    "runtime": {
+      "prec": 28,
+      "rounding": "ROUND_HALF_EVEN",
+      "Emin": -999999,
+      "Emax": 999999,
+      "capitals": 1,
+      "clamp": 0,
+      "traps": ["InvalidOperation", "DivisionByZero", "Overflow"]
+    }
+  },
+  "design_gate": {
+    "pure_forecast_rows_to_incremental_result_core": false,
+    "one_shared_scientific_core_possible_without_historical_mutation": false,
+    "algorithm_duplication_required_under_immutable_history": true,
+    "real_rows_can_remain_explicitly_real": false,
+    "claim_before_outcome_architecture_is_conceptually_compatible": true,
+    "v2_result_contract_substitution_allowed": false,
+    "disposition": "CLOSED_BLOCKED",
+    "blocking_findings": [
+      "SUCCESSOR_REQUIRES_DUPLICATED_SCIENTIFIC_ASSEMBLY",
+      "HISTORICAL_V0_HAS_NO_EXTRACTABLE_CORE_SEAM",
+      "REAL_MODE_CANNOT_BE_ADDED_WITHOUT_MUTATING_OR_LAUNDERING_THE_HISTORICAL_WRAPPER"
+    ]
+  },
+  "outcome_firewall": {
+    "real_outcome_access": false,
+    "scientific_execution": false,
+    "evaluation_origins_consumed": 0,
+    "new_data_acquisition": false,
+    "real_forecast_rows_constructed": false,
+    "claim_consumed": false,
+    "scientific_result_created": false,
+    "trial_completion_recorded": false,
+    "order_flow_modified": false,
+    "jh01_modified": false,
+    "router_authority": "NONE",
+    "qnty_authority": "NONE",
+    "trading_authority": "NONE",
+    "capital_authority": "NONE"
+  }
+}

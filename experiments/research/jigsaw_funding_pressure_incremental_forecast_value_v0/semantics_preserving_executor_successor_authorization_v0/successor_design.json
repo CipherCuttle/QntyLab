@@ -1,0 +1,54 @@
+{
+  "artifact_type": "FUNDING_INCREMENTAL_SEMANTICS_PRESERVING_EXECUTOR_SUCCESSOR_DESIGN",
+  "schema_version": "funding-incremental-semantics-preserving-executor-successor-design-v0",
+  "phase_id": "FUNDING_INCREMENTAL_SEMANTICS_PRESERVING_EXECUTOR_SUCCESSOR_IMPLEMENTATION_AUTHORIZATION_V0",
+  "state": "CLOSED_BLOCKED",
+  "candidate_shape": {
+    "forecast_rows": "immutable validated ForecastRow sequence",
+    "pure_scientific_core": "one shared evaluator returning IncrementalForecastResult",
+    "synthetic_wrapper": "SYNTHETIC_VALIDATION rows into the shared core",
+    "future_real_wrapper": "authority validation, one-shot claim, frozen-evidence authentication, real ForecastRows, shared core",
+    "claim_order": ["validate authority", "consume irreversible one-shot claim", "authenticate evidence", "construct real ForecastRows", "invoke shared core", "record one result"]
+  },
+  "static_finding": {
+    "historical_entrypoint": "run_incremental_forecast_evaluation",
+    "historical_mode_guard": ["SYNTHETIC_VALIDATION"],
+    "scientific_assembly_is_inside_guarded_entrypoint": true,
+    "separate_pure_evaluation_core_exists": false,
+    "real_loader_in_historical_module": false,
+    "historical_source_may_be_mutated": false,
+    "v2_result_contract_is_equivalent": false,
+    "conclusion": "No single shared successor core can be introduced under all frozen constraints."
+  },
+  "rejected_alternatives": {
+    "mutate_historical_source_to_extract_core": "REJECTED_HISTORICAL_IDENTITY_WOULD_CHANGE",
+    "duplicate_har_ols_forecast_and_statistics": "REJECTED_ANTI_DUPLICATION_GATE",
+    "pass_real_rows_as_synthetic": "REJECTED_OUTCOME_AND_MODE_LAUNDERING",
+    "reuse_v2_one_shot_result": "REJECTED_DIFFERENT_RESULT_CONTRACT"
+  },
+  "required_differential_test_plan_if_reopened": [
+    "every existing V0 synthetic fixture",
+    "canonical frozen synthetic qualification fixture",
+    "known PASS case",
+    "known FAIL case",
+    "BLOCKED and input-integrity cases",
+    "panel reorder and panel substitution attacks",
+    "boundary-origin and wrong-origin-count attacks",
+    "PIT/training-cutoff attacks",
+    "missingness attacks",
+    "rank-deficient designs",
+    "extreme valid Decimal/Fraction values",
+    "hostile ambient Decimal contexts",
+    "deterministic pseudo-random valid ForecastRow corpora",
+    "deterministic pseudo-random malformed corpora",
+    "canonical serialization equality for every result field",
+    "frozen synthetic digest equality"
+  ],
+  "future_implementation_scope": {
+    "authorized": false,
+    "would_require_new_phase": true,
+    "must_preserve_historical_identity": true,
+    "must_not_access_real_outcomes": true,
+    "must_not_create_scientific_authority": true
+  }
+}

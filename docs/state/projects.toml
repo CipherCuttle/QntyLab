@@ -4296,3 +4296,74 @@ capital_authority = "NONE"
 downstream_authority = "NONE"
 active_project_after_closure = "NONE"
 next_action = "CLOSED_BLOCKED: do not implement the seam, create a scientific authorization, acquire data, or run the 244-origin evaluation. Reopen only under a separately governed scientific-source refactor or successor-seam decision."
+
+[[project]]
+project_id = "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_SEMANTICS_PRESERVING_EXECUTOR_SUCCESSOR_IMPLEMENTATION_AUTHORIZATION_V0"
+display_name = "Funding-pressure incremental semantics-preserving executor successor implementation authorization V0"
+state = "CLOSED_BLOCKED"
+authority_level = "GOVERNANCE_SUCCESSOR_DESIGN_AUTHORIZATION_BLOCKED"
+phase_type = "SEMANTICS_PRESERVING_EXECUTOR_SUCCESSOR_IMPLEMENTATION_AUTHORIZATION"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/preregistration.json",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/semantics_preserving_executor_successor_authorization_v0/authorization.json",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/semantics_preserving_executor_successor_authorization_v0/successor_design.json",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/semantics_preserving_executor_successor_authorization_v0/hostile_review.md",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/semantics_preserving_executor_successor_authorization_v0/closure.json",
+  "qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py",
+  "qntylab/jigsaw_funding_pressure_execution_v2.py",
+  "qntylab/jigsaw_funding_pressure_execution_foundation_v0.py",
+  "tests/test_funding_incremental_semantics_preserving_executor_successor_authorization_v0.py",
+]
+predecessor_project_id = "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_REAL_EXECUTION_CONSUMER_SEAM_IMPLEMENTATION_AUTHORIZATION_V0"
+governing_preregistration_project_id = "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_PREREGISTRATION_V0"
+governing_preregistration_digest = "d7ec718ab14e73d2aea24749a22caa2921fd81b8a336e2f2eaffb30ae1e992ef"
+governing_preregistration_status_preserved = "PREREGISTERED_NOT_EXECUTED"
+canonical_predecessor_master = "502a4e02993f1d23f3cb91bc0d70044ebccaa79c"
+historical_implementation_candidate = "f6f12994d65c3dfeaf7839de560e58ad99547c62"
+historical_executor_sha256 = "b894d4d9316bed6f8c4f7171b32692aff7b1f0eb32abd686a33fdb38425a7490"
+successor_implementation_identity = "NEW_IF_LATER_AUTHORIZED"
+historical_source_mutated = false
+preregistered_scientific_semantics_changed = false
+exact_panel_member_count = 20
+panel_order_load_bearing = true
+evaluation_origin_count = 244
+forecast_row_origin_count = 609
+numerical_runtime_bound = true
+pure_scientific_core_possible_without_historical_mutation = false
+algorithm_duplication_required = true
+real_rows_can_remain_explicitly_real = false
+one_shot_claim_authorized = false
+real_outcome_access_performed = false
+scientific_execution_performed = false
+evaluation_origins_consumed = 0
+new_data_acquisition_performed = false
+scientific_result_created = false
+trial_completion_recorded = false
+preregistration_mutated = false
+order_flow_modified = false
+jh01_modified = false
+hostile_review_count = 1
+hostile_review_verdict = "BLOCKED"
+hostile_review_critical = 3
+hostile_review_high = 0
+hostile_review_medium = 0
+hostile_review_low = 0
+critical_high_repair_required = false
+targeted_rereview_used = false
+authorization_created = false
+successor_implemented = false
+implementation_authorized = false
+scientific_execution_authorized = false
+outcome_access_authorized = false
+market_data_access_authorized = false
+state_snapshot_authorized = false
+router_authority = "NONE"
+qnty_authority = "NONE"
+trading_authority = "NONE"
+promotion_authorized = false
+capital_authority = "NONE"
+downstream_authority = "NONE"
+active_project_after_closure = "NONE"
+next_action = "CLOSED_BLOCKED: do not implement the successor, create a scientific authorization, acquire data, or run the 244-origin evaluation. Reopen only under a separately governed source refactor that changes the historical identity contract or an explicitly superseding scientific design."

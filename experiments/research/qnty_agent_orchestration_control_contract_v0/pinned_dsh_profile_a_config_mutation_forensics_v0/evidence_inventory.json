@@ -1,0 +1,101 @@
+{
+  "artifact_type": "PINNED_DSH_PROFILE_A_CONFIG_MUTATION_FORENSICS_EVIDENCE_INVENTORY",
+  "schema_version": "v0",
+  "phase_id": "PINNED_DSH_PROFILE_A_CONFIG_MUTATION_FORENSICS_V0",
+  "governing_authorization": {
+    "pr": 159,
+    "merge_sha": "3901dc113ca736da821db14b0fcb1f083c84578e",
+    "project_id": "PINNED_DSH_PROFILE_A_CONFIG_MUTATION_FORENSICS_AUTHORIZATION_V0",
+    "authorization_commit": "fa0f72741e29670b74ea8645cc6cee4f088055b5"
+  },
+  "canonical_predecessor": {
+    "pr": 158,
+    "merge_sha": "89952634622f2480eebb8f695360379272bd01ea",
+    "classification": "INCONCLUSIVE_INFRA",
+    "classification_changed": false,
+    "c_consumed": true,
+    "expected_write_occurred": true
+  },
+  "evidence_sources": [
+    {
+      "path": "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_sandbox_policy_ownership_forensics_v0/live_canary_receipt.json",
+      "role": "canonical C receipt",
+      "read_only": true,
+      "content_status": "available"
+    },
+    {
+      "path": "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_sandbox_policy_ownership_forensics_v0/closure.json",
+      "role": "canonical C closure",
+      "read_only": true,
+      "content_status": "available"
+    },
+    {
+      "path": "qntylab/pinned_dsh_codex_terminal_error_permission_policy_forensics_v0.py",
+      "role": "hash implementation and live controller",
+      "read_only": true,
+      "content_status": "available",
+      "relevant_lines": "62-63, 215-217, 355, 392, 454-456"
+    },
+    {
+      "path": "/home/swirky/.codex/config.toml",
+      "role": "current Profile A raw-byte endpoint",
+      "read_only": true,
+      "content_status": "available",
+      "values_serialized": false
+    },
+    {
+      "path": "/home/swirky/.codex/packages/standalone/releases/0.147.0-x86_64-unknown-linux-musl/bin/codex",
+      "role": "locally pinned Codex 0.147.0 binary contract strings",
+      "read_only": true,
+      "sha256": "cb0a15567e9a60a5820d54b0f6ae86d504dc3805c1eab21a47f70e3eb7b73a40",
+      "invoked": false
+    }
+  ],
+  "recovery_search": {
+    "searched_surfaces": [
+      "canonical PR #158 artifacts",
+      "existing /tmp/qntylab-* PR-related directories",
+      "existing QntyLab pinned-DSH worktrees",
+      "PR controller source and relevant DSH source",
+      "Profile A local config/backup/snapshot filenames",
+      "shell history entries matching config.toml or pinned-DSh phase markers"
+    ],
+    "before_hash_content_found": false,
+    "after_hash_content_found": true,
+    "matching_before_snapshot": false,
+    "matching_after_snapshot": "current /home/swirky/.codex/config.toml",
+    "recorded_rpc_trace_found": false,
+    "associated_backup_found": false,
+    "unrelated_backups_excluded": [
+      "/home/swirky/.codex/config.toml.bak.20260801-171632",
+      "/home/swirky/.codex/backups/home__swirky__.codex__config.toml.20260503_055331.bak"
+    ],
+    "content_recovery": "PARTIAL_DIFF_RECOVERED"
+  },
+  "profile_a_start_observation": {
+    "path": "/home/swirky/.codex/config.toml",
+    "regular_file": true,
+    "symlink": false,
+    "mode": "600",
+    "size_bytes": 4157,
+    "mtime": "2026-08-20T05:07:28.627468120Z",
+    "sha256": "cb07d9468bb9f7e21b3cc507b20f31a6bffbc8328ef5b250bd7f9a12141ab6c7",
+    "equals_canonical_before": false,
+    "equals_canonical_after": true,
+    "values_serialized": false
+  },
+  "secret_safety": {
+    "raw_profile_bytes_recorded": false,
+    "config_values_recorded": false,
+    "secret_values_recorded": false,
+    "secret_keys_may_be_named": true,
+    "redaction_required": true
+  },
+  "live_execution_attestation": {
+    "dsh_invoked": false,
+    "codex_invoked": false,
+    "canary_run": false,
+    "product_invocations": 0,
+    "profile_mutation_by_forensic_phase": false
+  }
+}

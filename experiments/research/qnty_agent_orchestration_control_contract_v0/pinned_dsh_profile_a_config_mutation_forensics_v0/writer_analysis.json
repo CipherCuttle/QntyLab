@@ -1,0 +1,43 @@
+{
+  "artifact_type": "PINNED_DSH_PROFILE_A_CONFIG_MUTATION_WRITER_ANALYSIS",
+  "schema_version": "v0",
+  "phase_id": "PINNED_DSH_PROFILE_A_CONFIG_MUTATION_FORENSICS_V0",
+  "mutation_writer": "UNKNOWN",
+  "writer_confidence": "LOW",
+  "writer_evidence": [
+    "The canonical QntyLab controller calls profile_config_hash before and after the product child and only reads the target file in that function.",
+    "Relevant QntyLab source contains no runtime write path for the user Profile A config.toml; its writes are forensic/workspace artifacts.",
+    "Relevant DSH source hits that write config.toml are synthetic product-test fixtures, not evidence of a runtime write to /home/swirky/.codex/config.toml.",
+    "The canonical Codex 0.147.0 binary hash matches the PR #158 recorded binary and contains strings for config.toml writes, trusted-project persistence, trust_level, permission profiles, and sandbox handling.",
+    "The current Profile A config contains project trust_level entries for PR-related temporary paths.",
+    "The Profile A mtime falls inside the canonical C live window, but mtime alone cannot identify the process or code path."
+  ],
+  "candidate_mechanisms": [
+    {
+      "candidate": "CODEX_NORMAL_SESSION_PERSISTENCE",
+      "status": "PLAUSIBLE_NOT_PROVEN",
+      "evidence": "Codex binary contains config.toml write and trusted-project persistence strings; C spawned the canonical Codex child."
+    },
+    {
+      "candidate": "PROFILE_TRUST_BOOTSTRAP",
+      "status": "PLAUSIBLE_NOT_PROVEN",
+      "evidence": "Codex binary contains trusted-project/trust_level contract strings and current config has project trust state."
+    },
+    {
+      "candidate": "QNTYLAB_WRAPPER_CONTROLLER",
+      "status": "NOT_SUPPORTED_BY_RELEVANT_SOURCE",
+      "evidence": "Controller hash function reads the file; no relevant write call was found."
+    },
+    {
+      "candidate": "DSH",
+      "status": "NOT_SUPPORTED_BY_RELEVANT_SOURCE",
+      "evidence": "Only synthetic DSH test fixtures write a temporary config.toml; no runtime Profile A write path was found."
+    },
+    {
+      "candidate": "UNRELATED_CONCURRENT_PROCESS_OR_MANUAL_CHANGE",
+      "status": "NOT_EXCLUDED",
+      "evidence": "No writer trace or process evidence survives."
+    }
+  ],
+  "writer_attribution_from_mtime_alone": "PROHIBITED"
+}

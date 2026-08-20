@@ -4789,3 +4789,60 @@ scientific_authority = "NONE"
 downstream_authority = "NONE"
 active_project_after_closure = "NONE"
 next_action = "Do not retry the consumed C canary. Any follow-up addressing Profile A trust/config mutation or another treatment variable requires separate authorization."
+
+[[project]]
+project_id = "PINNED_DSH_PROFILE_A_CONFIG_MUTATION_FORENSICS_V0"
+display_name = "Pinned DSH Profile A configuration mutation forensics V0"
+state = "CLOSED_PASS"
+phase_type = "READ_ONLY_PROFILE_A_CONFIG_MUTATION_FORENSICS"
+authority_level = "READ_ONLY_FORENSIC_DIAGNOSIS_ONLY"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_profile_a_config_mutation_forensics_v0/evidence_inventory.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_profile_a_config_mutation_forensics_v0/hash_reconstruction.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_profile_a_config_mutation_forensics_v0/redacted_config_diff.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_profile_a_config_mutation_forensics_v0/writer_analysis.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_profile_a_config_mutation_forensics_v0/temporal_analysis.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_profile_a_config_mutation_forensics_v0/causal_analysis.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_profile_a_config_mutation_forensics_v0/closure.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_profile_a_config_mutation_forensics_v0/hostile_review.md",
+  "tests/test_pinned_dsh_profile_a_config_mutation_forensics_v0.py",
+]
+governing_authorization_project_id = "PINNED_DSH_PROFILE_A_CONFIG_MUTATION_FORENSICS_AUTHORIZATION_V0"
+governing_authorization_pr = 159
+governing_authorization_merge_sha = "3901dc113ca736da821db14b0fcb1f083c84578e"
+predecessor_pr = 158
+predecessor_merge_sha = "89952634622f2480eebb8f695360379272bd01ea"
+predecessor_classification = "INCONCLUSIVE_INFRA"
+predecessor_c_consumed = true
+predecessor_write_succeeded = true
+hash_input_type = "FILE"
+hash_input_path = "~/.codex/config.toml"
+hash_mode = "RAW_BYTES"
+profile_hash_before = "955cec088237c2ca3f2a704ab67ad2d805c0916feb74dec6fec0eb6c5b04eef0"
+profile_hash_after = "cb07d9468bb9f7e21b3cc507b20f31a6bffbc8328ef5b250bd7f9a12141ab6c7"
+current_profile_hash = "cb07d9468bb9f7e21b3cc507b20f31a6bffbc8328ef5b250bd7f9a12141ab6c7"
+content_recovery = "PARTIAL_DIFF_RECOVERED"
+semantic_config_changed = "UNKNOWN"
+mutation_writer = "UNKNOWN"
+writer_confidence = "LOW"
+profile_a_mutation_causal_relevance = "UNKNOWN"
+classification = "PARTIAL_CONFOUNDER"
+root_cause_claim_strength = "NOT_PROVEN"
+additional_canary_needed = "UNDECIDED"
+additional_canary_authorized = false
+profile_mutated_by_forensic_phase = false
+dsh_invoked = false
+codex_invoked = false
+live_product_invocations = 0
+canaries_consumed = 0
+qnty_agent_eval = "NO_MATCH"
+scientific_execution = false
+qnty_runtime_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+historical_reclassification_authorized = false
+implementation_authorized = false
+active_project_after_closure = "NONE"
+next_action = "Stop. Preserve PR #158 as INCONCLUSIVE_INFRA; no canary, product rerun, or Profile A mutation is authorized by this phase."

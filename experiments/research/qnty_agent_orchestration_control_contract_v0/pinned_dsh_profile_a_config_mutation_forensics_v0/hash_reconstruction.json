@@ -1,0 +1,38 @@
+{
+  "artifact_type": "PINNED_DSH_PROFILE_A_CONFIG_MUTATION_HASH_RECONSTRUCTION",
+  "schema_version": "v0",
+  "phase_id": "PINNED_DSH_PROFILE_A_CONFIG_MUTATION_FORENSICS_V0",
+  "hash_input_type": "FILE",
+  "hash_input_path_logical": "~/.codex/config.toml",
+  "hash_input_path_observed": "/home/swirky/.codex/config.toml",
+  "hash_mode": "RAW_BYTES",
+  "implementation": {
+    "source_file": "qntylab/pinned_dsh_codex_terminal_error_permission_policy_forensics_v0.py",
+    "hash_bytes_function_lines": "62-63",
+    "profile_hash_function_lines": "215-217",
+    "before_call_line": 355,
+    "after_call_line": 392,
+    "receipt_fields_lines": "454-456"
+  },
+  "normalization_behavior": {
+    "explicit_symlink_resolution": false,
+    "observed_input_symlink": false,
+    "filesystem_symlink_following": "OS_PATH_SEMANTICS_ONLY",
+    "newline_normalization": false,
+    "encoding_conversion": false,
+    "toml_parsing": false,
+    "toml_canonicalization": false,
+    "sorting_or_reformatting": false,
+    "raw_bytes_only": true
+  },
+  "canonical_hashes": {
+    "before": "955cec088237c2ca3f2a704ab67ad2d805c0916feb74dec6fec0eb6c5b04eef0",
+    "after": "cb07d9468bb9f7e21b3cc507b20f31a6bffbc8328ef5b250bd7f9a12141ab6c7"
+  },
+  "current_hash": "cb07d9468bb9f7e21b3cc507b20f31a6bffbc8328ef5b250bd7f9a12141ab6c7",
+  "current_equals_before": false,
+  "current_equals_after": true,
+  "current_equals_neither": false,
+  "secret_material_in_hash_input": "UNKNOWN",
+  "semantic_diff_from_hashes": "NOT_DERIVABLE"
+}

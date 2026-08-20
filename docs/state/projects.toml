@@ -4791,6 +4791,54 @@ active_project_after_closure = "NONE"
 next_action = "Do not retry the consumed C canary. Any follow-up addressing Profile A trust/config mutation or another treatment variable requires separate authorization."
 
 [[project]]
+project_id = "PINNED_DSH_CODEX_CLEAN_C_REPLICATION_AUTHORIZATION_V0"
+display_name = "Pinned DSH Codex clean C replication authorization V0"
+state = "CLOSED_PASS"
+phase_type = "GOVERNANCE_ONLY_LIVE_CONFIRMATION_AUTHORIZATION"
+authority_level = "ONE_LATER_C_REPLICATION_CANARY_ONLY"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_clean_c_replication_authorization_v0/authorization.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_clean_c_replication_authorization_v0/hostile_governance_review.md",
+  "tests/test_pinned_dsh_codex_clean_c_replication_authorization_v0.py",
+]
+governing_predecessor_forensics_pr = 160
+governing_predecessor_forensics_merge_sha = "74b6bae8fcf7f08af7b1c7ecdd740925a0eef5c5"
+governing_predecessor_forensics_classification = "PARTIAL_CONFOUNDER"
+c_predecessor_pr = 158
+c_predecessor_merge_sha = "89952634622f2480eebb8f695360379272bd01ea"
+c_predecessor_classification = "INCONCLUSIVE_INFRA"
+c_consumed = true
+c_write_succeeded = true
+frozen_dsh_commit = "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca"
+frozen_codex_version = "codex-cli 0.147.0"
+frozen_prompt_sha256 = "5998d2259d56942c071536866262fa7a7b72c1780ae41137b8e0de1aafef8683"
+frozen_approval_policy = "never"
+frozen_sandbox = "workspace-write"
+c_to_d_product_request_delta_count = 0
+authorization_profile_hash = "cb07d9468bb9f7e21b3cc507b20f31a6bffbc8328ef5b250bd7f9a12141ab6c7"
+expected_profile_hash = "cb07d9468bb9f7e21b3cc507b20f31a6bffbc8328ef5b250bd7f9a12141ab6c7"
+profile_baseline_match = true
+d_live_exposures_authorized = 1
+d_retries_authorized = 0
+raw_profile_snapshot_policy = "EPHEMERAL_LOCAL_ONLY"
+profile_mutation_authorized = false
+profile_restoration_authorized = false
+codex_home_mutation_authorized = false
+authorization_phase_live_product_invocations = 0
+implementation_authorized = false
+qnty_agent_eval = "NO_MATCH"
+scientific_execution_authorized = false
+qnty_runtime_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+downstream_authority = "NONE"
+historical_reclassification_authorized = false
+active_project_after_closure = "NONE"
+next_action = "Publish this governance authorization as a draft only. Do not begin D live execution until a separately governed later phase consumes this authorization."
+
+[[project]]
 project_id = "PINNED_DSH_PROFILE_A_CONFIG_MUTATION_FORENSICS_V0"
 display_name = "Pinned DSH Profile A configuration mutation forensics V0"
 state = "CLOSED_PASS"

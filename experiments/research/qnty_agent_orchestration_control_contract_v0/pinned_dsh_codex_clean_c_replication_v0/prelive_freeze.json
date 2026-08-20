@@ -1,0 +1,55 @@
+{
+  "allowed_changed_paths": [
+    "fixture.txt"
+  ],
+  "authorization_merge_sha": "e0c74578d86816d6edd7afd5d60b099bbd7d4fc1",
+  "authorization_pr": 161,
+  "authorization_profile_hash": "cb07d9468bb9f7e21b3cc507b20f31a6bffbc8328ef5b250bd7f9a12141ab6c7",
+  "c_request_digest": "26b4f3cadef2d03ed9b0a8f2bc4b30e99bc1a970daca1a26a333dec1eeafd44b",
+  "c_to_d_product_request_delta_count": 0,
+  "classification_table": [
+    "CLEAN_CONFIRMATION_PASS",
+    "PROFILE_MUTATED_RECORDED",
+    "WRITE_FAILURE_WITH_STABLE_PROFILE",
+    "INCONCLUSIVE_INFRA",
+    "PRELIVE_BLOCKED"
+  ],
+  "credential_policy": {
+    "all_false_required": true,
+    "forbidden_environment": [
+      "OPENAI_API_KEY",
+      "ANTHROPIC_API_KEY",
+      "DEEPSEEK_API_KEY"
+    ],
+    "pay_per_token_fallback": false,
+    "presence_only": true
+  },
+  "d_live_exposures_authorized": 1,
+  "d_request_digest": "26b4f3cadef2d03ed9b0a8f2bc4b30e99bc1a970daca1a26a333dec1eeafd44b",
+  "d_retries_authorized": 0,
+  "driver_sha256": "e29c1bb891e6ae2040dff1ac240e33dd84f1da34b5fdaa68dd437c097ced5b94",
+  "dsh_identity": {
+    "codex_binary": "/home/swirky/.codex/packages/standalone/releases/0.147.0-x86_64-unknown-linux-musl/bin/codex",
+    "codex_binary_sha256": "cb0a15567e9a60a5820d54b0f6ae86d504dc3805c1eab21a47f70e3eb7b73a40",
+    "codex_version": "codex-cli 0.147.0",
+    "dsh_commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "dsh_repository": "deepseek-ai/deepseek-harness",
+    "dsh_tag": "dsh-v0.1.0-rc.7",
+    "dsh_tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "pass": true,
+    "prompt_sha256": "5998d2259d56942c071536866262fa7a7b72c1780ae41137b8e0de1aafef8683"
+  },
+  "dsh_patch_sha256": "735d1f303e759ee43eb960b7e95f9448a57c70e9d0d8dc01f09a6ed70b03894f",
+  "expected_fixture_after_sha256": "f72c713b7b432dd18949ca10f1be6dbcf493479945653609d1c715b2d8d74356",
+  "fixture_before_sha256": "be9351741a8155d01fd028d158546f1005e73ceeb0bb2d093335feac4144e450",
+  "frozen_candidate_head": "3442b696d713780979afa32e8edcd962b529c52b",
+  "immutable_after_commit": true,
+  "implementation_branch": "agent/pinned-dsh-codex-clean-c-replication-v0",
+  "implementation_sha256": "a3ddb290de99aae64c167c5603d21418c0db1976317deae33a831ec61e9f9611",
+  "phase_id": "PINNED_DSH_CODEX_CLEAN_C_REPLICATION_V0",
+  "prelive_gate": "PASS",
+  "profile_hash_initial": "cb07d9468bb9f7e21b3cc507b20f31a6bffbc8328ef5b250bd7f9a12141ab6c7",
+  "prompt_sha256": "5998d2259d56942c071536866262fa7a7b72c1780ae41137b8e0de1aafef8683",
+  "schema_version": "pinned-dsh-clean-c-prelive-freeze-v0",
+  "wrapper_sha256": "14d92dc9924329074f4e27b8136471770e18b23c0623a15b7d57356cc58332ef"
+}

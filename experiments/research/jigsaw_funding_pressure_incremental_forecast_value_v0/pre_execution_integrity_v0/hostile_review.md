@@ -28,7 +28,7 @@ hostile review, not an independent external audit.
 | Critical | 0 |
 | Medium | 1 |
 | High | 0 |
-| Low | 3 |
+| Low | 4 |
 
 Critical/High is zero, so the bounded repair cycle was NOT triggered, no repair
 pass was performed, and no targeted re-review was used. None of the Medium/Low

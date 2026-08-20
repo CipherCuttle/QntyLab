@@ -4045,3 +4045,104 @@ critical_high_repair_required = false
 targeted_rereview_used = false
 active_project_after_closure = "NONE"
 next_action = "CLOSED_PASS: the preregistered funding-pressure incremental forecast executor is implemented, source-bound and synthetically validated at f6f12994d65c3dfeaf7839de560e58ad99547c62, and the single hostile implementation review closed with 0 Critical and 0 High (2 Medium, 4 Low recorded, none reopening the phase). The governing preregistration is byte-unchanged and remains PREREGISTERED_NOT_EXECUTED. No real evidence execution, scientific execution, outcome access, market-data or funding acquisition, network access, scientific result, or trial completion occurred; no evaluation origin was consumed. The 244-origin scientific evaluation requires a separate Git-backed execution authorization that must, before any real run, bind the frozen 20-member panel to the preregistration (hostile review M-02). No State Snapshot, Router, Qnty, trading, promotion, or capital authority is granted or implied."
+
+[[project]]
+project_id = "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_PRE_EXECUTION_INTEGRITY_V0"
+display_name = "Funding-pressure incremental pre-execution integrity reconciliation V0"
+state = "CLOSED_PASS"
+authority_level = "OUTCOME_BLIND_PRE_EXECUTION_INTEGRITY_VERIFICATION_ONLY"
+phase_type = "PRE_EXECUTION_INTEGRITY_RECONCILIATION"
+authoritative_artifacts = [
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/pre_execution_integrity_v0/root_cause.json",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/pre_execution_integrity_v0/reconciliation_receipt.json",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/pre_execution_integrity_v0/hostile_review.md",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/pre_execution_integrity_v0/closure.json",
+  "qntylab/jigsaw_funding_pressure_incremental_pre_execution_integrity_v0.py",
+  "qntylab/jigsaw_funding_pressure_provenance_v0.py",
+  "tests/test_funding_incremental_pre_execution_integrity_v0.py",
+  "tests/test_jigsaw_funding_pressure_provenance_v0.py",
+]
+predecessor_project_id = "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_EXECUTION_IMPLEMENTATION_V0"
+governing_preregistration_project_id = "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_PREREGISTRATION_V0"
+governing_preregistration_digest = "d7ec718ab14e73d2aea24749a22caa2921fd81b8a336e2f2eaffb30ae1e992ef"
+governing_preregistration_status_preserved = "PREREGISTERED_NOT_EXECUTED"
+canonical_master_at_branch = "cc93a6b4dd234087bb007002e144f0ea9278ea2b"
+frozen_implementation_sha = "f6f12994d65c3dfeaf7839de560e58ad99547c62"
+
+# --- historical provenance repair -------------------------------------------
+provenance_defect = "materializer byte mismatch: qntylab/binance_um_kline_1h.py"
+provenance_defect_introduced_by = "d1a327a902b410e806cffd7ef90fa2b7719fb3c6"
+historical_materializer_identity_authenticated = true
+current_materializer_not_laundered_into_history = true
+historical_identity_source = "IMMUTABLE_GIT_BLOB_AT_FROZEN_BASELINE_ANCESTORS"
+historical_anchors = [
+  "98e9dbcbec5dab18f7498cf4c5df77e14a8d5569",
+  "3e54cb86cdc43c76c1cbf72acc4dfebecb6b10fa",
+]
+frozen_provenance_baseline_digest = "sha256:902be2246b64d133e0f22dd71c04eba344d12ead659e5f57c69183ab92f878d9"
+frozen_evidence_mutated = false
+order_flow_modified = false
+
+# --- panel binding (implementation review M-02) ------------------------------
+prereg_panel_equals_source_binding_panel = true
+source_binding_panel_equals_v2_panel = true
+v2_panel_equals_provenance_panel = true
+exact_panel_member_count = 20
+panel_substitution = false
+panel_order_mismatch = false
+m02_discharged = true
+
+# --- exact implementation identity -------------------------------------------
+prereg_digest_match = true
+executor_identity_match = true
+source_binding_match = true
+implementation_manifest_match = true
+origin_schedule_match = true
+execution_semantics_match = true
+executor_source_sha256 = "b894d4d9316bed6f8c4f7171b32692aff7b1f0eb32abd686a33fdb38425a7490"
+v2_source_sha256 = "d603e747952d31d1fa87df463b9c739bc495a4e94597c2be0f93c02c678fbbc6"
+foundation_v0_source_sha256 = "834964137e4f2b77ab12a1d454f8ba8da9d71330e0806d00d1d2e26f113c980c"
+evaluation_origin_count = 244
+
+# --- numerical runtime preflight (implementation review M-01) ----------------
+synthetic_runtime_preflight = "PASS"
+frozen_synthetic_result_digest = "sha256:1fca55ebdbe5c4d5b835cb65f87930755d231449c924eae912b522bd04b53ea2"
+hostile_ambient_contexts_absorbed = 24
+silent_divergences = 0
+frozen_algorithm_modified = false
+m01_discharged = true
+
+# --- outcome firewall ---------------------------------------------------------
+real_scientific_execution_performed = false
+real_evaluation_outcome_access_performed = false
+evaluation_origins_consumed = 0
+data_acquisition_performed = false
+network_access_performed = false
+preregistration_mutated = false
+scientific_result_created = false
+trial_completion_recorded = false
+jh01_ledger_accessed = false
+order_flow_reopened = false
+
+# --- review and authority ------------------------------------------------------
+hostile_review_count = 1
+hostile_review_verdict = "PASS"
+hostile_review_critical = 0
+hostile_review_high = 0
+hostile_review_medium = 1
+hostile_review_low = 4
+critical_high_repair_required = false
+targeted_rereview_used = false
+implementation_authorized = false
+scientific_execution_authorized = false
+outcome_access_authorized = false
+market_data_access_authorized = false
+state_snapshot_authorized = false
+router_authorized = false
+qnty_authorized = false
+trading_authorized = false
+promotion_authorized = false
+capital_authority = "NONE"
+downstream_authority = "NONE"
+active_project_after_closure = "NONE"
+next_action = "CLOSED_PASS: canonical master now authenticates the historical funding materializer identity from immutable Git blob identity at the frozen baseline's own ancestors, so unrelated later development of the shared materializer no longer breaks historical provenance and the current materializer cannot be laundered into the frozen record. Frozen evidence, the preregistration and Order Flow are byte-unchanged. Implementation review M-02 (panel binding) and M-01 (numerical runtime) are discharged: the exact 20-member ordered panel is mechanically identical across the preregistration, source binding, V2 and provenance, bound to preregistration digest d7ec718ab14e73d2aea24749a22caa2921fd81b8a336e2f2eaffb30ae1e992ef, and the frozen executor reproduces its frozen synthetic identity under an explicit Decimal runtime contract across 24 hostile ambient contexts with zero divergence. No real scientific execution, outcome access, data acquisition, or result creation occurred and no evaluation origin was consumed. This phase does NOT authorize the real run. Separately create an exact one-shot scientific execution authorization bound to the frozen preregistration, the frozen executor b894d4d9316bed6f8c4f7171b32692aff7b1f0eb32abd686a33fdb38425a7490, the authenticated historical evidence identity, the exact panel, the 244-origin schedule, and the frozen numerical runtime contract. No State Snapshot, Router, Qnty, trading, promotion, or capital authority is granted or implied."

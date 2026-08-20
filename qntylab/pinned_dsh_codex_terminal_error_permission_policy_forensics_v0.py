@@ -196,6 +196,22 @@ def credential_presence(environ: Mapping[str, str] | None = None) -> dict[str, b
     return {name: name in source for name in API_KEY_NAMES}
 
 
+def credential_gate_status(presence: Mapping[str, object]) -> str:
+    """Return a fail-closed decision from presence booleans only.
+
+    The gate deliberately accepts the presence map rather than credential
+    values.  Exact key and boolean validation prevents malformed internal
+    state from bypassing the deny rule.
+    """
+    if set(presence) != set(API_KEY_NAMES) or any(type(value) is not bool for value in presence.values()):
+        return "BLOCK_MALFORMED"
+    return "BLOCK" if any(presence.values()) else "PASS"
+
+
+def credential_gate_status_from_environment(environ: Mapping[str, str] | None = None) -> str:
+    return credential_gate_status(credential_presence(environ))
+
+
 def profile_config_hash() -> str | None:
     path = CODEX_HOME / "config.toml"
     return sha256_file(path) if path.is_file() else None
@@ -319,8 +335,8 @@ def run_live() -> dict[str, Any]:
     diff = json.loads((ARTIFACT_DIR / "fake_app_server_request_diff.json").read_text(encoding="utf-8"))
     if freeze["request_delta"] != expected_delta() or diff["request_delta"] != expected_delta():
         raise RuntimeError("PRELIVE_BLOCKED: request delta gate failed")
-    if credential_presence():
-        raise RuntimeError("PRELIVE_BLOCKED: pay-per-token credential present")
+    if credential_gate_status_from_environment() != "PASS":
+        raise RuntimeError("PRELIVE_BLOCKED: pay-per-token credential gate")
     if sha256_file(CODEX_BINARY) != freeze["codex_identity"]["binary_sha256"] or CODEX_VERSION != freeze["codex_identity"]["version"]:
         raise RuntimeError("PRELIVE_BLOCKED: Codex identity drift")
     if not FROZEN_DSH_ROOT.is_dir() or not FROZEN_DSH_DRIVER.is_file():

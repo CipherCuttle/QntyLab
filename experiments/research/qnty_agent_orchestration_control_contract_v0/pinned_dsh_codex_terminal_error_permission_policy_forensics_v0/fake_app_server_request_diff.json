@@ -1,0 +1,278 @@
+{
+  "codex_identity": {
+    "home": "/home/swirky/.codex",
+    "version": "codex-cli 0.147.0"
+  },
+  "dsh_identity": {
+    "commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "repository": "deepseek-ai/deepseek-harness",
+    "tag": "dsh-v0.1.0-rc.7",
+    "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188"
+  },
+  "environment_semantics": {
+    "api_key_values_read": false,
+    "identity_changed": false,
+    "model_changed": false
+  },
+  "expected_request_delta": [
+    {
+      "after": "never",
+      "before": "<ABSENT>",
+      "method": "thread/start",
+      "path": "params.approvalPolicy"
+    }
+  ],
+  "fake_historical_capture": {
+    "events": [
+      {
+        "direction": "request",
+        "method": "initialize",
+        "params": {
+          "capabilities": {
+            "experimentalApi": false,
+            "requestAttestation": false
+          },
+          "clientInfo": {
+            "name": "deepseek-harness",
+            "title": "DeepSeek Harness",
+            "version": "0.0.1"
+          }
+        },
+        "sequence": 1,
+        "status": "accepted"
+      },
+      {
+        "direction": "response",
+        "http_status": null,
+        "method": "initialize",
+        "sequence": 1,
+        "status": "PASS"
+      },
+      {
+        "direction": "request",
+        "method": "thread/start",
+        "params": {
+          "cwd": "<workspace>",
+          "ephemeral": true
+        },
+        "sequence": 2,
+        "status": "accepted"
+      },
+      {
+        "direction": "response",
+        "effective": {
+          "approvalPolicy": "on-request",
+          "cwd": "<workspace>",
+          "runtimeWorkspaceRoots": [],
+          "sandbox": null,
+          "writableRoots": []
+        },
+        "http_status": null,
+        "method": "thread/start",
+        "sequence": 2,
+        "status": "PASS"
+      },
+      {
+        "direction": "request",
+        "method": "turn/start",
+        "params": {
+          "input": [
+            {
+              "text": "In this disposable diagnostic repository, replace the exact contents of\nfixture.txt with:\n\nAFTER\n\nDo not modify any other file.\nDo not ask questions.\nDo not perform unrelated work.\nStop after making that filesystem change.\n",
+              "text_elements": [],
+              "type": "text"
+            }
+          ],
+          "threadId": "<thread-id>"
+        },
+        "sequence": 3,
+        "status": "accepted"
+      },
+      {
+        "direction": "response",
+        "http_status": null,
+        "method": "turn/start",
+        "sequence": 3,
+        "status": "PASS",
+        "turn_id": "<turn-id>"
+      },
+      {
+        "direction": "event",
+        "error": null,
+        "method": "turn/completed",
+        "status": "completed"
+      }
+    ],
+    "schema_version": "fake-pinned-dsh-app-server-capture-v0"
+  },
+  "fake_intervention_b_capture": {
+    "events": [
+      {
+        "direction": "request",
+        "method": "initialize",
+        "params": {
+          "capabilities": {
+            "experimentalApi": false,
+            "requestAttestation": false
+          },
+          "clientInfo": {
+            "name": "deepseek-harness",
+            "title": "DeepSeek Harness",
+            "version": "0.0.1"
+          }
+        },
+        "sequence": 1,
+        "status": "accepted"
+      },
+      {
+        "direction": "response",
+        "http_status": null,
+        "method": "initialize",
+        "sequence": 1,
+        "status": "PASS"
+      },
+      {
+        "direction": "request",
+        "method": "thread/start",
+        "params": {
+          "approvalPolicy": "never",
+          "cwd": "<workspace>",
+          "ephemeral": true
+        },
+        "sequence": 2,
+        "status": "accepted"
+      },
+      {
+        "direction": "response",
+        "effective": {
+          "approvalPolicy": "never",
+          "cwd": "<workspace>",
+          "runtimeWorkspaceRoots": [],
+          "sandbox": null,
+          "writableRoots": []
+        },
+        "http_status": null,
+        "method": "thread/start",
+        "sequence": 2,
+        "status": "PASS"
+      },
+      {
+        "direction": "request",
+        "method": "turn/start",
+        "params": {
+          "input": [
+            {
+              "text": "In this disposable diagnostic repository, replace the exact contents of\nfixture.txt with:\n\nAFTER\n\nDo not modify any other file.\nDo not ask questions.\nDo not perform unrelated work.\nStop after making that filesystem change.\n",
+              "text_elements": [],
+              "type": "text"
+            }
+          ],
+          "threadId": "<thread-id>"
+        },
+        "sequence": 3,
+        "status": "accepted"
+      },
+      {
+        "direction": "response",
+        "http_status": null,
+        "method": "turn/start",
+        "sequence": 3,
+        "status": "PASS",
+        "turn_id": "<turn-id>"
+      },
+      {
+        "direction": "event",
+        "error": null,
+        "method": "turn/completed",
+        "status": "completed"
+      }
+    ],
+    "schema_version": "fake-pinned-dsh-app-server-capture-v0"
+  },
+  "historical_shape": [
+    {
+      "method": "initialize",
+      "params": {
+        "capabilities": {
+          "experimentalApi": false,
+          "requestAttestation": false
+        },
+        "clientInfo": {
+          "name": "deepseek-harness",
+          "title": "DeepSeek Harness",
+          "version": "0.0.1"
+        }
+      }
+    },
+    {
+      "method": "thread/start",
+      "params": {
+        "cwd": "<workspace>",
+        "ephemeral": true
+      }
+    },
+    {
+      "method": "turn/start",
+      "params": {
+        "input": [
+          {
+            "text": "In this disposable diagnostic repository, replace the exact contents of\nfixture.txt with:\n\nAFTER\n\nDo not modify any other file.\nDo not ask questions.\nDo not perform unrelated work.\nStop after making that filesystem change.\n",
+            "text_elements": [],
+            "type": "text"
+          }
+        ],
+        "threadId": "<thread-id>"
+      }
+    }
+  ],
+  "intervention_b_shape": [
+    {
+      "method": "initialize",
+      "params": {
+        "capabilities": {
+          "experimentalApi": false,
+          "requestAttestation": false
+        },
+        "clientInfo": {
+          "name": "deepseek-harness",
+          "title": "DeepSeek Harness",
+          "version": "0.0.1"
+        }
+      }
+    },
+    {
+      "method": "thread/start",
+      "params": {
+        "approvalPolicy": "never",
+        "cwd": "<workspace>",
+        "ephemeral": true
+      }
+    },
+    {
+      "method": "turn/start",
+      "params": {
+        "input": [
+          {
+            "text": "In this disposable diagnostic repository, replace the exact contents of\nfixture.txt with:\n\nAFTER\n\nDo not modify any other file.\nDo not ask questions.\nDo not perform unrelated work.\nStop after making that filesystem change.\n",
+            "text_elements": [],
+            "type": "text"
+          }
+        ],
+        "threadId": "<thread-id>"
+      }
+    }
+  ],
+  "phase_id": "PINNED_DSH_CODEX_TERMINAL_ERROR_PERMISSION_POLICY_FORENSICS_V0",
+  "prompt_sha256": "5998d2259d56942c071536866262fa7a7b72c1780ae41137b8e0de1aafef8683",
+  "request_delta": [
+    {
+      "after": "never",
+      "before": "<ABSENT>",
+      "method": "thread/start",
+      "path": "params.approvalPolicy"
+    }
+  ],
+  "request_delta_count": 1,
+  "request_delta_pass": true,
+  "schema_version": "pinned-dsh-permission-policy-request-diff-v0"
+}

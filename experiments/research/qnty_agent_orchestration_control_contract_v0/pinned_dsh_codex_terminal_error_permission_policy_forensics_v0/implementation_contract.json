@@ -1,0 +1,75 @@
+{
+  "artifact_type": "PINNED_DSH_CODEX_TERMINAL_ERROR_PERMISSION_POLICY_FORENSICS_IMPLEMENTATION_CONTRACT",
+  "schema_version": "pinned-dsh-permission-policy-forensics-implementation-v0",
+  "phase_id": "PINNED_DSH_CODEX_TERMINAL_ERROR_PERMISSION_POLICY_FORENSICS_V0",
+  "state": "IMPLEMENTATION_IN_PROGRESS",
+  "authorization_project_id": "PINNED_DSH_CODEX_TERMINAL_ERROR_PERMISSION_POLICY_FORENSICS_AUTHORIZATION_V0",
+  "canonical_baseline": "502a4e02993f1d23f3cb91bc0d70044ebccaa79c",
+  "predecessor": {
+    "pr": 137,
+    "phase": "PINNED_DSH_CODEX_WRITE_PATH_MATERIALIZATION_V0R1",
+    "episode_consumed": true,
+    "rerun_forbidden": true,
+    "historical_terminal": "stopReason=error",
+    "historical_fixture_before": "BEFORE",
+    "historical_fixture_after": "BEFORE",
+    "historical_changed_paths": []
+  },
+  "intervention": {
+    "name": "B",
+    "description": "Historical exact pinned DSH request shape plus one thread/start approval policy field",
+    "thread_start_approval_policy": "never",
+    "semantic_delta_count": 1,
+    "forbidden_semantic_changes": [
+      "sandbox", "sandboxPolicy", "runtimeWorkspaceRoots", "experimentalApi=true",
+      "permissions", "alternate model", "alternate Codex", "alternate DSH",
+      "prompt bytes", "retry logic", "environment credentials"
+    ]
+  },
+  "product_identity": {
+    "dsh_repository": "deepseek-ai/deepseek-harness",
+    "dsh_commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "dsh_tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "dsh_tag": "dsh-v0.1.0-rc.7",
+    "codex_binary": "/home/swirky/.local/bin/codex",
+    "codex_version": "codex-cli 0.147.0",
+    "codex_home": "/home/swirky/.codex",
+    "subscription_backed": true,
+    "parent_llm_provider": "NONE",
+    "parent_llm_request_count": 0
+  },
+  "fixture": {
+    "name": "fixture.txt",
+    "before_bytes": "BEFORE\n",
+    "after_bytes": "AFTER\n",
+    "allowed_changed_paths": ["fixture.txt"],
+    "network_access": false
+  },
+  "receipt_requirements": [
+    "initialize request and response status",
+    "thread/start request and response status",
+    "effective cwd, approval policy, sandbox class, runtime roots, writable roots",
+    "turn/start acceptance, turn id, terminal lifecycle and error details",
+    "tool call, approval request, sandbox denial, HTTP status when exposed",
+    "child exit, timeout, fixture digests, changed and unauthorized paths",
+    "stderr and event-stream digests",
+    "Profile A config hash before and after"
+  ],
+  "credential_policy": {
+    "allowed": "subscription-backed Codex login only",
+    "forbidden_names": ["OPENAI_API_KEY", "ANTHROPIC_API_KEY", "DEEPSEEK_API_KEY", "OPENROUTER_API_KEY"],
+    "values_read_or_stored": false,
+    "presence_only_observation": true
+  },
+  "classification": [
+    "INTERVENTION_PASS", "SAME_FAILURE", "DIFFERENT_FAILURE", "INCONCLUSIVE_INFRA", "PRELIVE_BLOCKED"
+  ],
+  "authority_ceiling": {
+    "scientific": "NONE",
+    "qnty_runtime": "NONE",
+    "qnty_next_action": "NONE",
+    "trading": "NONE",
+    "capital": "NONE",
+    "auto_merge": false
+  }
+}

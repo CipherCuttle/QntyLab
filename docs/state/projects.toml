@@ -4685,3 +4685,67 @@ scientific_authority = "NONE"
 downstream_authority = "NONE"
 active_project_after_closure = "NONE"
 next_action = "After canonical merge, separately implement and qualify exactly one C exposure with only thread/start.params.sandbox absent -> workspace-write; no live C call is authorized by this governance record alone."
+
+[[project]]
+project_id = "PINNED_DSH_CODEX_SANDBOX_POLICY_OWNERSHIP_FORENSICS_V0"
+display_name = "Pinned DSH sandbox-policy ownership forensics V0"
+state = "CLOSED_BLOCKED"
+phase_type = "BOUNDED_SANDBOX_OWNERSHIP_CAUSAL_EXPOSURE"
+authority_level = "PINNED_DSH_SANDBOX_POLICY_FORENSICS_ONLY"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "qntylab/pinned_dsh_codex_sandbox_policy_ownership_forensics_v0.py",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_sandbox_policy_ownership_forensics_v0/intervention_c.patch",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_sandbox_policy_ownership_forensics_v0/request_qualification.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_sandbox_policy_ownership_forensics_v0/fake_app_server_request_diff.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_sandbox_policy_ownership_forensics_v0/hostile_implementation_review.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_sandbox_policy_ownership_forensics_v0/prelive_freeze.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_sandbox_policy_ownership_forensics_v0/live_canary_consumed.marker",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_sandbox_policy_ownership_forensics_v0/live_canary_receipt.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_sandbox_policy_ownership_forensics_v0/closure.json",
+  "tests/test_pinned_dsh_codex_sandbox_policy_ownership_forensics_v0.py",
+]
+governing_authorization_project_id = "PINNED_DSH_CODEX_SANDBOX_POLICY_OWNERSHIP_FORENSICS_AUTHORIZATION_V0"
+governing_authorization_pr = 157
+governing_authorization_merge_sha = "c63603383bc4f16af6fd8f3f2760a6c1de51c72d"
+implementation_authorized = false
+implementation_commit = "b895874d962d537658f33c773b98197ceed6a79b"
+prelive_freeze_commit = "93be066"
+classification = "INCONCLUSIVE_INFRA"
+root_cause_status = "NOT_PROVEN"
+causal_update = "NO_VALID_CAUSAL_COMPARISON_DUE_TO_UNEXPECTED_PROFILE_A_CONFIG_MUTATION"
+treatment_changed = false
+treatment_delta_count_from_b = 1
+treatment_delta_method = "thread/start"
+treatment_delta_path = "params.sandbox"
+treatment_delta_before = "<ABSENT>"
+treatment_delta_after = "workspace-write"
+dsh_repository = "deepseek-ai/deepseek-harness"
+dsh_commit = "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca"
+dsh_tree = "3bc8f89fe494a4755c188be354add4e8b1e7b188"
+dsh_tag = "dsh-v0.1.0-rc.7"
+codex_version = "codex-cli 0.147.0"
+predecessor_b_pr = 156
+predecessor_b_consumed = true
+predecessor_b_classification = "DIFFERENT_FAILURE"
+product_invocations = 1
+live_canaries_consumed = 1
+retry_count = 0
+consumed_marker_present = true
+expected_write_occurred = true
+changed_paths = ["fixture.txt"]
+unauthorized_writes = []
+profile_a_config_mutated = true
+secrets_observed_or_stored = false
+qnty_agent_eval = "NO_MATCH"
+scientific_execution_authorized = false
+qnty_runtime_authorized = false
+market_data_access_authorized = false
+trading_authority = "NONE"
+capital_authority = "NONE"
+qnty_authority = "NONE"
+scientific_authority = "NONE"
+downstream_authority = "NONE"
+active_project_after_closure = "NONE"
+next_action = "Do not retry the consumed C canary. Any follow-up addressing Profile A trust/config mutation or another treatment variable requires separate authorization."

@@ -1,0 +1,56 @@
+{
+  "b_predecessor_receipt": "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_permission_policy_canary_controller_gate_repair_and_continuation_v0/live_canary_receipt.json",
+  "b_to_c_request_delta": [
+    {
+      "after": "workspace-write",
+      "before": "<ABSENT>",
+      "method": "thread/start",
+      "path": "params.sandbox"
+    }
+  ],
+  "b_to_c_request_delta_count": 1,
+  "codex_identity": {
+    "binary": "/home/swirky/.local/bin/codex",
+    "binary_sha256": "cb0a15567e9a60a5820d54b0f6ae86d504dc3805c1eab21a47f70e3eb7b73a40",
+    "home": "/home/swirky/.codex",
+    "version": "codex-cli 0.147.0"
+  },
+  "consumption_marker_semantics": "write immediately before product invocation; independent from B; irrevocable; no retry",
+  "dsh_identity": {
+    "commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "repository": "deepseek-ai/deepseek-harness",
+    "tag": "dsh-v0.1.0-rc.7",
+    "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188"
+  },
+  "fake_diff_sha256": "e5c37182acd719e96985f7690008b2e1bce468a2a2d6712cc352929d67ddbf67",
+  "frozen_at": "PRELIVE_FREEZE_TIME_RECORDED_AT_COMMIT",
+  "frozen_candidate_head": "b895874d962d537658f33c773b98197ceed6a79b",
+  "frozen_dsh_driver_sha256": "e29c1bb891e6ae2040dff1ac240e33dd84f1da34b5fdaa68dd437c097ced5b94",
+  "hostile_review_sha256": "933fa1b1185d90a957dfa00a71408fd14a9d9d3514fa2be32b48ce69fe8de17e",
+  "immutable_after_commit": true,
+  "implementation_source_sha256": "706836910408eb007a5e2dfdbc1521122ffc1a2c7bdb48b568c36d1495f63150",
+  "intervention_patch_sha256": "735d1f303e759ee43eb960b7e95f9448a57c70e9d0d8dc01f09a6ed70b03894f",
+  "live_attempts_authorized": 1,
+  "live_attempts_consumed": 0,
+  "phase_id": "PINNED_DSH_CODEX_SANDBOX_POLICY_OWNERSHIP_FORENSICS_V0",
+  "prelive_gate": "PASS",
+  "prompt_sha256": "5998d2259d56942c071536866262fa7a7b72c1780ae41137b8e0de1aafef8683",
+  "receipt_schema": "pinned-dsh-sandbox-policy-ownership-canary-receipt-v0",
+  "request_delta": [
+    {
+      "after": "never",
+      "before": "<ABSENT>",
+      "method": "thread/start",
+      "path": "params.approvalPolicy"
+    },
+    {
+      "after": "workspace-write",
+      "before": "<ABSENT>",
+      "method": "thread/start",
+      "path": "params.sandbox"
+    }
+  ],
+  "request_delta_digest": "07a90ad951a2671b6202ce3441384428c1b704ba87beab1fb6b3b323039494dd",
+  "request_qualification_sha256": "1445c514152e9eae0f2995d7c3bc70d7a149757d8ad3a309615ca7c575f4208a",
+  "schema_version": "pinned-dsh-permission-policy-prelive-freeze-v0"
+}

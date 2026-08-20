@@ -1,0 +1,32 @@
+{
+  "artifact_type": "PINNED_DSH_SANDBOX_POLICY_B_TO_C_REQUEST_QUALIFICATION",
+  "schema_version": "v0",
+  "phase_id": "PINNED_DSH_CODEX_SANDBOX_POLICY_OWNERSHIP_FORENSICS_V0",
+  "predecessor_b_consumed": true,
+  "b_to_c_semantic_delta_count": 1,
+  "b_to_c_delta": [
+    {
+      "method": "thread/start",
+      "path": "params.sandbox",
+      "before": "<ABSENT>",
+      "after": "workspace-write"
+    }
+  ],
+  "approval_policy_preserved": "never",
+  "prohibited_second_variables": [
+    "turn/start.sandboxPolicy",
+    "writableRoots",
+    "runtimeWorkspaceRoots",
+    "networkAccess",
+    "experimentalApi",
+    "initialize capabilities",
+    "cwd",
+    "prompt",
+    "task",
+    "model",
+    "DSH version",
+    "Codex version",
+    "profile trust/config"
+  ],
+  "qualification_result": "PASS"
+}

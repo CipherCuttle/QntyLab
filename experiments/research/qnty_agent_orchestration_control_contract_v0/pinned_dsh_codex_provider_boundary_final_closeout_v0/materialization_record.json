@@ -1,0 +1,80 @@
+{
+  "artifact_type": "PINNED_DSH_CODEX_PROVIDER_BOUNDARY_REPAIR_MATERIALIZATION",
+  "schema_version": "v0",
+  "authorization_merge_sha": "928e6e1ee7eab30ac51d6b562b74d8cc40d20679",
+  "dsh": {
+    "repository": "deepseek-ai/deepseek-harness",
+    "commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "tag": "dsh-v0.1.0-rc.7",
+    "identity_gate": "PASS",
+    "tracked_source_status": "CLEAN"
+  },
+  "provider_source_path": "packages/subagent/subagent-codex/src/wire.ts",
+  "repair_mechanism": "QNTYLAB_SOURCE_CONTROLLED_EXACT_SPAN_MATERIALIZER",
+  "upstream_source_sha256": "9d94284e578ff2253f09e10130cac4aa977e8f3e9e64d442f1ca005cb207fdbd",
+  "upstream_preimage_sha256": "d3b8c0f7083c7d00b75c60c97e9353c735f1e6818495d92c1a6dcb2c9b64f4c8",
+  "repaired_postimage_sha256": "4b6f9bcca0d1940085a978d7f413f456fb030f303704061e1d1a682b460ff716",
+  "repaired_source_sha256": "9223f47a6aef5971df53857e5ec7daf2d20a55fcef0e935e39b4c2bca506dc41",
+  "preimage_match": true,
+  "postimage_contract_match": true,
+  "patch_delta_count": 2,
+  "semantic_delta": [
+    {
+      "path": "thread/start.params.approvalPolicy",
+      "before": "<ABSENT>",
+      "after": "never"
+    },
+    {
+      "path": "thread/start.params.sandbox",
+      "before": "<ABSENT>",
+      "after": "workspace-write"
+    }
+  ],
+  "captured_initialize_shape": {
+    "capabilities": {
+      "experimentalApi": false,
+      "requestAttestation": false
+    },
+    "changed": false
+  },
+  "captured_thread_start_shape": {
+    "cwd": "<runtime cwd>",
+    "ephemeral": true,
+    "approvalPolicy": "never",
+    "sandbox": "workspace-write"
+  },
+  "captured_turn_start_shape": {
+    "threadId": "<runtime thread id>",
+    "input": "text blocks with text_elements=[]",
+    "changed": false
+  },
+  "forbidden_field_assertions": {
+    "turn/start.sandboxPolicy": false,
+    "writableRoots": false,
+    "runtimeWorkspaceRoots": false,
+    "networkAccess_change": false,
+    "model_change": false,
+    "prompt_change": false,
+    "task_change": false,
+    "text_elements_change": false,
+    "trust_mutation": false,
+    "profile_mutation": false,
+    "CODEX_HOME_change": false
+  },
+  "fail_closed": [
+    "wrong DSH commit/tree/tag",
+    "tracked source drift",
+    "whole-file preimage mismatch",
+    "startThread preimage mismatch",
+    "non-unique policy insertion point",
+    "malformed or broadened policy construction"
+  ],
+  "c_d_request_digest": "26b4f3cadef2d03ed9b0a8f2bc4b30e99bc1a970daca1a26a333dec1eeafd44b",
+  "c_to_d_product_request_delta_count": 0,
+  "no_live_dsh": true,
+  "no_live_codex": true,
+  "no_app_server": true,
+  "api_key_values_read": false,
+  "qnty_agent_eval": "NO_MATCH"
+}

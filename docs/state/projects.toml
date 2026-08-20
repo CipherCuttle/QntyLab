@@ -5016,3 +5016,77 @@ capital_authority = "NONE"
 downstream_authority = "NONE"
 active_project_after_closure = "NONE"
 next_action = "After canonical merge, execute exactly one final implementation/closeout phase containing read-only trust forensics, durable provider repair, offline tests, one hostile review, and closure; open PR #164 and stop. No further DSH permission, forensic, canary, or authorization phase."
+
+[[project]]
+project_id = "PINNED_DSH_CODEX_PROVIDER_BOUNDARY_FINAL_CLOSEOUT_V0"
+display_name = "Pinned DSH Codex provider boundary final closeout V0"
+state = "CLOSED_PASS"
+phase_type = "FINAL_FORENSICS_REPAIR_TEST_REVIEW_AND_CLOSEOUT"
+authority_level = "ONE_FINAL_OFFLINE_IMPLEMENTATION_CLOSEOUT"
+implementation_authorized = false
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "qntylab/pinned_dsh_provider_boundary_repair_v0.py",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_provider_boundary_final_closeout_v0/trust_forensics.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_provider_boundary_final_closeout_v0/materialization_record.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_provider_boundary_final_closeout_v0/request_contract.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_provider_boundary_final_closeout_v0/closure.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_provider_boundary_final_closeout_v0/hostile_implementation_review.md",
+  "tests/test_pinned_dsh_provider_boundary_repair_v0.py",
+]
+governing_authorization_pr = 163
+governing_authorization_merge_sha = "928e6e1ee7eab30ac51d6b562b74d8cc40d20679"
+expected_pr = 164
+trust_forensics_mode = "READ_ONLY_EXISTING_EVIDENCE_SAME_PHASE"
+trust_differential_classification = "TRUST_TIMING_UNRECOVERABLE"
+b_permission_config = "UNKNOWN"
+d_permission_config = "UNKNOWN"
+repair_mechanism = "QNTYLAB_SOURCE_CONTROLLED_EXACT_SPAN_MATERIALIZER"
+dsh_repository = "deepseek-ai/deepseek-harness"
+dsh_commit = "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca"
+dsh_tree = "3bc8f89fe494a4755c188be354add4e8b1e7b188"
+dsh_tag = "dsh-v0.1.0-rc.7"
+provider_source_path = "packages/subagent/subagent-codex/src/wire.ts"
+upstream_preimage_sha256 = "d3b8c0f7083c7d00b75c60c97e9353c735f1e6818495d92c1a6dcb2c9b64f4c8"
+repaired_postimage_sha256 = "4b6f9bcca0d1940085a978d7f413f456fb030f303704061e1d1a682b460ff716"
+repair_semantic_delta_count = 2
+approval_policy_after = "never"
+sandbox_after = "workspace-write"
+cwd_semantics_preserved = true
+ephemeral_semantics_preserved = true
+initialize_semantics_changed = false
+turn_start_semantics_changed = false
+network_semantics_changed = false
+model_changed = false
+prompt_changed = false
+task_changed = false
+text_elements_changed = false
+live_dsh_invocations = 0
+live_codex_invocations = 0
+app_server_invocations = 0
+canaries_consumed = 0
+retries = 0
+profile_mutation_authorized = false
+profile_mutated_by_phase = false
+trust_mutation_authorized = false
+trust_mutated_by_phase = false
+codex_home_mutation_authorized = false
+api_keys_authorized = false
+pay_per_token_authorized = false
+parent_model_requests = 0
+qnty_agent_eval = "NO_MATCH"
+final_outcome = "CLOSED_PASS_CONSERVATIVE_REPAIR"
+causal_wording = "HISTORICAL_SINGLE_VARIABLE_CAUSALITY_NOT_PROVEN; REPRODUCED_KNOWN_WORKING_PROVIDER_CONTRACT_PERMANENTLY_APPLIED"
+root_cause_claim_strength = "NOT_PROVEN"
+additional_dsh_permission_phase_authorized = false
+additional_canary_authorized = false
+additional_pr_authorized = false
+historical_reclassification_authorized = false
+scientific_execution_authorized = false
+qnty_runtime_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+downstream_authority = "NONE"
+active_project_after_closure = "NONE"
+next_action = "MERGE_PR_164_WHEN_EXACT_HEAD_CI_IS_GREEN_THEN_RETURN_TO_PARENT_ORCHESTRATION_WORK"

@@ -1,0 +1,49 @@
+{
+  "artifact_type": "PINNED_DSH_CODEX_PROVIDER_BOUNDARY_FINAL_TRUST_FORENSICS",
+  "schema_version": "v0",
+  "authorization_merge_sha": "928e6e1ee7eab30ac51d6b562b74d8cc40d20679",
+  "read_only": true,
+  "profile_mutated": false,
+  "trust_mutated": false,
+  "codex_home_mutated": false,
+  "q1_b_trust_timing": {
+    "workspace": "/tmp/qntylab-pinned-dsh-permission-b-o4u8xcq8",
+    "result": "TIMING_UNRECOVERABLE",
+    "evidence": [
+      "The surviving current Profile A state contains the named B project trust entry with trust_level classified as trusted.",
+      "No pre-decision Profile A snapshot, trust event, or process trace survives for B.",
+      "The later existence of the entry and filesystem mtime cannot establish its state at B's permission decision."
+    ]
+  },
+  "q2_codex_trust_mechanics": {
+    "codex_version": "codex-cli 0.147.0",
+    "evidence": [
+      "The pinned binary contains project-config parsing and project-hooks config diagnostics.",
+      "The pinned binary contains trusted-project persistence diagnostics and the trust_level key.",
+      "The pinned binary contains project-config override and unsupported project-local config diagnostics.",
+      "No matching-version evidence establishes that trust directly selects sandbox mode, writable roots, or approval policy."
+    ],
+    "controls": {
+      "directly_selects_sandbox_mode": "NOT_ESTABLISHED",
+      "changes_sandbox_default": "NOT_ESTABLISHED",
+      "changes_writable_roots": "NOT_ESTABLISHED",
+      "changes_approval_policy": "NOT_ESTABLISHED",
+      "gates_project_local_config": "YES",
+      "gates_project_local_instructions": "YES_OR_PROJECT_CONFIG_RELATED",
+      "other_mechanism": "Trusted-project state controls acceptance/persistence of project-local configuration or instructions; permission effects of any such local config were not evidenced for B or D."
+    }
+  },
+  "q3_permission_config": {
+    "b_permission_config": "UNKNOWN",
+    "d_permission_config": "UNKNOWN",
+    "evidence": [
+      "Historical B and D artifacts preserve request/fixture evidence, not complete project-local configuration snapshots.",
+      "The recorded drivers create the fixture workspace and do not show a project-local permission configuration file.",
+      "Absence from surviving artifacts is insufficient to prove historical filesystem absence."
+    ]
+  },
+  "q4_differential_result": "TRUST_TIMING_UNRECOVERABLE",
+  "repair_gate": "TRUST_UNRESOLVED_BLOCKS_REPAIR = NO",
+  "causal_interpretation": "HISTORICAL_CAUSAL_ATTRIBUTION_REMAINS_PARTIAL; CONSERVATIVE_OPERATIONAL_REPAIR_SELECTED_FROM_REPRODUCED_SUCCESSFUL_CONTRACT",
+  "secrets_recorded": false
+}

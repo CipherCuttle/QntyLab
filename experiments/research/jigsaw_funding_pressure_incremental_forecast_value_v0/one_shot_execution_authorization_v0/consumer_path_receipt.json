@@ -1,0 +1,123 @@
+{
+  "artifact_type": "FUNDING_INCREMENTAL_ONE_SHOT_CONSUMER_PATH_RECEIPT",
+  "schema_version": "funding-incremental-one-shot-consumer-path-receipt-v0",
+  "phase_id": "FUNDING_INCREMENTAL_ONE_SHOT_SCIENTIFIC_EXECUTION_AUTHORIZATION_V0",
+  "project_id": "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_ONE_SHOT_SCIENTIFIC_EXECUTION_AUTHORIZATION_V0",
+  "canonical_predecessor_master": "39358d7ee35690f9c91d2657c7ce772607599bd5",
+  "canonical_predecessor_master_verified": true,
+  "preregistration": {
+    "status": "PREREGISTERED_NOT_EXECUTED",
+    "digest": "d7ec718ab14e73d2aea24749a22caa2921fd81b8a336e2f2eaffb30ae1e992ef",
+    "file_sha256": "42b96afae80e55611bcd9786169050520525fbc5534b9f94c72ed867380ba9cf"
+  },
+  "frozen_bindings": {
+    "implementation_sha": "f6f12994d65c3dfeaf7839de560e58ad99547c62",
+    "executor_sha256": "b894d4d9316bed6f8c4f7171b32692aff7b1f0eb32abd686a33fdb38425a7490",
+    "executor_test_sha256": "7de2bd14b2997b5aee9f8820b54a1819b8423da5b55d362a8ab7b0bb95bb6d30",
+    "v2_sha256": "d603e747952d31d1fa87df463b9c739bc495a4e94597c2be0f93c02c678fbbc6",
+    "foundation_sha256": "834964137e4f2b77ab12a1d454f8ba8da9d71330e0806d00d1d2e26f113c980c",
+    "source_binding_sha256": "9961d086b4c029f52d7840f1abfe200c0d37c6ff7368b81a14b067ae237db7ba",
+    "implementation_manifest_sha256": "748c74c2cf039dab287a4b336f0443180202cc3545d1100d6ddc9532887b5fd3",
+    "origin_schedule_sha256": "220eda6dc41b66820d6e1de31ed4023dcd11ec75ee713ea9d8fa9d1e74233d3a",
+    "execution_semantics_sha256": "66000949a064fb913b2a61bcf716304ff324bb58e56602471a726fcbb1a7ccc4",
+    "historical_provenance_baseline_digest": "sha256:902be2246b64d133e0f22dd71c04eba344d12ead659e5f57c69183ab92f878d9",
+    "historical_materializer_identity": "IMMUTABLE_GIT_BLOB_AT_FROZEN_BASELINE_ANCESTORS",
+    "historical_materializer_authenticated": true,
+    "current_materializer_laundered_into_history": false
+  },
+  "exact_panel": [
+    "BCHUSDT", "XRPUSDT", "LTCUSDT", "TRXUSDT", "ETCUSDT", "LINKUSDT",
+    "XLMUSDT", "CHZUSDT", "SANDUSDT", "REEFUSDT", "CHRUSDT", "ALICEUSDT",
+    "ONEUSDT", "API3USDT", "GMTUSDT", "APEUSDT", "OPUSDT", "INJUSDT",
+    "LDOUSDT", "APTUSDT"
+  ],
+  "panel_member_count": 20,
+  "panel_order_load_bearing": true,
+  "origin_schedule": {
+    "development": "2023-10-19T00:00:00Z..2024-10-17T00:00:00Z",
+    "development_origin_count": 365,
+    "excluded_boundary_origin": "2024-10-18T00:00:00Z",
+    "evaluation": "2024-10-19T00:00:00Z..2025-06-19T00:00:00Z",
+    "evaluation_origin_count": 244,
+    "forecast_row_origin_count": 609,
+    "training_cutoff": "TARGET_COMPLETION_TIME < FORECAST_ORIGIN"
+  },
+  "numerical_runtime": {
+    "context_identity": "DECIMAL_PREC_28_ROUND_HALF_EVEN_DEFAULT_TRAPS_LITERAL",
+    "prec": 28,
+    "rounding": "ROUND_HALF_EVEN",
+    "Emin": -999999,
+    "Emax": 999999,
+    "capitals": 1,
+    "clamp": 0,
+    "traps": ["InvalidOperation", "DivisionByZero", "Overflow"],
+    "constructed_from": "MODULE_LITERALS_NOT_DECIMAL_DEFAULTCONTEXT",
+    "algorithm_modified": false
+  },
+  "inspected_existing_flow": [
+    "pre_execution_integrity.verify_historical_provenance -> outcome-blind historical identity proof",
+    "pre_execution_integrity.verify_panel_binding -> exact four-way panel equality",
+    "foundation.load_verified_frozen_evidence -> real verified evidence bundle",
+    "v2 primitives -> exact funding pressure and RV24 primitives",
+    "incremental_executor.build_causal_forecast_rows -> exact 609 ForecastRows",
+    "incremental_executor.run_incremental_forecast_evaluation -> frozen M0/M1 statistics"
+  ],
+  "consumer_path_gate": {
+    "consumable_real_execution_path_exists": false,
+    "frozen_executor_authorized_execution_modes": ["SYNTHETIC_VALIDATION"],
+    "frozen_executor_has_real_evidence_loader": false,
+    "real_v2_consumer_is_incremental_compatible": false,
+    "claim_machinery_exists_for_reuse": true,
+    "claim_before_outcome_access_is_available_in_foundation": true,
+    "truthful_real_rows_can_reach_frozen_incremental_entrypoint": false,
+    "real_rows_can_be_labeled_synthetic": false,
+    "scientific_semantics_can_be_preserved_without_a_successor_seam": false
+  },
+  "blocking_findings": [
+    {
+      "severity": "CRITICAL",
+      "finding": "The frozen incremental entrypoint rejects every mode except SYNTHETIC_VALIDATION.",
+      "evidence": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py declares AUTHORIZED_EXECUTION_MODES = (EXECUTION_MODE_SYNTHETIC_VALIDATION,) and require_authorized_execution_mode rejects all other modes."
+    },
+    {
+      "severity": "CRITICAL",
+      "finding": "The frozen incremental module has no real evidence loader or real execution wrapper.",
+      "evidence": "Its module contract states that it contains no data reader, network client, or evidence loader and that real evidence execution requires a separate authorization."
+    },
+    {
+      "severity": "CRITICAL",
+      "finding": "The existing V2 controlled seam cannot be reused for this authorization.",
+      "evidence": "V2 executes compute_frozen_experiment and returns FrozenExperimentResult for the 610-decision volatility contract; it does not construct incremental ForecastRows or invoke the frozen incremental M0/M1 executor."
+    }
+  ],
+  "required_successor_semantics_if_reopened": {
+    "type": "SEPARATE_GIT_BACKED_CONSUMER_SEAM_ONLY",
+    "must_claim_before_real_evidence_loading": true,
+    "must_supply_authority_bound_real_forecast_rows": true,
+    "must_call_frozen_incremental_algorithm_without_semantic_change": true,
+    "must_not_call_real_rows_synthetic_validation": true,
+    "must_reuse_foundation_at_most_once_claim_machinery": true,
+    "must_bind_result_to_authorization_and_implementation": true,
+    "must_not_grant_router_qnty_trading_or_capital_authority": true
+  },
+  "outcome_firewall": {
+    "authorization_created": false,
+    "authorization_consumed": false,
+    "real_outcome_access_performed": false,
+    "scientific_execution_performed": false,
+    "evaluation_origins_consumed": 0,
+    "new_data_acquisition_performed": false,
+    "scientific_result_created": false,
+    "trial_completion_recorded": false,
+    "preregistration_mutated": false,
+    "frozen_evidence_mutated": false,
+    "order_flow_modified": false,
+    "jh01_modified": false,
+    "router_authority": "NONE",
+    "qnty_authority": "NONE",
+    "trading_authority": "NONE",
+    "capital_authority": "NONE"
+  },
+  "verdict": "FUNDING_INCREMENTAL_ONE_SHOT_SCIENTIFIC_EXECUTION_AUTHORIZATION_V0 = CLOSED_BLOCKED",
+  "root_cause": "REAL_EXECUTION_CONSUMER_PATH_NOT_MECHANICALLY_ESTABLISHED"
+}

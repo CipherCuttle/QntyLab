@@ -1,0 +1,25 @@
+{
+  "schema_version": "pinned-dsh-permission-policy-prelive-block-receipt-v0",
+  "phase_id": "PINNED_DSH_CODEX_TERMINAL_ERROR_PERMISSION_POLICY_FORENSICS_V0",
+  "classification": "PRELIVE_BLOCKED",
+  "attempted": false,
+  "product_invocation_count": 0,
+  "consumed_marker_written": false,
+  "blocking_gate": "PAY_PER_TOKEN_CREDENTIAL_PRESENT",
+  "controller_observation": "credential_presence() returned a non-empty presence map, which the controller treated as truthy",
+  "environment_presence_only": {
+    "OPENAI_API_KEY": false,
+    "ANTHROPIC_API_KEY": false,
+    "DEEPSEEK_API_KEY": false,
+    "OPENROUTER_API_KEY": false
+  },
+  "credential_values_read_or_stored": false,
+  "historical_episode_rerun": false,
+  "next_action": "Do not retry. Repair and any future live execution require a new separately Git-backed authorization.",
+  "product_identities": {
+    "dsh_commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "dsh_tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "dsh_tag": "dsh-v0.1.0-rc.7",
+    "codex_version": "codex-cli 0.147.0"
+  }
+}

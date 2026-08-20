@@ -4357,7 +4357,7 @@ next_action = "After canonical presence is verified, perform exactly one separat
 [[project]]
 project_id = "PINNED_DSH_CODEX_TERMINAL_ERROR_PERMISSION_POLICY_FORENSICS_V0"
 display_name = "Pinned DSH Codex terminal-error permission-policy forensics V0"
-state = "ACTIVE"
+state = "CLOSED_BLOCKED"
 authority_level = "ONE_BOUNDED_INTERVENTION_IMPLEMENTATION_AND_CANARY"
 phase_type = "PRODUCT_EXECUTION_CAUSAL_DIAGNOSTIC"
 authoritative_artifacts = [
@@ -4370,6 +4370,8 @@ authoritative_artifacts = [
   "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_terminal_error_permission_policy_forensics_v0/fake_app_server_request_diff.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_terminal_error_permission_policy_forensics_v0/hostile_implementation_review.md",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_terminal_error_permission_policy_forensics_v0/prelive_freeze.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_terminal_error_permission_policy_forensics_v0/prelive_block_receipt.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_terminal_error_permission_policy_forensics_v0/closure.json",
   "qntylab/pinned_dsh_codex_terminal_error_permission_policy_forensics_v0.py",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_terminal_error_permission_policy_forensics_v0/codex_stdio_capture_wrapper.mjs",
   "tests/test_pinned_dsh_codex_terminal_error_permission_policy_forensics_v0.py",
@@ -4377,7 +4379,7 @@ authoritative_artifacts = [
 governing_authorization_project_id = "PINNED_DSH_CODEX_TERMINAL_ERROR_PERMISSION_POLICY_FORENSICS_AUTHORIZATION_V0"
 governing_authorization_commit = "4135fb10a613522256f63b5b327fee6555e7fedb"
 canonical_baseline = "502a4e02993f1d23f3cb91bc0d70044ebccaa79c"
-implementation_authorized = true
+implementation_authorized = false
 historical_a_rerun_authorized = false
 authorized_live_canaries = 1
 live_canaries_consumed = 0
@@ -4407,4 +4409,4 @@ qnty_next_action_authority = "NONE"
 trading_authority = "NONE"
 capital_authority = "NONE"
 downstream_authority = "NONE"
-next_action = "Implement and freeze intervention B, then execute at most one canary only if all prelive, identity, credential, and evidence-integrity gates pass."
+next_action = "Do not retry the canary. Any controller credential-gate repair or future live execution requires a new separately Git-backed authorization."

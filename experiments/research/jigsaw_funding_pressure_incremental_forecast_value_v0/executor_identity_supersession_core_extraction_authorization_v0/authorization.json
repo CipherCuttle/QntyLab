@@ -1,0 +1,117 @@
+{
+  "artifact_type": "FUNDING_INCREMENTAL_EXECUTOR_IDENTITY_SUPERSESSION_AND_CORE_EXTRACTION_AUTHORIZATION",
+  "schema_version": "funding-incremental-executor-identity-supersession-core-extraction-authorization-v0",
+  "phase_id": "FUNDING_INCREMENTAL_EXECUTOR_IDENTITY_SUPERSESSION_AND_CORE_EXTRACTION_AUTHORIZATION_V0",
+  "project_id": "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_EXECUTOR_IDENTITY_SUPERSESSION_AND_CORE_EXTRACTION_AUTHORIZATION_V0",
+  "state": "CLOSED_PASS",
+  "authorization_created": true,
+  "authorization_effective": "AFTER_CANONICAL_MERGE_ONLY",
+  "later_implementation_phase": "FUNDING_INCREMENTAL_EXECUTOR_CORE_EXTRACTION_AND_SUCCESSOR_IMPLEMENTATION_V1",
+  "later_implementation_phases_authorized": 1,
+  "scientific_execution_authority": "NONE",
+  "canonical_reconciliation": {
+    "canonical_master": "502a4e02993f1d23f3cb91bc0d70044ebccaa79c",
+    "pr150_merge_sha": "502a4e02993f1d23f3cb91bc0d70044ebccaa79c",
+    "pr150_predecessor_head": "8b7adae4d584d009a9f163fc3b5703178f8720e5",
+    "pr151_state": "CLOSED_UNMERGED",
+    "pr151_merged": false,
+    "pr151_canonical_authority": "NONE",
+    "parallel_drift": "NONE",
+    "git_verification": {
+      "origin_master_must_equal": "502a4e02993f1d23f3cb91bc0d70044ebccaa79c",
+      "implementation_branch_must_descend_from_origin_master": true,
+      "pr150_merge_must_be_ancestor": true,
+      "pr151_merge_commit_must_be_absent": true
+    }
+  },
+  "historical_v0_identity": {
+    "implementation_candidate_commit": "f6f12994d65c3dfeaf7839de560e58ad99547c62",
+    "source_path": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py",
+    "source_sha256": "b894d4d9316bed6f8c4f7171b32692aff7b1f0eb32abd686a33fdb38425a7490",
+    "identity_mutated": false,
+    "history_rule": "Historical Git commits, blobs, claims, and source bytes are immutable; no amend, rewrite, force-push, or retroactive V0 claim is permitted."
+  },
+  "source_supersession_policy": {
+    "current_source_evolution_permitted": true,
+    "successor_requires_new_identity": true,
+    "successor_sha_must_differ_from_historical_sha": true,
+    "successor_requires_new_manifest_and_binding": true,
+    "source_path_may_evolve_after_canonical_merge": true,
+    "historical_git_oracle_counts_as_active_duplicate": false,
+    "active_successor_tree_one_shared_scientific_core": true,
+    "mechanical_move_or_extraction_preferred": true
+  },
+  "frozen_scientific_contract": {
+    "preregistration_project_id": "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_PREREGISTRATION_V0",
+    "status": "PREREGISTERED_NOT_EXECUTED",
+    "digest": "d7ec718ab14e73d2aea24749a22caa2921fd81b8a336e2f2eaffb30ae1e992ef",
+    "file_sha256": "42b96afae80e55611bcd9786169050520525fbc5534b9f94c72ed867380ba9cf",
+    "architecture": "A_EXPLORATORY_610_INCREMENTAL_FORECAST_TEST",
+    "ordered_panel": ["BCHUSDT", "XRPUSDT", "LTCUSDT", "TRXUSDT", "ETCUSDT", "LINKUSDT", "XLMUSDT", "CHZUSDT", "SANDUSDT", "REEFUSDT", "CHRUSDT", "ALICEUSDT", "ONEUSDT", "API3USDT", "GMTUSDT", "APEUSDT", "OPUSDT", "INJUSDT", "LDOUSDT", "APTUSDT"],
+    "development_origins": 365,
+    "excluded_boundary_origin": "2024-10-18T00:00:00Z",
+    "evaluation_origins": 244,
+    "forecast_rows": 609,
+    "strict_training_cutoff": "TARGET_COMPLETION_TIME < FORECAST_ORIGIN",
+    "har_lags": [1, 7, 30],
+    "model": "intercept-bearing OLS; M1 = M0 plus exactly one funding-pressure predictor",
+    "metrics": ["raw RV24 MSE", "relative MSE improvement", "Clark-West adjusted MSPE", "one-sided Bartlett/Newey-West lag 5", "alpha 0.05"],
+    "runtime": {"prec": 28, "rounding": "ROUND_HALF_EVEN", "Emin": -999999, "Emax": 999999, "capitals": 1, "clamp": 0, "traps": ["InvalidOperation", "DivisionByZero", "Overflow"]}
+  },
+  "authorized_successor_shape": {
+    "shared_core": "one callable core for HAR assembly, OLS, forecasting, loss, Clark-West, HAC, p-value, and classification",
+    "synthetic_wrapper": "SYNTHETIC_VALIDATION rows into the shared core",
+    "real_capable_wrapper": "explicit REAL_SCIENTIFIC_EXECUTION authority envelope, claim-before-outcome ordering, real ForecastRows into the same core",
+    "historical_oracle": "isolated read-only worktree at the historical V0 commit; never modified and never used for real outcomes"
+  },
+  "equivalence_closure_gate": {
+    "required_at_implementation_close": true,
+    "oracle_must_be_actual_historical_v0_bytes": true,
+    "valid_inputs": "exact contract-visible field equality; canonical serialization and result digest equality where defined",
+    "invalid_inputs": "same fail-closed class and semantics, not merely both raising",
+    "corpus": ["all V0 valid fixtures", "canonical synthetic fixture", "PASS", "FAIL", "BLOCKED/input integrity", "schedule boundaries", "panel reorder/substitution", "missingness", "PIT/training cutoff", "rank-deficient designs", "Decimal/Fraction edges", "24+ hostile Decimal contexts", "deterministic pseudo-random valid rows", "deterministic pseudo-random malformed rows"],
+    "frozen_synthetic_result_digest": "sha256:1fca55ebdbe5c4d5b835cb65f87930755d231449c924eae912b522bd04b53ea2",
+    "unexplained_valid_divergence": "SCIENTIFIC_SEMANTICS_CHANGED; FAIL",
+    "closure_manifest": {
+      "required_path": "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/implementation_v1/differential_corpus_manifest.json",
+      "required_digest_fields": ["historical_oracle_commit", "historical_oracle_source_sha256", "successor_source_sha256", "successor_manifest_sha256", "corpus_digest", "canonical_result_schema_sha256"],
+      "required_existing_fixture_path": "tests/test_jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py",
+      "required_frozen_fixture_path": "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/implementation_v0/synthetic_validation.json",
+      "required_differential_runner_path": "tests/test_funding_incremental_executor_core_extraction_differential_v1.py",
+      "generator_seeds": {"valid_forecast_rows": 20260820, "malformed_forecast_rows": 20260821},
+      "hostile_decimal_contexts": 24,
+      "canonical_result_schema": "IncrementalForecastEvaluation canonical serialization",
+      "canonical_result_schema_sha256": "0eb5029002fe472035023b9d73b4d852cf1a3f18a2693ed3454e5167cca2871f",
+      "invalid_input_failure_classes": ["UnauthorizedExecutionError", "TemporalContractError", "InputIntegrityError", "ContractViolationError", "RankDeficientDesignError", "NumericalContractError"],
+      "failure_comparison": "class and fail-closed semantics equality"
+    }
+  },
+  "provenance_and_contract_bindings": {
+    "historical_provenance_baseline": "sha256:902be2246b64d133e0f22dd71c04eba344d12ead659e5f57c69183ab92f878d9",
+    "v2_source_sha256": "d603e747952d31d1fa87df463b9c739bc495a4e94597c2be0f93c02c678fbbc6",
+    "foundation_source_sha256": "834964137e4f2b77ab12a1d454f8ba8da9d71330e0806d00d1d2e26f113c980c",
+    "v2_result_contract": {"module": "qntylab.jigsaw_funding_pressure_execution_v2", "entrypoint": "execute_authorized_frozen_experiment_v2", "result_type": "FrozenExperimentResult", "schema_sha256": "ea88d58dbb8f390fa4549539bdeb19c93e3e3f6a9a45f220a315c815ae4b4805", "substitution_allowed": false},
+    "successor_result_contract": {"result_type": "IncrementalForecastEvaluation", "schema_sha256": "0eb5029002fe472035023b9d73b4d852cf1a3f18a2693ed3454e5167cca2871f", "must_preserve_exact_fields": true},
+    "successor_manifest_binding": {"required": true, "path": "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/implementation_v1/implementation_manifest.json", "must_bind_new_source_digest": true, "must_bind_new_result_contract": true}
+  },
+  "claim_before_outcome": {
+    "required": true,
+    "order": ["validate canonical authorization", "consume irreversible one-shot claim", "authenticate frozen evidence", "construct real ForecastRows", "invoke successor core", "record exactly one result"],
+    "claim_failure": "zero real ForecastRows and zero scientific-core invocation",
+    "post_claim_crash_replay": "not automatically authorized"
+  },
+  "outcome_firewall": {
+    "real_outcome_access": false,
+    "scientific_execution": false,
+    "evaluation_origins_consumed": 0,
+    "new_data_acquisition": false,
+    "scientific_result_created": false,
+    "trial_completion_recorded": false,
+    "order_flow_modified": false,
+    "jh01_modified": false,
+    "router_authority": "NONE",
+    "qnty_authority": "NONE",
+    "trading_authority": "NONE",
+    "capital_authority": "NONE"
+  }
+}

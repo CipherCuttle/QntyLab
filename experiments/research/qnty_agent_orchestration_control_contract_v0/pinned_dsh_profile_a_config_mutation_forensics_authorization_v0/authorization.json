@@ -1,0 +1,183 @@
+{
+  "artifact_type": "PINNED_DSH_PROFILE_A_CONFIG_MUTATION_FORENSICS_AUTHORIZATION",
+  "schema_version": "v0",
+  "phase_id": "PINNED_DSH_PROFILE_A_CONFIG_MUTATION_FORENSICS_AUTHORIZATION_V0",
+  "phase_state": "CLOSED_PASS",
+  "authorization_state": "AUTHORIZED_IF_CANONICAL",
+  "authorization_effective": "AFTER_CANONICAL_MERGE_ONLY",
+  "authorized_operation": "READ_ONLY_FORENSIC_DIAGNOSIS",
+  "authorization_scope": "Determine the concrete Profile A mutation, its event ordering and writer, its load-bearing relevance, whether it could explain B-to-C writability, and whether existing PR #158 evidence can be strengthened without another live exposure.",
+  "predecessor": {
+    "pr": 158,
+    "merge_sha": "89952634622f2480eebb8f695360379272bd01ea",
+    "project_id": "PINNED_DSH_CODEX_SANDBOX_POLICY_OWNERSHIP_FORENSICS_V0",
+    "classification": "INCONCLUSIVE_INFRA",
+    "classification_immutable": true,
+    "c_consumed": true,
+    "c_product_invocations": 1,
+    "c_retries": 0,
+    "approval_policy_requested": "never",
+    "sandbox_requested": "workspace-write",
+    "effective_sandbox": "workspaceWrite",
+    "turn_started": true,
+    "terminal_status": "completed",
+    "child_exit": 0,
+    "timeout": false,
+    "write_attempt": true,
+    "write_success": true,
+    "fixture_before_sha256": "be9351741a8155d01fd028d158546f1005e73ce0bb2d093335feac4144e450",
+    "fixture_after_sha256": "f72c713b7b432dd18949ca10f1be6dbcf493479945653609d1c715b2d8d74356",
+    "changed_paths": ["fixture.txt"],
+    "unauthorized_writes": [],
+    "read_only_message_observed": false,
+    "sandbox_denial_observed": false,
+    "approval_request_observed": false,
+    "jsonrpc_32600": {
+      "code": -32600,
+      "message": "no active turn to interrupt",
+      "event_ordinal": 93,
+      "stage": "terminal/other",
+      "fatal": "NO",
+      "causal_explanation_for_failed_B": "NOT_ADEQUATE"
+    }
+  },
+  "profile_a_mutation": {
+    "mutated": true,
+    "hash_before": "955cec088237c2ca3f2a704ab67ad2d805c0916feb74dec6fec0eb6c5b04eef0",
+    "hash_after": "cb07d9468bb9f7e21b3cc507b20f31a6bffbc8328ef5b250bd7f9a12141ab6c7",
+    "hash_source_evidence": {
+      "input_type": "FILE",
+      "input_paths": ["~/.codex/config.toml"],
+      "normalization": "raw bytes",
+      "secret_material_included": "UNKNOWN",
+      "source_function": "qntylab.pinned_dsh_codex_terminal_error_permission_policy_forensics_v0.profile_config_hash",
+      "source_contract": "Path(CODEX_HOME) / config.toml, hashed with hashlib.sha256 over file bytes when present"
+    },
+    "content_recovery_status": "NOT_YET_DETERMINED",
+    "safe_recording_rule": "Record only sanitized semantic fields, paths, classes, timestamps, and digests; never serialize secret values."
+  },
+  "later_forensic_project_id": "PINNED_DSH_PROFILE_A_CONFIG_MUTATION_FORENSICS_V0",
+  "authorized_read_surface": [
+    "canonical Git-tracked repository evidence",
+    "PR #158 source and artifacts",
+    "recorded RPC traces, stdout, stderr, and event evidence if present",
+    "filesystem metadata for Profile A and Codex configuration paths",
+    "Profile A configuration file content only as necessary for safe semantic identification",
+    "shell history, timestamps, and process evidence when locally available and relevant",
+    "hash-calculation source and contracts",
+    "locally pinned Codex 0.147.0 source/contracts, pinned DSH source, and wrapper/controller source"
+  ],
+  "new_sanitized_forensic_artifacts_authorized": true,
+  "existing_canonical_artifact_mutation_authorized": false,
+  "forensic_requirements": {
+    "must_determine": [
+      "exact hash input type, paths, normalization, and secret-material inclusion status",
+      "mechanically recovered before/after semantic difference, or HASH_ONLY_NO_CONTENT_RECOVERY",
+      "changed-setting classifications, safe values/classes, mutation-time evidence, likely writer, and causal relevance",
+      "strongest defensible temporal order against launch, initialize, thread/start, turn/start, turn/started, write attempt, fixture mutation, and turn/completed",
+      "whether a DSH, Codex app-server, Codex CLI, normal persistence, wrapper, trust bootstrap, concurrent process, manual change, or UNKNOWN writer is supported",
+      "whether existing evidence can be strengthened without another live exposure"
+    ],
+    "temporal_outputs": [
+      "MUTATION_BEFORE_EFFECTIVE_SANDBOX",
+      "MUTATION_BEFORE_WRITE",
+      "MUTATION_AFTER_WRITE",
+      "MUTATION_AFTER_TURN_COMPLETED"
+    ],
+    "tri_state_values": ["YES", "NO", "UNKNOWN"],
+    "content_recovery_outcomes": ["EXACT_DIFF_RECOVERED", "PARTIAL_DIFF_RECOVERED", "HASH_ONLY_NO_CONTENT_RECOVERY"],
+    "setting_classes": [
+      "SANDBOX_LOAD_BEARING",
+      "APPROVAL_LOAD_BEARING",
+      "TRUST_LOAD_BEARING",
+      "WORKSPACE_LOAD_BEARING",
+      "MODEL_LOAD_BEARING",
+      "AUTHENTICATION_ONLY",
+      "TELEMETRY_OR_METADATA",
+      "SESSION_STATE",
+      "TIMESTAMP_OR_VOLATILE_STATE",
+      "UNKNOWN"
+    ],
+    "writer_classes": [
+      "DSH",
+      "CODEX_APP_SERVER",
+      "CODEX_CLI_STARTUP",
+      "CODEX_NORMAL_SESSION_PERSISTENCE",
+      "QNTYLAB_WRAPPER_CONTROLLER",
+      "PROFILE_TRUST_BOOTSTRAP",
+      "UNRELATED_CONCURRENT_PROCESS",
+      "USER_MANUAL_CHANGE",
+      "UNKNOWN"
+    ]
+  },
+  "secret_safety": {
+    "tokens_authorized": false,
+    "api_keys_authorized": false,
+    "auth_cookies_authorized": false,
+    "credentials_authorized": false,
+    "bearer_values_authorized": false,
+    "subscription_secrets_authorized": false,
+    "redaction_required_before_serialization": true,
+    "permitted_recording": "key names, paths, structural locations, safe semantic classes, and redacted values only"
+  },
+  "counterfactual_scope": {
+    "known_good_d3_approval_policy": "never",
+    "known_good_d3_sandbox": "workspace-write",
+    "known_good_d3_effective_sandbox": "workspaceWrite",
+    "c_approval_policy": "never",
+    "c_sandbox": "workspace-write",
+    "alternative_causal_explanation_must_be_tested": true,
+    "causal_relevance_initial_status": "UNKNOWN"
+  },
+  "later_outcome_classes": {
+    "CONFOUNDER_EXCLUDED": "Profile A mutation is mechanically non-load-bearing or occurs only after the successful write or relevant permission decision; existing C evidence may be interpreted as strong support for sandbox ownership without another live canary.",
+    "LOAD_BEARING_CONFOUNDER": "Mutation changes trust, sandbox, workspace, or approval semantics and could plausibly enable the write; no clean sandbox conclusion.",
+    "PARTIAL_CONFOUNDER": "Some mutation semantics are recovered but causal relevance cannot be excluded; remain inconclusive.",
+    "HASH_ONLY_INCONCLUSIVE": "Exact changed material cannot be recovered; remain inconclusive and separately decide whether another clean canary is worth consuming.",
+    "FORENSIC_CONTRADICTION": "Canonical evidence is internally inconsistent; stop and report, with no experiment."
+  },
+  "governance_boundary": {
+    "live_product_invocations_authorized": 0,
+    "dsh_invocations_authorized": 0,
+    "codex_invocations_authorized": 0,
+    "canaries_authorized": 0,
+    "fixture_mutation_authorized": false,
+    "profile_a_mutation_authorized": false,
+    "treatment_mutation_authorized": false,
+    "sandbox_mutation_authorized": false,
+    "approval_policy_mutation_authorized": false,
+    "trust_mutation_authorized": false,
+    "writable_roots_mutation_authorized": false,
+    "runtime_workspace_roots_mutation_authorized": false,
+    "rerun_b_authorized": false,
+    "rerun_c_authorized": false,
+    "historical_reclassification_authorized": false,
+    "scientific_execution_authorized": false,
+    "qnty_runtime_authority": "NONE",
+    "trading_authority": "NONE",
+    "capital_authority": "NONE",
+    "parent_model_requests": 0,
+    "pay_per_token_authorized": false,
+    "deploy_authorized": false,
+    "merge_authorized": false,
+    "prohibited_operations": [
+      "DSH execution",
+      "Codex invocation",
+      "canary execution",
+      "B rerun",
+      "C rerun",
+      "changing ~/.codex/config.toml",
+      "changing Profile A trust, sandbox, writable roots, runtimeWorkspaceRoots, or approvalPolicy",
+      "changing the sandbox treatment",
+      "changing PR #158 classification",
+      "API keys, pay-per-token services, or subscription credentials",
+      "scientific execution, Qnty runtime, trading, or capital"
+    ]
+  },
+  "review": {
+    "independent_hostile_review_required": true,
+    "targeted_rereview_only_if_critical_or_high_repair": true
+  },
+  "qnty_agent_eval": "NO_MATCH",
+  "active_project_after_closure": "NONE"
+}

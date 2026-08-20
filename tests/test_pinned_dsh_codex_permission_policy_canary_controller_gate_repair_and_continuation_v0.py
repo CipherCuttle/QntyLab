@@ -75,4 +75,4 @@ def test_continuation_reuses_exact_frozen_treatment_and_pins():
 
 def test_predecessor_artifacts_and_marker_are_not_reused_for_consumption():
     assert not (PREDECESSOR / "live_canary_consumed.marker").exists()
-    assert not (CONTINUATION / "live_canary_consumed.marker").exists()
+    assert (CONTINUATION / "live_canary_consumed.marker").is_file()

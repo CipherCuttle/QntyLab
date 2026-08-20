@@ -1,0 +1,49 @@
+{
+  "artifact_type": "PINNED_DSH_PERMISSION_POLICY_CANARY_CONTROLLER_GATE_REPAIR_AND_CONTINUATION_CLOSURE",
+  "schema_version": "v0",
+  "phase_id": "PINNED_DSH_CODEX_PERMISSION_POLICY_CANARY_CONTROLLER_GATE_REPAIR_AND_CONTINUATION_V0",
+  "phase_state": "CLOSED_BLOCKED",
+  "governing_authorization_project_id": "PINNED_DSH_CODEX_PERMISSION_POLICY_CANARY_CONTROLLER_GATE_REPAIR_AND_CONTINUATION_AUTHORIZATION_V0",
+  "governing_authorization_pr": 155,
+  "governing_authorization_merge_sha": "8b980838eed6c906b05c71c41aa83f1fe33ac28a",
+  "implementation_commit": "41e1e4c6b8e8f42e814c4f117ed561604967d75c",
+  "prelive_freeze_commit": "d0dc0d5eb72184b135539253f072aedd3f3dd303",
+  "prelive_freeze": "PASS",
+  "product_invocation_count": 1,
+  "consumed_marker_present": true,
+  "consumed_marker_sha256": "1ece0063447dcba795e6fbdcf1406870ec64b78038fceb98418946fca2b485c5",
+  "live_canary_receipt_sha256": "9475250dec6e87179cfa65cbd3a7f545a4c4c988302c83a4ac53f8ed3feeb41f",
+  "classification": "DIFFERENT_FAILURE",
+  "causal_update": "APPROVAL_POLICY_AFFECTS_PATH_YES_APPROVAL_POLICY_SUFFICIENT_FOR_WRITE_NO",
+  "root_cause_claim_strength": "NOT_PROVEN",
+  "treatment_changed": false,
+  "treatment_delta_count": 1,
+  "treatment_delta": [
+    {
+      "method": "thread/start",
+      "path": "params.approvalPolicy",
+      "before": "<ABSENT>",
+      "after": "never"
+    }
+  ],
+  "pinned_dsh_identity": {
+    "repository": "deepseek-ai/deepseek-harness",
+    "commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "tag": "dsh-v0.1.0-rc.7"
+  },
+  "pinned_codex_identity": "codex-cli 0.147.0",
+  "terminal_observation": {
+    "status": "completed",
+    "sanitized_category": "WORKSPACE_READ_ONLY_REPORTED_IN_TURN_MESSAGE",
+    "sanitized_message": "Unable to modify fixture.txt: the workspace is read-only.",
+    "changed_paths": [],
+    "unauthorized_writes": [],
+    "timeout": false,
+    "child_exit_status": 0,
+    "profile_a_config_mutated": false
+  },
+  "secrets_observed_or_stored": false,
+  "retries": 0,
+  "next_action": "Close this path. Do not stack sandbox or other treatment variables under this authority; any further forensic intervention requires separate authorization."
+}

@@ -4907,14 +4907,15 @@ authoritative_artifacts = [
   "qntylab/pinned_dsh_codex_clean_c_replication_v0.py",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_clean_c_replication_v0/request_equivalence.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_clean_c_replication_v0/hostile_implementation_review.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_clean_c_replication_v0/prelive_freeze.json",
   "tests/test_pinned_dsh_codex_clean_c_replication_v0.py",
 ]
 governing_authorization_pr = 161
 governing_authorization_merge_sha = "e0c74578d86816d6edd7afd5d60b099bbd7d4fc1"
 authorization_effective = "AFTER_CANONICAL_MERGE_ONLY"
 implementation_authorized = true
-implementation_commit = "PENDING_PRELIVE_COMMIT"
-prelive_freeze_commit = "PENDING_FREEZE_COMMIT"
+implementation_commit = "3442b696d713780979afa32e8edcd962b529c52b"
+prelive_freeze_commit = "8523794391950479e24557f6a79ac424a8463bd6"
 dsh_repository = "deepseek-ai/deepseek-harness"
 dsh_commit = "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca"
 dsh_tree = "3bc8f89fe494a4755c188be354add4e8b1e7b188"

@@ -407,7 +407,13 @@ def run_live() -> dict[str, Any]:
         "initialize_request_observed": any(event.get("direction") == "request" and event.get("method") == "initialize" for event in events),
         "thread_start_request_observed": any(event.get("direction") == "request" and event.get("method") == "thread/start" for event in events),
         "turn_start_request_observed": any(event.get("direction") == "request" and event.get("method") == "turn/start" for event in events),
-        "turn_id_observed": any(event.get("result", {}).get("turn", {}).get("id") for event in events if event.get("id") is not None),
+        "turn_id_observed": any(
+            isinstance(event.get("result"), Mapping)
+            and isinstance(event["result"].get("turn"), Mapping)
+            and event["result"]["turn"].get("id")
+            for event in events
+            if event.get("id") is not None
+        ),
         "turn_started_observed": any(event.get("method") == "turn/started" for event in events),
         "turn_terminal_observed": bool(terminal_events),
         "terminal_status": terminal_status,

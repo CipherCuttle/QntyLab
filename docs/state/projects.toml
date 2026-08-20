@@ -4357,7 +4357,7 @@ next_action = "After canonical presence is verified, perform exactly one separat
 [[project]]
 project_id = "PINNED_DSH_CODEX_TERMINAL_ERROR_PERMISSION_POLICY_FORENSICS_V0"
 display_name = "Pinned DSH Codex terminal-error permission-policy forensics V0"
-state = "IN_PROGRESS"
+state = "ACTIVE"
 authority_level = "ONE_BOUNDED_INTERVENTION_IMPLEMENTATION_AND_CANARY"
 phase_type = "PRODUCT_EXECUTION_CAUSAL_DIAGNOSTIC"
 authoritative_artifacts = [

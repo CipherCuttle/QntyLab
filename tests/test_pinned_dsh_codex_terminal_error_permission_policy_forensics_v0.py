@@ -9,6 +9,7 @@ from qntylab.pinned_dsh_codex_terminal_error_permission_policy_forensics_v0 impo
     classify_live,
     historical_requests,
     intervention_b_requests,
+    normalize_observed_requests,
     request_diff_artifact,
     semantic_request_delta,
 )
@@ -53,6 +54,23 @@ def test_fake_captures_preserve_effective_policy_without_inventing_sandbox():
     assert b_thread["effective"]["sandbox"] is None
     assert a_thread["effective"]["runtimeWorkspaceRoots"] == []
     assert b_thread["effective"]["runtimeWorkspaceRoots"] == []
+
+
+def test_observed_request_normalization_discards_transport_metadata_only():
+    workspace = Path("/tmp/diagnostic-workspace")
+    events = [{
+        "direction": "request",
+        "sequence": 7,
+        "jsonrpc": "2.0",
+        "id": 42,
+        "status": "accepted",
+        "method": "thread/start",
+        "params": {"cwd": str(workspace), "ephemeral": True},
+    }]
+    assert normalize_observed_requests(events, workspace) == [{
+        "method": "thread/start",
+        "params": {"cwd": "<workspace>", "ephemeral": True},
+    }]
 
 
 def test_classification_is_closed_and_fail_closed():

@@ -1,0 +1,26 @@
+{
+  "artifact_type": "PINNED_DSH_CODEX_PROVIDER_BOUNDARY_REPAIRED_REQUEST_CONTRACT",
+  "schema_version": "v0",
+  "source": "materialized provider source bytes",
+  "initialize": {
+    "capabilities": {
+      "experimentalApi": false,
+      "requestAttestation": false
+    }
+  },
+  "thread_start": {
+    "cwd": "<runtime cwd>",
+    "ephemeral": true,
+    "approvalPolicy": "never",
+    "sandbox": "workspace-write"
+  },
+  "turn_start": {
+    "threadId": "<runtime thread id>",
+    "input": "text blocks with text_elements=[]"
+  },
+  "c_d_request_digest": "26b4f3cadef2d03ed9b0a8f2bc4b30e99bc1a970daca1a26a333dec1eeafd44b",
+  "semantic_delta_count": 2,
+  "forbidden_permission_fields_present": false,
+  "historical_artifacts_rewritten": false,
+  "live_processes_spawned": false
+}

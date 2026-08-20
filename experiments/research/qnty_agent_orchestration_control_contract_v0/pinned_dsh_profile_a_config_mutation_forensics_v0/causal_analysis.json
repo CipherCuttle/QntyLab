@@ -1,0 +1,42 @@
+{
+  "artifact_type": "PINNED_DSH_PROFILE_A_CONFIG_MUTATION_CAUSAL_ANALYSIS",
+  "schema_version": "v0",
+  "phase_id": "PINNED_DSH_PROFILE_A_CONFIG_MUTATION_FORENSICS_V0",
+  "profile_a_mutation_causal_relevance": "UNKNOWN",
+  "classification": "PARTIAL_CONFOUNDER",
+  "semantic_config_changed": "UNKNOWN",
+  "reason": "The current AFTER bytes and in-window file metadata were recovered, but the BEFORE bytes and event ordering against the write decision were not. Current project trust fields are permission-relevant candidates, not mechanically proven changed fields.",
+  "causal_matrix": {
+    "known_good_d3": {
+      "approval_policy": "never",
+      "sandbox": "workspace-write",
+      "effective_sandbox": "workspaceWrite",
+      "result": "write success"
+    },
+    "b_pr156": {
+      "approval_policy": "never",
+      "sandbox_explicit": false,
+      "result": "read-only / no write"
+    },
+    "c_pr158": {
+      "approval_policy": "never",
+      "sandbox": "workspace-write",
+      "effective_sandbox": "workspaceWrite",
+      "result": "write success",
+      "profile_a_hash_mutation": true
+    },
+    "alternative_explanation_status": "Causal alternative remains possible but unproven; similarity to D3 is not treated as proof."
+  },
+  "classification_gate": {
+    "confounder_excluded_requires_positive_mechanical_exclusion": true,
+    "hash_only_or_missing_before_prohibits_confounder_excluded": true,
+    "load_bearing_confounder_requires_changed_setting_and_relevant_timing": true,
+    "current_phase_has_positive_exclusion": false,
+    "current_phase_has_changed_setting": false,
+    "current_phase_has_relevant_timing": false
+  },
+  "root_cause_claim_strength": "NOT_PROVEN",
+  "c_forensic_interpretation": "Existing C evidence remains contaminated by a partially recovered Profile A confounder; no clean sandbox-only causal conclusion is established.",
+  "additional_canary_needed": "UNDECIDED",
+  "additional_canary_authorized": false
+}

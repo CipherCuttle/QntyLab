@@ -1,0 +1,35 @@
+{
+  "artifact_type": "PINNED_DSH_PROFILE_A_CONFIG_MUTATION_TEMPORAL_ANALYSIS",
+  "schema_version": "v0",
+  "phase_id": "PINNED_DSH_PROFILE_A_CONFIG_MUTATION_FORENSICS_V0",
+  "profile_hash_forensic_start": "cb07d9468bb9f7e21b3cc507b20f31a6bffbc8328ef5b250bd7f9a12141ab6c7",
+  "events": {
+    "T0_prelive_profile_hash": {"evidence": "canonical C receipt", "timestamp": "NOT_RECORDED"},
+    "T1_product_launch": {"evidence": "canonical C receipt started_at", "timestamp": "2026-08-20T05:07:28.231948Z"},
+    "T2_initialize": {"evidence": "observed", "timestamp": "NOT_RECORDED"},
+    "T3_thread_start": {"evidence": "observed", "timestamp": "NOT_RECORDED"},
+    "T4_turn_start": {"evidence": "observed", "timestamp": "NOT_RECORDED"},
+    "T5_turn_started": {"evidence": "observed; terminal payload startedAt is second-resolution", "timestamp": "2026-08-20T05:07:28Z (second resolution)"},
+    "T6_write_attempt": {"evidence": "observed", "timestamp": "NOT_RECORDED"},
+    "T7_fixture_write": {"evidence": "fixture BEFORE/AFTER hashes and changed_paths", "timestamp": "NOT_RECORDED"},
+    "T8_turn_completed": {"evidence": "canonical C receipt ended_at and terminal lifecycle", "timestamp": "2026-08-20T05:07:42.942930Z"},
+    "T9_profile_hash_after": {"evidence": "canonical C receipt", "timestamp": "NOT_RECORDED"}
+  },
+  "profile_metadata_evidence": {
+    "path": "/home/swirky/.codex/config.toml",
+    "mtime": "2026-08-20T05:07:28.627468120Z",
+    "mtime_after_product_launch_seconds": 0.395520120,
+    "mtime_before_recorded_completion_seconds": 14.315461880,
+    "metadata_is_not_writer_proof": true
+  },
+  "ordering": {
+    "mutation_before_product_launch": "NO",
+    "mutation_before_thread_start": "UNKNOWN",
+    "mutation_before_turn_started": "UNKNOWN",
+    "mutation_before_fixture_write": "UNKNOWN",
+    "mutation_after_fixture_write": "UNKNOWN",
+    "mutation_after_turn_completed": "NO",
+    "resolution_limit": "No surviving event-level timestamps place the mutation against thread/start, turn/started, write attempt, or fixture write."
+  },
+  "profile_hash_forensic_end": "cb07d9468bb9f7e21b3cc507b20f31a6bffbc8328ef5b250bd7f9a12141ab6c7"
+}

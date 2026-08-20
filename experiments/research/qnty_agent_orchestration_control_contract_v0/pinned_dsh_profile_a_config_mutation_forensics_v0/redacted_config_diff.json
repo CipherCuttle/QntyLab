@@ -1,0 +1,59 @@
+{
+  "artifact_type": "PINNED_DSH_PROFILE_A_CONFIG_MUTATION_REDACTED_DIFF",
+  "schema_version": "v0",
+  "phase_id": "PINNED_DSH_PROFILE_A_CONFIG_MUTATION_FORENSICS_V0",
+  "content_recovery": "PARTIAL_DIFF_RECOVERED",
+  "before": {
+    "available": false,
+    "sha256": "955cec088237c2ca3f2a704ab67ad2d805c0916feb74dec6fec0eb6c5b04eef0",
+    "safe_semantic_values": "UNAVAILABLE"
+  },
+  "after": {
+    "available": true,
+    "source": "/home/swirky/.codex/config.toml",
+    "sha256": "cb07d9468bb9f7e21b3cc507b20f31a6bffbc8328ef5b250bd7f9a12141ab6c7",
+    "safe_semantic_values": "NOT_SERIALIZED"
+  },
+  "changed_config_keys": "UNKNOWN",
+  "semantic_config_changed": "UNKNOWN",
+  "candidate_current_fields_not_proven_changed": [
+    {
+      "key_path": "projects./home/swirky/DevHub/repos/QntyLab.trust_level",
+      "before_present": "UNKNOWN",
+      "after_present": true,
+      "before_value_class": "UNKNOWN",
+      "after_value_class": "STRING",
+      "safe_before_value": "REDACTED",
+      "safe_after_value": "REDACTED",
+      "secret_redacted": "YES",
+      "classification": "TRUST_LOAD_BEARING",
+      "change_proven": false
+    },
+    {
+      "key_path": "projects./tmp/qntylab-dsh-permission-forensics.trust_level",
+      "before_present": "UNKNOWN",
+      "after_present": true,
+      "before_value_class": "UNKNOWN",
+      "after_value_class": "STRING",
+      "safe_before_value": "REDACTED",
+      "safe_after_value": "REDACTED",
+      "secret_redacted": "YES",
+      "classification": "TRUST_LOAD_BEARING",
+      "change_proven": false
+    },
+    {
+      "key_path": "projects./tmp/qntylab-pinned-dsh-permission-b-o4u8xcq8.trust_level",
+      "before_present": "UNKNOWN",
+      "after_present": true,
+      "before_value_class": "UNKNOWN",
+      "after_value_class": "STRING",
+      "safe_before_value": "REDACTED",
+      "safe_after_value": "REDACTED",
+      "secret_redacted": "YES",
+      "classification": "TRUST_LOAD_BEARING",
+      "change_proven": false
+    }
+  ],
+  "current_permission_keys_at_top_level": [],
+  "interpretation": "The current endpoint contains project trust state, but no before bytes exist to establish which keys changed. No exact semantic diff is claimed."
+}

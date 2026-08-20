@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import subprocess
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
@@ -21,6 +22,8 @@ OHLCV_DIGEST = "sha256:97760d127e33c51f2ac687f5f8edb92ffa3ac01b1c7c963951872a87a
 PIT_V1_DIGEST = "sha256:eee5ce2769e49970a7a4e8d4851d7da569abc156d4f183959b416bfb8dbf188b"
 PIT_V1_SHA = "3e54cb86cdc43c76c1cbf72acc4dfebecb6b10fa"
 PREREG_SHA = "98e9dbcbec5dab18f7498cf4c5df77e14a8d5569"
+_FULL_SHA1 = re.compile(r"[0-9a-f]{40}")
+_SHA256_HEX = re.compile(r"[0-9a-f]{64}")
 
 
 def canonical_digest(payload: object) -> str:
@@ -122,6 +125,99 @@ def verify_git_ancestry(
             raise AssertionError(f"{ancestor} is not an ancestor of {commit}")
 
 
+def _git_text(args: list[str], root: Path = ROOT) -> str:
+    """Run a read-only Git plumbing command, failing closed on every error."""
+    try:
+        result = subprocess.run(args, cwd=root, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
+    except OSError as exc:
+        raise AssertionError(f"git command unavailable while running {args!r}: {exc}") from exc
+    if result.returncode:
+        raise AssertionError(f"git command failed: {args!r}")
+    return result.stdout.strip()
+
+
+def historical_materializer_digest(
+    commit: str, relative_path: str, root: Path = ROOT
+) -> str:
+    """SHA-256 of ``relative_path`` **as recorded in the immutable commit**.
+
+    Reads the historical Git blob, never the working tree.  ``commit`` must be
+    a full 40-hex object id that Git resolves to a commit, so an abbreviated,
+    ambiguous or ref-shaped identifier cannot select a different object than
+    the one the frozen baseline names.
+    """
+    if not _FULL_SHA1.fullmatch(commit):
+        raise AssertionError(f"historical anchor is not a full 40-hex object id: {commit!r}")
+    if _git_text(["git", "cat-file", "-t", commit], root) != "commit":
+        raise AssertionError(f"historical anchor is not a commit object: {commit}")
+    blob = _git_text(["git", "rev-parse", "--verify", "--quiet", f"{commit}:{relative_path}"], root)
+    if not _FULL_SHA1.fullmatch(blob):
+        raise AssertionError(f"{relative_path} does not resolve to an object at {commit}")
+    if _git_text(["git", "cat-file", "-t", blob], root) != "blob":
+        raise AssertionError(f"{relative_path} at {commit} is not a blob")
+    try:
+        content = subprocess.run(
+            ["git", "cat-file", "blob", blob], cwd=root, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL
+        )
+    except OSError as exc:
+        raise AssertionError(f"git command unavailable while reading blob {blob}: {exc}") from exc
+    if content.returncode:
+        raise AssertionError(f"could not read blob {blob} for {relative_path} at {commit}")
+    return hashlib.sha256(content.stdout).hexdigest()
+
+
+def verify_historical_materializer_identity(
+    baseline: dict, root: Path = ROOT, require_tracked: bool = True
+) -> list[dict]:
+    """Authenticate the **historical producer** of the frozen funding evidence.
+
+    The frozen ``materializer_files`` hashes identify the exact materializer
+    source that produced the frozen evidence bytes.  That is a statement about
+    history, so it is authenticated against the immutable Git blobs at the
+    baseline's own ``required_git_ancestors`` -- commits that
+    :func:`verify_git_ancestry` has already proven are ancestors of the
+    candidate commit, and that ``verify_self_digest`` has already proven are
+    the ones the frozen baseline actually names.
+
+    It is deliberately NOT authenticated against the working tree.  Checking
+    live bytes would assert "the materializer at HEAD is whatever produced the
+    frozen evidence", which is false as soon as the shared materializer is
+    developed further for unrelated work, and which would tempt a future
+    maintainer to launder the current hash into the frozen record.  Every
+    anchor must agree; a single disagreeing anchor fails closed.
+
+    ``require_tracked`` additionally asserts the materializer path is still
+    tracked at HEAD.  That is repository continuity only -- it constrains no
+    bytes and forms no part of the historical identity proof.
+    """
+    anchors = baseline["required_git_ancestors"]
+    if not isinstance(anchors, list) or not anchors:
+        raise AssertionError("baseline declares no historical Git anchors")
+    if tuple(anchors) != (PREREG_SHA, PIT_V1_SHA):
+        raise AssertionError(f"baseline Git anchors do not match the verified ancestry set: {anchors}")
+    entries = baseline["materializer_files"]
+    if not isinstance(entries, list) or not entries:
+        raise AssertionError("baseline declares no materializer files")
+    authenticated = []
+    for item in entries:
+        relative_path, expected = item["relative_path"], item["file_sha256"]
+        if not _SHA256_HEX.fullmatch(expected):
+            raise AssertionError(f"frozen materializer digest is malformed: {relative_path}")
+        for anchor in anchors:
+            actual = historical_materializer_digest(anchor, relative_path, root)
+            if actual != expected:
+                raise AssertionError(
+                    f"historical materializer identity mismatch: {relative_path} at {anchor} "
+                    f"is {actual}, frozen baseline requires {expected}"
+                )
+        if require_tracked:
+            tracked = subprocess.run(["git", "ls-files", "--error-unmatch", relative_path], cwd=root, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            if tracked.returncode:
+                raise AssertionError(f"materializer is not Git-tracked: {relative_path}")
+        authenticated.append({"relative_path": relative_path, "file_sha256": expected, "anchors": list(anchors)})
+    return authenticated
+
+
 def verify_evidence_entry(item: dict, root: Path = ROOT, require_tracked: bool = True) -> None:
     path = root / item["relative_path"]
     if not path.is_file() or file_digest(path) != item["sha256"] or path.stat().st_size != item["size_bytes"]:
@@ -164,17 +260,11 @@ def verify_baseline() -> dict:
     verify_git_ancestry(candidate_commit)
     for item in baseline["evidence_files"]:
         verify_evidence_entry(item)
-    for item in baseline["materializer_files"]:
-        path = ROOT / item["relative_path"]
-        if file_digest(path) != item["file_sha256"]:
-            raise AssertionError(f"materializer byte mismatch: {item['relative_path']}")
-        tracked = subprocess.run(["git", "ls-files", "--error-unmatch", item["relative_path"]], cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        if tracked.returncode:
-            raise AssertionError(f"materializer is not Git-tracked: {item['relative_path']}")
+    materializers = verify_historical_materializer_identity(baseline)
     actual_coverage = compute_funding_coverage()
     if actual_coverage != _without(coverage, "funding_history_coverage_digest"):
         raise AssertionError("funding history coverage does not match recomputation")
-    return {"evidence_files": len(baseline["evidence_files"]), "pressure_days": coverage["pressure_day_count"], "symbol_days_missing": coverage["missing_count"]}
+    return {"evidence_files": len(baseline["evidence_files"]), "pressure_days": coverage["pressure_day_count"], "symbol_days_missing": coverage["missing_count"], "historical_materializers": len(materializers)}
 
 
 if __name__ == "__main__":

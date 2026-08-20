@@ -1,0 +1,20 @@
+diff --git a/packages/subagent/subagent-codex/src/wire.ts b/packages/subagent/subagent-codex/src/wire.ts
+--- a/packages/subagent/subagent-codex/src/wire.ts
++++ b/packages/subagent/subagent-codex/src/wire.ts
+@@ -154,6 +154,8 @@ export class CodexAppServerWire {
+     const response = object(await this.guarded(this.transport.request('thread/start', {
+       cwd,
+       ephemeral: true,
++      approvalPolicy: 'never',
++      sandbox: 'workspace-write',
+     }, signal), signal), 'thread/start response')
+     const thread = object(response.thread, 'thread/start thread')
+     const id = string(thread.id, 'thread/start thread id')
+diff --git a/packages/subagent/subagent-codex/lib/index.js b/packages/subagent/subagent-codex/lib/index.js
+--- a/packages/subagent/subagent-codex/lib/index.js
++++ b/packages/subagent/subagent-codex/lib/index.js
+@@ -129 +129,3 @@
+-			ephemeral: true
++			ephemeral: true,
++			approvalPolicy: "never",
++			sandbox: "workspace-write"

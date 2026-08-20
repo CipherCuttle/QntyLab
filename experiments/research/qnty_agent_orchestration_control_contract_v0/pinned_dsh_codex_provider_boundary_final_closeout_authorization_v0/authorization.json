@@ -1,0 +1,254 @@
+{
+  "artifact_type": "PINNED_DSH_CODEX_PROVIDER_BOUNDARY_FINAL_CLOSEOUT_AUTHORIZATION",
+  "schema_version": "v0",
+  "phase_id": "PINNED_DSH_CODEX_PROVIDER_BOUNDARY_FINAL_CLOSEOUT_AUTHORIZATION_V0",
+  "phase_state": "CLOSED_PASS",
+  "authorization_state": "AUTHORIZED_IF_CANONICAL",
+  "authorization_effective": "AFTER_CANONICAL_MERGE_ONLY",
+  "authorized_operation": "ONE_FINAL_FORENSICS_REPAIR_TEST_REVIEW_AND_CLOSEOUT_PHASE",
+  "mission": {
+    "later_project_id": "PINNED_DSH_CODEX_PROVIDER_BOUNDARY_FINAL_CLOSEOUT_V0",
+    "includes_same_phase_read_only_trust_forensics": true,
+    "includes_permanent_provider_boundary_repair": true,
+    "includes_offline_deterministic_tests": true,
+    "includes_one_independent_hostile_review": true,
+    "includes_operational_closure": true,
+    "must_open_one_draft_implementation_closure_pr": true,
+    "must_stop_after_that_pr": true
+  },
+  "canonical_merge_gate": {
+    "predecessor_canonical_master": "623b60a844f37f63a879f94fbc1ff542a8a4d625",
+    "predecessor_pr": 162,
+    "authorization_expected_pr": 163,
+    "later_expected_pr": 164,
+    "effective_only_after_authorization_merge": true,
+    "noncanonical_action": "PRELIVE_BLOCKED"
+  },
+  "hard_pr_budget": {
+    "current_authorization_pr": 163,
+    "later_implementation_closeout_pr": 164,
+    "later_implementation_prs_authorized": 1,
+    "later_separate_forensic_prs_authorized": 0,
+    "later_additional_authorization_prs_authorized": 0,
+    "maximum_additional_prs_from_pr162": 2,
+    "investigation_closes_after_later_pr_merge": true,
+    "no_follow_on_forensic_repair_canary_or_confirmation_pr": true,
+    "blocking_defect_exception": "ONLY_OBJECTIVELY_BLOCKING_REPOSITORY_DEFECT_BEFORE_PR164_CLOSURE"
+  },
+  "historical_predecessors": {
+    "b": {
+      "pr": 156,
+      "approval_policy": "never",
+      "explicit_sandbox": "ABSENT",
+      "result": "READ_ONLY_NO_WRITE",
+      "immutable": true
+    },
+    "c": {
+      "pr": 158,
+      "classification": "INCONCLUSIVE_INFRA",
+      "approval_policy": "never",
+      "sandbox": "workspace-write",
+      "write_success": true,
+      "profile_mutated": true,
+      "immutable": true
+    },
+    "profile_forensics": {
+      "pr": 160,
+      "classification": "PARTIAL_CONFOUNDER",
+      "causal_relevance": "UNKNOWN",
+      "immutable": true
+    },
+    "d_authorization": {
+      "pr": 161,
+      "merge_sha": "e0c74578d86816d6edd7afd5d60b099bbd7d4fc1",
+      "immutable": true
+    },
+    "d": {
+      "pr": 162,
+      "merge_sha": "623b60a844f37f63a879f94fbc1ff542a8a4d625",
+      "classification": "PROFILE_MUTATED_RECORDED",
+      "causal_update": "NO_CAUSAL_UPDATE",
+      "approval_policy": "never",
+      "sandbox": "workspace-write",
+      "turn_started": true,
+      "terminal_status": "completed",
+      "child_exit": 0,
+      "timeout": false,
+      "write_success": true,
+      "fixture_after_sha256": "f72c713b7b432dd18949ca10f1be6dbcf493479945653609d1c715b2d8d74356",
+      "changed_paths": ["fixture.txt"],
+      "unauthorized_writes": [],
+      "read_only_message": false,
+      "sandbox_denial": false,
+      "request_digest": "26b4f3cadef2d03ed9b0a8f2bc4b30e99bc1a970daca1a26a333dec1eeafd44b",
+      "profile_before": "cb07d9468bb9f7e21b3cc507b20f31a6bffbc8328ef5b250bd7f9a12141ab6c7",
+      "profile_after": "de281169449aae0a5db88df4cd004f65e6c9b7c3629353a70e130ae1376e6611",
+      "profile_changed_key": "projects./tmp/qntylab-clean-c-workspace-d4xjsli9.trust_level",
+      "profile_changed_key_before": "ABSENT",
+      "profile_changed_key_after": "trusted",
+      "profile_changed_key_classification": "TRUST_LOAD_BEARING",
+      "profile_mutation_causal_relevance": "UNKNOWN",
+      "immutable": true
+    }
+  },
+  "frozen_product_identities": {
+    "dsh_repository": "deepseek-ai/deepseek-harness",
+    "dsh_commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "dsh_tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "dsh_tag": "dsh-v0.1.0-rc.7",
+    "codex_version": "codex-cli 0.147.0",
+    "codex_binary_sha256": "cb0a15567e9a60a5820d54b0f6ae86d504dc3805c1eab21a47f70e3eb7b73a40",
+    "prompt_sha256": "5998d2259d56942c071536866262fa7a7b72c1780ae41137b8e0de1aafef8683"
+  },
+  "frozen_successful_contract": {
+    "request_digest_c": "26b4f3cadef2d03ed9b0a8f2bc4b30e99bc1a970daca1a26a333dec1eeafd44b",
+    "request_digest_d": "26b4f3cadef2d03ed9b0a8f2bc4b30e99bc1a970daca1a26a333dec1eeafd44b",
+    "c_to_d_product_request_delta_count": 0,
+    "required_thread_start": {
+      "approvalPolicy": "never",
+      "sandbox": "workspace-write"
+    },
+    "preserve_thread_start": ["cwd", "ephemeral"],
+    "repair_relative_delta": [
+      {"method": "thread/start", "path": "params.approvalPolicy", "before": "<ABSENT>", "after": "never"},
+      {"method": "thread/start", "path": "params.sandbox", "before": "<ABSENT>", "after": "workspace-write"}
+    ],
+    "no_other_product_semantic_delta": true
+  },
+  "later_trust_forensics": {
+    "authorized": true,
+    "read_only": true,
+    "must_happen_before_repair": true,
+    "must_not_gate_repair": true,
+    "no_dsh_invocation": true,
+    "no_codex_invocation": true,
+    "no_canary": true,
+    "questions": [
+      "Was /tmp/qntylab-pinned-dsh-permission-b-o4u8xcq8 trusted during B's relevant execution decision?",
+      "What does Codex 0.147.0 project trust mechanically control?",
+      "Did B or D contain trust-gated project-local permission configuration?",
+      "Can trust explain the B-to-D differential?"
+    ],
+    "allowed_q1_values": ["YES", "NO", "TIMING_UNRECOVERABLE"],
+    "allowed_q3_values": ["PRESENT", "ABSENT", "UNKNOWN"],
+    "allowed_q4_values": [
+      "TRUST_DIFFERENTIAL_EXCLUDED",
+      "TRUST_IS_LOAD_BEARING_COVARIATE",
+      "JOINT_MECHANISM_SUPPORTED",
+      "TRUST_TIMING_UNRECOVERABLE"
+    ],
+    "repair_proceeds_under_all_q4_outcomes": true,
+    "profile_mutation_prohibited": true,
+    "trust_mutation_prohibited": true,
+    "codex_home_mutation_prohibited": true,
+    "secret_values_prohibited": true
+  },
+  "later_permanent_repair": {
+    "authorized": true,
+    "must_target_actual_pinned_dsh_provider_boundary": true,
+    "test_only_overlay_insufficient": true,
+    "required_outgoing_thread_start": {"approvalPolicy": "never", "sandbox": "workspace-write"},
+    "required_existing_fields_preserved": ["cwd", "ephemeral"],
+    "forbidden_additions_or_changes": [
+      "turn/start.sandboxPolicy",
+      "writableRoots",
+      "runtimeWorkspaceRoots",
+      "networkAccess",
+      "experimentalApi",
+      "initialize capabilities",
+      "model",
+      "prompt",
+      "task",
+      "text_elements",
+      "cwd semantics",
+      "ephemeral semantics",
+      "CODEX_HOME",
+      "trust",
+      "Profile A"
+    ],
+    "must_fail_closed_if_policy_construction_malformed": true,
+    "offline_only": true,
+    "live_dsh_invocations_authorized": 0,
+    "live_codex_invocations_authorized": 0,
+    "canaries_authorized": 0,
+    "retries_authorized": 0
+  },
+  "offline_test_requirements": [
+    "actual provider emits approvalPolicy never",
+    "actual provider emits sandbox workspace-write",
+    "cwd and ephemeral remain correct",
+    "no new initialize capability or experimental field",
+    "no runtimeWorkspaceRoots, writableRoots, or turn/start sandboxPolicy",
+    "no network, model, prompt, task, text_elements, CODEX_HOME, or trust change",
+    "captured thread/start equals frozen repaired contract",
+    "C/D semantics remain representable",
+    "B/C/D historical artifacts remain immutable",
+    "no Profile A or trust mutation in tests",
+    "no API-key values read",
+    "no live DSH/Codex process spawned",
+    "no duplicate permission-policy path or fallback",
+    "malformed provider policy fails closed",
+    "unrelated provider behavior remains deterministic"
+  ],
+  "frozen_final_outcomes": {
+    "CLOSED_PASS_SANDBOX_STRONGLY_SUPPORTED": {
+      "requires": ["repair tests pass", "no unresolved Critical/High", "trust differential excluded", "permanent never plus workspace-write contract"],
+      "causal_wording": "SANDBOX_OWNERSHIP_STRONGLY_CAUSALLY_SUPPORTED",
+      "root_cause_ceiling": "STRONG_CAUSAL_SUPPORT"
+    },
+    "CLOSED_PASS_CONSERVATIVE_REPAIR": {
+      "requires": ["repair tests pass", "no unresolved Critical/High", "permanent never plus workspace-write contract", "trust remains load-bearing, joint, or timing-unrecoverable"],
+      "causal_wording": "HISTORICAL_SINGLE_VARIABLE_CAUSALITY_NOT_PROVEN; REPRODUCED_KNOWN_WORKING_PROVIDER_CONTRACT_PERMANENTLY_APPLIED"
+    },
+    "BLOCKED_IMPLEMENTATION": {
+      "only_if": ["repair impossible", "deterministic verification fails", "unresolved Critical/High blocks closure"],
+      "no_automatic_new_pr_authority": true
+    }
+  },
+  "governance_boundary": {
+    "authorization_phase_dsh_invocations": 0,
+    "authorization_phase_codex_invocations": 0,
+    "authorization_phase_live_product_invocations": 0,
+    "authorization_phase_canaries": 0,
+    "later_live_dsh_invocations": 0,
+    "later_live_codex_invocations": 0,
+    "later_canaries": 0,
+    "later_retries": 0,
+    "profile_mutation_authorized": false,
+    "trust_mutation_authorized": false,
+    "codex_home_mutation_authorized": false,
+    "api_keys_authorized": false,
+    "pay_per_token_authorized": false,
+    "parent_model_requests": 0,
+    "historical_reclassification_authorized": false,
+    "scientific_execution_authorized": false,
+    "qnty_runtime_authority": "NONE",
+    "trading_authority": "NONE",
+    "capital_authority": "NONE",
+    "downstream_authority": "NONE",
+    "later_separate_forensic_prs": 0,
+    "later_additional_authorization_prs": 0,
+    "later_implementation_closeout_prs": 1,
+    "closeout_must_terminate_investigation": true,
+    "prohibited_operations": [
+      "DSH/Codex invocation in authorization",
+      "DSH/Codex live invocation in later phase",
+      "canary or retry",
+      "Profile A mutation or restoration",
+      "trust mutation",
+      "alternate CODEX_HOME/profile",
+      "API-key or pay-per-token route",
+      "historical B/C/D rewrite",
+      "separate forensic, repair, confirmation, or authorization PR",
+      "new DSH permission investigation after closeout"
+    ]
+  },
+  "qnty_agent_eval": "NO_MATCH",
+  "review_policy": {
+    "authorization_hostile_review_count": 1,
+    "later_hostile_review_count": 1,
+    "targeted_rereview_only_if_critical_or_high_repair": true,
+    "medium_low_do_not_restart": true
+  },
+  "active_project_after_closure": "NONE"
+}

@@ -4969,3 +4969,50 @@ codex_invoked = true
 secrets_observed_or_stored = false
 active_project_after_closure = "NONE"
 next_action = "Stop. Preserve PROFILE_MUTATED_RECORDED; do not invoke DSH/Codex again or authorize another canary."
+
+[[project]]
+project_id = "PINNED_DSH_CODEX_PROVIDER_BOUNDARY_FINAL_CLOSEOUT_AUTHORIZATION_V0"
+display_name = "Pinned DSH Codex provider boundary final closeout authorization V0"
+state = "CLOSED_PASS"
+phase_type = "GOVERNANCE_ONLY_FINAL_CLOSEOUT_AUTHORIZATION"
+authority_level = "ONE_FINAL_IMPLEMENTATION_CLOSEOUT_PHASE"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_provider_boundary_final_closeout_authorization_v0/authorization.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_provider_boundary_final_closeout_authorization_v0/hostile_governance_review.md",
+  "tests/test_pinned_dsh_codex_provider_boundary_final_closeout_authorization_v0.py",
+]
+predecessor_pr = 162
+predecessor_merge_sha = "623b60a844f37f63a879f94fbc1ff542a8a4d625"
+predecessor_classification = "PROFILE_MUTATED_RECORDED"
+authorization_expected_pr = 163
+later_final_closeout_project_id = "PINNED_DSH_CODEX_PROVIDER_BOUNDARY_FINAL_CLOSEOUT_V0"
+later_expected_pr = 164
+authorization_effective = "AFTER_CANONICAL_MERGE_ONLY"
+implementation_authorized = false
+later_implementation_prs_authorized = 1
+later_separate_forensic_prs_authorized = 0
+later_additional_authorization_prs_authorized = 0
+live_product_invocations_authorized = 0
+dsh_invocations_authorized = 0
+codex_invocations_authorized = 0
+canaries_authorized = 0
+retries_authorized = 0
+trust_forensics_authorized = "READ_ONLY_SAME_PHASE"
+permanent_repair_authorized = true
+closure_authorized = true
+profile_mutation_authorized = false
+trust_mutation_authorized = false
+codex_home_mutation_authorized = false
+api_keys_authorized = false
+pay_per_token_authorized = false
+historical_reclassification_authorized = false
+qnty_agent_eval = "NO_MATCH"
+scientific_execution_authorized = false
+qnty_runtime_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+downstream_authority = "NONE"
+active_project_after_closure = "NONE"
+next_action = "After canonical merge, execute exactly one final implementation/closeout phase containing read-only trust forensics, durable provider repair, offline tests, one hostile review, and closure; open PR #164 and stop. No further DSH permission, forensic, canary, or authorization phase."

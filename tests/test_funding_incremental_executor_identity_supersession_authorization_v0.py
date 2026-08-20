@@ -39,14 +39,17 @@ def test_source_evolution_is_not_history_mutation():
 
 
 def test_one_later_phase_is_authorized_only_after_canonical_merge():
-    assert AUTH["canonical_reconciliation"]["canonical_master"] == "502a4e02993f1d23f3cb91bc0d70044ebccaa79c"
+    frozen_baseline = AUTH["canonical_reconciliation"]["git_verification"]["origin_master_must_equal"]
+    assert frozen_baseline == "502a4e02993f1d23f3cb91bc0d70044ebccaa79c"
     assert AUTH["authorization_effective"] == "AFTER_CANONICAL_MERGE_ONLY"
     assert AUTH["later_implementation_phases_authorized"] == 1
     assert CLOSURE["later_implementation_phase_count"] == 1
     assert CLOSURE["later_implementation_phase"] == "FUNDING_INCREMENTAL_EXECUTOR_CORE_EXTRACTION_AND_SUCCESSOR_IMPLEMENTATION_V1"
+    assert subprocess.run(["git", "cat-file", "-e", f"{frozen_baseline}^{{commit}}"], cwd=ROOT).returncode == 0
     git_master = subprocess.run(["git", "rev-parse", "origin/master"], cwd=ROOT, check=True, capture_output=True, text=True).stdout.strip()
-    assert git_master == AUTH["canonical_reconciliation"]["git_verification"]["origin_master_must_equal"]
-    assert subprocess.run(["git", "merge-base", "--is-ancestor", git_master, "HEAD"], cwd=ROOT).returncode == 0
+    assert subprocess.run(["git", "merge-base", "--is-ancestor", frozen_baseline, "HEAD"], cwd=ROOT).returncode == 0
+    assert subprocess.run(["git", "merge-base", "--is-ancestor", frozen_baseline, git_master], cwd=ROOT).returncode == 0
+    assert subprocess.run(["git", "merge-base", "--is-ancestor", "HEAD", frozen_baseline], cwd=ROOT).returncode != 0
 
 
 def test_pr151_is_diagnostic_only_and_science_is_not_authorized():

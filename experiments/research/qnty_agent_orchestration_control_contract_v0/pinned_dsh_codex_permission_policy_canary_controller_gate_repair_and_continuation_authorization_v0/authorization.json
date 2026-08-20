@@ -1,0 +1,179 @@
+{
+  "artifact_type": "PINNED_DSH_CODEX_PERMISSION_POLICY_CANARY_CONTROLLER_GATE_REPAIR_AND_CONTINUATION_AUTHORIZATION",
+  "schema_version": "pinned-dsh-controller-gate-repair-continuation-authorization-v0",
+  "phase_id": "PINNED_DSH_CODEX_PERMISSION_POLICY_CANARY_CONTROLLER_GATE_REPAIR_AND_CONTINUATION_AUTHORIZATION_V0",
+  "phase_state": "CLOSED_PASS",
+  "authorization_state": "AUTHORIZED_IF_CANONICAL",
+  "authorization_effective": "AFTER_CANONICAL_MERGE_ONLY",
+  "authority_effective_only_if_canonical": true,
+  "predecessor": {
+    "project_id": "PINNED_DSH_CODEX_TERMINAL_ERROR_PERMISSION_POLICY_FORENSICS_V0",
+    "pr": 153,
+    "merge_sha": "2e0025b71a0212aed211b0f6a95d39093b7b1a48",
+    "state": "CLOSED_BLOCKED",
+    "live_product_invocations": 0,
+    "live_canaries_consumed": 0,
+    "retry_count": 0,
+    "treatment_exposures": 0,
+    "causal_update": "NONE",
+    "historical_root_cause": "NOT_PROVEN",
+    "consumed_marker": {
+      "path": "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_terminal_error_permission_policy_forensics_v0/live_canary_consumed.marker",
+      "present": false
+    }
+  },
+  "controller_defect": {
+    "proven": true,
+    "path": "qntylab/pinned_dsh_codex_terminal_error_permission_policy_forensics_v0.py",
+    "symbols": ["credential_presence", "run_live"],
+    "old_predicate": "if credential_presence():",
+    "observed_presence_state_when_absent": {
+      "OPENAI_API_KEY": false,
+      "ANTHROPIC_API_KEY": false,
+      "DEEPSEEK_API_KEY": false,
+      "OPENROUTER_API_KEY": false
+    },
+    "defect": "credential_presence returns a non-empty mapping and run_live tests mapping truthiness instead of whether any prohibited credential is present",
+    "root_cause_class": "PRETREATMENT_CREDENTIAL_GATE_MAPPING_TRUTHINESS_DEFECT"
+  },
+  "allowed_later_repair": {
+    "controller_repair_is_treatment_change": false,
+    "surface": "pre-treatment credential gate only",
+    "implementation_path": "qntylab/pinned_dsh_codex_terminal_error_permission_policy_forensics_v0.py",
+    "required_semantics": {
+      "allow_only_if": "credential presence state is structurally valid and every prohibited credential is absent",
+      "block_if": "any prohibited credential is present or presence state is missing, unexpected, or non-boolean",
+      "secret_handling": "presence booleans only; never read, print, serialize, hash, or transmit credential values"
+    },
+    "prohibited_repairs": [
+      "change DSH treatment",
+      "change sandbox or sandboxPolicy",
+      "change runtimeWorkspaceRoots",
+      "change experimentalApi",
+      "change prompt or task",
+      "change DSH version",
+      "change Codex version",
+      "change model",
+      "add retry logic",
+      "modify ~/.codex/config.toml",
+      "use API keys or pay-per-token services"
+    ]
+  },
+  "credential_gate_test_matrix": {
+    "deny_set": ["OPENAI_API_KEY", "ANTHROPIC_API_KEY", "DEEPSEEK_API_KEY", "OPENROUTER_API_KEY"],
+    "dummy_values_only": true,
+    "cases": [
+      {"id": "A", "state": "all absent", "expected": "PASS"},
+      {"id": "B", "state": "OPENAI_API_KEY present", "expected": "BLOCK"},
+      {"id": "C", "state": "ANTHROPIC_API_KEY present", "expected": "BLOCK"},
+      {"id": "D", "state": "DEEPSEEK_API_KEY present", "expected": "BLOCK"},
+      {"id": "E", "state": "each other deny-set credential individually present", "expected": "BLOCK"},
+      {"id": "F", "state": "multiple deny-set credentials present", "expected": "BLOCK"},
+      {"id": "G", "state": "all deny-set credentials present", "expected": "BLOCK"},
+      {"id": "H", "state": "expected presence key missing", "expected": "BLOCK_MALFORMED"},
+      {"id": "I", "state": "unexpected or non-boolean presence value", "expected": "BLOCK_MALFORMED"}
+    ]
+  },
+  "frozen_treatment": {
+    "controller_repair_is_treatment_change": false,
+    "request_delta_count": 1,
+    "request_delta": [
+      {
+        "method": "thread/start",
+        "path": "params.approvalPolicy",
+        "before": "<ABSENT>",
+        "after": "never"
+      }
+    ],
+    "additional_semantic_request_deltas": "PRELIVE_FAIL"
+  },
+  "product_identity": {
+    "dsh_repository": "deepseek-ai/deepseek-harness",
+    "dsh_commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "dsh_tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "dsh_tag": "dsh-v0.1.0-rc.7",
+    "codex_version": "codex-cli 0.147.0",
+    "subscription_backed": true,
+    "pay_per_token_credentials": false
+  },
+  "first_exposure": {
+    "predecessor_live_product_invocations": 0,
+    "predecessor_live_canaries_consumed": 0,
+    "predecessor_treatment_exposures": 0,
+    "this_is_not_a_retry_of_an_exposed_canary": true,
+    "authorized_later_live_exposures": 1,
+    "authorized_later_retries_after_product_launch": 0
+  },
+  "consumption_boundary": {
+    "marker_path": "live_canary_consumed.marker",
+    "write_point": "durably write immediately before the real DSH/Codex product invocation after all deterministic prelive gates pass",
+    "marker_written_means": "canary consumed; no second product attempt permitted",
+    "crash_after_marker": "canary remains consumed",
+    "block_before_marker": "canary remains unconsumed"
+  },
+  "later_live_contract": {
+    "max_product_invocations": 1,
+    "max_retries": 0,
+    "subscription_backed_only": true,
+    "synthetic_bounded_fixture_only": true,
+    "network_scientific_or_market_data": false,
+    "qnty_runtime": false,
+    "trading": false,
+    "capital": false,
+    "receipt_must_be_sanitized": true
+  },
+  "required_receipt_fields": [
+    "canonical authority identity",
+    "implementation/freeze identity",
+    "DSH commit/tree/tag",
+    "Codex version/binary identity",
+    "treatment delta digest",
+    "controller qualification digest",
+    "consumed marker state",
+    "product invocation count",
+    "product process launched",
+    "Codex child spawned",
+    "initialize/thread-start/turn-start observations",
+    "turn lifecycle and terminal status",
+    "sanitized error category/message",
+    "approval/sandbox/write observations",
+    "child exit and timeout",
+    "fixture digests",
+    "changed and unauthorized paths",
+    "safe stdout/stderr/event digests"
+  ],
+  "classifications": [
+    "INTERVENTION_PASS",
+    "SAME_FAILURE",
+    "DIFFERENT_FAILURE",
+    "INCONCLUSIVE_INFRA",
+    "PRELIVE_BLOCKED"
+  ],
+  "epistemic_rule": "A passing intervention may be STRONGLY_CAUSALLY_SUPPORTED without claiming MECHANICALLY_PROVEN_EXACT_ROOT_CAUSE unless historical and live evidence justify it.",
+  "governance_ceiling": {
+    "historical_a_rerun": false,
+    "pr137_rerun": false,
+    "pr141_rerun": false,
+    "stage_a": false,
+    "sandbox_experiment": false,
+    "runtime_workspace_roots": false,
+    "experimental_api": false,
+    "dsh_upgrade": false,
+    "codex_upgrade": false,
+    "alternate_model": false,
+    "prompt_change": false,
+    "market_data": false,
+    "scientific": "NONE",
+    "qnty_runtime": "NONE",
+    "trading": "NONE",
+    "capital": "NONE",
+    "downstream": "NONE",
+    "auto_merge": false
+  },
+  "review": {
+    "independent_hostile_review_required": true,
+    "critical_high_fix_pass_limit": 1,
+    "targeted_rereview_limit": 1
+  },
+  "qnty_agent_eval": "NO_MATCH"
+}

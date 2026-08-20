@@ -1,0 +1,30 @@
+{
+  "artifact_type": "FUNDING_INCREMENTAL_EXECUTOR_IDENTITY_MODEL",
+  "schema_version": "funding-incremental-executor-identity-model-v0",
+  "historical_v0": {
+    "commit": "f6f12994d65c3dfeaf7839de560e58ad99547c62",
+    "source_path": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py",
+    "source_sha256": "b894d4d9316bed6f8c4f7171b32692aff7b1f0eb32abd686a33fdb38425a7490",
+    "immutable": true,
+    "oracle_only": true
+  },
+  "corrected_distinction": {
+    "historical_git_identity_immutable": true,
+    "current_source_path_permanently_frozen": false,
+    "current_source_may_evolve_after_canonical_merge": true,
+    "successor_identity": "NEW_COMMIT_BLOB_SOURCE_DIGEST_MANIFEST_AND_BINDING"
+  },
+  "anti_duplication_rule": {
+    "active_successor_tree": "exactly one maintained scientific core",
+    "historical_git_snapshots": "not active implementations and not counted as duplication",
+    "forbidden_active_duplicates": ["HAR assembly", "OLS", "forecasting", "loss", "Clark-West", "HAC", "p-value", "classification"]
+  },
+  "pr151_disposition": {
+    "merged": false,
+    "canonical_authority": "NONE",
+    "use": "diagnostic evidence only",
+    "useful_finding": "the guarded entrypoint contains complete assembly and no separate core exists",
+    "rejected_inference": "changing the current source path mutates historical Git identity",
+    "rejected_inference_2": "future equivalence must already exist before implementation authorization"
+  }
+}

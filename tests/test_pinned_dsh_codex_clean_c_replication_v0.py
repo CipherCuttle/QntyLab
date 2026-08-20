@@ -85,7 +85,12 @@ def test_profile_baseline_is_authorization_hash_and_no_mutation_authority_exists
 def test_profile_baseline_mismatch_is_a_prelive_block():
     assert d.AUTHORIZATION_PROFILE_HASH != "different"
     assert d.AUTHORIZATION_PROFILE_HASH == d.authorization()["authorization_profile_baseline"]["authorization_profile_hash"]
-    assert d.profile_hash() == d.AUTHORIZATION_PROFILE_HASH
+    current = d.profile_hash()
+    postlive = ARTIFACT / "live_canary_receipt.json"
+    if postlive.exists():
+        assert current == json.loads(postlive.read_text(encoding="utf-8"))["profile_hash_after"]
+    else:
+        assert current == d.AUTHORIZATION_PROFILE_HASH
 
 
 def test_credential_gate_uses_presence_only_and_empty_value_is_present():
@@ -184,3 +189,37 @@ def test_live_controller_has_single_product_boundary_and_no_retry_branch():
     assert source.count('subprocess.run(["node", str(DRIVER)]') == 1
     assert d.AUTHORIZATION_MERGE_SHA == "e0c74578d86816d6edd7afd5d60b099bbd7d4fc1"
     assert d.authorization()["later_live_budget"]["d_retries_authorized"] == 0
+
+
+def test_recorded_single_exposure_is_profile_mutation_not_clean_confirmation():
+    receipt_path = ARTIFACT / "live_canary_receipt.json"
+    closure_path = ARTIFACT / "closure.json"
+    marker_path = ARTIFACT / "live_canary_consumed.marker"
+    if not receipt_path.exists():
+        pytest.skip("postlive artifact not present in a pre-exposure checkout")
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    closure = json.loads(closure_path.read_text(encoding="utf-8"))
+    assert marker_path.is_file()
+    assert receipt["d_consumed"] is True
+    assert receipt["product_invocation_count"] == 1
+    assert receipt["d_retries"] == 0
+    assert receipt["prelive_gate"] == "PASS"
+    assert receipt["fixture_after_digest"] == d.FIXTURE_AFTER_SHA256
+    assert receipt["changed_paths"] == ["fixture.txt"]
+    assert receipt["profile_bytes_changed"] is True
+    assert receipt["classification"] == "PROFILE_MUTATED_RECORDED"
+    assert closure["classification"] == "PROFILE_MUTATED_RECORDED"
+    assert closure["profile_mutation_causal_relevance"] == "UNKNOWN"
+    assert closure["profile_changed_key_classifications"][0]["classification"] == "TRUST_LOAD_BEARING"
+    assert receipt["raw_profile_before_deleted"] is True
+    assert receipt["raw_profile_after_deleted"] is True
+
+
+def test_postlive_receipt_repair_is_non_product_and_preserves_single_exposure():
+    repair = json.loads((ARTIFACT / "postlive_recording_repair.json").read_text(encoding="utf-8"))
+    assert repair["product_invocation_count"] == 1
+    assert repair["additional_product_invocation"] is False
+    assert repair["corrected_receipt_classification"] == "PROFILE_MUTATED_RECORDED"
+    assert repair["historical_artifacts_rewritten"] is False
+    assert repair["profile_restored"] is False
+    assert repair["raw_profile_snapshots_recreated"] is False

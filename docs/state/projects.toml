@@ -4898,7 +4898,7 @@ next_action = "Stop. Preserve PR #158 as INCONCLUSIVE_INFRA; no canary, product 
 [[project]]
 project_id = "PINNED_DSH_CODEX_CLEAN_C_REPLICATION_V0"
 display_name = "Pinned DSH Codex clean C replication V0"
-state = "ACTIVE"
+state = "CLOSED_PASS"
 phase_type = "ONE_FINAL_C_REPLICATION_CANARY"
 authority_level = "EXACT_C_PRODUCT_TREATMENT_WITH_PROFILE_OBSERVATION_ONLY"
 authoritative_artifacts = [
@@ -4908,12 +4908,18 @@ authoritative_artifacts = [
   "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_clean_c_replication_v0/request_equivalence.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_clean_c_replication_v0/hostile_implementation_review.md",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_clean_c_replication_v0/prelive_freeze.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_clean_c_replication_v0/live_canary_consumed.marker",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_clean_c_replication_v0/live_canary_receipt.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_clean_c_replication_v0/profile_observation.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_clean_c_replication_v0/redacted_profile_diff.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_clean_c_replication_v0/closure.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_clean_c_replication_v0/postlive_recording_repair.json",
   "tests/test_pinned_dsh_codex_clean_c_replication_v0.py",
 ]
 governing_authorization_pr = 161
 governing_authorization_merge_sha = "e0c74578d86816d6edd7afd5d60b099bbd7d4fc1"
 authorization_effective = "AFTER_CANONICAL_MERGE_ONLY"
-implementation_authorized = true
+implementation_authorized = false
 implementation_commit = "3442b696d713780979afa32e8edcd962b529c52b"
 prelive_freeze_commit = "8523794391950479e24557f6a79ac424a8463bd6"
 dsh_repository = "deepseek-ai/deepseek-harness"
@@ -4930,8 +4936,8 @@ fixture_after_sha256_expected = "f72c713b7b432dd18949ca10f1be6dbcf49347994565360
 authorization_profile_hash = "cb07d9468bb9f7e21b3cc507b20f31a6bffbc8328ef5b250bd7f9a12141ab6c7"
 d_live_exposures_authorized = 1
 d_retries_authorized = 0
-product_invocations = 0
-live_canaries_consumed = 0
+product_invocations = 1
+live_canaries_consumed = 1
 retry_count = 0
 profile_a_mutation_authorized = false
 profile_restoration_authorized = false
@@ -4946,5 +4952,20 @@ trading_authority = "NONE"
 capital_authority = "NONE"
 downstream_authority = "NONE"
 historical_reclassification_authorized = false
+classification = "PROFILE_MUTATED_RECORDED"
+causal_update = "NO_CAUSAL_UPDATE"
+root_cause_claim_strength = "NOT_PROVEN"
+profile_a_config_mutated = true
+profile_hash_before = "cb07d9468bb9f7e21b3cc507b20f31a6bffbc8328ef5b250bd7f9a12141ab6c7"
+profile_hash_after = "de281169449aae0a5db88df4cd004f65e6c9b7c3629353a70e130ae1376e6611"
+semantic_config_changed = "YES"
+profile_changed_key = "projects./tmp/qntylab-clean-c-workspace-d4xjsli9.trust_level"
+profile_changed_key_classification = "TRUST_LOAD_BEARING"
+profile_mutation_causal_relevance = "UNKNOWN"
+mutation_writer = "UNKNOWN"
+writer_confidence = "UNKNOWN"
+dsh_invoked = true
+codex_invoked = true
+secrets_observed_or_stored = false
 active_project_after_closure = "NONE"
-next_action = "Complete the immediate prelive gates, then consume exactly one D exposure. Stop after recording the result; no retry or additional canary is authorized."
+next_action = "Stop. Preserve PROFILE_MUTATED_RECORDED; do not invoke DSH/Codex again or authorize another canary."

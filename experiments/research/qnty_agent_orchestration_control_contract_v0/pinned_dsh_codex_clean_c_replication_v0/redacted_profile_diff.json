@@ -1,0 +1,19 @@
+{
+  "changed_keys": [
+    {
+      "after_present": true,
+      "after_value_class": "STRING",
+      "before_present": false,
+      "before_value_class": "ABSENT",
+      "key_path": "projects./tmp/qntylab-clean-c-workspace-d4xjsli9.trust_level",
+      "load_bearing_classification": "TRUST_LOAD_BEARING",
+      "safe_after_value": "trusted",
+      "safe_before_value": "<ABSENT>",
+      "secret_redacted": "NO"
+    }
+  ],
+  "profile_bytes_changed": true,
+  "raw_bytes_included": false,
+  "schema_version": "pinned-dsh-profile-observation-redacted-diff-v0",
+  "semantic_config_changed": "YES"
+}

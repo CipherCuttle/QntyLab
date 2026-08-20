@@ -1,0 +1,132 @@
+{
+  "artifact_type": "FUNDING_INCREMENTAL_REAL_EXECUTION_CONSUMER_SEAM_STATIC_PATH_ANALYSIS",
+  "schema_version": "funding-incremental-real-consumer-seam-static-analysis-v0",
+  "phase_id": "FUNDING_INCREMENTAL_REAL_EXECUTION_CONSUMER_SEAM_IMPLEMENTATION_AUTHORIZATION_V0",
+  "project_id": "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_REAL_EXECUTION_CONSUMER_SEAM_IMPLEMENTATION_AUTHORIZATION_V0",
+  "state": "CLOSED_BLOCKED",
+  "canonical_master": "60cec2646d4d6602e0ad33d0d4fc84edc2f272b9",
+  "pr149_blocked_closure": {
+    "project_id": "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_ONE_SHOT_SCIENTIFIC_EXECUTION_AUTHORIZATION_V0",
+    "state": "CLOSED_BLOCKED",
+    "root_cause": "REAL_EXECUTION_CONSUMER_PATH_NOT_MECHANICALLY_ESTABLISHED",
+    "authorization_created": false,
+    "scientific_execution_authorized": false,
+    "evaluation_origins_consumed": 0
+  },
+  "frozen_bindings": {
+    "preregistration_status": "PREREGISTERED_NOT_EXECUTED",
+    "preregistration_digest": "d7ec718ab14e73d2aea24749a22caa2921fd81b8a336e2f2eaffb30ae1e992ef",
+    "preregistration_file_sha256": "42b96afae80e55611bcd9786169050520525fbc5534b9f94c72ed867380ba9cf",
+    "frozen_implementation_sha": "f6f12994d65c3dfeaf7839de560e58ad99547c62",
+    "executor_source_sha256": "b894d4d9316bed6f8c4f7171b32692aff7b1f0eb32abd686a33fdb38425a7490",
+    "v2_source_sha256": "d603e747952d31d1fa87df463b9c739bc495a4e94597c2be0f93c02c678fbbc6",
+    "foundation_source_sha256": "834964137e4f2b77ab12a1d454f8ba8da9d71330e0806d00d1d2e26f113c980c",
+    "historical_provenance_baseline_digest": "sha256:902be2246b64d133e0f22dd71c04eba344d12ead659e5f57c69183ab92f878d9"
+  },
+  "static_consumer_path_analysis": {
+    "frozen_computation_entry_point": "qntylab.jigsaw_funding_pressure_incremental_forecast_value_executor_v0.run_incremental_forecast_evaluation",
+    "frozen_computation_entry_point_is_single_entrypoint": true,
+    "forecast_row_builder": "qntylab.jigsaw_funding_pressure_incremental_forecast_value_executor_v0.build_causal_forecast_rows",
+    "forecast_row_schema_validator": "qntylab.jigsaw_funding_pressure_incremental_forecast_value_executor_v0.validate_forecast_rows",
+    "authorized_execution_modes": ["SYNTHETIC_VALIDATION"],
+    "real_evidence_loader": "qntylab.jigsaw_funding_pressure_execution_foundation_v0.load_verified_frozen_evidence",
+    "historical_provenance_verifier": "qntylab.jigsaw_funding_pressure_provenance_v0.verify_historical_materializer_identity",
+    "runtime_contract": "qntylab.jigsaw_funding_pressure_incremental_pre_execution_integrity_v0.scientific_runtime",
+    "claim_primitive": "qntylab.jigsaw_funding_pressure_execution_foundation_v0.claim_authorization_once",
+    "v2_primitives_reusable": [
+      "select_latest_eligible_funding",
+      "median_abs_funding",
+      "hourly_asset_returns",
+      "market_returns",
+      "rv24",
+      "ecdf_percentile"
+    ],
+    "v2_result_contract_not_reusable": {
+      "entry_point": "qntylab.jigsaw_funding_pressure_execution_v2.execute_authorized_frozen_experiment_v2",
+      "computation": "compute_frozen_experiment",
+      "result_type": "FrozenExperimentResult",
+      "decision_count": 610,
+      "reason": "V2 does not construct incremental ForecastRows or invoke the frozen incremental M0/M1 evaluation."
+    },
+    "narrow_successor_architecture": [
+      "claim before real evidence interpretation",
+      "verify immutable historical provenance and exact frozen evidence",
+      "materialize exact 609 authority-bound ForecastRows with fail-closed panel/schedule/PIT semantics",
+      "enter an explicit REAL_SCIENTIFIC_EXECUTION boundary",
+      "invoke the unchanged frozen incremental computation"
+    ],
+    "frozen_source_modification_required_for_truthful_real_mode": true,
+    "algorithm_duplication_required_if_frozen_source_is_not_modified": true,
+    "private_internal_call_would_bypass_load_bearing_invariant": true,
+    "real_rows_can_remain_explicitly_real_under_current_executor": false,
+    "disposition": "BLOCKED",
+    "blocking_root_cause": "FROZEN_INCREMENTAL_CORE_NOT_REUSABLE_FROM_EXTERNAL_REAL_CONSUMER"
+  },
+  "frozen_panel": [
+    "BCHUSDT", "XRPUSDT", "LTCUSDT", "TRXUSDT", "ETCUSDT", "LINKUSDT",
+    "XLMUSDT", "CHZUSDT", "SANDUSDT", "REEFUSDT", "CHRUSDT", "ALICEUSDT",
+    "ONEUSDT", "API3USDT", "GMTUSDT", "APEUSDT", "OPUSDT", "INJUSDT",
+    "LDOUSDT", "APTUSDT"
+  ],
+  "frozen_schedule": {
+    "development": "2023-10-19..2024-10-17",
+    "development_origins": 365,
+    "excluded_boundary": "2024-10-18",
+    "evaluation": "2024-10-19..2025-06-19",
+    "evaluation_origins": 244,
+    "forecast_rows": 609,
+    "training_cutoff": "TARGET_COMPLETION_TIME < FORECAST_ORIGIN"
+  },
+  "numerical_runtime": {
+    "prec": 28,
+    "rounding": "ROUND_HALF_EVEN",
+    "Emin": -999999,
+    "Emax": 999999,
+    "capitals": 1,
+    "clamp": 0,
+    "traps": ["InvalidOperation", "DivisionByZero", "Overflow"]
+  },
+  "fail_closed_contract_gates": [
+    "wrong prereg digest",
+    "wrong frozen executor digest",
+    "frozen executor source mutation",
+    "copied/reimplemented algorithm proposal",
+    "current-materializer laundering",
+    "panel reorder",
+    "panel substitution",
+    "schedule count drift",
+    "boundary-date inclusion",
+    "runtime mismatch",
+    "real rows labeled SYNTHETIC_VALIDATION",
+    "adapter bypassing provenance verification",
+    "adapter invoking computation before future claim",
+    "adapter silently using V2 result semantics",
+    "unauthorized data acquisition",
+    "Router/Qnty/trading authority leakage"
+  ],
+  "authority": {
+    "implementation_authorization_created": false,
+    "later_implementation_phases_authorized": 0,
+    "scientific_execution_authorized": false,
+    "outcome_access_authorized": false,
+    "new_data_acquisition_authorized": false,
+    "router_authority": "NONE",
+    "qnty_authority": "NONE",
+    "trading_authority": "NONE",
+    "capital_authority": "NONE"
+  },
+  "outcome_firewall": {
+    "real_outcome_access": false,
+    "scientific_execution": false,
+    "evaluation_origins_consumed": 0,
+    "new_data_acquisition": false,
+    "scientific_result_created": false,
+    "trial_completion_recorded": false,
+    "frozen_executor_mutated": false,
+    "frozen_evidence_mutated": false,
+    "preregistration_mutated": false,
+    "order_flow_modified": false,
+    "jh01_modified": false
+  },
+  "next_action": "CLOSED_BLOCKED: a separately governed scientific-source refactor or successor seam must expose the unchanged frozen computation truthfully to REAL_SCIENTIFIC_EXECUTION without algorithm duplication before any implementation or one-shot scientific authorization can be considered."
+}

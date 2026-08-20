@@ -4221,3 +4221,78 @@ capital_authority = "NONE"
 active_project_after_closure = "NONE"
 implementation_authorized = false
 next_action = "CLOSED_BLOCKED: do not create an authorization or run the 244-origin evaluation. The frozen incremental executor has no truthful real-row consumer seam: its only mode is SYNTHETIC_VALIDATION, its real evidence loader is absent, and the existing V2 one-shot seam computes a different result contract. A future separately governed consumer-seam phase must establish authority-bound real ForecastRows into the unchanged frozen incremental algorithm before this authorization can be reconsidered."
+
+[[project]]
+project_id = "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_REAL_EXECUTION_CONSUMER_SEAM_IMPLEMENTATION_AUTHORIZATION_V0"
+display_name = "Funding-pressure incremental real-execution consumer seam implementation authorization V0"
+state = "CLOSED_BLOCKED"
+authority_level = "GOVERNANCE_AUTHORIZATION_CONSTRUCTION_BLOCKED"
+phase_type = "SOURCE_BOUND_IMPLEMENTATION_AUTHORIZATION"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/preregistration.json",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/real_execution_consumer_seam_implementation_authorization_v0/static_consumer_path_analysis.json",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/real_execution_consumer_seam_implementation_authorization_v0/hostile_review.md",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/real_execution_consumer_seam_implementation_authorization_v0/closure.json",
+  "qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py",
+  "qntylab/jigsaw_funding_pressure_execution_v2.py",
+  "qntylab/jigsaw_funding_pressure_execution_foundation_v0.py",
+  "qntylab/jigsaw_funding_pressure_provenance_v0.py",
+  "qntylab/jigsaw_funding_pressure_incremental_pre_execution_integrity_v0.py",
+  "tests/test_funding_incremental_real_execution_consumer_seam_implementation_authorization_v0.py",
+]
+predecessor_project_id = "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_ONE_SHOT_SCIENTIFIC_EXECUTION_AUTHORIZATION_V0"
+governing_preregistration_project_id = "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_PREREGISTRATION_V0"
+governing_preregistration_digest = "d7ec718ab14e73d2aea24749a22caa2921fd81b8a336e2f2eaffb30ae1e992ef"
+governing_preregistration_status_preserved = "PREREGISTERED_NOT_EXECUTED"
+canonical_predecessor_master = "60cec2646d4d6602e0ad33d0d4fc84edc2f272b9"
+frozen_implementation_sha = "f6f12994d65c3dfeaf7839de560e58ad99547c62"
+executor_source_sha256 = "b894d4d9316bed6f8c4f7171b32692aff7b1f0eb32abd686a33fdb38425a7490"
+v2_source_sha256 = "d603e747952d31d1fa87df463b9c739bc495a4e94597c2be0f93c02c678fbbc6"
+foundation_source_sha256 = "834964137e4f2b77ab12a1d454f8ba8da9d71330e0806d00d1d2e26f113c980c"
+historical_provenance_baseline_digest = "sha256:902be2246b64d133e0f22dd71c04eba344d12ead659e5f57c69183ab92f878d9"
+exact_panel_member_count = 20
+panel_order_load_bearing = true
+evaluation_origin_count = 244
+forecast_row_origin_count = 609
+numerical_runtime_bound = true
+consumer_path_analyzed = true
+consumable_real_execution_path_exists = false
+real_rows_cannot_be_laundered_as_synthetic = true
+frozen_incremental_core_reusable_without_duplication = false
+v2_result_contract_substituted = false
+one_shot_claim_authorized = false
+real_outcome_access_performed = false
+scientific_execution_performed = false
+evaluation_origins_consumed = 0
+new_data_acquisition_performed = false
+scientific_result_created = false
+trial_completion_recorded = false
+frozen_executor_mutated = false
+frozen_evidence_mutated = false
+preregistration_mutated = false
+order_flow_modified = false
+jh01_modified = false
+hostile_review_count = 1
+hostile_review_verdict = "BLOCKED"
+hostile_review_critical = 3
+hostile_review_high = 0
+hostile_review_medium = 0
+hostile_review_low = 0
+critical_high_repair_required = false
+targeted_rereview_used = false
+authorization_created = false
+implementation_authorized = false
+scientific_execution_authorized = false
+outcome_access_authorized = false
+market_data_access_authorized = false
+state_snapshot_authorized = false
+router_authority = "NONE"
+qnty_authority = "NONE"
+trading_authority = "NONE"
+promotion_authorized = false
+capital_authority = "NONE"
+downstream_authority = "NONE"
+active_project_after_closure = "NONE"
+next_action = "CLOSED_BLOCKED: do not implement the seam, create a scientific authorization, acquire data, or run the 244-origin evaluation. Reopen only under a separately governed scientific-source refactor or successor-seam decision."

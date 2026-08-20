@@ -1,0 +1,52 @@
+{
+  "active_project_after_closure": "NONE",
+  "additional_canary_authorized": false,
+  "additional_canary_recommended": false,
+  "artifact_type": "PINNED_DSH_CODEX_CLEAN_C_REPLICATION_CLOSURE",
+  "authorization_merge_sha": "e0c74578d86816d6edd7afd5d60b099bbd7d4fc1",
+  "authorization_pr": 161,
+  "capital_authority": "NONE",
+  "causal_update": "NO_CAUSAL_UPDATE",
+  "changed_paths": [
+    "fixture.txt"
+  ],
+  "classification": "PROFILE_MUTATED_RECORDED",
+  "codex_invoked": true,
+  "content_recovery": "REDACTED_DIFF_RECOVERED",
+  "d_consumed": true,
+  "d_product_invocations": 1,
+  "d_retries": 0,
+  "dsh_invoked": true,
+  "execution_project_id": "PINNED_DSH_CODEX_CLEAN_C_REPLICATION_V0",
+  "historical_pr158_reclassified": false,
+  "historical_pr160_reclassified": false,
+  "historical_pr161_reclassified": false,
+  "mutation_writer": "UNKNOWN",
+  "next_action": "Stop. Do not invoke DSH/Codex again or authorize another live exposure.",
+  "phase_id": "PINNED_DSH_CODEX_CLEAN_C_REPLICATION_V0",
+  "profile_bytes_changed": true,
+  "profile_changed_key_classifications": [
+    {
+      "classification": "TRUST_LOAD_BEARING",
+      "key_path": "projects./tmp/qntylab-clean-c-workspace-d4xjsli9.trust_level"
+    }
+  ],
+  "profile_changed_keys": [
+    "projects./tmp/qntylab-clean-c-workspace-d4xjsli9.trust_level"
+  ],
+  "profile_hash_after": "de281169449aae0a5db88df4cd004f65e6c9b7c3629353a70e130ae1376e6611",
+  "profile_hash_before": "cb07d9468bb9f7e21b3cc507b20f31a6bffbc8328ef5b250bd7f9a12141ab6c7",
+  "profile_mutation_causal_relevance": "UNKNOWN",
+  "qnty_agent_eval": "NO_MATCH",
+  "qnty_runtime_authority": "NONE",
+  "raw_profile_after_deleted": true,
+  "raw_profile_before_deleted": true,
+  "root_cause_claim_strength": "NOT_PROVEN",
+  "schema_version": "v0",
+  "scientific_execution": false,
+  "secrets_recorded": false,
+  "semantic_config_changed": "YES",
+  "trading_authority": "NONE",
+  "unauthorized_writes": [],
+  "writer_confidence": "UNKNOWN"
+}

@@ -1,0 +1,26 @@
+{
+  "profile_bytes_changed": true,
+  "profile_path": "/home/swirky/.codex/config.toml",
+  "profile_sha256_after": "de281169449aae0a5db88df4cd004f65e6c9b7c3629353a70e130ae1376e6611",
+  "profile_sha256_before": "cb07d9468bb9f7e21b3cc507b20f31a6bffbc8328ef5b250bd7f9a12141ab6c7",
+  "profile_size_after": 4235,
+  "profile_size_before": 4157,
+  "profile_stat_after": {
+    "mode": "0600",
+    "mtime_ns": 1787243672690003967,
+    "regular_file": true,
+    "size_bytes": 4235,
+    "symlink": false
+  },
+  "profile_stat_before": {
+    "mode": "0600",
+    "mtime_ns": 1787202448627468120,
+    "regular_file": true,
+    "size_bytes": 4157,
+    "symlink": false
+  },
+  "raw_profile_after_deleted": true,
+  "raw_profile_before_deleted": true,
+  "raw_profile_values_serialized": false,
+  "schema_version": "pinned-dsh-profile-observation-v0"
+}

@@ -1,0 +1,24 @@
+{
+  "artifact_type": "PINNED_DSH_CODEX_CLEAN_C_POSTLIVE_RECORDING_REPAIR",
+  "schema_version": "v0",
+  "phase_id": "PINNED_DSH_CODEX_CLEAN_C_REPLICATION_V0",
+  "product_invocation_count": 1,
+  "additional_product_invocation": false,
+  "original_receipt_classification": "PRELIVE_BLOCKED",
+  "corrected_receipt_classification": "PROFILE_MUTATED_RECORDED",
+  "repair_basis": [
+    "prelive gates passed immediately before marker",
+    "marker exists and is irrevocable",
+    "observed request semantic diff is empty",
+    "turn started and terminal completed",
+    "fixture write succeeded with exact expected digest and changed paths",
+    "Profile A before/after hashes differ"
+  ],
+  "recording_defect": "The first postlive serializer omitted prelive_gate=PASS from the receipt; the classifier therefore selected PRELIVE_BLOCKED despite postlive evidence.",
+  "corrective_action": "Reclassified existing sanitized receipt only; no DSH/Codex process was started and no raw snapshot was recreated.",
+  "codex_child_spawned_basis": "Observed initialize/RPC lifecycle and completed turn establish the one child route; no second child was started.",
+  "historical_artifacts_rewritten": false,
+  "profile_restored": false,
+  "secrets_recorded": false,
+  "raw_profile_snapshots_recreated": false
+}

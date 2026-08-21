@@ -34,6 +34,7 @@ V1R2_QUALIFICATION = ROOT / (
     "experiments/research/qnty_agent_orchestration_control_contract_v0/"
     "dsh_multi_agent_orchestration_stage_a_v1r2_native_child_compatibility_qualification_v0/qualification.json"
 )
+V1R2_EXECUTION_PROJECT_ID = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R2_EXECUTION_V0"
 FAKE_CODEX = ROOT / "tests/fixtures/fake_codex_app_server_v0.py"
 
 
@@ -192,7 +193,7 @@ def test_historical_v1r1_execution_remains_closed_blocked_and_unconsumed() -> No
     assert evidence["closure"]["project_state_after"] == "CLOSED_BLOCKED"
 
 
-def test_v1r2_closes_without_active_successor_or_live_authority() -> None:
+def test_v1r2_qualification_closes_and_only_its_execution_successor_is_active() -> None:
     qualification = json.loads(V1R2_QUALIFICATION.read_text(encoding="utf-8"))
     _, _, registry = project_context.load_context_sources(ROOT)
     project = next(record for record in registry["project"] if record["project_id"] == qualification["project_id"])
@@ -205,4 +206,6 @@ def test_v1r2_closes_without_active_successor_or_live_authority() -> None:
     assert qualification["governance"]["fixture_runs"] == 0
     assert project["state"] == "CLOSED_PASS"
     assert project["implementation_authorized"] is False
-    assert [record for record in registry["project"] if record["state"] == "ACTIVE"] == []
+    active = [record for record in registry["project"] if record["state"] == "ACTIVE"]
+    assert [record["project_id"] for record in active] == [V1R2_EXECUTION_PROJECT_ID]
+    assert active[0]["implementation_authorized"] is True

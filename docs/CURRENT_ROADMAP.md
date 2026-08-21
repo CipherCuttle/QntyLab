@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- None.
+- `DSH Stage-A V1R2 one live execution V0` — `ACTIVE`. Execute exactly one Stage-A V1R2 live episode using the canonical runtime and canonical V1R2 native compatibility fingerprints; record exactly one terminal PASS/FAIL/BLOCK outcome; open exactly one draft closure PR; STOP. No second episode and no Stage B.
 
 ## Queued — not authorized
 

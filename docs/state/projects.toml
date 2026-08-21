@@ -5490,3 +5490,79 @@ capital_authority = "NONE"
 qnty_agent_eval = "NOT_APPLICABLE"
 active_project_after_closure = "NONE"
 next_action = "CLOSED_PASS: offline native Codex and Claude compatibility is qualified by executable fingerprint plus zero-model evidence. No live OpenAI, DSH parent, Codex task, Claude task, Stage-A fixture, Stage B, scientific, trading, capital, Qnty, or QntyAgentEval authority follows. A later live episode requires separate Git-backed authorization and this exact preflight."
+
+[[project]]
+project_id = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R2_EXECUTION_V0"
+display_name = "DSH Stage-A V1R2 one live execution V0"
+state = "ACTIVE"
+authority_level = "BOUNDED_ONE_EPISODE_DSH_V1R2_EXECUTION_AND_CLOSURE"
+phase_type = "BOUNDED_LIVE_INFRASTRUCTURE_EXECUTION"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1r2_live_execution_authorization_and_activation_v0/authorization.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1r2_live_execution_authorization_and_activation_v0/hostile_governance_review.md",
+  "tests/test_dsh_stage_a_v1r2_live_execution_authorization_activation_v0.py",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1r2_native_child_compatibility_qualification_v0/qualification.json",
+]
+authorization_state = "AUTHORIZED_IF_CANONICAL"
+authorization_effective = "AFTER_CANONICAL_MERGE_ONLY"
+canonical_predecessor_project_id = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R2_NATIVE_CHILD_COMPATIBILITY_QUALIFICATION_V0"
+canonical_predecessor_pr = 173
+canonical_predecessor_reviewed_head = "d44d87ce974b7cb691a199aef79b68cf84bb768f"
+canonical_predecessor_merge = "c795f2233afe97b2fccbda41e62695cb8a2f84b5"
+qualification_required = "V1R2_NATIVE_CHILD_COMPATIBILITY_CLOSED_PASS"
+implementation_authorized = true
+implementation_completed = false
+episode_consumed = false
+authorized_live_episodes = 1
+second_v1r2_episode_authorized = false
+execution_closure_pr_budget = 1
+activation_consumes_live_episode = false
+activation_consumes_execution_closure_pr_budget = false
+pinned_dsh_commit = "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca"
+pinned_dsh_tree = "3bc8f89fe494a4755c188be354add4e8b1e7b188"
+pinned_dsh_tag = "dsh-v0.1.0-rc.7"
+parent_provider = "openai"
+parent_model = "gpt-5-mini"
+parent_max_request_attempts = 8
+parent_retry_max = 0
+parent_max_tokens = 4096
+spend_ceiling_usd = 1.00
+child_routes = ["subagent_codex", "subagent_claude_code"]
+child_route_providers = ["qntylab-gated-codex", "qntylab-gated-claude-code"]
+raw_providers = ["codex", "claude-code"]
+generic_child_tools = []
+background_delegation = false
+child_infra_retries = 0
+codex_native_fingerprint = "fce6ecefe03ff72403f124456e4976a4a251ede6d1c74a820843ad1e7ee517a6"
+claude_native_fingerprint = "8939d4b139759c12f240fdcba81661b5e8d59d53f769722baab001dea3f8180b"
+claude_sdk_package = "@anthropic-ai/claude-agent-sdk"
+claude_sdk_version = "0.3.220"
+version_namespace_equality = "NEVER_USED"
+codex_max_initial = 1
+codex_max_repair = 1
+codex_max_total = 2
+claude_max_initial = 1
+claude_max_rereview = 1
+claude_max_total = 2
+claude_hard_read_only = true
+prelive_boot_ready_required = true
+fingerprint_match_required = true
+runtime_repairs_authorized = false
+authorization_phase_live_openai_calls = 0
+authorization_phase_live_dsh_calls = 0
+authorization_phase_live_codex_calls = 0
+authorization_phase_live_claude_calls = 0
+authorization_phase_fixture_runs = 0
+authorization_phase_secret_read = false
+authorization_phase_spend_usd = 0.0
+stage_b_authorized = false
+scientific_execution_authorized = false
+qnty_runtime_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+qnty_agent_eval = "NOT_APPLICABLE"
+active_project_after_closure = "NONE"
+next_action = "Execute exactly one Stage-A V1R2 live episode using the canonical runtime and canonical V1R2 native compatibility fingerprints; record exactly one terminal PASS/FAIL/BLOCK outcome; open exactly one draft closure PR; STOP. No second episode and no Stage B."

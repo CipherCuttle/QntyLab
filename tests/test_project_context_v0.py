@@ -139,26 +139,26 @@ def test_active_project_with_implementation_false_remains_unauthorized(tmp_path:
     assert registry["ONE"]["implementation_authorized"] is False
 
 
-def test_dsh_stage_a_v1_activation_bridge_is_single_bounded_active_project() -> None:
+def test_dsh_stage_a_v1_execution_closure_is_single_bounded_blocked_project() -> None:
     data = project_context.context_data(ROOT)
     _, _, registry = project_context.load_context_sources(ROOT)
     active = [record for record in registry["project"] if record["state"] == "ACTIVE"]
-    assert [record["project_id"] for record in active] == [DSH_STAGE_A_V1_EXECUTION_PROJECT_ID]
-    execution = active[0]
+    assert active == []
+    execution = next(record for record in registry["project"] if record["project_id"] == DSH_STAGE_A_V1_EXECUTION_PROJECT_ID)
     authorization = next(record for record in registry["project"] if record["project_id"] == DSH_STAGE_A_V1_AUTHORIZATION_PROJECT_ID)
 
-    assert data["active_project"]["project_id"] == DSH_STAGE_A_V1_EXECUTION_PROJECT_ID
-    assert data["current_permitted_next_action"] == "Execute exactly one V1 episode, record PASS/FAIL/BLOCK, open exactly one draft closure PR, stop; no second episode, no Stage B."
-    assert "No project implementation is currently authorized." not in data["current_permitted_next_action"]
-    assert execution["implementation_authorized"] is True
-    assert execution["implementation_completed"] is False
+    assert data["active_project"] is None
+    assert data["current_permitted_next_action"] == "No project implementation is currently authorized."
+    assert execution["state"] == "CLOSED_BLOCKED"
+    assert execution["implementation_authorized"] is False
+    assert execution["implementation_completed"] is True
     assert execution["authorization_project_id"] == DSH_STAGE_A_V1_AUTHORIZATION_PROJECT_ID
     assert execution["authorization_pr"] == 167
     assert execution["authorization_merge_sha"] == "c3d8f9d99c0400b2c5fd407068e96ee419d0028f"
     assert execution["episode_consumed"] is False
     assert execution["activation_consumes_live_episode"] is False
     assert execution["activation_consumes_execution_closure_pr_budget"] is False
-    assert execution["authorized_live_episodes"] == 1
+    assert execution["authorized_live_episodes"] == 0
     assert execution["second_v1_episode_authorized"] is False
     assert execution["execution_closure_pr_budget"] == 1
     assert execution["stage_b_authorized"] is False
@@ -255,11 +255,11 @@ def test_human_context_does_not_claim_no_queued_projects() -> None:
 def test_funding_incremental_implementation_freeze_is_closed_without_escalation() -> None:
     data = project_context.context_data(ROOT)
     _, _, registry = project_context.load_context_sources(ROOT)
-    # The source-bound implementation freeze is complete and remains closed;
-    # the separate Stage-A V1 activation bridge is the sole ACTIVE project.
-    assert [record["project_id"] for record in registry["project"] if record["state"] == "ACTIVE"] == [DSH_STAGE_A_V1_EXECUTION_PROJECT_ID]
-    assert data["active_project"]["project_id"] == DSH_STAGE_A_V1_EXECUTION_PROJECT_ID
-    assert data["current_permitted_next_action"] == data["active_project"]["next_action"]
+    # The source-bound implementation freeze and the blocked Stage-A V1
+    # execution are closed; no implementation project remains active.
+    assert [record["project_id"] for record in registry["project"] if record["state"] == "ACTIVE"] == []
+    assert data["active_project"] is None
+    assert data["current_permitted_next_action"] == "No project implementation is currently authorized."
     _assert_project_is_not_active(registry, FUNDING_INCREMENTAL_IMPLEMENTATION_PROJECT_ID)
     _assert_project_is_not_current_active(data, FUNDING_INCREMENTAL_IMPLEMENTATION_PROJECT_ID)
     project = next(

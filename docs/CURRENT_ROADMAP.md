@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- `DSH Stage-A V1 execution V0` — `ACTIVE`. Execute exactly one V1 episode, record PASS/FAIL/BLOCK, open exactly one draft closure PR, stop; no second episode, no Stage B.
+- None.
 
 ## Queued — not authorized
 
@@ -20,6 +20,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 ## Closed / stale
 
 - `DSH multi-agent orchestration Stage-A authorization V0` — `CLOSED_PASS`. After canonical merge, execute exactly one DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_EXECUTION_V0 phase: build the runnable profile from the pinned DSH commit plus the canonical repaired Codex-provider materialization, run the frozen bounded lifecycle (Codex implements the STAGE_A_BOUNDED_RETRY_V0 fixture in a disposable copy, Claude independently hostile-reviews, at most one repair and one targeted rereview if a Critical/High is found), keep OPENAI_API_KEY scoped to the DSH parent process only, keep total parent-model spend under the frozen $1.00 ceiling, record PASS/FAIL/BLOCK evidence, open one draft execution/closure PR, and stop. No second fixture, no benchmark suite, no permission-forensics reopening.
+- `DSH Stage-A V1 execution V0` — `CLOSED_BLOCKED`. CLOSED_BLOCKED: the one authorized V1 execution attempt failed before session materialization because the gated-provider fibers loaded before the raw codex and claude-code providers. No parent request, child call, fixture test, review, spend, or rescue run occurred. Do not repair or rerun this authorization; publish exactly one draft execution/closure PR, then stop. No Stage B.
 - `DSH Stage-A V1 hard orchestration authorization V0` — `CLOSED_PASS`. After canonical merge, execute exactly one separately recorded DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1_EXECUTION_V0 phase under the frozen hard-gated profile; record PASS/FAIL/BLOCK; open one draft execution/closure PR; STOP. No Stage B follows automatically.
 - `JFPV3 prospective shadow activation and forward collection authorization` — `CLOSED_PASS`. CLOSED_PASS: Canonicalize this authorization, then execute exactly one real activate-shadow, verify the committed 365-origin schedule, and stop before any origin collection unless an origin is actually due. No scientific inference or terminal evaluation is authorized.
 - `JFPV3 PR-B R2 activation persistence and forward runner implementation authorization` — `CLOSED_PASS`. CLOSED_PASS: R2 activation persistence and forward runner are implemented and frozen from canonical PR #100 lineage. No real activation, market-data access, scientific execution, inference, Jigsaw, State Snapshot, Router, Qnty, trading, promotion, or capital authority was granted. Separately authorize or execute activation only after this R2 implementation is canonicalized and only under a new bounded authority.

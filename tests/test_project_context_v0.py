@@ -17,6 +17,8 @@ PROSPECTIVE_SHADOW_AUTHORIZATION_PROJECT_ID = "JFPV3_PROSPECTIVE_SHADOW_ACTIVATI
 JH01_REAL_OPERATION_AUTHORIZATION_PROJECT_ID = "JH01_V1_REAL_ACTIVATION_AND_FORWARD_RECORDER_IMPLEMENTATION_V0"
 JH01_REAL_PROSPECTIVE_AUTHORIZATION_PROJECT_ID = "JH01_V1_REAL_PROSPECTIVE_OPERATION_AUTHORIZATION_V0"
 FUNDING_INCREMENTAL_IMPLEMENTATION_PROJECT_ID = "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_EXECUTION_IMPLEMENTATION_V0"
+DSH_STAGE_A_V1_AUTHORIZATION_PROJECT_ID = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1_HARD_ORCHESTRATION_AUTHORIZATION_V0"
+DSH_STAGE_A_V1_EXECUTION_PROJECT_ID = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1_EXECUTION_V0"
 
 
 def _assert_project_is_not_active(registry: dict, project_id: str) -> None:
@@ -128,6 +130,52 @@ def test_non_active_project_cannot_authorize_implementation(tmp_path: Path, stat
         project_context.validate_projects_registry(_tracked_root(tmp_path), {"schema_version": 1, "project": [_project(state=state)]})
 
 
+def test_active_project_with_implementation_false_remains_unauthorized(tmp_path: Path) -> None:
+    registry = project_context.validate_projects_registry(
+        _tracked_root(tmp_path),
+        {"schema_version": 1, "project": [_project(implementation_authorized=False)]},
+    )
+    assert registry["ONE"]["state"] == "ACTIVE"
+    assert registry["ONE"]["implementation_authorized"] is False
+
+
+def test_dsh_stage_a_v1_activation_bridge_is_single_bounded_active_project() -> None:
+    data = project_context.context_data(ROOT)
+    _, _, registry = project_context.load_context_sources(ROOT)
+    active = [record for record in registry["project"] if record["state"] == "ACTIVE"]
+    assert [record["project_id"] for record in active] == [DSH_STAGE_A_V1_EXECUTION_PROJECT_ID]
+    execution = active[0]
+    authorization = next(record for record in registry["project"] if record["project_id"] == DSH_STAGE_A_V1_AUTHORIZATION_PROJECT_ID)
+
+    assert data["active_project"]["project_id"] == DSH_STAGE_A_V1_EXECUTION_PROJECT_ID
+    assert data["current_permitted_next_action"] == "Execute exactly one V1 episode, record PASS/FAIL/BLOCK, open exactly one draft closure PR, stop; no second episode, no Stage B."
+    assert "No project implementation is currently authorized." not in data["current_permitted_next_action"]
+    assert execution["implementation_authorized"] is True
+    assert execution["implementation_completed"] is False
+    assert execution["authorization_project_id"] == DSH_STAGE_A_V1_AUTHORIZATION_PROJECT_ID
+    assert execution["authorization_pr"] == 167
+    assert execution["authorization_merge_sha"] == "c3d8f9d99c0400b2c5fd407068e96ee419d0028f"
+    assert execution["episode_consumed"] is False
+    assert execution["activation_consumes_live_episode"] is False
+    assert execution["activation_consumes_execution_closure_pr_budget"] is False
+    assert execution["authorized_live_episodes"] == 1
+    assert execution["second_v1_episode_authorized"] is False
+    assert execution["execution_closure_pr_budget"] == 1
+    assert execution["stage_b_authorized"] is False
+    assert execution["qnty_agent_eval"] == "NOT_APPLICABLE"
+    assert execution["scientific_execution_authorized"] is False
+    assert execution["qnty_runtime_authority"] == "NONE"
+    assert execution["trading_authority"] == "NONE"
+    assert execution["capital_authority"] == "NONE"
+    assert execution["upstream_dsh_mutation_authorized"] is False
+    assert execution["live_openai_calls"] == execution["live_dsh_calls"] == 0
+    assert execution["live_codex_calls"] == execution["live_claude_calls"] == 0
+    assert execution["spend_usd"] == 0.0
+    assert authorization["state"] == "CLOSED_PASS"
+    assert authorization["implementation_authorized"] is False
+    assert authorization["authorization_state"] == "AUTHORIZED_IF_CANONICAL"
+
+
 def test_project_supersession_targets_self_and_cycles_fail(tmp_path: Path) -> None:
     root = _tracked_root(tmp_path)
     with pytest.raises(project_context.ProjectContextError, match="does not resolve"):
@@ -207,12 +255,11 @@ def test_human_context_does_not_claim_no_queued_projects() -> None:
 def test_funding_incremental_implementation_freeze_is_closed_without_escalation() -> None:
     data = project_context.context_data(ROOT)
     _, _, registry = project_context.load_context_sources(ROOT)
-    # The source-bound implementation freeze is complete, so it is no longer
-    # ACTIVE and no successor phase is authorized: the registry has no ACTIVE
-    # project at all.
-    assert [record["project_id"] for record in registry["project"] if record["state"] == "ACTIVE"] == []
-    assert data["active_project"] is None
-    assert data["current_permitted_next_action"] == "No project implementation is currently authorized."
+    # The source-bound implementation freeze is complete and remains closed;
+    # the separate Stage-A V1 activation bridge is the sole ACTIVE project.
+    assert [record["project_id"] for record in registry["project"] if record["state"] == "ACTIVE"] == [DSH_STAGE_A_V1_EXECUTION_PROJECT_ID]
+    assert data["active_project"]["project_id"] == DSH_STAGE_A_V1_EXECUTION_PROJECT_ID
+    assert data["current_permitted_next_action"] == data["active_project"]["next_action"]
     _assert_project_is_not_active(registry, FUNDING_INCREMENTAL_IMPLEMENTATION_PROJECT_ID)
     _assert_project_is_not_current_active(data, FUNDING_INCREMENTAL_IMPLEMENTATION_PROJECT_ID)
     project = next(

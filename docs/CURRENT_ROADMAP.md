@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- None.
+- `DSH Stage-A V1 execution V0` — `ACTIVE`. Execute exactly one V1 episode, record PASS/FAIL/BLOCK, open exactly one draft closure PR, stop; no second episode, no Stage B.
 
 ## Queued — not authorized
 

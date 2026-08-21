@@ -147,3 +147,68 @@ change, and leave every other authorization field unchanged.
 
 Conclusion: ACCEPTABLE GOVERNANCE-ONLY AUTHORIZATION, effective only after
 canonical merge and bounded to one later Stage-A execution/closure PR.
+
+## Post-publication closure repair — H-02
+
+**Source:** an external pre-merge closure review of the published draft PR
+#165, not a self-generated finding.
+
+**H-02 — RUNNABLE_PROFILE_NOT_FROZEN_AT_AUTHORIZATION_CLOSURE.** The
+authorization required this phase to freeze the exact reproducible runnable
+DSH profile/materialization path. The published candidate instead deferred
+the exact build step, the exact `cordis.patch.yml` provider registration, and
+the byte-identity gate to `later_phase_must_establish` — prose requiring the
+*execution* phase to invent the profile, not a frozen contract for it to
+*consume*. That is a real gap against the phase's own closure criteria, not a
+manufactured one: this candidate's own VERIFY report before publication
+already flagged `RUNNABLE_PROFILE_DEFINED = PARTIALLY`.
+
+**Repair (this commit):** replaced the deferred prose with a frozen,
+file-backed contract:
+
+- `profile/package.json` and `profile/cordis.patch.yml` — byte-exact profile
+  files, digested in `authorization.json.runnable_profile_composition.profile_files_sha256`.
+  The `cordis.patch.yml` insert/id-patch shapes are not invented: they are
+  adapted directly from two real files in the pinned source tree
+  (`examples/acp-agent/product-subagent-both.cordis.yml` for the
+  subagent-codex/subagent-claude-code insert entries, and
+  `examples/headless-agent/tests/fixtures/headless-profile.cordis.yml` for
+  the `agent-default-model` id-patch shape), and parsed with PyYAML in this
+  repository's own test suite to confirm they produce the exact intended
+  structure.
+- `profile/PROFILE.md` — the seven-step deterministic procedure (reference
+  checkout → disposable build root → call the existing unmodified
+  `materialize_provider_boundary` → build → compose the frozen profile →
+  two offline verification gates → only then the later phase's one live
+  call), naming exact function calls and exact CLI invocations
+  (`--dump-config`, documented by the pinned `apps/cli` README as inspecting
+  the composed plugin tree with no model or network call) rather than
+  prose intentions.
+- `authorization.json.runnable_profile_composition` renamed its governing
+  field from `later_phase_must_establish` to
+  `later_phase_must_materialize_and_verify` and now points at these frozen
+  files instead of describing them abstractly.
+
+**H-01's spend controls, model selection, child routes, and synthetic task
+are unchanged by this repair** — verified: `gpt-5-mini`, the `$1.00`
+ceiling, the 8-step budget, the `4096`-token output override, the
+parent-only `OPENAI_API_KEY` scope, and native Codex/Claude auth are
+byte-identical to the previously reviewed values, and the `cordis.patch.yml`
+frozen here encodes the exact same `maxTokens: 4096` / `maxRetries: 2` /
+`gpt-5-mini` values as H-01's repair, not new ones.
+
+**Live calls during this repair:** 0. **Authorization spend:** $0.
+
+**Review-budget status:** the phase's frozen `review_policy` authorized
+exactly one hostile review plus one targeted rereview, and both were already
+consumed closing H-01. Per explicit instruction, no second independent
+rereview was performed for H-02 — this repair is recorded as an externally
+discovered, pre-merge closure-blocking fix applied directly, not as a second
+rereview invented under the original budget. If canonical QntyLab governance
+requires an independent rereview of a post-publication High repair before
+this candidate may be treated as merge-ready, that is a distinct budget this
+phase does not have standing authority to grant itself; it would require
+explicit user extension before being performed.
+
+Critical (H-02 pass): 0. High (H-02 pass): 1, repaired as above. Medium: 0.
+Low: 0.

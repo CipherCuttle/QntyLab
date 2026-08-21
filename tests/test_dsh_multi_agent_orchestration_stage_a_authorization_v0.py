@@ -2,6 +2,8 @@ import hashlib
 import json
 from pathlib import Path
 
+import yaml
+
 
 ROOT = Path(__file__).resolve().parents[1]
 ARTIFACT = ROOT / "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_authorization_v0"
@@ -38,12 +40,73 @@ def test_canonical_repaired_provider_path_and_contract_are_bound():
     assert identities["repair_semantic_delta_count"] == 2
 
 
-def test_profile_composition_requires_byte_identity_gate_and_forbids_raw_upstream():
+def test_profile_composition_is_frozen_not_deferred_to_the_later_phase():
     composition = auth()["runnable_profile_composition"]
+    assert composition["frozen"] is True
     assert composition["raw_upstream_fallback_prohibited"] is True
-    joined = " ".join(composition["later_phase_must_establish"])
-    assert "byte-identity check" in joined
-    assert "postimage digest" in joined
+    assert "later_phase_must_establish" not in composition
+    steps = composition["later_phase_must_materialize_and_verify"]
+    assert "materialize_provider_boundary" in steps["step_3_materialize"]
+    assert "captured_thread_start_contract" in steps["step_6a_provider_identity_gate"]
+    assert "--dump-config" in steps["step_6b_composition_identity_gate"]
+
+
+def test_frozen_profile_files_exist_and_match_digests():
+    composition = auth()["runnable_profile_composition"]
+    profile_root = ROOT / composition["profile_files_root"]
+    for relative, expected_digest in composition["profile_files_sha256"].items():
+        path = profile_root / Path(relative).relative_to("profile")
+        assert path.is_file(), f"missing profile file: {relative}"
+        actual = hashlib.sha256(path.read_bytes()).hexdigest()
+        assert actual == expected_digest, f"profile file digest drift: {relative}"
+
+
+def test_frozen_cordis_patch_registers_exactly_the_intended_plugins():
+    composition = auth()["runnable_profile_composition"]
+    profile_root = ROOT / composition["profile_files_root"]
+    patch = yaml.safe_load((profile_root / "cordis.patch.yml").read_text(encoding="utf-8"))
+
+    inserted_ids = {entry["id"] for item in patch if "insert" in item for entry in item["insert"]}
+    assert inserted_ids == {"subagent-codex", "subagent-claude-code", "llm-pi-ai"}
+
+    id_patches = {item["id"]: item for item in patch if "id" in item}
+    assert id_patches["agent-default-model"]["config"] == {"provider": "openai", "model": "gpt-5-mini"}
+
+    llm_entry = next(
+        entry
+        for item in patch if "insert" in item
+        for entry in item["insert"]
+        if entry["id"] == "llm-pi-ai"
+    )
+    openai_route = llm_entry["config"]["providers"]["openai"]
+    assert set(llm_entry["config"]["providers"]) == {"openai"}
+    assert openai_route["apiKeyEnv"] == "OPENAI_API_KEY"
+    assert openai_route["retryPolicy"]["maxRetries"] == 2
+    assert openai_route["models"] == [{"id": "gpt-5-mini", "maxTokens": 4096}]
+
+
+def test_frozen_profile_package_json_declares_exactly_the_headless_bundles():
+    composition = auth()["runnable_profile_composition"]
+    profile_root = ROOT / composition["profile_files_root"]
+    manifest = json.loads((profile_root / "package.json").read_text(encoding="utf-8"))
+    assert manifest["dsh"]["profile"]["bundles"] == ["@deepseek-ai/dsh-base", "@deepseek-ai/dsh-headless"]
+
+
+def test_frozen_profile_matches_h01_spend_controls_exactly():
+    value = auth()
+    route = value["parent_model_route"]
+    composition = value["runnable_profile_composition"]
+    profile_root = ROOT / composition["profile_files_root"]
+    patch = yaml.safe_load((profile_root / "cordis.patch.yml").read_text(encoding="utf-8"))
+    llm_entry = next(
+        entry
+        for item in patch if "insert" in item
+        for entry in item["insert"]
+        if entry["id"] == "llm-pi-ai"
+    )
+    model_override = llm_entry["config"]["providers"]["openai"]["models"][0]
+    assert model_override["id"] == route["model_id"]
+    assert model_override["maxTokens"] == route["max_output_tokens_per_call_override"]
 
 
 def test_authorization_has_exactly_one_synthetic_fixture():

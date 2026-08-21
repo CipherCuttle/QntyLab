@@ -56,21 +56,32 @@
     "pi_ai_openai_catalog_path": "packages/llm/llm-pi-ai/node_modules/@earendil-works/pi-ai/dist/providers/data/openai.json"
   },
   "runnable_profile_composition": {
-    "base_local_profile_root": "~/.dsh/profiles/headless",
+    "frozen": true,
+    "profile_files_root": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_authorization_v0/profile",
+    "procedure_doc": "profile/PROFILE.md",
+    "profile_package_json": "profile/package.json",
+    "profile_cordis_patch_yml": "profile/cordis.patch.yml",
+    "profile_files_sha256": {
+      "profile/package.json": "75586a8cd5e840f32e172e7350a474e439f5fd26a70c89c9222a67b615da4f27",
+      "profile/cordis.patch.yml": "dbe03a13b674298a26c9c414fc16d53dd6eb68c52aa090714ef70ce1dc374bf9",
+      "profile/PROFILE.md": "24129eaabe85dec4e5e84416934579c4e610865965ec9596203edc62e523c1d3"
+    },
     "base_bundles": ["@deepseek-ai/dsh-base", "@deepseek-ai/dsh-headless"],
-    "required_additional_bundles_or_patches": [
-      "subagent-codex provider, configured to consume the QntyLab-materialized repaired provider source in place of the raw upstream packages/subagent/subagent-codex/src/wire.ts",
-      "subagent-claude-code provider",
-      "llm-pi-ai provider registered with an 'openai' route"
-    ],
-    "current_local_profile_state": "EMPTY_SCAFFOLD_NO_PATCHES_APPLIED",
-    "materializer_output_contract": "qntylab/pinned_dsh_provider_boundary_repair_v0.py emits repaired provider source into a QntyLab-owned output root only; it does not run DSH/Codex and does not mutate the pinned upstream checkout",
-    "later_phase_must_establish": [
-      "exact build step substituting the materialized repaired provider source into a pinned-commit DSH checkout before `pnpm install && pnpm run build`",
-      "exact cordis.patch.yml entries registering subagent-codex, subagent-claude-code, and llm-pi-ai(openai) in one profile",
-      "byte-identity check that the running build's provider source matches the materializer's postimage digest before any live call"
-    ],
-    "raw_upstream_fallback_prohibited": true
+    "registered_plugin_ids": ["subagent-codex", "subagent-claude-code", "llm-pi-ai", "agent-default-model"],
+    "registered_plugin_ids_source": "cordis.patch.yml insert/id-patch entries, adapted from real pinned-source examples: examples/acp-agent/product-subagent-both.cordis.yml (subagent-codex/subagent-claude-code insert shape) and examples/headless-agent/tests/fixtures/headless-profile.cordis.yml (agent-default-model id-patch shape); parsed and structurally verified against PyYAML in this repository's tests",
+    "materializer_output_contract": "qntylab/pinned_dsh_provider_boundary_repair_v0.py's materialize_provider_boundary(source_root, output_root) emits the repaired provider source into a QntyLab-owned output root only; it does not run DSH/Codex and does not mutate the pinned upstream checkout",
+    "later_phase_must_materialize_and_verify": {
+      "step_1_reference_checkout": "source_root = pristine checkout of pinned commit 99f6f02fecdb7dff40c3fbc9470f5907c29f74ca, never written to",
+      "step_2_disposable_build_root": "build_root = full copy of source_root, outside the upstream checkout",
+      "step_3_materialize": "call materialize_provider_boundary(source_root, build_root) unmodified; record returned postimage_source_sha256",
+      "step_4_build": "cd build_root && pnpm install && pnpm run build",
+      "step_5_compose_profile": "copy this frozen profile/package.json and profile/cordis.patch.yml byte-exact to $DSH_HOME/profiles/stage-a-v0/ (a disposable Stage-A-only profile, not the ambient headless profile)",
+      "step_6a_provider_identity_gate": "call captured_thread_start_contract(build_root/packages/subagent/subagent-codex/src/wire.ts); a clean return (no ProviderBoundaryError) is the byte-identity proof against raw upstream source",
+      "step_6b_composition_identity_gate": "run build_root/apps/cli/lib/bin.js --profile stage-a-v0 --dump-config (documented by the pinned CLI as inspecting the composed plugin tree with no model or network call) and assert it contains exactly registered_plugin_ids with the frozen config and no other llm-* or subagent-* plugin",
+      "step_7_only_then_live": "only after 6a and 6b both pass may the later phase run build_root/apps/cli/lib/bin.js --profile stage-a-v0 \"<task>\" for its one authorized parent episode"
+    },
+    "raw_upstream_fallback_prohibited": true,
+    "raw_upstream_fallback_structurally_excluded": "source_root is never built or run directly in this procedure; only the verified build_root is ever invoked"
   },
   "parent_model_route": {
     "provider_package": "@deepseek-ai/dsh-llm-pi-ai",

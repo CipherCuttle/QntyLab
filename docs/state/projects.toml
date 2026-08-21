@@ -5090,3 +5090,62 @@ capital_authority = "NONE"
 downstream_authority = "NONE"
 active_project_after_closure = "NONE"
 next_action = "MERGE_PR_164_WHEN_EXACT_HEAD_CI_IS_GREEN_THEN_RETURN_TO_PARENT_ORCHESTRATION_WORK"
+
+[[project]]
+project_id = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_AUTHORIZATION_V0"
+display_name = "DSH multi-agent orchestration Stage-A authorization V0"
+state = "CLOSED_PASS"
+authority_level = "GOVERNANCE_AUTHORIZATION_FOR_ONE_LATER_EXECUTION_PHASE_ONLY"
+phase_type = "GOVERNANCE_ONLY_STAGE_A_AUTHORIZATION"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_authorization_v0/authorization.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_authorization_v0/hostile_governance_review.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_authorization_v0/fixture/retry.py",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_authorization_v0/fixture/tests/test_retry.py",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_authorization_v0/fixture/TASK.md",
+  "tests/test_dsh_multi_agent_orchestration_stage_a_authorization_v0.py",
+]
+predecessor_project_id = "PINNED_DSH_CODEX_PROVIDER_BOUNDARY_FINAL_CLOSEOUT_V0"
+predecessor_pr = 164
+predecessor_canonical_master = "0424212f922d4028527025b77be6a96cb3adf3c3"
+predecessor_outcome = "CLOSED_PASS_CONSERVATIVE_REPAIR"
+authorization_expected_pr = 165
+later_execution_project_id = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_EXECUTION_V0"
+later_expected_pr = 166
+authorization_effective = "AFTER_CANONICAL_MERGE_ONLY"
+implementation_authorized = false
+later_execution_prs_authorized = 1
+later_separate_forensic_prs_authorized = 0
+later_additional_authorization_prs_authorized = 0
+live_dsh_invocations_authorized = 0
+codex_invocations_authorized = 0
+claude_invocations_authorized = 0
+parent_api_calls_authorized_this_phase = 0
+parent_model_provider = "@deepseek-ai/dsh-llm-pi-ai"
+parent_model_id = "gpt-5-mini"
+parent_model_auth_route = "OPENAI_API_KEY"
+parent_spend_authority = true
+parent_spend_authority_source = "explicit user instruction, this conversation"
+parent_spend_ceiling_usd = 1.00
+parent_spend_ceiling_applies_to = "later_execution_phase_only"
+codex_child_route = "native codex app-server / host Codex auth"
+claude_child_route = "native claude via Agent SDK / host Claude Code auth"
+api_key_child_override_prohibited = true
+synthetic_fixture_id = "STAGE_A_BOUNDED_RETRY_V0"
+single_fixture_only = true
+benchmark_suite_authorized = false
+trust_forensics_reopening_authorized = false
+profile_mutation_authorized = false
+codex_home_mutation_authorized = false
+upstream_dsh_mutation_authorized = false
+qnty_agent_eval = "NOT_APPLICABLE"
+scientific_execution_authorized = false
+qnty_runtime_authority = "NONE"
+trading_authority = "NONE"
+promotion_authority = "NONE"
+capital_authority = "NONE"
+downstream_authority = "NONE"
+active_project_after_closure = "NONE"
+next_action = "After canonical merge, execute exactly one DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_EXECUTION_V0 phase: build the runnable profile from the pinned DSH commit plus the canonical repaired Codex-provider materialization, run the frozen bounded lifecycle (Codex implements the STAGE_A_BOUNDED_RETRY_V0 fixture in a disposable copy, Claude independently hostile-reviews, at most one repair and one targeted rereview if a Critical/High is found), keep OPENAI_API_KEY scoped to the DSH parent process only, keep total parent-model spend under the frozen $1.00 ceiling, record PASS/FAIL/BLOCK evidence, open one draft execution/closure PR, and stop. No second fixture, no benchmark suite, no permission-forensics reopening."

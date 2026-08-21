@@ -5570,3 +5570,57 @@ qnty_agent_eval = "NOT_APPLICABLE"
 active_project_after_closure = "NONE"
 terminal_outcome = "STAGE_A_V1R2_BLOCK_PARENT_INFRA"
 next_action = "CLOSED_BLOCKED: the one authorized V1R2 episode stopped before DSH boot and before paid parent dispatch because the disposable fixture cwd could not resolve the runtime tsx loader. No rescue rerun, runtime repair, second episode, or Stage B is authorized. Review the single draft execution/closure PR, then stop. Any later V1R2 attempt requires new Git-backed authority."
+
+[[project]]
+project_id = "DSH_STAGE_A_V1R3_LAUNCH_PLANE_QUALIFICATION_V0"
+display_name = "DSH Stage-A V1R3 launch-plane qualification V0"
+state = "CLOSED_PARTIAL_LAUNCH_PLANE_CONTRACT_ONLY"
+authority_level = "BOUNDED_OFFLINE_LAUNCH_PLANE_QUALIFICATION"
+phase_type = "BOUNDED_OFFLINE_INFRASTRUCTURE_QUALIFICATION"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3_launch_plane_qualification_v0/PHASE.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3_launch_plane_qualification_v0/qualification.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3_launch_plane_qualification_v0/hostile_review.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3_launch_plane_qualification_v0/materializer/qntylab-materialize-dsh-runtime.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3_launch_plane_qualification_v0/launcher/qntylab-launch-dsh.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3_launch_plane_qualification_v0/repairs/codex-executable-binding.patch",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3_launch_plane_qualification_v0/mock/qualification-openai-mock.mjs",
+  "tests/test_dsh_stage_a_v1r3_launch_plane_qualification.py",
+]
+authorization_state = "AUTHORIZED_IF_CANONICAL"
+authorization_effective = "AFTER_CANONICAL_MERGE_ONLY"
+canonical_predecessor_project_id = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R2_EXECUTION_V0"
+canonical_predecessor_pr = 175
+canonical_predecessor_reviewed_head = "f3c864bead33d383a581200d582d1e62baca02c6"
+canonical_predecessor_merge = "549e8e947086aeef1ec18ea77dfb18e6f30f36ac"
+qualification_required = "NONE_THIS_IS_THE_QUALIFICATION_PHASE"
+implementation_authorized = true
+implementation_completed = true
+episode_consumed = false
+live_materialization_executed = false
+live_dsh_boot_executed = false
+codex_executable_binding_repair_landed = false
+pinned_dsh_commit = "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca"
+pinned_dsh_tree = "3bc8f89fe494a4755c188be354add4e8b1e7b188"
+pinned_dsh_tag = "dsh-v0.1.0-rc.7"
+offline_node_tests_total = 15
+offline_node_tests_pass = 15
+offline_node_tests_fail = 0
+mock_parent_requests = 0
+external_parent_requests = 0
+paid_model_requests = 0
+codex_model_turns = 0
+claude_model_turns = 0
+spend_usd = 0.0
+secret_read = false
+stage_b_authorized = false
+scientific_execution_authorized = false
+qnty_runtime_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+qnty_agent_eval = "NOT_APPLICABLE"
+active_project_after_closure = "NONE"
+terminal_outcome = "STAGE_A_V1R3_CLOSED_PARTIAL_LAUNCH_PLANE_CONTRACT_ONLY"
+next_action = "CLOSED_PARTIAL: the materializer/launcher/manifest/executable-identity contract and its offline test suite are implemented and pass (15/15), but no real pinned-commit materialization, no landed Codex executable-binding repair compile, and no end-to-end full-profile loopback-mock boot were executed in this offline environment (no network clone access, no populated offline pnpm store). No QUALIFIED_LAUNCH_CONTRACT_DIGEST is issued by this phase. A later phase must run real materialization against commit 99f6f02fecdb7dff40c3fbc9470f5907c29f74ca, land and compile the Codex repair, and execute the full-profile mock boot before any live episode may cite this phase. No live episode, Stage-A fixture execution, Qnty/QntyAgentEval, trading/capital action, or Stage B is authorized by this phase."

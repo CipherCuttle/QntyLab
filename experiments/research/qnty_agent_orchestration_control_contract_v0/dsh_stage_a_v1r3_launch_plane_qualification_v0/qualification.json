@@ -1,0 +1,84 @@
+{
+  "schema_version": "dsh-stage-a-v1r3-launch-plane-qualification-v0",
+  "artifact_type": "DSH_STAGE_A_V1R3_LAUNCH_PLANE_QUALIFICATION",
+  "project_id": "DSH_STAGE_A_V1R3_LAUNCH_PLANE_QUALIFICATION_V0",
+  "display_name": "DSH Stage-A V1R3 launch-plane qualification V0",
+  "authority": "BOUNDED_OFFLINE_LAUNCH_PLANE_QUALIFICATION",
+  "qualification": "CLOSED_PARTIAL_LAUNCH_PLANE_CONTRACT_ONLY",
+  "canonical_reconciliation": {
+    "origin_master_at_authorization": "549e8e947086aeef1ec18ea77dfb18e6f30f36ac",
+    "pr175_head": "f3c864bead33d383a581200d582d1e62baca02c6",
+    "pr175_state": "MERGED",
+    "canonical_predecessor_merge": "549e8e947086aeef1ec18ea77dfb18e6f30f36ac",
+    "historical_v1r2_execution_project": "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R2_EXECUTION_V0",
+    "historical_v1r2_terminal": "STAGE_A_V1R2_BLOCK_PARENT_INFRA",
+    "historical_v1r2_episode_consumed": false,
+    "historical_v1r2_root_cause": "LAUNCH_PLANE_NOT_HERMETIC"
+  },
+  "root_cause_addressed": {
+    "code": "LAUNCH_PLANE_NOT_HERMETIC",
+    "contributing_causes": [
+      "runtime_materialization_not_part_of_qualified_graph",
+      "caller_cwd_was_only_workspace_isolation_mechanism",
+      "executable_identity_binding_asymmetric_node_python_codex_claude"
+    ]
+  },
+  "changeset": {
+    "materializer": "materializer/qntylab-materialize-dsh-runtime.mjs",
+    "launcher": "launcher/qntylab-launch-dsh.mjs",
+    "codex_repair_patch": "repairs/codex-executable-binding.patch",
+    "mock": "mock/qualification-openai-mock.mjs",
+    "offline_test_suite": "test/qntylab-dsh-v1r3.test.mjs",
+    "python_test_wrapper": "tests/test_dsh_stage_a_v1r3_launch_plane_qualification.py"
+  },
+  "offline_test_results": {
+    "runner": "node --test",
+    "tests_total": 19,
+    "tests_pass": 19,
+    "tests_fail": 0,
+    "coverage_notes": [
+      "preflightLaunch happy path: manifest, fingerprint, and built-CLI identity resolution",
+      "FAIL_WORKSPACE_ISOLATION: workspace inside forbidden root",
+      "FAIL_WORKSPACE_ISOLATION: workspace symlink-equivalent to forbidden root",
+      "FAIL_WORKSPACE_ISOLATION: workspace inside materialization root",
+      "FAIL_WORKSPACE_ISOLATION: workspace leaf not-yet-existing with a symlinked ancestor (hostile-review Critical #1 regression)",
+      "BLOCK_EXECUTABLE_IDENTITY: fingerprint mismatch (altered/decoy binary)",
+      "BLOCK_LAUNCH_ARGV: missing required absolute flag",
+      "BLOCK_RUNTIME_IDENTITY: manifest chunk resolving outside materialization root",
+      "BLOCK_RUNTIME_IDENTITY: manifest missing builtCliDigest (hostile-review High #4 regression)",
+      "spawnDsh executes preflight-resolved realpath, not a post-preflight symlink swap (hostile-review High #2 regression)",
+      "spawnDsh propagates fingerprint-verified codex/claude executable paths into child env (hostile-review High #3 partial mitigation)",
+      "spawnDsh caller-cwd irrelevance across 4 distinct caller cwds -> identical child cwd",
+      "verifySourceIdentity: matching and mismatched commit/tag via real git",
+      "applyCanonicalPatches: clean apply and fail-closed non-applying patch, via real git apply",
+      "qualification mock: one deterministic completion, no tool call, captured request, both wire-protocol shapes, loopback-only bind"
+    ]
+  },
+  "hostile_review": {
+    "artifact": "hostile_review.md",
+    "critical_found": 1,
+    "high_found": 3,
+    "critical_fixed": 1,
+    "high_fixed": 3,
+    "targeted_rereview_performed": true,
+    "targeted_rereview_outcome": "no new Critical/High findings; all four fixes confirmed correct"
+  },
+  "residual_scope_not_closed_by_this_run": {
+    "real_pinned_commit_materialization_executed": false,
+    "reason": "this offline implementation environment has no network access to clone deepseek-ai/deepseek-harness and no local pnpm store pre-populated with its dependency graph",
+    "codex_executable_binding_patch_landed_and_compiled": false,
+    "full_profile_mock_boot_end_to_end_executed": false,
+    "qualified_launch_contract_digest_issued": false
+  },
+  "invariant_counters": {
+    "mock_parent_requests": 0,
+    "external_parent_requests": 0,
+    "paid_model_requests": 0,
+    "codex_model_turns": 0,
+    "claude_model_turns": 0,
+    "spend_usd": 0.0,
+    "secret_read": false
+  },
+  "active_projects_after_closure": "NONE",
+  "next_action": "A later phase must run qntylab-materialize-dsh-runtime.mjs against the real pinned commit (99f6f02fecdb7dff40c3fbc9470f5907c29f74ca, tag dsh-v0.1.0-rc.7) on a machine with network clone access and a populated offline pnpm store, land and compile the Codex executable-binding repair patch, and execute the full-profile loopback-mock boot end-to-end before any QUALIFIED_LAUNCH_CONTRACT_DIGEST may be cited by a later live authorization. No live episode, Stage-A fixture execution, Qnty/QntyAgentEval, trading/capital action, or Stage B is authorized by this phase."
+}

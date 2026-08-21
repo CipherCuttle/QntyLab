@@ -63,8 +63,8 @@
     "profile_cordis_patch_yml": "profile/cordis.patch.yml",
     "profile_files_sha256": {
       "profile/package.json": "f026effa586470d64f58011e6178b63c076b5848890fdb797b73e9319f1ab053",
-      "profile/cordis.patch.yml": "d15bc9899cfa4293e1e46dabdc35e2ad9d650b1c95e9696510ee0e115c81abc9",
-      "profile/PROFILE.md": "699358691c995d7fc80b1a8bf9f2bbfd6adcab5453553a1ec1db18b21162207a"
+      "profile/cordis.patch.yml": "e62b091f909201a7618b9688d631d9919c7970921abc457bda8b295061fa39df",
+      "profile/PROFILE.md": "8b2a701537350a463fc3c66776c97e1e0b815f49b8eca5da9b9949d3c38405d1"
     },
     "dedicated_dsh_home": "build_root/.dsh-home (never the ambient host ~/.dsh; HOME itself stays the normal host HOME so native Codex/Claude child auth still reads real product/account state -- DSH_HOME and HOME are separate controls)",
     "base_bundles": ["@deepseek-ai/dsh-base", "@deepseek-ai/dsh-headless"],
@@ -129,9 +129,11 @@
     "cost_boundedness_basis": "The pinned dsh-agent-loop (packages/core/agent-loop/src/agent.ts) nests two unbounded loops: turn() runs an outer `while (true)` over steps, and step() runs an inner `while (true)` per LLM request/retry. Neither loop has a native hard cap; a turn ends only when the model stops requesting tool calls (or errors/aborts), and a single turn may internally contain an arbitrary number of steps, each step being roughly one billed LLM call. A budget expressed only as a turn ceiling therefore does NOT bound total LLM call count or spend -- this was caught in this authorization's own hostile review (finding H-01) and fixed below by budgeting STEPS, not turns. A QntyLab-owned driver process (in the pattern of the existing pinned_dsh_codex_route_driver_v0.mjs) must externally enforce, by observing the session's own `step/start` events (the pinned loop already appends one per LLM call): (1) a hard maximum total-step count across the whole episode, (2) a hard wall-clock timeout, (3) a low llm-pi-ai retryPolicy.maxRetries ceiling, and (4) termination of the DSH process the instant the frozen step budget is reached. Under gpt-5-mini's worst-case per-call cost (128000 output tokens x $2/1e6 = $0.256), the frozen total-step ceiling below keeps worst-case spend under $1 with margin; this remains a conservative-implausibility bound enforced by the wrapper, not a framework guarantee, and is disclosed as such rather than overclaimed.",
     "max_output_tokens_per_call_override": 4096,
     "max_output_tokens_override_mechanism": "llm-pi-ai route model-catalog override (documented in packages/llm/llm-pi-ai/src/index.ts: a route's `models[].maxTokens` entry narrows the pi-ai catalog default for that model)",
-    "worst_case_input_tokens_per_call_assumed": 200000,
-    "worst_case_single_call_cost_usd": 0.058192,
-    "worst_case_single_call_cost_basis": "(200000 input tokens x $0.25/1e6) + (4096 output tokens x $2/1e6), a deliberately pessimistic per-call estimate assuming full conversation-history resend near half of gpt-5-mini's 400000-token context window; the model's raw catalog output cap (128000 tokens, $0.256/call) is intentionally overridden downward rather than relied upon."
+    "retry_policy": {"mode": "normal", "maxRetries": 0},
+    "retry_policy_h04_note": "H-04 (pre-live, found and repaired on the execution branch before any live call): maxRetries was 2, not 0, at merge. step/start (packages/core/agent-loop/src/agent.ts) fires once per step, BEFORE step()'s own internal retry loop, so a retry does not create a new step/start event -- a step-count-only guard undercounts request attempts. At maxRetries=2 one step could cost up to 3 attempts (24 across 8 steps), exceeding the $1.00 ceiling. maxRetries=0 makes 1 step == at most 1 request attempt, closing the gap monotonically (safety-restricting only; no other field changed).",
+    "worst_case_input_tokens_per_call_assumed": 400000,
+    "worst_case_single_call_cost_usd": 0.108192,
+    "worst_case_single_call_cost_basis": "(400000 input tokens x $0.25/1e6) + (4096 output tokens x $2/1e6) -- H-04's strengthened bound, using the model's full context window as the input assumption now that maxRetries=0 makes each step exactly one attempt; the model's raw catalog output cap (128000 tokens, $0.256/call) remains intentionally overridden downward rather than relied upon."
   },
   "child_routes": {
     "codex": {
@@ -189,10 +191,13 @@
     "conditional_extra_turns_if_repair_path_taken": ["dispatch_codex_repair", "dispatch_claude_targeted_rereview"],
     "parent_turn_ceiling_with_repair_path": 8,
     "parent_max_total_steps": 8,
-    "parent_max_total_steps_includes_retries": true,
-    "step_ceiling_enforcement_mechanism": "external wrapper counts `step/start` session events (already emitted once per LLM call by the pinned loop) and hard-terminates the DSH process the instant parent_max_total_steps is reached, regardless of turn boundary",
-    "worst_case_episode_cost_usd": 0.465536,
-    "worst_case_episode_cost_basis": "parent_max_total_steps (8) x worst_case_single_call_cost_usd (0.058192), all under parent_model_route.max_output_tokens_per_call_override; margin under the $1.00 ceiling is approximately 2.1x",
+    "internal_parent_retries_disabled": true,
+    "internal_parent_retries_disabled_h04_note": "H-04 repair: maxRetries=0 (was 2) makes internal retries structurally absent rather than merely 'included' in the step count -- a step-count-only guard cannot see retries that happen inside step()'s own request loop without a new step/start event, so counting retries into the step budget was never actually enforceable; disabling them instead is the monotonic fix.",
+    "max_parent_request_attempts": 8,
+    "max_parent_request_attempts_basis": "with internal_parent_retries_disabled, 1 step == at most 1 request attempt, so max_parent_request_attempts == parent_max_total_steps exactly",
+    "step_ceiling_enforcement_mechanism": "external wrapper counts `step/start` session events (already emitted once per LLM call by the pinned loop) and hard-terminates the DSH process the instant parent_max_total_steps is reached, regardless of turn boundary; additionally asserts zero `llm/retry`/`llm/retry-started` events occur, since maxRetries=0 makes any such event an unexpected policy violation, not routine recovery",
+    "worst_case_episode_cost_usd": 0.865536,
+    "worst_case_episode_cost_basis": "max_parent_request_attempts (8) x worst_case_single_call_cost_usd (0.108192, H-04-strengthened bound using the model's full 400000-token context window as the input assumption); margin under the $1.00 ceiling is approximately $0.134464",
     "no_autonomous_indefinite_loop": true,
     "no_recursive_review": true,
     "no_review_of_review": true,

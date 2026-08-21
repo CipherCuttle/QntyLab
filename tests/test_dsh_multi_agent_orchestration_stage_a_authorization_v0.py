@@ -79,7 +79,10 @@ def test_llm_pi_ai_is_patched_by_id_not_reinserted():
     openai_route = id_patches["llm-pi-ai"]["config"]["providers"]["openai"]
     assert set(id_patches["llm-pi-ai"]["config"]["providers"]) == {"openai"}
     assert openai_route["apiKeyEnv"] == "OPENAI_API_KEY"
-    assert openai_route["retryPolicy"]["maxRetries"] == 2
+    # H-04: retries are disabled, not merely counted -- step/start fires once
+    # per step before step()'s own internal retry loop, so a retry never
+    # produces a new step/start event and a step-count-only guard can't see it.
+    assert openai_route["retryPolicy"]["maxRetries"] == 0
     assert openai_route["models"] == [{"id": "gpt-5-mini", "maxTokens": 4096}]
 
     assert "name" not in id_patches["agent-default-model"]
@@ -222,8 +225,23 @@ def test_parent_spend_boundedness_uses_step_ceiling_not_turn_ceiling():
     budget = auth()["parent_lifecycle_budget"]
     assert budget["budget_unit_that_actually_bounds_spend"] == "STEPS_NOT_TURNS"
     assert isinstance(budget["parent_max_total_steps"], int) and budget["parent_max_total_steps"] > 0
-    assert budget["parent_max_total_steps_includes_retries"] is True
     assert budget["no_autonomous_indefinite_loop"] is True
+
+
+def test_h04_retries_are_disabled_not_merely_counted():
+    value = auth()
+    budget = value["parent_lifecycle_budget"]
+    route = value["parent_model_route"]
+
+    assert budget["internal_parent_retries_disabled"] is True
+    assert budget["max_parent_request_attempts"] == budget["parent_max_total_steps"]
+    assert route["retry_policy"] == {"mode": "normal", "maxRetries": 0}
+
+    # The frozen profile file must encode the same maxRetries=0, cross-checked
+    # against the JSON contract rather than trusted in isolation.
+    patch = _load_patch()
+    id_patches = {item["id"]: item for item in patch if "id" in item and "insert" not in item}
+    assert id_patches["llm-pi-ai"]["config"]["providers"]["openai"]["retryPolicy"]["maxRetries"] == route["retry_policy"]["maxRetries"]
 
 
 def test_worst_case_episode_cost_stays_under_the_dollar_ceiling():

@@ -133,7 +133,11 @@ phase makes its first live call:
    layers only -- no cordis context is booted, so no plugin `apply()` runs
    and no network or model call occurs). Assert the dumped tree:
    - patches `llm-pi-ai` (not re-inserts it) to exactly one route, `openai`,
-     with `apiKeyEnv: OPENAI_API_KEY`, `retryPolicy.maxRetries: 2`, and a
+     with `apiKeyEnv: OPENAI_API_KEY`, `retryPolicy.maxRetries: 0` (H-04: not
+     2 -- `step/start` fires once per step before `step()`'s own internal
+     retry loop, so a retry never creates a new `step/start` event, and a
+     step-count-only guard cannot see or bound them; disabling retries
+     entirely makes one step exactly one request attempt), and a
      `models` override of exactly `[{id: gpt-5-mini, maxTokens: 4096}]`;
    - patches `agent-default-model` to exactly
      `{provider: openai, model: gpt-5-mini}`;

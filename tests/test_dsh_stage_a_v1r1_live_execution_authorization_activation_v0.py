@@ -32,18 +32,17 @@ def test_authorization_artifact_is_canonical_one_episode_activation():
     }
 
 
-def test_project_context_has_exactly_one_active_execution_project():
+def test_project_context_closes_execution_project_after_terminal_outcome():
     _, _, registry = project_context.load_context_sources(ROOT)
     projects = project_context.validate_projects_registry(ROOT, registry)
-    active = [record for record in projects.values() if record["state"] == "ACTIVE"]
-    assert len(active) == 1
-    assert active[0]["project_id"] == PROJECT_ID
-    assert active[0]["implementation_authorized"] is True
-    assert active[0]["implementation_completed"] is False
-    assert active[0]["episode_consumed"] is False
-    assert active[0]["authorized_live_episodes"] == 1
-    assert active[0]["second_v1r1_episode_authorized"] is False
-    assert active[0]["execution_closure_pr_budget"] == 1
+    record = projects[PROJECT_ID]
+    assert record["state"] == "CLOSED_BLOCKED"
+    assert record["implementation_authorized"] is False
+    assert record["implementation_completed"] is True
+    assert record["episode_consumed"] is False
+    assert record["second_v1r1_episode_authorized"] is False
+    assert record["stage_b_authorized"] is False
+    assert record["active_project_after_closure"] == "NONE"
 
 
 def test_project_context_preserves_closed_qualified_predecessor():
@@ -106,12 +105,8 @@ def test_no_authority_leakage_or_live_activity_in_this_phase():
 
 def test_project_context_next_action_is_bounded_and_no_second_episode():
     data = project_context.context_data(ROOT)
-    assert data["active_project"]["project_id"] == PROJECT_ID
-    action = data["current_permitted_next_action"]
-    assert "exactly one Stage-A V1R1 live episode" in action
-    assert "exactly one draft execution/closure PR" in action
-    assert "No second episode" in action
-    assert "no stage b" in action.lower()
+    assert data["active_project"] is None
+    assert data["current_permitted_next_action"] == "No project implementation is currently authorized."
 
 
 def test_codex_claude_and_prelive_boundaries_are_fail_closed():

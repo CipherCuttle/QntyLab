@@ -110,6 +110,30 @@ def test_repair_requires_validated_claude_critical_high_and_rereview_requires_re
     assert controller.state == AuthorityState.TERMINAL
 
 
+@pytest.mark.parametrize(
+    ("retest_passed", "rereview_critical", "expected"),
+    [
+        (False, False, "FAIL_IMPLEMENTATION"),
+        (False, True, "FAIL_IMPLEMENTATION"),
+        (True, True, "FAIL_REVIEW"),
+        (True, False, "PASS_AFTER_BOUNDED_REPAIR"),
+    ],
+)
+def test_rereview_cannot_turn_failed_retest_into_pass(tmp_path, retest_passed, rereview_critical, expected):
+    controller = prepared(tmp_path)
+    codex = controller.pre_dispatch_authorize(CODEX_TOOL)
+    controller.complete_child(codex)
+    controller.record_driver_tests(passed=False)
+    claude = controller.pre_dispatch_authorize(CLAUDE_TOOL)
+    controller.complete_child(claude, review_result=review(critical=True))
+    repair = controller.pre_dispatch_authorize(CODEX_TOOL)
+    controller.complete_child(repair)
+    controller.record_driver_tests(passed=retest_passed, retest=True)
+    rereview = controller.pre_dispatch_authorize(CLAUDE_TOOL)
+    controller.complete_child(rereview, review_result=review(critical=rereview_critical))
+    assert controller.snapshot()["terminal_outcome"] == expected
+
+
 @pytest.mark.parametrize("tool_name", ["subagent", "subagent_fork", "subagent_codex_v1", "tool-subagent-codex"])
 def test_generic_fork_and_alias_bypasses_fail_closed(tmp_path, tool_name):
     controller = prepared(tmp_path)

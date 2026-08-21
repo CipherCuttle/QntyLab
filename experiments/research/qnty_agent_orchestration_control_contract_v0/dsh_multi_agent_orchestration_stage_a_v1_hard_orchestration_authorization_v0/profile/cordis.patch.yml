@@ -1,0 +1,56 @@
+# V1 hard-gated profile. Raw DSH providers are loaded first; the QntyLab
+# provider plugin wraps their SubagentProvider.start seam before model-facing
+# tools are registered. The !!js values are explicit runtime bindings and do
+# not contain credentials.
+- id: llm-pi-ai
+  config:
+    providers:
+      openai:
+        apiKeyEnv: OPENAI_API_KEY
+        retryPolicy:
+          mode: normal
+          maxRetries: 0
+        models:
+          - id: gpt-5-mini
+            maxTokens: 4096
+- id: agent-default-model
+  config:
+    provider: openai
+    model: gpt-5-mini
+- insert:
+    - id: subagent-codex
+      name: '@deepseek-ai/dsh-subagent-codex'
+    - id: subagent-claude-code
+      name: '@deepseek-ai/dsh-subagent-claude-code'
+    - id: qntylab-gated-codex
+      name: '@qntylab/dsh-gated-provider'
+      config:
+        providerName: qntylab-gated-codex
+        rawProvider: codex
+        toolName: subagent_codex
+        statePath: !!js process.env.QNTYLAB_DSH_STAGE_A_STATE_PATH
+        qntyLabRoot: !!js process.env.QNTYLAB_ROOT
+        pythonExecutable: !!js process.env.QNTYLAB_PYTHON
+    - id: qntylab-gated-claude-code
+      name: '@qntylab/dsh-gated-provider'
+      config:
+        providerName: qntylab-gated-claude-code
+        rawProvider: claude-code
+        toolName: subagent_claude_code
+        statePath: !!js process.env.QNTYLAB_DSH_STAGE_A_STATE_PATH
+        qntyLabRoot: !!js process.env.QNTYLAB_ROOT
+        pythonExecutable: !!js process.env.QNTYLAB_PYTHON
+    - id: tool-subagent-codex
+      name: '@deepseek-ai/dsh-tool-subagent'
+      config:
+        provider: qntylab-gated-codex
+        toolName: subagent_codex
+        backgroundMode: one-shot
+        maxDepth: provider-managed
+    - id: tool-subagent-claude-code
+      name: '@deepseek-ai/dsh-tool-subagent'
+      config:
+        provider: qntylab-gated-claude-code
+        toolName: subagent_claude_code
+        backgroundMode: one-shot
+        maxDepth: provider-managed

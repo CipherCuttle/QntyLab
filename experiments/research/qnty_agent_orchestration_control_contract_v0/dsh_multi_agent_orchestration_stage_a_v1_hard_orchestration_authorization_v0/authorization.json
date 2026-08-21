@@ -2,6 +2,20 @@
   "artifact_type": "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1_HARD_ORCHESTRATION_AUTHORIZATION",
   "schema_version": "dsh-stage-a-v1-hard-orchestration-authorization-v0",
   "project_id": "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1_HARD_ORCHESTRATION_AUTHORIZATION_V0",
+  "authorization_state": "AUTHORIZED_IF_CANONICAL",
+  "authorization_effective": "AFTER_CANONICAL_MERGE_ONLY",
+  "authorized_operation": "ONE_LATER_STAGE_A_V1_EXECUTION_AND_CLOSURE_PHASE",
+  "later_live_episodes_authorized": 1,
+  "second_v1_episode_authorized": false,
+  "later_execution_closure_pr_authorized": 1,
+  "must_open_one_draft_execution_closure_pr": true,
+  "must_stop_after_that_pr": true,
+  "stage_b_authorized": false,
+  "qnty_agent_eval": "NOT_APPLICABLE",
+  "scientific_execution_authorized": false,
+  "trading_authority": "NONE",
+  "capital_authority": "NONE",
+  "active_project_after_closure": "NONE",
   "canonical_predecessor": {
     "project_id": "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_EXECUTION_V0",
     "merge_commit": "6d9469aa8fc82381b124947f4518b6be7279a532",
@@ -102,5 +116,19 @@
     "child_environment_secret_scrubbing": true,
     "historical_chat_exposure_global_never_exposed_claim": false,
     "credential_value_in_artifacts": false
+  },
+  "gated_provider_integration": {
+    "pinned_dsh_commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "pinned_dsh_tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "real_provider_seam": "SubagentProvider.start(request)",
+    "raw_providers": ["codex", "claude-code"],
+    "gated_providers": ["qntylab-gated-codex", "qntylab-gated-claude-code"],
+    "model_facing_tools": {
+      "subagent_codex": "qntylab-gated-codex",
+      "subagent_claude_code": "qntylab-gated-claude-code"
+    },
+    "authorization_precedes_raw_provider_start": true,
+    "raw_provider_bypass_possible_through_profile": false,
+    "upstream_dsh_files_modified": false
   }
 }

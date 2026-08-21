@@ -9,9 +9,11 @@ starts DSH, Codex, Claude, or any other subprocess.
 from __future__ import annotations
 
 import copy
+import argparse
 import fcntl
 import json
 import os
+import sys
 import tempfile
 import threading
 from collections.abc import Iterable, Mapping
@@ -331,7 +333,12 @@ class HardOrchestrationController:
             elif role == "codex_repair":
                 self._transition(state, AuthorityState.RETEST_REQUIRED, event_type="REPAIR_RETURNED", token=grant.token)
             elif role == "claude_rereview":
-                if state["review"]["closure_blocking"]:
+                # A clean rereview cannot launder a failed retest into PASS.
+                # The latest driver-owned retest is the authoritative
+                # implementation result at this point in the state machine.
+                if not state["test_results"][-1]["passed"]:
+                    self._terminal(state, AuthorityState.TERMINAL, "FAIL_IMPLEMENTATION", "REREVIEW_RETURNED")
+                elif state["review"]["closure_blocking"]:
                     self._terminal(state, AuthorityState.TERMINAL, "FAIL_REVIEW", "REREVIEW_RETURNED")
                 else:
                     self._terminal(state, AuthorityState.TERMINAL, "PASS_AFTER_BOUNDED_REPAIR", "REREVIEW_RETURNED")
@@ -441,3 +448,58 @@ class HardOrchestrationController:
     def _terminal(cls, state: dict[str, Any], target: AuthorityState, outcome: str, event_type: str) -> None:
         state["terminal_outcome"] = outcome
         cls._transition(state, target, event_type=event_type, outcome=outcome)
+
+
+def _controller_for_cli(state_path: str) -> HardOrchestrationController:
+    controller = HardOrchestrationController(Path(state_path))
+    if controller.state == AuthorityState.PREPARED:
+        controller.prepare()
+    return controller
+
+
+def main(argv: list[str] | None = None) -> int:
+    """Small JSON CLI used by the V1 profile's pre-provider gate adapter."""
+
+    parser = argparse.ArgumentParser(prog="qntylab.dsh_stage_a_v1_hard_orchestration")
+    parser.add_argument("--state", required=True, help="persisted authority checkpoint path")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+    subparsers.add_parser("prepare")
+    authorize = subparsers.add_parser("authorize")
+    authorize.add_argument("tool", choices=sorted(ALLOWED_TOOLS))
+    complete = subparsers.add_parser("complete")
+    complete.add_argument("--token", required=True)
+    complete.add_argument("--tool", required=True, choices=sorted(ALLOWED_TOOLS))
+    complete.add_argument("--role", required=True)
+    complete.add_argument("--status", choices=[item.value for item in ChildLifecycle], default=ChildLifecycle.CHILD_COMPLETED.value)
+    complete.add_argument("--review-json")
+    tests = subparsers.add_parser("tests")
+    tests.add_argument("--retest", action="store_true")
+    tests.add_argument("--passed", action="store_true")
+    tests.add_argument("--failed", action="store_true")
+
+    args = parser.parse_args(argv)
+    try:
+        controller = _controller_for_cli(args.state)
+        if args.command == "prepare":
+            print(json.dumps(controller.snapshot(), sort_keys=True))
+        elif args.command == "authorize":
+            grant = controller.pre_dispatch_authorize(args.tool)
+            print(json.dumps({"token": grant.token, "tool_name": grant.tool_name, "role": grant.role, "state": grant.state.value}, sort_keys=True))
+        elif args.command == "complete":
+            review_result = json.loads(args.review_json) if args.review_json is not None else None
+            grant = AuthorizationGrant(args.token, args.tool, args.role, controller.state)
+            controller.complete_child(grant, status=ChildLifecycle(args.status), review_result=review_result)
+            print(json.dumps(controller.snapshot(), sort_keys=True))
+        else:
+            if args.passed == args.failed:
+                raise OrchestrationError("tests requires exactly one of --passed or --failed")
+            controller.record_driver_tests(passed=args.passed, retest=args.retest)
+            print(json.dumps(controller.snapshot(), sort_keys=True))
+        return 0
+    except (OrchestrationError, OSError, ValueError, json.JSONDecodeError) as exc:
+        print(f"qntylab gate denied: {exc}", file=sys.stderr)
+        return 2
+
+
+if __name__ == "__main__":  # pragma: no cover - exercised by the profile adapter
+    raise SystemExit(main())

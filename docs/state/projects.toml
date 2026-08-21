@@ -5449,3 +5449,44 @@ qnty_agent_eval = "NOT_APPLICABLE"
 terminal_outcome = "STAGE_A_V1R1_BLOCK_CHILD_INFRA"
 active_project_after_closure = "NONE"
 next_action = "CLOSED_BLOCKED: native Codex/Claude executable identities were incompatible with the exact V1R1 qualification assumptions before secret or paid-parent dispatch. No rescue, rerun, runtime repair, second episode, or Stage B is authorized. Any later attempt requires new Git-backed authority."
+
+[[project]]
+project_id = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R2_NATIVE_CHILD_COMPATIBILITY_QUALIFICATION_V0"
+display_name = "DSH Stage-A V1R2 native child compatibility qualification V0"
+state = "CLOSED_PASS"
+authority_level = "BOUNDED_OFFLINE_NATIVE_COMPATIBILITY_QUALIFICATION"
+phase_type = "GOVERNANCE_BOUNDED_OFFLINE_QUALIFICATION"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "qntylab/dsh_stage_a_v1r2_native_compatibility.py",
+  "tests/test_dsh_stage_a_v1r2_native_compatibility.py",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1r2_native_child_compatibility_qualification_v0/qualification.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1r2_native_child_compatibility_qualification_v0/hostile_review.md",
+]
+canonical_predecessor_project_id = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R1_EXECUTION_V0"
+canonical_predecessor_merge = "014d5b46fa83e613d8a5a8e8d33035d4e5b66952"
+canonical_predecessor_reviewed_head = "7e9ffe2798dc78f94a82e75615d649b9402345f8"
+historical_terminal_outcome = "STAGE_A_V1R1_BLOCK_CHILD_INFRA"
+historical_episode_consumed = false
+implementation_authorized = false
+implementation_completed = true
+live_openai_calls = 0
+live_dsh_parent_calls = 0
+live_codex_calls = 0
+live_claude_calls = 0
+codex_model_turns = 0
+claude_model_turns = 0
+model_requests = 0
+paid_requests = 0
+stage_a_fixture_runs = 0
+spend_usd = 0.0
+stage_b_authorized = false
+scientific_execution_authorized = false
+qnty_runtime_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+qnty_agent_eval = "NOT_APPLICABLE"
+active_project_after_closure = "NONE"
+next_action = "CLOSED_PASS: offline native Codex and Claude compatibility is qualified by executable fingerprint plus zero-model evidence. No live OpenAI, DSH parent, Codex task, Claude task, Stage-A fixture, Stage B, scientific, trading, capital, Qnty, or QntyAgentEval authority follows. A later live episode requires separate Git-backed authorization and this exact preflight."

@@ -25,11 +25,24 @@ def test_all_four_offline_gates_passed_before_any_live_call():
         assert gates[key].startswith("PASS"), key
 
 
-def test_secret_value_never_exposed():
-    value = evidence()
-    assert value["secret_handling"]["value_ever_exposed_in_transcript_or_artifact"] is False
-    text = json.dumps(value)
+def test_secret_handling_claims_are_narrowly_scoped_not_a_global_never_exposed_claim():
+    # M-01: a prior version of this artifact claimed the secret was globally
+    # "never exposed," which was false -- the user had already pasted the
+    # temporary credential into chat before this execution began. The
+    # honest, supportable claim is scoped to what Stage-A execution tooling
+    # itself did, not a claim about the credential's entire history.
+    secret = evidence()["secret_handling"]
+    assert secret["preexisting_chat_exposure_acknowledged"] is True
+    assert secret["secret_value_exposed_by_stage_a_execution_tooling"] is False
+    assert secret["secret_value_committed_or_persisted_in_stage_a_artifacts"] is False
+    assert "value_ever_exposed_in_transcript_or_artifact" not in secret
+
+
+def test_no_literal_secret_value_appears_anywhere_in_serialized_evidence():
+    text = json.dumps(evidence())
     assert "sk-" not in text
+    closure_text = (ARTIFACT / "closure.md").read_text(encoding="utf-8")
+    assert "sk-" not in closure_text
 
 
 def test_episode_consumed_and_no_second_episode_authorized():

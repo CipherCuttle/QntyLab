@@ -76,6 +76,12 @@ workflow end-to-end. It could not, on this one attempt.
 
 ## Evidence
 
+A temporary OpenAI credential had already appeared in pre-execution chat
+before this episode began; Stage-A execution did not reproduce, print, or
+persist its value anywhere (see `secret_handling` in
+`execution_evidence.json`), but that prior exposure itself is not undone by
+this closure.
+
 Full structured evidence: `execution_evidence.json` in this directory. The
 raw session JSONL log is intentionally not committed (per the authorization's
 prohibition on committing raw transcripts); every figure above is derived

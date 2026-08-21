@@ -46,7 +46,11 @@
   "secret_handling": {
     "secret_file": "~/.secrets/openai_api_key_stage_a",
     "presence_gate": "PASS (test -s only, value never read by the orchestrating agent, never printed, never included in any command text -- injected via `OPENAI_API_KEY=\"$(cat \"$SECRET_FILE\")\"` inside a single shell invocation)",
-    "value_ever_exposed_in_transcript_or_artifact": false,
+    "preexisting_chat_exposure_acknowledged": true,
+    "preexisting_chat_exposure_note": "The temporary OpenAI credential had already been pasted into chat by the user, in plaintext, before this Stage-A execution began. That prior exposure is real and is not undone by anything below -- these fields describe only what the Stage-A execution tooling itself did with the credential, not a claim that the value was never exposed anywhere.",
+    "secret_value_exposed_by_stage_a_execution_tooling": false,
+    "secret_value_exposed_by_stage_a_execution_tooling_basis": "the value was never printed, echoed, hashed, included in generated command text, or otherwise surfaced by any command the orchestrating agent issued during materialization or the live episode -- it was read exactly once, by the shell's own command substitution at DSH-parent invocation time, and flowed directly from the local secret file into the child process environment without passing through agent-visible output",
+    "secret_value_committed_or_persisted_in_stage_a_artifacts": false,
     "child_isolation_verified_from_pinned_source": "packages/subprocess/subprocess/src/index.ts: scrubbedParentEnv() strips any env var matching /KEY|PASSWORD|SECRET|TOKEN/i (case-insensitive) from every spawned child by default; subagent-codex's own env config defaults to {} (no explicit re-add), so OPENAI_API_KEY is structurally excluded from the Codex/Claude child processes by the framework itself, independent of anything this execution did"
   },
   "live_episode": {

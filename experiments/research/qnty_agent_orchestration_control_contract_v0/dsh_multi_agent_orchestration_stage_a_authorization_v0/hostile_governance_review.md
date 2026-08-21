@@ -212,3 +212,95 @@ explicit user extension before being performed.
 
 Critical (H-02 pass): 0. High (H-02 pass): 1, repaired as above. Medium: 0.
 Low: 0.
+
+## Post-publication closure repair — H-03
+
+**Source:** a single explicitly-authorized supplemental closure rereview of
+the H-02 repair, externally performed, not a self-generated finding and not
+a second broad hostile review. Per explicit instruction, this is the final
+independent review round for this authorization; H-03's closure is
+mechanical (source evidence + tests + CI), not another review cycle.
+
+**H-03 — FROZEN_STAGE_A_PROFILE_NOT_ACTUALLY_DELEGATION_CAPABLE.** The H-02
+repair froze a `cordis.patch.yml` that mounted `subagent-codex`,
+`subagent-claude-code`, `llm-pi-ai`, and patched `agent-default-model`, but:
+
+1. It never mounted the model-facing delegation tools
+   (`tool-subagent-codex`, `tool-subagent-claude-code`). Confirmed by
+   reading `packages/subagent/subagent-codex/src/index.ts` and
+   `.../subagent-claude-code/src/index.ts`: each calls only
+   `ctx.subagents.registerProvider(...)` — the provider packages add no
+   parent-visible tool by themselves, so the frozen profile, as written,
+   would have booted with no way for the DSH parent to actually delegate to
+   either child.
+2. `packages/bundle/base/cordis.patch.yml` (read directly) already inserts
+   `id: llm-pi-ai` (dormant, zero routes) and `id: agent-default-model`
+   (defaulting to `deepseek-official`/`deepseek-v4-flash`). H-02's
+   `cordis.patch.yml` re-`insert`ed a second `llm-pi-ai` row instead of
+   patching the existing one — a colliding duplicate id, not a working
+   override.
+3. `profile/package.json`'s empty `dependencies` gave no resolution path for
+   `@deepseek-ai/dsh-subagent-codex`/`-claude-code`, which are confirmed
+   absent from both `dsh-base` and `dsh-headless` bundle dependencies and
+   therefore excluded from the flat `$DSH_HOME/profiles/node_modules`
+   fallback (`packages/boot/app-boot/src/profile.ts`,
+   `healProfilesModuleFallback`, BFS over the app's own dependency closure
+   only). Left unresolved, a naive fix (declaring them as ordinary registry
+   dependencies) would silently fetch an unrepaired published copy from the
+   npm registry instead of the QntyLab-repaired `build_root` package.
+4. The dump-config assertion ("no other llm-* or subagent-* instance") was
+   overbroad: `dsh-base` itself already mounts generic
+   `subagent`/`subagent-spawn-in-process`/`subagent-fork-in-process`/
+   `tool-subagent-control`/`tool-subagent`(spawn)/`tool-subagent-fork`/
+   `tool-subagent-report` rows unrelated to Stage-A.
+
+**Repair (this commit):** `cordis.patch.yml` now **patches** the existing
+`llm-pi-ai` and `agent-default-model` rows by `id` (no `name`, replacing
+their whole `config`, matching the base bundle's own documented "last write
+wins per row" semantics — the same shape already used correctly for
+`agent-default-model` in H-02) instead of re-inserting `llm-pi-ai`, and
+`insert`s two new tool rows (`tool-subagent-codex`, provider `codex`,
+toolName `subagent_codex`; `tool-subagent-claude-code`, provider
+`claude-code`, toolName `subagent_claude_code`), in the exact config shape
+used by the pinned source's own
+`examples/acp-agent/product-subagent-both.cordis.yml`. `profile/package.json`
+now declares both provider packages via `link:../../../packages/subagent/...`
+— a local-path protocol that never queries a registry — relative to a newly
+frozen, fixed directory layout (`build_root/.dsh-home/profiles/stage-a-v0/`,
+documented in `PROFILE.md` section 0) that also serves as the dedicated,
+non-ambient `DSH_HOME` H-03 point 4 required. `PROFILE.md`'s verification
+section now names three gates (provider-source identity, an exact allowlist
+composition check distinguishing `dsh-base`'s own infrastructure from the
+required Stage-A additions, and package-resolution identity confirming the
+installed symlink resolves into `build_root`) instead of two.
+
+**H-01's spend controls, model selection, child auth routes, and the
+synthetic task are unchanged** — verified: the patched `llm-pi-ai` row
+encodes the identical `gpt-5-mini`/`4096`/`OPENAI_API_KEY`/`maxRetries: 2`
+values as before, cross-checked directly against `parent_model_route` in a
+new test.
+
+**Live calls:** 0. Two offline `--dump-config` invocations were authorized
+for this repair; **zero were exercised**. A locally pre-built checkout
+(`node_modules`/`lib/` already present from an earlier, unrelated setup)
+makes the check technically runnable without a fresh `pnpm install`, but a
+real `pnpm`/build invocation cannot be guaranteed free of incidental network
+activity (registry/version/telemetry checks), which would exceed the
+narrow authority's explicit "no network request is intentionally made"
+condition — so this repair relied on direct source-file verification only
+(every claim above cites an exact pinned-source path). **Authorization
+spend:** $0.
+
+**Review-budget status:** this was the single explicitly-authorized
+supplemental closure rereview; per instruction, no further independent
+review was initiated. Closure of H-03 rests on the source citations above
+plus the mechanical gates below, not another review round.
+
+Critical: 0. High: 1 (H-03, repaired as above). Medium: 0. Low: 0.
+
+Conclusion (updated): the frozen Stage-A profile is now delegation-capable
+by construction (both child tools mounted, provider resolution pinned
+off-registry into the repaired build, existing dsh-base rows patched rather
+than collided with) and verified against 28/28 targeted tests plus the full
+canonical check suite. Still effective only after canonical merge; still
+authorizes zero live execution in this phase.

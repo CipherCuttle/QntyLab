@@ -62,26 +62,44 @@
     "profile_package_json": "profile/package.json",
     "profile_cordis_patch_yml": "profile/cordis.patch.yml",
     "profile_files_sha256": {
-      "profile/package.json": "75586a8cd5e840f32e172e7350a474e439f5fd26a70c89c9222a67b615da4f27",
-      "profile/cordis.patch.yml": "dbe03a13b674298a26c9c414fc16d53dd6eb68c52aa090714ef70ce1dc374bf9",
-      "profile/PROFILE.md": "24129eaabe85dec4e5e84416934579c4e610865965ec9596203edc62e523c1d3"
+      "profile/package.json": "f026effa586470d64f58011e6178b63c076b5848890fdb797b73e9319f1ab053",
+      "profile/cordis.patch.yml": "d15bc9899cfa4293e1e46dabdc35e2ad9d650b1c95e9696510ee0e115c81abc9",
+      "profile/PROFILE.md": "699358691c995d7fc80b1a8bf9f2bbfd6adcab5453553a1ec1db18b21162207a"
     },
+    "dedicated_dsh_home": "build_root/.dsh-home (never the ambient host ~/.dsh; HOME itself stays the normal host HOME so native Codex/Claude child auth still reads real product/account state -- DSH_HOME and HOME are separate controls)",
     "base_bundles": ["@deepseek-ai/dsh-base", "@deepseek-ai/dsh-headless"],
-    "registered_plugin_ids": ["subagent-codex", "subagent-claude-code", "llm-pi-ai", "agent-default-model"],
-    "registered_plugin_ids_source": "cordis.patch.yml insert/id-patch entries, adapted from real pinned-source examples: examples/acp-agent/product-subagent-both.cordis.yml (subagent-codex/subagent-claude-code insert shape) and examples/headless-agent/tests/fixtures/headless-profile.cordis.yml (agent-default-model id-patch shape); parsed and structurally verified against PyYAML in this repository's tests",
+    "dsh_base_already_mounts": {
+      "llm-pi-ai": "dormant, zero routes, confirmed present in packages/bundle/base/cordis.patch.yml -- PATCHED by id here, never re-inserted",
+      "agent-default-model": "defaults to provider=deepseek-official, model=deepseek-v4-flash, confirmed present in packages/bundle/base/cordis.patch.yml -- PATCHED by id here to provider=openai, model=gpt-5-mini",
+      "generic_subagent_infra": ["subagent", "subagent-spawn-in-process", "subagent-fork-in-process", "tool-subagent-control", "tool-subagent (provider:spawn)", "tool-subagent-fork (provider:fork)", "tool-subagent-report"]
+    },
+    "registered_or_patched_plugin_ids": {
+      "patched_existing_rows": ["llm-pi-ai", "agent-default-model"],
+      "inserted_new_rows": ["subagent-codex", "subagent-claude-code", "tool-subagent-codex", "tool-subagent-claude-code"]
+    },
+    "provider_packages_add_no_tool_schema_themselves": "confirmed by reading packages/subagent/subagent-codex/src/index.ts and packages/subagent/subagent-claude-code/src/index.ts: each calls only ctx.subagents.registerProvider(...); the model-facing subagent_codex/subagent_claude_code tools come only from the two inserted tool-subagent rows",
+    "registered_plugin_ids_source": "cordis.patch.yml insert/id-patch entries, adapted from real pinned-source examples: examples/acp-agent/product-subagent-both.cordis.yml (subagent-codex/subagent-claude-code/tool-subagent-codex/tool-subagent-claude-code insert shape, including the exact tool config: provider/toolName/backgroundMode:one-shot/maxDepth:provider-managed) and examples/headless-agent/tests/fixtures/headless-profile.cordis.yml (id-patch shape for an existing dsh-base row); parsed and structurally verified against PyYAML in this repository's tests",
+    "provider_package_resolution": {
+      "mechanism": "link: protocol dependency in profile/package.json, relative path from the fixed profile directory depth (build_root/.dsh-home/profiles/stage-a-v0/) to build_root/packages/subagent/{subagent-codex,subagent-claude-code}",
+      "why_not_the_flat_fallback": "packages/boot/app-boot/src/profile.ts's healProfilesModuleFallback only symlinks packages in the dsh app's own dependency closure (BFS over apps/cli's package.json); subagent-codex/subagent-claude-code are absent from both dsh-base and dsh-headless bundle package.json dependencies, so they are not in that closure and must resolve from the profile's own node_modules instead",
+      "registry_fetch_excluded": "link: is a local-path protocol; pnpm never queries a registry for a link: dependency",
+      "verification": "step 6.3 in PROFILE.md confirms the installed symlink's real path resolves into build_root, not a .pnpm store copy"
+    },
     "materializer_output_contract": "qntylab/pinned_dsh_provider_boundary_repair_v0.py's materialize_provider_boundary(source_root, output_root) emits the repaired provider source into a QntyLab-owned output root only; it does not run DSH/Codex and does not mutate the pinned upstream checkout",
     "later_phase_must_materialize_and_verify": {
       "step_1_reference_checkout": "source_root = pristine checkout of pinned commit 99f6f02fecdb7dff40c3fbc9470f5907c29f74ca, never written to",
       "step_2_disposable_build_root": "build_root = full copy of source_root, outside the upstream checkout",
       "step_3_materialize": "call materialize_provider_boundary(source_root, build_root) unmodified; record returned postimage_source_sha256",
       "step_4_build": "cd build_root && pnpm install && pnpm run build",
-      "step_5_compose_profile": "copy this frozen profile/package.json and profile/cordis.patch.yml byte-exact to $DSH_HOME/profiles/stage-a-v0/ (a disposable Stage-A-only profile, not the ambient headless profile)",
+      "step_5_compose_profile": "create build_root/.dsh-home/profiles/stage-a-v0/, copy this frozen profile/package.json and profile/cordis.patch.yml byte-exact, run pnpm install there (resolves only the two link: entries, no registry access)",
       "step_6a_provider_identity_gate": "call captured_thread_start_contract(build_root/packages/subagent/subagent-codex/src/wire.ts); a clean return (no ProviderBoundaryError) is the byte-identity proof against raw upstream source",
-      "step_6b_composition_identity_gate": "run build_root/apps/cli/lib/bin.js --profile stage-a-v0 --dump-config (documented by the pinned CLI as inspecting the composed plugin tree with no model or network call) and assert it contains exactly registered_plugin_ids with the frozen config and no other llm-* or subagent-* plugin",
-      "step_7_only_then_live": "only after 6a and 6b both pass may the later phase run build_root/apps/cli/lib/bin.js --profile stage-a-v0 \"<task>\" for its one authorized parent episode"
+      "step_6b_composition_identity_gate": "run build_root/apps/cli/lib/bin.js --profile stage-a-v0 --dump-config with DSH_HOME=build_root/.dsh-home (dump-config.ts composes patch layers only, boots no cordis context, makes no model or network call) and assert the exact allowlist in PROFILE.md section 6.2: patched llm-pi-ai/agent-default-model rows plus exactly the four inserted rows, on top of dsh-base/dsh-headless's own unchanged infrastructure -- not a bare 'nothing else' check",
+      "step_6c_package_resolution_gate": "confirm $DSH_HOME/profiles/stage-a-v0/node_modules/@deepseek-ai/dsh-subagent-codex symlinks to build_root/packages/subagent/subagent-codex",
+      "step_7_only_then_live": "only after 6a, 6b, and 6c all pass may the later phase run build_root/apps/cli/lib/bin.js --profile stage-a-v0 \"<task>\" for its one authorized parent episode"
     },
     "raw_upstream_fallback_prohibited": true,
-    "raw_upstream_fallback_structurally_excluded": "source_root is never built or run directly in this procedure; only the verified build_root is ever invoked"
+    "raw_upstream_fallback_structurally_excluded": "source_root is never built or run directly in this procedure; only the verified build_root is ever invoked, and provider-package resolution is pinned to build_root via link:, never a registry",
+    "live_verification_not_exercised_in_this_authorization": "A pre-built local checkout technically exists and step 6 is executable without a fresh pnpm install, but this repair did not run it: a real pnpm/build invocation cannot be guaranteed free of incidental network activity, which would exceed the narrow offline authority's explicit no-network-request condition. See PROFILE.md section 8."
   },
   "parent_model_route": {
     "provider_package": "@deepseek-ai/dsh-llm-pi-ai",

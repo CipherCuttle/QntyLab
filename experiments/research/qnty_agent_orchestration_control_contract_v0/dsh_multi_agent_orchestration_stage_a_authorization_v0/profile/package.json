@@ -1,7 +1,11 @@
 {
   "name": "dsh-profile-stage-a-v0",
   "private": true,
-  "dependencies": {},
+  "comment_directory_contract": "This file MUST live at exactly <build_root>/.dsh-home/profiles/stage-a-v0/package.json (see PROFILE.md). The link: paths below are relative to that fixed depth and resolve to <build_root>/packages/subagent/* directly, without ever consulting a package registry.",
+  "dependencies": {
+    "@deepseek-ai/dsh-subagent-codex": "link:../../../packages/subagent/subagent-codex",
+    "@deepseek-ai/dsh-subagent-claude-code": "link:../../../packages/subagent/subagent-claude-code"
+  },
   "dsh": {
     "profile": {
       "bundles": [

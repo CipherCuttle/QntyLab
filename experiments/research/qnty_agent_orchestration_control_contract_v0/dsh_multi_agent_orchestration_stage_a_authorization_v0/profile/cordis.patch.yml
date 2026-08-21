@@ -1,25 +1,56 @@
 # Frozen Stage-A patch layer (DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_AUTHORIZATION_V0).
-# Applied after the dsh-base and dsh-headless bundle layers, over an otherwise
-# empty profile. Registers exactly the two child subagent providers and the
-# OpenAI-backed parent model route; sets no other plugin.
+# Applied after the dsh-base and dsh-headless bundle layers, over the profile
+# root. dsh-base already inserts a dormant `id: llm-pi-ai` row (zero routes)
+# and a default `id: agent-default-model` row (deepseek-official) -- both are
+# PATCHED here by id (no `name`, replacing the row's whole `config`, per the
+# base bundle's own "last write wins per row" patch semantics), never
+# re-inserted. subagent-codex, subagent-claude-code, and their two
+# model-facing delegation tools are genuinely new rows and are inserted.
+
+# Patches the existing dormant llm-pi-ai row from dsh-base: exactly one
+# route, openai, reading OPENAI_API_KEY, narrowed to gpt-5-mini with the
+# H-01 output-token ceiling. No other provider/model exists on this route.
+- id: llm-pi-ai
+  config:
+    providers:
+      openai:
+        apiKeyEnv: OPENAI_API_KEY
+        retryPolicy:
+          mode: normal
+          maxRetries: 2
+        models:
+          - id: gpt-5-mini
+            maxTokens: 4096
+
+# Patches the existing agent-default-model row from dsh-base (which defaults
+# to deepseek-official/deepseek-v4-flash) to the frozen Stage-A parent route.
+- id: agent-default-model
+  config:
+    provider: openai
+    model: gpt-5-mini
+
+# New rows: the two child subagent providers (registerProvider only -- the
+# provider packages add no model-facing tool schema by themselves, confirmed
+# by reading packages/subagent/subagent-codex/src/index.ts and
+# packages/subagent/subagent-claude-code/src/index.ts) and their delegation
+# tools, in the exact shape used by the pinned source's own
+# examples/acp-agent/product-subagent-both.cordis.yml.
 - insert:
     - id: subagent-codex
       name: '@deepseek-ai/dsh-subagent-codex'
     - id: subagent-claude-code
       name: '@deepseek-ai/dsh-subagent-claude-code'
-    - id: llm-pi-ai
-      name: '@deepseek-ai/dsh-llm-pi-ai'
+    - id: tool-subagent-codex
+      name: '@deepseek-ai/dsh-tool-subagent'
       config:
-        providers:
-          openai:
-            apiKeyEnv: OPENAI_API_KEY
-            retryPolicy:
-              mode: normal
-              maxRetries: 2
-            models:
-              - id: gpt-5-mini
-                maxTokens: 4096
-- id: agent-default-model
-  config:
-    provider: openai
-    model: gpt-5-mini
+        provider: codex
+        toolName: subagent_codex
+        backgroundMode: one-shot
+        maxDepth: provider-managed
+    - id: tool-subagent-claude-code
+      name: '@deepseek-ai/dsh-tool-subagent'
+      config:
+        provider: claude-code
+        toolName: subagent_claude_code
+        backgroundMode: one-shot
+        maxDepth: provider-managed

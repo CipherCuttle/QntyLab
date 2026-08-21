@@ -61,28 +61,50 @@ def test_frozen_profile_files_exist_and_match_digests():
         assert actual == expected_digest, f"profile file digest drift: {relative}"
 
 
-def test_frozen_cordis_patch_registers_exactly_the_intended_plugins():
+def _load_patch():
     composition = auth()["runnable_profile_composition"]
     profile_root = ROOT / composition["profile_files_root"]
-    patch = yaml.safe_load((profile_root / "cordis.patch.yml").read_text(encoding="utf-8"))
+    return yaml.safe_load((profile_root / "cordis.patch.yml").read_text(encoding="utf-8"))
 
+
+def test_llm_pi_ai_is_patched_by_id_not_reinserted():
+    # dsh-base already inserts a dormant `id: llm-pi-ai` row; a second insert
+    # of the same id would collide with it rather than configure it.
+    patch = _load_patch()
     inserted_ids = {entry["id"] for item in patch if "insert" in item for entry in item["insert"]}
-    assert inserted_ids == {"subagent-codex", "subagent-claude-code", "llm-pi-ai"}
+    assert "llm-pi-ai" not in inserted_ids
 
-    id_patches = {item["id"]: item for item in patch if "id" in item}
-    assert id_patches["agent-default-model"]["config"] == {"provider": "openai", "model": "gpt-5-mini"}
-
-    llm_entry = next(
-        entry
-        for item in patch if "insert" in item
-        for entry in item["insert"]
-        if entry["id"] == "llm-pi-ai"
-    )
-    openai_route = llm_entry["config"]["providers"]["openai"]
-    assert set(llm_entry["config"]["providers"]) == {"openai"}
+    id_patches = {item["id"]: item for item in patch if "id" in item and "insert" not in item}
+    assert "name" not in id_patches["llm-pi-ai"]  # a bare id+config patches the existing row
+    openai_route = id_patches["llm-pi-ai"]["config"]["providers"]["openai"]
+    assert set(id_patches["llm-pi-ai"]["config"]["providers"]) == {"openai"}
     assert openai_route["apiKeyEnv"] == "OPENAI_API_KEY"
     assert openai_route["retryPolicy"]["maxRetries"] == 2
     assert openai_route["models"] == [{"id": "gpt-5-mini", "maxTokens": 4096}]
+
+    assert "name" not in id_patches["agent-default-model"]
+    assert id_patches["agent-default-model"]["config"] == {"provider": "openai", "model": "gpt-5-mini"}
+
+
+def test_both_child_delegation_tools_are_inserted_with_correct_provider_binding():
+    patch = _load_patch()
+    inserted = {entry["id"]: entry for item in patch if "insert" in item for entry in item["insert"]}
+    assert set(inserted) == {"subagent-codex", "subagent-claude-code", "tool-subagent-codex", "tool-subagent-claude-code"}
+
+    assert inserted["subagent-codex"]["name"] == "@deepseek-ai/dsh-subagent-codex"
+    assert inserted["subagent-claude-code"]["name"] == "@deepseek-ai/dsh-subagent-claude-code"
+
+    codex_tool = inserted["tool-subagent-codex"]
+    assert codex_tool["name"] == "@deepseek-ai/dsh-tool-subagent"
+    assert codex_tool["config"]["provider"] == "codex"
+    assert codex_tool["config"]["toolName"] == "subagent_codex"
+    assert codex_tool["config"]["backgroundMode"] == "one-shot"
+
+    claude_tool = inserted["tool-subagent-claude-code"]
+    assert claude_tool["name"] == "@deepseek-ai/dsh-tool-subagent"
+    assert claude_tool["config"]["provider"] == "claude-code"
+    assert claude_tool["config"]["toolName"] == "subagent_claude_code"
+    assert claude_tool["config"]["backgroundMode"] == "one-shot"
 
 
 def test_frozen_profile_package_json_declares_exactly_the_headless_bundles():
@@ -95,18 +117,31 @@ def test_frozen_profile_package_json_declares_exactly_the_headless_bundles():
 def test_frozen_profile_matches_h01_spend_controls_exactly():
     value = auth()
     route = value["parent_model_route"]
-    composition = value["runnable_profile_composition"]
-    profile_root = ROOT / composition["profile_files_root"]
-    patch = yaml.safe_load((profile_root / "cordis.patch.yml").read_text(encoding="utf-8"))
-    llm_entry = next(
-        entry
-        for item in patch if "insert" in item
-        for entry in item["insert"]
-        if entry["id"] == "llm-pi-ai"
-    )
-    model_override = llm_entry["config"]["providers"]["openai"]["models"][0]
+    patch = _load_patch()
+    id_patches = {item["id"]: item for item in patch if "id" in item and "insert" not in item}
+    model_override = id_patches["llm-pi-ai"]["config"]["providers"]["openai"]["models"][0]
     assert model_override["id"] == route["model_id"]
     assert model_override["maxTokens"] == route["max_output_tokens_per_call_override"]
+
+
+def test_provider_packages_resolve_via_link_not_registry():
+    composition = auth()["runnable_profile_composition"]
+    profile_root = ROOT / composition["profile_files_root"]
+    manifest = json.loads((profile_root / "package.json").read_text(encoding="utf-8"))
+    deps = manifest["dependencies"]
+    assert deps["@deepseek-ai/dsh-subagent-codex"].startswith("link:")
+    assert deps["@deepseek-ai/dsh-subagent-claude-code"].startswith("link:")
+    assert "packages/subagent/subagent-codex" in deps["@deepseek-ai/dsh-subagent-codex"]
+    assert "packages/subagent/subagent-claude-code" in deps["@deepseek-ai/dsh-subagent-claude-code"]
+    resolution = composition["provider_package_resolution"]
+    assert resolution["registry_fetch_excluded"]
+
+
+def test_dedicated_dsh_home_is_not_ambient():
+    composition = auth()["runnable_profile_composition"]
+    dsh_home = composition["dedicated_dsh_home"]
+    assert "build_root" in dsh_home
+    assert "~/.dsh" in dsh_home  # documents that it is explicitly NOT the ambient host DSH_HOME
 
 
 def test_authorization_has_exactly_one_synthetic_fixture():

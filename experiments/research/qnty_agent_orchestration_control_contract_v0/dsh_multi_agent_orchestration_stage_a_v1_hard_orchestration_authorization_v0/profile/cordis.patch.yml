@@ -1,0 +1,84 @@
+# V1 hard-gated profile. Raw DSH providers are loaded first; the QntyLab
+# provider plugin wraps their SubagentProvider.start seam before model-facing
+# tools are registered. The !!js values are explicit runtime bindings and do
+# not contain credentials.
+- id: llm-pi-ai
+  config:
+    providers:
+      openai:
+        apiKeyEnv: OPENAI_API_KEY
+        retryPolicy:
+          mode: normal
+          maxRetries: 0
+        models:
+          - id: gpt-5-mini
+            maxTokens: 4096
+- id: agent-default-model
+  config:
+    provider: openai
+    model: gpt-5-mini
+- insert:
+    - id: subagent-codex
+      name: '@deepseek-ai/dsh-subagent-codex'
+    - id: subagent-claude-code
+      name: '@deepseek-ai/dsh-subagent-claude-code'
+    - id: qntylab-gated-codex
+      name: '@qntylab/dsh-gated-provider'
+      config:
+        providerName: qntylab-gated-codex
+        rawProvider: codex
+        toolName: subagent_codex
+        statePath: !!js process.env.QNTYLAB_DSH_STAGE_A_STATE_PATH
+        qntyLabRoot: !!js process.env.QNTYLAB_ROOT
+        pythonExecutable: !!js process.env.QNTYLAB_PYTHON
+    - id: qntylab-gated-claude-code
+      name: '@qntylab/dsh-gated-provider'
+      config:
+        providerName: qntylab-gated-claude-code
+        rawProvider: claude-code
+        toolName: subagent_claude_code
+        statePath: !!js process.env.QNTYLAB_DSH_STAGE_A_STATE_PATH
+        qntyLabRoot: !!js process.env.QNTYLAB_ROOT
+        pythonExecutable: !!js process.env.QNTYLAB_PYTHON
+    - id: tool-subagent-codex
+      name: '@deepseek-ai/dsh-tool-subagent'
+      config:
+        provider: qntylab-gated-codex
+        toolName: subagent_codex
+        backgroundMode: one-shot
+        maxDepth: provider-managed
+    - id: tool-subagent-claude-code
+      name: '@deepseek-ai/dsh-tool-subagent'
+      config:
+        provider: qntylab-gated-claude-code
+        toolName: subagent_claude_code
+        backgroundMode: one-shot
+        maxDepth: provider-managed
+
+# The pinned dsh-base layer also mounts generic child/delegation infrastructure.
+# These rows are disabled by id after composing dsh-base + dsh-headless.  The
+# pinned source semantics are model-facing for the tool rows below: `spawn`,
+# `fork`, `workflow`, and `ralph` all create child-session execution; the
+# control/list/report rows expose the same generic child surface.  Keeping the
+# rows as inert disabled metadata makes the inherited surface explicit while
+# ensuring no alternate route can register or execute in Stage-A V1.
+- id: subagent-spawn-in-process
+  disabled: true
+- id: subagent-fork-in-process
+  disabled: true
+- id: tool-subagent-control
+  disabled: true
+- id: tool-subagent-list-agents
+  disabled: true
+- id: tool-subagent
+  disabled: true
+- id: tool-subagent-fork
+  disabled: true
+- id: tool-subagent-report
+  disabled: true
+- id: workflow-worker-thread
+  disabled: true
+- id: tool-workflow
+  disabled: true
+- id: tool-ralph
+  disabled: true

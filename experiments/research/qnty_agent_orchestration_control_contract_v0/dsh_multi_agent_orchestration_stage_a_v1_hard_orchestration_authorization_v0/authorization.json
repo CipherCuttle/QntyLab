@@ -1,0 +1,173 @@
+{
+  "artifact_type": "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1_HARD_ORCHESTRATION_AUTHORIZATION",
+  "schema_version": "dsh-stage-a-v1-hard-orchestration-authorization-v0",
+  "project_id": "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1_HARD_ORCHESTRATION_AUTHORIZATION_V0",
+  "authorization_state": "AUTHORIZED_IF_CANONICAL",
+  "authorization_effective": "AFTER_CANONICAL_MERGE_ONLY",
+  "authorized_operation": "ONE_LATER_STAGE_A_V1_EXECUTION_AND_CLOSURE_PHASE",
+  "later_live_episodes_authorized": 1,
+  "second_v1_episode_authorized": false,
+  "later_execution_closure_pr_authorized": 1,
+  "must_open_one_draft_execution_closure_pr": true,
+  "must_stop_after_that_pr": true,
+  "stage_b_authorized": false,
+  "qnty_agent_eval": "NOT_APPLICABLE",
+  "scientific_execution_authorized": false,
+  "trading_authority": "NONE",
+  "capital_authority": "NONE",
+  "active_project_after_closure": "NONE",
+  "canonical_predecessor": {
+    "project_id": "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_EXECUTION_V0",
+    "merge_commit": "6d9469aa8fc82381b124947f4518b6be7279a532",
+    "predecessor_head": "1a74547f0bf1db2ec15f392a7f020ecfaf6959fb",
+    "terminal_outcome": "BLOCK_PARENT_INFRA",
+    "episode_consumed": true,
+    "second_episode_authorized": false,
+    "stage_b_authorized": false
+  },
+  "scope": {
+    "implementation": true,
+    "offline_tests": true,
+    "offline_review": true,
+    "live_openai_calls": 0,
+    "live_dsh_calls": 0,
+    "live_codex_calls": 0,
+    "live_claude_calls": 0,
+    "spend_usd": 0,
+    "upstream_dsh_mutation": false,
+    "qnty_mutation": false,
+    "qnty_agent_eval": "NOT_APPLICABLE",
+    "stage_b_authorized": false
+  },
+  "controller": {
+    "path": "qntylab/dsh_stage_a_v1_hard_orchestration.py",
+    "authority_owner": "QntyLab phase-local pre-dispatch gate",
+    "provider_invocation": "never; callers must invoke only after a persisted grant",
+    "provider_wrapper": "qntylab/dsh_stage_a_v1_hard_orchestration.py:dispatch_authorized_child",
+    "state_machine": [
+      "PREPARED",
+      "IMPLEMENT_REQUIRED",
+      "IMPLEMENT_RUNNING",
+      "IMPLEMENT_RETURNED",
+      "TEST_REQUIRED",
+      "REVIEW_REQUIRED",
+      "REVIEW_RUNNING",
+      "REVIEW_RETURNED",
+      "PASS",
+      "REPAIR_REQUIRED",
+      "REPAIR_RUNNING",
+      "REPAIR_RETURNED",
+      "RETEST_REQUIRED",
+      "REREVIEW_REQUIRED",
+      "REREVIEW_RUNNING",
+      "REREVIEW_RETURNED",
+      "TERMINAL"
+    ],
+    "terminal_blockers": ["BLOCK_CHILD_INFRA", "BLOCK_AUTH", "BLOCK_COST"],
+    "persistence": "atomic JSON checkpoint plus interprocess lock; consumed reservations survive restart",
+    "child_lifecycle": ["CHILD_NOT_STARTED", "CHILD_STARTED", "CHILD_COMPLETED", "CHILD_FAILED", "CHILD_TIMEOUT"]
+  },
+  "delegation_authority": {
+    "exact_tools_only": ["subagent_codex", "subagent_claude_code"],
+    "codex_initial_max": 1,
+    "codex_repair_max": 1,
+    "codex_total_max": 2,
+    "claude_initial_max": 1,
+    "claude_rereview_max": 1,
+    "claude_total_max": 2,
+    "child_infra_retries": 0,
+    "generic_subagent_allowed": false,
+    "subagent_fork_allowed": false,
+    "aliases_allowed": false,
+    "provider_start_race_allowed": false,
+    "alternate_delegation_surfaces_disabled": true,
+    "only_gated_child_routes_model_visible": true,
+    "generic_spawn_executable": false,
+    "generic_fork_executable": false,
+    "workflow_child_bypass_executable": false
+  },
+  "review_contract": {
+    "validator_path": "qntylab/dsh_stage_a_v1_hard_orchestration.py:validate_review_result",
+    "keys": ["critical", "high", "medium", "low", "closure_blocking", "summary"],
+    "finding_keys": ["id", "summary"],
+    "repair_requires": "validated closure_blocking=true with Critical or High findings",
+    "malformed_result": "BLOCK_CHILD_INFRA"
+  },
+  "structural_event_parser": {
+    "path": "qntylab/dsh_stage_a_v1_hard_orchestration.py:parse_structured_tool_events",
+    "authoritative_event_type": "tool/call",
+    "matching": "exact event name only",
+    "substring_matching": false,
+    "catalog_schema_reasoning_prompt_stream_text_count_as_calls": false
+  },
+  "frozen_fixture": {
+    "fixture_id": "STAGE_A_BOUNDED_RETRY_V0",
+    "path": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_authorization_v0/fixture",
+    "new_fixture_created": false,
+    "fixture_mutated": false
+  },
+  "later_execution_controls": {
+    "parent_model": "gpt-5-mini",
+    "retry_policy": {"mode": "normal", "maxRetries": 0},
+    "max_tokens": 4096,
+    "parent_max_request_attempts": 8,
+    "spend_ceiling_usd": 1.0,
+    "authorization_phase_spend_usd": 0
+  },
+  "secret_policy": {
+    "parent_openai_key_only": true,
+    "native_codex_auth": true,
+    "native_claude_auth": true,
+    "child_environment_secret_scrubbing": true,
+    "historical_chat_exposure_global_never_exposed_claim": false,
+    "credential_value_in_artifacts": false
+  },
+  "gated_provider_integration": {
+    "pinned_dsh_commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "pinned_dsh_tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "real_provider_seam": "SubagentProvider.start(request)",
+    "raw_providers": ["codex", "claude-code"],
+    "gated_providers": ["qntylab-gated-codex", "qntylab-gated-claude-code"],
+    "model_facing_tools": {
+      "subagent_codex": "qntylab-gated-codex",
+      "subagent_claude_code": "qntylab-gated-claude-code"
+    },
+    "final_model_facing_delegation_tools": ["subagent_codex", "subagent_claude_code"],
+    "alternate_delegation_surfaces_disabled": true,
+    "only_gated_child_routes_model_visible": true,
+    "generic_spawn_executable": false,
+    "generic_fork_executable": false,
+    "workflow_child_bypass_executable": false,
+    "raw_codex_tool_route": false,
+    "raw_claude_code_tool_route": false,
+    "pinned_base_child_rows_inspected": {
+      "source_commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+      "source_paths": [
+        "packages/bundle/base/cordis.patch.yml",
+        "packages/workflow/tool-workflow/README.md",
+        "packages/workflow/tool-ralph/README.md"
+      ],
+      "disabled_rows": [
+        "subagent-spawn-in-process",
+        "subagent-fork-in-process",
+        "tool-subagent-control",
+        "tool-subagent-list-agents",
+        "tool-subagent",
+        "tool-subagent-fork",
+        "tool-subagent-report",
+        "workflow-worker-thread",
+        "tool-workflow",
+        "tool-ralph"
+      ],
+      "semantics": {
+        "tool-subagent": "provider spawn, toolName subagent",
+        "tool-subagent-fork": "provider fork, toolName subagent_fork",
+        "tool-workflow": "model-facing workflow script fans out subagents",
+        "tool-ralph": "model-facing bounded rounds start fresh child agents"
+      }
+    },
+    "authorization_precedes_raw_provider_start": true,
+    "raw_provider_bypass_possible_through_profile": false,
+    "upstream_dsh_files_modified": false
+  }
+}

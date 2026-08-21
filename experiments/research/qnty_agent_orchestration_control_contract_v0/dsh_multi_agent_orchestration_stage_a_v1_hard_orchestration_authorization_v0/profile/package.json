@@ -1,0 +1,18 @@
+{
+  "name": "dsh-profile-stage-a-v1-hard-orchestration",
+  "private": true,
+  "comment_directory_contract": "This V1 profile is copied to <build_root>/.dsh-home/profiles/stage-a-v1-hard-orchestration. The raw providers remain pinned DSH packages; model-facing tools target only the QntyLab gated providers.",
+  "dependencies": {
+    "@deepseek-ai/dsh-subagent-codex": "link:../../../packages/subagent/subagent-codex",
+    "@deepseek-ai/dsh-subagent-claude-code": "link:../../../packages/subagent/subagent-claude-code",
+    "@qntylab/dsh-gated-provider": "link:./qntylab-gated-provider"
+  },
+  "dsh": {
+    "profile": {
+      "bundles": [
+        "@deepseek-ai/dsh-base",
+        "@deepseek-ai/dsh-headless"
+      ]
+    }
+  }
+}

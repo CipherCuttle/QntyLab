@@ -1,0 +1,144 @@
+{
+  "schema_version": "dsh-stage-a-v1r2-execution-evidence-v0",
+  "project_id": "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R2_EXECUTION_V0",
+  "terminal_outcome": "STAGE_A_V1R2_BLOCK_PARENT_INFRA",
+  "canonical": {
+    "master": "bcd5633ab7aa1e066c893e85a80e5c67b9ead089",
+    "authorization_pr": 174,
+    "authorization_reviewed_head": "5bc886290fc75bea7d6c726b95b577ce1c382b8a",
+    "authorization_canonical_merge": "bcd5633ab7aa1e066c893e85a80e5c67b9ead089",
+    "qualification_pr": 173,
+    "qualification_reviewed_head": "d44d87ce974b7cb691a199aef79b68cf84bb768f",
+    "qualification_canonical_merge": "c795f2233afe97b2fccbda41e62695cb8a2f84b5"
+  },
+  "authorization": {
+    "authorization_state": "AUTHORIZED_IF_CANONICAL",
+    "authorized_operation": "ONE_STAGE_A_V1R2_LIVE_EXECUTION_AND_CLOSURE",
+    "qualification": "CLOSED_PASS",
+    "codex_compatibility": "PASS",
+    "claude_compatibility": "PASS",
+    "version_namespace_equality": "NEVER_USED",
+    "second_v1r2_episode_authorized": false,
+    "stage_b_authorized": false
+  },
+  "runtime": {
+    "repository": "deepseek-ai/deepseek-harness",
+    "commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "tag": "dsh-v0.1.0-rc.7",
+    "runtime_repairs_authorized": false,
+    "profile_package_sha256": "502e68cf2e5e954ba30f604d966302111322977eb3306d3e26edfd6cce0feb2e",
+    "profile_patch_sha256": "d6b44382d0afffede4bd90e7b21ac28167785e261f0a5717f63091eb6b0beee6",
+    "runtime_hardening_patch_sha256": "c1785092d1bb294c9eebb912a3935839ae83893b19c0df393bbab59c762ccaa9",
+    "built_artifact_sha256": {
+      "vendor/cordis/lib/index.js": "1729cdbf8ee40b17c8839e06bf96491490548559e11ef7e411271e0754e751c5",
+      "packages/subagent/subagent/lib/index.js": "510aba14f13d1a9deccf3d81d790be3e7ebcdc4797fcfa584908350d07c529c6",
+      "packages/subprocess/subprocess-local/lib/index.js": "e16ecbcce0fa3d60234a8a1ca3de80fa29d850ba1513bf9e8e6daa186e526ce4",
+      "packages/subagent/subagent-codex/lib/index.js": "153d8c6b236fe367ab6ba87efb8c60735c88dc9fae8eded658e2953cd96911d5",
+      "packages/subagent/subagent-claude-code/lib/index.js": "b9ce748cf318613f6475d143e7475ff2c0f5e72061b968ec4de3f6b92df572dc",
+      "apps/cli/lib/bin.js": "c0226687bb20f45c603ec6fe50f3de16d1c3510c3a803304ec575ef9bc366c62"
+    }
+  },
+  "prelive": {
+    "boot_ready": "YES",
+    "plugin_tree_settled": "YES",
+    "raw_providers": ["codex", "claude-code"],
+    "gated_providers": ["qntylab-gated-codex", "qntylab-gated-claude-code"],
+    "model_facing_child_tools": ["subagent_codex", "subagent_claude_code"],
+    "generic_child_tools": [],
+    "background_delegation": "DISABLED",
+    "parent_budget_gate": "ACTIVE",
+    "auxiliary_model_routes": [],
+    "boot_model_requests": 0,
+    "boot_child_spawns": 0,
+    "boot_help_exit_code": 0,
+    "profile_dump_sha256": "not_persisted",
+    "codex_fingerprint_expected": "fce6ecefe03ff72403f124456e4976a4a251ede6d1c74a820843ad1e7ee517a6",
+    "codex_fingerprint_observed": "fce6ecefe03ff72403f124456e4976a4a251ede6d1c74a820843ad1e7ee517a6",
+    "claude_fingerprint_expected": "8939d4b139759c12f240fdcba81661b5e8d59d53f769722baab001dea3f8180b",
+    "claude_fingerprint_observed": "8939d4b139759c12f240fdcba81661b5e8d59d53f769722baab001dea3f8180b",
+    "codex_zero_model_probe": "PASS",
+    "claude_static_contract": "PASS",
+    "secret_gate": "PASS",
+    "secret_read_before_prelive_pass": false
+  },
+  "controller": {
+    "initial_state": "IMPLEMENT_REQUIRED",
+    "final_state": "IMPLEMENT_REQUIRED",
+    "initial_digest": "2ec26e9ec88e9e0819a95eebc32cba02d87b5fc90c8869c69f14183b1a428d3b",
+    "final_digest": "2ec26e9ec88e9e0819a95eebc32cba02d87b5fc90c8869c69f14183b1a428d3b",
+    "event_count": 1,
+    "child_budgets_consumed": [],
+    "episode_consumed": false
+  },
+  "live": {
+    "first_paid_parent_dispatch": false,
+    "parent_request_attempts": 0,
+    "llm_retries": 0,
+    "estimated_spend_usd": 0.0,
+    "codex_actual_calls": 0,
+    "claude_actual_calls": 0,
+    "codex_denied_attempts": 0,
+    "claude_denied_attempts": 0,
+    "generic_delegation_actual_calls": 0,
+    "background_child_calls": 0,
+    "workflow_child_calls": 0,
+    "ralph_child_calls": 0,
+    "initial_test": "NOT_REACHED",
+    "initial_review": "NOT_REACHED",
+    "repair_authorized": false,
+    "repair_call": "NOT_REACHED",
+    "retest": "NOT_REACHED",
+    "rereview": "NOT_REACHED",
+    "parent_budget_state_materialized": false,
+    "dsh_boot_started": false,
+    "episode_consumed": false
+  },
+  "fixture": {
+    "id": "STAGE_A_BOUNDED_RETRY_V0",
+    "location": "DISPOSABLE_TEMPORARY_COPY_OUTSIDE_QNTYLAB_AND_QNTY",
+    "mutable_paths": ["retry.py"],
+    "immutable_paths": ["TASK.md", "tests/test_retry.py"],
+    "pre_hashes": {
+      "TASK.md": "19571f8c70364e41ae8366cd07b0f56546845c8b3f43b04f93634f75f9a6a6ff",
+      "retry.py": "f82a84088b76dd82ead87d5536f8120d62e7c4408c27fcbe59662155b5dd47ae",
+      "tests/test_retry.py": "caf317035b37a6606ff7b2250cf0b1cc6a1e8db7660414bf280eda4ddee641ac"
+    },
+    "post_hashes": {
+      "TASK.md": "19571f8c70364e41ae8366cd07b0f56546845c8b3f43b04f93634f75f9a6a6ff",
+      "retry.py": "f82a84088b76dd82ead87d5536f8120d62e7c4408c27fcbe59662155b5dd47ae",
+      "tests/test_retry.py": "caf317035b37a6606ff7b2250cf0b1cc6a1e8db7660414bf280eda4ddee641ac"
+    },
+    "immutable_hashes_preserved": true,
+    "mutation_scope": "NONE",
+    "claude_mutation": false
+  },
+  "blocker": {
+    "classification": "STAGE_A_V1R2_BLOCK_PARENT_INFRA",
+    "layer": "PARENT_INFRASTRUCTURE",
+    "exact_failure_class": "NODE_MODULE_RESOLUTION_BEFORE_DSH_BOOT",
+    "failure_detail": "The DSH launcher could not resolve the tsx loader from the disposable fixture cwd; no DSH process booted.",
+    "observed_before_paid_parent_dispatch": true,
+    "rescue_run_performed": false,
+    "runtime_repair_performed": false
+  },
+  "secrecy": {
+    "preexisting_chat_exposure_acknowledged": true,
+    "secret_value_exposed_by_stage_a_v1r2_execution_tooling": false,
+    "secret_value_committed_or_persisted_in_stage_a_v1r2_artifacts": false,
+    "secret_value_or_hash_recorded": false,
+    "native_child_auth_contents_recorded": false,
+    "raw_model_transcript_persisted": false
+  },
+  "closure": {
+    "project_state_after": "CLOSED_BLOCKED",
+    "implementation_authorized_after": false,
+    "implementation_completed_after": true,
+    "authorized_live_episodes_after": 0,
+    "episode_consumed_after": false,
+    "second_v1r2_episode_authorized": false,
+    "stage_b_authorized": false,
+    "active_project_after": "NONE",
+    "draft_closure_pr_budget": 1
+  }
+}

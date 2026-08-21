@@ -5494,8 +5494,8 @@ next_action = "CLOSED_PASS: offline native Codex and Claude compatibility is qua
 [[project]]
 project_id = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R2_EXECUTION_V0"
 display_name = "DSH Stage-A V1R2 one live execution V0"
-state = "ACTIVE"
-authority_level = "BOUNDED_ONE_EPISODE_DSH_V1R2_EXECUTION_AND_CLOSURE"
+state = "CLOSED_BLOCKED"
+authority_level = "BOUNDED_ONE_EPISODE_DSH_V1R2_EXECUTION_CLOSED_BLOCKED_PARENT_INFRA"
 phase_type = "BOUNDED_LIVE_INFRASTRUCTURE_EXECUTION"
 authoritative_artifacts = [
   "AGENTS.md",
@@ -5504,6 +5504,9 @@ authoritative_artifacts = [
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1r2_live_execution_authorization_and_activation_v0/authorization.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1r2_live_execution_authorization_and_activation_v0/hostile_governance_review.md",
   "tests/test_dsh_stage_a_v1r2_live_execution_authorization_activation_v0.py",
+  "tests/test_dsh_stage_a_v1r2_execution_evidence.py",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1r2_execution_v0/execution_evidence.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1r2_execution_v0/closure.md",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1r2_native_child_compatibility_qualification_v0/qualification.json",
 ]
 authorization_state = "AUTHORIZED_IF_CANONICAL"
@@ -5513,10 +5516,10 @@ canonical_predecessor_pr = 173
 canonical_predecessor_reviewed_head = "d44d87ce974b7cb691a199aef79b68cf84bb768f"
 canonical_predecessor_merge = "c795f2233afe97b2fccbda41e62695cb8a2f84b5"
 qualification_required = "V1R2_NATIVE_CHILD_COMPATIBILITY_CLOSED_PASS"
-implementation_authorized = true
-implementation_completed = false
+implementation_authorized = false
+implementation_completed = true
 episode_consumed = false
-authorized_live_episodes = 1
+authorized_live_episodes = 0
 second_v1r2_episode_authorized = false
 execution_closure_pr_budget = 1
 activation_consumes_live_episode = false
@@ -5565,4 +5568,5 @@ trading_authority = "NONE"
 capital_authority = "NONE"
 qnty_agent_eval = "NOT_APPLICABLE"
 active_project_after_closure = "NONE"
-next_action = "Execute exactly one Stage-A V1R2 live episode using the canonical runtime and canonical V1R2 native compatibility fingerprints; record exactly one terminal PASS/FAIL/BLOCK outcome; open exactly one draft closure PR; STOP. No second episode and no Stage B."
+terminal_outcome = "STAGE_A_V1R2_BLOCK_PARENT_INFRA"
+next_action = "CLOSED_BLOCKED: the one authorized V1R2 episode stopped before DSH boot and before paid parent dispatch because the disposable fixture cwd could not resolve the runtime tsx loader. No rescue rerun, runtime repair, second episode, or Stage B is authorized. Review the single draft execution/closure PR, then stop. Any later V1R2 attempt requires new Git-backed authority."

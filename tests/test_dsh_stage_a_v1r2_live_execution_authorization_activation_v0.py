@@ -49,16 +49,17 @@ def test_exact_native_fingerprints_and_sdk_identity():
     assert identity["version_namespace_equality"] == qualification["version_namespace_equality"]
 
 
-def test_exactly_one_active_execution_project_and_activation_state():
+def test_closed_execution_project_and_activation_state():
     _, _, registry = project_context.load_context_sources(ROOT)
     projects = project_context.validate_projects_registry(ROOT, registry)
     active = [record for record in projects.values() if record["state"] == "ACTIVE"]
-    assert [record["project_id"] for record in active] == [PROJECT_ID]
+    assert active == []
     record = projects[PROJECT_ID]
-    assert record["implementation_authorized"] is True
-    assert record["implementation_completed"] is False
+    assert record["state"] == "CLOSED_BLOCKED"
+    assert record["implementation_authorized"] is False
+    assert record["implementation_completed"] is True
     assert record["episode_consumed"] is False
-    assert record["authorized_live_episodes"] == 1
+    assert record["authorized_live_episodes"] == 0
     assert record["second_v1r2_episode_authorized"] is False
     assert record["execution_closure_pr_budget"] == 1
     assert record["activation_consumes_live_episode"] is False

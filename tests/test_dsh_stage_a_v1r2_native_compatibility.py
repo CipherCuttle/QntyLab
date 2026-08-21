@@ -193,7 +193,7 @@ def test_historical_v1r1_execution_remains_closed_blocked_and_unconsumed() -> No
     assert evidence["closure"]["project_state_after"] == "CLOSED_BLOCKED"
 
 
-def test_v1r2_qualification_closes_and_only_its_execution_successor_is_active() -> None:
+def test_v1r2_qualification_and_execution_successor_are_closed() -> None:
     qualification = json.loads(V1R2_QUALIFICATION.read_text(encoding="utf-8"))
     _, _, registry = project_context.load_context_sources(ROOT)
     project = next(record for record in registry["project"] if record["project_id"] == qualification["project_id"])
@@ -207,5 +207,9 @@ def test_v1r2_qualification_closes_and_only_its_execution_successor_is_active() 
     assert project["state"] == "CLOSED_PASS"
     assert project["implementation_authorized"] is False
     active = [record for record in registry["project"] if record["state"] == "ACTIVE"]
-    assert [record["project_id"] for record in active] == [V1R2_EXECUTION_PROJECT_ID]
-    assert active[0]["implementation_authorized"] is True
+    assert active == []
+    execution = next(record for record in registry["project"] if record["project_id"] == V1R2_EXECUTION_PROJECT_ID)
+    assert execution["state"] == "CLOSED_BLOCKED"
+    assert execution["implementation_authorized"] is False
+    assert execution["implementation_completed"] is True
+    assert execution["authorized_live_episodes"] == 0

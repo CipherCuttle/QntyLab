@@ -1,0 +1,92 @@
+{
+  "artifact_type": "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_EXECUTION_EVIDENCE",
+  "schema_version": "v0",
+  "phase_id": "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_EXECUTION_V0",
+  "canonical_authorization": {
+    "project_id": "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_AUTHORIZATION_V0",
+    "pr": 165,
+    "merge_commit": "1924bd4d4e8bd589ffde4887c5f8893c6c95496a",
+    "reviewed_head": "bb4d1a3b5bfb4ba7c13cd7b8eda3830f72897084"
+  },
+  "h04_prelive_repair": {
+    "commit": "523b86b",
+    "status": "COMPLETE",
+    "targeted_tests_before_live": "29/29 passing",
+    "max_retries": 0,
+    "max_parent_request_attempts": 8,
+    "conservative_max_episode_cost_usd": 0.865536,
+    "spend_ceiling_usd": 1.00
+  },
+  "materialization": {
+    "dsh_source_root": "/home/swirky/DevHub/dsh-pinned-materialization-v0",
+    "dsh_build_root": "/home/swirky/DevHub/worktrees/dsh-stage-a-build-root-v0",
+    "dsh_home": "/home/swirky/DevHub/worktrees/dsh-stage-a-build-root-v0/.dsh-home",
+    "pinned_dsh_commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "pinned_dsh_tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "pinned_dsh_tag": "dsh-v0.1.0-rc.7",
+    "provider_postimage_sha256": "9223f47a6aef5971df53857e5ec7daf2d20a55fcef0e935e39b4c2bca506dc41",
+    "materializer_identity_checks": "matches: true (exact commit/tree/tag, tracked_status empty)",
+    "build_command": "pnpm install && pnpm run build",
+    "build_result": "SUCCESS",
+    "compiled_provider_contains_repair": "verified: packages/subagent/subagent-codex/lib/index.js contains approvalPolicy",
+    "profile_composition_bug_found_and_fixed_before_live": "profile-local `pnpm install` inside build_root's own pnpm workspace requires --ignore-workspace, or pnpm silently no-ops against the parent monorepo instead of installing this directory's own link: dependencies. Execution-mechanics fix only; no frozen file or value changed."
+  },
+  "offline_gates": {
+    "gate_a_provider_identity": "PASS -- captured_thread_start_contract() returned {cwd, ephemeral:true, approvalPolicy:'never', sandbox:'workspace-write'} with no ProviderBoundaryError",
+    "gate_b_composition_identity": "PASS -- --dump-config output matched the exact frozen allowlist: llm-pi-ai patched (not duplicated) to one openai route with apiKeyEnv OPENAI_API_KEY, retryPolicy.maxRetries 0, models [{gpt-5-mini, maxTokens 4096}]; agent-default-model patched to {provider: openai, model: gpt-5-mini}; subagent-codex, subagent-claude-code, tool-subagent-codex (provider codex), tool-subagent-claude-code (provider claude-code) inserted exactly once each; no other llm-* or tool-subagent* row beyond dsh-base's own pre-existing infrastructure",
+    "gate_c_package_resolution": "PASS -- node_modules/@deepseek-ai/dsh-subagent-codex and dsh-subagent-claude-code both resolved as symlinks with real paths inside build_root/packages/subagent/, confirmed via readlink -f; no .pnpm store copy, no registry fetch",
+    "gate_d_ambient_override_exclusion": "PASS -- dedicated DSH_HOME (build_root/.dsh-home) contained no home-level cordis.patch.yml at execution time",
+    "monitoring_overlay": {
+      "purpose": "disable JSONL session-log compression (default zstd) so the real-time safety monitor could read step/retry events; applied via the CLI's own supported --patch overlay flag, layered on top of (not replacing) the frozen profile",
+      "affects_only": "session-persistence-jsonl.config.compression",
+      "does_not_affect": ["parent model", "spend ceiling", "auth mechanism", "child routes", "call budgets", "provider identity"],
+      "bug_found_and_fixed_before_live": "a cordis patch replaces a row's whole config rather than merging; the first overlay draft omitted the required `root` field and crashed DSH at boot (exit code 1, 3 seconds, before any live call) -- fixed by restating `root` byte-identical to dsh-base's own row, then re-verified offline via --dump-config diff before retrying"
+    }
+  },
+  "secret_handling": {
+    "secret_file": "~/.secrets/openai_api_key_stage_a",
+    "presence_gate": "PASS (test -s only, value never read by the orchestrating agent, never printed, never included in any command text -- injected via `OPENAI_API_KEY=\"$(cat \"$SECRET_FILE\")\"` inside a single shell invocation)",
+    "value_ever_exposed_in_transcript_or_artifact": false,
+    "child_isolation_verified_from_pinned_source": "packages/subprocess/subprocess/src/index.ts: scrubbedParentEnv() strips any env var matching /KEY|PASSWORD|SECRET|TOKEN/i (case-insensitive) from every spawned child by default; subagent-codex's own env config defaults to {} (no explicit re-add), so OPENAI_API_KEY is structurally excluded from the Codex/Claude child processes by the framework itself, independent of anything this execution did"
+  },
+  "live_episode": {
+    "episode_consumed": true,
+    "episode_consumed_basis": "confirmed real usage events (input/output/cache-read token counts) present in the session log across 7 completed steps -- genuine OpenAI API activity occurred",
+    "parent_model": "gpt-5-mini",
+    "parent_provider": "openai via llm-pi-ai",
+    "session_log_path": "--tmp-stage_a_evidence-fixture_workspace--/session-bd8e23f6-319d-4ee5-97cc-4d17c0244abd/session.jsonl (relative to DSH_HOME/sessions; kept out of QntyLab per the authorization's no-raw-transcript rule -- this artifact records only structured, minimal evidence derived from it)",
+    "parent_step_count": 8,
+    "parent_retry_event_count": 0,
+    "parent_retry_started_event_count": 0,
+    "parent_input_tokens_reported": 10142,
+    "parent_output_tokens_reported": 1442,
+    "parent_cache_read_tokens_reported": 47488,
+    "parent_estimated_spend_usd": 0.006607,
+    "parent_estimated_spend_source": "computed from session-log usage events self-reported by the provider adapter (input x $0.25/1e6 + output x $2/1e6 + cacheRead x $0.025/1e6); not a verified OpenAI billing statement",
+    "parent_conservative_max_spend_usd": 0.865536,
+    "codex_tool_calls_observed": 3,
+    "codex_tool_calls_authorized": "1 initial + max 1 conditional repair (gated on a Claude Critical/High finding) = 2 maximum",
+    "claude_tool_calls_observed": 0,
+    "workspace_boundary_violation": false,
+    "fixture_files_after_termination": {
+      "retry.py_sha256": "f82a84088b76dd82ead87d5536f8120d62e7c4408c27fcbe59662155b5dd47ae",
+      "retry.py_matches_frozen_stub": true,
+      "TASK.md_sha256": "19571f8c70364e41ae8366cd07b0f56546845c8b3f43b04f93634f75f9a6a6ff",
+      "tests_sha256": "caf317035b37a6606ff7b2250cf0b1cc6a1e8db7660414bf280eda4ddee641ac",
+      "note": "no file in the fixture was ever mutated -- all three Codex delegations were interrupted before any of them returned a completed result; the frozen tests still fail with the original NotImplementedError"
+    }
+  },
+  "termination": {
+    "reason": "PARENT_CALL_BUDGET_VIOLATION",
+    "reason_detail": "The DSH parent invoked subagent_codex three separate times (steps 6, 7, 8), each with a near-identical full implementation prompt, without ever invoking subagent_claude_code even once. The frozen contract authorizes at most 2 Codex calls total, and the second is conditional on a Claude Critical/High finding from the first review -- a finding that could not exist because Claude was never consulted. This is a genuine, source-confirmed protocol violation (verified via JSON-aware parsing of the top-level `tool/call` events, not a substring match), independent of the separate false-positive that triggered the actual kill command.",
+    "false_positive_in_original_kill_trigger": "The kill decision was issued after a raw substring grep (`\"name\":\"subagent_[a-z_]*\"`) matched the string 'subagent_fork' in the log. JSON-aware re-analysis after the fact showed no top-level tool/call event ever named subagent_fork -- the substring match came from tool-catalog/schema text embedded in streaming chunk or request-header data, not an actual invocation (subagent_fork is a real, always-present tool from dsh-base's own default composition, so its name legitimately appears in every request's tool list regardless of whether it is called). The termination is retrospectively validated by the independently-confirmed Codex call-budget violation above, but the monitor script's real-time check should have parsed tool/call events structurally rather than substring-matching the raw file; this gap is recorded honestly rather than silently corrected after the fact.",
+    "manual_kill_issued": true,
+    "kill_method": "SIGTERM, process exited cleanly (no SIGKILL escalation needed)",
+    "episode_number": 1,
+    "second_episode_authorized": false
+  },
+  "terminal_outcome": "BLOCK_PARENT_INFRA",
+  "terminal_outcome_basis": "The DSH parent's own orchestration behavior deviated from the frozen call-sequence contract (repeated Codex delegation without the required test-then-review gate), unrelated to whether any implementation Codex might have produced would have been correct. This is a parent-process/composition-level fault under the frozen taxonomy, not FAIL_IMPLEMENTATION (no implementation was ever completed to evaluate) and not BLOCK_COST (the step ceiling, retry count, and spend all stayed within bounds -- 8/8 steps, 0 retries, ~$0.0066 of $1.00).",
+  "no_second_episode_authorized": true,
+  "no_stage_b_authorized": true
+}

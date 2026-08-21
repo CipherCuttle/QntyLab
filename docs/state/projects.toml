@@ -5152,3 +5152,46 @@ capital_authority = "NONE"
 downstream_authority = "NONE"
 active_project_after_closure = "NONE"
 next_action = "After canonical merge, execute exactly one DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_EXECUTION_V0 phase: build the runnable profile from the pinned DSH commit plus the canonical repaired Codex-provider materialization, run the frozen bounded lifecycle (Codex implements the STAGE_A_BOUNDED_RETRY_V0 fixture in a disposable copy, Claude independently hostile-reviews, at most one repair and one targeted rereview if a Critical/High is found), keep OPENAI_API_KEY scoped to the DSH parent process only, keep total parent-model spend under the frozen $1.00 ceiling, record PASS/FAIL/BLOCK evidence, open one draft execution/closure PR, and stop. No second fixture, no benchmark suite, no permission-forensics reopening."
+
+[[project]]
+project_id = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_EXECUTION_V0"
+display_name = "DSH multi-agent orchestration Stage-A execution V0"
+state = "BLOCKED"
+authority_level = "ONE_LIVE_EPISODE_CONSUMED_NO_FURTHER_AUTHORITY"
+phase_type = "GOVERNANCE_BOUNDED_LIVE_EXECUTION"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_execution_v0/execution_evidence.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_execution_v0/closure.md",
+]
+predecessor_project_id = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_AUTHORIZATION_V0"
+predecessor_pr = 165
+predecessor_canonical_master = "1924bd4d4e8bd589ffde4887c5f8893c6c95496a"
+h04_prelive_repair_commit = "523b86b"
+h04_status = "COMPLETE"
+implementation_authorized = false
+episode_number = 1
+episode_consumed = true
+second_episode_authorized = false
+live_dsh_parent_calls = 8
+live_parent_retry_events = 0
+codex_calls_observed = 3
+codex_calls_authorized_max = 2
+claude_calls_observed = 0
+claude_calls_authorized_max = 2
+fixture_mutated = false
+estimated_spend_usd = 0.006607
+spend_ceiling_usd = 1.00
+terminal_outcome = "BLOCK_PARENT_INFRA"
+terminal_outcome_basis = "DSH parent invoked subagent_codex three times without ever invoking subagent_claude_code, violating the frozen call-sequence contract; unrelated to fixture-implementation correctness or cost/retry boundedness, both of which held throughout."
+qnty_agent_eval = "NOT_APPLICABLE"
+scientific_execution_authorized = false
+qnty_runtime_authority = "NONE"
+trading_authority = "NONE"
+promotion_authority = "NONE"
+capital_authority = "NONE"
+downstream_authority = "NONE"
+stage_b_authorized = false
+active_project_after_closure = "NONE"
+next_action = "CLOSED_BLOCKED: no second Stage-A episode is authorized under this closure. Any future DSH multi-agent orchestration attempt requires a new, separately Git-backed authorization phase that accounts for this finding -- specifically, that a prompt-level call-sequence instruction to the DSH parent is not self-enforcing and must be paired with a framework- or driver-level hard budget per delegation tool, not only a total-step ceiling. No Stage B, no benchmark suite, no scientific/trading/capital authority follows from this closure."

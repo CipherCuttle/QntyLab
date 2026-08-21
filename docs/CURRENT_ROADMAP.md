@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- None.
+- `DSH Stage-A V1R1 bootstrap and runtime hardening authorization V0` — `ACTIVE`. Commit, push, and open exactly one draft PR for review; do not merge, run the Stage-A fixture, or invoke live OpenAI/Codex/Claude/DSH execution.
 
 ## Queued — not authorized
 

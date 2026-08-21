@@ -73,6 +73,11 @@ class ChildLifecycle(str, Enum):
     CHILD_COMPLETED = "CHILD_COMPLETED"
     CHILD_FAILED = "CHILD_FAILED"
     CHILD_TIMEOUT = "CHILD_TIMEOUT"
+    RAW_START_FAILED = "RAW_START_FAILED"
+    RAW_RESULT_FAILED = "RAW_RESULT_FAILED"
+    MALFORMED_REVIEW = "MALFORMED_REVIEW"
+    GATE_COMPLETE_FAILED = "GATE_COMPLETE_FAILED"
+    DISPOSE_FAILED = "DISPOSE_FAILED"
 
 
 class OrchestrationError(ValueError):
@@ -305,9 +310,20 @@ class HardOrchestrationController:
             if active["tool_name"] != grant.tool_name or active["role"] != grant.role:
                 raise AuthorizationDenied("child token/tool binding mismatch")
             state["active_call"]["lifecycle"] = status.value
-            if status in {ChildLifecycle.CHILD_FAILED, ChildLifecycle.CHILD_TIMEOUT}:
+            if status in {
+                ChildLifecycle.CHILD_FAILED,
+                ChildLifecycle.CHILD_TIMEOUT,
+                ChildLifecycle.RAW_START_FAILED,
+                ChildLifecycle.RAW_RESULT_FAILED,
+                ChildLifecycle.GATE_COMPLETE_FAILED,
+                ChildLifecycle.DISPOSE_FAILED,
+            }:
                 state["active_call"] = None
-                self._terminal(state, AuthorityState.BLOCK_CHILD_INFRA, "BLOCK_CHILD_INFRA", "CHILD_INFRA_FAILURE")
+                self._terminal(state, AuthorityState.BLOCK_CHILD_INFRA, "BLOCK_CHILD_INFRA", status.value)
+                return
+            if status == ChildLifecycle.MALFORMED_REVIEW:
+                state["active_call"] = None
+                self._terminal(state, AuthorityState.BLOCK_CHILD_INFRA, "MALFORMED_REVIEW", "MALFORMED_REVIEW")
                 return
             if status != ChildLifecycle.CHILD_COMPLETED:
                 raise OrchestrationError(f"unsupported child status: {status.value}")

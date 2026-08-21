@@ -1,0 +1,4 @@
+# Offline qualification overlay: keep the built DSH/Cordis profile mounted
+# without starting the headless task runner or any model/child execution.
+- id: headless-runner
+  disabled: true

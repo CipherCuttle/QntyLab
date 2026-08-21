@@ -5,7 +5,8 @@
   "dependencies": {
     "@deepseek-ai/dsh-subagent-codex": "link:../../../packages/subagent/subagent-codex",
     "@deepseek-ai/dsh-subagent-claude-code": "link:../../../packages/subagent/subagent-claude-code",
-    "@qntylab/dsh-gated-provider": "link:./qntylab-gated-provider"
+    "@qntylab/dsh-gated-provider": "link:./qntylab-gated-provider",
+    "@qntylab/dsh-parent-budget": "link:./qntylab-parent-budget"
   },
   "dsh": {
     "profile": {

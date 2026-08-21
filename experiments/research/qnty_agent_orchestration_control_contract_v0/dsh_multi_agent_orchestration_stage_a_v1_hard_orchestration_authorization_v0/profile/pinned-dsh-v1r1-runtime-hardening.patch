@@ -1,0 +1,37 @@
+diff --git a/packages/subagent/subagent-claude-code/src/run.ts b/packages/subagent/subagent-claude-code/src/run.ts
+index 6c1e0a8dbf..2b8a63ad2a 100644
+--- a/packages/subagent/subagent-claude-code/src/run.ts
++++ b/packages/subagent/subagent-claude-code/src/run.ts
+@@ -185,7 +185,18 @@ export function claudeQueryOptions(
+     pathToClaudeCodeExecutable: spec.executable,
+     env: { ...scrubbedParentEnv(), ...spec.env },
+     persistSession: false,
+-    disallowedTools: ['AskUserQuestion'],
++    // The independent reviewer is a mechanical read-only actor. The pinned
++    // SDK accepts an explicit built-in tool allowlist and an empty settings
++    // source list; host/project settings therefore cannot add Edit, Bash,
++    // Agent, Task, or MCP capabilities behind this profile.
++    tools: ['Read', 'Glob', 'Grep'],
++    allowedTools: ['Read', 'Glob', 'Grep'],
++    disallowedTools: ['Write', 'Edit', 'Bash', 'Agent', 'Task', 'AskUserQuestion', 'mcp__*'],
++    settingSources: [],
++    permissionMode: 'dontAsk',
++    canUseTool: async (toolName) => toolName === 'Read' || toolName === 'Glob' || toolName === 'Grep'
++      ? { behavior: 'allow' }
++      : { behavior: 'deny', message: 'Stage-A reviewer is read-only' },
+     spawnClaudeCodeProcess: (options: SpawnOptions) => {
+       const child = spec.spawn(claudeSpawnSpec(options, spec.disposeGraceMs))
+       capture(child)
+diff --git a/packages/subagent/subagent-codex/src/wire.ts b/packages/subagent/subagent-codex/src/wire.ts
+index bc00ff0acf..65aab6d140 100644
+--- a/packages/subagent/subagent-codex/src/wire.ts
++++ b/packages/subagent/subagent-codex/src/wire.ts
+@@ -154,6 +154,8 @@ export class CodexAppServerWire {
+     const response = object(await this.guarded(this.transport.request('thread/start', {
+       cwd,
+       ephemeral: true,
++      approvalPolicy: 'never',
++      sandbox: 'workspace-write',
+     }, signal), signal), 'thread/start response')
+     const thread = object(response.thread, 'thread/start thread')
+     const id = string(thread.id, 'thread/start thread id')

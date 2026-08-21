@@ -49,7 +49,7 @@ export function createQntyLabGateClient({ statePath, qntyLabRoot, pythonExecutab
   }
 }
 
-export function createGatedProvider({ providerName, toolName, rawProvider, gate }) {
+export function createGatedProvider({ providerName, toolName, rawProvider, resolveCurrent = () => rawProvider, gate }) {
   return {
     name: providerName,
     capabilities: rawProvider.capabilities,
@@ -58,6 +58,14 @@ export function createGatedProvider({ providerName, toolName, rawProvider, gate 
       // This is the DSH SubagentProvider.start seam. The persisted grant is
       // obtained before rawProvider.start can reach native Codex/Claude spawn.
       const grant = await Promise.resolve(gate.authorize(toolName))
+      // The authorization reservation is intentionally before this identity
+      // check. A provider removal/replacement after reservation consumes the
+      // grant and blocks infrastructure without reaching native start().
+      const current = resolveCurrent()
+      if (current !== rawProvider) {
+        await Promise.resolve(gate.complete(grant, { status: 'CHILD_FAILED' }))
+        throw new Error('qntylab-gated-provider: raw provider disappeared or was replaced')
+      }
       let settled = false
       const settle = async (status, reviewResult) => {
         if (settled) return
@@ -68,12 +76,20 @@ export function createGatedProvider({ providerName, toolName, rawProvider, gate 
         const run = await rawProvider.start(request)
         const result = Promise.resolve(run.result).then(
           async value => {
-            const reviewResult = grant.role.startsWith('claude_') ? reviewResultFromChild(value) : undefined
+            let reviewResult
+            if (grant.role.startsWith('claude_')) {
+              try {
+                reviewResult = reviewResultFromChild(value)
+              } catch (error) {
+                await settle('MALFORMED_REVIEW')
+                throw error
+              }
+            }
             await settle('CHILD_COMPLETED', reviewResult)
             return value
           },
           async error => {
-            await settle('CHILD_FAILED')
+            await settle('RAW_RESULT_FAILED')
             throw error
           },
         )
@@ -83,15 +99,55 @@ export function createGatedProvider({ providerName, toolName, rawProvider, gate 
           async dispose() {
             try {
               return await run.dispose()
+            } catch (error) {
+              await settle('DISPOSE_FAILED')
+              throw error
             } finally {
               await settle('CHILD_TIMEOUT')
             }
           },
         }
       } catch (error) {
-        await settle('CHILD_FAILED')
+        await settle('RAW_START_FAILED')
         throw error
       }
     },
   }
+}
+
+export function createMirroredGatedProvider({ providerName, toolName, rawName, ctx, gate }) {
+  let disposeGated
+  let mountedRaw
+
+  function mount(rawProvider) {
+    if (disposeGated !== undefined) return
+    mountedRaw = rawProvider
+    const wrapped = createGatedProvider({
+      providerName,
+      toolName,
+      rawProvider,
+      resolveCurrent: () => ctx.subagents.getProvider(rawName),
+      gate,
+    })
+    disposeGated = ctx.subagents.registerProvider(wrapped)
+  }
+
+  function remove() {
+    if (disposeGated === undefined) return
+    disposeGated()
+    disposeGated = undefined
+    mountedRaw = undefined
+  }
+
+  // Register both listeners before observing current presence. This mirrors
+  // pinned tool-subagent and is safe when either provider fiber activates first.
+  ctx.on('subagent/provider-added', provider => {
+    if (provider.name === rawName) mount(provider)
+  })
+  ctx.on('subagent/provider-removed', name => {
+    if (name === rawName) remove()
+  })
+  const present = ctx.subagents.getProvider(rawName)
+  if (present !== undefined) mount(present)
+  return { remove, get mountedRaw() { return mountedRaw } }
 }

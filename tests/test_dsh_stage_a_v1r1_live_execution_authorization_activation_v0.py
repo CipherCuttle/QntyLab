@@ -105,8 +105,8 @@ def test_no_authority_leakage_or_live_activity_in_this_phase():
 
 def test_project_context_next_action_is_bounded_and_no_second_episode():
     data = project_context.context_data(ROOT)
-    assert data["active_project"] is None
-    assert data["current_permitted_next_action"] == "No project implementation is currently authorized."
+    assert data["active_project"]["project_id"] == "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R2_EXECUTION_V0"
+    assert data["current_permitted_next_action"].startswith("Execute exactly one Stage-A V1R2 live episode")
 
 
 def test_codex_claude_and_prelive_boundaries_are_fail_closed():

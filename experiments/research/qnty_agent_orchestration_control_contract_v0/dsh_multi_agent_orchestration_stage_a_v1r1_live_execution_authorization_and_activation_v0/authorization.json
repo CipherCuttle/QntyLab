@@ -1,0 +1,245 @@
+{
+  "artifact_type": "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R1_LIVE_EXECUTION_AUTHORIZATION_AND_ACTIVATION",
+  "schema_version": "dsh-stage-a-v1r1-live-execution-authorization-activation-v0",
+  "project_id": "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R1_EXECUTION_V0",
+  "phase_state": "ACTIVE_CANDIDATE",
+  "authorization_state": "AUTHORIZED_IF_CANONICAL",
+  "authorization_effective": "AFTER_CANONICAL_MERGE_ONLY",
+  "authorized_operation": "ONE_STAGE_A_V1R1_LIVE_EXECUTION_AND_CLOSURE",
+  "canonicalization": {
+    "candidate_base_sha": "e9c7a889747fd3a978f241e12448570b4634db81",
+    "branch_local_active_project_does_not_self_authorize": true,
+    "canonical_presence_required_before_execution": true,
+    "effective_scope": "Exactly one later live DSH Stage-A V1R1 episode and exactly one draft execution/closure PR; stop.",
+    "no_auto_merge": true
+  },
+  "canonical_predecessor": {
+    "project_id": "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R1_BOOTSTRAP_AND_RUNTIME_HARDENING_AUTHORIZATION_V0",
+    "pr": 170,
+    "reviewed_head": "1443d89f2f12f37dff777d2de05563698a2dce6b",
+    "merge": "e9c7a889747fd3a978f241e12448570b4634db81",
+    "required_state": "CLOSED_PASS",
+    "required_qualification": "QUALIFIED_OFFLINE_BOOT_READY",
+    "required_boot_ready": "YES",
+    "binding_mismatch_behavior": "BLOCK_AUTH"
+  },
+  "qualification_receipt": {
+    "path": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1r1_bootstrap_and_runtime_hardening_authorization_v0/qualification_receipt.json",
+    "sha256": "2eb7d9c2af67a120d5daef87e6c49bb5dfd41733546c9615316cdd250cd04704",
+    "qualification": "QUALIFIED_OFFLINE_BOOT_READY",
+    "boot_ready": "YES",
+    "model_requests": 0,
+    "child_spawns": 0
+  },
+  "active_execution_project": {
+    "state": "ACTIVE",
+    "authority_level": "BOUNDED_ONE_EPISODE_DSH_V1R1_EXECUTION_AND_CLOSURE",
+    "phase_type": "BOUNDED_LIVE_INFRASTRUCTURE_EXECUTION",
+    "implementation_authorized": true,
+    "implementation_completed": false,
+    "episode_consumed": false,
+    "authorized_live_episodes": 1,
+    "second_v1r1_episode_authorized": false,
+    "execution_closure_pr_budget": 1,
+    "activation_consumes_live_episode": false,
+    "activation_consumes_execution_closure_pr_budget": false
+  },
+  "pinned_dsh_identity": {
+    "repository": "deepseek-ai/deepseek-harness",
+    "commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "tag": "dsh-v0.1.0-rc.7",
+    "floating_source_forbidden": true
+  },
+  "runtime_hardening": {
+    "profile_path": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_hard_orchestration_authorization_v0/profile",
+    "artifacts": {
+      "runtime_hardening_patch": {
+        "path": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_hard_orchestration_authorization_v0/profile/pinned-dsh-v1r1-runtime-hardening.patch",
+        "sha256": "c1785092d1bb294c9eebb912a3935839ae83893b19c0df393bbab59c762ccaa9"
+      },
+      "profile_package": {
+        "path": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_hard_orchestration_authorization_v0/profile/package.json",
+        "sha256": "502e68cf2e5e954ba30f604d966302111322977eb3306d3e26edfd6cce0feb2e"
+      },
+      "profile_patch": {
+        "path": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_hard_orchestration_authorization_v0/profile/cordis.patch.yml",
+        "sha256": "d6b44382d0afffede4bd90e7b21ac28167785e261f0a5717f63091eb6b0beee6"
+      },
+      "gated_codex_provider": {
+        "path": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_hard_orchestration_authorization_v0/profile/qntylab-gated-provider/lib/index.js",
+        "sha256": "8081ca55edb4626718cd7a7152e829caa9616a779489b1e1b77cea60cb58aba9"
+      },
+      "gated_claude_provider": {
+        "path": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_hard_orchestration_authorization_v0/profile/qntylab-gated-provider/lib/gated-provider.mjs",
+        "sha256": "abe00467dea365d7c88d09e7ccd5e373fb74d2b50e32000b298c26582851119b"
+      }
+    },
+    "runtime_repairs_during_episode_authorized": false
+  },
+  "parent_authority": {
+    "provider": "openai",
+    "model": "gpt-5-mini",
+    "route": "openai / gpt-5-mini",
+    "retry_max": 0,
+    "max_request_attempts": 8,
+    "max_tokens": 4096,
+    "spend_ceiling_usd": 1.0,
+    "reservation_gate": "Atomically reserve each potentially paid parent request before adapter dispatch.",
+    "attempt_9": "DENY_BEFORE_PROVIDER_IO_BLOCK_COST",
+    "auxiliary_routes": [],
+    "parent_role": "COORDINATOR_ONLY",
+    "parent_direct_mutation_routes": false
+  },
+  "child_authority": {
+    "model_facing_tools": ["subagent_codex", "subagent_claude_code"],
+    "gated_providers": ["qntylab-gated-codex", "qntylab-gated-claude-code"],
+    "raw_model_facing_routes": false,
+    "generic_child_tools": [],
+    "alternate_child_routes": [],
+    "background_delegation": false,
+    "child_infra_retries": 0
+  },
+  "child_order_and_budget": {
+    "initial_state": "IMPLEMENT_REQUIRED",
+    "sequence": [
+      "IMPLEMENT_REQUIRED",
+      "one subagent_codex",
+      "TEST_REQUIRED",
+      "driver_owned_pytest",
+      "REVIEW_REQUIRED",
+      "one subagent_claude_code",
+      "optional bounded repair: one subagent_codex then driver_owned_pytest then one targeted subagent_claude_code"
+    ],
+    "codex_initial_max": 1,
+    "codex_repair_max": 1,
+    "codex_total_max": 2,
+    "claude_initial_max": 1,
+    "claude_rereview_max": 1,
+    "claude_total_max": 2,
+    "recursive_review": false,
+    "terminal_priority": ["failed_retest -> FAIL_IMPLEMENTATION", "remaining_critical_or_high -> FAIL_REVIEW", "otherwise -> PASS_AFTER_BOUNDED_REPAIR"]
+  },
+  "provider_lifecycle": {
+    "event_first": true,
+    "provider_added_listener_before_presence_inspection": true,
+    "provider_removed_listener_before_presence_inspection": true,
+    "raw_provider_reappearance_mounts_exactly_once": true,
+    "authorization_persisted_before_raw_start": true,
+    "current_raw_provider_reresolved_and_validated_before_start": true,
+    "disappearance_or_replacement_start_count": 0,
+    "disappearance_or_replacement_terminal": "BLOCK_CHILD_INFRA",
+    "retry": false
+  },
+  "codex_contract": {
+    "role": "IMPLEMENTATION_ONLY",
+    "fixture": "STAGE_A_BOUNDED_RETRY_V0",
+    "workspace": "ONE_DISPOSABLE_COPY_OUTSIDE_QNTYLAB_AND_QNTY",
+    "modifiable_paths": ["retry.py"],
+    "immutable_paths": ["TASK.md", "tests/test_retry.py"],
+    "repository_mutation": false,
+    "approval_policy": "never",
+    "sandbox": "workspace-write",
+    "ephemeral": true,
+    "network_disabled_where_supported_by_exact_native_protocol": true,
+    "fixture_committed": false
+  },
+  "claude_contract": {
+    "role": "INDEPENDENT_REVIEW_ONLY",
+    "allowed_tools": ["Read", "Glob", "Grep"],
+    "disallowed_tools": ["Write", "Edit", "Bash", "Agent", "Task", "mcp__*"],
+    "setting_sources": [],
+    "persist_session": false,
+    "mcp_servers": {},
+    "review_inputs": ["TASK.md", "retry.py", "tests/test_retry.py", "objective_driver_test_result"],
+    "codex_transcript": false,
+    "output_schema": ["critical", "high", "medium", "low", "closure_blocking", "summary"],
+    "malformed_review_terminal": "BLOCK_CHILD_INFRA",
+    "fixture_hashes_before_after_identical_required": true,
+    "reviewer_mutation_terminal": "BLOCK_CHILD_INFRA"
+  },
+  "fixture_and_testing": {
+    "pre_execution_hashes_required": ["TASK.md", "retry.py", "tests/test_retry.py"],
+    "test_command": "python -m pytest -q tests/test_retry.py",
+    "test_status_owner": "DETERMINISTIC_OUTER_DRIVER",
+    "llm_may_forge_test_completion": false,
+    "retest_status_owner": "DETERMINISTIC_OUTER_DRIVER"
+  },
+  "episode_consumption": {
+    "consumed_at": "FIRST_ACTUAL_PAID_PARENT_OPENAI_ADAPTER_DISPATCH_ATTEMPT",
+    "not_consumed_by": ["profile_boot", "session_preparation", "secret_presence_check", "offline_BOOT_READY", "local_auth_verification"],
+    "before_first_paid_dispatch": false,
+    "after_first_paid_dispatch": true,
+    "permanent_after_dispatch": true,
+    "no_rescue_rerun": true
+  },
+  "prelive": {
+    "exact_canonical_runtime_bytes_required": true,
+    "boot_ready": "YES",
+    "model_requests": 0,
+    "child_spawns": 0,
+    "raw_and_gated_providers_present": true,
+    "exact_two_child_tools_visible": true,
+    "background_disabled": true,
+    "generic_delegation_absent": true,
+    "parent_budget_gate_active": true,
+    "auxiliary_llm_routes_absent": true,
+    "secret_read_before_prelive_pass": false,
+    "runtime_repair_allowed": false,
+    "failure_action": "STOP_BEFORE_LIVE"
+  },
+  "secret_boundary": {
+    "authorization_phase_secret_read": false,
+    "later_secret_path": "$HOME/.secrets/openai_api_key_stage_a",
+    "preflight_checks": ["exists", "non-empty", "mode 0600"],
+    "value_printed": false,
+    "value_echoed": false,
+    "value_hashed": false,
+    "value_committed": false,
+    "value_persisted_in_evidence": false,
+    "historical_chat_exposure_acknowledged": true
+  },
+  "terminal_outcomes": [
+    "STAGE_A_V1R1_PASS",
+    "STAGE_A_V1R1_PASS_AFTER_BOUNDED_REPAIR",
+    "STAGE_A_V1R1_FAIL_IMPLEMENTATION",
+    "STAGE_A_V1R1_FAIL_REVIEW",
+    "STAGE_A_V1R1_BLOCK_CHILD_INFRA",
+    "STAGE_A_V1R1_BLOCK_PARENT_INFRA",
+    "STAGE_A_V1R1_BLOCK_AUTH",
+    "STAGE_A_V1R1_BLOCK_COST"
+  ],
+  "wall_clock": {"seconds": 1800, "timeout_allows_rerun": false},
+  "closure_contract": {
+    "after_episode_state": "CLOSED_PASS_OR_CLOSED_BLOCKED_BY_CANONICAL_OUTCOME",
+    "implementation_authorized_after_closure": false,
+    "implementation_completed_after_closure": true,
+    "episode_consumed_reflects_first_paid_dispatch": true,
+    "second_v1r1_episode_authorized": false,
+    "stage_b_authorized": false,
+    "successor_active_project": false,
+    "draft_execution_closure_prs": 1,
+    "merge_closure_pr_automatically": false,
+    "rerun_requires_new_git_backed_authority": true
+  },
+  "authority_firewall": {
+    "benchmark_suite_authorized": false,
+    "scientific_execution_authorized": false,
+    "qnty_agent_eval": "NOT_APPLICABLE",
+    "qnty_runtime_authority": "NONE",
+    "trading_authority": "NONE",
+    "capital_authority": "NONE",
+    "stage_b_authorized": false,
+    "live_openai_calls_this_phase": 0,
+    "live_dsh_calls_this_phase": 0,
+    "live_codex_calls_this_phase": 0,
+    "live_claude_calls_this_phase": 0,
+    "spend_usd_this_phase": 0.0
+  },
+  "execution_status": {
+    "episode_started": false,
+    "future_execution_result_recorded": false,
+    "authorization_pr_consumes_live_episode": false,
+    "authorization_pr_consumes_execution_closure_pr_budget": false
+  }
+}

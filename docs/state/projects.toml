@@ -5378,3 +5378,70 @@ trading_authority = "NONE"
 capital_authority = "NONE"
 active_project_after_closure = "NONE"
 next_action = "After canonical merge, the V1R1 offline bootstrap/runtime hardening is qualified and closed. No live Stage-A V1R1 execution is authorized by this phase. Any live V1R1 episode requires a separate Git-backed bounded execution authorization/activation. No Stage B, scientific, trading, capital, Qnty, or QntyAgentEval authority follows automatically."
+
+[[project]]
+project_id = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R1_EXECUTION_V0"
+display_name = "DSH Stage-A V1R1 live execution authorization and activation V0"
+state = "ACTIVE"
+authority_level = "BOUNDED_ONE_EPISODE_DSH_V1R1_EXECUTION_AND_CLOSURE"
+phase_type = "BOUNDED_LIVE_INFRASTRUCTURE_EXECUTION"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1r1_live_execution_authorization_and_activation_v0/authorization.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1r1_live_execution_authorization_and_activation_v0/hostile_governance_review.md",
+  "tests/test_dsh_stage_a_v1r1_live_execution_authorization_activation_v0.py",
+]
+authorization_state = "AUTHORIZED_IF_CANONICAL"
+authorization_effective = "AFTER_CANONICAL_MERGE_ONLY"
+canonical_predecessor_project_id = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R1_BOOTSTRAP_AND_RUNTIME_HARDENING_AUTHORIZATION_V0"
+canonical_predecessor_pr = 170
+canonical_predecessor_reviewed_head = "1443d89f2f12f37dff777d2de05563698a2dce6b"
+canonical_predecessor_merge = "e9c7a889747fd3a978f241e12448570b4634db81"
+qualification_required = "QUALIFIED_OFFLINE_BOOT_READY"
+boot_ready_required = true
+implementation_authorized = true
+implementation_completed = false
+episode_consumed = false
+authorized_live_episodes = 1
+second_v1r1_episode_authorized = false
+execution_closure_pr_budget = 1
+activation_consumes_live_episode = false
+activation_consumes_execution_closure_pr_budget = false
+pinned_dsh_commit = "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca"
+pinned_dsh_tree = "3bc8f89fe494a4755c188be354add4e8b1e7b188"
+pinned_dsh_tag = "dsh-v0.1.0-rc.7"
+parent_provider = "openai"
+parent_model = "gpt-5-mini"
+parent_max_request_attempts = 8
+parent_retry_max = 0
+parent_max_tokens = 4096
+spend_ceiling_usd = 1.00
+child_routes = ["subagent_codex", "subagent_claude_code"]
+child_route_providers = ["qntylab-gated-codex", "qntylab-gated-claude-code"]
+generic_child_tools = []
+background_delegation = false
+child_infra_retries = 0
+codex_max_initial = 1
+codex_max_repair = 1
+codex_max_total = 2
+claude_max_initial = 1
+claude_max_rereview = 1
+claude_max_total = 2
+claude_hard_read_only = true
+prelive_boot_ready_required = true
+fixture_id = "STAGE_A_BOUNDED_RETRY_V0"
+runtime_repairs_authorized = false
+authorization_phase_live_openai_calls = 0
+authorization_phase_live_dsh_calls = 0
+authorization_phase_live_codex_calls = 0
+authorization_phase_live_claude_calls = 0
+authorization_phase_spend_usd = 0.0
+stage_b_authorized = false
+scientific_execution_authorized = false
+qnty_runtime_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+qnty_agent_eval = "NOT_APPLICABLE"
+next_action = "Execute exactly one Stage-A V1R1 live episode using the canonical PR #170 qualified runtime; record PASS/FAIL/BLOCK; open exactly one draft execution/closure PR; STOP. No second episode and no Stage B."

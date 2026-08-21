@@ -1,0 +1,180 @@
+{
+  "schema_version": "dsh-stage-a-v1r2-native-child-compatibility-qualification-v0",
+  "artifact_type": "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R2_NATIVE_CHILD_COMPATIBILITY_QUALIFICATION",
+  "project_id": "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R2_NATIVE_CHILD_COMPATIBILITY_QUALIFICATION_V0",
+  "display_name": "DSH Stage-A V1R2 native child compatibility qualification V0",
+  "authority": "BOUNDED_OFFLINE_NATIVE_COMPATIBILITY_QUALIFICATION",
+  "qualification": "CLOSED_PASS",
+  "canonical_reconciliation": {
+    "origin_master": "014d5b46fa83e613d8a5a8e8d33035d4e5b66952",
+    "reviewed_head_for_merge_172": "7e9ffe2798dc78f94a82e75615d649b9402345f8",
+    "merge_172": "014d5b46fa83e613d8a5a8e8d33035d4e5b66952",
+    "historical_v1r1_execution_project": "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R1_EXECUTION_V0",
+    "historical_v1r1_terminal": "STAGE_A_V1R1_BLOCK_CHILD_INFRA",
+    "historical_v1r1_episode_consumed": false,
+    "historical_v1r1_parent_requests": 0,
+    "historical_v1r1_codex_calls": 0,
+    "historical_v1r1_claude_calls": 0,
+    "historical_v1r1_spend_usd": 0.0,
+    "historical_evidence_path": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1r1_execution_v0/execution_evidence.json",
+    "historical_evidence_reinterpreted": false
+  },
+  "root_cause": {
+    "code": "VERSION_NAMESPACE_CONFLATION",
+    "statement": "@openai/codex package identity is not automatically native host Codex CLI identity; @anthropic-ai/claude-agent-sdk identity is not native Claude Code CLI identity.",
+    "historical_codex": {
+      "native_observed": "codex-cli 0.148.0",
+      "package_recorded_as_qualified": "0.147.0"
+    },
+    "historical_claude": {
+      "native_observed": "2.1.223 (Claude Code)",
+      "sdk_recorded_as_qualified": "0.3.220"
+    },
+    "historical_interpretation": "V1R1 was a valid fail-closed response to an invalid compatibility contract, not a runtime failure."
+  },
+  "pinned_dsh": {
+    "repository": "deepseek-ai/deepseek-harness",
+    "commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "codex_provider_source": {
+      "path": "packages/subagent/subagent-codex/src/wire.ts",
+      "runtime_command": ["codex", "app-server", "--stdio"],
+      "initialize_method": "initialize",
+      "initialized_notification": "initialized",
+      "thread_method": "thread/start",
+      "thread_params": ["cwd", "ephemeral=true"],
+      "source_sha256": "9d94284e578ff2253f09e10130cac4aa977e8f3e9e64d442f1ca005cb207fdbd"
+    },
+    "claude_provider_source": [
+      {
+        "path": "packages/subagent/subagent-claude-code/src/run.ts",
+        "source_sha256": "4cdf8017ebde908787adf07350e2d289e1c2ff2fee2c562f5f7f541636cb85d5",
+        "facts": ["uses @anthropic-ai/claude-agent-sdk", "passes pathToClaudeCodeExecutable", "uses spawnClaudeCodeProcess seam", "disposes query and process tree"]
+      },
+      {
+        "path": "packages/subagent/subagent-claude-code/src/process.ts",
+        "source_sha256": "fe87d70479ef70ff47eb5e3d67568523226d6c54bafef537287078a21bcc3762",
+        "facts": ["maps SDK command and args to managed process", "stdin/stdout piped", "stderr inherited", "process-tree disposal is explicit"]
+      }
+    ]
+  },
+  "identity_ontology": {
+    "codex": {
+      "provider_identity": {
+        "dsh_commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+        "dsh_tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+        "dsh_package": "@deepseek-ai/dsh-subagent-codex"
+      },
+      "package_reference_identity": {
+        "package": "@openai/codex",
+        "version": "0.147.0",
+        "comparison_to_native_cli": "forbidden"
+      },
+      "native_executable_identity": {
+        "command_name": "codex",
+        "resolved_path": "/home/swirky/.local/bin/codex",
+        "realpath": "/home/swirky/.codex/packages/standalone/releases/0.148.0-x86_64-unknown-linux-musl/bin/codex",
+        "product_version": "codex-cli 0.148.0",
+        "version_output": "codex-cli 0.148.0",
+        "entrypoint_sha256": "ac2cfed85fb647d61e0150b8548102b330e4799d9d81ad5d354de701edf6b074",
+        "launcher_package_version": null,
+        "fingerprint": "fce6ecefe03ff72403f124456e4976a4a251ede6d1c74a820843ad1e7ee517a6"
+      },
+      "compatibility_evidence": {
+        "kind": "CODEX_APP_SERVER_ZERO_MODEL_PROTOCOL",
+        "compatibility": "PASS",
+        "sequence": ["spawn codex app-server --stdio", "initialize", "initialized", "thread/start", "dispose process tree"],
+        "app_server_started": true,
+        "protocol_initialized": true,
+        "thread_start_compatible": true,
+        "model_turns": 0,
+        "api_requests": 0,
+        "usage_events": 0,
+        "task_execution": 0,
+        "process_quiesced": true,
+        "cwd_scope": "disposable temporary directory; path omitted",
+        "uncertainty": null
+      }
+    },
+    "claude": {
+      "provider_identity": {
+        "dsh_commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+        "dsh_tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+        "dsh_package": "@deepseek-ai/dsh-subagent-claude-code"
+      },
+      "sdk_identity": {
+        "package": "@anthropic-ai/claude-agent-sdk",
+        "version": "0.3.220",
+        "bundled_cli_version": "2.1.220",
+        "package_json_sha256": "1c9d0905f64e126850efe4fc4e7244c604a0855de8d4c82aff78da6f1988bd08",
+        "source_sha256": "1202bcd295a7c69cd0952f819a939e63071a3f2c3476a05f7e23425b01184fda",
+        "type_definition_sha256": "b415fbff96b9f754bca6e7113c4bf3d278a76e453be1264e9bd1acb9c0b2a836",
+        "manifest_sha256": "40f281ff188f1cd4f39309da41a219014dad2555d96e9780c67a2138720d12ed",
+        "runtime_version_constraint": "node >=18.0.0",
+        "runtime_cli_version_equality_gate": false,
+        "tested_wrapper_metadata_is_not_a_cli_equality_gate": true
+      },
+      "native_executable_identity": {
+        "command_name": "claude",
+        "resolved_path": "/usr/bin/claude",
+        "realpath": "/usr/bin/claude",
+        "product_version": "2.1.223 (Claude Code)",
+        "version_output": "2.1.223 (Claude Code)",
+        "entrypoint_sha256": "98226474f802e3094d6a86c5ade8883c16206d0fcb5c400b7401c800063e99d7",
+        "launcher_package_version": null,
+        "fingerprint": "8939d4b139759c12f240fdcba81661b5e8d59d53f769722baab001dea3f8180b"
+      },
+      "compatibility_evidence": {
+        "kind": "CLAUDE_SDK_CLI_ZERO_MODEL_STATIC_AND_PARSER_PROBE",
+        "compatibility": "PASS",
+        "sdk_spawn_seam": "captured with deterministic non-executing child",
+        "captured_argv": ["--output-format", "stream-json", "--verbose", "--input-format", "stream-json", "--permission-prompt-tool", "stdio", "--allowedTools", "Read,Glob,Grep", "--disallowedTools", "Write,Edit,Bash,Agent,Task,AskUserQuestion,mcp__*", "--tools", "Read,Glob,Grep", "--setting-sources=", "--permission-mode", "dontAsk", "--no-session-persistence"],
+        "path_to_executable_consumed": "/usr/bin/claude",
+        "stream_contract": "JSON stream over stdin/stdout; exact SDK argv captured",
+        "required_cli_parser_probe": {"argv_suffix": "--help", "exit_code": 0, "model_invocation": false},
+        "model_turns": 0,
+        "api_requests": 0,
+        "usage_events": 0,
+        "task_execution": 0,
+        "process_quiesced": true,
+        "missing_from_human_help_but_parser_accepted": ["--permission-prompt-tool"],
+        "uncertainty": null
+      }
+    }
+  },
+  "future_live_preflight": {
+    "codex_executable_fingerprint": "fce6ecefe03ff72403f124456e4976a4a251ede6d1c74a820843ad1e7ee517a6",
+    "codex_zero_model_protocol_compatibility": "PASS",
+    "claude_executable_fingerprint": "8939d4b139759c12f240fdcba81661b5e8d59d53f769722baab001dea3f8180b",
+    "claude_sdk_identity": {"package": "@anthropic-ai/claude-agent-sdk", "version": "0.3.220"},
+    "claude_sdk_cli_compatibility": "PASS",
+    "version_namespace_equality": "NEVER_USED",
+    "drift_action": ["BLOCK BEFORE SECRET", "BLOCK BEFORE PAID PARENT DISPATCH", "REQUIRE OFFLINE REQUALIFICATION"]
+  },
+  "optional_pinning_assessment": {
+    "host_native_current_design": "DSH resolves native Codex through PATH and receives a separately resolved native Claude executable through pathToClaudeCodeExecutable.",
+    "bundled_or_package_local_option": "Claude SDK 0.3.220 carries a platform package with bundled CLI 2.1.220; Codex package-local materialization was not adopted.",
+    "auth_compatibility": "Not migrated or exercised; host-native auth/settings remain out of scope and uninspected.",
+    "reproducibility_gain": "Bundled/package-local execution could reduce PATH drift.",
+    "migration_risk": "Auth/settings behavior and native host subscription boundaries require a separate qualification; no migration is justified here."
+  },
+  "governance": {
+    "model_requests": 0,
+    "paid_requests": 0,
+    "fixture_runs": 0,
+    "live_openai_calls": 0,
+    "live_dsh_parent_calls": 0,
+    "codex_model_turns": 0,
+    "claude_model_turns": 0,
+    "spend_usd": 0.0,
+    "implementation_authorized_after_closure": false,
+    "active_project_after_closure": "NONE",
+    "stage_b_authorized": false,
+    "qnty_runtime_authority": "NONE",
+    "scientific_execution_authorized": false,
+    "trading_authority": "NONE",
+    "capital_authority": "NONE",
+    "no_stage_a_fixture_execution": true,
+    "no_secret_read": true
+  }
+}

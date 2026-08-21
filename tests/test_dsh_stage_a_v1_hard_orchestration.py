@@ -134,11 +134,45 @@ def test_rereview_cannot_turn_failed_retest_into_pass(tmp_path, retest_passed, r
     assert controller.snapshot()["terminal_outcome"] == expected
 
 
-@pytest.mark.parametrize("tool_name", ["subagent", "subagent_fork", "subagent_codex_v1", "tool-subagent-codex"])
+@pytest.mark.parametrize(
+    "tool_name",
+    [
+        "subagent",
+        "subagent_fork",
+        "workflow",
+        "ralph",
+        "subagent_codex_v1",
+        "tool-subagent-codex",
+    ],
+)
 def test_generic_fork_and_alias_bypasses_fail_closed(tmp_path, tool_name):
     controller = prepared(tmp_path)
     with pytest.raises(AuthorizationDenied):
         controller.pre_dispatch_authorize(tool_name)
+
+
+def test_alternate_delegation_routes_are_denied_before_any_provider_callable(tmp_path):
+    controller = prepared(tmp_path)
+    alternate_names = ("subagent", "subagent_fork", "workflow", "ralph")
+    for name in alternate_names:
+        with pytest.raises(AuthorizationDenied):
+            dispatch_authorized_child(controller, name, lambda _grant: pytest.fail("alternate route executed"))
+
+    codex = controller.pre_dispatch_authorize(CODEX_TOOL)
+    for name in alternate_names:
+        with pytest.raises(AuthorizationDenied):
+            dispatch_authorized_child(controller, name, lambda _grant: pytest.fail("alternate route executed"))
+    controller.complete_child(codex)
+    controller.record_driver_tests(passed=True)
+    claude = controller.pre_dispatch_authorize(CLAUDE_TOOL)
+    for name in alternate_names:
+        with pytest.raises(AuthorizationDenied):
+            dispatch_authorized_child(controller, name, lambda _grant: pytest.fail("alternate route executed"))
+    controller.complete_child(claude, review_result=review())
+    controller.seal_pass()
+    for name in alternate_names:
+        with pytest.raises(AuthorizationDenied):
+            dispatch_authorized_child(controller, name, lambda _grant: pytest.fail("alternate route executed"))
 
 
 def test_malformed_review_blocks_child_infra_and_grants_no_repair(tmp_path):

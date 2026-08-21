@@ -11,8 +11,20 @@ The two raw providers register their normal DSH names (`codex` and
 real pinned `SubagentProvider.start(request)` seam. Its first operation is a
 synchronous JSON CLI authorization against the crash-safe QntyLab checkpoint;
 only a successful grant reaches the raw provider. The model-facing tools are
-bound exclusively to the gated names, so a raw provider route is not possible
-through the configured delegation tools.
+bound exclusively to the gated names. The pinned `dsh-base` generic
+`tool-subagent` (`spawn`), `tool-subagent-fork` (`fork`), `tool-workflow`, and
+`tool-ralph` child-creation rows, plus their generic child control/backends,
+are explicitly disabled in this profile. The final composed model-facing
+child surface therefore contains only `subagent_codex` and
+`subagent_claude_code`; a raw provider, alias, fork, or workflow route is not
+executable.
+
+The disabled-row decision is based on the pinned commit
+`99f6f02fecdb7dff40c3fbc9470f5907c29f74ca`, specifically
+`packages/bundle/base/cordis.patch.yml` and the pinned
+`packages/workflow/tool-workflow/README.md` / `packages/workflow/tool-ralph/README.md`
+semantics. The offline profile tests apply the actual id-patch composition
+rules to those discovered base rows and inspect the final enabled surface.
 
 Before launching DSH, set `QNTYLAB_ROOT` to the QntyLab checkout,
 `QNTYLAB_DSH_STAGE_A_STATE_PATH` to the phase checkpoint, and

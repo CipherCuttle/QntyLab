@@ -54,3 +54,31 @@
         toolName: subagent_claude_code
         backgroundMode: one-shot
         maxDepth: provider-managed
+
+# The pinned dsh-base layer also mounts generic child/delegation infrastructure.
+# These rows are disabled by id after composing dsh-base + dsh-headless.  The
+# pinned source semantics are model-facing for the tool rows below: `spawn`,
+# `fork`, `workflow`, and `ralph` all create child-session execution; the
+# control/list/report rows expose the same generic child surface.  Keeping the
+# rows as inert disabled metadata makes the inherited surface explicit while
+# ensuring no alternate route can register or execute in Stage-A V1.
+- id: subagent-spawn-in-process
+  disabled: true
+- id: subagent-fork-in-process
+  disabled: true
+- id: tool-subagent-control
+  disabled: true
+- id: tool-subagent-list-agents
+  disabled: true
+- id: tool-subagent
+  disabled: true
+- id: tool-subagent-fork
+  disabled: true
+- id: tool-subagent-report
+  disabled: true
+- id: workflow-worker-thread
+  disabled: true
+- id: tool-workflow
+  disabled: true
+- id: tool-ralph
+  disabled: true

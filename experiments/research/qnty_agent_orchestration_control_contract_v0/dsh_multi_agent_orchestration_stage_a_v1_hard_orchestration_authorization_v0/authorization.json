@@ -79,7 +79,12 @@
     "generic_subagent_allowed": false,
     "subagent_fork_allowed": false,
     "aliases_allowed": false,
-    "provider_start_race_allowed": false
+    "provider_start_race_allowed": false,
+    "alternate_delegation_surfaces_disabled": true,
+    "only_gated_child_routes_model_visible": true,
+    "generic_spawn_executable": false,
+    "generic_fork_executable": false,
+    "workflow_child_bypass_executable": false
   },
   "review_contract": {
     "validator_path": "qntylab/dsh_stage_a_v1_hard_orchestration.py:validate_review_result",
@@ -126,6 +131,40 @@
     "model_facing_tools": {
       "subagent_codex": "qntylab-gated-codex",
       "subagent_claude_code": "qntylab-gated-claude-code"
+    },
+    "final_model_facing_delegation_tools": ["subagent_codex", "subagent_claude_code"],
+    "alternate_delegation_surfaces_disabled": true,
+    "only_gated_child_routes_model_visible": true,
+    "generic_spawn_executable": false,
+    "generic_fork_executable": false,
+    "workflow_child_bypass_executable": false,
+    "raw_codex_tool_route": false,
+    "raw_claude_code_tool_route": false,
+    "pinned_base_child_rows_inspected": {
+      "source_commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+      "source_paths": [
+        "packages/bundle/base/cordis.patch.yml",
+        "packages/workflow/tool-workflow/README.md",
+        "packages/workflow/tool-ralph/README.md"
+      ],
+      "disabled_rows": [
+        "subagent-spawn-in-process",
+        "subagent-fork-in-process",
+        "tool-subagent-control",
+        "tool-subagent-list-agents",
+        "tool-subagent",
+        "tool-subagent-fork",
+        "tool-subagent-report",
+        "workflow-worker-thread",
+        "tool-workflow",
+        "tool-ralph"
+      ],
+      "semantics": {
+        "tool-subagent": "provider spawn, toolName subagent",
+        "tool-subagent-fork": "provider fork, toolName subagent_fork",
+        "tool-workflow": "model-facing workflow script fans out subagents",
+        "tool-ralph": "model-facing bounded rounds start fresh child agents"
+      }
     },
     "authorization_precedes_raw_provider_start": true,
     "raw_provider_bypass_possible_through_profile": false,

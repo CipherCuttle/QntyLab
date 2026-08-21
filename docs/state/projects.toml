@@ -2856,6 +2856,50 @@ active_project_after_closure = "NONE"
 next_action = "fresh bounded QntyAgentRuntime ecosystem-registration phase; not Stage-A directly"
 
 [[project]]
+project_id = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1_HARD_ORCHESTRATION_AUTHORIZATION_V0"
+display_name = "DSH Stage-A V1 hard orchestration authorization V0"
+state = "CLOSED_PASS"
+authority_level = "BOUNDED_OFFLINE_IMPLEMENTATION_AND_AUTHORIZATION"
+phase_type = "GOVERNANCE_BOUNDED_OFFLINE_IMPLEMENTATION"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/ADR/0008-qnty-agent-orchestration-runtime-boundary.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "qntylab/dsh_stage_a_v1_hard_orchestration.py",
+  "tests/test_dsh_stage_a_v1_hard_orchestration.py",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_hard_orchestration_authorization_v0/authorization.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_hard_orchestration_authorization_v0/hostile_review.md",
+]
+canonical_predecessor_project_id = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_EXECUTION_V0"
+canonical_predecessor_merge = "6d9469aa8fc82381b124947f4518b6be7279a532"
+predecessor_terminal_outcome = "BLOCK_PARENT_INFRA"
+episode_consumed = true
+second_episode_authorized = false
+implementation_authorized = false
+implementation_completed = true
+upstream_dsh_mutation_authorized = false
+live_openai_calls_authorized = false
+live_dsh_calls_authorized = false
+live_codex_calls_authorized = false
+live_claude_calls_authorized = false
+authorization_phase_spend_usd = 0.0
+parent_model = "gpt-5-mini"
+parent_retry_max = 0
+parent_max_request_attempts = 8
+parent_max_tokens = 4096
+spend_ceiling_usd = 1.0
+child_infra_retries = 0
+stage_b_authorized = false
+qnty_agent_eval = "NOT_APPLICABLE"
+scientific_execution_authorized = false
+qnty_runtime_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+active_project_after_closure = "NONE"
+next_action = "Complete offline tests and one bounded hostile review; if clean, commit and open one draft authorization PR. Do not merge or run V1 live."
+
+[[project]]
 project_id = "STAGE_A_DSH_SHADOW_EVALUATION_AUTHORIZATION_V0"
 display_name = "Stage-A DSH shadow evaluation authorization V0"
 state = "CLOSED_PASS"

@@ -19,6 +19,7 @@ JH01_REAL_PROSPECTIVE_AUTHORIZATION_PROJECT_ID = "JH01_V1_REAL_PROSPECTIVE_OPERA
 FUNDING_INCREMENTAL_IMPLEMENTATION_PROJECT_ID = "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_EXECUTION_IMPLEMENTATION_V0"
 DSH_STAGE_A_V1_AUTHORIZATION_PROJECT_ID = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1_HARD_ORCHESTRATION_AUTHORIZATION_V0"
 DSH_STAGE_A_V1_EXECUTION_PROJECT_ID = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1_EXECUTION_V0"
+DSH_STAGE_A_V1R1_PROJECT_ID = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R1_BOOTSTRAP_AND_RUNTIME_HARDENING_AUTHORIZATION_V0"
 
 
 def _assert_project_is_not_active(registry: dict, project_id: str) -> None:
@@ -174,6 +175,34 @@ def test_dsh_stage_a_v1_execution_closure_is_single_bounded_blocked_project() ->
     assert authorization["state"] == "CLOSED_PASS"
     assert authorization["implementation_authorized"] is False
     assert authorization["authorization_state"] == "AUTHORIZED_IF_CANONICAL"
+
+
+def test_dsh_stage_a_v1r1_offline_qualification_is_closed_without_live_authority() -> None:
+    data = project_context.context_data(ROOT)
+    _, _, registry = project_context.load_context_sources(ROOT)
+    project = next(record for record in registry["project"] if record["project_id"] == DSH_STAGE_A_V1R1_PROJECT_ID)
+    receipt = json.loads(
+        (
+            ROOT
+            / "experiments/research/qnty_agent_orchestration_control_contract_v0/"
+            "dsh_multi_agent_orchestration_stage_a_v1r1_bootstrap_and_runtime_hardening_authorization_v0/"
+            "qualification_receipt.json"
+        ).read_text(encoding="utf-8")
+    )
+
+    assert project["state"] == "CLOSED_PASS"
+    assert project["implementation_authorized"] is False
+    assert project["implementation_completed"] is True
+    assert project["active_project_after_closure"] == "NONE"
+    assert receipt["qualification"] == "QUALIFIED_OFFLINE_BOOT_READY"
+    assert receipt["boot_receipt"]["BOOT_READY"] == "YES"
+    assert receipt["live_model_requests"] == 0
+    assert receipt["native_codex_child_runs"] == 0
+    assert receipt["native_claude_child_runs"] == 0
+    assert receipt["stage_a_fixture_runs"] == 0
+    assert receipt["spend_usd"] == 0.0
+    assert data["active_project"] is None
+    assert data["current_permitted_next_action"] == "No project implementation is currently authorized."
 
 
 def test_project_supersession_targets_self_and_cycles_fail(tmp_path: Path) -> None:

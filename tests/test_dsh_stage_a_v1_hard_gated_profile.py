@@ -134,12 +134,14 @@ def test_v1_composed_profile_exposes_only_the_two_gated_child_routes():
     assert enabled[0]["config"] == {
         "provider": "qntylab-gated-codex",
         "toolName": "subagent_codex",
+        "enableRunInBackground": False,
         "backgroundMode": "one-shot",
         "maxDepth": "provider-managed",
     }
     assert enabled[1]["config"] == {
         "provider": "qntylab-gated-claude-code",
         "toolName": "subagent_claude_code",
+        "enableRunInBackground": False,
         "backgroundMode": "one-shot",
         "maxDepth": "provider-managed",
     }
@@ -151,6 +153,25 @@ def test_v1_composed_profile_exposes_only_the_two_gated_child_routes():
         "qntylab-gated-claude-code",
     }
     assert all(row.get("config", {}).get("provider") not in {"spawn", "fork", "raw-codex", "raw-claude-code"} for row in enabled)
+
+
+def test_v1_parent_surface_disables_mutation_and_auxiliary_model_routes():
+    patch = (PROFILE / "cordis.patch.yml").read_text(encoding="utf-8")
+    rows = yaml.load(patch, Loader=_PinnedPatchLoader)
+    disabled = {row["id"] for row in rows if row.get("disabled") is True}
+    assert {
+        "tool-bash",
+        "tool-pwsh",
+        "tool-fs",
+        "tool-str-replace-editor",
+        "tool-jobs",
+        "tool-web",
+        "web-search-deepseek",
+        "web",
+        "tool-goal",
+        "tool-todo",
+        "tool-skill",
+    } <= disabled
 
 
 def test_authorization_artifact_records_alternate_surface_closure():

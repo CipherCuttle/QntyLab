@@ -1,0 +1,64 @@
+{
+  "artifact_type": "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R1_OFFLINE_QUALIFICATION_RECEIPT",
+  "project_id": "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R1_BOOTSTRAP_AND_RUNTIME_HARDENING_AUTHORIZATION_V0",
+  "qualification": "QUALIFIED_OFFLINE_BOOT_READY",
+  "spend_usd": 0.0,
+  "live_model_requests": 0,
+  "native_codex_child_runs": 0,
+  "native_claude_child_runs": 0,
+  "stage_a_fixture_runs": 0,
+  "canonical_predecessor": {
+    "project_id": "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1_EXECUTION_V0",
+    "terminal": "STAGE_A_V1_BLOCK_PARENT_INFRA",
+    "parent_requests": 0,
+    "codex_calls": 0,
+    "claude_calls": 0,
+    "spend_usd": 0.0,
+    "merge_sha": "64cd87fc2f28a59f9c7670c73d6e0af04e0fba7a",
+    "merge_pr": 169
+  },
+  "pinned_dsh": {
+    "commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "runtime_hardening_patch": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_hard_orchestration_authorization_v0/profile/pinned-dsh-v1r1-runtime-hardening.patch"
+  },
+  "built_product": {
+    "build_command": "pnpm run build:lib:host",
+    "build_result": "exit 0",
+    "node": "v22.22.0",
+    "codex_executable": "/home/swirky/.local/bin/codex",
+    "codex_version": "0.147.0 (pinned @openai/codex dependency)",
+    "claude_executable": "/usr/bin/claude",
+    "claude_version": "0.3.220 (pinned @anthropic-ai/claude-agent-sdk dependency)",
+    "native_executables_invoked": false
+  },
+  "boot_receipt": {
+    "PLUGIN_TREE_SETTLED": "YES",
+    "provider_names": [
+      "codex",
+      "qntylab-gated-codex",
+      "claude-code",
+      "qntylab-gated-claude-code"
+    ],
+    "model_facing_child_tools": [
+      "subagent_claude_code",
+      "subagent_codex"
+    ],
+    "generic_child_tools": [],
+    "parent_mutation_tools": [],
+    "background_delegation": "DISABLED",
+    "parent_gate": "ACTIVE",
+    "parent_route": "openai / gpt-5-mini",
+    "retry_max": 0,
+    "max_tokens": 4096,
+    "model_calls": 0,
+    "child_spawns": 0,
+    "BOOT_READY": "YES"
+  },
+  "verification": {
+    "python_tests": "9 passed; 32 passed",
+    "node_gated_provider_tests": "6 passed",
+    "built_dsh_boot_smoke": "exit 0",
+    "boot_smoke_overlay": "tests/fixtures/dsh_stage_a_v1r1_boot_smoke.patch.yml"
+  }
+}

@@ -5327,3 +5327,54 @@ downstream_authority = "NONE"
 stage_b_authorized = false
 active_project_after_closure = "NONE"
 next_action = "CLOSED_BLOCKED: no second Stage-A episode is authorized under this closure. Any future DSH multi-agent orchestration attempt requires a new, separately Git-backed authorization phase that accounts for this finding -- specifically, that a prompt-level call-sequence instruction to the DSH parent is not self-enforcing and must be paired with a framework- or driver-level hard budget per delegation tool, not only a total-step ceiling. No Stage B, no benchmark suite, no scientific/trading/capital authority follows from this closure."
+
+[[project]]
+project_id = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R1_BOOTSTRAP_AND_RUNTIME_HARDENING_AUTHORIZATION_V0"
+display_name = "DSH Stage-A V1R1 bootstrap and runtime hardening authorization V0"
+state = "CLOSED_PASS"
+authority_level = "BOUNDED_OFFLINE_IMPLEMENTATION_AND_QUALIFICATION"
+phase_type = "GOVERNANCE_BOUNDED_OFFLINE_IMPLEMENTATION"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/state/projects.toml",
+  "qntylab/dsh_stage_a_v1_hard_orchestration.py",
+  "qntylab/dsh_stage_a_v1r1.py",
+  "qntylab/dsh_stage_a_v1r1_cli.py",
+  "tests/test_dsh_stage_a_v1_hard_orchestration.py",
+  "tests/test_dsh_stage_a_v1_hard_gated_profile.py",
+  "tests/test_dsh_stage_a_v1r1.py",
+  "tests/fixtures/dsh_stage_a_v1r1_boot_smoke.patch.yml",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_hard_orchestration_authorization_v0/profile/package.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_hard_orchestration_authorization_v0/profile/cordis.patch.yml",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_hard_orchestration_authorization_v0/profile/pinned-dsh-v1r1-runtime-hardening.patch",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_hard_orchestration_authorization_v0/profile/qntylab-gated-provider/lib/index.js",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_hard_orchestration_authorization_v0/profile/qntylab-gated-provider/lib/gated-provider.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1r1_bootstrap_and_runtime_hardening_authorization_v0/qualification_receipt.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1r1_bootstrap_and_runtime_hardening_authorization_v0/hostile_review.md",
+]
+canonical_predecessor_project_id = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1_EXECUTION_V0"
+canonical_predecessor_pr = 169
+canonical_predecessor_merge = "64cd87fc2f28a59f9c7670c73d6e0af04e0fba7a"
+predecessor_terminal_outcome = "STAGE_A_V1_BLOCK_PARENT_INFRA"
+implementation_authorized = false
+implementation_completed = true
+live_dsh_invocations_authorized = 0
+live_openai_calls_authorized = false
+live_codex_calls_authorized = false
+live_claude_calls_authorized = false
+stage_a_fixture_runs = 0
+authorization_phase_spend_usd = 0.0
+parent_model = "gpt-5-mini"
+parent_retry_max = 0
+parent_max_request_attempts = 8
+parent_max_tokens = 4096
+spend_ceiling_usd = 1.00
+child_infra_retries = 0
+stage_b_authorized = false
+qnty_agent_eval = "NOT_APPLICABLE"
+scientific_execution_authorized = false
+qnty_runtime_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+active_project_after_closure = "NONE"
+next_action = "After canonical merge, the V1R1 offline bootstrap/runtime hardening is qualified and closed. No live Stage-A V1R1 execution is authorized by this phase. Any live V1R1 episode requires a separate Git-backed bounded execution authorization/activation. No Stage B, scientific, trading, capital, Qnty, or QntyAgentEval authority follows automatically."

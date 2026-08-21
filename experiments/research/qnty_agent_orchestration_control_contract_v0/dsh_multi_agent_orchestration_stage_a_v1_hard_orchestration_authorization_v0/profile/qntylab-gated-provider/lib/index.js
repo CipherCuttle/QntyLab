@@ -1,5 +1,5 @@
 import z from '@deepseek-ai/schemastery'
-import { createGatedProvider, createQntyLabGateClient } from './gated-provider.mjs'
+import { createGatedProvider, createMirroredGatedProvider, createQntyLabGateClient } from './gated-provider.mjs'
 
 export const name = 'qntylab-gated-provider'
 export const inject = ['subagents']
@@ -14,16 +14,16 @@ export const Config = z.object({
 })
 
 export function apply(ctx, config) {
-  const rawProvider = ctx.subagents.getProvider(config.rawProvider)
-  if (rawProvider === undefined) {
-    throw new Error(`qntylab-gated-provider: raw provider is not registered: ${config.rawProvider}`)
-  }
-  ctx.subagents.registerProvider(createGatedProvider({
+  // Lifecycle listeners are installed before the presence check. Raw provider
+  // fibers and this gate may activate in either order; neither path performs
+  // an invalid apply-time lookup or waits on patch-list order.
+  return createMirroredGatedProvider({
     providerName: config.providerName,
     toolName: config.toolName,
-    rawProvider,
+    rawName: config.rawProvider,
+    ctx,
     gate: createQntyLabGateClient(config),
-  }))
+  })
 }
 
 export { createGatedProvider, createQntyLabGateClient }

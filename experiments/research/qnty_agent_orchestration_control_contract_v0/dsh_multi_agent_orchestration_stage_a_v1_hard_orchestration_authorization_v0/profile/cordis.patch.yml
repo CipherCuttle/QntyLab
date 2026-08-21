@@ -17,6 +17,16 @@
   config:
     provider: openai
     model: gpt-5-mini
+- id: session-title-llm
+  disabled: true
+- id: llm-retry
+  disabled: true
+- id: compaction-basic
+  disabled: true
+- id: command-compact
+  disabled: true
+- id: tool-result-pruner
+  disabled: true
 - insert:
     - id: subagent-codex
       name: '@deepseek-ai/dsh-subagent-codex'
@@ -40,11 +50,18 @@
         statePath: !!js process.env.QNTYLAB_DSH_STAGE_A_STATE_PATH
         qntyLabRoot: !!js process.env.QNTYLAB_ROOT
         pythonExecutable: !!js process.env.QNTYLAB_PYTHON
+    - id: qntylab-parent-budget
+      name: '@qntylab/dsh-parent-budget'
+      config:
+        statePath: !!js process.env.QNTYLAB_DSH_PARENT_BUDGET_STATE_PATH
+        qntyLabRoot: !!js process.env.QNTYLAB_ROOT
+        pythonExecutable: !!js process.env.QNTYLAB_PYTHON
     - id: tool-subagent-codex
       name: '@deepseek-ai/dsh-tool-subagent'
       config:
         provider: qntylab-gated-codex
         toolName: subagent_codex
+        enableRunInBackground: false
         backgroundMode: one-shot
         maxDepth: provider-managed
     - id: tool-subagent-claude-code
@@ -52,6 +69,7 @@
       config:
         provider: qntylab-gated-claude-code
         toolName: subagent_claude_code
+        enableRunInBackground: false
         backgroundMode: one-shot
         maxDepth: provider-managed
 
@@ -81,4 +99,26 @@
 - id: tool-workflow
   disabled: true
 - id: tool-ralph
+  disabled: true
+- id: tool-bash
+  disabled: true
+- id: tool-pwsh
+  disabled: true
+- id: tool-jobs
+  disabled: true
+- id: tool-fs
+  disabled: true
+- id: tool-skill
+  disabled: true
+- id: tool-todo
+  disabled: true
+- id: tool-goal
+  disabled: true
+- id: tool-str-replace-editor
+  disabled: true
+- id: tool-web
+  disabled: true
+- id: web-search-deepseek
+  disabled: true
+- id: web
   disabled: true

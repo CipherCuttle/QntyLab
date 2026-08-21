@@ -2915,6 +2915,77 @@ active_project_after_closure = "NONE"
 next_action = "After canonical merge, execute exactly one separately recorded DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1_EXECUTION_V0 phase under the frozen hard-gated profile; record PASS/FAIL/BLOCK; open one draft execution/closure PR; STOP. No Stage B follows automatically."
 
 [[project]]
+project_id = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1_EXECUTION_V0"
+display_name = "DSH Stage-A V1 execution V0"
+state = "ACTIVE"
+authority_level = "BOUNDED_ONE_EPISODE_DSH_V1_EXECUTION_AND_CLOSURE"
+phase_type = "BOUNDED_LIVE_INFRASTRUCTURE_EXECUTION"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/ADR/0008-qnty-agent-orchestration-runtime-boundary.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "qntylab/dsh_stage_a_v1_hard_orchestration.py",
+  "tests/test_dsh_stage_a_v1_hard_orchestration.py",
+  "tests/test_dsh_stage_a_v1_hard_gated_profile.py",
+  "tests/test_project_context_v0.py",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_hard_orchestration_authorization_v0/authorization.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_hard_orchestration_authorization_v0/hostile_review.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_hard_orchestration_authorization_v0/profile/package.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_hard_orchestration_authorization_v0/profile/cordis.patch.yml",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_hard_orchestration_authorization_v0/profile/PROFILE.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_hard_orchestration_authorization_v0/profile/qntylab-gated-provider/package.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_hard_orchestration_authorization_v0/profile/qntylab-gated-provider/lib/index.js",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_hard_orchestration_authorization_v0/profile/qntylab-gated-provider/lib/gated-provider.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_hard_orchestration_authorization_v0/profile/qntylab-gated-provider/test/gated-provider.test.mjs",
+]
+authorization_project_id = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1_HARD_ORCHESTRATION_AUTHORIZATION_V0"
+authorization_pr = 167
+authorization_merge_sha = "c3d8f9d99c0400b2c5fd407068e96ee419d0028f"
+authorization_project_state = "CLOSED_PASS"
+implementation_authorized = true
+implementation_completed = false
+activation_is_governance_only = true
+activation_consumes_live_episode = false
+activation_consumes_execution_closure_pr_budget = false
+episode_consumed = false
+authorized_live_episodes = 1
+second_v1_episode_authorized = false
+execution_closure_pr_budget = 1
+stage_b_authorized = false
+qnty_agent_eval = "NOT_APPLICABLE"
+scientific_execution_authorized = false
+qnty_runtime_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+upstream_dsh_mutation_authorized = false
+live_openai_calls_authorized = true
+live_dsh_calls_authorized = true
+live_codex_calls_authorized = true
+live_claude_calls_authorized = true
+parent_model = "gpt-5-mini"
+parent_retry_max = 0
+parent_max_request_attempts = 8
+parent_max_tokens = 4096
+spend_ceiling_usd = 1.0
+child_infra_retries = 0
+frozen_fixture = "STAGE_A_BOUNDED_RETRY_V0"
+model_facing_child_routes = ["subagent_codex", "subagent_claude_code"]
+gated_provider_routes = { subagent_codex = "qntylab-gated-codex", subagent_claude_code = "qntylab-gated-claude-code" }
+generic_subagent_allowed = false
+subagent_fork_allowed = false
+workflow_child_bypass_allowed = false
+ralph_child_bypass_allowed = false
+raw_provider_model_facing_route_allowed = false
+alternate_delegation_surfaces_disabled = true
+live_openai_calls = 0
+live_dsh_calls = 0
+live_codex_calls = 0
+live_claude_calls = 0
+spend_usd = 0.0
+next_action = "Execute exactly one V1 episode, record PASS/FAIL/BLOCK, open exactly one draft closure PR, stop; no second episode, no Stage B."
+
+[[project]]
 project_id = "STAGE_A_DSH_SHADOW_EVALUATION_AUTHORIZATION_V0"
 display_name = "Stage-A DSH shadow evaluation authorization V0"
 state = "CLOSED_PASS"

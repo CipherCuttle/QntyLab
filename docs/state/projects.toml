@@ -5382,8 +5382,8 @@ next_action = "After canonical merge, the V1R1 offline bootstrap/runtime hardeni
 [[project]]
 project_id = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R1_EXECUTION_V0"
 display_name = "DSH Stage-A V1R1 live execution authorization and activation V0"
-state = "ACTIVE"
-authority_level = "BOUNDED_ONE_EPISODE_DSH_V1R1_EXECUTION_AND_CLOSURE"
+state = "CLOSED_BLOCKED"
+authority_level = "BOUNDED_ONE_EPISODE_DSH_V1R1_EXECUTION_CLOSED_BLOCKED_CHILD_INFRA"
 phase_type = "BOUNDED_LIVE_INFRASTRUCTURE_EXECUTION"
 authoritative_artifacts = [
   "AGENTS.md",
@@ -5392,6 +5392,8 @@ authoritative_artifacts = [
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1r1_live_execution_authorization_and_activation_v0/authorization.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1r1_live_execution_authorization_and_activation_v0/hostile_governance_review.md",
   "tests/test_dsh_stage_a_v1r1_live_execution_authorization_activation_v0.py",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1r1_execution_v0/execution_evidence.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1r1_execution_v0/closure.md",
 ]
 authorization_state = "AUTHORIZED_IF_CANONICAL"
 authorization_effective = "AFTER_CANONICAL_MERGE_ONLY"
@@ -5401,8 +5403,8 @@ canonical_predecessor_reviewed_head = "1443d89f2f12f37dff777d2de05563698a2dce6b"
 canonical_predecessor_merge = "e9c7a889747fd3a978f241e12448570b4634db81"
 qualification_required = "QUALIFIED_OFFLINE_BOOT_READY"
 boot_ready_required = true
-implementation_authorized = true
-implementation_completed = false
+implementation_authorized = false
+implementation_completed = true
 episode_consumed = false
 authorized_live_episodes = 1
 second_v1r1_episode_authorized = false
@@ -5444,4 +5446,6 @@ qnty_runtime_authority = "NONE"
 trading_authority = "NONE"
 capital_authority = "NONE"
 qnty_agent_eval = "NOT_APPLICABLE"
-next_action = "Execute exactly one Stage-A V1R1 live episode using the canonical PR #170 qualified runtime; record PASS/FAIL/BLOCK; open exactly one draft execution/closure PR; STOP. No second episode and no Stage B."
+terminal_outcome = "STAGE_A_V1R1_BLOCK_CHILD_INFRA"
+active_project_after_closure = "NONE"
+next_action = "CLOSED_BLOCKED: native Codex/Claude executable identities were incompatible with the exact V1R1 qualification assumptions before secret or paid-parent dispatch. No rescue, rerun, runtime repair, second episode, or Stage B is authorized. Any later attempt requires new Git-backed authority."

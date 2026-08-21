@@ -1,0 +1,120 @@
+{
+  "schema_version": "dsh-stage-a-v1r1-execution-evidence-v0",
+  "project_id": "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R1_EXECUTION_V0",
+  "terminal_outcome": "STAGE_A_V1R1_BLOCK_CHILD_INFRA",
+  "canonical_master": "b28c85ec184a991fdb13b2e7c6000a4e6c0f4898",
+  "authorization": {
+    "pr": 171,
+    "reviewed_head": "dad22c4a1843384983c8fe835b9464433f82fe16",
+    "canonical_merge": "b28c85ec184a991fdb13b2e7c6000a4e6c0f4898",
+    "runtime_qualification_pr": 170,
+    "runtime_qualification_merge": "e9c7a889747fd3a978f241e12448570b4634db81",
+    "second_v1r1_episode_authorized": false,
+    "stage_b_authorized": false
+  },
+  "pinned_dsh": {
+    "commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "tag": "dsh-v0.1.0-rc.7",
+    "runtime_hardening_patch_sha256": "c1785092d1bb294c9eebb912a3935839ae83893b19c0df393bbab59c762ccaa9"
+  },
+  "prelive": {
+    "boot_ready": "YES",
+    "offline_boot_smoke": "PASS",
+    "offline_boot_smoke_exit_code": 0,
+    "plugin_tree_settled": "YES",
+    "raw_provider_contract": ["codex", "claude-code"],
+    "gated_provider_contract": ["qntylab-gated-codex", "qntylab-gated-claude-code"],
+    "model_facing_child_tools": ["subagent_codex", "subagent_claude_code"],
+    "generic_child_tools": [],
+    "background_delegation": "DISABLED",
+    "parent_budget_gate": "ACTIVE",
+    "auxiliary_model_routes": [],
+    "boot_model_requests": 0,
+    "boot_child_spawns": 0,
+    "composed_config_sha256": "a3cb889ea755a6f80498acfe1119ec6a42ecab5c731379edecd0f0a5b36f077a"
+  },
+  "native_preflight": {
+    "codex_executable": "/home/swirky/.local/bin/codex",
+    "codex_version_observed": "codex-cli 0.148.0",
+    "codex_version_qualified": "0.147.0 (pinned @openai/codex dependency)",
+    "claude_executable": "/usr/bin/claude",
+    "claude_version_observed": "2.1.223 (Claude Code)",
+    "claude_version_qualified": "0.3.220 (pinned @anthropic-ai/claude-agent-sdk dependency)",
+    "compatibility": "INCOMPATIBLE",
+    "block_reason": "Installed native executable identities do not match the exact V1R1 qualification assumptions.",
+    "paid_parent_dispatch_attempted": false
+  },
+  "controller": {
+    "initial_state": "IMPLEMENT_REQUIRED",
+    "initial_digest": "2ec26e9ec88e9e0819a95eebc32cba02d87b5fc90c8869c69f14183b1a428d3b",
+    "final_state": "BLOCK_CHILD_INFRA",
+    "final_state_digest": "bdbb686dd5a0625a486deacd72d7ebdcd99024c7e70bdb5c75cc75afead3403c",
+    "parent_request_attempts": 0,
+    "child_budgets_consumed": {
+      "codex_initial": false,
+      "codex_repair": false,
+      "claude_initial": false,
+      "claude_rereview": false
+    }
+  },
+  "fixture": {
+    "id": "STAGE_A_BOUNDED_RETRY_V0",
+    "copy_scope": "ONE_DISPOSABLE_COPY_OUTSIDE_QNTYLAB_AND_QNTY",
+    "immutable_paths": ["TASK.md", "tests/test_retry.py"],
+    "modifiable_path": "retry.py",
+    "pre_hashes": {
+      "TASK.md": "19571f8c70364e41ae8366cd07b0f56546845c8b3f43b04f93634f75f9a6a6ff",
+      "retry.py": "f82a84088b76dd82ead87d5536f8120d62e7c4408c27fcbe59662155b5dd47ae",
+      "tests/test_retry.py": "caf317035b37a6606ff7b2250cf0b1cc6a1e8db7660414bf280eda4ddee641ac"
+    },
+    "post_hashes": {
+      "TASK.md": "19571f8c70364e41ae8366cd07b0f56546845c8b3f43b04f93634f75f9a6a6ff",
+      "retry.py": "f82a84088b76dd82ead87d5536f8120d62e7c4408c27fcbe59662155b5dd47ae",
+      "tests/test_retry.py": "caf317035b37a6606ff7b2250cf0b1cc6a1e8db7660414bf280eda4ddee641ac"
+    },
+    "mutation_scope": "NONE",
+    "initial_test": "NOT_RUN_PRELIVE_NATIVE_INCOMPATIBILITY",
+    "review": "NOT_RUN_PRELIVE_NATIVE_INCOMPATIBILITY"
+  },
+  "live": {
+    "episode_consumed": false,
+    "parent_request_attempts": 0,
+    "llm_retries": 0,
+    "codex_actual_calls": 0,
+    "claude_actual_calls": 0,
+    "codex_denied_attempts": 0,
+    "claude_denied_attempts": 0,
+    "generic_delegation_actual_calls": 0,
+    "background_child_calls": 0,
+    "initial_test": "NOT_RUN",
+    "initial_review": "NOT_RUN",
+    "repair_authorized": false,
+    "repair_test": "NOT_APPLICABLE",
+    "rereview": "NOT_APPLICABLE",
+    "estimated_spend_usd": 0.0,
+    "conservative_spend_bound_usd": 0.0,
+    "wall_clock_result": "BLOCKED_BEFORE_LIVE_DISPATCH"
+  },
+  "secret_statement": {
+    "preexisting_chat_exposure_acknowledged": true,
+    "secret_gate": "NOT_READ_NATIVE_PREFLIGHT_FAILED",
+    "secret_value_exposed_by_stage_a_v1r1_execution_tooling": false,
+    "secret_value_committed_or_persisted_in_stage_a_v1r1_artifacts": false,
+    "native_codex_auth": "NOT_INSPECTED",
+    "native_claude_auth": "NOT_INSPECTED"
+  },
+  "closure": {
+    "project_state_after": "CLOSED_BLOCKED",
+    "implementation_authorized_after": false,
+    "implementation_completed_after": true,
+    "episode_consumed_after": false,
+    "second_v1r1_episode_authorized": false,
+    "stage_b_authorized": false,
+    "qnty_agent_eval": "NOT_APPLICABLE",
+    "qnty_runtime_authority": "NONE",
+    "trading_authority": "NONE",
+    "capital_authority": "NONE",
+    "active_project_after_closure": "NONE"
+  }
+}

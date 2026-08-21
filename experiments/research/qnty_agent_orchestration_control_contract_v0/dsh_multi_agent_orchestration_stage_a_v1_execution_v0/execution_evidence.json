@@ -1,0 +1,26 @@
+{
+  "schema_version": "dsh-stage-a-v1-execution-evidence-v0",
+  "project_id": "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1_EXECUTION_V0",
+  "terminal_outcome": "STAGE_A_V1_BLOCK_PARENT_INFRA",
+  "canonical_authorization_pr": 167,
+  "canonical_authorization_merge": "c3d8f9d99c0400b2c5fd407068e96ee419d0028f",
+  "canonical_activation_pr": 168,
+  "canonical_activation_merge": "6e6056f2c79ef2ad1260a5e3bb153b0fa5c4d16a",
+  "pinned_dsh": {"commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca", "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188", "tag": "dsh-v0.1.0-rc.7"},
+  "canonical_profile_sha256": {
+    "package.json": "69a98c56082d0b9cd33d005b728e63d0580bfe926b31e18a22d3cac19afc4d2b",
+    "cordis.patch.yml": "bb9231325ad5043a8588d56ceb451c2b90c8ebe8d9c14e441e4af67c26f6be20",
+    "qntylab-gated-provider/lib/index.js": "f44576758f27df42f9fdb114936d98578902668f24653d1c2e658ef58ae48a57",
+    "qntylab-gated-provider/lib/gated-provider.mjs": "9dac1a9eefba18256824ef78f98414d3948e8f40c835d1f52c197df352617e7d"
+  },
+  "repaired_codex_provider": {"source_preimage_sha256": "9d94284e578ff2253f09e10130cac4aa977e8f3e9e64d442f1ca005cb207fdbd", "disposable_postimage_sha256": "9223f47a6aef5971df53857e5ec7daf2d20a55fcef0e935e39b4c2bca506dc41"},
+  "final_composed_config": {"sha256": "1af2b3d9e3a7db5710a738d7c90aaa561c5d88457db381dddf2aec8507e11288", "parent_model": "gpt-5-mini", "parent_retry_max": 0, "parent_max_tokens": 4096, "title_helper_disabled_by_disposable_monotonic_overlay": true, "model_facing_child_routes": ["subagent_codex", "subagent_claude_code"], "gated_provider_routes": ["qntylab-gated-codex", "qntylab-gated-claude-code"], "alternate_delegation_surfaces_disabled": true},
+  "fixture": {"id": "STAGE_A_BOUNDED_RETRY_V0", "pre_hashes": {"TASK.md": "19571f8c70364e41ae8366cd07b0f56546845c8b3f43b04f93634f75f9a6a6ff", "retry.py": "f82a84088b76dd82ead87d5536f8120d62e7c4408c27fcbe59662155b5dd47ae", "tests/test_retry.py": "caf317035b37a6606ff7b2250cf0b1cc6a1e8db7660414bf280eda4ddee641ac"}, "post_hashes": {"TASK.md": "19571f8c70364e41ae8366cd07b0f56546845c8b3f43b04f93634f75f9a6a6ff", "retry.py": "f82a84088b76dd82ead87d5536f8120d62e7c4408c27fcbe59662155b5dd47ae", "tests/test_retry.py": "caf317035b37a6606ff7b2250cf0b1cc6a1e8db7660414bf280eda4ddee641ac"}, "mutated": false},
+  "prompt_sha256": "6419b786fd633f70db1c7110a89636438741e3f4d1ac8899287dd300b7e43204",
+  "execution_driver_sha256": "374670a8638364fd11bbf11ef27029b1c7d8ec689993e88d76470d416d7fa0ad",
+  "authority": {"initial_state": "IMPLEMENT_REQUIRED", "initial_digest": "2ec26e9ec88e9e0819a95eebc32cba02d87b5fc90c8869c69f14183b1a428d3b", "final_state_before_closure": "IMPLEMENT_REQUIRED", "final_digest_before_closure": "2ec26e9ec88e9e0819a95eebc32cba02d87b5fc90c8869c69f14183b1a428d3b", "event_count": 1, "child_budgets_consumed": [], "transitions": ["IMPLEMENT_REQUIRED"]},
+  "live": {"episode_consumed": false, "parent_request_attempts": 0, "llm_retry_events": 0, "llm_retry_started_events": 0, "codex_actual_calls": 0, "claude_actual_calls": 0, "codex_denied_attempts": 0, "claude_denied_attempts": 0, "generic_delegation_actual_calls": 0, "initial_test": "NOT_REACHED", "initial_review": "NOT_REACHED", "repair_authorized": false, "repair_test": "NOT_REACHED", "rereview": "NOT_REACHED", "observed_or_estimated_spend_usd": 0.0, "conservative_spend_bound_usd": 0.0, "wall_clock_result": "PRELIVE_BOOT_FAILED_BEFORE_SESSION_OR_PARENT_REQUEST"},
+  "blocker": {"classification": "BLOCK_PARENT_INFRA", "exact_failure": "dsh: plugin tree failed: loader fibers failed", "cause": "qntylab-gated-provider: raw provider is not registered: codex; qntylab-gated-provider: raw provider is not registered: claude-code", "observed_before_paid_parent_request": true, "canonical_controls_modified": false, "rescue_run_performed": false},
+  "secret_statement": {"preexisting_chat_exposure_acknowledged": true, "secret_value_exposed_by_stage_a_v1_execution_tooling": false, "secret_value_committed_or_persisted_in_stage_a_v1_artifacts": false, "secret_file_gate": "present, nonempty, mode 0600; value omitted", "native_codex_auth": "normal host HOME preserved; no child call reached", "native_claude_auth": "normal host HOME preserved; no child call reached"},
+  "closure": {"project_state_after": "CLOSED_BLOCKED", "implementation_authorized_after": false, "implementation_completed_after": true, "episode_consumed_after": false, "second_v1_episode_authorized": false, "stage_b_authorized": false, "qnty_agent_eval": "NOT_APPLICABLE"}
+}

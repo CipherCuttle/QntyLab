@@ -2877,6 +2877,8 @@ authoritative_artifacts = [
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_hard_orchestration_authorization_v0/profile/qntylab-gated-provider/lib/index.js",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_hard_orchestration_authorization_v0/profile/qntylab-gated-provider/lib/gated-provider.mjs",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_hard_orchestration_authorization_v0/profile/qntylab-gated-provider/test/gated-provider.test.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_execution_v0/execution_evidence.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_v1_execution_v0/closure.md",
 ]
 canonical_predecessor_project_id = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_EXECUTION_V0"
 canonical_predecessor_merge = "6d9469aa8fc82381b124947f4518b6be7279a532"
@@ -2917,8 +2919,8 @@ next_action = "After canonical merge, execute exactly one separately recorded DS
 [[project]]
 project_id = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1_EXECUTION_V0"
 display_name = "DSH Stage-A V1 execution V0"
-state = "ACTIVE"
-authority_level = "BOUNDED_ONE_EPISODE_DSH_V1_EXECUTION_AND_CLOSURE"
+state = "CLOSED_BLOCKED"
+authority_level = "BOUNDED_ONE_EPISODE_DSH_V1_EXECUTION_AND_CLOSURE_BLOCKED"
 phase_type = "BOUNDED_LIVE_INFRASTRUCTURE_EXECUTION"
 authoritative_artifacts = [
   "AGENTS.md",
@@ -2943,13 +2945,13 @@ authorization_project_id = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1_HARD_ORCHES
 authorization_pr = 167
 authorization_merge_sha = "c3d8f9d99c0400b2c5fd407068e96ee419d0028f"
 authorization_project_state = "CLOSED_PASS"
-implementation_authorized = true
-implementation_completed = false
+implementation_authorized = false
+implementation_completed = true
 activation_is_governance_only = true
 activation_consumes_live_episode = false
 activation_consumes_execution_closure_pr_budget = false
 episode_consumed = false
-authorized_live_episodes = 1
+authorized_live_episodes = 0
 second_v1_episode_authorized = false
 execution_closure_pr_budget = 1
 stage_b_authorized = false
@@ -2959,10 +2961,10 @@ qnty_runtime_authority = "NONE"
 trading_authority = "NONE"
 capital_authority = "NONE"
 upstream_dsh_mutation_authorized = false
-live_openai_calls_authorized = true
-live_dsh_calls_authorized = true
-live_codex_calls_authorized = true
-live_claude_calls_authorized = true
+live_openai_calls_authorized = false
+live_dsh_calls_authorized = false
+live_codex_calls_authorized = false
+live_claude_calls_authorized = false
 parent_model = "gpt-5-mini"
 parent_retry_max = 0
 parent_max_request_attempts = 8
@@ -2983,7 +2985,7 @@ live_dsh_calls = 0
 live_codex_calls = 0
 live_claude_calls = 0
 spend_usd = 0.0
-next_action = "Execute exactly one V1 episode, record PASS/FAIL/BLOCK, open exactly one draft closure PR, stop; no second episode, no Stage B."
+next_action = "CLOSED_BLOCKED: the one authorized V1 execution attempt failed before session materialization because the gated-provider fibers loaded before the raw codex and claude-code providers. No parent request, child call, fixture test, review, spend, or rescue run occurred. Do not repair or rerun this authorization; publish exactly one draft execution/closure PR, then stop. No Stage B."
 
 [[project]]
 project_id = "STAGE_A_DSH_SHADOW_EVALUATION_AUTHORIZATION_V0"

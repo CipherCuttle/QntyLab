@@ -1,0 +1,269 @@
+{
+  "artifact_type": "DSH_STAGE_A_V1R3R2_PRELIVE_EXECUTION_ENFORCEMENT_GAP_CLOSURE_AUTHORIZATION",
+  "schema_version": "dsh-stage-a-v1r3r2-prelive-execution-enforcement-gap-closure-authorization-v0",
+  "project_id": "DSH_STAGE_A_V1R3R2_PRELIVE_EXECUTION_ENFORCEMENT_GAP_CLOSURE_AUTHORIZATION_V0",
+  "future_implementation_project_id": "DSH_STAGE_A_V1R3R2_PRELIVE_EXECUTION_ENFORCEMENT_GAP_CLOSURE_V0",
+  "phase_state": "CLOSED_PASS",
+  "authorization_state": "AUTHORIZED_IF_CANONICAL",
+  "authorization_effective": "AFTER_CANONICAL_MERGE_ONLY",
+  "authority_level": "BOUNDED_OFFLINE_EXECUTION_CONTROL_ENGINEERING_AND_CONDITIONAL_REQUALIFICATION",
+  "authorized_operation": "EXACTLY_ONE_OFFLINE_PRELIVE_EXECUTION_ENFORCEMENT_GAP_CLOSURE_PHASE",
+  "canonicalization": {
+    "canonical_repository": "QntyLab",
+    "candidate_branch": "agent/dsh-stage-a-v1r3r2-prelive-execution-enforcement-gap-closure-authorization-v0",
+    "candidate_artifact_path": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_authorization_v0/authorization.json",
+    "candidate_base_sha": "276c1706c02bdb4fcc0d3e688c371e20fcee2065",
+    "branch_local_artifact_does_not_self_authorize": true,
+    "canonical_presence_required_before_implementation": true,
+    "exact_equivalent_canonical_authorization_initially_present": false,
+    "duplicate_authorization_allowed": false,
+    "no_auto_merge": true,
+    "scope": "One later bounded offline execution-control engineering phase; no activation or live episode authority."
+  },
+  "canonical_predecessor": {
+    "project_id": "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R1",
+    "pr": 188,
+    "reviewed_head": "6c3434ac02051e1f9d3a3baa02a6103e2693a406",
+    "merge": "276c1706c02bdb4fcc0d3e688c371e20fcee2065",
+    "required_state": "CLOSED_BLOCKED",
+    "episode_claimed": false,
+    "episode_consumed": false,
+    "binding_mismatch_behavior": "BLOCK_AUTH"
+  },
+  "reconciliation": {
+    "memory_check": "MEMPALACE_UNAVAILABLE_FALLBACK_TO_CANONICAL_GIT_AND_COMPLETE_CONTEXT_SPINE",
+    "origin_master": "276c1706c02bdb4fcc0d3e688c371e20fcee2065",
+    "complete_context_spine_conflicts": 0,
+    "active_implementation_project": "NONE",
+    "v0r1_execution_state": "CLOSED_BLOCKED",
+    "v0r1_episode_claimed": false,
+    "v0r1_episode_consumed": false,
+    "equivalent_canonical_authorization_found": false
+  },
+  "held_pr_189": {
+    "number": 189,
+    "head": "aa6b383c41a68e52f35c3c0e1fcae61e7cf0004d",
+    "state_observed": "OPEN",
+    "draft_observed": true,
+    "canonical": false,
+    "merged": false,
+    "modified_by_this_phase": false,
+    "substitutes_for_this_authorization": false,
+    "authorizes_future_implementation": false,
+    "merge_decision_authorized": false
+  },
+  "historical_authority_rejected": {
+    "v0r1_authorization_project_id": "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_AUTHORIZATION_V0R1",
+    "v0r1_execution_project_id": "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R1",
+    "v0r1_authorization_or_activation_substitution_allowed": false,
+    "held_pr_189_project_id": "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_AUTHORIZATION_V0R2",
+    "held_pr_189_substitution_allowed": false,
+    "only_this_exact_authorization_may_authorize_future_implementation_after_canonical_merge": true
+  },
+  "triggering_evidence": {
+    "classification": "CONCRETE_PRELIVE_FALSIFYING_FINDINGS_NOT_SPECULATIVE_CLEANUP",
+    "historical_stage_a": {
+      "artifact": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_execution_v0/execution_evidence.json",
+      "sha256": "152417301932ec55f6b2817c186b469abc2a97ff05a0d45d07714803f23ebf72",
+      "codex_tool_calls_observed": 3,
+      "intended_codex_max": 2,
+      "finding": "The DSH parent repeated Codex delegation without the required test-then-review gate."
+    },
+    "qualified_budget_gate": {
+      "v1r3r2_reexport_artifact": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_claude_hard_read_only_repair_and_requalification_v0/gate/qualification-budget-gate.mjs",
+      "v1r3r2_reexport_sha256": "6e577802f1dbc39dd3a424e8438c84ae6b16ff09fbfb5030c51126a38063d760",
+      "implementation_artifact": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/gate/qualification-budget-gate.mjs",
+      "implementation_sha256": "b6979f669c7cd76c16f65e37a01442700b87181e77e2dadc4f72b76642cdda0e",
+      "parent_request_ceiling": 8,
+      "workflow_state_machine": false
+    },
+    "v1r3r2_qualification": {
+      "artifact": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_claude_hard_read_only_repair_and_requalification_v0/qualification.json",
+      "sha256": "f25d9305cbfe106b1b7295088140e9b6f4c2f8e041692ebea7e8f63630988304",
+      "codex_actual_task_calls": 0,
+      "claude_actual_task_calls": 0,
+      "failing_child_sequence_empirically_proven": false
+    },
+    "held_v0r2_authorization": {
+      "pr": 189,
+      "head": "aa6b383c41a68e52f35c3c0e1fcae61e7cf0004d",
+      "authorization_artifact_sha256": "c69764ed3ed0bd7594f45ce20d715d09df84e5f6e5670f24deccbd95cbccd5d8",
+      "focused_test_sha256": "6b1f10833d1f7a1ae75e7b66eea0b156f58f74978bab09237e5b1222949f4b9c",
+      "declared_codex_max": 2,
+      "declared_claude_max": 2,
+      "declared_parent_request_max": 8,
+      "declared_max_tokens_per_request": 4096,
+      "declared_spend_max_usd": 1.0,
+      "all_limits_proven_through_live_equivalent_execution_seams": false,
+      "focused_tests_include_schema_or_synthetic_helper_models": true
+    }
+  },
+  "future_authority_scope": {
+    "read": [
+      "relevant QntyLab Stage-A orchestration, runtime, qualification, launcher, materializer, claim, and gated-provider code",
+      "historical Stage-A evidence and existing test fixtures"
+    ],
+    "modify_if_necessary": [
+      "QntyLab Stage-A orchestration enforcement",
+      "qualification or runtime overlay and gating code",
+      "bounded claim helper code",
+      "directly corresponding tests",
+      "phase evidence, project state, and generated roadmap artifacts"
+    ],
+    "create": [
+      "deterministic offline full-profile integration fixtures",
+      "fake or stub parent, Codex, and Claude providers",
+      "disposable Git claim remotes and workspaces",
+      "sentinel-secret fixtures",
+      "qualification artifacts only if covered runtime or policy identity changes"
+    ],
+    "smallest_necessary_runtime_or_policy_repair_authorized": true,
+    "historical_evidence_mutation_authorized": false,
+    "real_episode_artifact_mutation_authorized": false
+  },
+  "required_child_state_machine": {
+    "pre_dispatch_enforcement_required": true,
+    "transitions": [
+      "INITIAL -> exactly one Codex implementation",
+      "AFTER_INITIAL_CODEX -> exactly one Claude hostile review",
+      "AFTER_REVIEW_NO_CRITICAL_HIGH -> TERMINAL",
+      "AFTER_REVIEW_CRITICAL_HIGH -> exactly one Codex repair",
+      "AFTER_REPAIR -> exactly one Claude targeted rereview",
+      "AFTER_REREVIEW -> TERMINAL"
+    ],
+    "codex_calls_max": 2,
+    "claude_calls_max": 2,
+    "invalid_transition_denied_before_native_child_spawn": true,
+    "must_reject": [
+      "third Codex",
+      "third Claude",
+      "duplicate initial Codex",
+      "Claude before initial Codex completion",
+      "repair without Critical or High",
+      "second repair",
+      "rereview without repair",
+      "generic child route",
+      "alternative child provider",
+      "background delegation"
+    ]
+  },
+  "required_parent_budget": {
+    "max_parent_request_attempts": 8,
+    "attempt_9_denied_before_adapter_or_provider_io": true,
+    "max_tokens_per_request": 4096,
+    "max_total_authorized_spend_usd": 1.0,
+    "reservation_before_every_paid_dispatch_required": true,
+    "automatic_provider_retries": false,
+    "auxiliary_model_route_bypass": false,
+    "declarative_only_limit_requires_smallest_predispatch_repair": true
+  },
+  "required_claim_acceptance": {
+    "fixtures": "DISPOSABLE_FILESYSTEM_AND_BARE_GIT_ONLY",
+    "cases": [
+      "fresh claim",
+      "remote claim already exists",
+      "local claim already exists",
+      "concurrent contenders",
+      "remote success and local failure",
+      "local success and remote failure",
+      "ambiguous write state",
+      "crash and restart interpretation"
+    ],
+    "partial_or_ambiguous_state_makes_second_episode_eligible": false,
+    "at_most_once_priority": "SAFETY_OVER_AVAILABILITY",
+    "real_v0r2_claim_authorized": false
+  },
+  "required_secret_firewall": {
+    "credential_kind": "FAKE_SENTINEL_ONLY",
+    "sentinel_reaches_parent_through_exact_extra_env_seam": true,
+    "sentinel_reaches_codex": false,
+    "sentinel_reaches_claude": false,
+    "sentinel_reaches_persisted_state_logs_receipts_or_evidence": false,
+    "sentinel_hash_or_serialization_allowed": false,
+    "real_secret_read_authorized": false
+  },
+  "required_offline_integration": {
+    "profile": "FULL_PROFILE_LIVE_EQUIVALENT_OFFLINE",
+    "components": [
+      "mock parent adapter",
+      "stub Codex provider",
+      "stub Claude provider",
+      "fake sentinel secret",
+      "disposable workspace",
+      "disposable claim remote"
+    ],
+    "mock_parent_attempts_forbidden_sequences": true,
+    "enforcement_layer_must_block_forbidden_sequences": true,
+    "cooperative_mock_parent_is_decisive_proof": false,
+    "synthetic_helper_only_tests_are_decisive_proof": false,
+    "external_network_authorized": false
+  },
+  "qualification_consequence": {
+    "historical_qualified_launch_contract_digest": "57162eb65a4177ae58c6b503110dfe802ae345c3e6e9c3963acd207f693fbcc1",
+    "historical_evidence_preserved": true,
+    "covered_identity_change_makes_old_contract_valid_for_new_runtime": false,
+    "conditional_requalification_authorized": true,
+    "requalification_max": 1,
+    "requalification_only_if_covered_identity_changes": true,
+    "unchanged_components_requalified_without_need": false,
+    "fresh_digest_issued_only_if_objectively_required": true,
+    "requalification_live_episode_authorized": false,
+    "requalification_real_secret_authorized": false
+  },
+  "pr_189_consequence": {
+    "if_runtime_or_policy_identity_changes": "SUPERSEDED_NOT_MERGEABLE",
+    "fresh_v0r2_authorization_required_after_repaired_runtime_qualification_is_canonical": true,
+    "if_no_relevant_identity_change_and_all_enforcement_is_already_hard": "ELIGIBLE_FOR_RECONSIDERATION_ONLY",
+    "merge_decision_granted": false
+  },
+  "governance_boundary": {
+    "live_execution_authorized": false,
+    "activation_authorized": false,
+    "real_secret_read_authorized": false,
+    "real_claim_authorized": false,
+    "real_provider_io_authorized": false,
+    "spend_authorized_usd": 0.0,
+    "live_dsh_codex_or_claude_authorized": false,
+    "stage_b_authorized": false,
+    "qnty_runtime_authority": "NONE",
+    "trading_authority": "NONE",
+    "capital_authority": "NONE",
+    "scientific_execution_or_promotion_authorized": false,
+    "production_deployment_authorized": false
+  },
+  "construction_receipts": {
+    "runtime_files_modified": 0,
+    "qualification_runs": 0,
+    "activation_artifacts_created": 0,
+    "real_secret_reads": 0,
+    "real_claims_created": 0,
+    "provider_or_model_requests": 0,
+    "live_dsh_codex_or_claude_invocations": 0,
+    "spend_usd": 0.0,
+    "pr_189_modified": false,
+    "hostile_review_completed": true
+  },
+  "future_implementation_authority_after_construction": {
+    "available_on_branch": false,
+    "available_after_canonical_merge": true,
+    "implementation_project_id": "DSH_STAGE_A_V1R3R2_PRELIVE_EXECUTION_ENFORCEMENT_GAP_CLOSURE_V0",
+    "active_project_after_authorization_closure": "NONE",
+    "separate_activation_required": false,
+    "live_execution_authority_created": false
+  },
+  "review_policy": {
+    "hostile_review_count_required": 1,
+    "hostile_review_count_actual": 1,
+    "hostile_review_verdict": "PASS",
+    "critical_findings": 0,
+    "high_findings": 1,
+    "open_critical_findings": 0,
+    "open_high_findings": 0,
+    "high_findings_repaired": 1,
+    "targeted_rereview_only_if_critical_or_high_repair": true,
+    "targeted_rereview_used": true,
+    "medium_low_reopen_only_if_frozen_invariant_or_fail_closed_behavior_is_invalidated": true
+  },
+  "architecture_relevance": "NOT_REQUIRED_WITHIN_EXISTING_ADR_0008_BOUNDARY",
+  "qnty_agent_eval": "NO_MATCH"
+}

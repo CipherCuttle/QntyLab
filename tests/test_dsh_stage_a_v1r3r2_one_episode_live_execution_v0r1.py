@@ -73,7 +73,11 @@ def _synthetic_repo(tmp_path: Path, *, canonical: bool, state: str = "ACTIVE") -
     record["authorization_canonical_merge"] = canonical_sha
     record["canonical_predecessor_merge"] = canonical_sha
     record["state"] = state
-    if state != "ACTIVE":
+    if state == "ACTIVE":
+        record["implementation_authorized"] = True
+        record["implementation_completed"] = False
+        record["effective_execution_authority"] = True
+    else:
         record["implementation_authorized"] = False
         record["implementation_completed"] = True
         record["terminal_outcome"] = "BLOCK_AUTHORITY"
@@ -125,7 +129,7 @@ def test_fresh_activation_binds_authorization_runtime_episode_and_firewall() -> 
     }
 
 
-def test_branch_local_activation_is_inert_and_claim_is_untouched() -> None:
+def test_closed_execution_has_no_effective_authority_and_claim_is_untouched() -> None:
     _, _, registry = project_context.load_context_sources(ROOT)
     projects = project_context.validate_projects_registry(ROOT, registry)
     projection = project_context.execution_authority_projection(ROOT, projects)
@@ -133,8 +137,8 @@ def test_branch_local_activation_is_inert_and_claim_is_untouched() -> None:
     assert projection["issues"] == []
     assert projection["active_project"] is None
     assert identity["effective"] is False
-    assert identity["canonical_sha"] == "afd5991abb2d3202367a22a5bda25526be476e69"
-    assert identity["head_sha"] != identity["canonical_sha"]
+    assert identity["canonical_sha"] == "0f5d8d527ccbd0b284d8e9cc7dcd1bfe3518a278"
+    assert identity["head_sha"] == identity["canonical_sha"]
     assert identity["candidate_base_is_ancestor"] is True
 
 

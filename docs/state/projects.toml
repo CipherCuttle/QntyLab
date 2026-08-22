@@ -6291,7 +6291,7 @@ next_action = "CLOSED_PASS: the fresh V0R1 authorization is frozen against the r
 [[project]]
 project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R1"
 display_name = "DSH Stage-A V1R3R2 one-episode live execution activation V0R1"
-state = "ACTIVE"
+state = "CLOSED_BLOCKED"
 authority_level = "BOUNDED_ONE_EPISODE_DSH_STAGE_A_V1R3R2_LIVE_EXECUTION_AND_CLOSURE"
 phase_type = "BOUNDED_LIVE_INFRASTRUCTURE_EXECUTION"
 authoritative_artifacts = [
@@ -6301,6 +6301,9 @@ authoritative_artifacts = [
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_authorization_v0r1/authorization.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0r1/activation.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0r1/hostile_governance_review.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_result_v0r1/execution_evidence.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_result_v0r1/closure.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_result_v0r1/hostile_review.md",
   "tests/test_dsh_stage_a_v1r3r2_one_episode_live_execution_v0r1.py",
 ]
 authorization_state = "AUTHORIZED_IF_CANONICAL"
@@ -6316,10 +6319,10 @@ canonical_predecessor_reviewed_head = "f1c4313e4fccc721843883901af0ffc234d2d33a"
 canonical_predecessor_merge = "afd5991abb2d3202367a22a5bda25526be476e69"
 projection_contract = "ACTIVATION_REGISTRY_PROJECT_CONTEXT_CANONICAL_GIT_PARITY_V0"
 activation_artifact_project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R1"
-implementation_authorized = true
-implementation_completed = false
+implementation_authorized = false
+implementation_completed = true
 activation_authorized_after_canonicalization = true
-effective_execution_authority = true
+effective_execution_authority = false
 episode_started = false
 episode_claimed = false
 episode_consumed = false
@@ -6415,5 +6418,13 @@ hostile_governance_high_total = 0
 hostile_governance_medium_total = 0
 hostile_governance_low_total = 0
 targeted_governance_rereview_used = true
-terminal_outcome = "ACTIVE_CANDIDATE_INERT_UNTIL_CANONICAL"
-next_action = "ACTIVE_CANDIDATE: this activation is inert until the exact candidate is canonical on origin/master. Do not read the secret, create the claim, execute the episode, invoke DSH, mutate the fixture, or authorize Stage B; a later action-time preflight is required after canonicalization."
+execution_hostile_review_count = 1
+execution_hostile_review_verdict = "PASS"
+execution_hostile_critical_total = 0
+execution_hostile_high_total = 0
+execution_hostile_medium_total = 0
+execution_hostile_low_total = 0
+execution_targeted_rereview_used = false
+terminal_outcome = "BLOCK_PARENT_INFRA"
+terminal_outcome_basis = "The required provider secret was unavailable after every non-secret action-time gate passed; the episode stopped before claim creation, provider I/O, DSH invocation, child calls, fixture execution, and spend."
+next_action = "CLOSED_BLOCKED: the required provider secret was unavailable at the action-time secret gate. The one episode remains unclaimed and unconsumed; no replay, second episode, claim repair, Stage B, Qnty, trading, capital, promotion, or scientific authority is authorized. Any later attempt requires new Git-backed authority."

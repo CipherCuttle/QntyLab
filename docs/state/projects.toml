@@ -5624,3 +5624,66 @@ qnty_agent_eval = "NOT_APPLICABLE"
 active_project_after_closure = "NONE"
 terminal_outcome = "STAGE_A_V1R3_CLOSED_PARTIAL_LAUNCH_PLANE_CONTRACT_ONLY"
 next_action = "CLOSED_BLOCKED: the materializer/launcher/manifest/executable-identity contract and its offline test suite are implemented and pass (19/19, including 4 regression tests added after one hostile review found 1 Critical and 3 High and both were fixed), but the actual V1R3 qualification objective is not complete because this environment could not materialize the real pinned DSH runtime, perform the offline/frozen dependency install, land and compile the Codex executable-binding repair into that real runtime, or execute the real full-profile loopback-mock boot. No QUALIFIED_LAUNCH_CONTRACT_DIGEST is issued by this phase. A later phase must run real materialization against commit 99f6f02fecdb7dff40c3fbc9470f5907c29f74ca, land and compile the Codex repair, and execute the full-profile mock boot before any live episode may cite this phase. No live episode, Stage-A fixture execution, Qnty/QntyAgentEval, trading/capital action, or Stage B is authorized by this phase."
+
+[[project]]
+project_id = "DSH_STAGE_A_V1R3R1_REAL_RUNTIME_QUALIFICATION_V0"
+display_name = "DSH Stage-A V1R3R1 real runtime qualification V0"
+state = "CLOSED_PASS"
+authority_level = "BOUNDED_OFFLINE_LAUNCH_PLANE_QUALIFICATION"
+phase_type = "BOUNDED_OFFLINE_INFRASTRUCTURE_QUALIFICATION"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/PHASE.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/qualification.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/hostile_review.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/materializer/qntylab-materialize-dsh-runtime.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/launcher/qntylab-launch-dsh.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/repairs/codex-executable-binding.patch",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/mock/qualification-openai-mock.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/gate/qualification-budget-gate.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/driver/qualification.patch.yml",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/evidence/runtime_manifest.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/evidence/digests.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/evidence/canonical-json.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/driver/run-materialize.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/driver/run-via-launcher.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/test/qntylab-dsh-v1r3r1.test.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/test/digest-regression.test.mjs",
+]
+authorization_state = "AUTHORIZED_IF_CANONICAL"
+authorization_effective = "AFTER_CANONICAL_MERGE_ONLY"
+canonical_predecessor_project_id = "DSH_STAGE_A_V1R3_LAUNCH_PLANE_QUALIFICATION_V0"
+canonical_predecessor_pr = 176
+canonical_predecessor_reviewed_head = "24bf629de36258520cdb73866d907c5633ca1e2c"
+canonical_predecessor_merge = "8ad4a92f3447ba7fff27cefc72fc1f258f07f2be"
+qualification_required = "NONE_THIS_IS_THE_QUALIFICATION_PHASE"
+implementation_authorized = false
+implementation_completed = true
+episode_consumed = false
+live_materialization_executed = true
+live_dsh_boot_executed = true
+codex_executable_binding_repair_landed = true
+pinned_dsh_commit = "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca"
+pinned_dsh_tree = "3bc8f89fe494a4755c188be354add4e8b1e7b188"
+pinned_dsh_tag = "dsh-v0.1.0-rc.7"
+offline_node_tests_total = 19
+offline_node_tests_pass = 19
+offline_node_tests_fail = 0
+mock_parent_requests = 1
+external_parent_requests = 0
+paid_model_requests = 0
+codex_model_turns = 0
+claude_model_turns = 0
+spend_usd = 0.0
+secret_read = false
+stage_b_authorized = false
+scientific_execution_authorized = false
+qnty_runtime_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+qnty_agent_eval = "NOT_APPLICABLE"
+active_project_after_closure = "NONE"
+terminal_outcome = "DSH_STAGE_A_V1R3R1_REAL_RUNTIME_QUALIFIED"
+qualified_launch_contract_digest = "4cd2734f229a97d4258ace4576f23f76f3d36aeef888a19fa61d2f4a7bff37d4"
+next_action = "CLOSED_PASS: post-PR H-01..H-04 provenance repairs were requalified from a fresh pristine pinned source. The canonical materializer verified repository/commit/tree/tag, applied the committed V1R3R1 patch, installed offline/frozen, ran full pnpm run build:lib, bound lockfile/pnpm/Claude SDK identity, and emitted the corrected manifest. The canonical launcher then ran a real full-profile headless boot with a settled plugin tree, one deterministic loopback parent request bearing exactly subagent_codex/subagent_claude_code, zero retries/auxiliary/paid/external requests, zero child turns, and matching session cwd/workspace. The old digest is SUPERSEDED_INVALID_DIGEST_CANONICALIZATION; corrected digests are issued in qualification.json. No live episode, Stage-A fixture execution, Qnty/QntyAgentEval, trading/capital action, or Stage B is authorized; a later live episode requires separate Git-backed authorization + activation."

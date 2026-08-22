@@ -1,0 +1,151 @@
+{
+  "schema_version": "dsh-stage-a-v1r3r2-one-episode-live-execution-result-v0",
+  "project_id": "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0",
+  "terminal_outcome": "BLOCK_AUTHORITY",
+  "canonical": {
+    "master": "ce91e29ee4f1441b750e28559bec9f291fd02036",
+    "expected_master": "ce91e29ee4f1441b750e28559bec9f291fd02036",
+    "source_conflict": false,
+    "authorization_pr": 182,
+    "authorization_head": "cdf5282c4cae4dd219fad1dbe6020db475ad6381",
+    "authorization_canonical_merge": "0dbd9ee0dceb9c6dab9781816230b5518c1de490",
+    "activation_pr": 183,
+    "activation_head": "72dcc4509b52bf9cdb09905ccf6bb0c18f813a8c",
+    "activation_canonical_merge": "ce91e29ee4f1441b750e28559bec9f291fd02036",
+    "qualification_pr": 181,
+    "qualification_head": "4ee6131ddcc39d4c677db1259cab2c23d7937379",
+    "qualification_canonical_merge": "117df125266b028225aefdd87cebdfadc7ab3735"
+  },
+  "authority": {
+    "project_id": "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0",
+    "activation_effective_after_canonicalization": true,
+    "activation_artifact_phase_state": "ACTIVE_CANDIDATE",
+    "activation_artifact_active_execution_project_state": "ACTIVE",
+    "canonical_project_context_active_project": "NONE",
+    "canonical_registry_state_at_start": "CLOSED_PASS",
+    "canonical_registry_implementation_authorized_at_start": false,
+    "canonical_registry_implementation_completed_at_start": true,
+    "canonical_registry_episode_claimed_at_start": false,
+    "canonical_registry_episode_consumed_at_start": false,
+    "authorized_live_episodes": 1,
+    "second_episode_authorized": false,
+    "whole_episode_retry_allowed": false,
+    "execution_closure_pr_budget": 1,
+    "authority_reconciliation": "BLOCKED_CANONICAL_PROJECT_CONTEXT_REGISTRY_CONTRADICTION",
+    "blocker": {
+      "layer": "AUTHORITY",
+      "exact_failure_class": "CANONICAL_ACTIVE_EXECUTION_PROJECT_MISSING",
+      "observed_project_context": "Active project: none",
+      "observed_registry_record": "state=CLOSED_PASS, implementation_authorized=false, implementation_completed=true",
+      "required_execution_semantics": "active_execution_project.state=ACTIVE and implementation_authorized=true",
+      "observed_before_secret_read": true,
+      "observed_before_remote_claim": true,
+      "observed_before_provider_io": true
+    }
+  },
+  "prelive": {
+    "non_secret_gates": "BLOCKED",
+    "remote_claim_ref": "refs/heads/qntylab-claims/dsh-stage-a-v1r3r2-one-episode-live-execution-v0",
+    "remote_claim_ref_absent_at_start": true,
+    "remote_claim_dry_run_create_capability": "NOT_REACHED",
+    "local_o_excl_receipt_capability": "NOT_REACHED",
+    "secret_read_before_gates": false,
+    "qualified_launch_contract_digest": "57162eb65a4177ae58c6b503110dfe802ae345c3e6e9c3963acd207f693fbcc1",
+    "superseded_launch_digest_rejected": "4cd2734f229a97d4258ace4576f23f76f3d36aeef888a19fa61d2f4a7bff37d4",
+    "runtime_manifest_digest": "afcfa011de46bd9fccaa120b5612c24a5ace2b2c451591ddf8b67fb43a8ce321",
+    "executable_identity_digest": "ae07ece34c88b3ebaebd7452df8d136c82935f9c8ec9df16a40e50a2582a2fd9",
+    "launch_policy_digest": "34d5ceabbd89eaa7520cb5d5b69fa938a4cf15132b5c37e98382c4f6aab53f28",
+    "codex_repair_digest": "f89bf5833956f3c4202ca88a9285e39658976b29605fc1b63b7c62ebdd07fcb3",
+    "claude_repair_digest": "2b8277bf13e077651046e2527dc7aa092c3c9669cedc61eac1f742d9364a17e3",
+    "dsh_repository": "deepseek-ai/deepseek-harness",
+    "dsh_commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "dsh_tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "dsh_tag": "dsh-v0.1.0-rc.7",
+    "runtime_identity_verification": "NOT_REACHED_AUTHORITY_BLOCK",
+    "fresh_pristine_materialization": "NOT_REACHED",
+    "fixture_identity": "NOT_REACHED",
+    "workspace_containment": "NOT_REACHED",
+    "provider": "openai",
+    "model": "gpt-5-mini",
+    "route": "llm-pi-ai",
+    "model_facing_tools_declared": ["subagent_codex", "subagent_claude_code"],
+    "generic_child_tools_declared": [],
+    "parent_request_ceiling": 8,
+    "retry_policy": {
+      "llm_retries": 0,
+      "provider_retry": 0,
+      "automatic_continuation": false
+    },
+    "spend_ceiling_usd": 1.0,
+    "child_ceilings": {
+      "codex": 2,
+      "claude": 2
+    },
+    "timeout_seconds": 1800
+  },
+  "claim": {
+    "mechanism": "REMOTE_GIT_REF_PLUS_O_EXCL_RECEIPT",
+    "remote_claim_created": false,
+    "local_o_excl_receipt_created": false,
+    "partial_claim": false,
+    "claimed_before_provider_io": false,
+    "episode_claimed": false,
+    "episode_consumed": false
+  },
+  "live": {
+    "started": false,
+    "dsh_started": false,
+    "parent_provider": "openai",
+    "parent_model": "gpt-5-mini",
+    "parent_request_attempts": 0,
+    "parent_wire_requests": 0,
+    "parent_spend_usd": 0.0,
+    "llm_retries": 0,
+    "codex_child_calls": 0,
+    "claude_child_calls": 0,
+    "model_facing_tools_observed": [],
+    "auxiliary_model_requests": 0,
+    "external_or_unauthorized_model_requests": 0,
+    "children_quiescent": "NOT_REACHED_NO_CHILDREN_STARTED",
+    "timeout_result": "NOT_REACHED"
+  },
+  "secret": {
+    "real_secret_read": false,
+    "secret_value_recorded": false,
+    "secret_derived_identifier_recorded": false,
+    "parent_secret_reached_child": false
+  },
+  "fixture": {
+    "id": "STAGE_A_BOUNDED_RETRY_V0",
+    "digest": "397ed055f2fb5cd14fd4c0b54fc21994c688f6cf56f07fb073d4e3257cd47552",
+    "expected_workspace": "NOT_CREATED_AUTHORITY_BLOCK",
+    "actual_session_cwd": "NOT_STARTED",
+    "workspace_match": "NOT_REACHED",
+    "initial_hashes": {
+      "TASK.md": "19571f8c70364e41ae8366cd07b0f56546845c8b3f43b04f93634f75f9a6a6ff",
+      "retry.py": "f82a84088b76dd82ead87d5536f8120d62e7c4408c27fcbe59662155b5dd47ae",
+      "tests/test_retry.py": "caf317035b37a6606ff7b2250cf0b1cc6a1e8db7660414bf280eda4ddee641ac"
+    },
+    "post_hashes": "NOT_REACHED",
+    "mutated_paths": [],
+    "immutable_paths_unchanged": "NOT_REACHED",
+    "frozen_fixture_tests": "NOT_REACHED"
+  },
+  "timing": {
+    "started_at": "NOT_STARTED",
+    "ended_at": "NOT_STARTED",
+    "duration": "NOT_STARTED"
+  },
+  "closure": {
+    "project_state_after": "CLOSED_BLOCKED",
+    "implementation_authorized_after": false,
+    "implementation_completed_after": true,
+    "active_projects_after": "NONE",
+    "stage_b_authorized": false,
+    "qnty_runtime_authority": "NONE",
+    "trading_authority": "NONE",
+    "capital_authority": "NONE",
+    "scientific_execution_authorized": false,
+    "qnty_agent_eval": "NOT_APPLICABLE"
+  }
+}

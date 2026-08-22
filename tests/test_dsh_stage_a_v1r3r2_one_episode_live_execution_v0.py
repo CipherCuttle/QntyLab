@@ -147,13 +147,13 @@ def test_no_secret_model_dsh_spend_or_fixture_activity_and_downstream_denied():
     }
 
 
-def test_project_context_keeps_activation_candidate_inactive_until_canonical_merge():
+def test_project_context_keeps_execution_closed_blocked_and_inactive():
     _, _, registry = project_context.load_context_sources(ROOT)
     projects = project_context.validate_projects_registry(ROOT, registry)
     active = [record for record in projects.values() if record["state"] == "ACTIVE"]
     assert active == []
     record = projects["DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0"]
-    assert record["state"] == "CLOSED_PASS"
+    assert record["state"] == "CLOSED_BLOCKED"
     assert record["implementation_authorized"] is False
     assert record["implementation_completed"] is True
     assert record["activation_authorized_after_canonicalization"] is True

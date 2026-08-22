@@ -6133,3 +6133,43 @@ hostile_governance_low_total = 0
 targeted_governance_rereview_used = false
 terminal_outcome = "BLOCK_AUTHORITY"
 next_action = "CLOSED_BLOCKED: canonical project-context and registry evidence report no active V1R3R2 execution project, contradicting the activation artifact's active_execution_project semantics. The episode stopped before secret read, claim creation, provider I/O, DSH invocation, fixture execution, and spend. No rescue, activation repair, claim, second episode, or Stage B is authorized; any later attempt requires new Git-backed authority."
+
+[[project]]
+project_id = "DSH_STAGE_A_CANONICAL_ACTIVATION_PROJECTION_INTEGRITY_V0"
+display_name = "DSH Stage-A canonical activation projection integrity V0"
+state = "CLOSED_PASS"
+authority_level = "PROJECT_CONTEXT_CANONICAL_ACTIVATION_PROJECTION_INTEGRITY_ONLY"
+phase_type = "GOVERNANCE_BOUNDED_PROJECTION_REPAIR"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "qntylab/project_context.py",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "tests/test_dsh_stage_a_canonical_activation_projection_integrity_v0.py",
+]
+canonical_predecessor_project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0"
+canonical_predecessor_state = "CLOSED_BLOCKED"
+canonical_predecessor_merge = "d50f120e9a8ec8b1d6098fa9f5d696f225a1d069"
+projection_contract = "ACTIVATION_REGISTRY_PROJECT_CONTEXT_CANONICAL_GIT_PARITY_V0"
+branch_local_candidate_effective = false
+canonical_head_required = true
+activation_registry_parity_required = true
+implementation_authorized = false
+implementation_completed = true
+episode_consumed = false
+active_project_after_closure = "NONE"
+stage_b_authorized = false
+qnty_runtime_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+scientific_execution_authorized = false
+qnty_agent_eval = "NOT_APPLICABLE"
+hostile_review_count = 1
+hostile_review_verdict = "PASS"
+hostile_governance_critical_total = 0
+hostile_governance_high_total = 0
+hostile_governance_medium_total = 0
+hostile_governance_low_total = 0
+targeted_governance_rereview_used = false
+terminal_outcome = "CLOSED_PASS"
+next_action = "CLOSED_PASS: activation/registry parity, canonical-Git effectiveness, fail-closed contradiction handling, canonical activation projection, and terminal closure projection are mechanically enforced. No live DSH episode, secret read, model call, Stage B, Qnty, trading, capital, or scientific authority follows; the next phase is a fresh bounded Stage-A one-episode authorization construction."

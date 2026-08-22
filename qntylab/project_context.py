@@ -124,6 +124,69 @@ CONTEXT_SPINE_PROHIBITIONS = (
     "GENERATED_VIEWS_AND_REMEMBERED_SUMMARIES_CANNOT_OVERRIDE_CANONICAL_GIT",
 )
 
+EXECUTION_CANONICAL_REF = "refs/remotes/origin/master"
+DSH_STAGE_A_V1R3R2_ACTIVATION_SCHEMA = "dsh-stage-a-v1r3r2-one-episode-live-execution-activation-v0"
+_MISSING = object()
+
+# These are the fields that form one execution-authority view.  The activation
+# artifact uses a nested representation while the project registry is flat;
+# keeping the mapping explicit prevents either source from silently growing a
+# second, unbound authority vocabulary.
+_EXECUTION_PROJECTION_FIELDS = (
+    ("project_id", ("project_id",), ("project_id",)),
+    ("state", ("active_execution_project", "state"), ("state",)),
+    ("authority_level", ("active_execution_project", "authority_level"), ("authority_level",)),
+    ("implementation_authorized", ("active_execution_project", "implementation_authorized"), ("implementation_authorized",)),
+    ("implementation_completed", ("active_execution_project", "implementation_completed"), ("implementation_completed",)),
+    ("episode_consumed", ("active_execution_project", "episode_consumed"), ("episode_consumed",)),
+    ("authorized_live_episodes", ("active_execution_project", "authorized_live_episodes"), ("authorized_live_episodes",)),
+    ("second_episode_authorized", ("active_execution_project", "second_episode_authorized"), ("second_episode_authorized",)),
+    ("whole_episode_retry_allowed", ("active_execution_project", "whole_episode_retry_allowed"), ("whole_episode_retry_allowed",)),
+    ("execution_closure_pr_budget", ("active_execution_project", "execution_closure_pr_budget"), ("execution_closure_pr_budget",)),
+    ("activation_consumes_live_episode", ("active_execution_project", "activation_consumes_live_episode"), ("activation_consumes_live_episode",)),
+    ("activation_consumes_execution_closure_pr_budget", ("active_execution_project", "activation_consumes_execution_closure_pr_budget"), ("activation_consumes_execution_closure_pr_budget",)),
+    ("authorization_state", ("authorization_state",), ("authorization_state",)),
+    ("authorization_effective", ("authorization_effective",), ("authorization_effective",)),
+)
+_CLOSURE_PROJECTION_FIELDS = (
+    "project_id",
+    "authorization_state",
+    "authorization_effective",
+    "episode_consumed",
+    "authorized_live_episodes",
+    "second_episode_authorized",
+    "whole_episode_retry_allowed",
+    "execution_closure_pr_budget",
+    "activation_consumes_live_episode",
+    "activation_consumes_execution_closure_pr_budget",
+)
+_EXECUTION_STATUS_FIELDS = (
+    ("episode_started", ("execution_status", "episode_started"), ("episode_started",)),
+    ("episode_claimed", ("execution_status", "episode_claimed"), ("episode_claimed",)),
+    ("episode_consumed_status", ("execution_status", "episode_consumed"), ("episode_consumed",)),
+)
+_AUTHORITY_FIREWALL_FIELDS = (
+    ("stage_b_authorized", ("authority_firewall", "stage_b_authorized"), ("stage_b_authorized",)),
+    ("qnty_runtime_authority", ("authority_firewall", "qnty_runtime_authority"), ("qnty_runtime_authority",)),
+    ("trading_authority", ("authority_firewall", "trading_authority"), ("trading_authority",)),
+    ("capital_authority", ("authority_firewall", "capital_authority"), ("capital_authority",)),
+    ("scientific_execution_authorized", ("authority_firewall", "scientific_execution_authorized"), ("scientific_execution_authorized",)),
+    ("qnty_agent_eval", ("authority_firewall", "qnty_agent_eval"), ("qnty_agent_eval",)),
+)
+_RUNTIME_IDENTITY_FIELDS = (
+    ("pinned_dsh_commit", ("runtime_identity", "commit"), ("pinned_dsh_commit",)),
+    ("pinned_dsh_tree", ("runtime_identity", "tree"), ("pinned_dsh_tree",)),
+    ("pinned_dsh_tag", ("runtime_identity", "tag"), ("pinned_dsh_tag",)),
+    ("qualified_launch_contract_digest", ("runtime_identity", "qualified_launch_contract_digest"), ("qualified_launch_contract_digest",)),
+    ("runtime_manifest_digest", ("runtime_identity", "runtime_manifest_digest"), ("runtime_manifest_digest",)),
+    ("executable_identity_digest", ("runtime_identity", "executable_identity_digest"), ("executable_identity_digest",)),
+    ("launch_policy_digest", ("runtime_identity", "launch_policy_digest"), ("launch_policy_digest",)),
+    ("codex_repair_digest", ("runtime_identity", "codex_repair_digest"), ("codex_repair_digest",)),
+    ("claude_repair_digest", ("runtime_identity", "claude_repair_digest"), ("claude_repair_digest",)),
+    ("superseded_digest_rejected", ("runtime_identity", "superseded_digest_rejected"), ("superseded_launch_digest_rejected",)),
+    ("fixture_digest", ("fixture", "fixture_digest"), ("fixture_digest",)),
+)
+
 
 class ProjectContextError(RuntimeError):
     """A canonical Project Context source is malformed, conflicting, or untrusted."""
@@ -154,6 +217,199 @@ def _git_bytes(root: Path, *args: str, check: bool = True) -> bytes:
 
 def _run_git(root: Path, *args: str, check: bool = True) -> str:
     return _git_bytes(root, *args, check=check).decode("utf-8", "replace")
+
+
+def _git_succeeds(root: Path, *args: str) -> bool:
+    completed = subprocess.run(
+        ["git", "--no-optional-locks", "-C", str(root), *args],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        check=False,
+    )
+    return completed.returncode == 0
+
+
+def _lookup(value: dict[str, Any], path: tuple[str, ...]) -> Any:
+    current: Any = value
+    for key in path:
+        if not isinstance(current, dict) or key not in current:
+            return _MISSING
+        current = current[key]
+    return current
+
+
+def _load_json_authority(path: Path, *, label: str) -> dict[str, Any]:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ProjectContextError(f"cannot read JSON {label}: {exc}") from exc
+    if not isinstance(value, dict):
+        raise ProjectContextError(f"JSON object required: {label}")
+    return value
+
+
+def _activation_artifact_paths(record: dict[str, Any]) -> list[str]:
+    return [
+        artifact
+        for artifact in record.get("authoritative_artifacts", [])
+        if isinstance(artifact, str) and Path(artifact).name == "activation.json"
+    ]
+
+
+def _projection_parity_issues(
+    activation: dict[str, Any],
+    record: dict[str, Any],
+    *,
+    include_lifecycle: bool,
+) -> list[str]:
+    fields = _EXECUTION_PROJECTION_FIELDS if include_lifecycle else tuple(
+        field for field in _EXECUTION_PROJECTION_FIELDS if field[0] in _CLOSURE_PROJECTION_FIELDS
+    )
+    bindings = (*fields, *_EXECUTION_STATUS_FIELDS, *_AUTHORITY_FIREWALL_FIELDS, *_RUNTIME_IDENTITY_FIELDS)
+    issues: list[str] = []
+    for label, activation_path, registry_path in bindings:
+        activation_value = _lookup(activation, activation_path)
+        registry_value = _lookup(record, registry_path)
+        if activation_value is _MISSING or registry_value is _MISSING:
+            issues.append(f"activation/registry projection missing {label}")
+        elif activation_value != registry_value:
+            issues.append(
+                f"activation/registry projection mismatch for {label}: "
+                f"activation={activation_value!r}, registry={registry_value!r}"
+            )
+    return issues
+
+
+def _is_terminal_execution_closure(record: dict[str, Any]) -> bool:
+    outcome = record.get("terminal_outcome")
+    artifacts = record.get("authoritative_artifacts", [])
+    has_result_artifact = any(
+        isinstance(artifact, str)
+        and ("execution_evidence.json" in artifact or artifact.endswith("/closure.md"))
+        for artifact in artifacts
+    )
+    return (
+        record.get("state") in {"CLOSED_PASS", "CLOSED_NEGATIVE", "CLOSED_BLOCKED"}
+        and record.get("implementation_authorized") is False
+        and record.get("implementation_completed") is True
+        and record.get("episode_consumed") is False
+        and record.get("active_project_after_closure") == "NONE"
+        and isinstance(outcome, str)
+        and bool(outcome)
+        and "AUTHORIZATION_AVAILABLE" not in outcome
+        and "ACTIVATION_READY" not in outcome
+        and has_result_artifact
+    )
+
+
+def _canonical_activation_identity(
+    root: Path,
+    activation: dict[str, Any],
+    *,
+    canonical_ref: str = EXECUTION_CANONICAL_REF,
+) -> dict[str, Any]:
+    git = _git_state(root)
+    canonical_sha = _run_git(root, "rev-parse", "--verify", canonical_ref, check=False).strip()
+    candidate_base_sha = _lookup(activation, ("canonicalization", "candidate_base_sha"))
+    candidate_is_ancestor = (
+        isinstance(candidate_base_sha, str)
+        and bool(candidate_base_sha)
+        and _git_succeeds(root, "merge-base", "--is-ancestor", candidate_base_sha, git["head_sha"])
+    )
+    return {
+        "canonical_ref": canonical_ref,
+        "canonical_sha": canonical_sha or None,
+        "head_sha": git["head_sha"],
+        "worktree_clean": git["clean"],
+        "candidate_base_sha": candidate_base_sha if isinstance(candidate_base_sha, str) else None,
+        "candidate_base_is_ancestor": candidate_is_ancestor,
+        "effective": bool(git["clean"] and canonical_sha and git["head_sha"] == canonical_sha and candidate_is_ancestor),
+    }
+
+
+def execution_authority_projection(
+    root: Path,
+    projects: dict[str, dict[str, Any]],
+    *,
+    canonical_ref: str = EXECUTION_CANONICAL_REF,
+) -> dict[str, Any]:
+    """Project activation artifacts into effective live execution authority.
+
+    An ACTIVE registry row is executable only when its activation artifact is
+    parity-consistent and the clean checkout is exactly the canonical remote
+    master.  A branch-local candidate is therefore observable but ineffective.
+    A non-active execution row is accepted only when an explicit terminal result
+    closure records that no active project remains.
+    """
+    issues: list[str] = []
+    active_projects: list[dict[str, Any]] = []
+    identity_by_project: dict[str, dict[str, Any]] = {}
+
+    for record in projects.values():
+        activation_paths = _activation_artifact_paths(record)
+        if not activation_paths:
+            if record.get("state") == "ACTIVE":
+                active_projects.append(record)
+            continue
+        if len(activation_paths) != 1:
+            issues.append(f"execution project {record['project_id']} requires exactly one activation artifact")
+            continue
+
+        activation_path = _authority_path(
+            root,
+            activation_paths[0],
+            label=f"project {record['project_id']} activation artifact",
+        )
+        activation = _load_json_authority(activation_path, label=activation_paths[0])
+        if activation.get("schema_version") != DSH_STAGE_A_V1R3R2_ACTIVATION_SCHEMA:
+            # Older Stage-A activation schemas predate this projection contract
+            # and retain their own immutable closure semantics.
+            continue
+        activation_project_id = activation.get("project_id")
+        if activation_project_id != record["project_id"]:
+            issues.append(
+                f"activation project_id does not match registry: "
+                f"activation={activation_project_id!r}, registry={record['project_id']!r}"
+            )
+            continue
+
+        identity = _canonical_activation_identity(root, activation, canonical_ref=canonical_ref)
+        identity_by_project[record["project_id"]] = identity
+        activation_state = _lookup(activation, ("active_execution_project", "state"))
+        if record.get("state") == "ACTIVE":
+            issues.extend(_projection_parity_issues(activation, record, include_lifecycle=True))
+            activation_authorized = _lookup(activation, ("active_execution_project", "implementation_authorized"))
+            activation_completed = _lookup(activation, ("active_execution_project", "implementation_completed"))
+            activation_consumed = _lookup(activation, ("active_execution_project", "episode_consumed"))
+            if activation_authorized is not True:
+                # ACTIVE is a lifecycle label, not executable authority by
+                # itself; an explicitly unauthorized row remains inactive.
+                continue
+            if activation_completed is not False or activation_consumed is not False:
+                issues.append(
+                    f"active execution project {record['project_id']} has invalid lifecycle "
+                    "(authorized ACTIVE rows must be incomplete and unconsumed)"
+                )
+                continue
+            if not identity["effective"]:
+                continue
+            active_projects.append(record)
+        elif _is_terminal_execution_closure(record):
+            issues.extend(_projection_parity_issues(activation, record, include_lifecycle=False))
+        elif activation_state == "ACTIVE":
+            issues.extend(_projection_parity_issues(activation, record, include_lifecycle=True))
+            issues.append(
+                f"active activation {record['project_id']} lacks a valid ACTIVE registry row "
+                "or explicit terminal execution closure"
+            )
+
+    if len(active_projects) > 1:
+        issues.append("effective execution projection contains more than one ACTIVE project")
+    return {
+        "issues": sorted(set(issues)),
+        "active_project": active_projects[0] if len(active_projects) == 1 and not issues else None,
+        "identity_by_project": identity_by_project,
+    }
 
 
 def _load_toml(path: Path) -> dict[str, Any]:
@@ -719,7 +975,10 @@ def doctor(root: Path) -> list[str]:
     try:
         config, adr_registry, projects_registry = load_context_sources(root)
         validate_adr_registry(root, adr_registry)
-        validate_projects_registry(root, projects_registry)
+        projects = validate_projects_registry(root, projects_registry)
+        projection = execution_authority_projection(root, projects)
+        if projection["issues"]:
+            raise ProjectContextError("execution authority projection conflict: " + "; ".join(projection["issues"]))
         packet = compile_context_spine(root)
         if packet["packet_status"] != CONTEXT_SPINE_COMPILED:
             raise ProjectContextError("context spine conflict: " + "; ".join(f"{item['code']}: {item['detail']}" for item in packet["conflicts"]))
@@ -770,13 +1029,16 @@ def context_data(root: Path) -> dict[str, Any]:
     config, adr_registry, projects_registry = load_context_sources(root)
     adrs = validate_adr_registry(root, adr_registry)
     projects = validate_projects_registry(root, projects_registry)
+    projection = execution_authority_projection(root, projects)
+    if projection["issues"]:
+        raise ProjectContextError("execution authority projection conflict: " + "; ".join(projection["issues"]))
     global_adr = next(record for record in adrs.values() if record["status"] == "CURRENT_GLOBAL")
     global_companions = [
         {key: record[key] for key in ("adr_id", "path", "authority_scope")}
         for record in adrs.values()
         if record["status"] == "CURRENT_GLOBAL_COMPANION"
     ]
-    active = next((record for record in projects.values() if record["state"] == "ACTIVE"), None)
+    active = projection["active_project"]
     queued = sorted(
         (
             {

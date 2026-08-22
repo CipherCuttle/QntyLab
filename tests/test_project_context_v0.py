@@ -297,14 +297,15 @@ def test_funding_incremental_implementation_freeze_is_closed_without_escalation(
     data = project_context.context_data(ROOT)
     _, _, registry = project_context.load_context_sources(ROOT)
     # The source-bound implementation freeze and the blocked Stage-A V1
-    # execution and the later V0R1 live episode are closed. The separately
-    # activated V0R2R1 candidate is the sole current active registry row, but
-    # remains ineffective until its canonical activation merge.
+    # execution, V0R1, and V0R2R1 live episodes are all closed. V0R2R1 became
+    # canonically effective after PR #193 merged, then closed BLOCK_RUNTIME_INFRA
+    # because this environment cannot materialize or launch the pinned DSH
+    # runtime. No registry row is currently ACTIVE.
     assert {
         record["project_id"]
         for record in registry["project"]
         if record["state"] == "ACTIVE"
-    } == {DSH_STAGE_A_V1R3R2_V0R2R1_EXECUTION_PROJECT_ID}
+    } == set()
     assert data["active_project"] is None
     assert data["current_permitted_next_action"] == "No project implementation is currently authorized."
     _assert_project_is_not_active(registry, FUNDING_INCREMENTAL_IMPLEMENTATION_PROJECT_ID)

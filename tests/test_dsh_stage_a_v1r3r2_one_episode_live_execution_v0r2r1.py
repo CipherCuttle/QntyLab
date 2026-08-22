@@ -81,6 +81,17 @@ def _synthetic_repo(tmp_path: Path, *, canonical: bool, closed: bool = False) ->
         (root / "result/execution_evidence.json").write_text("{}\n", encoding="utf-8")
         (root / "result/closure.md").write_text("terminal closure\n", encoding="utf-8")
         record["authoritative_artifacts"] += ["result/execution_evidence.json", "result/closure.md"]
+    else:
+        # The real V0R2R1 registry row is itself CLOSED_BLOCKED now (this
+        # project's own real closure, recorded elsewhere in this same
+        # change). These synthetic-repo tests exercise the pre-closure
+        # activation-effective projection behavior, so force the copied
+        # baseline record back to its pre-closure ACTIVE shape.
+        record["state"] = "ACTIVE"
+        record["implementation_authorized"] = True
+        record["implementation_completed"] = False
+        record["effective_execution_authority"] = True
+        record.pop("terminal_outcome", None)
     (root / "artifact/activation.json").write_text(json.dumps(activation, indent=2) + "\n", encoding="utf-8")
     candidate_sha = _commit(root, "activation candidate")
     subprocess.run(
@@ -197,16 +208,21 @@ def test_candidate_activation_is_ineffective_and_canonical_activation_projects_o
     assert canonical_projection["active_project"]["episode_consumed"] is False
 
 
-def test_canonical_registry_contains_exactly_one_current_active_execution_row() -> None:
+def test_closed_execution_has_no_effective_authority_and_claim_is_untouched() -> None:
+    # V0R2R1 became canonically effective after PR #193 merged, then closed
+    # BLOCK_RUNTIME_INFRA: this environment cannot materialize or launch the
+    # pinned DSH runtime. No registry row is ACTIVE any longer.
     _, _, registry = project_context.load_context_sources(ROOT)
     projects = project_context.validate_projects_registry(ROOT, registry)
     active = [record["project_id"] for record in projects.values() if record["state"] == "ACTIVE"]
-    assert active == [EXECUTION_ID]
+    assert EXECUTION_ID not in active
     projection = project_context.execution_authority_projection(ROOT, projects)
+    identity = projection["identity_by_project"][EXECUTION_ID]
     assert projection["issues"] == []
     assert projection["active_project"] is None
-    assert projection["identity_by_project"][EXECUTION_ID]["canonical_sha"] == "c60cbc772de45ca6caa27a5ee651b9599831df1a"
-    assert projection["identity_by_project"][EXECUTION_ID]["effective"] is False
+    assert identity["effective"] is False
+    assert identity["canonical_sha"] == identity["head_sha"]
+    assert identity["candidate_base_is_ancestor"] is True
 
 
 def test_historical_authorization_and_wrong_claim_lineage_fail_closed(tmp_path: Path) -> None:

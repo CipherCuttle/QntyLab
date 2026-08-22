@@ -6291,7 +6291,7 @@ next_action = "CLOSED_PASS: the fresh V0R1 authorization is frozen against the r
 [[project]]
 project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R2R1"
 display_name = "DSH Stage-A V1R3R2 one-episode live execution activation V0R2R1"
-state = "ACTIVE"
+state = "CLOSED_BLOCKED"
 authority_level = "BOUNDED_ONE_EPISODE_DSH_STAGE_A_LIVE_EXECUTION_ONLY"
 phase_type = "BOUNDED_LIVE_INFRASTRUCTURE_EXECUTION"
 authoritative_artifacts = [
@@ -6301,6 +6301,9 @@ authoritative_artifacts = [
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_authorization_v0r2r1/authorization.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0r2r1/activation.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0r2r1/hostile_governance_review.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_result_v0r2r1/execution_evidence.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_result_v0r2r1/closure.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_result_v0r2r1/hostile_review.md",
   "tests/test_dsh_stage_a_v1r3r2_one_episode_live_execution_v0r2r1.py",
 ]
 authorization_state = "AUTHORIZED_IF_CANONICAL"
@@ -6314,12 +6317,15 @@ canonical_predecessor_project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTIO
 canonical_predecessor_pr = 192
 canonical_predecessor_reviewed_head = "3c2be8acc83efce1cd518bcdf03b7d41b0fb4829"
 canonical_predecessor_merge = "c60cbc772de45ca6caa27a5ee651b9599831df1a"
+activation_pr = 193
+activation_reviewed_head = "c0ea28e3f69d21bc3fd9fd4ade613b13ec04a9fc"
+activation_canonical_merge = "b279685e88e28aad32d742bd8f64e95e34a88358"
 projection_contract = "ACTIVATION_REGISTRY_PROJECT_CONTEXT_CANONICAL_GIT_PARITY_V0"
 activation_artifact_project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R2R1"
-implementation_authorized = true
-implementation_completed = false
+implementation_authorized = false
+implementation_completed = true
 activation_authorized_after_canonicalization = true
-effective_execution_authority = true
+effective_execution_authority = false
 episode_started = false
 episode_claimed = false
 episode_consumed = false
@@ -6412,7 +6418,16 @@ hostile_governance_high_total = 0
 hostile_governance_medium_total = 0
 hostile_governance_low_total = 0
 targeted_governance_rereview_used = false
-next_action = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R2R1_ACTION_TIME"
+execution_hostile_review_count = 1
+execution_hostile_review_verdict = "PASS"
+execution_hostile_critical_total = 0
+execution_hostile_high_total = 0
+execution_hostile_medium_total = 0
+execution_hostile_low_total = 0
+execution_targeted_rereview_used = false
+terminal_outcome = "BLOCK_RUNTIME_INFRA"
+terminal_outcome_basis = "After the canonical activation merge (PR #193) became effective, the action-time non-secret preflight found no repository-native mechanism to materialize or launch the pinned deepseek-ai/deepseek-harness runtime in this environment (no installed package, no local clone, no action-time launcher or qualification-build script). The episode stopped before the secret gate, claim creation, provider I/O, DSH invocation, child calls, fixture execution, and spend."
+next_action = "CLOSED_BLOCKED: this environment could not materialize or launch the pinned DSH runtime at the action-time non-secret preflight. The one episode remains unclaimed and unconsumed; no replay, second episode, claim repair, Stage B, Qnty, trading, capital, promotion, or scientific authority is authorized. Any later attempt requires new Git-backed authority that provides a repository-native mechanism to materialize and launch the pinned DSH runtime."
 
 [[project]]
 project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R1"

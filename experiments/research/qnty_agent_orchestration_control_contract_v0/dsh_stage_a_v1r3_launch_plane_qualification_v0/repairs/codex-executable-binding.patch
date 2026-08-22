@@ -1,0 +1,45 @@
+# PROPOSED, NOT YET VERIFIED AGAINST A MATERIALIZED PINNED CHECKOUT.
+#
+# This offline qualification environment has no materialized pinned DSH
+# source tree to diff against (V1R3 does not perform a network clone). The
+# hunk below is written from the plan's own source citations
+# (`packages/subagent/subagent-codex/src/run.ts`, `codexAppServerArgv()`
+# returning the bare literal argv `['codex', 'app-server', '--stdio']`) and
+# from the already-landed sibling pattern in
+# `pinned-dsh-v1r1-runtime-hardening.patch`
+# (`packages/subagent/subagent-claude-code/src/run.ts`'s
+# `resolveExecutable('claude', ...)` → `pathToClaudeCodeExecutable` pin).
+# `qntylab-materialize-dsh-runtime.mjs` applies this with `git apply --check`
+# before it is ever used, and fails closed
+# (`DSH_STAGE_A_V1R3_BLOCK_RUNTIME_IDENTITY`) if it does not apply cleanly —
+# so a real materialization run against the actual pinned tree is what
+# confirms or rejects this hunk's exact context lines, not this document.
+#
+# Intent: close the Codex PATH TOCTOU gap (PASS 3, High) by routing Codex's
+# executable resolution through the same shared seam Claude's provider
+# already uses — resolve once per child start, pin the resolved absolute
+# path into argv[0] before spawn — rather than leaving a bare `'codex'`
+# string for the OS to resolve fresh at the actual execve.
+diff --git a/packages/subagent/subagent-codex/src/run.ts b/packages/subagent/subagent-codex/src/run.ts
+index 0000000000..0000000000 100644
+--- a/packages/subagent/subagent-codex/src/run.ts
++++ b/packages/subagent/subagent-codex/src/run.ts
+@@ -1,6 +1,17 @@
+-export function codexAppServerArgv(): string[] {
+-  return ['codex', 'app-server', '--stdio']
+-}
++// Mirrors the resolve-then-pin pattern already used by
++// subagent-claude-code/src/run.ts (`resolveExecutable('claude', ...)` ->
++// `pathToClaudeCodeExecutable`). Resolving once here and pinning the
++// absolute path into argv[0] closes the gap between "resolve" and "use":
++// previously the bare string `'codex'` was left for the OS to resolve fresh
++// at the actual `execve`, the latest possible moment, which is a real
++// PATH-substitution TOCTOU window a decoy earlier in PATH could exploit.
++export async function codexAppServerArgv(
++  ctx: { subprocess: { resolveExecutable(name: string, env: NodeJS.ProcessEnv, signal?: AbortSignal): Promise<string> } },
++  env: NodeJS.ProcessEnv,
++  signal?: AbortSignal,
++): Promise<string[]> {
++  const resolved = await ctx.subprocess.resolveExecutable('codex', env, signal)
++  return [resolved, 'app-server', '--stdio']
++}

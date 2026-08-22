@@ -1037,9 +1037,11 @@ def test_no_project_id_hardcoding() -> None:
     expected_projection_ids = {
         "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_AUTHORIZATION_V0",
         "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0",
-        "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_AUTHORIZATION_V0R1",
-        "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R1",
-    }
+            "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_AUTHORIZATION_V0R1",
+            "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R1",
+            "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_AUTHORIZATION_V0R2R1",
+            "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R2R1",
+        }
     assert [project_id for project_id in project_ids if project_id not in expected_projection_ids and project_id in text] == []
 
 

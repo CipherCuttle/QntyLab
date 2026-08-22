@@ -126,8 +126,14 @@ CONTEXT_SPINE_PROHIBITIONS = (
 
 EXECUTION_CANONICAL_REF = "refs/remotes/origin/master"
 DSH_STAGE_A_V1R3R2_ACTIVATION_SCHEMA = "dsh-stage-a-v1r3r2-one-episode-live-execution-activation-v0"
-DSH_STAGE_A_V1R3R2_AUTHORIZATION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_AUTHORIZATION_V0R1"
-DSH_STAGE_A_V1R3R2_EXECUTION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R1"
+DSH_STAGE_A_V1R3R2_V0R1_AUTHORIZATION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_AUTHORIZATION_V0R1"
+DSH_STAGE_A_V1R3R2_V0R1_EXECUTION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R1"
+DSH_STAGE_A_V1R3R2_AUTHORIZATION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_AUTHORIZATION_V0R2R1"
+DSH_STAGE_A_V1R3R2_EXECUTION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R2R1"
+_FRESH_AUTHORIZATION_BINDINGS = {
+    DSH_STAGE_A_V1R3R2_V0R1_EXECUTION_ID: DSH_STAGE_A_V1R3R2_V0R1_AUTHORIZATION_ID,
+    DSH_STAGE_A_V1R3R2_EXECUTION_ID: DSH_STAGE_A_V1R3R2_AUTHORIZATION_ID,
+}
 _MISSING = object()
 
 # These are the fields that form one execution-authority view.  The activation
@@ -275,7 +281,12 @@ def _projection_parity_issues(
     fields = _EXECUTION_PROJECTION_FIELDS if include_lifecycle else tuple(
         field for field in _EXECUTION_PROJECTION_FIELDS if field[0] in _CLOSURE_PROJECTION_FIELDS
     )
-    bindings = (*fields, *_EXECUTION_STATUS_FIELDS, *_AUTHORITY_FIREWALL_FIELDS, *_RUNTIME_IDENTITY_FIELDS)
+    runtime_fields = _RUNTIME_IDENTITY_FIELDS
+    if record.get("project_id") == DSH_STAGE_A_V1R3R2_EXECUTION_ID:
+        runtime_fields = tuple(
+            field for field in runtime_fields if field[0] not in {"codex_repair_digest", "claude_repair_digest"}
+        )
+    bindings = (*fields, *_EXECUTION_STATUS_FIELDS, *_AUTHORITY_FIREWALL_FIELDS, *runtime_fields)
     issues: list[str] = []
     for label, activation_path, registry_path in bindings:
         activation_value = _lookup(activation, activation_path)
@@ -303,7 +314,8 @@ def _fresh_v0r1_binding_issues(
     authorization artifact as well, so a parity-preserving historical or
     branch-local substitute cannot become effective authority.
     """
-    if record.get("project_id") != DSH_STAGE_A_V1R3R2_EXECUTION_ID:
+    expected_authorization_id = _FRESH_AUTHORIZATION_BINDINGS.get(record.get("project_id"))
+    if expected_authorization_id is None:
         return []
 
     issues: list[str] = []
@@ -321,9 +333,9 @@ def _fresh_v0r1_binding_issues(
     authorization = activation.get("authorization_identity")
     if not isinstance(authorization, dict):
         return [*issues, "fresh V0R1 authorization identity must be an object"]
-    if authorization.get("project_id") != DSH_STAGE_A_V1R3R2_AUTHORIZATION_ID:
+    if authorization.get("project_id") != expected_authorization_id:
         issues.append("fresh V0R1 activation cannot substitute historical authorization")
-    if activation.get("project_id") != DSH_STAGE_A_V1R3R2_EXECUTION_ID:
+    if activation.get("project_id") != record.get("project_id"):
         issues.append("fresh V0R1 activation project identity is invalid")
     canonical_predecessor_merge = _lookup(activation, ("canonicalization", "canonical_predecessor_merge"))
     if authorization.get("canonical_merge") != canonical_predecessor_merge:
@@ -351,6 +363,26 @@ def _fresh_v0r1_binding_issues(
             issues.append("fresh V0R1 authorization artifact identity does not match activation")
         if authorization_document.get("execution_project_id") != activation.get("project_id"):
             issues.append("fresh V0R1 authorization execution identity does not match activation")
+        if record.get("project_id") == DSH_STAGE_A_V1R3R2_EXECUTION_ID:
+            if activation.get("canonical_enforcement_bytes") != authorization_document.get("canonical_enforcement_bytes"):
+                issues.append("fresh V0R2R1 canonical enforcement bytes are not authorization-bound")
+            for contract_name in ("profile_contract",):
+                authorized_contract = authorization_document.get(contract_name)
+                activation_contract = activation.get(contract_name)
+                if not isinstance(authorized_contract, dict) or not isinstance(activation_contract, dict):
+                    issues.append(f"fresh V0R2R1 {contract_name} binding is incomplete")
+                else:
+                    for field, expected in authorized_contract.items():
+                        if activation_contract.get(field) != expected:
+                            issues.append(f"fresh V0R2R1 {contract_name} mismatch for {field}")
+            authorized_secret = authorization_document.get("secret_binding_contract")
+            activation_secret = activation.get("secret_binding_contract")
+            if not isinstance(authorized_secret, dict) or not isinstance(activation_secret, dict):
+                issues.append("fresh V0R2R1 secret binding contract is incomplete")
+            else:
+                for field, expected in authorized_secret.items():
+                    if activation_secret.get(field) != expected:
+                        issues.append(f"fresh V0R2R1 secret binding mismatch for {field}")
         auth_canonicalization = authorization_document.get("canonicalization")
         if not isinstance(auth_canonicalization, dict):
             issues.append("fresh V0R1 authorization canonicalization is missing")
@@ -370,7 +402,8 @@ def _fresh_v0r1_binding_issues(
         else:
             repairs = contract.get("repair_digests")
             if not isinstance(repairs, dict):
-                issues.append("fresh V0R1 qualified runtime repair binding is incomplete")
+                if record.get("project_id") != DSH_STAGE_A_V1R3R2_EXECUTION_ID:
+                    issues.append("fresh V0R1 qualified runtime repair binding is incomplete")
                 repairs = {}
             runtime_bindings = {
                 "repository": (runtime.get("repository"), pinned.get("repository")),
@@ -381,9 +414,14 @@ def _fresh_v0r1_binding_issues(
                 "runtime_manifest_digest": (runtime.get("runtime_manifest_digest"), contract.get("runtime_manifest_digest")),
                 "executable_identity_digest": (runtime.get("executable_identity_digest"), contract.get("executable_identity_digest")),
                 "launch_policy_digest": (runtime.get("launch_policy_digest"), contract.get("launch_policy_digest")),
-                "codex_repair_digest": (runtime.get("codex_repair_digest"), repairs.get("codex")),
-                "claude_repair_digest": (runtime.get("claude_repair_digest"), repairs.get("claude")),
             }
+            if repairs:
+                runtime_bindings.update(
+                    {
+                        "codex_repair_digest": (runtime.get("codex_repair_digest"), repairs.get("codex")),
+                        "claude_repair_digest": (runtime.get("claude_repair_digest"), repairs.get("claude")),
+                    }
+                )
             for label, (actual, expected) in runtime_bindings.items():
                 if actual != expected:
                     issues.append(f"fresh V0R1 authorization/runtime mismatch for {label}")
@@ -409,18 +447,41 @@ def _fresh_v0r1_binding_issues(
         else:
             retry_policy = authorized_parent.get("retry_policy")
             if not isinstance(retry_policy, dict):
-                issues.append("fresh V0R1 authorization retry policy binding is incomplete")
+                if record.get("project_id") != DSH_STAGE_A_V1R3R2_EXECUTION_ID:
+                    issues.append("fresh V0R1 authorization retry policy binding is incomplete")
                 retry_policy = {}
+            spend_authority = authorization_document.get("spend_authority")
+            expected_spend = authorized_parent.get("max_total_spend_usd")
+            if expected_spend is None and isinstance(spend_authority, dict):
+                try:
+                    expected_spend = float(spend_authority.get("cap_usd"))
+                except (TypeError, ValueError):
+                    expected_spend = _MISSING
+            expected_tokens = authorized_parent.get("max_tokens_per_request")
+            if expected_tokens is None:
+                expected_tokens = authorized_parent.get("max_output_tokens_per_request")
+            expected_llm_retries = retry_policy.get("llm_retries")
+            expected_provider_retry = retry_policy.get("provider_retry")
+            actual_llm_retries = parent.get("llm_retries")
+            actual_provider_retry = parent.get("provider_retry")
+            if record.get("project_id") == DSH_STAGE_A_V1R3R2_EXECUTION_ID:
+                expected_llm_retries = authorized_parent.get("provider_internal_retries")
+                expected_provider_retry = authorized_parent.get("provider_internal_retries")
+                actual_llm_retries = parent.get("provider_internal_retries")
+                actual_provider_retry = parent.get("provider_internal_retries")
             parent_bindings = {
                 "provider": (parent.get("provider"), authorized_parent.get("provider")),
                 "model": (parent.get("model"), authorized_parent.get("model")),
                 "route": (parent.get("route"), authorized_parent.get("route")),
                 "max_request_attempts": (parent.get("max_request_attempts"), authorized_parent.get("max_request_attempts")),
-                "max_tokens_per_request": (parent.get("max_tokens_per_request"), authorized_parent.get("max_tokens_per_request")),
-                "max_total_spend_usd": (parent.get("max_total_spend_usd"), authorized_parent.get("max_total_spend_usd")),
-                "llm_retries": (parent.get("llm_retries"), retry_policy.get("llm_retries")),
-                "provider_retry": (parent.get("provider_retry"), retry_policy.get("provider_retry")),
-                "automatic_continuation": (parent.get("automatic_continuation"), retry_policy.get("automatic_continuation")),
+                "max_tokens_per_request": (parent.get("max_tokens_per_request"), expected_tokens),
+                "max_total_spend_usd": (parent.get("max_total_spend_usd"), expected_spend),
+                "llm_retries": (actual_llm_retries, expected_llm_retries),
+                "provider_retry": (actual_provider_retry, expected_provider_retry),
+                "automatic_continuation": (
+                    parent.get("automatic_continuation"),
+                    False if record.get("project_id") == DSH_STAGE_A_V1R3R2_EXECUTION_ID else retry_policy.get("automatic_continuation"),
+                ),
             }
             for label, (actual, expected) in parent_bindings.items():
                 if actual != expected:
@@ -465,6 +526,22 @@ def _fresh_v0r1_binding_issues(
     construction = activation.get("construction_receipts")
     if not isinstance(construction, dict):
         issues.append("fresh V0R1 construction receipts are missing")
+    elif record.get("project_id") == DSH_STAGE_A_V1R3R2_EXECUTION_ID:
+        expected_zeroes = {
+            "claim_creations": 0,
+            "external_provider_requests": 0,
+            "fixture_mutations": 0,
+            "live_dsh_calls": 0,
+            "real_claude_child_turns": 0,
+            "real_codex_child_turns": 0,
+            "real_secret_reads": 0,
+            "spend_usd": "0",
+        }
+        for field, expected in expected_zeroes.items():
+            if construction.get(field) != expected:
+                issues.append(f"fresh V0R2R1 construction receipt {field} must be {expected!r}")
+        if construction.get("activation_artifacts_created") != 1:
+            issues.append("fresh V0R2R1 activation construction must create exactly one activation artifact")
     else:
         for field in ("remote_claim_created", "local_claim_created", "episode_claimed", "episode_consumed"):
             if construction.get(field) is not False:

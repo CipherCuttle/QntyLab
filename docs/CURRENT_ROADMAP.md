@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- None.
+- `DSH Stage-A V1R3R2 one-episode live execution activation V0R2R1` — `ACTIVE`. DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R2R1_ACTION_TIME
 
 ## Queued — not authorized
 

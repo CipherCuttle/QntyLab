@@ -137,7 +137,7 @@ def test_closed_execution_has_no_effective_authority_and_claim_is_untouched() ->
     assert projection["issues"] == []
     assert projection["active_project"] is None
     assert identity["effective"] is False
-    assert identity["canonical_sha"] == "0f5d8d527ccbd0b284d8e9cc7dcd1bfe3518a278"
+    assert identity["canonical_sha"] == "c60cbc772de45ca6caa27a5ee651b9599831df1a"
     assert identity["head_sha"] == identity["canonical_sha"]
     assert identity["candidate_base_is_ancestor"] is True
 

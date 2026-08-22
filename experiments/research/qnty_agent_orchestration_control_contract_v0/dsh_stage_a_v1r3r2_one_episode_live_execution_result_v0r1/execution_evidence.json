@@ -1,0 +1,149 @@
+{
+  "schema_version": "dsh-stage-a-v1r3r2-one-episode-live-execution-result-v0r1",
+  "project_id": "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R1",
+  "episode_id": "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R1#EPISODE_1",
+  "terminal_outcome": "BLOCK_PARENT_INFRA",
+  "canonical": {
+    "master": "0f5d8d527ccbd0b284d8e9cc7dcd1bfe3518a278",
+    "expected_activation_merge": "0f5d8d527ccbd0b284d8e9cc7dcd1bfe3518a278",
+    "activation_merge_canonical": true,
+    "activation_still_effective_before_closure": true,
+    "authorization_project_id": "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_AUTHORIZATION_V0R1",
+    "authorization_candidate": "f1c4313e4fccc721843883901af0ffc234d2d33a",
+    "authorization_canonical_merge": "afd5991abb2d3202367a22a5bda25526be476e69",
+    "activation_final_head": "de91857ae6897a24178a0693c7531c1608a33831",
+    "activation_reviewed_core_ancestor": "da0707869288a1959e7b2d6e49960ea4d1e78e44",
+    "source_conflict": false
+  },
+  "authority": {
+    "active_project_at_preflight": "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R1",
+    "state_at_preflight": "ACTIVE",
+    "implementation_authorized_at_preflight": true,
+    "implementation_completed_at_preflight": false,
+    "episode_consumed_at_preflight": false,
+    "authority_projection": "PASS",
+    "active_project_after_closure": "NONE",
+    "blocker": {
+      "layer": "PARENT_INFRASTRUCTURE",
+      "classification": "BLOCK_PARENT_INFRA",
+      "exact_failure_class": "REQUIRED_PROVIDER_SECRET_UNAVAILABLE",
+      "observed_after_non_secret_preflight": true,
+      "observed_before_claim": true,
+      "observed_before_provider_io": true
+    }
+  },
+  "prelive": {
+    "non_secret_preflight": "PASS",
+    "remote_claim_ref": "refs/heads/qntylab-claims/dsh-stage-a-v1r3r2-one-episode-live-execution-v0r1",
+    "remote_claim_absent": true,
+    "remote_claim_create_dry_run": "PASS",
+    "local_o_excl_capability": "PASS",
+    "local_claim_receipt_absent": true,
+    "runtime_identity": "PASS",
+    "fresh_disposable_materialization": "PASS",
+    "fixture_identity": "PASS",
+    "workspace_containment": "PASS",
+    "claude_policy": "PASS",
+    "cost_bounds": "PASS",
+    "qualified_launch_contract_digest": "57162eb65a4177ae58c6b503110dfe802ae345c3e6e9c3963acd207f693fbcc1",
+    "runtime_manifest_digest": "afcfa011de46bd9fccaa120b5612c24a5ace2b2c451591ddf8b67fb43a8ce321",
+    "executable_identity_digest": "ae07ece34c88b3ebaebd7452df8d136c82935f9c8ec9df16a40e50a2582a2fd9",
+    "launch_policy_digest": "34d5ceabbd89eaa7520cb5d5b69fa938a4cf15132b5c37e98382c4f6aab53f28",
+    "codex_repair_digest": "f89bf5833956f3c4202ca88a9285e39658976b29605fc1b63b7c62ebdd07fcb3",
+    "claude_repair_digest": "2b8277bf13e077651046e2527dc7aa092c3c9669cedc61eac1f742d9364a17e3",
+    "dsh_repository": "deepseek-ai/deepseek-harness",
+    "dsh_commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "dsh_tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "dsh_tag": "dsh-v0.1.0-rc.7",
+    "provider": "openai",
+    "model": "gpt-5-mini",
+    "route": "llm-pi-ai",
+    "model_facing_tools": ["subagent_codex", "subagent_claude_code"],
+    "generic_child_tools": [],
+    "parent_request_ceiling": 8,
+    "retry_policy": {
+      "llm_retries": 0,
+      "provider_retries": 0,
+      "automatic_continuation": false
+    },
+    "max_tokens_per_request": 4096,
+    "spend_ceiling_usd": 1.0,
+    "child_ceilings": {
+      "codex": 2,
+      "claude": 2
+    },
+    "timeout_seconds": 1800
+  },
+  "secret": {
+    "available": false,
+    "real_secret_read": false,
+    "secret_value_recorded": false,
+    "secret_derived_data_recorded": false,
+    "parent_secret_reached_child": false
+  },
+  "claim": {
+    "mechanism": "REMOTE_GIT_REF_PLUS_O_EXCL_RECEIPT",
+    "claim_attempted": false,
+    "remote_claim_created": false,
+    "local_receipt_created": false,
+    "partial_claim": false,
+    "episode_claimed": false,
+    "episode_consumed": false
+  },
+  "live": {
+    "started": false,
+    "dsh_invoked": false,
+    "parent_request_attempts": 0,
+    "parent_wire_requests": 0,
+    "public_model_requests": 0,
+    "codex_child_turns": 0,
+    "claude_child_turns": 0,
+    "auxiliary_model_requests": 0,
+    "external_or_unauthorized_model_requests": 0,
+    "spend_usd": 0.0,
+    "timeout": "NOT_REACHED",
+    "wall_time": "NOT_STARTED",
+    "children_quiescent": "NOT_APPLICABLE_NO_PROCESS_STARTED"
+  },
+  "settlement": {
+    "quiescence": "NOT_APPLICABLE_NO_PROCESS_STARTED",
+    "task_test_result": "NOT_REACHED_PRELIVE_BLOCK",
+    "fixture_tests": "NOT_REACHED",
+    "terminal_outcome": "BLOCK_PARENT_INFRA",
+    "rerun_allowed": false
+  },
+  "fixture": {
+    "id": "STAGE_A_BOUNDED_RETRY_V0",
+    "digest": "397ed055f2fb5cd14fd4c0b54fc21994c688f6cf56f07fb073d4e3257cd47552",
+    "workspace": "/tmp/qntylab-dsh-stage-a-v1r3r2-episode.uqNPNN/workspace",
+    "actual_session_cwd": "NOT_STARTED",
+    "mutable_paths": ["retry.py"],
+    "immutable_paths": ["TASK.md", "tests/test_retry.py"],
+    "initial_hashes": {
+      "TASK.md": "19571f8c70364e41ae8366cd07b0f56546845c8b3f43b04f93634f75f9a6a6ff",
+      "retry.py": "f82a84088b76dd82ead87d5536f8120d62e7c4408c27fcbe59662155b5dd47ae",
+      "tests/test_retry.py": "caf317035b37a6606ff7b2250cf0b1cc6a1e8db7660414bf280eda4ddee641ac"
+    },
+    "post_hashes": "NOT_REACHED_PRELIVE_BLOCK",
+    "mutated_paths": [],
+    "immutable_paths_unchanged": "NOT_REACHED_NO_EXECUTION",
+    "workspace_mutation": "NONE"
+  },
+  "closure": {
+    "project_state_after": "CLOSED_BLOCKED",
+    "implementation_authorized_after": false,
+    "implementation_completed_after": true,
+    "episode_consumed_after": false,
+    "active_projects_after": "NONE",
+    "stage_b_authorized": false,
+    "qnty_runtime_authority": "NONE",
+    "trading_authority": "NONE",
+    "capital_authority": "NONE",
+    "promotion_authority": "NONE",
+    "scientific_execution_authorized": false,
+    "qnty_agent_eval": "NOT_APPLICABLE",
+    "execution_hostile_review_count": 1,
+    "execution_hostile_review_verdict": "PASS",
+    "execution_targeted_rereview_used": false
+  }
+}

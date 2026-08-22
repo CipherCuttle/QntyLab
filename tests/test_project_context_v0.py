@@ -292,11 +292,9 @@ def test_funding_incremental_implementation_freeze_is_closed_without_escalation(
     data = project_context.context_data(ROOT)
     _, _, registry = project_context.load_context_sources(ROOT)
     # The source-bound implementation freeze and the blocked Stage-A V1
-    # execution are closed.  The fresh Stage-A V0R1 activation candidate is
-    # intentionally ACTIVE but remains inert until canonicalization.
-    assert {record["project_id"] for record in registry["project"] if record["state"] == "ACTIVE"} == {
-        DSH_STAGE_A_V1R3R2_EXECUTION_PROJECT_ID
-    }
+    # execution and the later V0R1 live episode are closed. No execution
+    # project remains active after the bounded closure.
+    assert {record["project_id"] for record in registry["project"] if record["state"] == "ACTIVE"} == set()
     assert data["active_project"] is None
     assert data["current_permitted_next_action"] == "No project implementation is currently authorized."
     _assert_project_is_not_active(registry, FUNDING_INCREMENTAL_IMPLEMENTATION_PROJECT_ID)

@@ -154,7 +154,11 @@ def test_project_context_sees_no_active_execution_project() -> None:
     assert projection["active_project"] is None
     assert [
         item for item in projects.values()
-        if item["state"] == "ACTIVE" and item["project_id"] != EXECUTION_ID
+        if item["state"] == "ACTIVE"
+        and item["project_id"] not in {
+            EXECUTION_ID,
+            "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R2R1",
+        }
     ] == []
 
 

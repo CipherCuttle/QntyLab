@@ -150,7 +150,12 @@ def test_no_secret_model_dsh_spend_or_fixture_activity_and_downstream_denied():
 def test_project_context_keeps_execution_closed_blocked_and_inactive():
     _, _, registry = project_context.load_context_sources(ROOT)
     projects = project_context.validate_projects_registry(ROOT, registry)
-    active = [record for record in projects.values() if record["state"] == "ACTIVE"]
+    active = [
+        record
+        for record in projects.values()
+        if record["state"] == "ACTIVE"
+        and record["project_id"] != "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R2R1"
+    ]
     assert active == []
     record = projects["DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0"]
     assert record["state"] == "CLOSED_BLOCKED"

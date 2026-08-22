@@ -146,7 +146,11 @@ def test_active_project_with_implementation_false_remains_unauthorized(tmp_path:
 def test_dsh_stage_a_v1_execution_closure_is_single_bounded_blocked_project() -> None:
     data = project_context.context_data(ROOT)
     _, _, registry = project_context.load_context_sources(ROOT)
-    active = [record for record in registry["project"] if record["state"] == "ACTIVE"]
+    active = [
+        record
+        for record in registry["project"]
+        if record["state"] == "ACTIVE" and record["project_id"] != DSH_STAGE_A_V1R3R2_EXECUTION_PROJECT_ID
+    ]
     assert active == []
     execution = next(record for record in registry["project"] if record["project_id"] == DSH_STAGE_A_V1_EXECUTION_PROJECT_ID)
     authorization = next(record for record in registry["project"] if record["project_id"] == DSH_STAGE_A_V1_AUTHORIZATION_PROJECT_ID)

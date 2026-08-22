@@ -5689,6 +5689,89 @@ qualified_launch_contract_digest = "4cd2734f229a97d4258ace4576f23f76f3d36aeef888
 next_action = "CLOSED_PASS: post-PR H-01..H-04 provenance repairs were requalified from a fresh pristine pinned source. The canonical materializer verified repository/commit/tree/tag, applied the committed V1R3R1 patch, installed offline/frozen, ran full pnpm run build:lib, bound lockfile/pnpm/Claude SDK identity, and emitted the corrected manifest. The canonical launcher then ran a real full-profile headless boot with a settled plugin tree, one deterministic loopback parent request bearing exactly subagent_codex/subagent_claude_code, zero retries/auxiliary/paid/external requests, zero child turns, and matching session cwd/workspace. The old digest is SUPERSEDED_INVALID_DIGEST_CANONICALIZATION; corrected digests are issued in qualification.json. No live episode, Stage-A fixture execution, Qnty/QntyAgentEval, trading/capital action, or Stage B is authorized; a later live episode requires separate Git-backed authorization + activation."
 
 [[project]]
+project_id = "DSH_STAGE_A_V1R3R2_CLAUDE_HARD_READ_ONLY_REPAIR_AND_REQUALIFICATION_V0"
+display_name = "DSH Stage-A V1R3R2 Claude hard read-only repair and requalification V0"
+state = "CLOSED_PASS"
+authority_level = "BOUNDED_OFFLINE_LAUNCH_PLANE_QUALIFICATION"
+phase_type = "BOUNDED_OFFLINE_INFRASTRUCTURE_QUALIFICATION"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_claude_hard_read_only_repair_and_requalification_v0/PHASE.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_claude_hard_read_only_repair_and_requalification_v0/qualification.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_claude_hard_read_only_repair_and_requalification_v0/hostile_review.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_claude_hard_read_only_repair_and_requalification_v0/materializer/qntylab-materialize-dsh-runtime.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_claude_hard_read_only_repair_and_requalification_v0/launcher/qntylab-launch-dsh.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_claude_hard_read_only_repair_and_requalification_v0/repairs/claude-hard-read-only.patch",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_claude_hard_read_only_repair_and_requalification_v0/mock/qualification-openai-mock.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_claude_hard_read_only_repair_and_requalification_v0/gate/qualification-budget-gate.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_claude_hard_read_only_repair_and_requalification_v0/driver/qualification.patch.yml",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_claude_hard_read_only_repair_and_requalification_v0/evidence/runtime_manifest.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_claude_hard_read_only_repair_and_requalification_v0/evidence/digests.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_claude_hard_read_only_repair_and_requalification_v0/evidence/canonical-json.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_claude_hard_read_only_repair_and_requalification_v0/driver/run-materialize.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_claude_hard_read_only_repair_and_requalification_v0/driver/run-via-launcher.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_claude_hard_read_only_repair_and_requalification_v0/test/qntylab-dsh-v1r3r2.test.mjs",
+  "tests/test_dsh_stage_a_v1r3r2_claude_hard_read_only_requalification.py",
+]
+authorization_state = "AUTHORIZED_IF_CANONICAL"
+authorization_effective = "AFTER_CANONICAL_MERGE_ONLY"
+canonical_predecessor_project_id = "DSH_STAGE_A_V1R3R1_REAL_RUNTIME_QUALIFICATION_V0"
+canonical_predecessor_pr = 180
+canonical_predecessor_reviewed_head = "8313136f79773e7d826cd7efe5d91dc963fb92bb"
+canonical_predecessor_merge = "ba74eb17aece6d37a21189ab0671c98282df0fed"
+qualification_required = "NONE_THIS_IS_THE_REQUALIFICATION_PHASE"
+implementation_authorized = false
+implementation_completed = true
+episode_consumed = false
+live_materialization_executed = false
+live_dsh_boot_executed = false
+offline_materialization_executed = true
+codex_executable_binding_repair_landed = true
+claude_hard_read_only_repair_landed = true
+pinned_dsh_commit = "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca"
+pinned_dsh_tree = "3bc8f89fe494a4755c188be354add4e8b1e7b188"
+pinned_dsh_tag = "dsh-v0.1.0-rc.7"
+offline_node_tests_total = 26
+offline_node_tests_pass = 26
+offline_node_tests_fail = 0
+mock_parent_requests = 1
+external_parent_requests = 0
+paid_model_requests = 0
+codex_model_turns = 0
+claude_model_turns = 0
+spend_usd = 0.0
+secret_read = false
+stage_b_authorized = false
+scientific_execution_authorized = false
+qnty_runtime_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+qnty_agent_eval = "NOT_APPLICABLE"
+active_project_after_closure = "NONE"
+hostile_review_count = 1
+hostile_review_verdict = "PASS"
+hostile_review_critical_total = 0
+hostile_review_high_total = 0
+hostile_review_medium_total = 0
+hostile_review_low_total = 0
+targeted_rereview_used = false
+old_authority_compatible_with_new_runtime = false
+qualified_launch_contract_digest = "57162eb65a4177ae58c6b503110dfe802ae345c3e6e9c3963acd207f693fbcc1"
+superseded_launch_digest_rejected = "4cd2734f229a97d4258ace4576f23f76f3d36aeef888a19fa61d2f4a7bff37d4"
+claude_allowed_tools = ["Read", "Glob", "Grep"]
+claude_write_allowed = false
+claude_edit_allowed = false
+claude_bash_allowed = false
+claude_agent_allowed = false
+claude_task_allowed = false
+claude_mcp_allowed = false
+claude_delegation_allowed = false
+terminal_outcome = "DSH_STAGE_A_V1R3R2_CLAUDE_HARD_READ_ONLY_RUNTIME_REQUALIFIED"
+next_action = "CLOSED_PASS: fresh pristine pinned DSH source was verified, the reused Codex patch and new Claude hard read-only patch were applied by the canonical materializer, offline frozen dependencies installed, full pnpm run build:lib passed, direct Claude options tests passed 24/24, Codex regression passed 32/32, and the full-profile headless loopback qualification produced exactly one mock parent request with the exact two model-facing child tools, zero retries/auxiliary/external/paid requests, zero child turns, no real secret read, and zero spend. The new Claude-bound launch digest is issued; the prior V1R3R1 authority/digest is incompatible and the prior episode remains unclaimed/unconsumed. No live Stage-A episode, real model call, secret read, Qnty/QntyAgentEval, trading/capital action, implementation authority, or Stage B is authorized. Any future live use requires separate fresh Git-backed authorization after canonical merge."
+
+[[project]]
 project_id = "DSH_STAGE_A_V1R3R1_ONE_EPISODE_LIVE_EXECUTION_AUTHORIZATION_V0"
 display_name = "DSH Stage-A V1R3R1 one-episode live execution authorization V0"
 state = "CLOSED_PASS"

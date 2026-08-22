@@ -1,0 +1,166 @@
+{
+  "phaseId": "DSH_STAGE_A_V1R3R2_CLAUDE_HARD_READ_ONLY_REPAIR_AND_REQUALIFICATION_V0",
+  "predecessor": {
+    "pr": 180,
+    "blockedResultHead": "8313136f79773e7d826cd7efe5d91dc963fb92bb",
+    "canonicalMerge": "ba74eb17aece6d37a21189ab0671c98282df0fed",
+    "previousQualifiedDigest": "4cd2734f229a97d4258ace4576f23f76f3d36aeef888a19fa61d2f4a7bff37d4",
+    "previousEpisodeUnclaimedAndUnconsumed": true
+  },
+  "sourceIdentity": {
+    "repository": "deepseek-ai/deepseek-harness",
+    "commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "tag": "dsh-v0.1.0-rc.7"
+  },
+  "oldAuthorityCompatibleWithNewRuntime": false,
+  "materialization": {
+    "freshPristineSource": true,
+    "canonicalMaterializer": "driver/run-materialize.mjs",
+    "codexRepairReused": true,
+    "codexRepairPath": "../dsh_stage_a_v1r3r1_real_runtime_qualification_v0/repairs/codex-executable-binding.patch",
+    "claudeRepairPath": "repairs/claude-hard-read-only.patch",
+    "patchesAppliedByCanonicalMaterializerInOrder": true,
+    "offlineFrozenInstall": "PASS",
+    "canonicalBuildCommand": "pnpm run build:lib",
+    "build": "PASS",
+    "fullBuildRequiredArtifactPresent": true,
+    "lockfileDigest": "f517dc3978d57531cda747df62a2abdde1df5b9f25415fcf1fc5d51f8b7547ea",
+    "pnpm": {
+      "declaredVersion": "pnpm@11.7.0",
+      "actualVersion": "11.22.0",
+      "executableIdentityBound": true,
+      "executableDigest": "7c2a67995976b5b592b611d8b236e3b0633bd654fb49aedd96c6eb7ce04c9cbb"
+    },
+    "claudeSdkIdentity": {
+      "package": "@anthropic-ai/claude-agent-sdk",
+      "version": "0.3.220",
+      "identityBound": true,
+      "packageJsonDigest": "1c9d0905f64e126850efe4fc4e7244c604a0855de8d4c82aff78da6f1988bd08"
+    }
+  },
+  "claudePolicy": {
+    "allowedTools": ["Read", "Glob", "Grep"],
+    "tools": ["Read", "Glob", "Grep"],
+    "disallowedTools": ["Write", "Edit", "Bash", "Agent", "Task", "mcp__*", "AskUserQuestion"],
+    "permissionMode": "dontAsk",
+    "settingSources": [],
+    "strictMcpConfig": true,
+    "mcpServers": {},
+    "agents": {},
+    "plugins": [],
+    "persistence": false,
+    "writeAllowed": false,
+    "editAllowed": false,
+    "bashAllowed": false,
+    "agentAllowed": false,
+    "taskAllowed": false,
+    "mcpAllowed": false,
+    "delegationAllowed": false,
+    "askUserQuestionAllowed": false
+  },
+  "compiledRuntimeProof": {
+    "package": "packages/subagent/subagent-claude-code/lib/index.js",
+    "requiredPolicyStringsPresent": ["allowedTools", "strictMcpConfig", "settingSources", "mcp__*"],
+    "sourceSeam": "officialQuery(options) via startClaudeCodeRun",
+    "directOptionsTest": "24/24 pass",
+    "codexRegressionTest": "32/32 pass"
+  },
+  "acceptance": {
+    "realPinnedRuntimeMaterialized": true,
+    "realFullProfileLoopbackBoot": "PASS",
+    "pluginTreeSettled": true,
+    "expectedWorkspace": "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r2-claude-repair/workspace/run3",
+    "actualSessionCwd": "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r2-claude-repair/workspace/run3",
+    "workspaceMatch": true,
+    "modelFacingTools": ["subagent_codex", "subagent_claude_code"],
+    "observedModelFacingTools": ["subagent_claude_code", "subagent_codex"],
+    "modelFacingToolsExact": true,
+    "mockParentWireRequests": 1,
+    "auxiliaryParentRequests": 0,
+    "llmRetries": 0,
+    "externalParentRequests": 0,
+    "paidParentRequests": 0,
+    "codexModelTurns": 0,
+    "claudeModelTurns": 0,
+    "realStageASecretRead": false,
+    "spendUsd": 0,
+    "noToolCallResponse": true
+  },
+  "decisiveRun": {
+    "sourceRoot": "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r2-claude-repair-source",
+    "launcher": "phase wrapper over canonical qntylab-launch-dsh.mjs",
+    "materializer": "phase driver over canonical run-materialize.mjs",
+    "profile": "headless",
+    "overlayPatch": "driver/qualification.patch.yml",
+    "parentProvider": "openai",
+    "parentModel": "gpt-5-mini",
+    "exitCode": 0,
+    "stdout": "Qualification loopback response. No tool call.",
+    "mockParentWireRequests": 1,
+    "auxiliaryParentRequests": 0,
+    "llmRetries": 0,
+    "codexActualTaskCalls": 0,
+    "claudeActualTaskCalls": 0,
+    "sessionCwd": "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r2-claude-repair/workspace/run3",
+    "expectedWorkspace": "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r2-claude-repair/workspace/run3",
+    "workspaceMatch": true,
+    "pluginTreeSettled": true
+  },
+  "network": {
+    "realStageASecretRead": false,
+    "externalNetworkDuringQualification": 0,
+    "externalModelRequests": 0,
+    "paidModelRequests": 0,
+    "spendUsd": 0,
+    "evidenceLevel": "configuration_plus_observation; no kernel/network namespace guarantee"
+  },
+  "budgetGate": {
+    "maxParentRequestAttempts": 8,
+    "attempt9": "DENIED_CEILING",
+    "reservationBeforeAdapterIo": "architectural (no I/O in reservation path other than durable counter write)"
+  },
+  "digests": {
+    "oldQualifiedLaunchContractDigest": "4cd2734f229a97d4258ace4576f23f76f3d36aeef888a19fa61d2f4a7bff37d4",
+    "oldDigestStatus": "SUPERSEDED_BY_FRESH_CLAUDE_POLICY_BOUND_RUNTIME",
+    "RUNTIME_MANIFEST_DIGEST": "afcfa011de46bd9fccaa120b5612c24a5ace2b2c451591ddf8b67fb43a8ce321",
+    "EXECUTABLE_IDENTITY_DIGEST": "ae07ece34c88b3ebaebd7452df8d136c82935f9c8ec9df16a40e50a2582a2fd9",
+    "LAUNCH_POLICY_DIGEST": "34d5ceabbd89eaa7520cb5d5b69fa938a4cf15132b5c37e98382c4f6aab53f28",
+    "QUALIFIED_LAUNCH_CONTRACT_DIGEST": "57162eb65a4177ae58c6b503110dfe802ae345c3e6e9c3963acd207f693fbcc1",
+    "codexRepairDigest": "f89bf5833956f3c4202ca88a9285e39658976b29605fc1b63b7c62ebdd07fcb3",
+    "claudeRepairDigest": "2b8277bf13e077651046e2527dc7aa092c3c9669cedc61eac1f742d9364a17e3",
+    "issued": true
+  },
+  "security": {
+    "realSecretRead": false,
+    "liveStageAEpisodes": 0,
+    "externalNetworkRequests": 0,
+    "paidModelRequests": 0,
+    "spendUsd": 0,
+    "stageBExecuted": false,
+    "oldAuthorityCompatibleWithNewRuntime": false
+  },
+  "tests": {
+    "phaseMaterializerTests": "2/2 pass",
+    "predecessorLaunchAndMaterializerTests": "19/19 pass",
+    "digestRegressionTests": "5/5 pass plus 5 policy/binding mutations pass",
+    "repairedClaudePackageOwnTests": "24/24 pass",
+    "reusedCodexPackageOwnTests": "32/32 pass",
+    "projectContextTests": "58/58 pass (tests/test_project_context_v0.py, tests/test_research_ledger.py)"
+  },
+  "review": {
+    "hostileReviewCount": 1,
+    "hostileReviewVerdict": "PASS",
+    "criticalFindings": 0,
+    "highFindings": 0,
+    "mediumFindings": 0,
+    "lowFindings": 0,
+    "targetedRereview": "NOT_REQUIRED"
+  },
+  "closure": {
+    "projectState": "CLOSED_PASS",
+    "implementationAuthorizedAfter": false,
+    "implementationCompletedAfter": true,
+    "activeProjectsAfter": "NONE"
+  }
+}

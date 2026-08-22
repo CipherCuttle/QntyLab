@@ -1,0 +1,50 @@
+{
+  "phaseId": "DSH_STAGE_A_V1R3R2_CLAUDE_HARD_READ_ONLY_REPAIR_AND_REQUALIFICATION_V0",
+  "materializationRoot": "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r2-claude-repair-source",
+  "sourceIdentity": {
+    "repository": "deepseek-ai/deepseek-harness",
+    "commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "tag": "dsh-v0.1.0-rc.7"
+  },
+  "packageManagerFingerprint": {
+    "declaredPackageManager": "pnpm@11.7.0",
+    "actualVersion": "11.22.0",
+    "executablePath": "/home/swirky/.nvm/versions/node/v22.22.0/lib/node_modules/corepack/dist/pnpm.js",
+    "executableDigest": "7c2a67995976b5b592b611d8b236e3b0633bd654fb49aedd96c6eb7ce04c9cbb"
+  },
+  "lockfileDigest": "f517dc3978d57531cda747df62a2abdde1df5b9f25415fcf1fc5d51f8b7547ea",
+  "claudeSdkIdentity": {
+    "package": "@anthropic-ai/claude-agent-sdk",
+    "version": "0.3.220",
+    "packageJsonDigest": "1c9d0905f64e126850efe4fc4e7244c604a0855de8d4c82aff78da6f1988bd08"
+  },
+  "patchDigests": [
+    {
+      "path": "/home/swirky/DevHub/repos/QntyLab/experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/repairs/codex-executable-binding.patch",
+      "digest": "f89bf5833956f3c4202ca88a9285e39658976b29605fc1b63b7c62ebdd07fcb3"
+    },
+    {
+      "path": "/home/swirky/DevHub/repos/QntyLab/experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_claude_hard_read_only_repair_and_requalification_v0/repairs/claude-hard-read-only.patch",
+      "digest": "2b8277bf13e077651046e2527dc7aa092c3c9669cedc61eac1f742d9364a17e3"
+    }
+  ],
+  "profileDigests": {
+    "qualificationOverlay": "50f8e5ad84ad00bc39c6654975f90d7e64b2c4006d2173850e605aeb4417f399"
+  },
+  "launcherDigest": "00b2128ad2f02094d560ce649c5871dea1b264e3a5ab8d96779b0fc2a47eeaa8",
+  "builtCliAbsolutePath": "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r2-claude-repair-source/apps/cli/lib/bin.js",
+  "builtCliDigest": "c0226687bb20f45c603ec6fe50f3de16d1c3510c3a803304ec575ef9bc366c62",
+  "workspaceBundledChunks": {
+    "apps/cli/lib/plugin-9h8shc4d.js": "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r2-claude-repair-source/apps/cli/lib/plugin-9h8shc4d.js",
+    "apps/cli/lib/profile-boot-BnJoK_kl.js": "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r2-claude-repair-source/apps/cli/lib/profile-boot-BnJoK_kl.js",
+    "apps/cli/lib/profile-boot-DG5t9aNs.js": "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r2-claude-repair-source/apps/cli/lib/profile-boot-DG5t9aNs.js"
+  },
+  "executableFingerprints": {
+    "nodeExecutable": "1bec56ef7cfa9a76f3e0b7c0a87f220eb73f23102b9c0b4c7529a3f7c3ce7c31",
+    "pythonExecutable": "b8d8288faefdd300201f43fcf00f6f539a27218eeed3a3dff5ab10b9c4c99700",
+    "codexExecutable": "ac2cfed85fb647d61e0150b8548102b330e4799d9d81ad5d354de701edf6b074",
+    "claudeExecutable": "98226474f802e3094d6a86c5ade8883c16206d0fcb5c400b7401c800063e99d7"
+  },
+  "materializedAtUtc": "2026-08-22T08:41:37.358Z"
+}

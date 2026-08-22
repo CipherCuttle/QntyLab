@@ -1,0 +1,110 @@
+{
+  "RUNTIME_MANIFEST_DIGEST": "afcfa011de46bd9fccaa120b5612c24a5ace2b2c451591ddf8b67fb43a8ce321",
+  "EXECUTABLE_IDENTITY_DIGEST": "ae07ece34c88b3ebaebd7452df8d136c82935f9c8ec9df16a40e50a2582a2fd9",
+  "LAUNCH_POLICY_DIGEST": "34d5ceabbd89eaa7520cb5d5b69fa938a4cf15132b5c37e98382c4f6aab53f28",
+  "QUALIFIED_LAUNCH_CONTRACT_DIGEST": "57162eb65a4177ae58c6b503110dfe802ae345c3e6e9c3963acd207f693fbcc1",
+  "components": {
+    "runtimeIdentity": {
+      "phaseId": "DSH_STAGE_A_V1R3R2_CLAUDE_HARD_READ_ONLY_REPAIR_AND_REQUALIFICATION_V0",
+      "sourceIdentity": {
+        "repository": "deepseek-ai/deepseek-harness",
+        "commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+        "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+        "tag": "dsh-v0.1.0-rc.7"
+      },
+      "packageManagerFingerprint": {
+        "declaredPackageManager": "pnpm@11.7.0",
+        "actualVersion": "11.22.0",
+        "executableDigest": "7c2a67995976b5b592b611d8b236e3b0633bd654fb49aedd96c6eb7ce04c9cbb"
+      },
+      "lockfileDigest": "f517dc3978d57531cda747df62a2abdde1df5b9f25415fcf1fc5d51f8b7547ea",
+      "patchDigests": [
+        "f89bf5833956f3c4202ca88a9285e39658976b29605fc1b63b7c62ebdd07fcb3",
+        "2b8277bf13e077651046e2527dc7aa092c3c9669cedc61eac1f742d9364a17e3"
+      ],
+      "builtCliDigest": "c0226687bb20f45c603ec6fe50f3de16d1c3510c3a803304ec575ef9bc366c62",
+      "builtCliRelativePath": "apps/cli/lib/bin.js",
+      "workspaceBundledChunkDigests": {
+        "apps/cli/lib/plugin-9h8shc4d.js": "6f4459da44f0e5bdb3c72471f4be0ee1929913be352baf8b0da7b700afc1804c",
+        "apps/cli/lib/profile-boot-BnJoK_kl.js": "778c5b338674d986a49972be920c965d28b2c8cac85364ae77f8587070397663",
+        "apps/cli/lib/profile-boot-DG5t9aNs.js": "f83ffea6a4d30cfbe02b41dabcc05104c4ad27bf79c74f601f0ddb6ccdf88969"
+      },
+      "claudeSdkIdentity": {
+        "package": "@anthropic-ai/claude-agent-sdk",
+        "version": "0.3.220",
+        "packageJsonDigest": "1c9d0905f64e126850efe4fc4e7244c604a0855de8d4c82aff78da6f1988bd08"
+      }
+    },
+    "executableIdentity": {
+      "nodeExecutableDigest": "1bec56ef7cfa9a76f3e0b7c0a87f220eb73f23102b9c0b4c7529a3f7c3ce7c31",
+      "pythonExecutableDigest": "b8d8288faefdd300201f43fcf00f6f539a27218eeed3a3dff5ab10b9c4c99700",
+      "codexExecutableDigest": "ac2cfed85fb647d61e0150b8548102b330e4799d9d81ad5d354de701edf6b074",
+      "claudeExecutableDigest": "98226474f802e3094d6a86c5ade8883c16206d0fcb5c400b7401c800063e99d7"
+    },
+    "launchPolicy": {
+      "launcherDigest": "00b2128ad2f02094d560ce649c5871dea1b264e3a5ab8d96779b0fc2a47eeaa8",
+      "predecessorLauncherDigest": "9a97a56283fa98f90fca2838d64cc1233653ce7e6838a7aad1e153c71823344a",
+      "materializerDigest": "a540014dc42bd848a10d370416bad8a0f58af6423cdc472b490343b1ebbe286a",
+      "materializationDriverDigest": "b6c9f9cc4002596f9344cbe169cad7e6152238b3f250a0495a146df62a04b497",
+      "qualificationDriverDigest": "49abff967301eacb97b1e206d4fcd1a989247f9a3b2c1d22d7f1151a2d9a5cb2",
+      "codexRepairDigest": "f89bf5833956f3c4202ca88a9285e39658976b29605fc1b63b7c62ebdd07fcb3",
+      "claudeRepairDigest": "2b8277bf13e077651046e2527dc7aa092c3c9669cedc61eac1f742d9364a17e3",
+      "overlayPatchDigest": "50f8e5ad84ad00bc39c6654975f90d7e64b2c4006d2173850e605aeb4417f399",
+      "budgetGateDigest": "6e577802f1dbc39dd3a424e8438c84ae6b16ff09fbfb5030c51126a38063d760",
+      "parentProvider": "openai",
+      "parentModel": "gpt-5-mini",
+      "modelFacingTools": [
+        "subagent_codex",
+        "subagent_claude_code"
+      ],
+      "claudeSdkIdentity": {
+        "package": "@anthropic-ai/claude-agent-sdk",
+        "version": "0.3.220",
+        "packageJsonDigest": "1c9d0905f64e126850efe4fc4e7244c604a0855de8d4c82aff78da6f1988bd08"
+      },
+      "claudePolicy": {
+        "allowedTools": [
+          "Read",
+          "Glob",
+          "Grep"
+        ],
+        "writeAllowed": false,
+        "editAllowed": false,
+        "bashAllowed": false,
+        "agentAllowed": false,
+        "taskAllowed": false,
+        "mcpAllowed": false,
+        "delegationAllowed": false,
+        "askUserQuestionAllowed": false,
+        "tools": [
+          "Read",
+          "Glob",
+          "Grep"
+        ],
+        "disallowedTools": [
+          "Write",
+          "Edit",
+          "Bash",
+          "Agent",
+          "Task",
+          "mcp__*",
+          "AskUserQuestion"
+        ],
+        "permissionMode": "dontAsk",
+        "settingSources": [],
+        "strictMcpConfig": true,
+        "persistence": false
+      },
+      "workspaceContainmentPolicy": "realpath-symlink-aware; workspace must not be inside runtime root or forbidden roots",
+      "budgetPolicy": {
+        "maxParentRequestAttempts": 8,
+        "reservationBeforeAdapterIo": true
+      },
+      "retryPolicy": {
+        "llmRetries": 0,
+        "providerRetry": 0,
+        "automaticContinuation": false
+      }
+    }
+  }
+}

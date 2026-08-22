@@ -1,0 +1,106 @@
+diff --git a/packages/subagent/subagent-claude-code/src/run.ts b/packages/subagent/subagent-claude-code/src/run.ts
+index 6c1e0a8dbf..80997e5966 100644
+--- a/packages/subagent/subagent-claude-code/src/run.ts
++++ b/packages/subagent/subagent-claude-code/src/run.ts
+@@ -38,6 +38,18 @@ import {
+ /** Default POSIX grace between subprocess termination tiers. */
+ export const DEFAULT_DISPOSE_GRACE_MS = 3_000
+
++/** Frozen Stage-A hard read-only Claude tool policy. */
++export const CLAUDE_ALLOWED_TOOLS = ['Read', 'Glob', 'Grep'] as const
++export const CLAUDE_DISALLOWED_TOOLS = [
++  'Write',
++  'Edit',
++  'Bash',
++  'Agent',
++  'Task',
++  'mcp__*',
++  'AskUserQuestion',
++] as const
++
+ /* jscpd:ignore-start -- sibling providers intentionally keep product-private
+  * run inputs and error normalization instead of adding a shared lifecycle owner. */
+ /** Fully resolved inputs for one official Claude Agent SDK query. */
+@@ -185,7 +197,17 @@ export function claudeQueryOptions(
+     pathToClaudeCodeExecutable: spec.executable,
+     env: { ...scrubbedParentEnv(), ...spec.env },
+     persistSession: false,
+-    disallowedTools: ['AskUserQuestion'],
++    // In SDK 0.3.220, `tools` restricts the built-in tool set and
++    // `allowedTools` auto-approves only the same exact read-only set.
++    tools: [...CLAUDE_ALLOWED_TOOLS],
++    allowedTools: [...CLAUDE_ALLOWED_TOOLS],
++    disallowedTools: [...CLAUDE_DISALLOWED_TOOLS],
++    permissionMode: 'dontAsk',
++    settingSources: [],
++    strictMcpConfig: true,
++    mcpServers: {},
++    agents: {},
++    plugins: [],
+     spawnClaudeCodeProcess: (options: SpawnOptions) => {
+       const child = spec.spawn(claudeSpawnSpec(options, spec.disposeGraceMs))
+       capture(child)
+       return new ManagedClaudeCodeProcess(child)
+diff --git a/packages/subagent/subagent-claude-code/tests/subagent-claude-code.spec.ts b/packages/subagent/subagent-claude-code/tests/subagent-claude-code.spec.ts
+index a3df59a74f..e66c097384 100644
+--- a/packages/subagent/subagent-claude-code/tests/subagent-claude-code.spec.ts
++++ b/packages/subagent/subagent-claude-code/tests/subagent-claude-code.spec.ts
+@@ -557,7 +557,17 @@ describe('query options and result mapping', () => {
+       cwd: '/workspace',
+       pathToClaudeCodeExecutable: '/native/claude',
+       persistSession: false,
+-      disallowedTools: ['AskUserQuestion'],
++      tools: ['Read', 'Glob', 'Grep'],
++      allowedTools: ['Read', 'Glob', 'Grep'],
++      disallowedTools: [
++        'Write', 'Edit', 'Bash', 'Agent', 'Task', 'mcp__*', 'AskUserQuestion',
++      ],
++      permissionMode: 'dontAsk',
++      settingSources: [],
++      strictMcpConfig: true,
++      mcpServers: {},
++      agents: {},
++      plugins: [],
+     })
+     expect(options.env).toMatchObject({
+       HOST_VISIBLE: 'overridden',
+@@ -568,7 +568,6 @@ describe('query options and result mapping', () => {
+     for (const omitted of [
+-      'settingSources',
+       'canUseTool',
+       'onElicitation',
+       'onUserDialog',
+       'supportedDialogKinds',
+     ]) {
+@@ -585,6 +585,31 @@ describe('query options and result mapping', () => {
+     }))
+   })
+
++  it('passes the exact hard read-only options through officialQuery', async () => {
++    const run = fakeRun([success('captured')])
++    const started = await startClaudeCodeRun(request(), run.spec)
++    const options = run.options[0]!
++    expect(options).toMatchObject({
++      cwd: '/workspace',
++      pathToClaudeCodeExecutable: '/native/claude',
++      tools: ['Read', 'Glob', 'Grep'],
++      allowedTools: ['Read', 'Glob', 'Grep'],
++      disallowedTools: [
++        'Write', 'Edit', 'Bash', 'Agent', 'Task', 'mcp__*', 'AskUserQuestion',
++      ],
++      permissionMode: 'dontAsk',
++      settingSources: [],
++      strictMcpConfig: true,
++      mcpServers: {},
++      agents: {},
++      plugins: [],
++      persistSession: false,
++    })
++    expect(options.env).not.toHaveProperty('OPENAI_API_KEY')
++    expect(options.spawnClaudeCodeProcess).toEqual(expect.any(Function))
++    await started.dispose()
++  })
++
+   it('accepts only a non-error success with a non-blank final result', () => {
+     expect(successfulResult(success('exact final'))).toBe('exact final')
+     expect(() => successfulResult(success('answer', true)))

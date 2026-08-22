@@ -1,0 +1,15 @@
+{
+  "candidateDigest": "c98c0a91d15c0875e3635e9791561af5bbb8588ff66d4144c822570b6227b666",
+  "candidateRecomputedDigest": "c98c0a91d15c0875e3635e9791561af5bbb8588ff66d4144c822570b6227b666",
+  "candidateMatch": true,
+  "oldQualifiedDigest": "e3b623c58d0ce591baa9d0e07d9cf4dd802203d34a4a1b1521d29f75ca302ffa",
+  "oldContractRecomputedDigest": "e3b623c58d0ce591baa9d0e07d9cf4dd802203d34a4a1b1521d29f75ca302ffa",
+  "oldContractPreserved": true,
+  "runtimeManifestDigest": "0e09b9d9d977f73d146c4a35d497cc93bd046bae016e1b1a6a52b481f07731b3",
+  "qualifiedContractDigest": "e16872fc1f419e5253d633bbdf35e936bb58e34a7636decb8eda688113658e82",
+  "launchPolicyDigest": "00336402a7b34757ba05194ae083805b84f699f1f706990278b9aaf121e973b4",
+  "executableIdentityDigest": "ae07ece34c88b3ebaebd7452df8d136c82935f9c8ec9df16a40e50a2582a2fd9",
+  "contractDigestRecomputable": true,
+  "loopbackReused": true,
+  "rebuildRequired": false
+}

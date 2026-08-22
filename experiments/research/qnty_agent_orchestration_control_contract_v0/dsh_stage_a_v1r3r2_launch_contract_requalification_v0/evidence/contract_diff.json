@@ -1,0 +1,53 @@
+{
+  "artifactType": "DSH_STAGE_A_V1R3R2_LAUNCH_CONTRACT_DIFFERENTIAL",
+  "schemaVersion": "dsh-stage-a-v1r3r2-launch-contract-diff-v0",
+  "OLD_QUALIFIED_DIGEST": "e3b623c58d0ce591baa9d0e07d9cf4dd802203d34a4a1b1521d29f75ca302ffa",
+  "NEW_QUALIFIED_DIGEST": "e16872fc1f419e5253d633bbdf35e936bb58e34a7636decb8eda688113658e82",
+  "CANDIDATE_DIGEST": "c98c0a91d15c0875e3635e9791561af5bbb8588ff66d4144c822570b6227b666",
+  "CANDIDATE_RECOMPUTED_DIGEST": "c98c0a91d15c0875e3635e9791561af5bbb8588ff66d4144c822570b6227b666",
+  "CANDIDATE_MATCH": true,
+  "UNCHANGED_BINDINGS": [
+    "components.runtimeIdentity.sourceIdentity.repository",
+    "components.runtimeIdentity.sourceIdentity.commit",
+    "components.runtimeIdentity.sourceIdentity.tree",
+    "components.runtimeIdentity.sourceIdentity.tag",
+    "components.runtimeIdentity.lockfileDigest",
+    "components.runtimeIdentity.patchDigests",
+    "components.runtimeIdentity.builtCliRelativePath",
+    "components.runtimeIdentity.builtCliDigest",
+    "components.executableIdentity",
+    "components.launchPolicy.stageA.parentPolicy",
+    "components.launchPolicy.stageA.childPolicy",
+    "components.launchPolicy.stageA.claimPolicy",
+    "components.launchPolicy.stageA.secretPolicy"
+  ],
+  "CHANGED_BINDINGS": [
+    "projectId",
+    "components.runtimeIdentity.phaseId",
+    "components.runtimeIdentity.packageManagerFingerprint.actualVersion",
+    "components.runtimeIdentity.packageManagerFingerprint.executableDigest",
+    "components.runtimeIdentity.toolchain",
+    "components.launchPolicy",
+    "qualifiedContract",
+    "qualifiedContractDigest"
+  ],
+  "ADDED_BINDINGS": [
+    "components.launchPolicy.physicalLaunch.toolchain.node",
+    "components.launchPolicy.physicalLaunch.toolchain.corepack",
+    "components.launchPolicy.physicalLaunch.toolchain.installCommand",
+    "components.launchPolicy.physicalLaunch.toolchain.buildCommand",
+    "components.launchPolicy.physicalLaunch",
+    "components.launchPolicy.stageA.claudePolicy",
+    "components.launchPolicy.authorityFirewall"
+  ],
+  "REMOVED_BINDINGS": [],
+  "weakeningChecks": {
+    "budgetEnforcementPreserved": true,
+    "claimSemanticsPreserved": true,
+    "claudeHardReadOnlyPreserved": true,
+    "atMostOnceEpisodeSemanticsPreserved": true,
+    "sourcePinningPreserved": true,
+    "executableIdentityPreserved": true,
+    "authorityFirewallPreserved": true
+  }
+}

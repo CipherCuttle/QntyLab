@@ -1,0 +1,45 @@
+{
+  "artifactType": "DSH_STAGE_A_V1R3R2_PHYSICAL_CONSISTENCY_CHECK",
+  "sourceIdentity": {
+    "remote": "https://github.com/deepseek-ai/deepseek-harness.git",
+    "repository": "deepseek-ai/deepseek-harness",
+    "commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "tag": "dsh-v0.1.0-rc.7",
+    "checkoutClean": true
+  },
+  "toolchainIdentity": {
+    "node": "v22.22.0",
+    "corepack": "0.34.0",
+    "declaredPackageManager": "pnpm@11.7.0",
+    "actualPackageManager": "11.7.0",
+    "installCommand": "corepack pnpm@11.7.0 install --offline --frozen-lockfile",
+    "buildCommand": "corepack pnpm@11.7.0 run build:lib"
+  },
+  "lockfileDigest": "f517dc3978d57531cda747df62a2abdde1df5b9f25415fcf1fc5d51f8b7547ea",
+  "governedPatches": [
+    {
+      "name": "codex-executable-binding",
+      "digest": "f89bf5833956f3c4202ca88a9285e39658976b29605fc1b63b7c62ebdd07fcb3",
+      "applied": true,
+      "compiled": true
+    },
+    {
+      "name": "claude-hard-read-only",
+      "digest": "2b8277bf13e077651046e2527dc7aa092c3c9669cedc61eac1f742d9364a17e3",
+      "applied": true,
+      "compiled": true
+    }
+  ],
+  "buildIdentity": {
+    "entrypoint": null,
+    "entrypointDigest": null
+  },
+  "runtimeManifestDigest": "0e09b9d9d977f73d146c4a35d497cc93bd046bae016e1b1a6a52b481f07731b3",
+  "executableIdentityDigest": "ae07ece34c88b3ebaebd7452df8d136c82935f9c8ec9df16a40e50a2582a2fd9",
+  "launchPolicyDigest": "00336402a7b34757ba05194ae083805b84f699f1f706990278b9aaf121e973b4",
+  "physicalEvidencePass": true,
+  "loopbackReused": true,
+  "rebuildRequired": false,
+  "reason": "No runtime, launcher, materializer, profile, or policy implementation bytes changed; canonical predecessor evidence is complete and identity-matching."
+}

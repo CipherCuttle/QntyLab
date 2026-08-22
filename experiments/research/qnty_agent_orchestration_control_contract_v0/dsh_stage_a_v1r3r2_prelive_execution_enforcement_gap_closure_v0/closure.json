@@ -1,0 +1,87 @@
+{
+  "artifact_type": "DSH_STAGE_A_V1R3R2_PRELIVE_EXECUTION_ENFORCEMENT_GAP_CLOSURE",
+  "schema_version": "dsh-stage-a-v1r3r2-prelive-execution-enforcement-gap-closure-v0",
+  "project_id": "DSH_STAGE_A_V1R3R2_PRELIVE_EXECUTION_ENFORCEMENT_GAP_CLOSURE_V0",
+  "state": "CLOSED_PASS",
+  "authorization": {
+    "project_id": "DSH_STAGE_A_V1R3R2_PRELIVE_EXECUTION_ENFORCEMENT_GAP_CLOSURE_AUTHORIZATION_V0",
+    "canonical_origin_master": "3a51a044895bd974de14d611e5055dee478e905c",
+    "verified_before_modification": true
+  },
+  "enforcement": {
+    "CHILD_SEQUENCE_HARD_ENFORCED": true,
+    "CODEX_MAX_HARD_ENFORCED": 2,
+    "CLAUDE_MAX_HARD_ENFORCED": 2,
+    "PARENT_REQUEST_MAX_HARD_ENFORCED": 8,
+    "PROVIDER_WIRE_ATTEMPT_BOUND": "ACTUAL_PROVIDER_WIRE_ATTEMPTS_EQUALS_RESERVED_LOGICAL_ATTEMPTS_AND_IS_AT_MOST_8",
+    "HIDDEN_RETRY_BYPASS": false,
+    "PROVIDER_INTERNAL_RETRIES": 0,
+    "MAX_TOKENS_4096_HARD_ENFORCED": true,
+    "SPEND_CAP_SCOPE": "PARENT_OPENAI_AUTHORIZED_SPEND_USD_UNDER_FROZEN_SCHEDULE",
+    "SPEND_CAP_HARD_ENFORCED": true,
+    "SPEND_CAP_USD": "1.00",
+    "PRICE_SCHEDULE_ID": "openai-gpt-5-mini-2026-08-22-4x-authorization-reserve-v0",
+    "INPUT_TOKEN_COST_INCLUDED": true,
+    "OUTPUT_TOKEN_COST_INCLUDED": true,
+    "NON_TEXT_MODALITIES_FAIL_CLOSED": true,
+    "CLAIM_IMPLEMENTATION_TESTED": "ACTUAL_CREATE_ONLY_GIT_PUSH_PLUS_DURABLE_INTENT_AND_EXCLUSIVE_LOCAL_RECEIPT_USING_DISPOSABLE_LOCAL_BARE_GIT",
+    "CLAIM_CONCURRENCY_PASS": true,
+    "CLAIM_PARTIAL_FAILURE_FAIL_CLOSED": true,
+    "FULL_PROFILE_OFFLINE_ADVERSARIAL_TEST": "PASS",
+    "SECRET_SENTINEL_FIREWALL": "PASS_ZERO_CHILD_OR_PERSISTED_LEAKS",
+    "QUALIFIED_CONTRACT_REQUIRED_BEFORE_SPAWN": true,
+    "QNTYLAB_ROOT_DERIVED_NOT_CALLER_CONTROLLED": true,
+    "PROFILE_AND_CRITICAL_PACKAGE_IDENTITIES_CHECKED": true,
+    "PREFLIGHTED_NATIVE_EXECUTABLES_REACH_RAW_RESOLUTION_SEAM": true
+  },
+  "identity": {
+    "RUNTIME_BYTES_CHANGED": false,
+    "LAUNCH_POLICY_CHANGED": true,
+    "QUALIFIED_IDENTITY_COVERED_BYTES_CHANGED": true,
+    "OLD_QUALIFIED_DIGEST": "57162eb65a4177ae58c6b503110dfe802ae345c3e6e9c3963acd207f693fbcc1",
+    "OLD_QUALIFIED_DIGEST_STILL_VALID": false,
+    "NEW_RUNTIME_MANIFEST_DIGEST": "afcfa011de46bd9fccaa120b5612c24a5ace2b2c451591ddf8b67fb43a8ce321",
+    "NEW_EXECUTABLE_IDENTITY_DIGEST": "ae07ece34c88b3ebaebd7452df8d136c82935f9c8ec9df16a40e50a2582a2fd9",
+    "NEW_LAUNCH_POLICY_DIGEST": "024256a6dd2fbce6e883a73d9d2df01e3b2b21f738c7ca700c86cca13bd1ec73",
+    "NEW_QUALIFIED_LAUNCH_CONTRACT_DIGEST": "e3b623c58d0ce591baa9d0e07d9cf4dd802203d34a4a1b1521d29f75ca302ffa",
+    "qualification_runs": 1
+  },
+  "review": {
+    "HOSTILE_REVIEW": "ONE_BROAD_REVIEW_AND_ONE_TARGETED_REREVIEW_COMPLETED",
+    "broad_critical": 1,
+    "broad_high": 1,
+    "broad_medium": 2,
+    "broad_low": 0,
+    "broad_critical_repaired": 1,
+    "broad_high_repaired": 1,
+    "TARGETED_REREVIEW": "USED_ONCE_FOUND_H_RR_01_REPAIRED_AFTERWARD_NO_SECOND_REREVIEW_PERMITTED",
+    "targeted_critical": 0,
+    "targeted_high": 1,
+    "targeted_high_repaired": 1,
+    "open_critical": 0,
+    "open_high": 0
+  },
+  "held_pr_189": {
+    "observed_state": "OPEN_DRAFT",
+    "observed_head": "aa6b383c41a68e52f35c3c0e1fcae61e7cf0004d",
+    "modified_by_phase": false,
+    "PR189_STATUS": "SUPERSEDED_NOT_MERGEABLE"
+  },
+  "safety": {
+    "REAL_SECRET_READS": 0,
+    "REAL_CLAIMS": 0,
+    "EXTERNAL_MODEL_REQUESTS": 0,
+    "SPEND": "$0",
+    "real_stage_a_episodes": 0,
+    "activation_artifacts_created": 0
+  },
+  "tests": {
+    "python_enforcement_and_claim": "20/20 PASS",
+    "node_gate_launcher_and_mock": "15/15 PASS",
+    "single_full_profile_qualification": "12/12 PASS",
+    "post_review_full_profile_native_identity_scenario": "PASS"
+  },
+  "verdict": "CLOSED_PASS",
+  "next_phase": "FRESH_V0R2_LIVE_EXECUTION_AUTHORIZATION_BOUND_TO_REPAIRED_RUNTIME",
+  "next_phase_started": false
+}

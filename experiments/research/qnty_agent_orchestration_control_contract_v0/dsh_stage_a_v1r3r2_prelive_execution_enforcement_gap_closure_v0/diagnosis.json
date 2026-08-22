@@ -1,0 +1,47 @@
+{
+  "artifact_type": "DSH_STAGE_A_V1R3R2_PRELIVE_EXECUTION_ENFORCEMENT_DIAGNOSIS",
+  "schema_version": "dsh-stage-a-v1r3r2-prelive-execution-enforcement-diagnosis-v0",
+  "project_id": "DSH_STAGE_A_V1R3R2_PRELIVE_EXECUTION_ENFORCEMENT_GAP_CLOSURE_V0",
+  "canonical_authorization": {
+    "project_id": "DSH_STAGE_A_V1R3R2_PRELIVE_EXECUTION_ENFORCEMENT_GAP_CLOSURE_AUTHORIZATION_V0",
+    "verified_on_origin_master": true,
+    "origin_master_at_reconciliation": "3a51a044895bd974de14d611e5055dee478e905c",
+    "source_conflicts": 0
+  },
+  "before_modification": {
+    "CHILD_SEQUENCE": "DECLARATIVE_ONLY",
+    "CODEX_MAX_2": "DECLARATIVE_ONLY",
+    "CLAUDE_MAX_2": "DECLARATIVE_ONLY",
+    "PARENT_REQUEST_MAX_8": "DECLARATIVE_ONLY",
+    "ATTEMPT_9_BEFORE_WIRE_IO": "DECLARATIVE_ONLY",
+    "MAX_OUTPUT_TOKENS_4096": "NOT_PRESENT",
+    "PARENT_OPENAI_SPEND_CAP_1USD": "DECLARATIVE_ONLY",
+    "PROVIDER_INTERNAL_RETRIES_DISABLED": "DECLARATIVE_ONLY",
+    "CLAIM_AT_MOST_ONCE": "DECLARATIVE_ONLY",
+    "SECRET_CHILD_FIREWALL": "NOT_PRESENT"
+  },
+  "diagnostic_nuance": {
+    "isolated_predecessor_child_controller_existed": true,
+    "isolated_controller_wired_into_qualified_v1r3r2_profile": false,
+    "predecessor_budget_gate_counted_only_attempts": true,
+    "predecessor_budget_gate_attached_to_qualified_profile": false,
+    "pinned_pi_ai_sdk_max_retries_observed": 0,
+    "qualified_profile_bound_retry_zero_before_modification": false,
+    "pinned_dsh_subprocess_credential_name_scrub_present": true,
+    "qualified_full_profile_sentinel_firewall_proof_before_modification": false
+  },
+  "reuse_preflight": {
+    "REUSE_PREFLIGHT": "REQUIRED",
+    "PROJECT_CODE_REFERENCE_MATCHES": [
+      "qntylab/dsh_stage_a_v1_hard_orchestration.py",
+      "qntylab/dsh_stage_a_v1r2_native_compatibility.py"
+    ],
+    "PROJECTION_TRUNCATED": "YES",
+    "BOUNDED_SEARCH": "rg --files qntylab tests | rg 'dsh_stage_a|qualification|claim|launch'",
+    "CANDIDATES_INSPECTED": [
+      "qntylab/dsh_stage_a_v1_hard_orchestration.py",
+      "qntylab/dsh_stage_a_v1r2_native_compatibility.py"
+    ],
+    "DISPOSITION": "EXTEND"
+  }
+}

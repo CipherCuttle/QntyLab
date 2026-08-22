@@ -1,0 +1,9 @@
+{
+  "name": "@qntylab/dsh-stage-a-stub-provider",
+  "private": true,
+  "type": "module",
+  "main": "lib/index.js",
+  "dependencies": {
+    "@deepseek-ai/schemastery": "link:../../../../vendor/schemastery"
+  }
+}

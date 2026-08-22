@@ -1,0 +1,12 @@
+{
+  "boot": "PASS",
+  "actualDshProcessConfirmed": true,
+  "exitCode": 0,
+  "entrypoint": "/var/tmp/qntylab-dsh-runtime-v0-final/source/apps/cli/lib/bin.js",
+  "entrypointDigest": "c0226687bb20f45c603ec6fe50f3de16d1c3510c3a803304ec575ef9bc366c62",
+  "workspace": "/var/tmp/qntylab-dsh-boot-workspace-v0-final",
+  "stdoutHead": "Usage: dsh --profile headless [options] [task...]\n\nAnswer one task, print the final assistant message, and exit.\n\nArguments:\n  task        the task text; multiple words are joined by spaces\n\nOptions:\n  -h, --help  show this help\n\nExamples:\n  dsh --profile headless \"run the tests\"     answer one task and exit\n\n",
+  "stderrTail": "",
+  "providerRequests": 0,
+  "secretReads": 0
+}

@@ -1,0 +1,25 @@
+{
+  "runtimeManifestDigest": "0e09b9d9d977f73d146c4a35d497cc93bd046bae016e1b1a6a52b481f07731b3",
+  "executableIdentityDigest": "ae07ece34c88b3ebaebd7452df8d136c82935f9c8ec9df16a40e50a2582a2fd9",
+  "launchPolicyDigest": "16a7d8d00351a3d9ac71c4a8d82650ccc918713ac6c79f1024331e20c0c381fc",
+  "qualifiedContractDigest": "c98c0a91d15c0875e3635e9791561af5bbb8588ff66d4144c822570b6227b666",
+  "primaryManifestPath": "/home/swirky/DevHub/repos/QntyLab/experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_runtime_materialization_and_launch_v0/evidence/runtime_manifest.json",
+  "replicaManifestPath": "/var/tmp/qntylab-dsh-runtime-v0-final-replica-manifest.json",
+  "reproducibility": {
+    "sourceIdentityMatch": true,
+    "lockfileIdentityMatch": true,
+    "patchIdentityMatch": true,
+    "runtimeIdentityMatch": true,
+    "executableIdentityMatch": true
+  },
+  "oldQualifiedContract": {
+    "digest": "e3b623c58d0ce591baa9d0e07d9cf4dd802203d34a4a1b1521d29f75ca302ffa",
+    "runtimeIdentityMatches": false,
+    "executableIdentityMatches": true,
+    "launcherIdentityMatches": false,
+    "physicallyReproduced": false,
+    "requalificationRequired": true,
+    "invalidated": false,
+    "reason": "Phase-D binds exact pnpm@11.7.0 and a new acquisition/launch seam; the historical contract recorded pnpm 11.22.0 and different launch-policy bytes."
+  }
+}

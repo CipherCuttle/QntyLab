@@ -12,7 +12,9 @@ import os
 import subprocess
 import sys
 import tomllib
+from dataclasses import dataclass
 from pathlib import Path
+from pathlib import PurePosixPath
 from typing import Any
 
 from qntylab import research_ledger
@@ -208,6 +210,53 @@ class ProjectContextError(RuntimeError):
     """A canonical Project Context source is malformed, conflicting, or untrusted."""
 
 
+@dataclass(frozen=True)
+class RepositorySnapshot:
+    """Invocation-scoped Git index membership used by authority validation."""
+
+    root: Path
+    tracked_paths: frozenset[str]
+
+    @classmethod
+    def acquire(cls, root: Path) -> "RepositorySnapshot":
+        resolved_root = root.resolve()
+        output = _git_bytes(resolved_root, "ls-files", "--cached", "-z")
+        tracked_paths = frozenset(os.fsdecode(path) for path in output.split(b"\0") if path)
+        return cls(resolved_root, tracked_paths)
+
+    def contains_file(self, path: str) -> bool:
+        return path in self.tracked_paths
+
+    def contains_directory(self, path: str) -> bool:
+        normalized = PurePosixPath(path).as_posix()
+        if normalized == ".":
+            return bool(self.tracked_paths)
+        prefix = normalized.rstrip("/") + "/"
+        return any(tracked.startswith(prefix) for tracked in self.tracked_paths)
+
+
+@dataclass(frozen=True)
+class ValidatedContext:
+    """All canonical registries validated once for one logical invocation."""
+
+    root: Path
+    snapshot: RepositorySnapshot
+    config: dict[str, Any]
+    adr_registry: dict[str, Any]
+    projects_registry: dict[str, Any]
+    adrs: dict[str, dict[str, Any]]
+    projects: dict[str, dict[str, Any]]
+
+
+def _snapshot_for(root: Path, snapshot: RepositorySnapshot | None) -> RepositorySnapshot:
+    resolved_root = root.resolve()
+    if snapshot is None:
+        return RepositorySnapshot.acquire(resolved_root)
+    if snapshot.root != resolved_root:
+        raise ProjectContextError("repository snapshot root does not match requested root")
+    return snapshot
+
+
 def _canonical_json(value: Any) -> bytes:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("utf-8")
 
@@ -306,6 +355,8 @@ def _fresh_v0r1_binding_issues(
     activation: dict[str, Any],
     record: dict[str, Any],
     identity: dict[str, Any],
+    *,
+    snapshot: RepositorySnapshot | None = None,
 ) -> list[str]:
     """Enforce the fresh V0R1 authorization and pre-claim boundary.
 
@@ -355,7 +406,12 @@ def _fresh_v0r1_binding_issues(
     if not isinstance(artifact_value, str):
         issues.append("fresh V0R1 authorization artifact is missing")
     else:
-        authorization_path = _authority_path(root, artifact_value, label="fresh V0R1 authorization artifact")
+        authorization_path = _authority_path(
+            root,
+            artifact_value,
+            label="fresh V0R1 authorization artifact",
+            snapshot=snapshot,
+        )
         authorization_document = _load_json_authority(
             authorization_path, label="fresh V0R1 authorization artifact"
         )
@@ -619,6 +675,7 @@ def execution_authority_projection(
     projects: dict[str, dict[str, Any]],
     *,
     canonical_ref: str = EXECUTION_CANONICAL_REF,
+    snapshot: RepositorySnapshot | None = None,
 ) -> dict[str, Any]:
     """Project activation artifacts into effective live execution authority.
 
@@ -628,6 +685,7 @@ def execution_authority_projection(
     A non-active execution row is accepted only when an explicit terminal result
     closure records that no active project remains.
     """
+    snapshot = _snapshot_for(root, snapshot)
     issues: list[str] = []
     active_projects: list[dict[str, Any]] = []
     identity_by_project: dict[str, dict[str, Any]] = {}
@@ -646,6 +704,7 @@ def execution_authority_projection(
             root,
             activation_paths[0],
             label=f"project {record['project_id']} activation artifact",
+            snapshot=snapshot,
         )
         activation = _load_json_authority(activation_path, label=activation_paths[0])
         if activation.get("schema_version") != DSH_STAGE_A_V1R3R2_ACTIVATION_SCHEMA:
@@ -665,7 +724,7 @@ def execution_authority_projection(
         activation_state = _lookup(activation, ("active_execution_project", "state"))
         if record.get("state") == "ACTIVE":
             issues.extend(_projection_parity_issues(activation, record, include_lifecycle=True))
-            issues.extend(_fresh_v0r1_binding_issues(root, activation, record, identity))
+            issues.extend(_fresh_v0r1_binding_issues(root, activation, record, identity, snapshot=snapshot))
             activation_authorized = _lookup(activation, ("active_execution_project", "implementation_authorized"))
             activation_completed = _lookup(activation, ("active_execution_project", "implementation_completed"))
             activation_consumed = _lookup(activation, ("active_execution_project", "episode_consumed"))
@@ -717,7 +776,15 @@ def _as_string(value: Any, label: str) -> str:
     return value
 
 
-def _authority_path(root: Path, raw_path: Any, *, label: str, expected: str = "file") -> Path:
+def _authority_path(
+    root: Path,
+    raw_path: Any,
+    *,
+    label: str,
+    expected: str = "file",
+    snapshot: RepositorySnapshot | None = None,
+) -> Path:
+    snapshot = _snapshot_for(root, snapshot)
     raw = _as_string(raw_path, label)
     candidate = Path(raw)
     if candidate.is_absolute() or ".." in candidate.parts:
@@ -734,12 +801,19 @@ def _authority_path(root: Path, raw_path: Any, *, label: str, expected: str = "f
         raise ProjectContextError(f"authority path must be a file: {raw}")
     if expected == "directory" and not lexical.is_dir():
         raise ProjectContextError(f"authority path must be a directory: {raw}")
-    if _run_git(root, "ls-files", "--error-unmatch", "--", raw, check=False).strip() != raw:
+    if not snapshot.contains_file(raw):
         raise ProjectContextError(f"authority source is not Git-tracked: {raw}")
     return lexical
 
 
-def _authority_directory(root: Path, raw_path: Any, *, label: str) -> Path:
+def _authority_directory(
+    root: Path,
+    raw_path: Any,
+    *,
+    label: str,
+    snapshot: RepositorySnapshot | None = None,
+) -> Path:
+    snapshot = _snapshot_for(root, snapshot)
     raw = _as_string(raw_path, label)
     candidate = Path(raw)
     if candidate.is_absolute() or ".." in candidate.parts:
@@ -752,8 +826,7 @@ def _authority_directory(root: Path, raw_path: Any, *, label: str) -> Path:
         raise ProjectContextError(f"authority path escapes repository root: {raw}") from exc
     if lexical.is_symlink() or not lexical.is_dir():
         raise ProjectContextError(f"authority path must be a non-symlink directory: {raw}")
-    tracked = _run_git(root, "ls-files", "--", raw, check=False).splitlines()
-    if not tracked:
+    if not snapshot.contains_directory(raw):
         raise ProjectContextError(f"authority source is not Git-tracked: {raw}")
     return lexical
 
@@ -764,9 +837,14 @@ def _require_list(value: Any, label: str) -> list[Any]:
     return value
 
 
-def load_context_sources(root: Path) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+def load_context_sources(
+    root: Path,
+    *,
+    snapshot: RepositorySnapshot | None = None,
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     root = root.resolve()
-    config_path = _authority_path(root, CONFIG_SOURCE_PATH, label=CONFIG_SOURCE_PATH)
+    snapshot = _snapshot_for(root, snapshot)
+    config_path = _authority_path(root, CONFIG_SOURCE_PATH, label=CONFIG_SOURCE_PATH, snapshot=snapshot)
     config = _load_toml(config_path)
     if config.get("schema_version") != SCHEMA_VERSION:
         raise ProjectContextError("unsupported qntylab.toml schema_version")
@@ -774,17 +852,28 @@ def load_context_sources(root: Path) -> tuple[dict[str, Any], dict[str, Any], di
     authority = config.get("authority")
     if not isinstance(authority, dict):
         raise ProjectContextError("qntylab.toml [authority] table is required")
-    adr_path = _authority_path(root, authority.get("global_architecture_registry"), label="global_architecture_registry")
-    projects_path = _authority_path(root, authority.get("project_registry"), label="project_registry")
-    _authority_path(root, authority.get("ecosystem_catalog"), label="ecosystem_catalog")
-    _authority_path(root, authority.get("current_roadmap"), label="current_roadmap")
-    _authority_directory(root, authority.get("research_ledger_root"), label="research_ledger_root")
+    adr_path = _authority_path(
+        root,
+        authority.get("global_architecture_registry"),
+        label="global_architecture_registry",
+        snapshot=snapshot,
+    )
+    projects_path = _authority_path(root, authority.get("project_registry"), label="project_registry", snapshot=snapshot)
+    _authority_path(root, authority.get("ecosystem_catalog"), label="ecosystem_catalog", snapshot=snapshot)
+    _authority_path(root, authority.get("current_roadmap"), label="current_roadmap", snapshot=snapshot)
+    _authority_directory(root, authority.get("research_ledger_root"), label="research_ledger_root", snapshot=snapshot)
     adr_registry = _load_toml(adr_path)
     projects_registry = _load_toml(projects_path)
     return config, adr_registry, projects_registry
 
 
-def validate_adr_registry(root: Path, registry: dict[str, Any]) -> dict[str, dict[str, Any]]:
+def validate_adr_registry(
+    root: Path,
+    registry: dict[str, Any],
+    *,
+    snapshot: RepositorySnapshot | None = None,
+) -> dict[str, dict[str, Any]]:
+    snapshot = _snapshot_for(root, snapshot)
     if registry.get("schema_version") != SCHEMA_VERSION:
         raise ProjectContextError("unsupported ADR registry schema_version")
     records = _require_list(registry.get("adr"), "ADR registry adr")
@@ -799,7 +888,7 @@ def validate_adr_registry(root: Path, registry: dict[str, Any]) -> dict[str, dic
         if status not in ADR_STATUSES:
             raise ProjectContextError(f"unknown ADR status: {status}")
         _as_string(record.get("authority_scope"), f"ADR {adr_id} authority_scope")
-        _authority_path(root, record.get("path"), label=f"ADR {adr_id} path")
+        _authority_path(root, record.get("path"), label=f"ADR {adr_id} path", snapshot=snapshot)
         by_id[adr_id] = record
     current = [record for record in by_id.values() if record["status"] == "CURRENT_GLOBAL"]
     if len(current) != 1:
@@ -843,7 +932,13 @@ def validate_adr_registry(root: Path, registry: dict[str, Any]) -> dict[str, dic
     return by_id
 
 
-def validate_projects_registry(root: Path, registry: dict[str, Any]) -> dict[str, dict[str, Any]]:
+def validate_projects_registry(
+    root: Path,
+    registry: dict[str, Any],
+    *,
+    snapshot: RepositorySnapshot | None = None,
+) -> dict[str, dict[str, Any]]:
+    snapshot = _snapshot_for(root, snapshot)
     if registry.get("schema_version") != SCHEMA_VERSION:
         raise ProjectContextError("unsupported projects registry schema_version")
     records = _require_list(registry.get("project"), "projects registry project")
@@ -868,7 +963,7 @@ def validate_projects_registry(root: Path, registry: dict[str, Any]) -> dict[str
         if not artifacts:
             raise ProjectContextError(f"project {project_id} requires authoritative_artifacts")
         for artifact in artifacts:
-            _authority_path(root, artifact, label=f"project {project_id} authoritative artifact")
+            _authority_path(root, artifact, label=f"project {project_id} authoritative artifact", snapshot=snapshot)
         by_id[project_id] = record
         edges[project_id] = set()
     active = [record for record in by_id.values() if record["state"] == "ACTIVE"]
@@ -910,6 +1005,15 @@ def validate_projects_registry(root: Path, registry: dict[str, Any]) -> dict[str
     for project_id in sorted(by_id):
         visit(project_id)
     return by_id
+
+
+def _validated_context(root: Path, *, snapshot: RepositorySnapshot | None = None) -> ValidatedContext:
+    root = root.resolve()
+    snapshot = _snapshot_for(root, snapshot)
+    config, adr_registry, projects_registry = load_context_sources(root, snapshot=snapshot)
+    adrs = validate_adr_registry(root, adr_registry, snapshot=snapshot)
+    projects = validate_projects_registry(root, projects_registry, snapshot=snapshot)
+    return ValidatedContext(root, snapshot, config, adr_registry, projects_registry, adrs, projects)
 
 
 def _context_sources(config: dict[str, Any]) -> dict[str, dict[str, Any]]:
@@ -1088,11 +1192,30 @@ def _architecture_conflicts(normalized: dict[str, Any], config: dict[str, Any], 
     return sorted(conflicts, key=lambda conflict: (conflict["code"], conflict["detail"])), north_star
 
 
-def _foundation(root: Path) -> tuple[dict[str, Any], dict[str, dict[str, Any]], dict[str, Any], dict[str, Any], list[dict[str, str]], dict[str, Any] | None]:
+def _foundation(
+    root: Path,
+    *,
+    validated_context: ValidatedContext | None = None,
+    snapshot: RepositorySnapshot | None = None,
+) -> tuple[dict[str, Any], dict[str, dict[str, Any]], dict[str, Any], dict[str, Any], list[dict[str, str]], dict[str, Any] | None]:
     """Load and reconcile the foundation without reading worktree Git state."""
-    config, adr_registry, _ = load_context_sources(root)
-    catalog_path = _authority_path(root, config["authority"]["ecosystem_catalog"], label="ecosystem_catalog")
-    adrs = validate_adr_registry(root, adr_registry)
+    root = root.resolve()
+    if validated_context is not None:
+        if validated_context.root != root:
+            raise ProjectContextError("validated context root does not match requested root")
+        snapshot = validated_context.snapshot
+        config = validated_context.config
+        adrs = validated_context.adrs
+    else:
+        snapshot = _snapshot_for(root, snapshot)
+        config, adr_registry, _ = load_context_sources(root, snapshot=snapshot)
+        adrs = validate_adr_registry(root, adr_registry, snapshot=snapshot)
+    catalog_path = _authority_path(
+        root,
+        config["authority"]["ecosystem_catalog"],
+        label="ecosystem_catalog",
+        snapshot=snapshot,
+    )
     normalized = validate_ecosystem_catalog(config, _load_toml(catalog_path))
     global_adr = next(record for record in adrs.values() if record["status"] == "CURRENT_GLOBAL")
     conflicts, north_star = _architecture_conflicts(normalized, config, adrs, global_adr)
@@ -1159,13 +1282,26 @@ def _external_repository_views(
     return records, conflicts
 
 
-def _project_orientation(root: Path) -> dict[str, Any]:
+def _project_orientation(
+    root: Path,
+    *,
+    validated_context: ValidatedContext | None = None,
+    snapshot: RepositorySnapshot | None = None,
+) -> dict[str, Any]:
     """Project-scoped code references, with explicit partial-coverage semantics."""
-    _, _, projects_registry = load_context_sources(root)
-    projects = validate_projects_registry(root, projects_registry)
+    root = root.resolve()
+    if validated_context is not None:
+        if validated_context.root != root:
+            raise ProjectContextError("validated context root does not match requested root")
+        snapshot = validated_context.snapshot
+        projects = validated_context.projects
+    else:
+        snapshot = _snapshot_for(root, snapshot)
+        _, _, projects_registry = load_context_sources(root, snapshot=snapshot)
+        projects = validate_projects_registry(root, projects_registry, snapshot=snapshot)
     module_inventory = sorted(
         path
-        for path in _git_bytes(root, "ls-files", "--cached", "-z", "--", "qntylab/").decode("utf-8").split("\0")
+        for path in snapshot.tracked_paths
         if path.startswith("qntylab/") and path.endswith(".py")
     )
     rows = []
@@ -1196,7 +1332,12 @@ def _project_orientation(root: Path) -> dict[str, Any]:
     }
 
 
-def compile_context_spine(root: Path, *, external_roots: dict[str, Path] | None = None) -> dict[str, Any]:
+def _compile_context_spine(
+    root: Path,
+    *,
+    external_roots: dict[str, Path] | None,
+    validated_context: ValidatedContext,
+) -> dict[str, Any]:
     """Compile the read-only Context Spine foundation packet.
 
     The local foundation is derived from canonical local repository bytes. Any
@@ -1204,7 +1345,10 @@ def compile_context_spine(root: Path, *, external_roots: dict[str, Path] | None 
     remains bounded by that adapter's contract.
     """
     root = root.resolve()
-    config, adrs, normalized, global_adr, conflicts, north_star = _foundation(root)
+    config, adrs, normalized, global_adr, conflicts, north_star = _foundation(
+        root,
+        validated_context=validated_context,
+    )
     sources = _context_sources(config)
     git = _git_state(root)
     compiled_inputs = sorted({CONFIG_SOURCE_PATH, *(config["authority"][key] for key in COMPILED_AUTHORITY_KEYS)})
@@ -1240,7 +1384,7 @@ def compile_context_spine(root: Path, *, external_roots: dict[str, Path] | None 
             "companions": [_adr_view(adrs[adr_id]) for adr_id in sorted(adrs) if adrs[adr_id]["status"] == "CURRENT_GLOBAL_COMPANION"],
         },
         "repository": {key: local[key] for key in repository_keys},
-        "project_orientation": _project_orientation(root),
+        "project_orientation": _project_orientation(root, validated_context=validated_context),
         "external_repositories": external,
         "context_sources": sorted(sources.values(), key=lambda source: (source["precedence_rank"], source["source_id"])),
         "conflicts": conflicts,
@@ -1254,20 +1398,36 @@ def compile_context_spine(root: Path, *, external_roots: dict[str, Path] | None 
     }
 
 
+def compile_context_spine(
+    root: Path,
+    *,
+    external_roots: dict[str, Path] | None = None,
+    snapshot: RepositorySnapshot | None = None,
+    validated_context: ValidatedContext | None = None,
+) -> dict[str, Any]:
+    context = validated_context or _validated_context(root, snapshot=snapshot)
+    return _compile_context_spine(root, external_roots=external_roots, validated_context=context)
+
+
 def context_spine_bytes(root: Path, *, external_roots: dict[str, Path] | None = None) -> bytes:
     """Canonical serialization of the Context Spine packet, without a newline."""
     return _canonical_json(compile_context_spine(root, external_roots=external_roots))
 
 
-def doctor(root: Path) -> list[str]:
+def doctor(
+    root: Path,
+    *,
+    snapshot: RepositorySnapshot | None = None,
+    validated_context: ValidatedContext | None = None,
+) -> list[str]:
     try:
-        config, adr_registry, projects_registry = load_context_sources(root)
-        validate_adr_registry(root, adr_registry)
-        projects = validate_projects_registry(root, projects_registry)
-        projection = execution_authority_projection(root, projects)
+        context = validated_context or _validated_context(root, snapshot=snapshot)
+        config = context.config
+        projects = context.projects
+        projection = execution_authority_projection(root, projects, snapshot=context.snapshot)
         if projection["issues"]:
             raise ProjectContextError("execution authority projection conflict: " + "; ".join(projection["issues"]))
-        packet = compile_context_spine(root)
+        packet = _compile_context_spine(root, external_roots=None, validated_context=context)
         if packet["packet_status"] != CONTEXT_SPINE_COMPILED:
             raise ProjectContextError("context spine conflict: " + "; ".join(f"{item['code']}: {item['detail']}" for item in packet["conflicts"]))
         data = config.get("data")
@@ -1312,12 +1472,18 @@ def _research_summary(root: Path, config: dict[str, Any]) -> dict[str, Any]:
         return {"canonical_source": config["authority"]["research_ledger_root"], "error": str(exc)}
 
 
-def context_data(root: Path) -> dict[str, Any]:
+def context_data(
+    root: Path,
+    *,
+    snapshot: RepositorySnapshot | None = None,
+    validated_context: ValidatedContext | None = None,
+) -> dict[str, Any]:
     root = root.resolve()
-    config, adr_registry, projects_registry = load_context_sources(root)
-    adrs = validate_adr_registry(root, adr_registry)
-    projects = validate_projects_registry(root, projects_registry)
-    projection = execution_authority_projection(root, projects)
+    context = validated_context or _validated_context(root, snapshot=snapshot)
+    config = context.config
+    adrs = context.adrs
+    projects = context.projects
+    projection = execution_authority_projection(root, projects, snapshot=context.snapshot)
     if projection["issues"]:
         raise ProjectContextError("execution authority projection conflict: " + "; ".join(projection["issues"]))
     global_adr = next(record for record in adrs.values() if record["status"] == "CURRENT_GLOBAL")
@@ -1361,13 +1527,23 @@ def context_data(root: Path) -> dict[str, Any]:
         "research_ledger": _research_summary(root, config),
         "future_dataset_registry": config["data"],
         "authority_domains": [{"domain": domain, "source": source} for domain, source in AUTHORITY_DOMAINS],
-        "authority_conflicts_or_warnings": doctor(root),
+        "authority_conflicts_or_warnings": doctor(root, validated_context=context),
     }
 
 
-def _roadmap_bytes(root: Path) -> bytes:
-    _, _, projects_registry = load_context_sources(root)
-    projects = validate_projects_registry(root, projects_registry)
+def _roadmap_bytes(
+    root: Path,
+    *,
+    validated_context: ValidatedContext | None = None,
+    snapshot: RepositorySnapshot | None = None,
+) -> bytes:
+    if validated_context is not None:
+        projects = validated_context.projects
+    else:
+        root = root.resolve()
+        snapshot = _snapshot_for(root, snapshot)
+        _, _, projects_registry = load_context_sources(root, snapshot=snapshot)
+        projects = validate_projects_registry(root, projects_registry, snapshot=snapshot)
     groups = (("Active", "ACTIVE"), ("Queued — not authorized", "PLANNED_NOT_AUTHORIZED"), ("Closed / stale", None))
     lines = [
         "# GENERATED — DO NOT EDIT BY HAND",
@@ -1393,7 +1569,13 @@ def _roadmap_bytes(root: Path) -> bytes:
     return ("\n".join(lines)).encode("utf-8")
 
 
-def _generated_view_destination(root: Path, config: dict[str, Any], view: str) -> Path:
+def _generated_view_destination(
+    root: Path,
+    config: dict[str, Any],
+    view: str,
+    *,
+    snapshot: RepositorySnapshot | None = None,
+) -> Path:
     """The one path this compiler may write for ``view``, or a closed failure.
 
     The destination is taken from :data:`GENERATED_VIEW_DESTINATIONS`;
@@ -1421,22 +1603,29 @@ def _generated_view_destination(root: Path, config: dict[str, Any], view: str) -
     # Resolved through the same guard as every other authority source, so the
     # supported path must still be a Git-tracked, non-symlink file inside this
     # repository before any byte is written to it.
-    return _authority_path(root, supported, label=key)
+    return _authority_path(root, supported, label=key, snapshot=snapshot)
 
 
-def render(root: Path, *, check: bool) -> int:
-    config, _, _ = load_context_sources(root)
+def render(
+    root: Path,
+    *,
+    check: bool,
+    snapshot: RepositorySnapshot | None = None,
+    validated_context: ValidatedContext | None = None,
+) -> int:
+    context = validated_context or _validated_context(root, snapshot=snapshot)
+    config = context.config
     # Resolving the destination is the first thing that happens and the only
     # thing that decides where bytes may land, so an unauthorized target is
     # rejected before a single repository byte can be produced or written.
-    path = _generated_view_destination(root, config, CURRENT_ROADMAP_VIEW)
+    path = _generated_view_destination(root, config, CURRENT_ROADMAP_VIEW, snapshot=context.snapshot)
     # ADR-0007 stops architecture-affecting mutation while canonical sources
     # conflict, so a generated view is never rewritten during a conflict.  The
     # reconciliation alone is enough here, and it leaves the Git index untouched.
-    if _foundation(root)[4]:
+    if _foundation(root, validated_context=context)[4]:
         print(f"project context error: {ARCHITECTURE_CONFLICT}; roadmap generation is blocked", file=sys.stderr)
         return 1
-    expected = _roadmap_bytes(root)
+    expected = _roadmap_bytes(root, validated_context=context)
     if check:
         if path.read_bytes() != expected:
             print("project context error: generated roadmap is stale; run python -m qntylab.project_context render", file=sys.stderr)
@@ -1807,8 +1996,9 @@ def main(argv: list[str] | None = None) -> None:
     args = _parser().parse_args(argv)
     root = args.root.resolve()
     try:
+        snapshot = RepositorySnapshot.acquire(root)
         if args.command == "doctor":
-            issues = doctor(root)
+            issues = doctor(root, snapshot=snapshot)
             if issues:
                 for issue in issues:
                     print(f"SOURCE_CONFLICT: {issue}", file=sys.stderr)
@@ -1816,16 +2006,24 @@ def main(argv: list[str] | None = None) -> None:
             print("project context ok")
             return
         if args.command == "render":
-            raise SystemExit(render(root, check=args.check))
+            raise SystemExit(render(root, check=args.check, snapshot=snapshot))
         if args.command == "spine":
-            packet = compile_context_spine(root, external_roots=_parse_external_roots(args.external_roots))
+            packet = compile_context_spine(
+                root,
+                external_roots=_parse_external_roots(args.external_roots),
+                snapshot=snapshot,
+            )
             sys.stdout.buffer.write(_canonical_json(packet) + b"\n")
             raise SystemExit(0 if packet["packet_status"] == CONTEXT_SPINE_COMPILED else 1)
         if args.command == "brief":
-            packet = compile_context_spine(root, external_roots=_parse_external_roots(args.external_roots))
+            packet = compile_context_spine(
+                root,
+                external_roots=_parse_external_roots(args.external_roots),
+                snapshot=snapshot,
+            )
             print(brief_text(packet))
             raise SystemExit(0 if packet["packet_status"] == CONTEXT_SPINE_COMPILED else 1)
-        data = context_data(root)
+        data = context_data(root, snapshot=snapshot)
         if args.as_json:
             sys.stdout.buffer.write(_canonical_json(data) + b"\n")
         else:

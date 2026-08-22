@@ -6021,9 +6021,9 @@ next_action = "Review and merge this authorization PR before any live execution;
 [[project]]
 project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0"
 display_name = "DSH Stage-A V1R3R2 one-episode live execution activation V0"
-state = "CLOSED_PASS"
-authority_level = "GOVERNANCE_BOUNDED_LIVE_EXECUTION_ACTIVATION"
-phase_type = "GOVERNANCE_ONLY"
+state = "CLOSED_BLOCKED"
+authority_level = "BOUNDED_ONE_EPISODE_DSH_STAGE_A_V1R3R2_EXECUTION_CLOSED_BLOCKED_AUTHORITY"
+phase_type = "BOUNDED_LIVE_INFRASTRUCTURE_EXECUTION"
 authoritative_artifacts = [
   "AGENTS.md",
   "docs/state/projects.toml",
@@ -6032,6 +6032,9 @@ authoritative_artifacts = [
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0/activation.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0/hostile_governance_review.md",
   "tests/test_dsh_stage_a_v1r3r2_one_episode_live_execution_v0.py",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_result_v0/execution_evidence.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_result_v0/closure.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_result_v0/hostile_review.md",
 ]
 authorization_state = "AUTHORIZED_IF_CANONICAL"
 authorization_effective = "AFTER_CANONICAL_MERGE_ONLY"
@@ -6128,5 +6131,5 @@ hostile_governance_high_total = 0
 hostile_governance_medium_total = 0
 hostile_governance_low_total = 0
 targeted_governance_rereview_used = false
-terminal_outcome = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_ACTIVATION_READY"
-next_action = "Review and merge this activation PR; then execute exactly one V1R3R2 live episode and create one draft closure PR. Do not read the secret, invoke DSH, call OpenAI, or create the claim during activation construction."
+terminal_outcome = "BLOCK_AUTHORITY"
+next_action = "CLOSED_BLOCKED: canonical project-context and registry evidence report no active V1R3R2 execution project, contradicting the activation artifact's active_execution_project semantics. The episode stopped before secret read, claim creation, provider I/O, DSH invocation, fixture execution, and spend. No rescue, activation repair, claim, second episode, or Stage B is authorized; any later attempt requires new Git-backed authority."

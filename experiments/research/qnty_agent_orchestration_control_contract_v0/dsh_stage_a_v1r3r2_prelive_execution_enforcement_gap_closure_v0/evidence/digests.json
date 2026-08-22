@@ -1,0 +1,37 @@
+{
+  "artifact_type": "DSH_STAGE_A_V1R3R2_PRELIVE_REPAIRED_IDENTITY",
+  "schema_version": "dsh-stage-a-v1r3r2-prelive-repaired-identity-v0",
+  "project_id": "DSH_STAGE_A_V1R3R2_PRELIVE_EXECUTION_ENFORCEMENT_GAP_CLOSURE_V0",
+  "RUNTIME_BYTES_CHANGED": false,
+  "LAUNCH_POLICY_CHANGED": true,
+  "QUALIFIED_IDENTITY_COVERED_BYTES_CHANGED": true,
+  "OLD_QUALIFIED_DIGEST": "57162eb65a4177ae58c6b503110dfe802ae345c3e6e9c3963acd207f693fbcc1",
+  "OLD_QUALIFIED_DIGEST_STILL_VALID": false,
+  "NEW_RUNTIME_MANIFEST_DIGEST": "afcfa011de46bd9fccaa120b5612c24a5ace2b2c451591ddf8b67fb43a8ce321",
+  "NEW_EXECUTABLE_IDENTITY_DIGEST": "ae07ece34c88b3ebaebd7452df8d136c82935f9c8ec9df16a40e50a2582a2fd9",
+  "NEW_LAUNCH_POLICY_DIGEST": "024256a6dd2fbce6e883a73d9d2df01e3b2b21f738c7ca700c86cca13bd1ec73",
+  "NEW_QUALIFIED_LAUNCH_CONTRACT_DIGEST": "e3b623c58d0ce591baa9d0e07d9cf4dd802203d34a4a1b1521d29f75ca302ffa",
+  "identity_interpretation": {
+    "runtime_and_executable_components_reused_unchanged": true,
+    "new_runtime_and_executable_digests_equal_predecessor": true,
+    "repaired_launch_policy_is_new_and_supersedes_old_contract": true,
+    "all_repaired_production_enforcement_files_bound": true
+  },
+  "production_file_digests": {
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/evidence/canonical-json.mjs": "751202c0bd2149fb2ba19a0b40da8b95eec96ef77298b59fcf33f3b31c2b9e70",
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/evidence/compute-digests.mjs": "80d0a369bdcb69b9e878fd13534971f267a39a32a110128a7d3709df30dcd4e5",
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/launcher/qntylab-launch-dsh.mjs": "26cdb310ebf742765710e44f0be676f88c6b3c7efbcefe825bf4870e50ead4cb",
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/profile/cordis.patch.yml": "0f170f31034879a7d79c7b8cf7ef80fbecbfee6fddd6752b259d9719a49d8dad",
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/profile/qntylab-stage-a-gated-provider/lib/gated-provider.mjs": "6149cf6bf82b30f1e19aee455081edb1d7ee76071d0169250193bf69c0ee3776",
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/profile/qntylab-stage-a-gated-provider/lib/index.js": "f9f435b6ceeaf9502c686b435056e308104ef68e175520ed139d655d5d5b7720",
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/profile/qntylab-stage-a-gated-provider/package.json": "30d4ccbf89e35696bd9f1bfafa7bcf98a45e829725496b6a4c5c4a91c421d9c7",
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/profile/qntylab-stage-a-parent-enforcement/lib/guard.mjs": "3666ae5a21d5c064fb086a407317ffadb289cd9c1b8acd75aa17a89f44a7a41d",
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/profile/qntylab-stage-a-parent-enforcement/lib/index.js": "5447eb8db7e937f1d1188417200a98778ea75f8b9a8ae1d3c2b375301454c856",
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/profile/qntylab-stage-a-parent-enforcement/package.json": "24f1104d6c2952ae247ffe9a8543eff239c159c67fa569c8070608227b14c7ab",
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/stub/native-child-stub.mjs": "ba7171e1367d2e61fc9328240f240ac2936fef3746ce3f0d42e646731efb6e98",
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/stub/offline-stub.patch.yml": "4dace55659bc087fe0c0fc2bdb69dc1a7e3669a97724bc0dc5c3da30f30fc174",
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/stub/qntylab-stage-a-stub-provider/lib/index.js": "868876f68e692bfde5469b2ffb2611ce4344db63c9e057a1b84717a619d550dc",
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/stub/qntylab-stage-a-stub-provider/package.json": "488ea3a7420488dcc04dc00f046239bd1d9ff18b91a7382dd60fc6e941c1af2e",
+    "qntylab/dsh_stage_a_v1r3r2_prelive_enforcement.py": "5935aae551d1307d12e803a1caba52b83c7e7d19b53077e88f56d53210dc4555"
+  }
+}

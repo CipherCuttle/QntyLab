@@ -1,0 +1,10 @@
+{
+  "name": "@qntylab/dsh-stage-a-parent-enforcement",
+  "private": true,
+  "type": "module",
+  "main": "lib/index.js",
+  "dependencies": {
+    "@deepseek-ai/dsh-llm": "link:../../../../packages/llm/llm",
+    "@deepseek-ai/schemastery": "link:../../../../vendor/schemastery"
+  }
+}

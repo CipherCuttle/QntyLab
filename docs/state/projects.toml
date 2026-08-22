@@ -6504,3 +6504,76 @@ targeted_governance_rereview_used = true
 active_project_after_closure = "NONE"
 terminal_outcome = "OFFLINE_ENFORCEMENT_GAP_CLOSURE_AUTHORIZED_IF_CANONICAL"
 next_action = "CLOSED_PASS: after canonical merge, perform exactly one DSH_STAGE_A_V1R3R2_PRELIVE_EXECUTION_ENFORCEMENT_GAP_CLOSURE_V0 offline implementation phase. Prove or minimally repair child sequencing, parent attempt/token/spend enforcement, at-most-once claim semantics, sentinel-secret isolation, and the full-profile live-equivalent offline seams. Requalify at most once and only if a covered runtime or policy identity changes. Do not activate or execute V0R2, read a real secret, create a real claim, perform real provider/model I/O, spend money, modify or merge PR #189, or grant Stage B, Qnty, trading, capital, scientific, promotion, production, or live authority."
+
+[[project]]
+project_id = "DSH_STAGE_A_V1R3R2_PRELIVE_EXECUTION_ENFORCEMENT_GAP_CLOSURE_V0"
+display_name = "DSH Stage-A V1R3R2 prelive execution-enforcement gap closure V0"
+state = "CLOSED_PASS"
+authority_level = "BOUNDED_OFFLINE_EXECUTION_CONTROL_ENGINEERING_AND_CONDITIONAL_REQUALIFICATION"
+phase_type = "OFFLINE_EXECUTION_CONTROL_IMPLEMENTATION_AND_REQUALIFICATION"
+implementation_authorized = false
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/PHASE.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/diagnosis.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/qualification.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/evidence/digests.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/hostile_review.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/closure.json",
+  "qntylab/dsh_stage_a_v1r3r2_prelive_enforcement.py",
+  "tests/test_dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0.py",
+]
+authorization_project_id = "DSH_STAGE_A_V1R3R2_PRELIVE_EXECUTION_ENFORCEMENT_GAP_CLOSURE_AUTHORIZATION_V0"
+authorization_canonical_origin_master = "3a51a044895bd974de14d611e5055dee478e905c"
+authorization_verified_before_modification = true
+implementation_completed = true
+runtime_bytes_changed = false
+launch_policy_changed = true
+qualified_identity_covered_bytes_changed = true
+old_qualified_launch_contract_digest = "57162eb65a4177ae58c6b503110dfe802ae345c3e6e9c3963acd207f693fbcc1"
+old_qualified_digest_still_valid = false
+new_runtime_manifest_digest = "afcfa011de46bd9fccaa120b5612c24a5ace2b2c451591ddf8b67fb43a8ce321"
+new_executable_identity_digest = "ae07ece34c88b3ebaebd7452df8d136c82935f9c8ec9df16a40e50a2582a2fd9"
+new_launch_policy_digest = "024256a6dd2fbce6e883a73d9d2df01e3b2b21f738c7ca700c86cca13bd1ec73"
+new_qualified_launch_contract_digest = "e3b623c58d0ce591baa9d0e07d9cf4dd802203d34a4a1b1521d29f75ca302ffa"
+qualification_runs = 1
+full_profile_offline_adversarial_test = "PASS"
+claim_concurrency = "PASS"
+claim_partial_failure = "FAIL_CLOSED_PASS"
+secret_sentinel_leaks = 0
+provider_internal_retries = 0
+parent_request_max = 8
+max_output_tokens = 4096
+parent_openai_authorized_spend_cap_usd = 1.0
+held_pr = 189
+held_pr_modified = false
+pr189_status = "SUPERSEDED_NOT_MERGEABLE"
+hostile_review_count = 1
+hostile_review_critical_total = 1
+hostile_review_high_total = 1
+hostile_review_medium_total = 2
+hostile_review_low_total = 0
+hostile_review_critical_repaired = 1
+hostile_review_high_repaired = 1
+targeted_rereview_used = true
+targeted_rereview_critical_total = 0
+targeted_rereview_high_total = 1
+targeted_rereview_high_repaired = 1
+open_critical = 0
+open_high = 0
+real_secret_reads = 0
+real_claims_created = 0
+provider_or_model_requests = 0
+construction_spend_usd = 0.0
+live_execution_authorized = false
+activation_authorized = false
+stage_b_authorized = false
+qnty_runtime_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+scientific_execution_or_promotion_authorized = false
+production_deployment_authorized = false
+terminal_outcome = "PRELIVE_EXECUTION_ENFORCEMENT_GAPS_CLOSED_AND_REQUALIFIED_OFFLINE"
+next_action = "CLOSED_PASS: after canonical merge, only a fresh Git-backed V0R2 live-execution authorization explicitly bound to repaired qualified contract e3b623c58d0ce591baa9d0e07d9cf4dd802203d34a4a1b1521d29f75ca302ffa may be constructed. Do not activate Stage-A, execute an episode, read a real secret, create a real claim, call a provider/model, spend, merge PR #189, or begin the next phase automatically."

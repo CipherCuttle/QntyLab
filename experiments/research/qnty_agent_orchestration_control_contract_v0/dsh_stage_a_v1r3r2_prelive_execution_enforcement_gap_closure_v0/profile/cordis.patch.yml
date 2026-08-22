@@ -1,0 +1,132 @@
+# Stage-A V1R3R2 phase-local prelive enforcement profile.
+- id: llm-pi-ai
+  config:
+    providers:
+      openai:
+        apiKeyEnv: OPENAI_API_KEY
+        baseURL: !!js process.env.QNTYLAB_DSH_PARENT_ENDPOINT
+        api: openai-completions
+        timeoutMs: !!js Number(process.env.QNTYLAB_DSH_PARENT_TIMEOUT_MS)
+        retryPolicy:
+          mode: normal
+          maxRetries: 0
+        models:
+          - id: gpt-5-mini
+            name: gpt-5-mini
+            contextWindow: 128000
+            maxTokens: 4096
+- id: agent-default-model
+  config:
+    provider: openai
+    model: gpt-5-mini
+    maxTokens: 4096
+- id: session-title-llm
+  disabled: true
+- id: llm-retry
+  disabled: true
+- id: compaction-basic
+  disabled: true
+- id: command-compact
+  disabled: true
+- insert:
+    - id: subagent-codex
+      name: '@deepseek-ai/dsh-subagent-codex'
+      config:
+        env:
+          PATH: !!js process.env.QNTYLAB_DSH_NATIVE_PATH
+    - id: subagent-claude-code
+      name: '@deepseek-ai/dsh-subagent-claude-code'
+      config:
+        env:
+          PATH: !!js process.env.QNTYLAB_DSH_NATIVE_PATH
+    - id: qntylab-stage-a-gated-codex
+      name: '@qntylab/dsh-stage-a-gated-provider'
+      config:
+        providerName: qntylab-stage-a-gated-codex
+        rawProvider: codex
+        toolName: subagent_codex
+        statePath: !!js process.env.QNTYLAB_DSH_STAGE_A_CHILD_STATE_PATH
+        qntyLabRoot: !!js process.env.QNTYLAB_ROOT
+        pythonExecutable: !!js process.env.QNTYLAB_PYTHON
+    - id: qntylab-stage-a-gated-claude
+      name: '@qntylab/dsh-stage-a-gated-provider'
+      config:
+        providerName: qntylab-stage-a-gated-claude
+        rawProvider: claude-code
+        toolName: subagent_claude_code
+        statePath: !!js process.env.QNTYLAB_DSH_STAGE_A_CHILD_STATE_PATH
+        qntyLabRoot: !!js process.env.QNTYLAB_ROOT
+        pythonExecutable: !!js process.env.QNTYLAB_PYTHON
+    - id: qntylab-stage-a-parent-enforcement
+      name: '@qntylab/dsh-stage-a-parent-enforcement'
+      config:
+        budgetStatePath: !!js process.env.QNTYLAB_DSH_PARENT_BUDGET_STATE_PATH
+        claimStateDir: !!js process.env.QNTYLAB_DSH_CLAIM_STATE_DIR
+        claimRemote: !!js process.env.QNTYLAB_DSH_CLAIM_REMOTE
+        claimRef: !!js process.env.QNTYLAB_DSH_CLAIM_REF
+        claimSourceRepo: !!js process.env.QNTYLAB_DSH_CLAIM_SOURCE_REPO
+        sessionNonce: !!js process.env.QNTYLAB_DSH_SESSION_NONCE
+        qntyLabRoot: !!js process.env.QNTYLAB_ROOT
+        pythonExecutable: !!js process.env.QNTYLAB_PYTHON
+    - id: tool-subagent-codex
+      name: '@deepseek-ai/dsh-tool-subagent'
+      config:
+        provider: qntylab-stage-a-gated-codex
+        toolName: subagent_codex
+        enableRunInBackground: false
+        backgroundMode: one-shot
+        maxDepth: provider-managed
+    - id: tool-subagent-claude-code
+      name: '@deepseek-ai/dsh-tool-subagent'
+      config:
+        provider: qntylab-stage-a-gated-claude
+        toolName: subagent_claude_code
+        enableRunInBackground: false
+        backgroundMode: one-shot
+        maxDepth: provider-managed
+- id: subagent-spawn-in-process
+  disabled: true
+- id: subagent-fork-in-process
+  disabled: true
+- id: tool-subagent-control
+  disabled: true
+- id: tool-subagent-list-agents
+  disabled: true
+- id: tool-subagent
+  disabled: true
+- id: tool-subagent-fork
+  disabled: true
+- id: tool-subagent-report
+  disabled: true
+- id: workflow-worker-thread
+  disabled: true
+- id: tool-workflow
+  disabled: true
+- id: tool-ralph
+  disabled: true
+- id: tool-bash
+  disabled: true
+- id: tool-pwsh
+  disabled: true
+- id: tool-jobs
+  disabled: true
+- id: tool-fs
+  disabled: true
+- id: tool-fs-search
+  disabled: true
+- id: tool-skill
+  disabled: true
+- id: tool-todo
+  disabled: true
+- id: tool-goal
+  disabled: true
+- id: tool-str-replace-editor
+  disabled: true
+- id: tool-web
+  disabled: true
+- id: web-search-deepseek
+  disabled: true
+- id: web
+  disabled: true
+- id: plan-mode
+  disabled: true

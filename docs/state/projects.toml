@@ -6428,3 +6428,79 @@ execution_targeted_rereview_used = false
 terminal_outcome = "BLOCK_PARENT_INFRA"
 terminal_outcome_basis = "The required provider secret was unavailable after every non-secret action-time gate passed; the episode stopped before claim creation, provider I/O, DSH invocation, child calls, fixture execution, and spend."
 next_action = "CLOSED_BLOCKED: the required provider secret was unavailable at the action-time secret gate. The one episode remains unclaimed and unconsumed; no replay, second episode, claim repair, Stage B, Qnty, trading, capital, promotion, or scientific authority is authorized. Any later attempt requires new Git-backed authority."
+
+[[project]]
+project_id = "DSH_STAGE_A_V1R3R2_PRELIVE_EXECUTION_ENFORCEMENT_GAP_CLOSURE_AUTHORIZATION_V0"
+display_name = "DSH Stage-A V1R3R2 prelive execution-enforcement gap-closure authorization V0"
+state = "CLOSED_PASS"
+authority_level = "BOUNDED_OFFLINE_EXECUTION_CONTROL_ENGINEERING_AND_CONDITIONAL_REQUALIFICATION"
+phase_type = "GOVERNANCE_ONLY_AUTHORIZATION_CONSTRUCTION"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_authorization_v0/authorization.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_authorization_v0/hostile_governance_review.md",
+  "tests/test_dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_authorization_v0.py",
+]
+authorization_state = "AUTHORIZED_IF_CANONICAL"
+authorization_effective = "AFTER_CANONICAL_MERGE_ONLY"
+future_implementation_project_id = "DSH_STAGE_A_V1R3R2_PRELIVE_EXECUTION_ENFORCEMENT_GAP_CLOSURE_V0"
+implementation_authorized = false
+implementation_completed = true
+future_implementation_authorized_after_canonicalization = true
+branch_local_authority_effective = false
+canonical_base_sha = "276c1706c02bdb4fcc0d3e688c371e20fcee2065"
+canonical_predecessor_project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R1"
+canonical_predecessor_pr = 188
+canonical_predecessor_reviewed_head = "6c3434ac02051e1f9d3a3baa02a6103e2693a406"
+canonical_predecessor_merge = "276c1706c02bdb4fcc0d3e688c371e20fcee2065"
+canonical_predecessor_state = "CLOSED_BLOCKED"
+v0r1_episode_claimed = false
+v0r1_episode_consumed = false
+held_pr = 189
+held_pr_head = "aa6b383c41a68e52f35c3c0e1fcae61e7cf0004d"
+held_pr_canonical = false
+held_pr_modified = false
+held_pr_substitution_allowed = false
+v0r1_authority_substitution_allowed = false
+live_execution_authorized = false
+activation_authorized = false
+real_secret_read_authorized = false
+real_claim_authorized = false
+real_provider_io_authorized = false
+spend_authorized_usd = 0.0
+offline_runtime_repair_authorized_after_canonicalization = true
+offline_full_profile_test_authorized_after_canonicalization = true
+disposable_claim_test_authorized_after_canonicalization = true
+sentinel_secret_test_authorized_after_canonicalization = true
+conditional_requalification_authorized_after_canonicalization = true
+requalification_only_if_covered_identity_changes = true
+current_qualified_launch_contract_digest = "57162eb65a4177ae58c6b503110dfe802ae345c3e6e9c3963acd207f693fbcc1"
+runtime_files_modified = 0
+qualification_runs = 0
+activation_artifacts_created = 0
+real_secret_reads = 0
+real_claims_created = 0
+provider_or_model_requests = 0
+live_dsh_codex_or_claude_invocations = 0
+construction_spend_usd = 0.0
+stage_b_authorized = false
+qnty_runtime_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+scientific_execution_or_promotion_authorized = false
+production_deployment_authorized = false
+architecture_relevance = "NOT_REQUIRED_WITHIN_EXISTING_ADR_0008_BOUNDARY"
+qnty_agent_eval = "NO_MATCH"
+hostile_review_count = 1
+hostile_review_verdict = "PASS"
+hostile_governance_critical_total = 0
+hostile_governance_high_total = 1
+hostile_governance_high_repaired = 1
+hostile_governance_open_critical = 0
+hostile_governance_open_high = 0
+targeted_governance_rereview_used = true
+active_project_after_closure = "NONE"
+terminal_outcome = "OFFLINE_ENFORCEMENT_GAP_CLOSURE_AUTHORIZED_IF_CANONICAL"
+next_action = "CLOSED_PASS: after canonical merge, perform exactly one DSH_STAGE_A_V1R3R2_PRELIVE_EXECUTION_ENFORCEMENT_GAP_CLOSURE_V0 offline implementation phase. Prove or minimally repair child sequencing, parent attempt/token/spend enforcement, at-most-once claim semantics, sentinel-secret isolation, and the full-profile live-equivalent offline seams. Requalify at most once and only if a covered runtime or policy identity changes. Do not activate or execute V0R2, read a real secret, create a real claim, perform real provider/model I/O, spend money, modify or merge PR #189, or grant Stage B, Qnty, trading, capital, scientific, promotion, production, or live authority."

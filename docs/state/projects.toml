@@ -5763,9 +5763,9 @@ next_action = "Review and merge this authorization PR before any live execution;
 [[project]]
 project_id = "DSH_STAGE_A_V1R3R1_ONE_EPISODE_LIVE_EXECUTION_V0"
 display_name = "DSH Stage-A V1R3R1 one-episode live execution activation V0"
-state = "CLOSED_PASS"
-authority_level = "GOVERNANCE_BOUNDED_LIVE_EXECUTION_ACTIVATION"
-phase_type = "GOVERNANCE_ONLY"
+state = "CLOSED_BLOCKED"
+authority_level = "BOUNDED_ONE_EPISODE_DSH_STAGE_A_V1R3R1_EXECUTION_CLOSED_BLOCKED_CHILD_INFRA"
+phase_type = "BOUNDED_LIVE_INFRASTRUCTURE_EXECUTION"
 authoritative_artifacts = [
   "AGENTS.md",
   "docs/state/projects.toml",
@@ -5774,6 +5774,9 @@ authoritative_artifacts = [
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_one_episode_live_execution_v0/activation.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_one_episode_live_execution_v0/hostile_governance_review.md",
   "tests/test_dsh_stage_a_v1r3r1_one_episode_live_execution_v0.py",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_one_episode_live_execution_result_v0/execution_evidence.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_one_episode_live_execution_result_v0/closure.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_one_episode_live_execution_result_v0/hostile_review.md",
 ]
 authorization_state = "AUTHORIZED_IF_CANONICAL"
 authorization_effective = "AFTER_CANONICAL_MERGE_ONLY"
@@ -5828,4 +5831,5 @@ trading_authority = "NONE"
 capital_authority = "NONE"
 qnty_agent_eval = "NOT_APPLICABLE"
 active_project_after_closure = "NONE"
-next_action = "CLOSED_PASS: review and merge this activation PR; after canonical merge, separately establish the durable claim and pass all prelive gates before exactly one later episode. Do not read the secret, invoke DSH, call OpenAI, or create the claim during activation construction."
+terminal_outcome = "BLOCK_CHILD_INFRA"
+next_action = "CLOSED_BLOCKED: the exact prelive runtime and fixture gates passed, but the pinned Claude child adapter does not enforce the authorized hard read-only Read/Glob/Grep surface. The episode stopped before secret read, claim creation, provider I/O, DSH invocation, fixture execution, and spend. No rescue, runtime repair, claim, second episode, or Stage B is authorized; any later attempt requires new Git-backed authority."

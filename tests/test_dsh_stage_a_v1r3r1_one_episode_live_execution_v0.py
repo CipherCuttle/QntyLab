@@ -80,16 +80,17 @@ def test_activation_does_not_consume_episode_or_expand_authority():
     assert closure["qnty_agent_eval"] == "NOT_APPLICABLE"
 
 
-def test_project_context_keeps_activation_governance_closed_and_inactive():
+def test_project_context_keeps_execution_closed_blocked_and_inactive():
     _, _, registry = project_context.load_context_sources(ROOT)
     projects = project_context.validate_projects_registry(ROOT, registry)
     active = [record for record in projects.values() if record["state"] == "ACTIVE"]
     assert active == []
     record = projects["DSH_STAGE_A_V1R3R1_ONE_EPISODE_LIVE_EXECUTION_V0"]
-    assert record["state"] == "CLOSED_PASS"
+    assert record["state"] == "CLOSED_BLOCKED"
     assert record["implementation_authorized"] is False
     assert record["implementation_completed"] is True
     assert record["activation_authorized_after_canonicalization"] is True
     assert record["episode_consumed"] is False
     assert record["authorized_live_episodes"] == 1
     assert record["claim_must_precede_provider_io"] is True
+    assert record["terminal_outcome"] == "BLOCK_CHILD_INFRA"

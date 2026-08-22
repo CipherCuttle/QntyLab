@@ -1,0 +1,132 @@
+{
+  "schema_version": "dsh-stage-a-v1r3r1-one-episode-live-execution-result-v0",
+  "project_id": "DSH_STAGE_A_V1R3R1_ONE_EPISODE_LIVE_EXECUTION_V0",
+  "terminal_outcome": "BLOCK_CHILD_INFRA",
+  "canonical": {
+    "master": "552788ce4d3163aa07b436d128386357deb82fe3",
+    "authorization_pr": 178,
+    "authorization_canonical_merge": "401a5a22a759673a99c66cc30c502279f9ed111b",
+    "activation_pr": 179,
+    "activation_head": "ea0de97849a97613b354ec0da1a0a4fd5af4eb21",
+    "activation_canonical_merge": "552788ce4d3163aa07b436d128386357deb82fe3",
+    "source_conflict": false
+  },
+  "authority": {
+    "project_id": "DSH_STAGE_A_V1R3R1_ONE_EPISODE_LIVE_EXECUTION_V0",
+    "activation_effective_after_canonicalization": true,
+    "implementation_authorized_at_start": true,
+    "implementation_completed_at_start": false,
+    "authorized_live_episodes": 1,
+    "episode_consumed_at_start": false,
+    "second_episode_authorized": false,
+    "whole_episode_retry_allowed": false,
+    "execution_closure_pr_budget": 1
+  },
+  "prelive": {
+    "non_secret_gates": "BLOCKED",
+    "remote_claim_ref": "refs/heads/qntylab-claims/dsh-stage-a-v1r3r1-one-episode-live-execution-v0",
+    "remote_claim_ref_absent_at_start": true,
+    "remote_claim_dry_run_create_capability": "PASS",
+    "local_o_excl_receipt_capability": "PASS",
+    "secret_read_before_gates": false,
+    "qualified_launch_contract_digest": "4cd2734f229a97d4258ace4576f23f76f3d36aeef888a19fa61d2f4a7bff37d4",
+    "runtime_manifest_digest": "de0cc23e5e71c034f6cd403627452305338d32a29a3282c71fd2315d005fd314",
+    "executable_identity_digest": "ae07ece34c88b3ebaebd7452df8d136c82935f9c8ec9df16a40e50a2582a2fd9",
+    "launch_policy_digest": "b73a3932d6f8f32966de717076cde532a7b6a8472685ffbc7383c73cd7bcafa1",
+    "dsh_commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "dsh_tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "dsh_tag": "dsh-v0.1.0-rc.7",
+    "node_version": "v22.22.0",
+    "python_version": "Python 3.14.4",
+    "pnpm_declared": "pnpm@11.7.0",
+    "pnpm_actual": "11.22.0",
+    "codex_identity": "codex-cli 0.148.0",
+    "claude_identity": "2.1.223 (Claude Code)",
+    "claude_sdk": "@anthropic-ai/claude-agent-sdk 0.3.220",
+    "fresh_pristine_materialization": "PASS",
+    "fixture_identity": "PASS",
+    "workspace_containment": "PASS",
+    "provider": "openai",
+    "model": "gpt-5-mini",
+    "model_facing_tools": ["subagent_codex", "subagent_claude_code"],
+    "generic_child_tools": [],
+    "parent_request_ceiling": 8,
+    "retry_policy": {"llm_retries": 0, "provider_retry": 0, "automatic_continuation": false},
+    "spend_ceiling_usd": 1.0,
+    "child_ceilings": {"codex": 2, "claude": 2},
+    "timeout_seconds": 1800,
+    "blocker": {
+      "layer": "CHILD_INFRASTRUCTURE",
+      "exact_failure_class": "CLAUDE_HARD_READ_ONLY_POLICY_NOT_ENFORCED",
+      "observed_pinned_source": "packages/subagent/subagent-claude-code/src/run.ts",
+      "observed_behavior": "Claude SDK options set disallowedTools to ['AskUserQuestion'] only; the authorized allowedTools ['Read','Glob','Grep'] and the required Write/Edit/Bash/Agent/Task/MCP/delegation denials are not enforced.",
+      "required_behavior": "Claude child must be hard read-only with only Read, Glob, and Grep.",
+      "observed_before_secret_read": true,
+      "observed_before_remote_claim": true,
+      "observed_before_provider_io": true
+    }
+  },
+  "claim": {
+    "mechanism": "REMOTE_GIT_REF_PLUS_O_EXCL_RECEIPT",
+    "remote_claim_created": false,
+    "local_o_excl_receipt_created": false,
+    "claimed_before_provider_io": false,
+    "episode_claimed": false,
+    "episode_consumed": false
+  },
+  "live": {
+    "started": false,
+    "parent_provider": "openai",
+    "parent_model": "gpt-5-mini",
+    "parent_request_attempts": 0,
+    "parent_wire_requests": 0,
+    "parent_spend_usd": 0.0,
+    "llm_retries": 0,
+    "codex_child_calls": 0,
+    "claude_child_calls": 0,
+    "children_quiescent": true,
+    "timeout_result": "NOT_REACHED"
+  },
+  "secret": {
+    "real_secret_read": false,
+    "secret_value_recorded": false,
+    "secret_derived_identifier_recorded": false,
+    "parent_secret_reached_child": false
+  },
+  "fixture": {
+    "id": "STAGE_A_BOUNDED_RETRY_V0",
+    "expected_workspace": "/tmp/qntylab-dsh-stage-a-v1r3r1-live-sC8GUA/workspace",
+    "actual_session_cwd": "NOT_STARTED",
+    "workspace_match": "NOT_REACHED",
+    "initial_hashes": {
+      "TASK.md": "19571f8c70364e41ae8366cd07b0f56546845c8b3f43b04f93634f75f9a6a6ff",
+      "retry.py": "f82a84088b76dd82ead87d5536f8120d62e7c4408c27fcbe59662155b5dd47ae",
+      "tests/test_retry.py": "caf317035b37a6606ff7b2250cf0b1cc6a1e8db7660414bf280eda4ddee641ac"
+    },
+    "post_hashes": {
+      "TASK.md": "19571f8c70364e41ae8366cd07b0f56546845c8b3f43b04f93634f75f9a6a6ff",
+      "retry.py": "f82a84088b76dd82ead87d5536f8120d62e7c4408c27fcbe59662155b5dd47ae",
+      "tests/test_retry.py": "caf317035b37a6606ff7b2250cf0b1cc6a1e8db7660414bf280eda4ddee641ac"
+    },
+    "mutated_paths": [],
+    "immutable_paths_unchanged": true,
+    "frozen_fixture_tests": "NOT_REACHED"
+  },
+  "timing": {
+    "started_at": "NOT_STARTED",
+    "ended_at": "NOT_STARTED",
+    "duration": "NOT_STARTED"
+  },
+  "closure": {
+    "project_state_after": "CLOSED_BLOCKED",
+    "implementation_authorized_after": false,
+    "implementation_completed_after": true,
+    "active_projects_after": "NONE",
+    "stage_b_authorized": false,
+    "qnty_runtime_authority": "NONE",
+    "trading_authority": "NONE",
+    "capital_authority": "NONE",
+    "scientific_execution_authorized": false,
+    "qnty_agent_eval": "NOT_APPLICABLE"
+  }
+}

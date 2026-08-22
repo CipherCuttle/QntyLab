@@ -378,6 +378,19 @@ def execution_authority_projection(
         activation_state = _lookup(activation, ("active_execution_project", "state"))
         if record.get("state") == "ACTIVE":
             issues.extend(_projection_parity_issues(activation, record, include_lifecycle=True))
+            activation_authorized = _lookup(activation, ("active_execution_project", "implementation_authorized"))
+            activation_completed = _lookup(activation, ("active_execution_project", "implementation_completed"))
+            activation_consumed = _lookup(activation, ("active_execution_project", "episode_consumed"))
+            if activation_authorized is not True:
+                # ACTIVE is a lifecycle label, not executable authority by
+                # itself; an explicitly unauthorized row remains inactive.
+                continue
+            if activation_completed is not False or activation_consumed is not False:
+                issues.append(
+                    f"active execution project {record['project_id']} has invalid lifecycle "
+                    "(authorized ACTIVE rows must be incomplete and unconsumed)"
+                )
+                continue
             if not identity["effective"]:
                 continue
             active_projects.append(record)

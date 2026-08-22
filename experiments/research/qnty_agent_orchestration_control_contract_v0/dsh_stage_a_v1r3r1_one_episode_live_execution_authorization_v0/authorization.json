@@ -1,0 +1,183 @@
+{
+  "artifact_type": "DSH_STAGE_A_V1R3R1_ONE_EPISODE_LIVE_EXECUTION_AUTHORIZATION",
+  "schema_version": "dsh-stage-a-v1r3r1-one-episode-live-execution-authorization-v0",
+  "project_id": "DSH_STAGE_A_V1R3R1_ONE_EPISODE_LIVE_EXECUTION_AUTHORIZATION_V0",
+  "phase_state": "CLOSED_PASS",
+  "authorization_state": "AUTHORIZED_IF_CANONICAL",
+  "authorization_effective": "AFTER_CANONICAL_MERGE_ONLY",
+  "authority_level": "BOUNDED_ONE_EPISODE_DSH_STAGE_A_LIVE_EXECUTION_ONLY",
+  "authorized_operation": "EXACTLY_ONE_STAGE_A_V1R3R1_LIVE_EPISODE",
+  "canonicalization": {
+    "canonical_repository": "QntyLab",
+    "candidate_base_sha": "57bf0ec0072077cc32055300c516133fff0b7c20",
+    "branch_local_artifact_does_not_self_authorize": true,
+    "canonical_presence_required_before_execution": true,
+    "no_auto_merge": true,
+    "scope": "One later Stage-A live episode under this exact contract; no general DSH execution authority."
+  },
+  "canonical_predecessor": {
+    "project_id": "DSH_STAGE_A_V1R3R1_REAL_RUNTIME_QUALIFICATION_V0",
+    "pr": 177,
+    "reviewed_head": "17a7c2b9df724b4bf09b6eab5c1e40ae21a5ebd8",
+    "merge": "57bf0ec0072077cc32055300c516133fff0b7c20",
+    "required_state": "CLOSED_PASS",
+    "qualification_sha256": "85a345c2d1a9c3517b55a8fbb4bccf78855217dab9e32586c2771f10b1e86c31",
+    "binding_mismatch_behavior": "BLOCK_AUTH"
+  },
+  "qualified_launch_contract": {
+    "digest": "4cd2734f229a97d4258ace4576f23f76f3d36aeef888a19fa61d2f4a7bff37d4",
+    "superseded_digests": {
+      "3bf649f5cbdd96dcc0edf91cd7dfb88b3245ff3617518c9d5da3dfbd5a01a18e": "SUPERSEDED_INVALID_DIGEST_CANONICALIZATION"
+    },
+    "runtime_manifest_digest": "de0cc23e5e71c034f6cd403627452305338d32a29a3282c71fd2315d005fd314",
+    "executable_identity_digest": "ae07ece34c88b3ebaebd7452df8d136c82935f9c8ec9df16a40e50a2582a2fd9",
+    "launch_policy_digest": "b73a3932d6f8f32966de717076cde532a7b6a8472685ffbc7383c73cd7bcafa1",
+    "qualification_artifact": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/qualification.json",
+    "qualification_artifacts_are_authoritative": true,
+    "mismatch_behavior": "BLOCK_BEFORE_SECRET_READ_AND_MODEL_IO"
+  },
+  "pinned_dsh_identity": {
+    "repository": "deepseek-ai/deepseek-harness",
+    "commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "tag": "dsh-v0.1.0-rc.7",
+    "moving_tag_or_branch_allowed": false,
+    "later_commit_allowed": false
+  },
+  "episode_authority": {
+    "live_episodes_max": 1,
+    "episode_consumed_initial": false,
+    "second_episode_allowed": false,
+    "whole_episode_retry_allowed": false,
+    "claim_boundary": "Before the first potentially paid parent OpenAI adapter dispatch, atomically durably claim the sole episode.",
+    "claim_must_precede_adapter_io": true,
+    "claim_is_permanent_after_irreversible_dispatch": true,
+    "crash_restart_behavior": "A claimed episode cannot be replayed under this authority.",
+    "timeout_behavior": "If the claim boundary has been crossed, the episode is consumed; timeout never grants another episode."
+  },
+  "parent_authority": {
+    "provider": "openai",
+    "model": "gpt-5-mini",
+    "route": "llm-pi-ai",
+    "max_request_attempts": 8,
+    "retry_policy": {"llm_retries": 0, "provider_retry": 0, "automatic_continuation": false},
+    "max_tokens_per_request": 4096,
+    "max_total_spend_usd": 1.0,
+    "reservation_before_adapter_io": true,
+    "attempt_9": "BLOCK_COST_BEFORE_PROVIDER_IO",
+    "alternate_provider_allowed": false,
+    "model_substitution_allowed": false,
+    "auxiliary_model_routes": [],
+    "title_generation_route": false,
+    "compaction_model_route": false
+  },
+  "child_authority": {
+    "model_facing_tools": ["subagent_codex", "subagent_claude_code"],
+    "generic_child_tools": [],
+    "alternate_delegation_routes": [],
+    "background_delegation": false,
+    "ruflo_or_swarm_routes": false,
+    "codex_calls_max": 2,
+    "claude_calls_max": 2,
+    "child_retry_beyond_counted_invocation": false,
+    "quiescence_required_before_settlement": true
+  },
+  "child_execution_policies": {
+    "codex": {
+      "route": "codex app-server --stdio",
+      "absolute_executable_binding_required": true,
+      "path_reresolution_at_action_time": false,
+      "workspace_write_scope": "disposable Stage-A fixture workspace only",
+      "qntylab_repository_mutation": false
+    },
+    "claude": {
+      "native_identity_required": true,
+      "read_only": true,
+      "allowed_tools": ["Read", "Glob", "Grep"],
+      "disallowed_tools": ["Write", "Edit", "Bash", "Agent", "Task", "MCP", "delegation"],
+      "qntylab_repository_mutation": false
+    }
+  },
+  "runtime_identity": {
+    "node_executable_digest": "1bec56ef7cfa9a76f3e0b7c0a87f220eb73f23102b9c0b4c7529a3f7c3ce7c31",
+    "python_executable_digest": "b8d8288faefdd300201f43fcf00f6f539a27218eeed3a3dff5ab10b9c4c99700",
+    "pnpm_declared": "pnpm@11.7.0",
+    "pnpm_actual": "11.22.0",
+    "pnpm_executable_digest": "7c2a67995976b5b592b611d8b236e3b0633bd654fb49aedd96c6eb7ce04c9cbb",
+    "codex_executable_digest": "ac2cfed85fb647d61e0150b8548102b330e4799d9d81ad5d354de701edf6b074",
+    "claude_executable_digest": "98226474f802e3094d6a86c5ade8883c16206d0fcb5c400b7401c800063e99d7",
+    "claude_sdk": {"package": "@anthropic-ai/claude-agent-sdk", "version": "0.3.220", "package_json_digest": "1c9d0905f64e126850efe4fc4e7244c604a0855de8d4c82aff78da6f1988bd08"},
+    "all_identities_must_match_qualification": true
+  },
+  "fixture": {
+    "fixture_id": "STAGE_A_BOUNDED_RETRY_V0",
+    "root": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_authorization_v0/fixture",
+    "fixture_digest": "397ed055f2fb5cd14fd4c0b54fc21994c688f6cf56f07fb073d4e3257cd47552",
+    "fixture_digest_basis": "sha256 of canonical JSON for initial_file_digests_sha256",
+    "initial_file_digests_sha256": {
+      "fixture/TASK.md": "19571f8c70364e41ae8366cd07b0f56546845c8b3f43b04f93634f75f9a6a6ff",
+      "fixture/retry.py": "f82a84088b76dd82ead87d5536f8120d62e7c4408c27fcbe59662155b5dd47ae",
+      "fixture/tests/test_retry.py": "caf317035b37a6606ff7b2250cf0b1cc6a1e8db7660414bf280eda4ddee641ac"
+    },
+    "mutable_paths_in_disposable_copy": ["retry.py"],
+    "immutable_paths": ["TASK.md", "tests/test_retry.py"],
+    "outside_fixture_mutation_allowed": false,
+    "fresh_disposable_copy_required": true
+  },
+  "workspace_policy": {
+    "fresh_disposable_workspace_required": true,
+    "session_cwd_must_equal_workspace": true,
+    "realpath_symlink_aware_containment_required": true,
+    "forbidden_workspace_roots": ["QntyLab", "Qnty", "QntyAgentEval", "DSH source/runtime", "operator home", "~/.dsh", "~/.codex", "~/.claude"],
+    "explicit_disposable_dsh_home_required": true,
+    "ambient_dsh_home_forbidden": true,
+    "caller_cwd_is_irrelevant": true
+  },
+  "prelive_gate": {
+    "secret_read_required": false,
+    "secret_read_allowed_only_after_all_non_secret_gates": true,
+    "ordered_gates": [
+      "canonical Git authority", "authorization project", "unconsumed episode", "qualified launch digest", "DSH commit/tree/tag", "runtime manifest", "launcher/materializer/repair identities", "Node", "Python", "pnpm", "Codex", "Claude", "Claude SDK", "fresh fixture", "fixture clean", "workspace containment", "disposable DSH_HOME", "provider/model", "exact child tool surface", "request budget", "spend ceiling", "retry policy", "child ceilings", "receipt/state paths", "no prior episode claim"
+    ],
+    "any_failure": "BLOCK_BEFORE_SECRET_READ"
+  },
+  "secret_policy": {
+    "authorization_phase_secret_read": false,
+    "secret_value_recorded": false,
+    "secret_derived_identifiers_recorded": false,
+    "future_secret_source": "operator-managed external Stage-A OpenAI credential; value and derived identifiers are never recorded",
+    "real_secret_read_receipt_field": "REAL_SECRET_READ",
+    "secret_must_not_reach_child_processes": true
+  },
+  "receipt_schema": {
+    "required_fields": ["AUTHORIZATION_PROJECT_ID", "AUTHORIZATION_COMMIT", "AUTHORIZATION_CANONICAL_MERGE", "QUALIFIED_LAUNCH_CONTRACT_DIGEST", "DSH_COMMIT", "DSH_TREE", "DSH_TAG", "RUNTIME_MANIFEST_DIGEST", "LAUNCH_POLICY_DIGEST", "EXECUTABLE_IDENTITY_DIGEST", "FIXTURE_ID", "FIXTURE_DIGEST", "EPISODE_CLAIMED", "EPISODE_CONSUMED", "PARENT_PROVIDER", "PARENT_MODEL", "PARENT_REQUEST_ATTEMPTS", "PARENT_WIRE_REQUESTS", "PARENT_SPEND_USD", "CODEX_CHILD_CALLS", "CLAUDE_CHILD_CALLS", "ACTUAL_SESSION_CWD", "EXPECTED_WORKSPACE", "WORKSPACE_MATCH", "REAL_SECRET_READ", "SECRET_VALUE_RECORDED", "STARTED_AT", "ENDED_AT", "DURATION", "TERMINAL_RESULT"],
+    "secret_material_allowed": false
+  },
+  "terminal_result_categories": ["PASS", "BLOCK_PARENT_INFRA", "BLOCK_CHILD_INFRA", "BLOCK_COST", "BLOCK_AUTHORITY", "BLOCK_RUNTIME_IDENTITY", "BLOCK_FIXTURE_IDENTITY", "BLOCK_TIMEOUT", "FAIL_TASK", "FAIL_ORCHESTRATION", "FAIL_SETTLEMENT"],
+  "wall_clock": {"live_episode_timeout_seconds": 1800, "timeout_allows_rerun": false},
+  "governance_boundary": {
+    "stage_b_authorized": false,
+    "qnty_runtime_authority": "NONE",
+    "trading_authority": "NONE",
+    "capital_authority": "NONE",
+    "scientific_execution_authorized": false,
+    "qnty_agent_eval": "NOT_APPLICABLE",
+    "authorization_phase_live_dsh_calls": 0,
+    "authorization_phase_paid_model_calls": 0,
+    "authorization_phase_codex_child_turns": 0,
+    "authorization_phase_claude_child_turns": 0,
+    "authorization_phase_spend_usd": 0.0,
+    "live_execution_during_authorization_phase": false
+  },
+  "review_policy": {"authorization_hostile_review_count": 1, "targeted_rereview_only_if_critical_or_high_repair": true, "medium_low_do_not_restart": true},
+  "execution_authority_after_construction": {
+    "available": true,
+    "state": "UNCONSUMED_ONE_EPISODE_AVAILABLE_IF_CANONICAL",
+    "implementation_authorized": false,
+    "implementation_completed": true,
+    "active_project_after_closure": "NONE",
+    "future_execution_result_recorded": false,
+    "stage_b_requires_separate_decision": true
+  },
+  "qnty_agent_eval": "NOT_APPLICABLE"
+}

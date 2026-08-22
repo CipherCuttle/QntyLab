@@ -126,6 +126,8 @@ CONTEXT_SPINE_PROHIBITIONS = (
 
 EXECUTION_CANONICAL_REF = "refs/remotes/origin/master"
 DSH_STAGE_A_V1R3R2_ACTIVATION_SCHEMA = "dsh-stage-a-v1r3r2-one-episode-live-execution-activation-v0"
+DSH_STAGE_A_V1R3R2_AUTHORIZATION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_AUTHORIZATION_V0R1"
+DSH_STAGE_A_V1R3R2_EXECUTION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R1"
 _MISSING = object()
 
 # These are the fields that form one execution-authority view.  The activation
@@ -185,6 +187,14 @@ _RUNTIME_IDENTITY_FIELDS = (
     ("claude_repair_digest", ("runtime_identity", "claude_repair_digest"), ("claude_repair_digest",)),
     ("superseded_digest_rejected", ("runtime_identity", "superseded_digest_rejected"), ("superseded_launch_digest_rejected",)),
     ("fixture_digest", ("fixture", "fixture_digest"), ("fixture_digest",)),
+)
+_FRESH_AUTHORIZATION_FIELDS = (
+    ("authorization_project_id", ("authorization_identity", "project_id"), ("authorization_project_id",)),
+    ("authorization_candidate_commit", ("authorization_identity", "candidate_commit"), ("authorization_candidate_commit",)),
+    ("authorization_canonical_merge", ("authorization_identity", "canonical_merge"), ("authorization_canonical_merge",)),
+    ("authorization_artifact", ("authorization_identity", "artifact"), ("authorization_artifact",)),
+    ("episode_id", ("episode_identity", "episode_id"), ("episode_id",)),
+    ("claim_ref", ("episode_identity", "claim_ref"), ("claim_ref",)),
 )
 
 
@@ -277,6 +287,206 @@ def _projection_parity_issues(
                 f"activation/registry projection mismatch for {label}: "
                 f"activation={activation_value!r}, registry={registry_value!r}"
             )
+    return issues
+
+
+def _fresh_v0r1_binding_issues(
+    root: Path,
+    activation: dict[str, Any],
+    record: dict[str, Any],
+    identity: dict[str, Any],
+) -> list[str]:
+    """Enforce the fresh V0R1 authorization and pre-claim boundary.
+
+    The generic #185 projection contract binds an activation to its registry
+    row.  This small V0R1 extension binds that paired view to the exact fresh
+    authorization artifact as well, so a parity-preserving historical or
+    branch-local substitute cannot become effective authority.
+    """
+    if record.get("project_id") != DSH_STAGE_A_V1R3R2_EXECUTION_ID:
+        return []
+
+    issues: list[str] = []
+    for label, activation_path, registry_path in _FRESH_AUTHORIZATION_FIELDS:
+        activation_value = _lookup(activation, activation_path)
+        registry_value = _lookup(record, registry_path)
+        if activation_value is _MISSING or registry_value is _MISSING:
+            issues.append(f"fresh V0R1 binding missing {label}")
+        elif activation_value != registry_value:
+            issues.append(
+                f"fresh V0R1 binding mismatch for {label}: "
+                f"activation={activation_value!r}, registry={registry_value!r}"
+            )
+
+    authorization = activation.get("authorization_identity")
+    if not isinstance(authorization, dict):
+        return [*issues, "fresh V0R1 authorization identity must be an object"]
+    if authorization.get("project_id") != DSH_STAGE_A_V1R3R2_AUTHORIZATION_ID:
+        issues.append("fresh V0R1 activation cannot substitute historical authorization")
+    if activation.get("project_id") != DSH_STAGE_A_V1R3R2_EXECUTION_ID:
+        issues.append("fresh V0R1 activation project identity is invalid")
+    canonical_predecessor_merge = _lookup(activation, ("canonicalization", "canonical_predecessor_merge"))
+    if authorization.get("canonical_merge") != canonical_predecessor_merge:
+        issues.append("fresh V0R1 authorization canonical merge does not match activation predecessor")
+    if authorization.get("canonical_merge") != record.get("canonical_predecessor_merge"):
+        issues.append("fresh V0R1 authorization canonical merge does not match registry predecessor")
+    candidate_commit = authorization.get("candidate_commit")
+    canonical_sha = identity.get("canonical_sha")
+    if not isinstance(candidate_commit, str) or not candidate_commit:
+        issues.append("fresh V0R1 authorization candidate commit is missing")
+    elif not isinstance(canonical_sha, str) or not canonical_sha or not _git_succeeds(
+        root, "merge-base", "--is-ancestor", candidate_commit, canonical_sha
+    ):
+        issues.append("fresh V0R1 authorization candidate is not in canonical origin/master")
+
+    artifact_value = authorization.get("artifact")
+    if not isinstance(artifact_value, str):
+        issues.append("fresh V0R1 authorization artifact is missing")
+    else:
+        authorization_path = _authority_path(root, artifact_value, label="fresh V0R1 authorization artifact")
+        authorization_document = _load_json_authority(
+            authorization_path, label="fresh V0R1 authorization artifact"
+        )
+        if authorization_document.get("project_id") != authorization.get("project_id"):
+            issues.append("fresh V0R1 authorization artifact identity does not match activation")
+        if authorization_document.get("execution_project_id") != activation.get("project_id"):
+            issues.append("fresh V0R1 authorization execution identity does not match activation")
+        auth_canonicalization = authorization_document.get("canonicalization")
+        if not isinstance(auth_canonicalization, dict):
+            issues.append("fresh V0R1 authorization canonicalization is missing")
+        else:
+            if auth_canonicalization.get("future_activation_project_id") != activation.get("project_id"):
+                issues.append("fresh V0R1 authorization future activation identity is not artifact-bound")
+            if auth_canonicalization.get("authorization_does_not_activate") is not True:
+                issues.append("fresh V0R1 authorization must not self-activate")
+        if _lookup(activation, ("canonicalization", "candidate_base_sha")) != candidate_commit:
+            issues.append("fresh V0R1 activation candidate base is not authorization-bound")
+
+        contract = authorization_document.get("qualified_launch_contract")
+        pinned = authorization_document.get("pinned_dsh_identity")
+        runtime = activation.get("runtime_identity")
+        if not isinstance(contract, dict) or not isinstance(pinned, dict) or not isinstance(runtime, dict):
+            issues.append("fresh V0R1 qualified runtime binding is incomplete")
+        else:
+            repairs = contract.get("repair_digests")
+            if not isinstance(repairs, dict):
+                issues.append("fresh V0R1 qualified runtime repair binding is incomplete")
+                repairs = {}
+            runtime_bindings = {
+                "repository": (runtime.get("repository"), pinned.get("repository")),
+                "commit": (runtime.get("commit"), pinned.get("commit")),
+                "tree": (runtime.get("tree"), pinned.get("tree")),
+                "tag": (runtime.get("tag"), pinned.get("tag")),
+                "qualified_launch_contract_digest": (runtime.get("qualified_launch_contract_digest"), contract.get("digest")),
+                "runtime_manifest_digest": (runtime.get("runtime_manifest_digest"), contract.get("runtime_manifest_digest")),
+                "executable_identity_digest": (runtime.get("executable_identity_digest"), contract.get("executable_identity_digest")),
+                "launch_policy_digest": (runtime.get("launch_policy_digest"), contract.get("launch_policy_digest")),
+                "codex_repair_digest": (runtime.get("codex_repair_digest"), repairs.get("codex")),
+                "claude_repair_digest": (runtime.get("claude_repair_digest"), repairs.get("claude")),
+            }
+            for label, (actual, expected) in runtime_bindings.items():
+                if actual != expected:
+                    issues.append(f"fresh V0R1 authorization/runtime mismatch for {label}")
+
+        episode_authority = authorization_document.get("episode_authority")
+        active_project = activation.get("active_execution_project")
+        if not isinstance(episode_authority, dict) or not isinstance(active_project, dict):
+            issues.append("fresh V0R1 episode authority binding is incomplete")
+        else:
+            episode_bindings = {
+                "authorized_live_episodes": (active_project.get("authorized_live_episodes"), episode_authority.get("live_episodes_max")),
+                "second_episode_authorized": (active_project.get("second_episode_authorized"), episode_authority.get("second_episode_allowed")),
+                "whole_episode_retry_allowed": (active_project.get("whole_episode_retry_allowed"), episode_authority.get("whole_episode_retry_allowed")),
+            }
+            for label, (actual, expected) in episode_bindings.items():
+                if actual != expected:
+                    issues.append(f"fresh V0R1 authorization/episode mismatch for {label}")
+
+        parent = activation.get("parent_authority")
+        authorized_parent = authorization_document.get("parent_authority")
+        if not isinstance(parent, dict) or not isinstance(authorized_parent, dict):
+            issues.append("fresh V0R1 parent budget binding is incomplete")
+        else:
+            retry_policy = authorized_parent.get("retry_policy")
+            if not isinstance(retry_policy, dict):
+                issues.append("fresh V0R1 authorization retry policy binding is incomplete")
+                retry_policy = {}
+            parent_bindings = {
+                "provider": (parent.get("provider"), authorized_parent.get("provider")),
+                "model": (parent.get("model"), authorized_parent.get("model")),
+                "route": (parent.get("route"), authorized_parent.get("route")),
+                "max_request_attempts": (parent.get("max_request_attempts"), authorized_parent.get("max_request_attempts")),
+                "max_tokens_per_request": (parent.get("max_tokens_per_request"), authorized_parent.get("max_tokens_per_request")),
+                "max_total_spend_usd": (parent.get("max_total_spend_usd"), authorized_parent.get("max_total_spend_usd")),
+                "llm_retries": (parent.get("llm_retries"), retry_policy.get("llm_retries")),
+                "provider_retry": (parent.get("provider_retry"), retry_policy.get("provider_retry")),
+                "automatic_continuation": (parent.get("automatic_continuation"), retry_policy.get("automatic_continuation")),
+            }
+            for label, (actual, expected) in parent_bindings.items():
+                if actual != expected:
+                    issues.append(f"fresh V0R1 authorization/parent budget mismatch for {label}")
+
+        child = activation.get("child_authority")
+        authorized_child = authorization_document.get("child_authority")
+        if child != authorized_child:
+            issues.append("fresh V0R1 authorization/child budget mismatch")
+
+        authorized_policies = authorization_document.get("child_execution_policies")
+        authorized_claude = authorized_policies.get("claude") if isinstance(authorized_policies, dict) else None
+        claude = activation.get("claude_policy")
+        claude_bindings = {
+            "allowed_tools": (claude.get("allowed_tools") if isinstance(claude, dict) else _MISSING, authorized_claude.get("allowed_tools") if isinstance(authorized_claude, dict) else _MISSING),
+            "denied_tools": (claude.get("denied_tools") if isinstance(claude, dict) else _MISSING, authorized_claude.get("disallowed_tools") if isinstance(authorized_claude, dict) else _MISSING),
+            "write_allowed": (claude.get("write_allowed") if isinstance(claude, dict) else _MISSING, authorized_claude.get("write_allowed") if isinstance(authorized_claude, dict) else _MISSING),
+            "edit_allowed": (claude.get("edit_allowed") if isinstance(claude, dict) else _MISSING, authorized_claude.get("edit_allowed") if isinstance(authorized_claude, dict) else _MISSING),
+            "bash_allowed": (claude.get("bash_allowed") if isinstance(claude, dict) else _MISSING, authorized_claude.get("bash_allowed") if isinstance(authorized_claude, dict) else _MISSING),
+            "agent_allowed": (claude.get("agent_allowed") if isinstance(claude, dict) else _MISSING, authorized_claude.get("agent_allowed") if isinstance(authorized_claude, dict) else _MISSING),
+            "task_allowed": (claude.get("task_allowed") if isinstance(claude, dict) else _MISSING, authorized_claude.get("task_allowed") if isinstance(authorized_claude, dict) else _MISSING),
+            "mcp_allowed": (claude.get("mcp_allowed") if isinstance(claude, dict) else _MISSING, authorized_claude.get("mcp_allowed") if isinstance(authorized_claude, dict) else _MISSING),
+        }
+        for label, (actual, expected) in claude_bindings.items():
+            if actual != expected:
+                issues.append(f"fresh V0R1 authorization/Claude policy mismatch for {label}")
+
+    episode = activation.get("episode_identity")
+    claim = activation.get("claim_contract")
+    if not isinstance(episode, dict) or not isinstance(claim, dict):
+        issues.append("fresh V0R1 episode and claim identities are required")
+    else:
+        if episode.get("episode_count") != 1 or episode.get("episode_consumed") is not False:
+            issues.append("fresh V0R1 activation must bind exactly one unconsumed episode")
+        if episode.get("claim_ref") != claim.get("remote_claim_ref"):
+            issues.append("fresh V0R1 episode and claim references disagree")
+        if claim.get("remote_claim_exists") is not False or claim.get("local_claim_exists") is not False:
+            issues.append("fresh V0R1 existing claim state fails closed")
+        if claim.get("created_during_activation_construction") is not False:
+            issues.append("fresh V0R1 activation construction cannot create a claim")
+
+    construction = activation.get("construction_receipts")
+    if not isinstance(construction, dict):
+        issues.append("fresh V0R1 construction receipts are missing")
+    else:
+        for field in ("remote_claim_created", "local_claim_created", "episode_claimed", "episode_consumed"):
+            if construction.get(field) is not False:
+                issues.append(f"fresh V0R1 construction receipt {field} must be false")
+
+    firewall = activation.get("authority_firewall")
+    expected_firewall = {
+        "stage_b_authorized": False,
+        "qnty_runtime_authority": "NONE",
+        "trading_authority": "NONE",
+        "capital_authority": "NONE",
+        "scientific_execution_authorized": False,
+        "promotion_authority": "NONE",
+        "qnty_agent_eval": "NOT_APPLICABLE",
+    }
+    if not isinstance(firewall, dict):
+        issues.append("fresh V0R1 downstream authority firewall is missing")
+    else:
+        for field, expected in expected_firewall.items():
+            if firewall.get(field) != expected:
+                issues.append(f"fresh V0R1 downstream firewall is not closed for {field}")
+
     return issues
 
 
@@ -378,6 +588,7 @@ def execution_authority_projection(
         activation_state = _lookup(activation, ("active_execution_project", "state"))
         if record.get("state") == "ACTIVE":
             issues.extend(_projection_parity_issues(activation, record, include_lifecycle=True))
+            issues.extend(_fresh_v0r1_binding_issues(root, activation, record, identity))
             activation_authorized = _lookup(activation, ("active_execution_project", "implementation_authorized"))
             activation_completed = _lookup(activation, ("active_execution_project", "implementation_completed"))
             activation_consumed = _lookup(activation, ("active_execution_project", "episode_consumed"))

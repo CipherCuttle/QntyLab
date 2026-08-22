@@ -1,0 +1,32 @@
+{
+  "phaseId": "DSH_RUNTIME_MATERIALIZATION_AND_LAUNCH_V0",
+  "profile": "headless",
+  "sourceRoot": "/var/tmp/qntylab-dsh-runtime-v0-final/source",
+  "workspace": "/var/tmp/qntylab-dsh-workspace-v0-final-run5",
+  "workspaceMatch": true,
+  "actualSessionCwd": "/var/tmp/qntylab-dsh-workspace-v0-final-run5",
+  "sessionCwdMatch": true,
+  "pluginTree": [
+    "@deepseek-ai/dsh-subagent-codex",
+    "@deepseek-ai/dsh-subagent-claude-code",
+    "@deepseek-ai/dsh-tool-subagent"
+  ],
+  "exitCode": 0,
+  "stdout": "Qualification loopback response. No tool call.\n",
+  "stderrTail": "",
+  "mockParentWireRequests": 1,
+  "observedModelFacingTools": [
+    "subagent_claude_code",
+    "subagent_codex"
+  ],
+  "modelFacingToolsExact": true,
+  "externalProviderRequests": 0,
+  "externalNetworkEvidence": "loopback-only configured route plus observed mock request; no kernel namespace guarantee",
+  "realSecretReads": 0,
+  "childEnvSecretSentinelPresent": false,
+  "realModelCalls": 0,
+  "realCodexTurns": 0,
+  "realClaudeTurns": 0,
+  "spendUsd": 0,
+  "terminalStateReached": true
+}

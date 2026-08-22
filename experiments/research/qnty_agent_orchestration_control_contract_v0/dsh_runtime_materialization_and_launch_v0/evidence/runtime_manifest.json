@@ -1,0 +1,98 @@
+{
+  "phaseId": "DSH_RUNTIME_MATERIALIZATION_AND_LAUNCH_V0",
+  "materializationRoot": "/var/tmp/qntylab-dsh-runtime-v0-final/source",
+  "sourceIdentity": {
+    "repository": "deepseek-ai/deepseek-harness",
+    "commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "tag": "dsh-v0.1.0-rc.7"
+  },
+  "packageManagerFingerprint": {
+    "declaredPackageManager": "pnpm@11.7.0",
+    "actualVersion": "11.7.0",
+    "executablePath": "/home/swirky/.nvm/versions/node/v22.22.0/lib/node_modules/corepack/dist/corepack.js",
+    "executableDigest": "3655bc798f300951f2070fee411b337d626b0c3ae80c2d24c46ccac4595d4bf9",
+    "invocation": [
+      "corepack",
+      "pnpm@11.7.0"
+    ],
+    "installCommand": "corepack pnpm@11.7.0 install --offline --frozen-lockfile"
+  },
+  "lockfileDigest": "f517dc3978d57531cda747df62a2abdde1df5b9f25415fcf1fc5d51f8b7547ea",
+  "claudeSdkIdentity": {
+    "package": "@anthropic-ai/claude-agent-sdk",
+    "version": "0.3.220",
+    "packageJsonDigest": "1c9d0905f64e126850efe4fc4e7244c604a0855de8d4c82aff78da6f1988bd08"
+  },
+  "patchDigests": [
+    {
+      "path": "/home/swirky/DevHub/repos/QntyLab/experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/repairs/codex-executable-binding.patch",
+      "digest": "f89bf5833956f3c4202ca88a9285e39658976b29605fc1b63b7c62ebdd07fcb3"
+    },
+    {
+      "path": "/home/swirky/DevHub/repos/QntyLab/experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_claude_hard_read_only_repair_and_requalification_v0/repairs/claude-hard-read-only.patch",
+      "digest": "2b8277bf13e077651046e2527dc7aa092c3c9669cedc61eac1f742d9364a17e3"
+    }
+  ],
+  "profileDigests": {
+    "qualificationOverlay": "50f8e5ad84ad00bc39c6654975f90d7e64b2c4006d2173850e605aeb4417f399"
+  },
+  "launcherDigest": "99c8181f22c59e37db313e0aa2bb26660c14e89224cbd5b43b6896abb5583039",
+  "builtCliAbsolutePath": "/var/tmp/qntylab-dsh-runtime-v0-final/source/apps/cli/lib/bin.js",
+  "builtCliDigest": "c0226687bb20f45c603ec6fe50f3de16d1c3510c3a803304ec575ef9bc366c62",
+  "workspaceBundledChunks": {
+    "apps/cli/lib/plugin-9h8shc4d.js": "/var/tmp/qntylab-dsh-runtime-v0-final/source/apps/cli/lib/plugin-9h8shc4d.js",
+    "apps/cli/lib/profile-boot-BnJoK_kl.js": "/var/tmp/qntylab-dsh-runtime-v0-final/source/apps/cli/lib/profile-boot-BnJoK_kl.js",
+    "apps/cli/lib/profile-boot-DG5t9aNs.js": "/var/tmp/qntylab-dsh-runtime-v0-final/source/apps/cli/lib/profile-boot-DG5t9aNs.js"
+  },
+  "executableFingerprints": {
+    "nodeExecutable": "1bec56ef7cfa9a76f3e0b7c0a87f220eb73f23102b9c0b4c7529a3f7c3ce7c31",
+    "pythonExecutable": "b8d8288faefdd300201f43fcf00f6f539a27218eeed3a3dff5ab10b9c4c99700",
+    "codexExecutable": "ac2cfed85fb647d61e0150b8548102b330e4799d9d81ad5d354de701edf6b074",
+    "claudeExecutable": "98226474f802e3094d6a86c5ade8883c16206d0fcb5c400b7401c800063e99d7"
+  },
+  "materializedAtUtc": "2026-08-22T22:12:30.989Z",
+  "schemaVersion": "qntylab-dsh-runtime-manifest-v0",
+  "sourceReceipt": {
+    "sourceRoot": "/var/tmp/qntylab-dsh-runtime-v0-final/source",
+    "sourceRemote": "https://github.com/deepseek-ai/deepseek-harness.git",
+    "sourceCommit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "sourceTree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "sourceTag": "dsh-v0.1.0-rc.7",
+    "checkoutClean": true,
+    "materializerVersion": "qntylab-dsh-materializer-v0"
+  },
+  "sourceRemote": "https://github.com/deepseek-ai/deepseek-harness.git",
+  "governedPatchIdentity": [
+    {
+      "path": "/home/swirky/DevHub/repos/QntyLab/experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/repairs/codex-executable-binding.patch",
+      "digest": "f89bf5833956f3c4202ca88a9285e39658976b29605fc1b63b7c62ebdd07fcb3"
+    },
+    {
+      "path": "/home/swirky/DevHub/repos/QntyLab/experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_claude_hard_read_only_repair_and_requalification_v0/repairs/claude-hard-read-only.patch",
+      "digest": "2b8277bf13e077651046e2527dc7aa092c3c9669cedc61eac1f742d9364a17e3"
+    }
+  ],
+  "buildIdentity": {
+    "buildScript": "build:lib",
+    "command": "corepack pnpm@11.7.0 run build:lib",
+    "commandDigest": "fc37462c311a4f589d82aae091957d9780b90746c2f761abb9e9e7877c0ce101",
+    "entrypointRelativePath": "apps/cli/lib/bin.js",
+    "entrypointDigest": "c0226687bb20f45c603ec6fe50f3de16d1c3510c3a803304ec575ef9bc366c62",
+    "chunkRelativePaths": [
+      "apps/cli/lib/plugin-9h8shc4d.js",
+      "apps/cli/lib/profile-boot-BnJoK_kl.js",
+      "apps/cli/lib/profile-boot-DG5t9aNs.js"
+    ]
+  },
+  "launcherIdentity": {
+    "path": "/home/swirky/DevHub/repos/QntyLab/experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_runtime_materialization_and_launch_v0/launcher/qntylab-launch-dsh.mjs",
+    "digest": "99c8181f22c59e37db313e0aa2bb26660c14e89224cbd5b43b6896abb5583039"
+  },
+  "materializerIdentity": {
+    "version": "qntylab-dsh-materializer-v0",
+    "path": "/home/swirky/DevHub/repos/QntyLab/experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_runtime_materialization_and_launch_v0/materializer/qntylab-materialize-dsh-runtime.mjs",
+    "digest": "2706a011c66bdce11f64c8c6db062c44160e65dd763c10b74a6533d9ba7d9668"
+  },
+  "manifestPath": "/home/swirky/DevHub/repos/QntyLab/experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_runtime_materialization_and_launch_v0/evidence/runtime_manifest.json"
+}

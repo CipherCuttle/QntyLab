@@ -325,11 +325,19 @@ test('verifySourceIdentity: accepts matching commit/tag, rejects mismatch', () =
   writeFileSync(join(dir, 'package.json'), '{"name":"fake-dsh"}\n')
   execFileSync('git', ['add', '.'], { cwd: dir })
   execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: dir })
+  execFileSync('git', ['remote', 'add', 'origin', 'https://github.com/deepseek-ai/deepseek-harness.git'], { cwd: dir })
   execFileSync('git', ['tag', 'dsh-v0.1.0-rc.7'], { cwd: dir })
   const head = execFileSync('git', ['-C', dir, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim()
+  const tree = execFileSync('git', ['-C', dir, 'rev-parse', 'HEAD^{tree}'], { encoding: 'utf8' }).trim()
 
-  const ok = verifySourceIdentity(dir, { expectedCommit: head, expectedTag: 'dsh-v0.1.0-rc.7' })
+  const ok = verifySourceIdentity(dir, {
+    expectedRepository: 'deepseek-ai/deepseek-harness',
+    expectedCommit: head,
+    expectedTree: tree,
+    expectedTag: 'dsh-v0.1.0-rc.7',
+  })
   assert.equal(ok.commit, head)
+  assert.equal(ok.tree, tree)
 
   assert.throws(
     () => verifySourceIdentity(dir, { expectedCommit: 'f'.repeat(40) }),
@@ -337,6 +345,10 @@ test('verifySourceIdentity: accepts matching commit/tag, rejects mismatch', () =
   )
   assert.throws(
     () => verifySourceIdentity(dir, { expectedCommit: head, expectedTag: 'wrong-tag' }),
+    err => err instanceof MaterializationError && err.code === 'DSH_STAGE_A_V1R3_BLOCK_RUNTIME_IDENTITY',
+  )
+  assert.throws(
+    () => verifySourceIdentity(dir, { expectedCommit: head, expectedTree: 'f'.repeat(40) }),
     err => err instanceof MaterializationError && err.code === 'DSH_STAGE_A_V1R3_BLOCK_RUNTIME_IDENTITY',
   )
 })

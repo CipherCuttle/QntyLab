@@ -5645,7 +5645,11 @@ authoritative_artifacts = [
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/driver/qualification.patch.yml",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/evidence/runtime_manifest.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/evidence/digests.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/evidence/canonical-json.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/driver/run-materialize.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/driver/run-via-launcher.mjs",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/test/qntylab-dsh-v1r3r1.test.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/test/digest-regression.test.mjs",
 ]
 authorization_state = "AUTHORIZED_IF_CANONICAL"
 authorization_effective = "AFTER_CANONICAL_MERGE_ONLY"
@@ -5681,5 +5685,5 @@ capital_authority = "NONE"
 qnty_agent_eval = "NOT_APPLICABLE"
 active_project_after_closure = "NONE"
 terminal_outcome = "DSH_STAGE_A_V1R3R1_REAL_RUNTIME_QUALIFIED"
-qualified_launch_contract_digest = "3bf649f5cbdd96dcc0edf91cd7dfb88b3245ff3617518c9d5da3dfbd5a01a18e"
-next_action = "CLOSED_PASS: real materialization of pinned commit 99f6f02fecdb7dff40c3fbc9470f5907c29f74ca (tag dsh-v0.1.0-rc.7) succeeded (frozen offline install, full pnpm run build:lib); the Codex executable-binding repair was corrected against the real tree, applied cleanly, compiled, and its package's own 32-test suite passes; the corrected canonical launcher ran a real full-profile headless boot through exactly one deterministic loopback mock-parent request bearing exactly the subagent_codex/subagent_claude_code tool surface, with zero retries and zero auxiliary requests; the real session's own state proved workspace/cwd binding directly; caller-cwd variance and an 8-request budget ceiling were proven. QUALIFIED_LAUNCH_CONTRACT_DIGEST is issued (see qualification.json). No live episode, Stage-A fixture execution, Qnty/QntyAgentEval, trading/capital action, or Stage B is authorized by this phase; a later live episode requires a separate, Git-backed authorization + activation."
+qualified_launch_contract_digest = "4cd2734f229a97d4258ace4576f23f76f3d36aeef888a19fa61d2f4a7bff37d4"
+next_action = "CLOSED_PASS: post-PR H-01..H-04 provenance repairs were requalified from a fresh pristine pinned source. The canonical materializer verified repository/commit/tree/tag, applied the committed V1R3R1 patch, installed offline/frozen, ran full pnpm run build:lib, bound lockfile/pnpm/Claude SDK identity, and emitted the corrected manifest. The canonical launcher then ran a real full-profile headless boot with a settled plugin tree, one deterministic loopback parent request bearing exactly subagent_codex/subagent_claude_code, zero retries/auxiliary/paid/external requests, zero child turns, and matching session cwd/workspace. The old digest is SUPERSEDED_INVALID_DIGEST_CANONICALIZATION; corrected digests are issued in qualification.json. No live episode, Stage-A fixture execution, Qnty/QntyAgentEval, trading/capital action, or Stage B is authorized; a later live episode requires separate Git-backed authorization + activation."

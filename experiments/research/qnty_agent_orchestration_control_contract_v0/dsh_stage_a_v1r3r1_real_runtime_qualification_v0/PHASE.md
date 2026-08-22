@@ -205,3 +205,41 @@ node evidence/compute-digests.mjs               # regenerate evidence/digests.js
 
 No live DSH-driven model call, real OpenAI/Anthropic request, or paid spend
 is part of this phase.
+
+## Post-PR H-01..H-04 repair and targeted rereview
+
+The previously issued contract digest `3bf649f5cbdd96dcc0edf91cd7dfb88b3245ff3617518c9d5da3dfbd5a01a18e` is invalidated as
+`SUPERSEDED_INVALID_DIGEST_CANONICALIZATION`. The repair was performed once
+on this existing PR branch:
+
+- H-01: `evidence/canonical-json.mjs` recursively sorts every object key,
+  preserves array order, and includes every field; the four new regression
+  tests prove nested identity/policy drift changes the relevant digest and
+  insertion order does not.
+- H-02: `driver/run-materialize.mjs` requires a fresh pristine source,
+  verifies identity, applies the committed V1R3R1 patch through
+  `applyCanonicalPatches()`, then performs install/build/manifest emission.
+  It contains no prior-session or already-patched bypass.
+- H-03: `buildRuntime()` and the decisive driver use `pnpm run build:lib`.
+  The full-build client artifacts were present and the real CLI booted.
+- H-04: the manifest now binds phase, repository/commit/tree/tag, lockfile,
+  declared and actual pnpm identity, installed Claude SDK identity, patch,
+  overlay, and built artifacts. `verifySourceIdentity()` checks HEAD,
+  HEAD\^{tree}, and the tag, failing closed on drift.
+
+One targeted rereview attempted to falsify all four findings: nested digest
+drift, pristine patch application, full build provenance, source identity
+fail-closed behavior, pnpm identity visibility, invalid-digest retirement,
+and conversation-independent reconstruction. Result: `CRITICAL = 0`,
+`HIGH = 0`. The network limitation remains truthful and unchanged:
+configuration-plus-observation, without a kernel/network namespace guarantee.
+Per the bounded completion rule, no broad architecture review is reopened.
+
+Corrected digests:
+
+```text
+RUNTIME_MANIFEST_DIGEST = de0cc23e5e71c034f6cd403627452305338d32a29a3282c71fd2315d005fd314
+EXECUTABLE_IDENTITY_DIGEST = ae07ece34c88b3ebaebd7452df8d136c82935f9c8ec9df16a40e50a2582a2fd9
+LAUNCH_POLICY_DIGEST = b73a3932d6f8f32966de717076cde532a7b6a8472685ffbc7383c73cd7bcafa1
+QUALIFIED_LAUNCH_CONTRACT_DIGEST = 4cd2734f229a97d4258ace4576f23f76f3d36aeef888a19fa61d2f4a7bff37d4
+```

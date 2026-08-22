@@ -119,5 +119,21 @@ No **Critical** or **High** finding. Two **Medium** findings, both already
 addressed: the network-isolation evidence-level limit is stated honestly
 rather than overclaimed (no code/process change applicable — it is an
 environment capability limit), and the `~/.dsh` boundary slip was corrected
-immediately. Per the bounded-completion policy, no targeted rereview is
-required (no Critical/High fix was made that would need one).
+immediately. That was the original pre-PR review and does not discharge the
+four post-PR findings repaired on PR #177.
+
+## Targeted post-PR rereview — H-01..H-04 only
+
+Exactly one targeted rereview was performed after the repair. It attempted
+to falsify recursive nested digest binding; pristine-source application of
+the committed V1R3R1 patch; canonical full `pnpm run build:lib` provenance;
+commit/tree/tag fail-closed checks; visible actual pnpm identity; retirement
+of the old invalid digest; and reconstruction without conversation/manual
+scratch state.
+
+Results: `H-01 = PASS`, `H-02 = PASS`, `H-03 = PASS`, `H-04 = PASS`,
+`CRITICAL = 0`, `HIGH = 0`. The two Medium limitations remain unchanged:
+loopback network evidence is configuration-plus-observation without kernel
+namespace isolation, and the historical `~/.dsh` diagnostic touch was
+self-corrected and documented. No further review is authorized by this
+bounded repair cycle.

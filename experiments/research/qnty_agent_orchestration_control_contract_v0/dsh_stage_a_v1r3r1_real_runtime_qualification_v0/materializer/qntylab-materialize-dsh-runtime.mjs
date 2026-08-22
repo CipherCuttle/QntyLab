@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// QntyLab DSH runtime materializer (DSH_STAGE_A_V1R3_LAUNCH_PLANE_QUALIFICATION_V0).
+// QntyLab DSH runtime materializer (DSH_STAGE_A_V1R3R1_REAL_RUNTIME_QUALIFICATION_V0).
 //
 // Materialization is treated as part of the qualified graph, not an external
 // precondition (V1R2's failure: a bare pinned clone with no install was
@@ -18,7 +18,7 @@
 
 import { createHash } from 'node:crypto'
 import { spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync, statSync, readdirSync } from 'node:fs'
 import { isAbsolute, join, resolve } from 'node:path'
 
 export class MaterializationError extends Error {
@@ -43,24 +43,88 @@ function run(cmd, cmdArgs, opts) {
   return result
 }
 
+function resolveExecutable(executable) {
+  if (isAbsolute(executable)) {
+    if (!existsSync(executable) || statSync(executable).isDirectory()) {
+      throw new MaterializationError('DSH_STAGE_A_V1R3_BLOCK_RUNTIME_IDENTITY', `executable does not exist: ${executable}`)
+    }
+    return realpathSync(executable)
+  }
+  for (const entry of (process.env.PATH || '').split(':')) {
+    if (!entry) continue
+    const candidate = join(entry, executable)
+    if (existsSync(candidate) && !statSync(candidate).isDirectory()) return realpathSync(candidate)
+  }
+  throw new MaterializationError('DSH_STAGE_A_V1R3_BLOCK_RUNTIME_IDENTITY', `executable not found on PATH: ${executable}`)
+}
+
+function gitOutput(sourceRoot, args, code) {
+  const result = run('git', ['-C', sourceRoot, ...args])
+  if (result.status !== 0) {
+    throw new MaterializationError(code, `git ${args.join(' ')} failed for ${sourceRoot}: ${result.stderr}`)
+  }
+  return result.stdout.trim()
+}
+
+function packageJsonPath(sourceRoot, packageName) {
+  const candidate = join(sourceRoot, 'node_modules', ...packageName.split('/'), 'package.json')
+  if (existsSync(candidate)) return realpathSync(candidate)
+
+  const virtualStore = join(sourceRoot, 'node_modules', '.pnpm')
+  if (existsSync(virtualStore)) {
+    for (const entry of readdirSync(virtualStore)) {
+      const virtualCandidate = join(virtualStore, entry, 'node_modules', ...packageName.split('/'), 'package.json')
+      if (existsSync(virtualCandidate)) return realpathSync(virtualCandidate)
+    }
+  }
+  throw new MaterializationError(
+    'DSH_STAGE_A_V1R3_BLOCK_MATERIALIZATION',
+    `installed package identity missing: ${packageName}`,
+  )
+}
+
+export function installedPackageIdentity(sourceRoot, packageName) {
+  const packagePath = packageJsonPath(sourceRoot, packageName)
+  const packageJson = JSON.parse(readFileSync(packagePath, 'utf8'))
+  return {
+    package: packageName,
+    version: packageJson.version ?? null,
+    packageJsonDigest: fingerprintFile(packagePath),
+  }
+}
+
 /**
  * Verify the pinned source tree's identity by comparing the checked-out
  * commit/tag against the declared expectation, via git itself (not a trust
  * label carried over from a prior phase).
  */
-export function verifySourceIdentity(sourceRoot, { expectedCommit, expectedTag } = {}) {
-  const headResult = run('git', ['-C', sourceRoot, 'rev-parse', 'HEAD'])
-  if (headResult.status !== 0) {
-    throw new MaterializationError(
-      'DSH_STAGE_A_V1R3_BLOCK_RUNTIME_IDENTITY',
-      `source root is not a git checkout or HEAD could not be resolved: ${sourceRoot}`,
-    )
+export function verifySourceIdentity(sourceRoot, { expectedRepository, expectedCommit, expectedTree, expectedTag } = {}) {
+  const actualCommit = gitOutput(sourceRoot, ['rev-parse', 'HEAD'], 'DSH_STAGE_A_V1R3_BLOCK_RUNTIME_IDENTITY')
+  const actualTree = gitOutput(sourceRoot, ['rev-parse', 'HEAD^{tree}'], 'DSH_STAGE_A_V1R3_BLOCK_RUNTIME_IDENTITY')
+  let actualRepository = null
+  if (expectedRepository) {
+    const remote = gitOutput(sourceRoot, ['config', '--get', 'remote.origin.url'], 'DSH_STAGE_A_V1R3_BLOCK_RUNTIME_IDENTITY')
+    actualRepository = remote
+      .replace(/\.git$/, '')
+      .replace(/^git@github\.com:/, '')
+      .replace(/^https?:\/\/github\.com\//, '')
   }
-  const actualCommit = headResult.stdout.trim()
   if (expectedCommit && actualCommit !== expectedCommit) {
     throw new MaterializationError(
       'DSH_STAGE_A_V1R3_BLOCK_RUNTIME_IDENTITY',
       `pinned source commit mismatch: expected ${expectedCommit}, got ${actualCommit}`,
+    )
+  }
+  if (expectedTree && actualTree !== expectedTree) {
+    throw new MaterializationError(
+      'DSH_STAGE_A_V1R3_BLOCK_RUNTIME_IDENTITY',
+      `pinned source tree mismatch: expected ${expectedTree}, got ${actualTree}`,
+    )
+  }
+  if (expectedRepository && actualRepository !== expectedRepository) {
+    throw new MaterializationError(
+      'DSH_STAGE_A_V1R3_BLOCK_RUNTIME_IDENTITY',
+      `pinned source repository mismatch: expected ${expectedRepository}, got ${actualRepository}`,
     )
   }
   const treeResult = run('git', ['-C', sourceRoot, 'cat-file', '-t', actualCommit])
@@ -80,7 +144,7 @@ export function verifySourceIdentity(sourceRoot, { expectedCommit, expectedTag }
       )
     }
   }
-  return { commit: actualCommit }
+  return { repository: actualRepository, commit: actualCommit, tree: actualTree, tag: expectedTag ?? null }
 }
 
 /**
@@ -132,24 +196,35 @@ export function installOffline(sourceRoot, { pnpmExecutable = 'pnpm', installArg
     )
   }
   const args = installArgs || ['install', '--offline', '--frozen-lockfile']
-  const result = run(pnpmExecutable, args, { cwd: sourceRoot })
+  const actualExecutable = resolveExecutable(pnpmExecutable)
+  const versionResult = run(actualExecutable, ['--version'])
+  if (versionResult.status !== 0) {
+    throw new MaterializationError('DSH_STAGE_A_V1R3_BLOCK_MATERIALIZATION', `could not read pnpm version: ${versionResult.stderr}`)
+  }
+  const result = run(actualExecutable, args, { cwd: sourceRoot })
   if (result.status !== 0) {
     throw new MaterializationError(
       'DSH_STAGE_A_V1R3_BLOCK_MISSING_OFFLINE_DEPENDENCY',
       `offline frozen install failed (no network fallback attempted):\n${result.stderr || result.stdout}`,
     )
   }
-  return { packageManager }
+  return {
+    declaredPackageManager: packageManager,
+    actualVersion: versionResult.stdout.trim(),
+    executablePath: actualExecutable,
+    executableDigest: fingerprintFile(actualExecutable),
+  }
 }
 
-export function buildRuntime(sourceRoot, { buildScript = 'build:lib:host', pnpmExecutable = 'pnpm' } = {}) {
-  const result = run(pnpmExecutable, ['run', buildScript], { cwd: sourceRoot })
+export function buildRuntime(sourceRoot, { buildScript = 'build:lib', pnpmExecutable = 'pnpm' } = {}) {
+  const result = run(resolveExecutable(pnpmExecutable), ['run', buildScript], { cwd: sourceRoot })
   if (result.status !== 0) {
     throw new MaterializationError(
       'DSH_STAGE_A_V1R3_BLOCK_MATERIALIZATION',
       `build step "${buildScript}" failed:\n${result.stderr || result.stdout}`,
     )
   }
+  return { buildScript }
 }
 
 /**
@@ -172,9 +247,13 @@ export function fingerprintExecutable(executablePath) {
  */
 export function buildManifest({
   sourceRoot,
+  repository,
   commit,
+  tree,
   expectedTag,
   packageManagerFingerprint,
+  lockfileDigest,
+  claudeSdkIdentity,
   patchDigests,
   profileDigests,
   launcherDigest,
@@ -200,10 +279,12 @@ export function buildManifest({
     workspaceBundledChunks[rel] = abs
   }
   return {
-    phaseId: 'DSH_STAGE_A_V1R3_LAUNCH_PLANE_QUALIFICATION_V0',
+    phaseId: 'DSH_STAGE_A_V1R3R1_REAL_RUNTIME_QUALIFICATION_V0',
     materializationRoot,
-    sourceIdentity: { repository: 'deepseek-ai/deepseek-harness', commit, tag: expectedTag ?? null },
+    sourceIdentity: { repository: repository ?? 'deepseek-ai/deepseek-harness', commit, tree, tag: expectedTag ?? null },
     packageManagerFingerprint,
+    lockfileDigest,
+    claudeSdkIdentity,
     patchDigests,
     profileDigests,
     launcherDigest,

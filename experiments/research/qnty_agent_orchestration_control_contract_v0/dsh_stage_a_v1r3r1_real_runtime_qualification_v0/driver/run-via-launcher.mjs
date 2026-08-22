@@ -1,21 +1,50 @@
-import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+import { dirname, join } from 'node:path'
+import { existsSync, lstatSync, mkdirSync, readFileSync, symlinkSync, unlinkSync } from 'node:fs'
 import { preflightLaunch, spawnDsh, parseLauncherArgv } from '/home/swirky/DevHub/repos/QntyLab/experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/launcher/qntylab-launch-dsh.mjs'
 import { createQualificationMock } from '/home/swirky/DevHub/repos/QntyLab/experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/mock/qualification-openai-mock.mjs'
 
-const SOURCE_ROOT = '/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1/source'
-const DSH_HOME = '/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1/dsh-home'
-const WORKSPACE = process.argv[2] || '/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1/workspace/run1'
+const PDIR = dirname(fileURLToPath(import.meta.url))
+const MANIFEST_PATH = process.env.QNTYLAB_DSH_MANIFEST || join(PDIR, '../evidence/runtime_manifest.json')
+const DSH_HOME = process.env.QNTYLAB_DSH_HOME || '/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1-repair/dsh-home'
+const WORKSPACE = process.argv[2] || '/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1-repair/workspace/run1'
+mkdirSync(WORKSPACE, { recursive: true })
+const SOURCE_ROOT = JSON.parse(readFileSync(MANIFEST_PATH, 'utf8')).materializationRoot
+
+function settleQualificationPluginTree() {
+  const modulesRoot = join(DSH_HOME, 'profiles/node_modules')
+  const packages = {
+    '@deepseek-ai/dsh-subagent-codex': 'packages/subagent/subagent-codex',
+    '@deepseek-ai/dsh-subagent-claude-code': 'packages/subagent/subagent-claude-code',
+    '@deepseek-ai/dsh-tool-subagent': 'packages/subagent/tool-subagent',
+  }
+  for (const [name, relativeTarget] of Object.entries(packages)) {
+    const target = join(SOURCE_ROOT, relativeTarget)
+    const link = join(modulesRoot, ...name.split('/'))
+    if (!existsSync(join(target, 'package.json'))) throw new Error(`PLUGIN_TREE_MISSING_TARGET: ${target}`)
+    mkdirSync(join(link, '..'), { recursive: true })
+    if (existsSync(link)) {
+      if (!lstatSync(link).isSymbolicLink()) throw new Error(`PLUGIN_TREE_NON_SYMLINK: ${link}`)
+      if (readFileSync(join(link, 'package.json'), 'utf8') !== readFileSync(join(target, 'package.json'), 'utf8')) unlinkSync(link)
+      else continue
+    }
+    symlinkSync(target, link, 'junction')
+  }
+  console.log('plugin tree settled:', Object.keys(packages).join(', '))
+}
+
+settleQualificationPluginTree()
 
 const mock = createQualificationMock({ model: 'gpt-5-mini' })
 const baseUrl = await mock.listen(0)
 console.log('mock listening at', baseUrl)
 
 const args = parseLauncherArgv([
-  '--runtime-manifest', '/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1/runtime/runtime_manifest.json',
+  '--runtime-manifest', MANIFEST_PATH,
   '--workspace', WORKSPACE,
   '--dsh-home', DSH_HOME,
   '--profile', 'headless',
-  '--controller-state', '/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1/state/controller.json',
+  '--controller-state', `${DSH_HOME}/../state/controller.json`,
   '--node-executable', process.execPath,
   '--python-executable', '/usr/bin/python3',
   '--codex-executable', '/home/swirky/.local/bin/codex',
@@ -47,7 +76,7 @@ const env = {
 }
 const child = spawn(resolved.nodeExecutable.resolvedPath, [
   preflightResult.cliPath, '--profile', args.profile,
-  '--patch', '/home/swirky/DevHub/repos/QntyLab/experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/driver/qualification.patch.yml',
+  '--patch', join(PDIR, 'qualification.patch.yml'),
   'Reply with a short greeting. Do not call any tool.',
 ], { cwd: preflightResult.workspaceReal, env, stdio: ['ignore', 'pipe', 'pipe'] })
 

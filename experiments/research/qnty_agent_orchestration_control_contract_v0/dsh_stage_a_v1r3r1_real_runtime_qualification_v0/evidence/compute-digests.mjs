@@ -1,72 +1,80 @@
 import { createHash } from 'node:crypto'
-import { readFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+import { dirname, join } from 'node:path'
+import { sha256Canonical } from './canonical-json.mjs'
 
-function sha256(obj) {
-  const text = typeof obj === 'string' ? obj : JSON.stringify(obj, Object.keys(obj).sort())
-  return createHash('sha256').update(text).digest('hex')
-}
-function fileDigest(p) {
-  return createHash('sha256').update(readFileSync(p)).digest('hex')
-}
+const PDIR = dirname(fileURLToPath(import.meta.url))
+const manifestPath = process.env.QNTYLAB_DSH_MANIFEST || join(PDIR, 'runtime_manifest.json')
+const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
+const fileDigest = path => createHash('sha256').update(readFileSync(path)).digest('hex')
 
-const REPO = '/home/swirky/DevHub/repos/QntyLab'
-const PDIR = `${REPO}/experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0`
-const SRC = '/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1/source'
-const manifest = JSON.parse(readFileSync('/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1/runtime/runtime_manifest.json', 'utf8'))
-
-// RUNTIME_MANIFEST_DIGEST: identity-bearing fields only, no ephemeral scratch paths/timestamps.
+// RUNTIME_MANIFEST_DIGEST: immutable identity only; no scratch paths/timestamps.
 const runtimeIdentity = {
+  phaseId: manifest.phaseId,
   sourceIdentity: manifest.sourceIdentity,
-  packageManagerFingerprint: manifest.packageManagerFingerprint,
-  patchDigest: manifest.patchDigests.map(p => p.digest), // digest only, not the QntyLab-repo path
+  packageManagerFingerprint: {
+    declaredPackageManager: manifest.packageManagerFingerprint.declaredPackageManager,
+    actualVersion: manifest.packageManagerFingerprint.actualVersion,
+    executableDigest: manifest.packageManagerFingerprint.executableDigest,
+  },
+  lockfileDigest: manifest.lockfileDigest,
+  patchDigests: manifest.patchDigests.map(p => p.digest),
   builtCliDigest: manifest.builtCliDigest,
   builtCliRelativePath: 'apps/cli/lib/bin.js',
-  lockfileDigest: fileDigest(`${SRC}/pnpm-lock.yaml`),
+  workspaceBundledChunkDigests: Object.fromEntries(
+    Object.entries(manifest.workspaceBundledChunks).map(([relativePath, absolutePath]) => [relativePath, fileDigest(absolutePath)]),
+  ),
+  claudeSdkIdentity: manifest.claudeSdkIdentity,
 }
-const RUNTIME_MANIFEST_DIGEST = sha256(runtimeIdentity)
+const RUNTIME_MANIFEST_DIGEST = sha256Canonical(runtimeIdentity)
 
-// EXECUTABLE_IDENTITY_DIGEST: which host tools were bound, by digest (not by ephemeral absolute path).
 const executableIdentity = {
   nodeExecutableDigest: manifest.executableFingerprints.nodeExecutable,
   pythonExecutableDigest: manifest.executableFingerprints.pythonExecutable,
   codexExecutableDigest: manifest.executableFingerprints.codexExecutable,
   claudeExecutableDigest: manifest.executableFingerprints.claudeExecutable,
 }
-const EXECUTABLE_IDENTITY_DIGEST = sha256(executableIdentity)
+const EXECUTABLE_IDENTITY_DIGEST = sha256Canonical(executableIdentity)
 
-// LAUNCH_POLICY_DIGEST: launcher/profile/gate/tool-surface/argv/budget policy — all content, not paths.
-const launcherDigest = fileDigest(`${PDIR}/launcher/qntylab-launch-dsh.mjs`)
-const materializerDigest = fileDigest(`${PDIR}/materializer/qntylab-materialize-dsh-runtime.mjs`)
-const repairPatchDigest = fileDigest(`${PDIR}/repairs/codex-executable-binding.patch`)
-const overlayPatchDigest = fileDigest(`${PDIR}/driver/qualification.patch.yml`)
-const budgetGateDigest = fileDigest(`${PDIR}/gate/qualification-budget-gate.mjs`)
+const launcherDigest = fileDigest(join(PDIR, '../launcher/qntylab-launch-dsh.mjs'))
+const materializerDigest = fileDigest(join(PDIR, '../materializer/qntylab-materialize-dsh-runtime.mjs'))
+const materializationDriverDigest = fileDigest(join(PDIR, '../driver/run-materialize.mjs'))
+const qualificationDriverDigest = fileDigest(join(PDIR, '../driver/run-via-launcher.mjs'))
+const repairPatchDigest = fileDigest(join(PDIR, '../repairs/codex-executable-binding.patch'))
+const overlayPatchDigest = fileDigest(join(PDIR, '../driver/qualification.patch.yml'))
+const budgetGateDigest = fileDigest(join(PDIR, '../gate/qualification-budget-gate.mjs'))
 const launchPolicy = {
   launcherDigest,
   materializerDigest,
+  materializationDriverDigest,
+  qualificationDriverDigest,
   repairPatchDigest,
-  overlayPatchDigest, // narrows the tool surface / selects parent provider+model
+  overlayPatchDigest,
   budgetGateDigest,
   parentProvider: 'openai',
   parentModel: 'gpt-5-mini',
-  modelFacingTools: ['subagent_codex', 'subagent_claude_code'].sort(),
+  modelFacingTools: ['subagent_codex', 'subagent_claude_code'],
   workspaceContainmentPolicy: 'realpath-symlink-aware; --workspace must not be inside runtimeManifest.materializationRoot or any declared forbidden root',
-  argvSchema: ['--runtime-manifest', '--workspace', '--dsh-home', '--profile', '--controller-state', '--node-executable', '--python-executable', '--codex-executable', '--claude-executable', '--parent-endpoint'].sort(),
+  argvSchema: ['--runtime-manifest', '--workspace', '--dsh-home', '--profile', '--controller-state', '--node-executable', '--python-executable', '--codex-executable', '--claude-executable', '--parent-endpoint'],
   budgetPolicy: { maxParentRequestAttempts: 8, reservationBeforeAdapterIo: true },
   retryPolicy: { llmRetries: 0 },
 }
-const LAUNCH_POLICY_DIGEST = sha256(launchPolicy)
+const LAUNCH_POLICY_DIGEST = sha256Canonical(launchPolicy)
 
-const QUALIFIED_LAUNCH_CONTRACT_DIGEST = sha256({
+const QUALIFIED_LAUNCH_CONTRACT_DIGEST = sha256Canonical({
   phaseId: 'DSH_STAGE_A_V1R3R1_REAL_RUNTIME_QUALIFICATION_V0',
   RUNTIME_MANIFEST_DIGEST,
   EXECUTABLE_IDENTITY_DIGEST,
   LAUNCH_POLICY_DIGEST,
 })
 
-console.log(JSON.stringify({
+const output = {
   RUNTIME_MANIFEST_DIGEST,
   EXECUTABLE_IDENTITY_DIGEST,
   LAUNCH_POLICY_DIGEST,
   QUALIFIED_LAUNCH_CONTRACT_DIGEST,
   components: { runtimeIdentity, executableIdentity, launchPolicy },
-}, null, 2))
+}
+writeFileSync(join(PDIR, 'digests.json'), `${JSON.stringify(output, null, 2)}\n`, 'utf8')
+console.log(JSON.stringify(output, null, 2))

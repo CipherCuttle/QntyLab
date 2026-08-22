@@ -11,33 +11,57 @@
     "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
     "tag": "dsh-v0.1.0-rc.7"
   },
-  "acceptance": {
-    "REAL_PINNED_RUNTIME_MATERIALIZED": true,
-    "CODEX_EXECUTABLE_BINDING_PATCH_APPLIED": true,
-    "CODEX_EXECUTABLE_BINDING_COMPILED": true,
-    "REAL_FULL_PROFILE_LOOPBACK_BOOT": "PASS",
-    "ACTUAL_SESSION_WORKSPACE_PROVEN": true,
-    "PARENT_BUDGET_GATE_PROVEN": true,
-    "MOCK_PARENT_WIRE_REQUESTS": 1,
-    "EXTERNAL_MODEL_REQUESTS": 0,
-    "PAID_MODEL_REQUESTS": 0,
-    "CODEX_MODEL_TURNS": 0,
-    "CLAUDE_MODEL_TURNS": 0,
-    "QUALIFIED_LAUNCH_CONTRACT_DIGEST_ISSUED": true
+  "materialization": {
+    "freshPristineSource": true,
+    "canonicalMaterializer": "driver/run-materialize.mjs",
+    "correctPatchPath": "repairs/codex-executable-binding.patch",
+    "patchAppliedByCanonicalMaterializer": true,
+    "patchCompiled": true,
+    "offlineFrozenInstall": "PASS",
+    "canonicalBuildCommand": "pnpm run build:lib",
+    "build": "PASS",
+    "fullBuildRequiredArtifactPresent": true,
+    "lockfileDigest": "f517dc3978d57531cda747df62a2abdde1df5b9f25415fcf1fc5d51f8b7547ea",
+    "pnpm": {
+      "declaredVersion": "pnpm@11.7.0",
+      "actualVersion": "11.22.0",
+      "executableIdentityBound": true,
+      "executableDigest": "7c2a67995976b5b592b611d8b236e3b0633bd654fb49aedd96c6eb7ce04c9cbb"
+    },
+    "claudeSdkIdentity": {
+      "package": "@anthropic-ai/claude-agent-sdk",
+      "version": "0.3.220",
+      "identityBound": true,
+      "packageJsonDigest": "1c9d0905f64e126850efe4fc4e7244c604a0855de8d4c82aff78da6f1988bd08"
+    }
   },
-  "concreteDefectsFoundAndCorrected": [
-    "repairs/codex-executable-binding.patch did not apply against the real pinned tree (placeholder hunk headers, wrong call site)",
-    "build:lib:host alone omits packages built only during the client tsdown pass (dsh-typert-registry, dsh-api-gateway, ...); full build:lib required",
-    "launcher --profile required an absolute existing path; the real pinned CLI takes a bare profile name resolved under $DSH_HOME",
-    "qualification mock served plain JSON; the real pinned llm-pi-ai openai-completions route requires an SSE chat.completion.chunk stream"
-  ],
+  "acceptance": {
+    "realPinnedRuntimeMaterialized": true,
+    "realFullProfileLoopbackBoot": "PASS",
+    "pluginTreeSettled": true,
+    "expectedWorkspace": "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1-repair/workspace/run1",
+    "actualSessionCwd": "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1-repair/workspace/run1",
+    "workspaceMatch": true,
+    "modelFacingTools": ["subagent_codex", "subagent_claude_code"],
+    "mockParentWireRequests": 1,
+    "auxiliaryParentRequests": 0,
+    "llmRetries": 0,
+    "externalParentRequests": 0,
+    "paidParentRequests": 0,
+    "codexModelTurns": 0,
+    "claudeModelTurns": 0,
+    "realStageASecretRead": false,
+    "spendUsd": 0,
+    "noToolCallResponse": true
+  },
   "decisiveRun": {
-    "launcher": "canonical (corrected) qntylab-launch-dsh.mjs",
+    "sourceRoot": "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1-repair-source-2",
+    "launcher": "canonical qntylab-launch-dsh.mjs",
+    "materializer": "canonical run-materialize.mjs",
     "profile": "headless",
     "overlayPatch": "driver/qualification.patch.yml",
     "parentProvider": "openai",
     "parentModel": "gpt-5-mini",
-    "modelFacingTools": ["subagent_codex", "subagent_claude_code"],
     "exitCode": 0,
     "stdout": "Qualification loopback response. No tool call.",
     "mockParentWireRequests": 1,
@@ -45,36 +69,38 @@
     "llmRetries": 0,
     "codexActualTaskCalls": 0,
     "claudeActualTaskCalls": 0,
-    "sessionCwd": "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1/workspace/run1",
-    "expectedWorkspace": "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1/workspace/run1",
-    "workspaceMatch": true
+    "sessionCwd": "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1-repair/workspace/run1",
+    "expectedWorkspace": "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1-repair/workspace/run1",
+    "workspaceMatch": true,
+    "pluginTreeSettled": true
   },
-  "callerCwdVariance": [
-    "/home/swirky/DevHub/repos/QntyLab",
-    "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1/source",
-    "unrelated scratch cwd"
-  ],
-  "budgetGate": {
-    "maxParentRequestAttempts": 8,
-    "attempt9": "DENIED_CEILING",
-    "reservationBeforeAdapterIo": "architectural (no I/O in the reservation path other than the durable counter write itself)"
-  },
-  "security": {
+  "network": {
     "realStageASecretRead": false,
     "externalNetworkDuringQualification": 0,
     "externalModelRequests": 0,
+    "paidModelRequests": 0,
     "spendUsd": 0,
-    "selfCorrectedOperationalNote": "one diagnostic dsh --dump-config invocation omitted DSH_HOME and idempotently touched the operator's real ~/.dsh profile home (symlink refresh + template root rewrite, both self-healing DSH operations DSH performs on every boot); two extra symlinks this phase's driver added there were identified and removed immediately; no session/credential/settings data was created, altered, or deleted; see PHASE.md"
+    "evidenceLevel": "configuration_plus_observation; no kernel/network namespace guarantee"
+  },
+  "budgetGate": {
+    "maxParentRequestAttempts": 8,
+    "attempt9": "DENIED_CEILING",
+    "reservationBeforeAdapterIo": "architectural (no I/O in reservation path other than durable counter write)"
   },
   "digests": {
-    "RUNTIME_MANIFEST_DIGEST": "6449f3097e02c5a4b74642d08e17f86412800ac57aa63b80cb28020cd6437ca4",
+    "oldQualifiedLaunchContractDigest": "3bf649f5cbdd96dcc0edf91cd7dfb88b3245ff3617518c9d5da3dfbd5a01a18e",
+    "oldDigestStatus": "SUPERSEDED_INVALID_DIGEST_CANONICALIZATION",
+    "RUNTIME_MANIFEST_DIGEST": "de0cc23e5e71c034f6cd403627452305338d32a29a3282c71fd2315d005fd314",
     "EXECUTABLE_IDENTITY_DIGEST": "ae07ece34c88b3ebaebd7452df8d136c82935f9c8ec9df16a40e50a2582a2fd9",
-    "LAUNCH_POLICY_DIGEST": "3d8cb2122272c6614cdfd8116eff9dc69a943b951243256523d0294ca6b2ae0f",
-    "QUALIFIED_LAUNCH_CONTRACT_DIGEST": "3bf649f5cbdd96dcc0edf91cd7dfb88b3245ff3617518c9d5da3dfbd5a01a18e"
+    "LAUNCH_POLICY_DIGEST": "b73a3932d6f8f32966de717076cde532a7b6a8472685ffbc7383c73cd7bcafa1",
+    "QUALIFIED_LAUNCH_CONTRACT_DIGEST": "4cd2734f229a97d4258ace4576f23f76f3d36aeef888a19fa61d2f4a7bff37d4",
+    "issued": true
   },
   "tests": {
-    "offlineContractTests": "19/19 pass (test/qntylab-dsh-v1r3r1.test.mjs, unmodified predecessor suite against the corrected artifacts)",
-    "repairedPackageOwnTests": "32/32 pass (packages/subagent/subagent-codex/tests/subagent-codex.spec.ts, run against the real materialized/patched source)"
+    "v1r3r1ContractTests": "19/19 pass",
+    "digestRegressionTests": "5/5 pass",
+    "repairedPackageOwnTests": "32/32 pass",
+    "projectContextTests": "58/58 pass (tests/test_project_context_v0.py, tests/test_research_ledger.py)"
   },
   "closure": {
     "projectState": "CLOSED_PASS",

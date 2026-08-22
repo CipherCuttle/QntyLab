@@ -90,13 +90,13 @@ def test_historical_pr183_contradiction_fails_closed(tmp_path: Path, monkeypatch
     monkeypatch.setattr(
         project_context,
         "load_context_sources",
-        lambda _root: (
+        lambda _root, **_kwargs: (
             {"data": {"registry_status": "NOT_ESTABLISHED"}, "authority": {"research_ledger_root": "ledger"}},
             {},
             {"schema_version": 1, "project": [record]},
         ),
     )
-    monkeypatch.setattr(project_context, "validate_adr_registry", lambda _root, _registry: {})
+    monkeypatch.setattr(project_context, "validate_adr_registry", lambda _root, _registry, **_kwargs: {})
     monkeypatch.setattr(
         project_context,
         "compile_context_spine",

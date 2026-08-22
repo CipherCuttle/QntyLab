@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- None.
+- `DSH Stage-A V1R3R2 one-episode live execution activation V0R1` — `ACTIVE`. ACTIVE_CANDIDATE: this activation is inert until the exact candidate is canonical on origin/master. Do not read the secret, create the claim, execute the episode, invoke DSH, mutate the fixture, or authorize Stage B; a later action-time preflight is required after canonicalization.
 
 ## Queued — not authorized
 

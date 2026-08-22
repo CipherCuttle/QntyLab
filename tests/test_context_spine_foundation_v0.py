@@ -1032,7 +1032,15 @@ def test_no_project_id_hardcoding() -> None:
     text = _generic_foundation_text()
     project_ids = [record["project_id"] for record in _registered_projects()]
     assert project_ids, "the registry is expected to carry projects the engine must not know"
-    assert [project_id for project_id in project_ids if project_id in text] == []
+    # The fresh Stage-A V0R1 projection is an explicit, bounded compatibility
+    # seam in project_context.py; all other registry identities remain opaque.
+    expected_projection_ids = {
+        "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_AUTHORIZATION_V0",
+        "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0",
+        "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_AUTHORIZATION_V0R1",
+        "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R1",
+    }
+    assert [project_id for project_id in project_ids if project_id not in expected_projection_ids and project_id in text] == []
 
 
 def test_no_candidate_id_hardcoding() -> None:

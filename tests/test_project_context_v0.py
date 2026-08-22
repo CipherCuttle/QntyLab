@@ -22,6 +22,7 @@ DSH_STAGE_A_V1_EXECUTION_PROJECT_ID = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1_
 DSH_STAGE_A_V1R1_PROJECT_ID = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R1_BOOTSTRAP_AND_RUNTIME_HARDENING_AUTHORIZATION_V0"
 DSH_STAGE_A_V1R1_EXECUTION_PROJECT_ID = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R1_EXECUTION_V0"
 DSH_STAGE_A_V1R2_EXECUTION_PROJECT_ID = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R2_EXECUTION_V0"
+DSH_STAGE_A_V1R3R2_EXECUTION_PROJECT_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R1"
 
 
 def _assert_project_is_not_active(registry: dict, project_id: str) -> None:
@@ -145,7 +146,11 @@ def test_active_project_with_implementation_false_remains_unauthorized(tmp_path:
 def test_dsh_stage_a_v1_execution_closure_is_single_bounded_blocked_project() -> None:
     data = project_context.context_data(ROOT)
     _, _, registry = project_context.load_context_sources(ROOT)
-    active = [record for record in registry["project"] if record["state"] == "ACTIVE"]
+    active = [
+        record
+        for record in registry["project"]
+        if record["state"] == "ACTIVE" and record["project_id"] != DSH_STAGE_A_V1R3R2_EXECUTION_PROJECT_ID
+    ]
     assert active == []
     execution = next(record for record in registry["project"] if record["project_id"] == DSH_STAGE_A_V1_EXECUTION_PROJECT_ID)
     authorization = next(record for record in registry["project"] if record["project_id"] == DSH_STAGE_A_V1_AUTHORIZATION_PROJECT_ID)
@@ -287,9 +292,11 @@ def test_funding_incremental_implementation_freeze_is_closed_without_escalation(
     data = project_context.context_data(ROOT)
     _, _, registry = project_context.load_context_sources(ROOT)
     # The source-bound implementation freeze and the blocked Stage-A V1
-    # execution are closed; no implementation project remains active after the
-    # bounded V1R1 episode reaches its terminal outcome.
-    assert [record["project_id"] for record in registry["project"] if record["state"] == "ACTIVE"] == []
+    # execution are closed.  The fresh Stage-A V0R1 activation candidate is
+    # intentionally ACTIVE but remains inert until canonicalization.
+    assert {record["project_id"] for record in registry["project"] if record["state"] == "ACTIVE"} == {
+        DSH_STAGE_A_V1R3R2_EXECUTION_PROJECT_ID
+    }
     assert data["active_project"] is None
     assert data["current_permitted_next_action"] == "No project implementation is currently authorized."
     _assert_project_is_not_active(registry, FUNDING_INCREMENTAL_IMPLEMENTATION_PROJECT_ID)

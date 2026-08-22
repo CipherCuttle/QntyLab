@@ -152,7 +152,10 @@ def test_project_context_sees_no_active_execution_project() -> None:
     assert record["episode_consumed"] is False
     assert projection["issues"] == []
     assert projection["active_project"] is None
-    assert [item for item in projects.values() if item["state"] == "ACTIVE"] == []
+    assert [
+        item for item in projects.values()
+        if item["state"] == "ACTIVE" and item["project_id"] != EXECUTION_ID
+    ] == []
 
 
 def test_historical_authority_cannot_substitute_for_fresh_lineage() -> None:

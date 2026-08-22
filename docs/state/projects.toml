@@ -5916,3 +5916,104 @@ qnty_agent_eval = "NOT_APPLICABLE"
 active_project_after_closure = "NONE"
 terminal_outcome = "BLOCK_CHILD_INFRA"
 next_action = "CLOSED_BLOCKED: the exact prelive runtime and fixture gates passed, but the pinned Claude child adapter does not enforce the authorized hard read-only Read/Glob/Grep surface. The episode stopped before secret read, claim creation, provider I/O, DSH invocation, fixture execution, and spend. No rescue, runtime repair, claim, second episode, or Stage B is authorized; any later attempt requires new Git-backed authority."
+
+[[project]]
+project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_AUTHORIZATION_V0"
+display_name = "DSH Stage-A V1R3R2 one-episode live execution authorization V0"
+state = "CLOSED_PASS"
+authority_level = "BOUNDED_ONE_EPISODE_DSH_STAGE_A_LIVE_EXECUTION_ONLY"
+phase_type = "GOVERNANCE_BOUNDED_OFFLINE_AUTHORIZATION_CONSTRUCTION"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_claude_hard_read_only_repair_and_requalification_v0/qualification.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_authorization_v0/authorization.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_authorization_v0/hostile_governance_review.md",
+  "tests/test_dsh_stage_a_v1r3r2_one_episode_live_execution_authorization_v0.py",
+]
+authorization_state = "AUTHORIZED_IF_CANONICAL"
+authorization_effective = "AFTER_CANONICAL_MERGE_ONLY"
+canonical_predecessor_project_id = "DSH_STAGE_A_V1R3R2_CLAUDE_HARD_READ_ONLY_REPAIR_AND_REQUALIFICATION_V0"
+canonical_predecessor_pr = 181
+canonical_predecessor_reviewed_head = "4ee6131ddcc39d4c677db1259cab2c23d7937379"
+canonical_predecessor_merge = "117df125266b028225aefdd87cebdfadc7ab3735"
+qualified_launch_contract_digest = "57162eb65a4177ae58c6b503110dfe802ae345c3e6e9c3963acd207f693fbcc1"
+superseded_launch_digest_rejected = "4cd2734f229a97d4258ace4576f23f76f3d36aeef888a19fa61d2f4a7bff37d4"
+runtime_manifest_digest = "afcfa011de46bd9fccaa120b5612c24a5ace2b2c451591ddf8b67fb43a8ce321"
+executable_identity_digest = "ae07ece34c88b3ebaebd7452df8d136c82935f9c8ec9df16a40e50a2582a2fd9"
+launch_policy_digest = "34d5ceabbd89eaa7520cb5d5b69fa938a4cf15132b5c37e98382c4f6aab53f28"
+codex_repair_digest = "f89bf5833956f3c4202ca88a9285e39658976b29605fc1b63b7c62ebdd07fcb3"
+claude_repair_digest = "2b8277bf13e077651046e2527dc7aa092c3c9669cedc61eac1f742d9364a17e3"
+implementation_authorized = false
+implementation_completed = true
+episode_consumed = false
+authorized_live_episodes = 1
+second_episode_authorized = false
+whole_episode_retry_allowed = false
+execution_closure_pr_budget = 1
+activation_consumes_live_episode = false
+activation_consumes_execution_closure_pr_budget = false
+claim_mechanism = "REMOTE_GIT_REF_PLUS_O_EXCL_RECEIPT"
+claim_ref = "refs/heads/qntylab-claims/dsh-stage-a-v1r3r2-one-episode-live-execution-v0"
+claim_must_precede_provider_io = true
+claim_is_permanent_after_irreversible_dispatch = true
+pinned_dsh_commit = "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca"
+pinned_dsh_tree = "3bc8f89fe494a4755c188be354add4e8b1e7b188"
+pinned_dsh_tag = "dsh-v0.1.0-rc.7"
+fixture_id = "STAGE_A_BOUNDED_RETRY_V0"
+mutable_fixture_paths = ["retry.py"]
+parent_provider = "openai"
+parent_model = "gpt-5-mini"
+parent_route = "llm-pi-ai"
+parent_max_request_attempts = 8
+parent_retry_max = 0
+parent_max_tokens = 4096
+spend_ceiling_usd = 1.0
+child_routes = ["subagent_codex", "subagent_claude_code"]
+generic_child_tools = []
+background_delegation = false
+codex_max_total = 2
+claude_max_total = 2
+claude_hard_read_only = true
+claude_allowed_tools = ["Read", "Glob", "Grep"]
+claude_write_allowed = false
+claude_edit_allowed = false
+claude_bash_allowed = false
+claude_agent_allowed = false
+claude_task_allowed = false
+claude_mcp_allowed = false
+claude_delegation_allowed = false
+claude_ask_user_question_allowed = false
+claude_permission_mode = "dontAsk"
+claude_setting_sources = []
+claude_strict_mcp_config = true
+claude_mcp_servers = {}
+claude_agents = {}
+claude_plugins = []
+claude_persistence = false
+live_episode_timeout_seconds = 1800
+explicit_disposable_dsh_home_required = true
+workspace_containment_required = true
+authorization_phase_secret_read = false
+authorization_phase_live_dsh_calls = 0
+authorization_phase_paid_model_calls = 0
+authorization_phase_spend_usd = 0.0
+remote_claim_created = false
+local_claim_created = false
+stage_b_authorized = false
+scientific_execution_authorized = false
+qnty_runtime_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+qnty_agent_eval = "NOT_APPLICABLE"
+active_project_after_closure = "NONE"
+hostile_review_count = 1
+hostile_review_verdict = "PASS"
+hostile_governance_critical_total = 0
+hostile_governance_high_total = 0
+hostile_governance_medium_total = 0
+hostile_governance_low_total = 0
+targeted_governance_rereview_used = false
+terminal_outcome = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_AUTHORIZATION_AVAILABLE"
+next_action = "Review and merge this authorization PR before any live execution; after canonical merge, perform exactly one separately recorded Stage-A V1R3R2 execution phase under this frozen authority. Do not activate, execute, read the secret, call OpenAI, invoke DSH, create the claim, or authorize Stage B during construction."

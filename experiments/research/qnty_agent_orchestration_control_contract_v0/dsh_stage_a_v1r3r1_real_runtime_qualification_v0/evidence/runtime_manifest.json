@@ -1,0 +1,33 @@
+{
+  "phaseId": "DSH_STAGE_A_V1R3_LAUNCH_PLANE_QUALIFICATION_V0",
+  "materializationRoot": "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1/source",
+  "sourceIdentity": {
+    "repository": "deepseek-ai/deepseek-harness",
+    "commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "tag": "dsh-v0.1.0-rc.7"
+  },
+  "packageManagerFingerprint": {
+    "packageManager": "pnpm@11.7.0"
+  },
+  "patchDigests": [
+    {
+      "path": "/home/swirky/DevHub/repos/QntyLab/experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3_launch_plane_qualification_v0/repairs/codex-executable-binding.patch",
+      "digest": "f89bf5833956f3c4202ca88a9285e39658976b29605fc1b63b7c62ebdd07fcb3"
+    }
+  ],
+  "profileDigests": {},
+  "launcherDigest": "b17ee777478d01410b2e571ce3c1a4b6b5d60ef125f31a7d560f3c87f81c8dfe",
+  "builtCliAbsolutePath": "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1/source/apps/cli/lib/bin.js",
+  "builtCliDigest": "c0226687bb20f45c603ec6fe50f3de16d1c3510c3a803304ec575ef9bc366c62",
+  "workspaceBundledChunks": {
+    "apps/cli/lib/profile-boot-DG5t9aNs.js": "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1/source/apps/cli/lib/profile-boot-DG5t9aNs.js",
+    "apps/cli/lib/plugin-9h8shc4d.js": "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1/source/apps/cli/lib/plugin-9h8shc4d.js"
+  },
+  "executableFingerprints": {
+    "nodeExecutable": "1bec56ef7cfa9a76f3e0b7c0a87f220eb73f23102b9c0b4c7529a3f7c3ce7c31",
+    "pythonExecutable": "b8d8288faefdd300201f43fcf00f6f539a27218eeed3a3dff5ab10b9c4c99700",
+    "codexExecutable": "ac2cfed85fb647d61e0150b8548102b330e4799d9d81ad5d354de701edf6b074",
+    "claudeExecutable": "98226474f802e3094d6a86c5ade8883c16206d0fcb5c400b7401c800063e99d7"
+  },
+  "materializedAtUtc": "2026-08-22T00:33:52.440Z"
+}

@@ -1,0 +1,98 @@
+# V1R3R1 qualification-only overlay patch: narrows the headless profile's
+# default tool surface to exactly the two native-product subagent tools
+# (subagent_codex, subagent_claude_code), and points the pi-ai openai route
+# at the deterministic loopback qualification mock.
+
+# Disable every other model-facing tool row the headless/base composition
+# ships by default, so the one real wire request's tool schema is exactly
+# [subagent_codex, subagent_claude_code].
+- id: tool-bash
+  disabled: true
+- id: tool-pwsh
+  disabled: true
+- id: tool-jobs
+  disabled: true
+- id: tool-fs
+  disabled: true
+- id: tool-fs-search
+  disabled: true
+- id: tool-skill
+  disabled: true
+- id: tool-subagent-control
+  disabled: true
+- id: tool-subagent-list-agents
+  disabled: true
+- id: tool-subagent
+  disabled: true
+- id: tool-subagent-fork
+  disabled: true
+- id: tool-subagent-report
+  disabled: true
+- id: tool-workflow
+  disabled: true
+- id: tool-result-pruner
+  disabled: true
+- id: tool-todo
+  disabled: true
+- id: tool-goal
+  disabled: true
+- id: tool-ralph
+  disabled: true
+- id: tool-str-replace-editor
+  disabled: true
+- id: tool-web
+  disabled: true
+- id: plan-mode
+  disabled: true
+- id: session-title-llm
+  disabled: true
+
+# Deterministic default selection: openai/gpt-5-mini, resolved by the
+# credential-scrubbed loopback mock configured below.
+- id: agent-default-model
+  config:
+    provider: openai
+    model: gpt-5-mini
+
+# Narrow, qualification-only openai route: baseURL is the loopback mock the
+# driver starts before boot; apiKeyEnv reads a fake, non-secret value the
+# driver sets in the child's environment.
+- id: llm-pi-ai
+  config:
+    providers:
+      openai:
+        apiKeyEnv: QNTYLAB_QUAL_OPENAI_API_KEY
+        baseURL: !!js process.env.QNTYLAB_QUAL_OPENAI_BASE_URL
+        api: openai-completions
+        models:
+          - id: gpt-5-mini
+            name: gpt-5-mini
+            contextWindow: 128000
+            maxTokens: 16384
+
+- insert:
+    # Native product subagent providers (real Codex app-server / real Claude
+    # Agent SDK child processes) — never invoked in this qualification run,
+    # since the mock parent's one deterministic response never requests a
+    # tool call, but their tools are the only ones on the model-facing wire.
+    - id: subagent-codex
+      name: '@deepseek-ai/dsh-subagent-codex'
+
+    - id: subagent-claude-code
+      name: '@deepseek-ai/dsh-subagent-claude-code'
+
+    - id: tool-subagent-codex
+      name: '@deepseek-ai/dsh-tool-subagent'
+      config:
+        provider: codex
+        toolName: subagent_codex
+        backgroundMode: one-shot
+        maxDepth: provider-managed
+
+    - id: tool-subagent-claude-code
+      name: '@deepseek-ai/dsh-tool-subagent'
+      config:
+        provider: claude-code
+        toolName: subagent_claude_code
+        backgroundMode: one-shot
+        maxDepth: provider-managed

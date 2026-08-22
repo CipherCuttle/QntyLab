@@ -1,0 +1,167 @@
+# CORRECTED IN V1R3R1 AGAINST THE REAL MATERIALIZED PINNED CHECKOUT.
+#
+# The V1R3 predecessor version of this file was written from the plan's
+# source citations without a materialized pinned tree to diff against, and
+# used placeholder `index 0000000000..0000000000` hunk headers. Real
+# materialization in V1R3R1 (commit 99f6f02fecdb7dff40c3fbc9470f5907c29f74ca,
+# tag dsh-v0.1.0-rc.7) ran `git apply --check` against the actual pinned tree
+# and it failed (`error: corrupt patch at line 46`) — the real
+# `codexAppServerArgv()` already takes a `platform` parameter and has a
+# win32 `cmd.exe` branch that the placeholder hunk did not know about, and
+# the real resolve-then-pin seam for the sibling Claude provider lives in
+# `subagent-claude-code/src/index.ts`'s `start()` (via
+# `ctx.subprocess.resolveExecutable('claude', ...)` -> an `executable` field
+# threaded through `ClaudeCodeRunSpec`), not inside `run.ts` as the
+# placeholder assumed. This is a corrected QntyLab-owned repair generated
+# directly from the real pinned source tree, applied and verified with
+# `git apply --check` by `qntylab-materialize-dsh-runtime.mjs`, and it
+# reproduces the exact same architectural intent as the sibling Claude
+# provider's already-landed pattern: resolve the executable once, in the
+# provider's `start()`, through the shared `ctx.subprocess.resolveExecutable`
+# seam, and pin the resolved absolute path into argv — closing the
+# PATH-substitution TOCTOU window where a bare `'codex'` string was
+# previously left for the OS to resolve fresh at the actual `execve`.
+#
+# Also updates the one pinned unit-test file that asserted the old
+# no-argument/bare-string contract, so the repaired package's own existing
+# test suite exercises the new contract rather than silently skipping it.
+diff --git a/packages/subagent/subagent-codex/src/index.ts b/packages/subagent/subagent-codex/src/index.ts
+index 3b1bbec799..24eded6c41 100644
+--- a/packages/subagent/subagent-codex/src/index.ts
++++ b/packages/subagent/subagent-codex/src/index.ts
+@@ -54,19 +54,25 @@ class CodexProvider implements SubagentProvider {
+     private readonly config: ResolvedConfig,
+   ) {}
+ 
+-  start(request: ResolvedSubagentStartRequest) {
++  async start(request: ResolvedSubagentStartRequest) {
+     const parentCwd = request.parent.session.header.cwd
+     if (parentCwd === undefined) {
+       throw new Error(
+         'subagent-codex: no working directory for the child — delegate from a parent session that has one',
+       )
+     }
++    const executable = await this.ctx.subprocess.resolveExecutable(
++      'codex',
++      this.config.env,
++      request.signal,
++    )
+     const spec: CodexRunSpec = {
+       cwd: resolveChildCwd(
+         'subagent-codex',
+         undefined,
+         parentCwd,
+       ),
++      executable,
+       env: this.config.env,
+       disposeGraceMs: this.config.disposeGraceMs,
+       spawn: spawnSpec => this.ctx.subprocess.spawn(spawnSpec),
+diff --git a/packages/subagent/subagent-codex/src/run.ts b/packages/subagent/subagent-codex/src/run.ts
+index ebce244f3b..87a1e07e88 100644
+--- a/packages/subagent/subagent-codex/src/run.ts
++++ b/packages/subagent/subagent-codex/src/run.ts
+@@ -25,26 +25,40 @@ import { CodexAppServerWire } from './wire.ts'
+ export const DEFAULT_DISPOSE_GRACE_MS = 3_000
+ 
+ /**
+- * Resolve the fixed app-server command for a platform.
++ * Resolve the fixed app-server command for a platform, pinned to an
++ * already-resolved absolute executable path.
++ *
++ * Mirrors the resolve-then-pin pattern subagent-claude-code's provider uses
++ * (`ctx.subprocess.resolveExecutable('claude', ...)` -> `executable` field):
++ * resolving once at provider `start()` and pinning the absolute path into
++ * argv closes the gap between "resolve" and "use" — previously the bare
++ * string `'codex'` was left for the OS to resolve fresh at the actual
++ * `execve`, the latest possible moment, which is a real PATH-substitution
++ * TOCTOU window a decoy earlier in PATH could exploit.
+  *
+  * Windows npm and pnpm installs expose `codex.cmd`, which requires `cmd.exe`;
+- * the argv is constant so no task or configuration text enters the
+- * shell boundary.
++ * only the resolved executable path varies, so no task or configuration
++ * text enters the shell boundary.
++ * @param executable - absolute path already resolved via the subprocess
++ *   service's `resolveExecutable('codex', ...)` seam.
+  * @param platform - host platform used to select the executable boundary.
+  * @returns argv for the fixed Codex app-server command.
+  */
+ export function codexAppServerArgv(
++  executable: string,
+   platform: NodeJS.Platform = process.platform,
+ ): string[] {
+   return platform === 'win32'
+-    ? ['cmd.exe', '/d', '/s', '/c', 'codex', 'app-server', '--stdio']
+-    : ['codex', 'app-server', '--stdio']
++    ? ['cmd.exe', '/d', '/s', '/c', executable, 'app-server', '--stdio']
++    : [executable, 'app-server', '--stdio']
+ }
+ 
+ /** Fully resolved inputs for one Codex app-server run. */
+ export interface CodexRunSpec {
+   /** Parent Session workspace, also supplied to `thread/start`. */
+   readonly cwd: string
++  /** Exact native Codex executable resolved from the host PATH. */
++  readonly executable: string
+   /** Explicit deployment/test environment layered after the shared scrub. */
+   readonly env: Record<string, string>
+   /** Subprocess termination grace passed to the shared process-tree owner. */
+@@ -123,7 +137,7 @@ export async function startCodexRun(
+   }
+ 
+   const child = spec.spawn({
+-    argv: codexAppServerArgv(),
++    argv: codexAppServerArgv(spec.executable),
+     cwd: spec.cwd,
+     stdio: { stdin: 'pipe', stdout: 'pipe', stderr: 'inherit' },
+     graceMs: spec.disposeGraceMs,
+diff --git a/packages/subagent/subagent-codex/tests/subagent-codex.spec.ts b/packages/subagent/subagent-codex/tests/subagent-codex.spec.ts
+index 37b2e9ff0b..ada8ed3571 100644
+--- a/packages/subagent/subagent-codex/tests/subagent-codex.spec.ts
++++ b/packages/subagent/subagent-codex/tests/subagent-codex.spec.ts
+@@ -183,6 +183,7 @@ function runSpec(
+ ): CodexRunSpec {
+   return {
+     cwd: process.cwd(),
++    executable: 'codex',
+     env: {},
+     disposeGraceMs: DEFAULT_DISPOSE_GRACE_MS,
+     spawn: () => child.handle,
+@@ -261,16 +262,16 @@ function turnCompleted(
+ 
+ describe('task admission and package contracts', () => {
+   it('resolves the fixed app-server command through the Windows npm shim boundary', () => {
+-    expect(codexAppServerArgv('win32')).toEqual([
++    expect(codexAppServerArgv('/abs/codex', 'win32')).toEqual([
+       'cmd.exe',
+       '/d',
+       '/s',
+       '/c',
+-      'codex',
++      '/abs/codex',
+       'app-server',
+       '--stdio',
+     ])
+-    expect(codexAppServerArgv('linux')).toEqual(['codex', 'app-server', '--stdio'])
++    expect(codexAppServerArgv('/abs/codex', 'linux')).toEqual(['/abs/codex', 'app-server', '--stdio'])
+   })
+ 
+   it('accepts one or more text blocks and rejects empty or non-text tasks', () => {
+@@ -862,7 +863,7 @@ describe('run lifecycle and quiescence', () => {
+     child.peer.respond(threadStart, { thread: { id: 'thread-1', ephemeral: true } })
+     const run = await starting
+     expect(spawn).toHaveBeenCalledWith({
+-      argv: codexAppServerArgv(),
++      argv: codexAppServerArgv('codex'),
+       cwd: process.cwd(),
+       stdio: { stdin: 'pipe', stdout: 'pipe', stderr: 'inherit' },
+       graceMs: DEFAULT_DISPOSE_GRACE_MS,
+@@ -932,6 +933,7 @@ describe('run lifecycle and quiescence', () => {
+       request(undefined, controller.signal),
+       {
+         cwd: process.cwd(),
++        executable: 'codex',
+         env: {},
+         disposeGraceMs: 10,
+         spawn,
+       },

@@ -1,0 +1,85 @@
+{
+  "phaseId": "DSH_STAGE_A_V1R3R1_REAL_RUNTIME_QUALIFICATION_V0",
+  "predecessor": {
+    "pr": 176,
+    "reviewedHead": "24bf629de36258520cdb73866d907c5633ca1e2c",
+    "canonicalMerge": "8ad4a92f3447ba7fff27cefc72fc1f258f07f2be"
+  },
+  "sourceIdentity": {
+    "repository": "deepseek-ai/deepseek-harness",
+    "commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "tag": "dsh-v0.1.0-rc.7"
+  },
+  "acceptance": {
+    "REAL_PINNED_RUNTIME_MATERIALIZED": true,
+    "CODEX_EXECUTABLE_BINDING_PATCH_APPLIED": true,
+    "CODEX_EXECUTABLE_BINDING_COMPILED": true,
+    "REAL_FULL_PROFILE_LOOPBACK_BOOT": "PASS",
+    "ACTUAL_SESSION_WORKSPACE_PROVEN": true,
+    "PARENT_BUDGET_GATE_PROVEN": true,
+    "MOCK_PARENT_WIRE_REQUESTS": 1,
+    "EXTERNAL_MODEL_REQUESTS": 0,
+    "PAID_MODEL_REQUESTS": 0,
+    "CODEX_MODEL_TURNS": 0,
+    "CLAUDE_MODEL_TURNS": 0,
+    "QUALIFIED_LAUNCH_CONTRACT_DIGEST_ISSUED": true
+  },
+  "concreteDefectsFoundAndCorrected": [
+    "repairs/codex-executable-binding.patch did not apply against the real pinned tree (placeholder hunk headers, wrong call site)",
+    "build:lib:host alone omits packages built only during the client tsdown pass (dsh-typert-registry, dsh-api-gateway, ...); full build:lib required",
+    "launcher --profile required an absolute existing path; the real pinned CLI takes a bare profile name resolved under $DSH_HOME",
+    "qualification mock served plain JSON; the real pinned llm-pi-ai openai-completions route requires an SSE chat.completion.chunk stream"
+  ],
+  "decisiveRun": {
+    "launcher": "canonical (corrected) qntylab-launch-dsh.mjs",
+    "profile": "headless",
+    "overlayPatch": "driver/qualification.patch.yml",
+    "parentProvider": "openai",
+    "parentModel": "gpt-5-mini",
+    "modelFacingTools": ["subagent_codex", "subagent_claude_code"],
+    "exitCode": 0,
+    "stdout": "Qualification loopback response. No tool call.",
+    "mockParentWireRequests": 1,
+    "auxiliaryParentRequests": 0,
+    "llmRetries": 0,
+    "codexActualTaskCalls": 0,
+    "claudeActualTaskCalls": 0,
+    "sessionCwd": "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1/workspace/run1",
+    "expectedWorkspace": "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1/workspace/run1",
+    "workspaceMatch": true
+  },
+  "callerCwdVariance": [
+    "/home/swirky/DevHub/repos/QntyLab",
+    "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1/source",
+    "unrelated scratch cwd"
+  ],
+  "budgetGate": {
+    "maxParentRequestAttempts": 8,
+    "attempt9": "DENIED_CEILING",
+    "reservationBeforeAdapterIo": "architectural (no I/O in the reservation path other than the durable counter write itself)"
+  },
+  "security": {
+    "realStageASecretRead": false,
+    "externalNetworkDuringQualification": 0,
+    "externalModelRequests": 0,
+    "spendUsd": 0,
+    "selfCorrectedOperationalNote": "one diagnostic dsh --dump-config invocation omitted DSH_HOME and idempotently touched the operator's real ~/.dsh profile home (symlink refresh + template root rewrite, both self-healing DSH operations DSH performs on every boot); two extra symlinks this phase's driver added there were identified and removed immediately; no session/credential/settings data was created, altered, or deleted; see PHASE.md"
+  },
+  "digests": {
+    "RUNTIME_MANIFEST_DIGEST": "6449f3097e02c5a4b74642d08e17f86412800ac57aa63b80cb28020cd6437ca4",
+    "EXECUTABLE_IDENTITY_DIGEST": "ae07ece34c88b3ebaebd7452df8d136c82935f9c8ec9df16a40e50a2582a2fd9",
+    "LAUNCH_POLICY_DIGEST": "3d8cb2122272c6614cdfd8116eff9dc69a943b951243256523d0294ca6b2ae0f",
+    "QUALIFIED_LAUNCH_CONTRACT_DIGEST": "3bf649f5cbdd96dcc0edf91cd7dfb88b3245ff3617518c9d5da3dfbd5a01a18e"
+  },
+  "tests": {
+    "offlineContractTests": "19/19 pass (test/qntylab-dsh-v1r3r1.test.mjs, unmodified predecessor suite against the corrected artifacts)",
+    "repairedPackageOwnTests": "32/32 pass (packages/subagent/subagent-codex/tests/subagent-codex.spec.ts, run against the real materialized/patched source)"
+  },
+  "closure": {
+    "projectState": "CLOSED_PASS",
+    "implementationAuthorizedAfter": false,
+    "implementationCompletedAfter": true,
+    "activeProjectsAfter": "NONE"
+  }
+}

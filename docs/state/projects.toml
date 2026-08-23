@@ -7658,3 +7658,159 @@ real_claude_turns = 0
 claims_created = 0
 spend_usd = 0.0
 next_action = "CLOSED_PASS: a later separately authorized phase may construct one fresh live authorization bound ONLY to a392f82efd5cf97e20a6ce4353597a8a7210e8638cc17e5a4209cc1003eee4be. Do not create or execute it automatically. No live execution, claim, secret, provider/model, spend, Stage B, Qnty, scientific, trading, capital, or promotion authority is created here."
+
+[[project]]
+project_id = "DSH_STAGE_A_V1R3R2_PRODUCTION_DSH_HOME_MATERIALIZATION_AND_ACTION_TIME_PARITY_AUTHORIZATION_V0"
+display_name = "DSH Stage-A V1R3R2 production DSH_HOME materialization and action-time parity authorization V0"
+state = "CLOSED_PASS"
+authority_level = "BOUNDED_PRELIVE_RUNTIME_PROFILE_MATERIALIZATION_REPAIR_ONLY"
+phase_type = "GOVERNANCE_ONLY_BOUNDED_REPAIR_AUTHORIZATION"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/evidence/contract.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/evidence/qualification.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/qualification/run-composite-qualification.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_result_v0r4/execution_evidence.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_result_v0r4/closure.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_production_dsh_home_materialization_and_action_time_parity_authorization_v0/authorization.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_production_dsh_home_materialization_and_action_time_parity_authorization_v0/hostile_governance_review.md",
+  "tests/test_dsh_stage_a_v1r3r2_production_dsh_home_materialization_authorization_v0.py",
+]
+authorization_state = "AUTHORIZED_IF_CANONICAL"
+authorization_effective = "AFTER_EXACT_CANONICAL_MERGE_ONLY"
+canonical_base_sha = "1913df60545616cb8eaf94f36f73f6686c683993"
+canonical_predecessor_project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R4"
+canonical_predecessor_merge = "1913df60545616cb8eaf94f36f73f6686c683993"
+canonical_predecessor_pr = 204
+canonical_predecessor_required_state = "CLOSED_BLOCKED"
+predecessor_project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R4"
+predecessor_state = "CLOSED_BLOCKED"
+predecessor_terminal_result = "BLOCK_RUNTIME_IDENTITY"
+predecessor_episode_claimed = false
+predecessor_episode_consumed = false
+predecessor_rerun_authorized = false
+predecessor_immutable_historical_evidence = true
+predecessor_reopen_allowed = false
+authorized_future_project_id = "DSH_STAGE_A_V1R3R2_PRODUCTION_DSH_HOME_MATERIALIZATION_AND_REQUALIFICATION_V0"
+authorized_future_project_count = 1
+authorized_future_project_exists = false
+authorized_future_project_authority = "BOUNDED_PRELIVE_RUNTIME_PROFILE_MATERIALIZATION_REPAIR_ONLY"
+implementation_authorized = false
+implementation_completed = false
+materializer_implemented_this_phase = false
+root_cause_classification = "QUALIFICATION_TO_ACTION_TIME_DSH_HOME_MATERIALIZATION_GAP"
+root_cause_rejected_classifications = [
+  "DSH_UPSTREAM_FAILURE",
+  "COMPOSITE_LAUNCHER_FAILURE",
+  "OPENAI_FAILURE",
+  "CODEX_FAILURE",
+  "CLAUDE_FAILURE",
+]
+qualification_only_helper_symbol = "prepareDisposableDshHome"
+qualification_only_helper_path = "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/qualification/run-composite-qualification.mjs"
+qualification_only_helper_sha256 = "11a35328790785de35562b4a9f2b68737c668f31eb9f43afc972a4871a9052f7"
+qualification_only_helper_is_production_authority = false
+qualification_only_helper_may_remain_production_authority = false
+failed_live_dsh_home = "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1-repair/dsh-home"
+scratch_dsh_home_canonical_authority = false
+scratch_dsh_home_may_be_declared_authoritative = false
+ambient_dsh_home_dependency_removal_required = true
+historical_ambient_dsh_home_mutation_authorized = false
+historical_ambient_dsh_home_repair_or_backfill_authorized = false
+ambient_root_mutation_authorized = false
+ambient_cross_check_must_be_read_only = true
+forbidden_ambient_authorities = [
+  "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1-repair/dsh-home",
+  "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r2-claude-repair-source",
+  "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1-repair-source-2",
+  "/home/swirky/node_modules",
+]
+production_materializer_required = true
+production_materializer_must_be_bound_into_successor_contract = true
+production_materializer_requires_empty_destination = true
+production_stub_provider_allowed = false
+required_qntylab_production_packages = [
+  "@qntylab/dsh-stage-a-gated-provider",
+  "@qntylab/dsh-stage-a-parent-enforcement",
+]
+qualification_only_optional_package = "@qntylab/dsh-stage-a-stub-provider"
+required_negative_control_count = 20
+determinism_independent_materializations_required = 2
+action_time_parity_receipt_required = true
+action_time_parity_skippable = false
+action_time_parity_stop_boundary = "IMMEDIATELY_BEFORE_REAL_SECRET_READ"
+offline_real_dsh_qualification_allowed = true
+offline_substitution_seam = "EXPLICIT_OFFLINE_PROVIDER_AND_CHILD_SUBSTITUTION_SEAM_ONLY"
+predecessor_qualified_launch_contract_digest = "a392f82efd5cf97e20a6ce4353597a8a7210e8638cc17e5a4209cc1003eee4be"
+a392_preserved_historically = true
+a392_remains_final_complete_live_contract = false
+successor_contract_required = true
+successor_contract_issued_this_phase = false
+new_production_dsh_home_materializer_digest_required = true
+new_qualified_launch_contract_digest_required = true
+composite_launch_policy_digest = "7345ab145a0c98696ce8b9e6d815f4da98092f7be680467278464fb098a51589"
+composite_launcher_path = "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/launcher/qntylab-launch-dsh.mjs"
+composite_launcher_digest = "6f212de0576127fea1dd2778a69c49a3b755a017a9d55f97f18b9057dc15c329"
+composite_launcher_modification_authorized = false
+pinned_dsh_repository = "deepseek-ai/deepseek-harness"
+pinned_dsh_commit = "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca"
+pinned_dsh_tree = "3bc8f89fe494a4755c188be354add4e8b1e7b188"
+pinned_dsh_tag = "dsh-v0.1.0-rc.7"
+runtime_manifest_digest = "0e09b9d9d977f73d146c4a35d497cc93bd046bae016e1b1a6a52b481f07731b3"
+executable_identity_digest = "ae07ece34c88b3ebaebd7452df8d136c82935f9c8ec9df16a40e50a2582a2fd9"
+runtime_rebuild_authorized = false
+runtime_byte_modification_authorized = false
+stage_a_package_modification_authorized = false
+runtime_identity_change_behavior = "STOP_AND_REPORT_SOURCE_CONFLICT_OR_SCOPE_EXPANSION_REQUIRED"
+stale_test_repair_authorized = true
+stale_test_repair_scope = "NARROW_TEST_ONLY"
+stale_test_file = "tests/test_dsh_stage_a_v1r3r2_one_episode_live_execution_authorization_v0r4.py"
+stale_test_name = "test_fresh_activation_artifact_was_not_present_in_canonical_history"
+stale_test_production_semantics_change_allowed = false
+stale_test_deletion_authorized = false
+live_execution_authorized = false
+secret_read_authorized = false
+claim_authorized = false
+provider_io_authorized = false
+real_children_authorized = false
+v0r5_authorized = false
+v0r5_created = false
+authorization_phase_secret_reads = 0
+authorization_phase_claim_creations = 0
+authorization_phase_live_dsh_calls = 0
+authorization_phase_external_provider_requests = 0
+authorization_phase_real_model_calls = 0
+authorization_phase_codex_child_turns = 0
+authorization_phase_claude_child_turns = 0
+authorization_phase_fixture_mutations = 0
+authorization_phase_runtime_bytes_modified = 0
+authorization_phase_launcher_bytes_modified = 0
+authorization_phase_ambient_dsh_home_bytes_modified = 0
+authorization_phase_spend_usd = 0.0
+stage_b_authorized = false
+scientific_execution_authorized = false
+qnty_runtime_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+promotion_authority = "NONE"
+broader_production_authority = "NONE"
+production_deployment_authorized = false
+qnty_agent_eval = "NOT_APPLICABLE"
+active_project_after_closure = "NONE"
+hostile_review_count = 1
+hostile_review_verdict = "PASS"
+hostile_governance_critical_total = 0
+hostile_governance_high_total = 1
+hostile_governance_medium_total = 2
+hostile_governance_low_total = 0
+hostile_governance_unrepaired_critical_total = 0
+hostile_governance_unrepaired_high_total = 0
+hostile_governance_high_repaired_total = 1
+hostile_governance_medium_accepted_without_repair = 2
+targeted_governance_rereview_used = true
+targeted_governance_rereview_count = 1
+targeted_governance_rereview_verdict = "PASS"
+terminal_outcome = "DSH_STAGE_A_V1R3R2_PRODUCTION_DSH_HOME_MATERIALIZATION_AUTHORIZATION_READY"
+next_action = "CLOSED_PASS: after canonical merge, perform exactly one DSH_STAGE_A_V1R3R2_PRODUCTION_DSH_HOME_MATERIALIZATION_AND_REQUALIFICATION_V0 implementation phase. Implement one production DSH_HOME materializer from Git-bound or contract-bound canonical inputs, remove the ambient scratch DSH_HOME dependency, prove determinism and the full negative-control set, produce the ACTION_TIME_PARITY_RECEIPT stopping immediately before any real secret read, issue a NEW successor qualified launch contract digest that binds the materializer, run one independent hostile review, and open one draft PR. Do not create, activate, or execute V0R5; do not read the secret, create a claim, call a provider, invoke real children, spend, rebuild the runtime, modify the composite launcher, or grant Stage B, Qnty, scientific, trading, capital, promotion, or broader production authority."

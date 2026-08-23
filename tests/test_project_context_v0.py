@@ -153,7 +153,7 @@ def test_dsh_stage_a_v1_execution_closure_is_single_bounded_blocked_project() ->
         for record in registry["project"]
         if record["state"] == "ACTIVE"
     }
-    assert active_ids == {DSH_STAGE_A_V1R3R2_V0R3_EXECUTION_PROJECT_ID}
+    assert active_ids == set()
     execution = next(record for record in registry["project"] if record["project_id"] == DSH_STAGE_A_V1_EXECUTION_PROJECT_ID)
     authorization = next(record for record in registry["project"] if record["project_id"] == DSH_STAGE_A_V1_AUTHORIZATION_PROJECT_ID)
 
@@ -294,16 +294,16 @@ def test_funding_incremental_implementation_freeze_is_closed_without_escalation(
     data = project_context.context_data(ROOT)
     _, _, registry = project_context.load_context_sources(ROOT)
     # The source-bound implementation freeze and the blocked Stage-A V1
-    # execution, V0R1, and V0R2R1 live episodes are all closed. V0R2R1 became
-    # canonically effective after PR #193 merged, then closed BLOCK_RUNTIME_INFRA
-    # because this environment cannot materialize or launch the pinned DSH
-    # runtime. The separate V0R3 activation is the only ACTIVE registry row;
-    # this branch-local candidate remains ineffective until canonical merge.
+    # execution, V0R1, V0R2R1, and V0R3 live episodes are all closed. V0R2R1
+    # became canonically effective after PR #193 merged, then closed
+    # BLOCK_RUNTIME_INFRA because this environment cannot materialize or launch
+    # the pinned DSH runtime. V0R3 then closed BLOCK_RUNTIME_IDENTITY before
+    # secret or runtime execution, so no ACTIVE registry rows remain.
     assert {
         record["project_id"]
         for record in registry["project"]
         if record["state"] == "ACTIVE"
-    } == {DSH_STAGE_A_V1R3R2_V0R3_EXECUTION_PROJECT_ID}
+    } == set()
     assert data["active_project"] is None
     assert data["current_permitted_next_action"] == "No project implementation is currently authorized."
     _assert_project_is_not_active(registry, FUNDING_INCREMENTAL_IMPLEMENTATION_PROJECT_ID)

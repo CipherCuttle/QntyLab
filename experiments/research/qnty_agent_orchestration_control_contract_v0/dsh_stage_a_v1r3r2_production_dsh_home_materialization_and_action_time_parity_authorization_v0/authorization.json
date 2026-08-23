@@ -1,0 +1,590 @@
+{
+  "artifact_type": "DSH_STAGE_A_V1R3R2_PRODUCTION_DSH_HOME_MATERIALIZATION_AND_ACTION_TIME_PARITY_AUTHORIZATION",
+  "schema_version": "dsh-stage-a-v1r3r2-production-dsh-home-materialization-and-action-time-parity-authorization-v0",
+  "project_id": "DSH_STAGE_A_V1R3R2_PRODUCTION_DSH_HOME_MATERIALIZATION_AND_ACTION_TIME_PARITY_AUTHORIZATION_V0",
+  "phase_state": "CLOSED_PASS",
+  "phase_type": "GOVERNANCE_ONLY_BOUNDED_REPAIR_AUTHORIZATION",
+  "authority_level": "BOUNDED_PRELIVE_RUNTIME_PROFILE_MATERIALIZATION_REPAIR_ONLY",
+  "authorized_operation": "AUTHORIZE_EXACTLY_ONE_FUTURE_PRODUCTION_DSH_HOME_MATERIALIZATION_AND_REQUALIFICATION_IMPLEMENTATION_PHASE_ONLY",
+  "authorization_state": "AUTHORIZED_IF_CANONICAL",
+  "authorization_effective": "AFTER_EXACT_CANONICAL_MERGE_ONLY",
+
+  "canonical_predecessor": {
+    "project_id": "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R4",
+    "canonical_master": "1913df60545616cb8eaf94f36f73f6686c683993",
+    "canonical_predecessor_merge": "1913df60545616cb8eaf94f36f73f6686c683993",
+    "canonical_predecessor_pr": 204,
+    "required_state": "CLOSED_BLOCKED",
+    "required_terminal_outcome": "BLOCK_RUNTIME_IDENTITY",
+    "required_episode_claimed": false,
+    "required_episode_consumed": false,
+    "required_rerun_authorized": false,
+    "required_active_project": "NONE",
+    "closure_artifact": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_result_v0r4/closure.md",
+    "closure_artifact_sha256": "e7162835249d5ec71cf3747ffd345288b206e683f6df4c2baf01f85f89fdc668",
+    "execution_evidence_artifact": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_result_v0r4/execution_evidence.json",
+    "execution_evidence_artifact_sha256": "dcbf94ae86d6df6c54a58bdd229e8116e0cac0c4bcd28f8926cf8ab543d8c6bf",
+    "activation_artifact": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0r4/activation.json",
+    "activation_artifact_sha256": "73f92807bca93eff312e5a697811476d234f40e614bc5b9e15a3ff6c6d234a37",
+    "authorization_artifact": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_authorization_v0r4/authorization.json",
+    "authorization_artifact_sha256": "8ae1ba578f7db2a59a5edda22e8ece50237f1d7315eb8dcbfd9333b251134084",
+    "binding_mismatch_behavior": "BLOCK_AUTH",
+    "v0r4_immutable_historical_evidence": true,
+    "v0r4_reopen_allowed": false,
+    "v0r4_rerun_allowed": false,
+    "v0r4_episode_reuse_allowed": false,
+    "v0r4_claim_tuple_reuse_allowed": false
+  },
+
+  "root_cause": {
+    "classification": "QUALIFICATION_TO_ACTION_TIME_DSH_HOME_MATERIALIZATION_GAP",
+    "rejected_classifications": [
+      "DSH_UPSTREAM_FAILURE",
+      "COMPOSITE_LAUNCHER_FAILURE",
+      "OPENAI_FAILURE",
+      "CODEX_FAILURE",
+      "CLAUDE_FAILURE"
+    ],
+    "v0r4_terminal_outcome": "BLOCK_RUNTIME_IDENTITY",
+    "v0r4_launcher_preflight_error": "DSH_HOME is missing the Stage-A package scope",
+    "v0r4_failed_dsh_home": "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1-repair/dsh-home",
+    "v0r4_gates_passed_before_failure": [
+      "authorization",
+      "activation",
+      "a392 contract",
+      "composite policy",
+      "composite launcher",
+      "runtime manifest",
+      "executable identity",
+      "claim absence"
+    ],
+    "qualification_only_helper": {
+      "symbol": "prepareDisposableDshHome",
+      "path": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/qualification/run-composite-qualification.mjs",
+      "file_sha256": "11a35328790785de35562b4a9f2b68737c668f31eb9f43afc972a4871a9052f7",
+      "definition_line": 50,
+      "invocation_line": 117,
+      "constructs": [
+        "profiles/headless",
+        "exact qualified headless profile files",
+        "profiles/node_modules",
+        "linked exact @deepseek-ai runtime packages",
+        "profiles/node_modules/@qntylab",
+        "dsh-stage-a-gated-provider",
+        "dsh-stage-a-parent-enforcement",
+        "optional qualification-only offline stub provider"
+      ],
+      "is_production_authority": false,
+      "was_executed_on_the_live_v0r4_path": false,
+      "may_remain_the_production_authority_path": false
+    },
+    "action_time_equivalent_materialization_executed": false,
+    "basis": "The successful composite qualification constructs a valid disposable DSH_HOME inside qualification-only scaffolding. The V0R4 live action-time path had no equivalent production materialization step and instead consumed a manually maintained ambient DSH_HOME, which lacked the required Stage-A package scope."
+  },
+
+  "forensic_findings": {
+    "recorded_at_utc": "2026-08-23T00:00:00Z",
+    "method": "READ_ONLY_INSPECTION_ONLY",
+    "ambient_scratch_dsh_home": "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1-repair/dsh-home",
+    "F1_profile_bytes_still_match_qualified_digests": {
+      "finding": "All four qualified headless profile files in the ambient scratch DSH_HOME still match contract qualifiedDshHomeProfileDigests.",
+      "files": ["cordis.yml", "cordis.patch.yml", "package.json", "pnpm-workspace.yaml"],
+      "match": true,
+      "implication": "The V0R4 block was not profile-byte drift."
+    },
+    "F2_stage_a_package_scope_absent": {
+      "finding": "profiles/node_modules/@qntylab does not exist in the ambient scratch DSH_HOME.",
+      "qntylab_scope_present": false,
+      "implication": "Exactly reproduces the recorded V0R4 terminal outcome BLOCK_RUNTIME_IDENTITY."
+    },
+    "F3_ambient_node_modules_is_an_unverified_symlink_farm": {
+      "finding": "The ambient DSH_HOME profiles/node_modules contains no real package files at all; it is entirely a symlink farm into ambient roots that are not the identity-bound pinned runtime materialization root.",
+      "symlinks_total_maxdepth_2": 252,
+      "scope_directories": 12,
+      "real_non_symlink_files_maxdepth_2": 0,
+      "top_level_symlinks": 38,
+      "deepseek_ai_scope_symlinks": 197,
+      "symlinks_resolving_inside_pinned_materialization_root": 0,
+      "symlink_target_roots": {
+        "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r2-claude-repair-source": 247,
+        "/home/swirky/node_modules": 3,
+        "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1-repair-source-2": 2
+      },
+      "operator_home_escapes": [
+        "profiles/node_modules/detect-libc -> /home/swirky/node_modules/detect-libc",
+        "profiles/node_modules/semver -> /home/swirky/node_modules/semver",
+        "profiles/node_modules/@img/colour -> /home/swirky/node_modules/@img/colour"
+      ],
+      "implication": "The effective action-time trusted computing base of the qualified composite path includes at least two ambient scratch trees plus the operator home. None of these are identity-covered by contract a392."
+    },
+    "F4_launcher_identity_coverage_is_partial": {
+      "finding": "The qualified composite launcher identity-verifies only a small subset of the DSH_HOME it is handed.",
+      "verified": [
+        "4 headless profile files by exact digest",
+        "@qntylab scope membership and mirrored package bytes",
+        "6 @deepseek-ai packages in qualifiedRuntimePackageTreeDigests, by tree digest plus containment inside the pinned manifest root"
+      ],
+      "unverified": "The remaining ~246 packages present in profiles/node_modules are neither digest-verified nor containment-checked.",
+      "verified_runtime_packages": [
+        "dsh-llm",
+        "dsh-llm-pi-ai",
+        "dsh-subagent-claude-code",
+        "dsh-subagent-codex",
+        "dsh-subprocess",
+        "dsh-tool-subagent"
+      ],
+      "implication": "A production materializer must establish identity coverage for the whole materialized DSH_HOME, not only the currently verified subset."
+    },
+    "F5_qualification_helper_reproduces_the_ambient_dependency": {
+      "finding": "prepareDisposableDshHome sources profile bytes and the entire base node_modules from QUALIFIED_DSH_HOME, which defaults to the ambient scratch DSH_HOME, and only then overwrites 6 @deepseek-ai packages with links into the pinned materialization root.",
+      "qualified_dsh_home_default": "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1-repair/dsh-home",
+      "env_override": "QNTYLAB_QUALIFIED_DSH_HOME",
+      "implication": "The proven construction semantics are reusable, but their input authority is ambient and must be replaced with Git-bound or contract-bound canonical sources."
+    },
+    "F6_canonical_re_derivation_appears_feasible": {
+      "finding": "The pinned runtime materialization root carries a lockfile whose digest is already identity-bound in the runtime manifest, plus a populated pnpm virtual store.",
+      "pinned_materialization_root": "/var/tmp/qntylab-dsh-runtime-v0-final/source",
+      "lockfile_present": true,
+      "lockfile_digest": "f517dc3978d57531cda747df62a2abdde1df5b9f25415fcf1fc5d51f8b7547ea",
+      "pnpm_virtual_store_entries": 925,
+      "pinned_root_git_head": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+      "implication": "Deterministic re-derivation of the DSH_HOME package graph from identity-bound inputs is plausible, but is NOT proven by this authorization phase and must be established by the implementation phase.",
+      "known_open_risk": "At least one ambient package (@img/colour) was not located in the pinned virtual store during read-only inspection. The implementation phase must resolve canonical provenance for every required package or STOP and report SOURCE_CONFLICT."
+    },
+    "F7_launcher_currently_tolerates_the_stub_provider": {
+      "finding": "The qualified composite launcher treats @qntylab/dsh-stage-a-stub-provider as an optional-but-allowed member of the DSH_HOME @qntylab scope.",
+      "launcher_path": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/launcher/qntylab-launch-dsh.mjs",
+      "launcher_digest": "6f212de0576127fea1dd2778a69c49a3b755a017a9d55f97f18b9057dc15c329",
+      "implication": "Because this authorization does not permit modifying the qualified launcher, the prohibition on a production stub provider MUST be enforced by the production materializer and the production preflight, and bound into the successor contract."
+    }
+  },
+
+  "authorized_future_project": {
+    "project_id": "DSH_STAGE_A_V1R3R2_PRODUCTION_DSH_HOME_MATERIALIZATION_AND_REQUALIFICATION_V0",
+    "count": 1,
+    "phase_type": "BOUNDED_OFFLINE_IMPLEMENTATION_AND_REQUALIFICATION",
+    "authority_level": "BOUNDED_PRELIVE_RUNTIME_PROFILE_MATERIALIZATION_REPAIR_ONLY",
+    "effective_only_after_canonical_merge_of_this_authorization": true,
+    "authorized_scope": [
+      "implement exactly one production DSH_HOME materializer",
+      "reuse or refactor the proven construction semantics currently embedded in prepareDisposableDshHome",
+      "remove action-time dependency on the historical ambient scratch DSH_HOME",
+      "construct a fresh disposable production DSH_HOME from canonical inputs",
+      "bind the production materializer bytes into a successor launch contract",
+      "perform offline and action-time parity qualification",
+      "produce a NEW qualified successor launch contract digest",
+      "perform exactly one independent hostile review",
+      "create exactly one draft implementation/requalification PR",
+      "apply the narrow test-only repair of the permanently stale V0R4 authorization assertion"
+    ],
+    "forbidden_scope": [
+      "create V0R5",
+      "activate V0R5",
+      "execute V0R5",
+      "execute any live episode",
+      "read the real provider secret",
+      "create any claim",
+      "perform real provider or model I/O",
+      "spend money",
+      "invoke real Codex or Claude children",
+      "rebuild or modify the pinned DSH runtime bytes",
+      "modify the qualified composite launcher",
+      "modify the Stage-A production packages",
+      "modify or reopen V0R4 historical evidence",
+      "freeze an ambient machine directory as canonical authority",
+      "modify, repair, or backfill the historical ambient scratch DSH_HOME",
+      "modify, repair, or backfill any forbidden ambient root",
+      "Stage B",
+      "Qnty runtime authority",
+      "scientific execution",
+      "trading",
+      "capital",
+      "promotion",
+      "broader production deployment"
+    ],
+    "second_implementation_phase_authorized": false,
+    "implementation_retry_authorized": false,
+    "grants_live_authority": false,
+    "grants_successor_live_authority_automatically": false,
+    "next_phase_after_implementation": "SEPARATE_FRESH_GIT_BACKED_AUTHORITY_REQUIRED"
+  },
+
+  "production_materializer_contract": {
+    "required": true,
+    "must_be_first_class_production_component": true,
+    "must_be_deterministic": true,
+    "must_be_identity_covered": true,
+    "must_be_bound_into_successor_contract": true,
+    "required_chain": [
+      "PINNED DSH RUNTIME",
+      "CANONICAL STAGE-A PROFILE/PACKAGE INPUTS",
+      "PRODUCTION DSH_HOME MATERIALIZER",
+      "FRESH DISPOSABLE DSH_HOME",
+      "EXACT IDENTITY VERIFICATION",
+      "COMPOSITE LAUNCHER",
+      "DSH"
+    ],
+    "destination_policy": {
+      "must_require_empty_or_fresh_destination": true,
+      "must_reject_non_empty_destination": true,
+      "must_reject_reuse_of_a_persistent_directory": true,
+      "destination_inside_qntylab_forbidden": true,
+      "destination_inside_dsh_runtime_forbidden": true,
+      "destination_inside_operator_home_forbidden": true,
+      "realpath_symlink_aware_containment_required": true
+    },
+    "must_materialize": {
+      "profiles/headless": [
+        "cordis.yml",
+        "cordis.patch.yml",
+        "package.json",
+        "pnpm-workspace.yaml"
+      ],
+      "profiles/node_modules": "the exact required pinned @deepseek-ai runtime package set",
+      "profiles/node_modules/@qntylab": [
+        "dsh-stage-a-gated-provider",
+        "dsh-stage-a-parent-enforcement"
+      ]
+    },
+    "required_qntylab_packages": [
+      "@qntylab/dsh-stage-a-gated-provider",
+      "@qntylab/dsh-stage-a-parent-enforcement"
+    ],
+    "qualification_only_optional_package": "@qntylab/dsh-stage-a-stub-provider",
+    "production_stub_provider_allowed": false,
+    "stub_provider_only_via": "SEPARATELY_EXPLICIT_LOOPBACK_ONLY_QUALIFICATION_OVERLAY_THROUGH_THE_BOUNDED_OFFLINE_TEST_SEAM",
+    "stub_presence_in_production_materialization_behavior": "FAIL_CLOSED",
+    "must_reject": [
+      "missing required packages",
+      "unexpected @qntylab packages",
+      "modified package bytes",
+      "package symlinks escaping allowed roots",
+      "ambient package substitution"
+    ],
+    "enforcement_note": "The qualified composite launcher currently treats the stub provider as optional-allowed and this authorization does not permit modifying it, so production stub rejection must be enforced by the materializer and production preflight and bound into the successor contract."
+  },
+
+  "source_of_profile_bytes": {
+    "old_scratch_dsh_home_is_authoritative_source": false,
+    "forbidden_authoritative_source": "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1-repair/dsh-home",
+    "additional_forbidden_ambient_authorities": [
+      "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r2-claude-repair-source",
+      "/home/swirky/DevHub/scratch/qntylab-dsh-v1r3r1-repair-source-2",
+      "/home/swirky/node_modules"
+    ],
+    "required_derivation": "GIT_BOUND_OR_CONTRACT_BOUND_CANONICAL_SOURCES_ONLY",
+    "if_seed_bytes_exist_only_through_the_old_scratch_home": "IDENTIFY_CANONICAL_PROVENANCE_FIRST_THEN_MATERIALIZE_THOSE_BYTES_INTO_GIT_BACKED_IDENTITY_BOUND_INPUTS",
+    "freeze_ambient_machine_directory_as_authority": false,
+    "ambient_directory_may_be_used_as_a_cross_check_only": true,
+    "ambient_cross_check_may_not_confer_authority": true,
+    "ambient_cross_check_must_be_read_only": true,
+    "historical_ambient_dsh_home_mutation_authorized": false,
+    "historical_ambient_dsh_home_repair_or_backfill_authorized": false,
+    "ambient_root_mutation_authorized": false,
+    "ambient_mutation_behavior": "FORBIDDEN_BLOCKS_IMPLEMENTATION",
+    "ambient_immutability_basis": "The ambient scratch DSH_HOME is the physical referent of the immutable V0R4 historical evidence and the exact object whose absence produced BLOCK_RUNTIME_IDENTITY. Repairing, backfilling, or otherwise mutating it would destroy forensic reproducibility and could manufacture a passing live path without a real production materializer, defeating the entire purpose of this repair authorization.",
+    "unresolvable_provenance_behavior": "STOP_AND_REPORT_SOURCE_CONFLICT"
+  },
+
+  "runtime_binding": {
+    "pinned_dsh_repository": "deepseek-ai/deepseek-harness",
+    "pinned_dsh_remote": "https://github.com/deepseek-ai/deepseek-harness.git",
+    "pinned_dsh_commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+    "pinned_dsh_tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+    "pinned_dsh_tag": "dsh-v0.1.0-rc.7",
+    "expected_unchanged_runtime_manifest_digest": "0e09b9d9d977f73d146c4a35d497cc93bd046bae016e1b1a6a52b481f07731b3",
+    "expected_unchanged_executable_identity_digest": "ae07ece34c88b3ebaebd7452df8d136c82935f9c8ec9df16a40e50a2582a2fd9",
+    "runtime_manifest_artifact": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_runtime_materialization_and_launch_v0/evidence/runtime_manifest.json",
+    "runtime_manifest_artifact_sha256": "9d5a27ee7d5e648ecdd281fe88f82a0b5f049fc0a0d5799be453546ec1c3daf3",
+    "existing_runtime_materializer_path": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_runtime_materialization_and_launch_v0/materializer/qntylab-materialize-dsh-runtime.mjs",
+    "existing_runtime_materializer_digest": "2706a011c66bdce11f64c8c6db062c44160e65dd763c10b74a6533d9ba7d9668",
+    "existing_runtime_materializer_is_the_architectural_precedent": true,
+    "physical_runtime_byte_change_authorized": false,
+    "runtime_rebuild_authorized": false,
+    "runtime_repatch_authorized": false,
+    "composite_launcher_modification_authorized": false,
+    "stage_a_package_modification_authorized": false,
+    "if_runtime_identities_must_change": "STOP_AND_REPORT_SOURCE_CONFLICT_OR_SCOPE_EXPANSION_REQUIRED",
+    "silent_rebuild_forbidden": true
+  },
+
+  "successor_contract_requirement": {
+    "predecessor_qualified_contract_digest": "a392f82efd5cf97e20a6ce4353597a8a7210e8638cc17e5a4209cc1003eee4be",
+    "predecessor_contract_artifact": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/evidence/contract.json",
+    "predecessor_contract_artifact_sha256": "77fec19bf275fe42422db4f88d39f310aa52d99edbe6f499196ef5e1e5b44c60",
+    "predecessor_qualification_artifact": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/evidence/qualification.json",
+    "predecessor_qualification_artifact_sha256": "9ac8e21cd2453b495bb856260f45653bdd3b4182bd00ec050784a1c7296fe5ce",
+    "a392_preserved_historically": true,
+    "a392_remains_final_complete_live_contract": false,
+    "a392_may_be_cited_as_final_live_contract_after_new_materializer_is_trusted": false,
+    "reason": "The production DSH_HOME materializer becomes part of the action-time trusted computing base, so it must be inside the qualified identity envelope.",
+    "must_compute": [
+      "NEW_PRODUCTION_DSH_HOME_MATERIALIZER_DIGEST",
+      "NEW_QUALIFIED_LAUNCH_CONTRACT_DIGEST"
+    ],
+    "successor_contract_minimum_bindings": [
+      "predecessor a392 digest",
+      "pinned DSH source identity",
+      "physical runtime manifest",
+      "executable identity",
+      "production DSH_HOME materializer path",
+      "production DSH_HOME materializer digest",
+      "materialized DSH_HOME manifest schema",
+      "exact headless profile identities",
+      "exact @deepseek-ai package tree identities",
+      "exact @qntylab package identities",
+      "composite launcher path/digest",
+      "Stage-A policy",
+      "parent policy",
+      "child controller",
+      "Codex boundary",
+      "Claude boundary",
+      "workspace containment",
+      "claim/secret order",
+      "fixture identity"
+    ],
+    "successor_contract_grants_live_authority": false,
+    "successor_contract_requires_separate_future_live_authorization": true
+  },
+
+  "action_time_parity_requirement": {
+    "required": true,
+    "skippable": false,
+    "waivable": false,
+    "is_the_most_important_new_requirement": true,
+    "single_production_preparation_path_used_by_both_qualification_and_live_execution": true,
+    "qualification_only_prerequisite_creation_forbidden": true,
+    "receipt_name": "ACTION_TIME_PARITY_RECEIPT",
+    "required_chain_from_empty_disposable_environment": [
+      "EMPTY DSH_HOME DESTINATION",
+      "PRODUCTION DSH_HOME MATERIALIZER",
+      "PRODUCTION COMPOSITE PREFLIGHT",
+      "PRODUCTION FIXTURE PREPARATION",
+      "ALL NON-SECRET LIVE GATES PASS",
+      "STOP IMMEDIATELY BEFORE REAL SECRET READ"
+    ],
+    "must_exercise_same_constructor_as_live": true,
+    "must_exercise_same_preflight_as_live": true,
+    "expected_receipts": {
+      "REAL_SECRET_READS": 0,
+      "CLAIMS_CREATED": 0,
+      "PUBLIC_PROVIDER_REQUESTS": 0,
+      "REAL_MODEL_CALLS": 0,
+      "REAL_CODEX_TURNS": 0,
+      "REAL_CLAUDE_TURNS": 0,
+      "SPEND_USD": 0
+    },
+    "stop_boundary": "IMMEDIATELY_BEFORE_REAL_SECRET_READ"
+  },
+
+  "offline_real_dsh_qualification_requirement": {
+    "allowed_after_production_materialization_succeeds": true,
+    "required_chain": [
+      "fresh empty destination",
+      "production materializer",
+      "composite launcher",
+      "actual pinned DSH process"
+    ],
+    "required_paths": {
+      "clean_child_path": "REQUIRED",
+      "repair_child_path": "PREFERRED"
+    },
+    "substitution_seam": "EXPLICIT_OFFLINE_PROVIDER_AND_CHILD_SUBSTITUTION_SEAM_ONLY",
+    "expected_receipts": {
+      "actual_dsh_process": true,
+      "public_provider_requests": 0,
+      "real_model_calls": 0,
+      "real_codex_turns": 0,
+      "real_claude_turns": 0,
+      "real_secret_reads": 0,
+      "authoritative_claims": 0,
+      "spend_usd": 0
+    }
+  },
+
+  "determinism_requirement": {
+    "independent_materializations_required": 2,
+    "procedure": [
+      "EMPTY DESTINATION A -> materialize -> HOME_MANIFEST_A",
+      "EMPTY DESTINATION B -> materialize -> HOME_MANIFEST_B"
+    ],
+    "identity_equality_required_for_all_deterministic_materialized_bytes": true,
+    "persistent_scratch_directory_as_source_of_truth": false,
+    "nondeterministic_residue_must_be_explicitly_enumerated_and_justified": true
+  },
+
+  "required_negative_controls": [
+    "empty destination succeeds",
+    "missing profile source fails",
+    "modified profile byte fails",
+    "missing gated-provider fails",
+    "modified gated-provider fails",
+    "missing parent-enforcement fails",
+    "modified parent-enforcement fails",
+    "unexpected @qntylab package fails",
+    "production stub-provider presence fails",
+    "wrong @deepseek-ai package fails",
+    "missing runtime package fails",
+    "symlink escape fails",
+    "destination inside QntyLab fails",
+    "destination inside DSH runtime fails",
+    "destination inside operator home fails",
+    "stale scratch DSH_HOME cannot substitute",
+    "caller-supplied arbitrary DSH_HOME cannot bypass materializer",
+    "materializer-byte substitution invalidates contract",
+    "home-manifest substitution invalidates contract",
+    "qualification-only helper cannot be used as the production authority path"
+  ],
+
+  "stale_test_repair_authority": {
+    "granted": true,
+    "scope": "NARROW_TEST_ONLY",
+    "test_file": "tests/test_dsh_stage_a_v1r3r2_one_episode_live_execution_authorization_v0r4.py",
+    "test_name": "test_fresh_activation_artifact_was_not_present_in_canonical_history",
+    "observed_state_at_authorization": "FAILING",
+    "observed_failure_basis": "git log origin/master for the V0R4 activation artifact now returns commit 9f6a97f, because PR #203 canonically merged the activation.",
+    "permanently_stale": true,
+    "reason": "The assertion encoded a pre-activation-merge precondition that can never be true again.",
+    "must_preserve_historical_purpose": true,
+    "replacement_requirement": "Replace the stale artifact-absent-from-origin/master assertion with the appropriate historical or canonical-transition assertion.",
+    "production_semantics_change_allowed": false,
+    "other_test_changes_authorized": false,
+    "deletion_of_the_test_authorized": false,
+    "weakening_to_a_trivially_true_assertion_authorized": false
+  },
+
+  "authorization_phase_boundary": {
+    "this_phase_may": [
+      "reconcile canonical Git",
+      "inspect V0R4 canonical closure",
+      "inspect composite qualification",
+      "inspect current runtime/profile/materializer architecture",
+      "construct a machine-readable bounded repair authorization",
+      "add registry/roadmap authority",
+      "add authorization tests",
+      "run exactly one independent hostile governance review",
+      "fix Critical/High findings only",
+      "run one targeted rereview only if Critical/High repairs were needed",
+      "commit",
+      "open exactly one draft PR"
+    ],
+    "this_phase_may_not": [
+      "implement the materializer",
+      "modify the composite launcher",
+      "modify the runtime",
+      "modify Stage-A packages",
+      "run DSH",
+      "read the secret",
+      "create a claim",
+      "call OpenAI",
+      "call Codex",
+      "call Claude",
+      "spend",
+      "create V0R5",
+      "activate V0R5",
+      "execute V0R5",
+      "Stage B",
+      "Qnty",
+      "scientific execution",
+      "trading",
+      "capital",
+      "promotion"
+    ],
+    "merge_authorized": false
+  },
+
+  "frozen_authority_flags": {
+    "live_execution_authorized": false,
+    "secret_read_authorized": false,
+    "claim_authorized": false,
+    "provider_io_authorized": false,
+    "real_children_authorized": false,
+    "v0r5_authorized": false,
+    "v0r5_created": false,
+    "stage_b_authorized": false
+  },
+
+  "authority_firewall": {
+    "authorization_effective": false,
+    "implementation_authorized_this_phase": false,
+    "materializer_implemented_this_phase": false,
+    "activation_created_this_phase": false,
+    "live_execution_authorized_this_phase": false,
+    "real_secret_read_authorized_this_phase": false,
+    "claim_authorized_this_phase": false,
+    "real_provider_io_authorized_this_phase": false,
+    "successor_contract_issued_this_phase": false,
+    "v0r5_authorized": false,
+    "stage_b_authorized": false,
+    "qnty_runtime_authority": "NONE",
+    "scientific_execution_authorized": false,
+    "trading_authority": "NONE",
+    "capital_authority": "NONE",
+    "promotion_authority": "NONE",
+    "broader_production_authority": "NONE",
+    "production_deployment_authorized": false,
+    "qnty_agent_eval": "NOT_APPLICABLE",
+    "active_project_after_closure": "NONE"
+  },
+
+  "canonicalization": {
+    "canonical_repository": "QntyLab",
+    "canonical_master_at_construction": "1913df60545616cb8eaf94f36f73f6686c683993",
+    "candidate_base_sha": "1913df60545616cb8eaf94f36f73f6686c683993",
+    "required_canonical_ref": "refs/remotes/origin/master",
+    "branch_local_artifact_does_not_self_authorize": true,
+    "canonical_presence_required_before_implementation": true,
+    "authorization_does_not_implement": true,
+    "authorization_does_not_activate": true,
+    "authorization_does_not_authorize_v0r5": true,
+    "future_implementation_must_bind_exact_authorization_bytes": true,
+    "git_wins_over_prompt_or_memory": true
+  },
+
+  "construction_receipts": {
+    "real_secret_reads": 0,
+    "claims_created": 0,
+    "live_dsh_calls": 0,
+    "external_provider_requests": 0,
+    "real_model_calls": 0,
+    "codex_child_turns": 0,
+    "claude_child_turns": 0,
+    "fixture_mutations": 0,
+    "activation_artifacts_created": 0,
+    "materializer_artifacts_created": 0,
+    "successor_contract_digests_issued": 0,
+    "runtime_bytes_modified": 0,
+    "launcher_bytes_modified": 0,
+    "stage_a_package_bytes_modified": 0,
+    "ambient_dsh_home_bytes_modified": 0,
+    "spend_usd": "0"
+  },
+
+  "review_policy": {
+    "exactly_one_independent_hostile_review_required": true,
+    "hostile_review_completed": true,
+    "hostile_review_artifact": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_production_dsh_home_materialization_and_action_time_parity_authorization_v0/hostile_governance_review.md",
+    "hostile_review_count": 1,
+    "critical_findings": 0,
+    "high_findings": 1,
+    "medium_findings": 2,
+    "low_findings": 0,
+    "critical_findings_repaired": 0,
+    "high_findings_repaired": 1,
+    "unrepaired_critical_findings": 0,
+    "unrepaired_high_findings": 0,
+    "medium_findings_repaired": 0,
+    "medium_findings_accepted_without_repair": 2,
+    "medium_and_low_repair_authorized": false,
+    "repaired_findings": ["H-01"],
+    "accepted_without_repair_findings": ["M-01", "M-02"],
+    "targeted_rereview_used": true,
+    "targeted_rereview_count": 1,
+    "targeted_rereview_verdict": "PASS",
+    "rereview_allowed_only_if_critical_or_high_repaired": true,
+    "review_loops_after_targeted_rereview": false
+  },
+
+  "next_action": "AFTER THIS AUTHORIZATION IS CANONICALLY MERGED, PERFORM EXACTLY ONE DSH_STAGE_A_V1R3R2_PRODUCTION_DSH_HOME_MATERIALIZATION_AND_REQUALIFICATION_V0 IMPLEMENTATION PHASE. Implement one production DSH_HOME materializer from Git-bound or contract-bound canonical inputs, remove the ambient scratch DSH_HOME dependency, prove determinism and the full negative-control set, produce the ACTION_TIME_PARITY_RECEIPT stopping immediately before any real secret read, issue a NEW successor qualified launch contract digest that binds the materializer, run one independent hostile review, and open one draft PR. Do not create, activate, or execute V0R5; do not read the secret, create a claim, call a provider, invoke real children, spend, rebuild the runtime, modify the composite launcher, or grant Stage B, Qnty, scientific, trading, capital, promotion, or broader production authority.",
+  "terminal_verdict": "DSH_STAGE_A_V1R3R2_PRODUCTION_DSH_HOME_MATERIALIZATION_AUTHORIZATION_READY"
+}

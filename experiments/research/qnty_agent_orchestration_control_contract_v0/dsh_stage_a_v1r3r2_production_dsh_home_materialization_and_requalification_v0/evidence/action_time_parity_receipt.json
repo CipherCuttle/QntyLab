@@ -1,0 +1,55 @@
+{
+  "artifactType": "DSH_STAGE_A_V1R3R2_ACTION_TIME_PARITY_RECEIPT",
+  "schemaVersion": "dsh-stage-a-v1r3r2-action-time-parity-receipt-v0",
+  "projectId": "DSH_STAGE_A_V1R3R2_PRODUCTION_DSH_HOME_MATERIALIZATION_AND_REQUALIFICATION_V0",
+  "preparationPath": "preparation/prepare-production-launch.mjs#prepareProductionLaunch",
+  "singleProductionPreparationPathUsedByQualificationAndLive": true,
+  "hiddenQualificationOnlyPreparationUsed": false,
+  "chain": [
+    "EMPTY DSH_HOME DESTINATION",
+    "PRODUCTION DSH_HOME MATERIALIZER",
+    "PRODUCTION COMPOSITE PREFLIGHT",
+    "PRODUCTION FIXTURE PREPARATION",
+    "ALL NON-SECRET LIVE GATES PASS",
+    "STOP IMMEDIATELY BEFORE REAL SECRET READ"
+  ],
+  "gates": {
+    "MATERIALIZER": "PASS",
+    "DSH_HOME_IDENTITY": "PASS",
+    "SUCCESSOR_CONTRACT": "PASS",
+    "RUNTIME_IDENTITY": "PASS",
+    "EXECUTABLE_IDENTITY": "PASS",
+    "COMPOSITE_PREFLIGHT": "PASS",
+    "WORKSPACE_CONTAINMENT": "PASS",
+    "FIXTURE_IDENTITY": "PASS",
+    "ALL_NON_SECRET_GATES": "PASS"
+  },
+  "homeManifestDigest": "5356ba6df6e0f35a4cc90225e920e34ef25ce33e658f16f00ba5cb6b9eb704fb",
+  "NEW_QUALIFIED_LAUNCH_CONTRACT_DIGEST": "50bd776263d05e9f2fe3e026c5e8904a12fa257a1667d11c1e22ef32376c24de",
+  "NEW_PRODUCTION_DSH_HOME_MATERIALIZER_DIGEST": "ce18ebb9bb65cc01a07509189437cd1041ad09afaaee5ba318a6e822d82a09be",
+  "NEW_DSH_HOME_MANIFEST_SCHEMA_DIGEST": "133d018700b0fc7a4de59d22bbcd1e87615d62b47582bc5a2a4e235d1fe1bcef",
+  "predecessorQualifiedContractDigest": "a392f82efd5cf97e20a6ce4353597a8a7210e8638cc17e5a4209cc1003eee4be",
+  "runtimeManifestDigest": "0e09b9d9d977f73d146c4a35d497cc93bd046bae016e1b1a6a52b481f07731b3",
+  "executableIdentityDigest": "ae07ece34c88b3ebaebd7452df8d136c82935f9c8ec9df16a40e50a2582a2fd9",
+  "fixture": {
+    "fixtureId": "STAGE_A_BOUNDED_RETRY_V0",
+    "fixtureDigest": "397ed055f2fb5cd14fd4c0b54fc21994c688f6cf56f07fb073d4e3257cd47552",
+    "canonicalFixtureMutated": false
+  },
+  "stopBoundary": "IMMEDIATELY_BEFORE_REAL_SECRET_READ",
+  "realSecretPathInspected": false,
+  "realSecretPath": "/home/swirky/.secrets/openai_api_key_stage_a",
+  "counters": {
+    "REAL_SECRET_READS": 0,
+    "CLAIMS_CREATED": 0,
+    "PUBLIC_PROVIDER_REQUESTS": 0,
+    "REAL_MODEL_CALLS": 0,
+    "REAL_CODEX_TURNS": 0,
+    "REAL_CLAUDE_TURNS": 0,
+    "SPEND_USD": 0
+  },
+  "LIVE_AUTHORITY": false,
+  "v0r5Created": false,
+  "terminal": "ACTION_TIME_PARITY_PASS",
+  "receiptDigest": "aa45f83ed7ed90fa2ae8647c52d9cd0eac92167670882e10eef28de2be178205"
+}

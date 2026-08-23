@@ -1,0 +1,102 @@
+{
+  "artifactType": "DSH_STAGE_A_V1R3R2_PRODUCTION_DSH_HOME_NEGATIVE_CONTROLS",
+  "schemaVersion": "dsh-stage-a-v1r3r2-production-dsh-home-negative-controls-v0",
+  "requiredControls": 20,
+  "executedControls": 20,
+  "passingControls": 20,
+  "controls": [
+    {
+      "name": "NC-01 empty destination succeeds",
+      "status": "PASS"
+    },
+    {
+      "name": "NC-02 missing profile source fails",
+      "status": "PASS"
+    },
+    {
+      "name": "NC-03 modified profile byte fails",
+      "status": "PASS"
+    },
+    {
+      "name": "NC-04 missing gated-provider fails",
+      "status": "PASS"
+    },
+    {
+      "name": "NC-05 modified gated-provider fails",
+      "status": "PASS"
+    },
+    {
+      "name": "NC-06 missing parent-enforcement fails",
+      "status": "PASS"
+    },
+    {
+      "name": "NC-07 modified parent-enforcement fails",
+      "status": "PASS"
+    },
+    {
+      "name": "NC-08 unexpected @qntylab package fails",
+      "status": "PASS"
+    },
+    {
+      "name": "NC-09 production stub-provider presence fails",
+      "status": "PASS"
+    },
+    {
+      "name": "NC-10 wrong @deepseek-ai package fails",
+      "status": "PASS"
+    },
+    {
+      "name": "NC-11 missing runtime package fails",
+      "status": "PASS"
+    },
+    {
+      "name": "NC-12 symlink escape fails",
+      "status": "PASS"
+    },
+    {
+      "name": "NC-13 destination inside QntyLab fails",
+      "status": "PASS"
+    },
+    {
+      "name": "NC-14 destination inside DSH runtime fails",
+      "status": "PASS"
+    },
+    {
+      "name": "NC-15 destination inside operator home fails",
+      "status": "PASS"
+    },
+    {
+      "name": "NC-16 stale scratch DSH_HOME cannot substitute",
+      "status": "PASS"
+    },
+    {
+      "name": "NC-17 caller-supplied arbitrary DSH_HOME cannot bypass the materializer",
+      "status": "PASS"
+    },
+    {
+      "name": "NC-18 materializer-byte substitution invalidates the contract",
+      "status": "PASS"
+    },
+    {
+      "name": "NC-19 home-manifest substitution invalidates the contract",
+      "status": "PASS"
+    },
+    {
+      "name": "NC-20 qualification-only helper cannot be used as production authority",
+      "status": "PASS"
+    }
+  ],
+  "supplementaryControls": [
+    {
+      "name": "NC-19b home-manifest root-widening forgery is rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "NC-19c unrecorded objects added to a verified home are rejected",
+      "status": "PASS"
+    }
+  ],
+  "supplementaryControlBasis": "Added to close hostile review findings F1 (root-widening forgery) and F2 (unrecorded additions).",
+  "allRealExecutedTests": true,
+  "terminal": "20_OF_20_PASS"
+}

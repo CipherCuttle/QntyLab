@@ -1,0 +1,20 @@
+{
+  "artifactType": "DSH_STAGE_A_V1R3R2_COMPOSITE_BINDING_GAP_REPRODUCTION",
+  "schemaVersion": "dsh-stage-a-v1r3r2-composite-binding-gap-reproduction-v0",
+  "projectId": "DSH_STAGE_A_V1R3R2_COMPOSITE_LIVE_LAUNCHER_INTEGRATION_AND_REQUALIFICATION_V0",
+  "predecessorQualifiedContractDigest": "e16872fc1f419e5253d633bbdf35e936bb58e34a7636decb8eda688113658e82",
+  "historicalContractPath": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_launch_contract_requalification_v0/evidence/contract.json",
+  "physicalPreflight": "PASS",
+  "oldStageALauncherWithPredecessor": "BLOCK_RUNTIME_IDENTITY: stale or unknown qualified launch contract",
+  "oldStageALauncherWithRecomputedHistoricalDigest": "BLOCK_RUNTIME_IDENTITY: runtime manifest is not the qualified runtime",
+  "oldStageADigestMachineryCurrentDigest": "e3b623c58d0ce591baa9d0e07d9cf4dd802203d34a4a1b1521d29f75ca302ffa",
+  "classification": "COMPOSITE_BINDING_GAP",
+  "successorRuntimeManifestDigest": "0e09b9d9d977f73d146c4a35d497cc93bd046bae016e1b1a6a52b481f07731b3",
+  "successorExecutableIdentityDigest": "ae07ece34c88b3ebaebd7452df8d136c82935f9c8ec9df16a40e50a2582a2fd9",
+  "successorQualifiedContractDigest": "a392f82efd5cf97e20a6ce4353597a8a7210e8638cc17e5a4209cc1003eee4be",
+  "liveAuthorityCreated": false,
+  "claimsCreated": 0,
+  "realSecretReads": 0,
+  "publicProviderRequests": 0,
+  "spendUsd": 0
+}

@@ -152,7 +152,7 @@ def test_dsh_stage_a_v1_execution_closure_is_single_bounded_blocked_project() ->
     active_ids = {
         record["project_id"]
         for record in registry["project"]
-        if record["state"] == "ACTIVE"
+        if record["state"] == "ACTIVE" and record.get("candidate_state") != "ACTIVE_CANDIDATE"
     }
     # V0R4 closed BLOCK_RUNTIME_IDENTITY, so no registry row remains ACTIVE.
     assert active_ids == set()
@@ -320,7 +320,7 @@ def test_funding_incremental_implementation_freeze_is_closed_without_escalation(
     assert {
         record["project_id"]
         for record in registry["project"]
-        if record["state"] == "ACTIVE"
+        if record["state"] == "ACTIVE" and record.get("candidate_state") != "ACTIVE_CANDIDATE"
     } == set()
     for closed_episode_id in (
         DSH_STAGE_A_V1R3R2_EXECUTION_PROJECT_ID,

@@ -162,7 +162,10 @@ def test_authorization_has_zero_external_activity_and_cannot_self_activate() -> 
     auth_rel = "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_authorization_v0r5/authorization.json"
     activation_rel = "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0r5/activation.json"
     assert not _blob_exists(CANONICAL_MASTER, auth_rel)
-    assert not (ROOT / activation_rel).exists()
+    activation = json.loads((ROOT / activation_rel).read_text(encoding="utf-8"))
+    assert activation["phase_state"] == "ACTIVE_CANDIDATE"
+    assert activation["effective_execution_authority"] is False
+    assert activation["branch_local_candidate_does_not_self_authorize"] is True
 
 
 def test_project_context_registry_projection_is_inactive_and_consistent() -> None:

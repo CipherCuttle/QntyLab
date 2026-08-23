@@ -101,6 +101,10 @@ def _synthetic_repo(tmp_path: Path, *, canonical: bool) -> tuple[Path, dict]:
     activation_path.write_text(json.dumps(activation, indent=2) + "\n", encoding="utf-8")
 
     record = _source_record()
+    record["state"] = "ACTIVE"
+    record["implementation_authorized"] = True
+    record["implementation_completed"] = False
+    record["effective_execution_authority"] = True
     record["canonical_predecessor_merge"] = base_sha
     record["authorization_candidate_commit"] = base_sha
     record["authorization_canonical_merge"] = base_sha
@@ -272,7 +276,7 @@ def test_v0r4_action_gate_order_and_construction_counters_are_closed() -> None:
     assert activation["effective_execution_authority"] is False
 
 
-def test_branch_local_activation_is_not_effective_and_registry_candidate_is_exact() -> None:
+def test_closed_v0r4_activation_is_not_effective_and_claim_is_untouched() -> None:
     _, _, registry = project_context.load_context_sources(ROOT)
     projects = project_context.validate_projects_registry(ROOT, registry)
     projection = project_context.execution_authority_projection(ROOT, projects)
@@ -280,10 +284,14 @@ def test_branch_local_activation_is_not_effective_and_registry_candidate_is_exac
     assert projection["active_project"] is None
     identity = projection["identity_by_project"][EXECUTION_ID]
     assert identity["effective"] is False
-    assert projects[EXECUTION_ID]["state"] == "ACTIVE"
+    assert projects[EXECUTION_ID]["state"] == "CLOSED_BLOCKED"
+    assert projects[EXECUTION_ID]["implementation_authorized"] is False
+    assert projects[EXECUTION_ID]["implementation_completed"] is True
+    assert projects[EXECUTION_ID]["effective_execution_authority"] is False
     assert projects[EXECUTION_ID]["episode_id"] == EPISODE_ID
     assert projects[EXECUTION_ID]["episode_claimed"] is False
     assert projects[EXECUTION_ID]["episode_consumed"] is False
+    assert projects[EXECUTION_ID]["terminal_outcome"] == "BLOCK_RUNTIME_IDENTITY"
     assert projects["DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R3"]["state"] == "CLOSED_BLOCKED"
 
 

@@ -7153,7 +7153,7 @@ next_action = "AFTER THIS AUTHORIZATION IS CANONICALLY MERGED, CONSTRUCT A SEPAR
 [[project]]
 project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R4"
 display_name = "DSH Stage-A V1R3R2 one-episode live execution activation V0R4"
-state = "ACTIVE"
+state = "CLOSED_BLOCKED"
 authority_level = "BOUNDED_ONE_EPISODE_DSH_STAGE_A_LIVE_EXECUTION_ONLY"
 phase_type = "BOUNDED_LIVE_INFRASTRUCTURE_EXECUTION"
 authoritative_artifacts = [
@@ -7166,6 +7166,8 @@ authoritative_artifacts = [
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_authorization_v0r4/authorization.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0r4/activation.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0r4/hostile_review.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_result_v0r4/execution_evidence.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_result_v0r4/closure.md",
   "tests/test_dsh_stage_a_v1r3r2_one_episode_live_execution_activation_v0r4.py",
 ]
 authorization_state = "AUTHORIZED_IF_CANONICAL"
@@ -7179,10 +7181,10 @@ canonical_predecessor_project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTIO
 canonical_predecessor_merge = "b5defe87e0f5b01450899c74d881149863a4d7c2"
 activation_artifact_project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R4"
 projection_contract = "ACTIVATION_REGISTRY_PROJECT_CONTEXT_CANONICAL_GIT_PARITY_V0"
-implementation_authorized = true
-implementation_completed = false
+implementation_authorized = false
+implementation_completed = true
 activation_authorized_after_canonicalization = true
-effective_execution_authority = true
+effective_execution_authority = false
 episode_started = false
 episode_claimed = false
 episode_consumed = false
@@ -7297,8 +7299,9 @@ broader_production_authority = "NONE"
 production_deployment_authorized = false
 qnty_agent_eval = "NOT_APPLICABLE"
 active_project_after_closure = "NONE"
-terminal_outcome = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_ACTIVATION_V0R4_READY"
-next_action = "AFTER EXACT CANONICAL MERGE, ACTION-TIME V0R4 ONE-EPISODE EXECUTION ONLY. Do not execute during activation construction; do not read the secret, create a claim, invoke DSH, call a provider, or spend."
+terminal_outcome = "BLOCK_RUNTIME_IDENTITY"
+terminal_outcome_basis = "The exact V0R4 composite launcher preflight reached the qualified physical runtime, executable, contract, policy, and launcher checks but failed before spawn because the recorded disposable DSH_HOME lacked the required Stage-A package scope. The episode stopped before secret read, claim creation, provider I/O, DSH invocation, child calls, fixture execution, and spend; no runtime repair, profile repair, rebuild, or action-time override was attempted."
+next_action = "CLOSED_BLOCKED: the exact qualified composite runtime is not executable in this environment because the recorded DSH_HOME is missing the required Stage-A package scope. Do not read the secret, create a claim, invoke DSH, call a provider, spend, repair or rebuild the runtime, rerun, or start Stage B. Any later attempt requires fresh Git-backed authority with a complete exact runtime/profile materialization."
 
 [[project]]
 project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R3"

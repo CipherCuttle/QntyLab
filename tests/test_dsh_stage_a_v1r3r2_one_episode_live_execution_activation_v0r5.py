@@ -24,7 +24,7 @@ LOCAL_STATE = Path(
 )
 
 MASTER = "415d15e807204cdaf83b14cb86d04b52cf11e61d"
-CURRENT_CANONICAL_MASTER = "b9cfcb41e1cff199da77f68b347ef912866c2ed1"
+CURRENT_CANONICAL_MASTER = "36e3085c18a747e3755097c97915f61f289d0835"
 CANDIDATE = "96a66205f7737096eaa4aba3faff0d34ed8eb1ce"
 AUTH_PREDECESSOR = "f2a3e7a9e39aac93c413d758a2f1f329cbe1fd79"
 AUTHORIZATION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_AUTHORIZATION_V0R5"
@@ -309,9 +309,7 @@ def test_registry_preserves_closed_v0r5_and_current_authorization_candidate() ->
     projects = project_context.validate_projects_registry(ROOT, registry)
     projection = project_context.execution_authority_projection(ROOT, projects)
     assert projection["issues"] == []
-    assert projection["active_project"]["project_id"] == (
-        "DSH_STAGE_A_CLAIM_ACQUISITION_TRANSPORT_AND_OBSERVABILITY_REPAIR_AUTHORIZATION_V0"
-    )
+    assert projection["active_project"] is None
     assert projection["identity_by_project"][EXECUTION_ID]["effective"] is False
     project = projects[EXECUTION_ID]
     assert project["state"] == "CLOSED_BLOCKED"

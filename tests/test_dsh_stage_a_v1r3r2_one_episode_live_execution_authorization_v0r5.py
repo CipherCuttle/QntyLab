@@ -178,7 +178,7 @@ def test_project_context_registry_projection_is_inactive_and_consistent() -> Non
     projects = project_context.validate_projects_registry(ROOT, registry)
     projection = project_context.execution_authority_projection(ROOT, projects)
     assert projection["issues"] == []
-    assert projection["active_project"]["project_id"] == CLAIM_REPAIR_AUTHORIZATION_PROJECT_ID
+    assert projection["active_project"] is None
     row = projects[AUTH_ID]
     assert row["state"] == "CLOSED_PASS"
     assert row["implementation_authorized"] is False

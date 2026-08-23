@@ -13,6 +13,7 @@ import copy
 import fcntl
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -23,6 +24,7 @@ from decimal import Decimal
 from enum import Enum
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 
 PROJECT_ID = "DSH_STAGE_A_V1R3R2_PRELIVE_EXECUTION_ENFORCEMENT_GAP_CLOSURE_V0"
@@ -51,6 +53,30 @@ PRICE_UNCERTAINTY_MULTIPLIER = Decimal("4")
 CHILD_SCHEMA = "dsh-stage-a-v1r3r2-prelive-child-state-v0"
 PARENT_SCHEMA = "dsh-stage-a-v1r3r2-prelive-parent-budget-v0"
 CLAIM_SCHEMA = "dsh-stage-a-v1r3r2-prelive-claim-v0"
+CLAIM_NAMESPACE = "refs/heads/qntylab-claims/"
+DIAGNOSTIC_CLAIM_NAMESPACE = "refs/heads/qntylab-diagnostics/claim-transport-v0/"
+CLAIM_OUTCOMES = frozenset(
+    {"COMMITTED", "CONFIRMED_NO_REMOTE_WRITE", "WRITE_STATE_UNKNOWN"}
+)
+CLAIM_DIAGNOSTIC_FIELDS = (
+    "repository_identity",
+    "credential_free_remote_identity",
+    "target_ref",
+    "expected_source_sha",
+    "operation_stage",
+    "process_exit_code",
+    "timeout",
+    "sanitized_stderr",
+    "sanitized_stdout_if_useful",
+    "remote_ref_state_before",
+    "remote_ref_state_after",
+    "expected_sha",
+    "observed_sha",
+    "local_intent_state",
+    "local_receipt_state",
+    "classification",
+    "reason_code",
+)
 
 
 class EnforcementBlocked(RuntimeError):
@@ -67,6 +93,51 @@ class ParentDenied(EnforcementBlocked):
 
 class ClaimBlocked(EnforcementBlocked):
     """The episode claim is present, partial, ambiguous, or could not be made."""
+
+
+def redact_diagnostic_text(value: str) -> str:
+    """Redact credential-shaped values without retaining environment/config data."""
+
+    redacted = str(value)
+    redacted = re.sub(
+        r"(?i)(https?://)([^/\s:@]+):([^/\s@]+)@",
+        r"\1<REDACTED>@",
+        redacted,
+    )
+    redacted = re.sub(
+        r"(?i)\b(authorization|proxy-authorization)\s*:\s*(?:bearer|basic)\s+\S+",
+        r"\1: <REDACTED>",
+        redacted,
+    )
+    redacted = re.sub(
+        r"(?i)\b(bearer|basic)\s+[A-Za-z0-9._~+/=-]+",
+        r"\1 <REDACTED>",
+        redacted,
+    )
+    redacted = re.sub(
+        r"(?i)([?&](?:access_token|api[_-]?key|auth|password|passwd|secret|token)=)[^&\s]+",
+        r"\1<REDACTED>",
+        redacted,
+    )
+    redacted = re.sub(
+        r"(?i)\b(password|passwd|secret|token|api[_-]?key)\s*[=:]\s*([^\s,;}]+)",
+        r"\1=<REDACTED>",
+        redacted,
+    )
+    return redacted
+
+
+def credential_free_remote_identity(remote: str) -> str:
+    """Return a stable remote identity without userinfo, query, or fragments."""
+
+    candidate = str(remote)
+    parsed = urlsplit(candidate)
+    if parsed.scheme and parsed.hostname:
+        host = parsed.hostname
+        if parsed.port is not None:
+            host = f"{host}:{parsed.port}"
+        return f"{parsed.scheme}://{host}{parsed.path}"
+    return redact_diagnostic_text(candidate.split("?", 1)[0].split("#", 1)[0])
 
 
 class ChildState(str, Enum):
@@ -460,17 +531,32 @@ class EpisodeClaim:
 
     An intent is durably written first.  Consequently every crash, timeout,
     partial result, or ambiguous push leaves evidence that blocks replay.
+    ``acquire_with_outcome`` adds evidence-calibrated transport classification;
+    ``acquire`` retains the historic exception-based caller contract.
     """
 
-    def __init__(self, state_dir: Path, *, remote: str, ref: str, source_repo: Path):
+    def __init__(
+        self,
+        state_dir: Path,
+        *,
+        remote: str,
+        ref: str,
+        source_repo: Path,
+        command_runner: Callable[..., subprocess.CompletedProcess[str]] | None = None,
+    ):
         self.state_dir = Path(state_dir)
         self.remote = remote
         self.ref = ref
         self.source_repo = Path(source_repo)
         self.intent_path = self.state_dir / "claim-intent.json"
         self.receipt_path = self.state_dir / "claim-receipt.json"
+        self._command_runner = command_runner or subprocess.run
+        self._last_remote_observation: dict[str, Any] | None = None
         self.state_dir.mkdir(parents=True, exist_ok=True)
-        if not ref.startswith("refs/heads/qntylab-claims/"):
+        if not (
+            ref.startswith(CLAIM_NAMESPACE)
+            or ref.startswith(DIAGNOSTIC_CLAIM_NAMESPACE)
+        ):
             raise ClaimBlocked("claim ref is outside the create-only QntyLab claim namespace")
 
     def acquire(
@@ -479,13 +565,39 @@ class EpisodeClaim:
         session_nonce: str,
         fault: Callable[[str], None] | None = None,
     ) -> dict[str, Any]:
+        outcome = self.acquire_with_outcome(
+            session_nonce=session_nonce,
+            fault=fault,
+        )
+        if outcome["classification"] != "COMMITTED" or "receipt" not in outcome:
+            detail = outcome.get("detail") or outcome["reason_code"]
+            raise ClaimBlocked(f"BLOCK_NEVER_REPLAY: {detail}")
+        return outcome["receipt"]
+
+    def acquire_with_outcome(
+        self,
+        *,
+        session_nonce: str,
+        fault: Callable[[str], None] | None = None,
+    ) -> dict[str, Any]:
+        """Attempt one claim and return a deterministic, sanitized outcome.
+
+        ``WRITE_STATE_UNKNOWN`` is deliberately returned instead of raising for
+        transport ambiguity so callers can retain evidence and still fail
+        closed.  The legacy ``acquire`` method converts every non-complete
+        outcome into ``ClaimBlocked``.
+        """
+
         if not session_nonce:
             raise ClaimBlocked("claim session nonce is empty")
         lock_path = self.state_dir / "claim.lock"
         with lock_path.open("a+") as lock:
             fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
             try:
-                return self._acquire_locked(session_nonce=session_nonce, fault=fault)
+                return self._acquire_locked_with_outcome(
+                    session_nonce=session_nonce,
+                    fault=fault,
+                )
             finally:
                 fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
 
@@ -495,15 +607,89 @@ class EpisodeClaim:
         session_nonce: str,
         fault: Callable[[str], None] | None,
     ) -> dict[str, Any]:
+        """Compatibility wrapper for older internal callers."""
+
+        outcome = self._acquire_locked_with_outcome(
+            session_nonce=session_nonce,
+            fault=fault,
+        )
+        if outcome["classification"] != "COMMITTED" or "receipt" not in outcome:
+            detail = outcome.get("detail") or outcome["reason_code"]
+            raise ClaimBlocked(f"BLOCK_NEVER_REPLAY: {detail}")
+        return outcome["receipt"]
+
+    def _acquire_locked_with_outcome(
+        self,
+        *,
+        session_nonce: str,
+        fault: Callable[[str], None] | None,
+    ) -> dict[str, Any]:
         local_present = self.intent_path.exists() or self.receipt_path.exists()
-        remote_present = self.remote_exists()
-        if local_present or remote_present:
-            raise ClaimBlocked("BLOCK_NEVER_REPLAY: pre-existing, partial, or ambiguous claim state")
+        try:
+            remote_present = self.remote_exists()
+            before = self._last_remote_observation or self._remote_state(
+                "ABSENT" if not remote_present else "PRESENT"
+            )
+        except ClaimBlocked as exc:
+            before = self._last_remote_observation or self._remote_state("UNKNOWN")
+            return self._outcome(
+                classification="WRITE_STATE_UNKNOWN",
+                reason_code="REMOTE_PRESENCE_AMBIGUOUS",
+                detail=str(exc),
+                expected_sha=None,
+                before=before,
+                after=before,
+                process_exit_code=before.get("process_exit_code"),
+                timeout=bool(before.get("timeout")),
+                operation_stage="PRECHECK",
+            )
+
         source_head = self._git("rev-parse", "HEAD").stdout.strip()
+        if not re.fullmatch(r"[0-9a-fA-F]{40,64}", source_head):
+            raise ClaimBlocked("claim source Git command returned an invalid HEAD SHA")
+
+        if local_present:
+            return self._outcome(
+                classification="WRITE_STATE_UNKNOWN",
+                reason_code="LOCAL_CLAIM_STATE_PRESENT",
+                detail="pre-existing, partial, or ambiguous local claim state",
+                expected_sha=source_head,
+                before=before,
+                after=before,
+                process_exit_code=before.get("process_exit_code"),
+                timeout=bool(before.get("timeout")),
+                operation_stage="PRECHECK",
+            )
+
+        if remote_present:
+            if before.get("sha") == source_head:
+                return self._outcome(
+                    classification="COMMITTED",
+                    reason_code="REMOTE_ALREADY_COMMITTED",
+                    detail="remote claim already points to the expected source SHA; no overwrite attempted",
+                    expected_sha=source_head,
+                    before=before,
+                    after=before,
+                    process_exit_code=None,
+                    timeout=False,
+                    operation_stage="PRECHECK",
+                )
+            return self._outcome(
+                classification="WRITE_STATE_UNKNOWN",
+                reason_code="REMOTE_REF_COLLISION",
+                detail="remote claim ref exists at a different SHA; create-only invariant blocks overwrite",
+                expected_sha=source_head,
+                before=before,
+                after=before,
+                process_exit_code=None,
+                timeout=False,
+                operation_stage="PRECHECK",
+            )
+
         intent = {
             "schema_version": CLAIM_SCHEMA,
             "session_nonce": session_nonce,
-            "remote": self.remote,
+            "remote": credential_free_remote_identity(self.remote),
             "ref": self.ref,
             "source_head": source_head,
             "state": "INTENT_DURABLE",
@@ -521,52 +707,282 @@ class EpisodeClaim:
             self.remote,
             f"{source_head}:{self.ref}",
         ]
+        pushed: subprocess.CompletedProcess[str] | None = None
+        process_exit_code: int | None = None
+        timed_out = False
+        transport_detail = ""
+        transport_stdout = ""
+        transport_stderr = ""
         try:
-            pushed = subprocess.run(command, check=False, capture_output=True, text=True, timeout=30)
-        except (OSError, subprocess.TimeoutExpired) as exc:
-            raise ClaimBlocked("BLOCK_NEVER_REPLAY: ambiguous remote claim result") from exc
-        if pushed.returncode != 0:
-            raise ClaimBlocked(
-                "BLOCK_NEVER_REPLAY: remote create-only claim failed: "
-                + (pushed.stderr or pushed.stdout).strip()
-            )
-        if fault is not None:
+            pushed = self._run_command(command)
+            process_exit_code = pushed.returncode
+            transport_stdout = pushed.stdout or ""
+            transport_stderr = pushed.stderr or ""
+            transport_detail = (pushed.stderr or pushed.stdout or "").strip()
+            if pushed.returncode != 0:
+                transport_detail = (
+                    "remote create-only claim failed: " + transport_detail
+                )
+        except subprocess.TimeoutExpired as exc:
+            timed_out = True
+            transport_detail = "remote create-only claim timed out: " + str(exc)
+            transport_stderr = str(exc)
+        except OSError as exc:
+            transport_detail = "remote create-only claim failed: " + str(exc)
+            transport_stderr = str(exc)
+
+        if pushed is not None and pushed.returncode == 0 and fault is not None:
             fault("after_remote")
-        receipt = {
-            **intent,
-            "state": "REMOTE_AND_LOCAL_COMPLETE",
-            "remote_push_porcelain": pushed.stdout.strip(),
+
+        after = self.remote_ref_state()
+        after_sha = after.get("sha")
+        if (
+            after.get("state") == "PRESENT"
+            and after_sha == source_head
+            and pushed is not None
+            and pushed.returncode == 0
+        ):
+            receipt = {
+                **intent,
+                "state": "REMOTE_AND_LOCAL_COMPLETE",
+                "remote_push_porcelain": redact_diagnostic_text(
+                    (pushed.stdout if pushed is not None else "").strip()
+                ),
+            }
+            _write_exclusive_json(self.receipt_path, receipt)
+            if fault is not None:
+                fault("after_local")
+            return self._outcome(
+                classification="COMMITTED",
+                reason_code=(
+                    "REMOTE_REF_CONFIRMED_EXPECTED_SHA"
+                    if pushed is not None and pushed.returncode == 0
+                    else "REMOTE_REF_CONFIRMED_AFTER_NONZERO_TRANSPORT"
+                ),
+                detail=transport_detail,
+                expected_sha=source_head,
+                before=before,
+                after=after,
+                process_exit_code=process_exit_code,
+                timeout=timed_out,
+                operation_stage="LOCAL_RECEIPT",
+                transport_stdout=transport_stdout,
+                transport_stderr=transport_stderr,
+                receipt=receipt,
+            )
+
+        if after.get("state") == "PRESENT" and after_sha == source_head:
+            return self._outcome(
+                classification="WRITE_STATE_UNKNOWN",
+                reason_code="REMOTE_REF_CONFIRMED_BUT_ATTEMPT_NOT_CONFIRMED",
+                detail=(
+                    transport_detail
+                    or "remote ref has the expected SHA, but this create-only attempt did not report success"
+                ),
+                expected_sha=source_head,
+                before=before,
+                after=after,
+                process_exit_code=process_exit_code,
+                timeout=timed_out,
+                operation_stage="REMOTE_VERIFY",
+                transport_stdout=transport_stdout,
+                transport_stderr=transport_stderr,
+            )
+
+        if (
+            before.get("state") == "ABSENT"
+            and after.get("state") == "ABSENT"
+            and (pushed is None or pushed.returncode != 0)
+        ):
+            return self._outcome(
+                classification="CONFIRMED_NO_REMOTE_WRITE",
+                reason_code="REMOTE_REF_ABSENT_BEFORE_AND_AFTER_FAILED_ATTEMPT",
+                detail=(transport_detail or "remote create-only claim failed"),
+                expected_sha=source_head,
+                before=before,
+                after=after,
+                process_exit_code=process_exit_code,
+                timeout=timed_out,
+                operation_stage="REMOTE_VERIFY",
+                transport_stdout=transport_stdout,
+                transport_stderr=transport_stderr,
+            )
+
+        return self._outcome(
+            classification="WRITE_STATE_UNKNOWN",
+            reason_code="REMOTE_WRITE_OUTCOME_AMBIGUOUS",
+            detail=(transport_detail or "remote claim write and independent verification disagree"),
+            expected_sha=source_head,
+            before=before,
+            after=after,
+            process_exit_code=process_exit_code,
+            timeout=timed_out,
+            operation_stage="REMOTE_VERIFY",
+        )
+
+    def _outcome(
+        self,
+        *,
+        classification: str,
+        reason_code: str,
+        detail: str,
+        expected_sha: str | None,
+        before: Mapping[str, Any],
+        after: Mapping[str, Any],
+        process_exit_code: int | None,
+        timeout: bool,
+        operation_stage: str,
+        transport_stdout: str | None = None,
+        transport_stderr: str | None = None,
+        receipt: Mapping[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        if classification not in CLAIM_OUTCOMES:
+            raise ValueError(f"unsupported claim classification: {classification}")
+        local_intent_state = "PRESENT" if self.intent_path.exists() else "ABSENT"
+        local_receipt_state = "PRESENT" if self.receipt_path.exists() else "ABSENT"
+        diagnostic = {
+            "repository_identity": f"{self.source_repo.resolve()}@{expected_sha or 'UNKNOWN'}",
+            "credential_free_remote_identity": credential_free_remote_identity(self.remote),
+            "target_ref": self.ref,
+            "expected_source_sha": expected_sha,
+            "operation_stage": operation_stage,
+            "process_exit_code": process_exit_code,
+            "timeout": timeout,
+            "sanitized_stderr": redact_diagnostic_text(
+                str(
+                    after.get("stderr", "")
+                    if transport_stderr is None
+                    else transport_stderr
+                )
+            ),
+            "sanitized_stdout_if_useful": redact_diagnostic_text(
+                str(
+                    after.get("stdout", "")
+                    if transport_stdout is None
+                    else transport_stdout
+                )
+            ),
+            "remote_ref_state_before": dict(before),
+            "remote_ref_state_after": dict(after),
+            "expected_sha": expected_sha,
+            "observed_sha": after.get("sha"),
+            "local_intent_state": local_intent_state,
+            "local_receipt_state": local_receipt_state,
+            "classification": classification,
+            "reason_code": reason_code,
         }
-        _write_exclusive_json(self.receipt_path, receipt)
-        if fault is not None:
-            fault("after_local")
-        return receipt
+        # Keep the contract mechanically visible if this evolves.
+        if tuple(diagnostic)[: len(CLAIM_DIAGNOSTIC_FIELDS)] != CLAIM_DIAGNOSTIC_FIELDS:
+            raise AssertionError("claim diagnostic field order drifted")
+        result: dict[str, Any] = {
+            "classification": classification,
+            "reason_code": reason_code,
+            "detail": redact_diagnostic_text(detail),
+            "fail_closed": classification == "WRITE_STATE_UNKNOWN",
+            "execution_authority_granted": False,
+            "production_retry_granted": False,
+            "diagnostic": diagnostic,
+        }
+        if receipt is not None:
+            result["receipt"] = dict(receipt)
+        return result
+
+    def remote_ref_state(self) -> dict[str, Any]:
+        """Read the exact target ref, retaining enough evidence to classify it."""
+
+        return self._remote_ref_state()
+
+    def _remote_ref_state(self) -> dict[str, Any]:
+        try:
+            result = self._run_command(
+                ["git", "ls-remote", "--exit-code", self.remote, self.ref]
+            )
+        except subprocess.TimeoutExpired as exc:
+            observation = self._remote_state(
+                "UNKNOWN",
+                process_exit_code=None,
+                timeout=True,
+                stderr=str(exc),
+            )
+            self._last_remote_observation = observation
+            return observation
+        except OSError as exc:
+            observation = self._remote_state(
+                "UNKNOWN",
+                process_exit_code=None,
+                timeout=False,
+                stderr=str(exc),
+            )
+            self._last_remote_observation = observation
+            return observation
+
+        stdout = result.stdout or ""
+        stderr = result.stderr or ""
+        rows = [line.split() for line in stdout.splitlines() if line.split()]
+        matching = [row for row in rows if len(row) >= 2 and row[1] == self.ref]
+        if result.returncode == 0 and len(matching) == 1 and re.fullmatch(
+            r"[0-9a-fA-F]{40,64}", matching[0][0]
+        ):
+            state = "PRESENT"
+            sha = matching[0][0]
+        elif result.returncode == 2 and not rows:
+            state = "ABSENT"
+            sha = None
+        else:
+            state = "UNKNOWN"
+            sha = None
+        observation = self._remote_state(
+            state,
+            sha=sha,
+            process_exit_code=result.returncode,
+            timeout=False,
+            stdout=stdout,
+            stderr=stderr,
+        )
+        self._last_remote_observation = observation
+        return observation
+
+    @staticmethod
+    def _remote_state(
+        state: str,
+        *,
+        sha: str | None = None,
+        process_exit_code: int | None = None,
+        timeout: bool = False,
+        stdout: str = "",
+        stderr: str = "",
+    ) -> dict[str, Any]:
+        return {
+            "state": state,
+            "sha": sha,
+            "process_exit_code": process_exit_code,
+            "timeout": timeout,
+            "stdout": redact_diagnostic_text(stdout),
+            "stderr": redact_diagnostic_text(stderr),
+        }
 
     def remote_exists(self) -> bool:
-        result = subprocess.run(
-            ["git", "ls-remote", "--exit-code", self.remote, self.ref],
-            check=False,
-            capture_output=True,
-            text=True,
-            timeout=30,
-        )
-        if result.returncode == 0:
+        observation = self.remote_ref_state()
+        if observation["state"] == "PRESENT":
             return True
-        if result.returncode == 2:
+        if observation["state"] == "ABSENT":
             return False
         raise ClaimBlocked("BLOCK_NEVER_REPLAY: remote claim presence is ambiguous")
 
     def _git(self, *args: str) -> subprocess.CompletedProcess[str]:
-        result = subprocess.run(
-            ["git", "-C", str(self.source_repo), *args],
+        result = self._run_command(["git", "-C", str(self.source_repo), *args])
+        if result.returncode != 0:
+            raise ClaimBlocked(f"claim source Git command failed: {' '.join(args)}")
+        return result
+
+    def _run_command(self, command: list[str]) -> subprocess.CompletedProcess[str]:
+        return self._command_runner(
+            command,
             check=False,
             capture_output=True,
             text=True,
             timeout=30,
         )
-        if result.returncode != 0:
-            raise ClaimBlocked(f"claim source Git command failed: {' '.join(args)}")
-        return result
 
 
 def _grant_from_args(args: argparse.Namespace) -> ChildGrant:

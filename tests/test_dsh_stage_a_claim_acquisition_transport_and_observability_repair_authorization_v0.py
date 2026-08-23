@@ -120,16 +120,24 @@ def test_observability_redaction_and_zero_activity_firewall_are_explicit() -> No
     }
 
 
-def test_registry_and_generated_roadmap_bind_the_authorization_candidate() -> None:
+def test_registry_and_generated_roadmap_bind_the_completed_repair_transition() -> None:
     record = _project_record()
-    assert record["state"] == "ACTIVE"
-    assert record["candidate_state"] == "ACTIVE_CANDIDATE"
-    assert record["implementation_authorized"] is True
-    assert record["implementation_completed"] is False
+    assert record["state"] == "CLOSED_PASS"
+    assert record["candidate_state"] == "CANONICAL_AUTHORIZATION_EFFECTIVE"
+    assert record["implementation_authorized"] is False
+    assert record["implementation_completed"] is True
+    assert record["canonicalization_status"] == "EXACT_CANONICAL_MERGE_VERIFIED"
+    assert record["repair_authority_was_effective"] is True
     assert record["authorization_effective"] == "AFTER_EXACT_CANONICAL_MERGE_ONLY"
     assert record["effective_repair_authority"] is False
     assert record["future_repair_project_id"] == REPAIR_ID
     assert record["canonical_base_sha"] == CANONICAL_MASTER
+    assert record["canonical_authorization_merge"] == "36e3085c18a747e3755097c97915f61f289d0835"
+    assert record["diagnostic_positive_create"] == "COMMITTED"
+    assert record["diagnostic_duplicate_control"] == "NO_OVERWRITE"
+    assert record["diagnostic_confirmed_no_write"] == "CONFIRMED_NO_REMOTE_WRITE"
+    assert record["diagnostic_unknown_control"] == "WRITE_STATE_UNKNOWN_FAIL_CLOSED"
+    assert record["historical_root_cause_status"] == "HISTORICAL_ROOT_CAUSE_UNRESOLVED"
     assert record["hostile_review_count"] == 1
     assert record["hostile_governance_critical_total"] == 0
     assert record["hostile_governance_high_total"] == 0
@@ -138,11 +146,12 @@ def test_registry_and_generated_roadmap_bind_the_authorization_candidate() -> No
     validated = project_context.validate_projects_registry(ROOT, registry)
     projection = project_context.execution_authority_projection(ROOT, validated)
     assert projection["issues"] == []
-    assert projection["active_project"]["project_id"] == PROJECT_ID
+    assert projection["active_project"] is None
 
     roadmap = (ROOT / "docs/CURRENT_ROADMAP.md").read_text(encoding="utf-8")
     assert "DSH Stage-A claim acquisition transport and observability repair authorization V0" in roadmap
-    assert "CANONICALIZE_THIS_AUTHORIZATION_THEN_BEGIN_ONE_BOUNDED_CLAIM_TRANSPORT_AND_OBSERVABILITY_REPAIR_PHASE" in roadmap
+    assert "CLOSED_PASS: Stop after this one bounded claim transport and observability repair candidate." in roadmap
+    assert "Historical V0R5 replay" in roadmap
     assert "RUN_V0R6" not in roadmap
     assert "RUN_LIVE_DSH" not in roadmap
     assert "REPLAY_V0R5" not in roadmap

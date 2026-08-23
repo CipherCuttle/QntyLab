@@ -1,0 +1,58 @@
+{
+  "artifact_type": "DSH_STAGE_A_CLAIM_ACQUISITION_TRANSPORT_AND_OBSERVABILITY_REPAIR_DIAGNOSTIC_RECEIPT",
+  "schema_version": "dsh-stage-a-claim-transport-diagnostic-receipt-v0",
+  "project_id": "DSH_STAGE_A_CLAIM_ACQUISITION_TRANSPORT_AND_OBSERVABILITY_REPAIR_V0",
+  "repository_identity": "QntyLab@36e3085c18a747e3755097c97915f61f289d0835",
+  "credential_free_remote_identity": "https://github.com/CipherCuttle/QntyLab.git",
+  "target_ref": "refs/heads/qntylab-diagnostics/claim-transport-v0/repaired-mt6c975m",
+  "expected_source_sha": "36e3085c18a747e3755097c97915f61f289d0835",
+  "operation_stage": "LOCAL_RECEIPT",
+  "process_exit_code": 0,
+  "timeout": false,
+  "sanitized_stderr": "Remote service emitted a pull-request hint; credential-bearing output was not retained.",
+  "sanitized_stdout_if_useful": "* 36e3085c18a747e3755097c97915f61f289d0835:refs/heads/qntylab-diagnostics/claim-transport-v0/repaired-mt6c975m [new branch]\nDone",
+  "remote_ref_state_before": {
+    "state": "ABSENT",
+    "sha": null,
+    "process_exit_code": 2,
+    "timeout": false
+  },
+  "remote_ref_state_after": {
+    "state": "PRESENT",
+    "sha": "36e3085c18a747e3755097c97915f61f289d0835",
+    "process_exit_code": 0,
+    "timeout": false
+  },
+  "expected_sha": "36e3085c18a747e3755097c97915f61f289d0835",
+  "observed_sha": "36e3085c18a747e3755097c97915f61f289d0835",
+  "local_intent_state": "PRESENT",
+  "local_receipt_state": "PRESENT",
+  "classification": "COMMITTED",
+  "reason_code": "REMOTE_REF_CONFIRMED_EXPECTED_SHA",
+  "controls": {
+    "positive_create": "COMMITTED; exact expected SHA independently observed",
+    "duplicate_create": "COMMITTED/REMOTE_ALREADY_COMMITTED; no overwrite attempted; SHA unchanged",
+    "confirmed_no_remote_write": "Focused injected-failure test proved ABSENT before and after",
+    "write_state_unknown": "Focused injected-ambiguous test returned WRITE_STATE_UNKNOWN and fail_closed=true"
+  },
+  "initial_mechanism_diagnostic": {
+    "episode_claim_namespace_gate": "CURRENT_IMPLEMENTATION_REJECTED_THE_AUTHORIZED_DISPOSABLE_DIAGNOSTIC_NAMESPACE_BEFORE_GIT_TRANSPORT",
+    "exact_transport_reproduction": "DIRECT_EFFECTIVE_PUSH_TO_THE_DISPOSABLE_NAMESPACE_SUCCEEDED_AT_THE_EXPECTED_SHA",
+    "historical_root_cause": "HISTORICAL_ROOT_CAUSE_UNRESOLVED",
+    "supported_reproduced_failure_mechanism": "DIAGNOSTIC_NAMESPACE_GATE_PREVENTED_SAFE_EPISODECLAIM_REPRODUCTION;_THIS_DOES_NOT_PROVE_THE_V0R5_HISTORICAL_FAILURE_CAUSE"
+  },
+  "cleanup": {
+    "disposable_refs_deleted": [
+      "refs/heads/qntylab-diagnostics/claim-transport-v0/transport-mt6bz7vr",
+      "refs/heads/qntylab-diagnostics/claim-transport-v0/repaired-mt6c975m"
+    ],
+    "deleted_refs_verified_absent": true,
+    "production_claim_namespace_touched": false,
+    "v0r5_state_touched": false
+  },
+  "authority_boundary": {
+    "execution_authority_granted": false,
+    "production_retry_granted": false,
+    "write_state_unknown_fail_closed": true
+  }
+}

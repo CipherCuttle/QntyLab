@@ -8324,9 +8324,9 @@ next_action = "CLOSED_BLOCKED: BLOCK_NEVER_REPLAY. Preserve the durable local cl
 [[project]]
 project_id = "DSH_STAGE_A_CLAIM_ACQUISITION_TRANSPORT_AND_OBSERVABILITY_REPAIR_AUTHORIZATION_V0"
 display_name = "DSH Stage-A claim acquisition transport and observability repair authorization V0"
-state = "ACTIVE"
-candidate_state = "ACTIVE_CANDIDATE"
-canonicalization_status = "AWAITING_EXACT_CANONICAL_MERGE"
+state = "CLOSED_PASS"
+candidate_state = "CANONICAL_AUTHORIZATION_EFFECTIVE"
+canonicalization_status = "EXACT_CANONICAL_MERGE_VERIFIED"
 authority_level = "BOUNDED_CLAIM_TRANSPORT_AND_OBSERVABILITY_REPAIR_ONLY"
 phase_type = "GOVERNANCE_ONLY_BOUNDED_REPAIR_AUTHORIZATION"
 authoritative_artifacts = [
@@ -8336,6 +8336,10 @@ authoritative_artifacts = [
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_claim_acquisition_transport_and_observability_repair_authorization_v0/authorization.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_claim_acquisition_transport_and_observability_repair_authorization_v0/hostile_governance_review.md",
   "tests/test_dsh_stage_a_claim_acquisition_transport_and_observability_repair_authorization_v0.py",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_claim_acquisition_transport_and_observability_repair_v0/diagnostic_receipt.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_claim_acquisition_transport_and_observability_repair_v0/hostile_review.md",
+  "qntylab/dsh_stage_a_v1r3r2_prelive_enforcement.py",
+  "tests/test_dsh_stage_a_claim_transport_repair_v0.py",
 ]
 authorization_state = "AUTHORIZED_IF_CANONICAL"
 authorization_effective = "AFTER_EXACT_CANONICAL_MERGE_ONLY"
@@ -8351,9 +8355,20 @@ canonical_predecessor_terminal_outcome = "V0R5_LIVE_EPISODE_CLOSED_BLOCK_NEVER_R
 future_repair_project_id = "DSH_STAGE_A_CLAIM_ACQUISITION_TRANSPORT_AND_OBSERVABILITY_REPAIR_V0"
 future_repair_phase_separate = true
 effective_repair_authority = false
-implementation_authorized = true
-implementation_completed = false
-diagnostic_network_writes = 0
+repair_authority_was_effective = true
+implementation_authorized = false
+implementation_completed = true
+canonical_authorization_merge = "36e3085c18a747e3755097c97915f61f289d0835"
+canonical_authorization_merge_parent_1 = "b9cfcb41e1cff199da77f68b347ef912866c2ed1"
+canonical_authorization_merge_parent_2 = "26806a98b0a08363d6b982ab4c32dfcb718371b0"
+diagnostic_network_writes = 2
+diagnostic_cleanup_writes = 2
+diagnostic_positive_create = "COMMITTED"
+diagnostic_duplicate_control = "NO_OVERWRITE"
+diagnostic_confirmed_no_write = "CONFIRMED_NO_REMOTE_WRITE"
+diagnostic_unknown_control = "WRITE_STATE_UNKNOWN_FAIL_CLOSED"
+historical_root_cause_status = "HISTORICAL_ROOT_CAUSE_UNRESOLVED"
+supported_reproduced_failure_mechanism = "EPISODECLAIM_REJECTED_AUTHORIZED_DIAGNOSTIC_NAMESPACE_BEFORE_TRANSPORT"
 production_claim_mutation_authorized = false
 secret_read_authorized = false
 provider_io_authorized = false
@@ -8379,5 +8394,6 @@ hostile_governance_high_total = 0
 hostile_governance_medium_total = 0
 hostile_governance_low_total = 0
 targeted_governance_rereview_used = false
-terminal_outcome = "DSH_STAGE_A_CLAIM_ACQUISITION_TRANSPORT_AND_OBSERVABILITY_REPAIR_AUTHORIZATION_V0_READY"
-next_action = "CANONICALIZE_THIS_AUTHORIZATION_THEN_BEGIN_ONE_BOUNDED_CLAIM_TRANSPORT_AND_OBSERVABILITY_REPAIR_PHASE"
+terminal_outcome = "DSH_STAGE_A_CLAIM_ACQUISITION_TRANSPORT_AND_OBSERVABILITY_REPAIR_V0_CLOSED_PASS"
+terminal_outcome_basis = "Canonical merge 36e3085c was verified with the exact authorization parents; the repaired disposable EpisodeClaim path committed and independently verified the expected SHA, duplicate creation did not overwrite, confirmed-no-write and ambiguous-write controls passed, sanitized evidence was retained, and protected V0R5/production claim state remained untouched."
+next_action = "CLOSED_PASS: Stop after this one bounded claim transport and observability repair candidate. Historical V0R5 replay, production claim writes, V0R6, Stage B, live DSH, provider I/O, Qnty, trading, capital, promotion, and scientific execution remain unauthorized."

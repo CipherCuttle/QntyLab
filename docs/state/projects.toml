@@ -8144,9 +8144,9 @@ next_action = "CANONICALIZE_THIS_V0R5_AUTHORIZATION, THEN CREATE_A_SEPARATE_V0R5
 [[project]]
 project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R5"
 display_name = "DSH Stage-A V1R3R2 one-episode live execution activation V0R5"
-state = "ACTIVE"
-candidate_state = "ACTIVE_CANDIDATE"
-canonicalization_status = "AWAITING_EXACT_CANONICAL_MERGE"
+state = "CLOSED_BLOCKED"
+candidate_state = "CLOSED_BLOCKED"
+canonicalization_status = "CLOSED"
 authority_level = "BOUNDED_ONE_EPISODE_DSH_STAGE_A_LIVE_EXECUTION_ONLY"
 phase_type = "BOUNDED_LIVE_EXECUTION_ACTIVATION_ONLY"
 authoritative_artifacts = [
@@ -8160,6 +8160,8 @@ authoritative_artifacts = [
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/launcher/qntylab-launch-dsh.mjs",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0r5/activation.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0r5/hostile_review.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_result_v0r5/execution_evidence.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_result_v0r5/closure.md",
   "tests/test_dsh_stage_a_v1r3r2_one_episode_live_execution_activation_v0r5.py",
 ]
 authorization_state = "AUTHORIZED_IF_CANONICAL"
@@ -8174,8 +8176,8 @@ canonical_predecessor_project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTIO
 canonical_predecessor_merge = "415d15e807204cdaf83b14cb86d04b52cf11e61d"
 activation_artifact_project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R5"
 projection_contract = "ACTIVATION_REGISTRY_PROJECT_CONTEXT_CANONICAL_GIT_PARITY_V0"
-implementation_authorized = true
-implementation_completed = false
+implementation_authorized = false
+implementation_completed = true
 activation_authorized_after_canonicalization = true
 effective_execution_authority = false
 episode_started = false
@@ -8208,7 +8210,7 @@ secret_auth_env = "OPENAI_API_KEY"
 secret_read_order = "AFTER_ALL_NON_SECRET_GATES_BEFORE_CLAIM"
 secret_value_recorded = false
 authorization_phase_secret_reads = 0
-activation_phase_secret_reads = 0
+activation_phase_secret_reads = 1
 parent_provider = "openai"
 parent_model = "gpt-5-mini"
 parent_route = "llm-pi-ai"
@@ -8234,7 +8236,7 @@ activation_artifacts_created = 1
 authorization_phase_claim_creations = 0
 activation_phase_claim_creations = 0
 authorization_phase_live_dsh_calls = 0
-activation_phase_live_dsh_calls = 0
+activation_phase_live_dsh_calls = 1
 authorization_phase_external_provider_requests = 0
 activation_phase_external_provider_requests = 0
 authorization_phase_real_model_calls = 0
@@ -8286,7 +8288,17 @@ live_authority_created = false
 live_execution_authorized = false
 v0r5_created = true
 v0r5_activated = false
-live_execution_performed = false
+terminal_secret_reads = 1
+terminal_dsh_invocations = 1
+terminal_claim_attempted = true
+terminal_claim_local_intent_created = true
+terminal_claim_remote_created = false
+terminal_claim_local_receipt_created = false
+terminal_parent_requests = 0
+terminal_codex_child_turns = 0
+terminal_claude_child_turns = 0
+terminal_fixture_mutations = 0
+terminal_spend_usd = 0.0
 stage_b_authorized = false
 scientific_execution_authorized = false
 qnty_runtime_authority = "NONE"
@@ -8304,5 +8316,7 @@ hostile_governance_high_total = 0
 hostile_governance_medium_total = 0
 hostile_governance_low_total = 0
 targeted_governance_rereview_used = false
-terminal_outcome = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R5_ACTIVATION_READY"
-next_action = "MERGE_ACTIVATION_PR_AFTER_EXPLICIT_USER_AUTHORIZATION, THEN EXECUTE EXACTLY ONE REAL V0R5 EPISODE AND CLOSE."
+live_execution_performed = true
+terminal_outcome = "BLOCK_NEVER_REPLAY"
+terminal_outcome_basis = "The exact V0R5 action-time non-secret gates passed; the one live DSH process started after one secret read, then the create-only EpisodeClaim persisted durable local intent but did not complete the remote claim ref or local receipt. The partial claim state is terminal BLOCK_NEVER_REPLAY. No parent request, child turn, provider wire request, fixture test, fixture mutation, or spend occurred."
+next_action = "CLOSED_BLOCKED: BLOCK_NEVER_REPLAY. Preserve the durable local claim intent; do not delete, reset, repair, replay, start a second episode, or begin Stage B. No Qnty, scientific, trading, capital, promotion, broader production, or QntyAgentEval authority follows."

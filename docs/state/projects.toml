@@ -7025,6 +7025,132 @@ terminal_outcome = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_AUTHORIZATION_FROZEN_NO_
 next_action = "CLOSED_PASS: after canonical merge, construct the separate activation phase for exactly one fresh V0R3 Stage-A episode under the e168 contract and exact claim tuple. Do not activate or execute now; do not read the real secret, create a claim, invoke DSH/Codex/Claude, call a provider, spend, or grant Stage B, Qnty, scientific, trading, capital, promotion, or broader production authority."
 
 [[project]]
+project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_AUTHORIZATION_V0R4"
+display_name = "DSH Stage-A V1R3R2 fresh one-episode live execution authorization V0R4"
+state = "CLOSED_PASS"
+authority_level = "BOUNDED_ONE_EPISODE_DSH_STAGE_A_LIVE_EXECUTION_ONLY"
+phase_type = "GOVERNANCE_ONLY_AUTHORIZATION_CONSTRUCTION"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/PHASE.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/evidence/contract.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/evidence/qualification.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_authorization_v0r4/authorization.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_authorization_v0r4/hostile_governance_review.md",
+  "tests/test_dsh_stage_a_v1r3r2_one_episode_live_execution_authorization_v0r4.py",
+]
+authorization_state = "AUTHORIZED_IF_CANONICAL"
+authorization_effective = "AFTER_EXACT_CANONICAL_MERGE_ONLY"
+execution_project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R4"
+episode_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R4#EPISODE_1"
+activation_exists = false
+activation_authorized = false
+effective_execution_authority = false
+implementation_authorized = false
+implementation_completed = true
+canonical_base_sha = "add590cac0afebd9666a3453b38ae19866b9dea5"
+canonical_predecessor_project_id = "DSH_STAGE_A_V1R3R2_COMPOSITE_LIVE_LAUNCHER_INTEGRATION_AND_REQUALIFICATION_V0"
+canonical_predecessor_merge = "add590cac0afebd9666a3453b38ae19866b9dea5"
+canonical_predecessor_required_state = "CLOSED_PASS"
+predecessor_project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R3"
+predecessor_state = "CLOSED_BLOCKED"
+predecessor_terminal_result = "BLOCK_RUNTIME_IDENTITY"
+predecessor_episode_claimed = false
+predecessor_episode_consumed = false
+predecessor_rerun_authorized = false
+v0r3_reused = false
+qualified_launch_contract_digest = "a392f82efd5cf97e20a6ce4353597a8a7210e8638cc17e5a4209cc1003eee4be"
+composite_launch_policy_digest = "7345ab145a0c98696ce8b9e6d815f4da98092f7be680467278464fb098a51589"
+composite_launcher_path = "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/launcher/qntylab-launch-dsh.mjs"
+composite_launcher_digest = "6f212de0576127fea1dd2778a69c49a3b755a017a9d55f97f18b9057dc15c329"
+runtime_manifest_digest = "0e09b9d9d977f73d146c4a35d497cc93bd046bae016e1b1a6a52b481f07731b3"
+executable_identity_digest = "ae07ece34c88b3ebaebd7452df8d136c82935f9c8ec9df16a40e50a2582a2fd9"
+pinned_dsh_repository = "deepseek-ai/deepseek-harness"
+pinned_dsh_commit = "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca"
+pinned_dsh_tree = "3bc8f89fe494a4755c188be354add4e8b1e7b188"
+pinned_dsh_tag = "dsh-v0.1.0-rc.7"
+episode_generation = "V0R4"
+episode_count = 1
+episode_claimed = false
+episode_consumed = false
+authorized_live_episodes = 1
+second_episode_authorized = false
+whole_episode_retry_allowed = false
+activation_consumes_live_episode = false
+authorization_construction_consumes_episode = false
+live_episode_timeout_seconds = 1800
+timeout_allows_rerun = false
+claim_mechanism = "CREATE_ONLY_GIT_REMOTE_REF_PLUS_DURABLE_INTENT_PLUS_EXCLUSIVE_LOCAL_RECEIPT"
+claim_remote = "https://github.com/CipherCuttle/QntyLab.git"
+claim_namespace = "refs/heads/qntylab-claims/"
+claim_ref = "refs/heads/qntylab-claims/dsh-stage-a-v1r3r2-one-episode-live-execution-v0r4"
+claim_local_receipt_namespace = "/var/tmp/qntylab-claims"
+claim_state_dir = "/var/tmp/qntylab-claims/dsh-stage-a-v1r3r2-one-episode-live-execution-v0r4/episode-1"
+claim_created = false
+remote_claim_created = false
+local_claim_created = false
+claim_exists = false
+claim_must_precede_provider_io = true
+claim_partial_or_ambiguous_behavior = "BLOCK_NEVER_REPLAY"
+claim_delete_reset_force_update_forbidden = true
+secret_source_kind = "operator-local-file"
+secret_source_path = "~/.secrets/openai_api_key_stage_a"
+secret_auth_env = "OPENAI_API_KEY"
+secret_read_order = "AFTER_ALL_NON_SECRET_GATES_BEFORE_CLAIM"
+secret_value_recorded = false
+authorization_phase_secret_reads = 0
+parent_provider = "openai"
+parent_model = "gpt-5-mini"
+parent_route = "llm-pi-ai"
+parent_max_request_attempts = 8
+parent_provider_retries = 0
+parent_automatic_continuation = false
+parent_max_tokens = 4096
+spend_ceiling_usd = 1.0
+price_schedule_id = "openai-gpt-5-mini-2026-08-22-4x-authorization-reserve-v0"
+codex_max_total = 2
+claude_max_total = 2
+claude_hard_read_only = true
+claude_allowed_tools = ["Read", "Glob", "Grep"]
+claude_denied_tools = ["Write", "Edit", "Bash", "Agent", "Task", "mcp__*", "AskUserQuestion", "delegation"]
+claude_permission_mode = "dontAsk"
+claude_setting_sources = []
+claude_strict_mcp_config = true
+claude_mcp_servers = {}
+claude_agents = {}
+claude_plugins = []
+claude_persistence = false
+activation_artifacts_created = 0
+authorization_phase_claim_creations = 0
+authorization_phase_live_dsh_calls = 0
+authorization_phase_external_provider_requests = 0
+authorization_phase_real_model_calls = 0
+authorization_phase_codex_child_turns = 0
+authorization_phase_claude_child_turns = 0
+authorization_phase_fixture_mutations = 0
+authorization_phase_spend_usd = 0.0
+stage_b_authorized = false
+scientific_execution_authorized = false
+qnty_runtime_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+promotion_authority = "NONE"
+broader_production_authority = "NONE"
+qnty_agent_eval = "NOT_APPLICABLE"
+active_project_after_closure = "NONE"
+hostile_review_count = 1
+hostile_review_verdict = "PASS"
+hostile_governance_critical_total = 0
+hostile_governance_high_total = 0
+hostile_governance_medium_total = 0
+hostile_governance_low_total = 0
+targeted_governance_rereview_used = false
+terminal_outcome = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_AUTHORIZATION_V0R4_READY"
+next_action = "AFTER THIS AUTHORIZATION IS CANONICALLY MERGED, CONSTRUCT A SEPARATE V0R4 ACTIVATION BOUND TO THE EXACT AUTHORIZATION BYTES AND a392 CONTRACT. Do not activate, execute, read the secret, create a claim, invoke DSH, call a provider, spend, or grant Stage B, Qnty, scientific, trading, capital, promotion, or broader production authority."
+
+[[project]]
 project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R3"
 display_name = "DSH Stage-A V1R3R2 one-episode live execution activation V0R3"
 state = "CLOSED_BLOCKED"

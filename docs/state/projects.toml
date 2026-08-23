@@ -7027,7 +7027,7 @@ next_action = "CLOSED_PASS: after canonical merge, construct the separate activa
 [[project]]
 project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R3"
 display_name = "DSH Stage-A V1R3R2 one-episode live execution activation V0R3"
-state = "ACTIVE"
+state = "CLOSED_BLOCKED"
 authority_level = "BOUNDED_ONE_EPISODE_DSH_STAGE_A_LIVE_EXECUTION_ONLY"
 phase_type = "BOUNDED_LIVE_INFRASTRUCTURE_EXECUTION"
 authoritative_artifacts = [
@@ -7037,6 +7037,8 @@ authoritative_artifacts = [
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_authorization_v0r3/authorization.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0r3/activation.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0r3/hostile_governance_review.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_result_v0r3/execution_evidence.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_result_v0r3/closure.md",
   "tests/test_dsh_stage_a_v1r3r2_one_episode_live_execution_activation_v0r3.py",
 ]
 authorization_state = "AUTHORIZED_IF_CANONICAL"
@@ -7052,10 +7054,10 @@ canonical_predecessor_reviewed_head = "e317b51fe0cd43d66684d6fc3b52882354a3ebbb"
 canonical_predecessor_merge = "a26b16b01090a67ae335533cabf752b0d7cb3df1"
 activation_artifact_project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R3"
 projection_contract = "ACTIVATION_REGISTRY_PROJECT_CONTEXT_CANONICAL_GIT_PARITY_V0"
-implementation_authorized = true
-implementation_completed = false
+implementation_authorized = false
+implementation_completed = true
 activation_authorized_after_canonicalization = true
-effective_execution_authority = true
+effective_execution_authority = false
 episode_started = false
 episode_claimed = false
 episode_consumed = false
@@ -7157,8 +7159,9 @@ hostile_governance_high_total = 0
 hostile_governance_medium_total = 0
 hostile_governance_low_total = 0
 targeted_governance_rereview_used = false
-terminal_outcome = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_ACTIVATION_V0R3_READY"
-next_action = "ACTION-TIME V0R3 ONE-EPISODE EXECUTION ONLY after this exact activation is canonically merged; do not execute during activation construction."
+terminal_outcome = "BLOCK_RUNTIME_IDENTITY"
+terminal_outcome_basis = "The exact action-time launcher preflight passed physical source and manifest identity but no launcher path simultaneously bound the required e168 Stage-A policy to that runtime: the Stage-A policy launcher rejected e168 as stale or unknown, while its historical e3 identity rejected the canonical e168-era runtime manifest. The episode stopped before secret read, claim creation, provider I/O, DSH invocation, child calls, fixture execution, and spend."
+next_action = "CLOSED_BLOCKED: the exact e168 Stage-A action-time launcher/runtime identity pair is incompatible in this environment. Do not read the secret, create a claim, invoke DSH, call a provider, spend, patch or rebuild the runtime, rerun, or start Stage B. Any later attempt requires fresh Git-backed authority with a launcher that binds the exact e168 contract to the pinned runtime."
 
 [[project]]
 project_id = "DSH_RUNTIME_MATERIALIZATION_AND_LAUNCH_V0"

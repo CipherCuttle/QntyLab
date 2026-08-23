@@ -86,6 +86,10 @@ def _synthetic_repo(tmp_path: Path, *, canonical: bool) -> tuple[Path, dict]:
     activation_path.write_text(json.dumps(activation, indent=2) + "\n", encoding="utf-8")
 
     record = _source_record()
+    record["state"] = "ACTIVE"
+    record["implementation_authorized"] = True
+    record["implementation_completed"] = False
+    record["effective_execution_authority"] = True
     record["authoritative_artifacts"] = [str(ACTIVATION_PATH.relative_to(ROOT))]
     record["authorization_artifact"] = str(AUTHORIZATION_PATH.relative_to(ROOT))
     record["authorization_candidate_commit"] = base_sha
@@ -293,10 +297,13 @@ def test_project_context_registry_projection_is_fail_closed_for_v0r3() -> None:
     _, _, registry = project_context.load_context_sources(ROOT)
     projects = project_context.validate_projects_registry(ROOT, registry)
     v0r3 = projects[EXECUTION_ID]
-    assert v0r3["state"] == "ACTIVE"
-    assert v0r3["implementation_authorized"] is True
+    assert v0r3["state"] == "CLOSED_BLOCKED"
+    assert v0r3["implementation_authorized"] is False
+    assert v0r3["implementation_completed"] is True
+    assert v0r3["effective_execution_authority"] is False
     assert v0r3["episode_claimed"] is False
     assert v0r3["episode_consumed"] is False
+    assert v0r3["terminal_outcome"] == "BLOCK_RUNTIME_IDENTITY"
     projection = project_context.execution_authority_projection(ROOT, projects)
     assert projection["issues"] == []
     assert projection["active_project"] is None

@@ -1,0 +1,194 @@
+{
+  "clean": {
+    "artifactType": "DSH_STAGE_A_V1R3R2_PRODUCTION_DSH_HOME_OFFLINE_QUALIFICATION",
+    "schemaVersion": "dsh-stage-a-v1r3r2-production-dsh-home-offline-qualification-v0",
+    "scenario": "clean",
+    "dshHomeSource": "PRODUCTION_DSH_HOME_MATERIALIZER",
+    "qualificationOnlyHelperUsed": false,
+    "ambientDshHomeUsed": false,
+    "productionHomeManifestDigest": "5356ba6df6e0f35a4cc90225e920e34ef25ce33e658f16f00ba5cb6b9eb704fb",
+    "qualificationOverlayPackages": [
+      "@qntylab/dsh-stage-a-stub-provider"
+    ],
+    "NEW_QUALIFIED_LAUNCH_CONTRACT_DIGEST": "50bd776263d05e9f2fe3e026c5e8904a12fa257a1667d11c1e22ef32376c24de",
+    "productionPreparationGates": {
+      "MATERIALIZER": "PASS",
+      "DSH_HOME_IDENTITY": "PASS",
+      "SUCCESSOR_CONTRACT": "PASS",
+      "RUNTIME_IDENTITY": "PASS",
+      "EXECUTABLE_IDENTITY": "PASS",
+      "COMPOSITE_PREFLIGHT": "PASS",
+      "WORKSPACE_CONTAINMENT": "PASS",
+      "FIXTURE_IDENTITY": "PASS",
+      "ALL_NON_SECRET_GATES": "PASS"
+    },
+    "actualDshProcessConfirmed": true,
+    "loopbackParent": "http://127.0.0.1:33635",
+    "dshExitCode": 0,
+    "canonicalStageAPolicyActive": true,
+    "workspaceContainment": true,
+    "childController": "PASS",
+    "childTerminalOutcome": "PASS_NO_CRITICAL_HIGH",
+    "fakeNativeChildInvocations": {
+      "codex": 1,
+      "claude": 1
+    },
+    "expectedFakeNativeChildInvocations": {
+      "codex": 1,
+      "claude": 1
+    },
+    "nativeExecutableIdentityMatches": true,
+    "nativeChildSentinelLeaks": 0,
+    "parentEnvironmentReceivedSentinel": true,
+    "loopbackParentWireRequests": 3,
+    "parentBudget": {
+      "attempts_reserved": 3,
+      "authorized_spend_usd": "0.1354960",
+      "denials": [],
+      "price_schedule_id": "openai-gpt-5-mini-2026-08-22-4x-authorization-reserve-v0",
+      "reservations": [
+        {
+          "attempt": 1,
+          "authorized_cost_usd": "0.0434580",
+          "cumulative_authorized_spend_usd": "0.0434580",
+          "input_token_upper_bound": 10690,
+          "output_tokens_reserved": 4096,
+          "price_schedule_id": "openai-gpt-5-mini-2026-08-22-4x-authorization-reserve-v0"
+        },
+        {
+          "attempt": 2,
+          "authorized_cost_usd": "0.0450980",
+          "cumulative_authorized_spend_usd": "0.0885560",
+          "input_token_upper_bound": 12330,
+          "output_tokens_reserved": 4096,
+          "price_schedule_id": "openai-gpt-5-mini-2026-08-22-4x-authorization-reserve-v0"
+        },
+        {
+          "attempt": 3,
+          "authorized_cost_usd": "0.046940",
+          "cumulative_authorized_spend_usd": "0.1354960",
+          "input_token_upper_bound": 14172,
+          "output_tokens_reserved": 4096,
+          "price_schedule_id": "openai-gpt-5-mini-2026-08-22-4x-authorization-reserve-v0"
+        }
+      ],
+      "schema_version": "dsh-stage-a-v1r3r2-prelive-parent-budget-v0"
+    },
+    "publicProviderRequests": 0,
+    "realModelCalls": 0,
+    "realCodexTurns": 0,
+    "realClaudeTurns": 0,
+    "realSecretReads": 0,
+    "authoritativeClaims": 0,
+    "claimsCreated": 0,
+    "spendUsd": 0,
+    "stdoutTail": "Qualification loopback response. No tool call.\n",
+    "stderrTail": "",
+    "terminal": "PRODUCTION_OFFLINE_QUALIFICATION_PASS",
+    "receiptDigest": "22fe2446892bf4179b5e68d12128cb17e1fe7d75ae509188ab72cfc88dd85d7e"
+  },
+  "repair": {
+    "artifactType": "DSH_STAGE_A_V1R3R2_PRODUCTION_DSH_HOME_OFFLINE_QUALIFICATION",
+    "schemaVersion": "dsh-stage-a-v1r3r2-production-dsh-home-offline-qualification-v0",
+    "scenario": "repair",
+    "dshHomeSource": "PRODUCTION_DSH_HOME_MATERIALIZER",
+    "qualificationOnlyHelperUsed": false,
+    "ambientDshHomeUsed": false,
+    "productionHomeManifestDigest": "5356ba6df6e0f35a4cc90225e920e34ef25ce33e658f16f00ba5cb6b9eb704fb",
+    "qualificationOverlayPackages": [
+      "@qntylab/dsh-stage-a-stub-provider"
+    ],
+    "NEW_QUALIFIED_LAUNCH_CONTRACT_DIGEST": "50bd776263d05e9f2fe3e026c5e8904a12fa257a1667d11c1e22ef32376c24de",
+    "productionPreparationGates": {
+      "MATERIALIZER": "PASS",
+      "DSH_HOME_IDENTITY": "PASS",
+      "SUCCESSOR_CONTRACT": "PASS",
+      "RUNTIME_IDENTITY": "PASS",
+      "EXECUTABLE_IDENTITY": "PASS",
+      "COMPOSITE_PREFLIGHT": "PASS",
+      "WORKSPACE_CONTAINMENT": "PASS",
+      "FIXTURE_IDENTITY": "PASS",
+      "ALL_NON_SECRET_GATES": "PASS"
+    },
+    "actualDshProcessConfirmed": true,
+    "loopbackParent": "http://127.0.0.1:36817",
+    "dshExitCode": 0,
+    "canonicalStageAPolicyActive": true,
+    "workspaceContainment": true,
+    "childController": "PASS",
+    "childTerminalOutcome": "PASS_AFTER_BOUNDED_REPAIR",
+    "fakeNativeChildInvocations": {
+      "codex": 2,
+      "claude": 2
+    },
+    "expectedFakeNativeChildInvocations": {
+      "codex": 2,
+      "claude": 2
+    },
+    "nativeExecutableIdentityMatches": true,
+    "nativeChildSentinelLeaks": 0,
+    "parentEnvironmentReceivedSentinel": true,
+    "loopbackParentWireRequests": 5,
+    "parentBudget": {
+      "attempts_reserved": 5,
+      "authorized_spend_usd": "0.2348760",
+      "denials": [],
+      "price_schedule_id": "openai-gpt-5-mini-2026-08-22-4x-authorization-reserve-v0",
+      "reservations": [
+        {
+          "attempt": 1,
+          "authorized_cost_usd": "0.043464",
+          "cumulative_authorized_spend_usd": "0.043464",
+          "input_token_upper_bound": 10696,
+          "output_tokens_reserved": 4096,
+          "price_schedule_id": "openai-gpt-5-mini-2026-08-22-4x-authorization-reserve-v0"
+        },
+        {
+          "attempt": 2,
+          "authorized_cost_usd": "0.045104",
+          "cumulative_authorized_spend_usd": "0.088568",
+          "input_token_upper_bound": 12336,
+          "output_tokens_reserved": 4096,
+          "price_schedule_id": "openai-gpt-5-mini-2026-08-22-4x-authorization-reserve-v0"
+        },
+        {
+          "attempt": 3,
+          "authorized_cost_usd": "0.0470620",
+          "cumulative_authorized_spend_usd": "0.1356300",
+          "input_token_upper_bound": 14294,
+          "output_tokens_reserved": 4096,
+          "price_schedule_id": "openai-gpt-5-mini-2026-08-22-4x-authorization-reserve-v0"
+        },
+        {
+          "attempt": 4,
+          "authorized_cost_usd": "0.0487020",
+          "cumulative_authorized_spend_usd": "0.1843320",
+          "input_token_upper_bound": 15934,
+          "output_tokens_reserved": 4096,
+          "price_schedule_id": "openai-gpt-5-mini-2026-08-22-4x-authorization-reserve-v0"
+        },
+        {
+          "attempt": 5,
+          "authorized_cost_usd": "0.050544",
+          "cumulative_authorized_spend_usd": "0.2348760",
+          "input_token_upper_bound": 17776,
+          "output_tokens_reserved": 4096,
+          "price_schedule_id": "openai-gpt-5-mini-2026-08-22-4x-authorization-reserve-v0"
+        }
+      ],
+      "schema_version": "dsh-stage-a-v1r3r2-prelive-parent-budget-v0"
+    },
+    "publicProviderRequests": 0,
+    "realModelCalls": 0,
+    "realCodexTurns": 0,
+    "realClaudeTurns": 0,
+    "realSecretReads": 0,
+    "authoritativeClaims": 0,
+    "claimsCreated": 0,
+    "spendUsd": 0,
+    "stdoutTail": "Qualification loopback response. No tool call.\n",
+    "stderrTail": "",
+    "terminal": "PRODUCTION_OFFLINE_QUALIFICATION_PASS",
+    "receiptDigest": "6f729e7f5bdf737c6df0f336fda2f59728d01b379fb5b9553da7513d9dde1d7a"
+  }
+}

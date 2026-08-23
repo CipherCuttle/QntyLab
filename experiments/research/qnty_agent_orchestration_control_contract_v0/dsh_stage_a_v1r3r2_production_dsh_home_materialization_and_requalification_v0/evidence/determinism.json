@@ -1,0 +1,14 @@
+{
+  "artifactType": "DSH_STAGE_A_V1R3R2_PRODUCTION_DSH_HOME_DETERMINISM_RECEIPT",
+  "schemaVersion": "dsh-stage-a-v1r3r2-production-dsh-home-determinism-receipt-v0",
+  "HOME_A_DIGEST": "5356ba6df6e0f35a4cc90225e920e34ef25ce33e658f16f00ba5cb6b9eb704fb",
+  "HOME_B_DIGEST": "5356ba6df6e0f35a4cc90225e920e34ef25ce33e658f16f00ba5cb6b9eb704fb",
+  "identical": true,
+  "profileFileDigestsEqual": true,
+  "packageInventoryEqual": true,
+  "symlinkIdentitiesEqual": true,
+  "qntylabPackageDigestsEqual": true,
+  "packageCount": 251,
+  "objectCount": 255,
+  "terminal": "DETERMINISTIC"
+}

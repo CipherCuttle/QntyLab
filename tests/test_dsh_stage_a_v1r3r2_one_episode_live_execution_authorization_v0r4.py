@@ -140,19 +140,76 @@ def test_fresh_authorization_episode_and_claim_tuple_are_exactly_one_and_collisi
     assert not Path(fresh["claim_local_path"]).exists()
 
 
+# The canonical V0R4 authorization -> activation transition, frozen by SHA.
+V0R4_AUTHORIZATION_COMMIT = "afd51f2bc1a99b6076d9419a05e70739b64ea722"
+V0R4_ACTIVATION_BASE = "b5defe87e0f5b01450899c74d881149863a4d7c2"
+V0R4_ACTIVATION_CANDIDATE = "9f6a97f53ead312f70e3ffdf8f8b93216642ff43"
+V0R4_ACTIVATION_MERGE = "4e237d0e8048dd1afecaeb6457d8ff80a890b7a1"
+
+AUTHORIZATION_RELATIVE = (
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/"
+    "dsh_stage_a_v1r3r2_one_episode_live_execution_authorization_v0r4/authorization.json"
+)
+ACTIVATION_RELATIVE = (
+    "experiments/research/qnty_agent_orchestration_control_contract_v0/"
+    "dsh_stage_a_v1r3r2_one_episode_live_execution_v0r4/activation.json"
+)
+
+
+def _git(*args: str) -> subprocess.CompletedProcess:
+    return subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True)
+
+
+def _blob_exists(commit: str, path: str) -> bool:
+    return _git("cat-file", "-e", f"{commit}:{path}").returncode == 0
+
+
 def test_fresh_activation_artifact_was_not_present_in_canonical_history() -> None:
-    activation_relative = (
-        "experiments/research/qnty_agent_orchestration_control_contract_v0/"
-        "dsh_stage_a_v1r3r2_one_episode_live_execution_v0r4/activation.json"
-    )
-    result = subprocess.run(
-        ["git", "log", "origin/master", "--oneline", "--", activation_relative],
-        cwd=ROOT,
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    assert result.stdout == ""
+    """The authorization never retroactively contained its own activation.
+
+    The name is preserved deliberately: the governing authorization pins this
+    test by name and does not authorize deleting or renaming it. Only the stale
+    assertion inside it is replaced.
+
+    This preserves the original test's purpose. When it was written, the
+    activation artifact had not yet reached canonical history at all, so
+    "absent from origin/master" expressed that fact. The activation has since
+    merged (PR #203), so the durable statement is about the canonical
+    transition rather than about the artifact's mere absence: authorization
+    came first and did not contain the activation; activation entered canonical
+    history only later, through its own separate lineage.
+    """
+    # The authorization commit exists and does NOT contain the activation.
+    assert _blob_exists(V0R4_AUTHORIZATION_COMMIT, AUTHORIZATION_RELATIVE)
+    assert not _blob_exists(V0R4_AUTHORIZATION_COMMIT, ACTIVATION_RELATIVE)
+
+    # The activation base — the canonical state the activation branched from —
+    # likewise did not contain the activation artifact.
+    assert not _blob_exists(V0R4_ACTIVATION_BASE, ACTIVATION_RELATIVE)
+
+    # The activation candidate introduced it, on top of that base.
+    assert _blob_exists(V0R4_ACTIVATION_CANDIDATE, ACTIVATION_RELATIVE)
+    assert _git(
+        "merge-base", "--is-ancestor", V0R4_ACTIVATION_BASE, V0R4_ACTIVATION_CANDIDATE
+    ).returncode == 0
+
+    # The activation merge joined exactly that base and that candidate.
+    parents = _git(
+        "rev-list", "--parents", "-n", "1", V0R4_ACTIVATION_MERGE
+    ).stdout.split()
+    assert parents == [
+        V0R4_ACTIVATION_MERGE,
+        V0R4_ACTIVATION_BASE,
+        V0R4_ACTIVATION_CANDIDATE,
+    ]
+
+    # Canonical history contains the artifact today, added exactly once, by the
+    # activation lineage and not by the authorization.
+    added_by = _git(
+        "log", "origin/master", "--diff-filter=A", "--format=%H", "--", ACTIVATION_RELATIVE
+    ).stdout.split()
+    assert added_by == [V0R4_ACTIVATION_CANDIDATE]
+    assert _blob_exists("origin/master", ACTIVATION_RELATIVE)
 
 
 def test_parent_policy_is_the_canonical_ceiling() -> None:

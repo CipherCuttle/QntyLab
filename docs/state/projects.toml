@@ -7814,3 +7814,181 @@ targeted_governance_rereview_count = 1
 targeted_governance_rereview_verdict = "PASS"
 terminal_outcome = "DSH_STAGE_A_V1R3R2_PRODUCTION_DSH_HOME_MATERIALIZATION_AUTHORIZATION_READY"
 next_action = "CLOSED_PASS: after canonical merge, perform exactly one DSH_STAGE_A_V1R3R2_PRODUCTION_DSH_HOME_MATERIALIZATION_AND_REQUALIFICATION_V0 implementation phase. Implement one production DSH_HOME materializer from Git-bound or contract-bound canonical inputs, remove the ambient scratch DSH_HOME dependency, prove determinism and the full negative-control set, produce the ACTION_TIME_PARITY_RECEIPT stopping immediately before any real secret read, issue a NEW successor qualified launch contract digest that binds the materializer, run one independent hostile review, and open one draft PR. Do not create, activate, or execute V0R5; do not read the secret, create a claim, call a provider, invoke real children, spend, rebuild the runtime, modify the composite launcher, or grant Stage B, Qnty, scientific, trading, capital, promotion, or broader production authority."
+
+[[project]]
+project_id = "DSH_STAGE_A_V1R3R2_PRODUCTION_DSH_HOME_MATERIALIZATION_AND_REQUALIFICATION_V0"
+display_name = "DSH Stage-A V1R3R2 production DSH_HOME materialization and requalification V0"
+state = "CLOSED_PASS"
+authority_level = "BOUNDED_PRELIVE_RUNTIME_PROFILE_MATERIALIZATION_REPAIR_ONLY"
+phase_type = "BOUNDED_OFFLINE_IMPLEMENTATION_AND_REQUALIFICATION"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_production_dsh_home_materialization_and_action_time_parity_authorization_v0/authorization.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_production_dsh_home_materialization_and_requalification_v0/PHASE.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_production_dsh_home_materialization_and_requalification_v0/materializer/qntylab-materialize-stage-a-dsh-home.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_production_dsh_home_materialization_and_requalification_v0/contract/successor-contract.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_production_dsh_home_materialization_and_requalification_v0/preparation/prepare-production-launch.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_production_dsh_home_materialization_and_requalification_v0/parity/run-action-time-parity.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_production_dsh_home_materialization_and_requalification_v0/qualification/run-production-qualification.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_production_dsh_home_materialization_and_requalification_v0/test/production-dsh-home.test.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_production_dsh_home_materialization_and_requalification_v0/evidence/compute-evidence.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_production_dsh_home_materialization_and_requalification_v0/evidence/successor_contract.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_production_dsh_home_materialization_and_requalification_v0/evidence/dsh_home_manifest.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_production_dsh_home_materialization_and_requalification_v0/evidence/determinism.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_production_dsh_home_materialization_and_requalification_v0/evidence/negative_controls.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_production_dsh_home_materialization_and_requalification_v0/evidence/action_time_parity_receipt.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_production_dsh_home_materialization_and_requalification_v0/evidence/offline_actual_dsh_qualification.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_production_dsh_home_materialization_and_requalification_v0/evidence/digests.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_production_dsh_home_materialization_and_requalification_v0/hostile_review.md",
+  "tests/test_dsh_stage_a_v1r3r2_production_dsh_home_materialization_and_requalification_v0.py",
+]
+canonical_base_sha = "838b6e03608e4c2bc686a4f571dfbb340a333ddb"
+canonical_authorization_merge_pr = 205
+authorization_project_id = "DSH_STAGE_A_V1R3R2_PRODUCTION_DSH_HOME_MATERIALIZATION_AND_ACTION_TIME_PARITY_AUTHORIZATION_V0"
+authorization_artifact_sha256 = "e0a056b5b8905736ab174fa46407166ab8f1357ef1f6e082e69a3f51f265c221"
+authorization_artifact_git_blob = "b2294649e2b66046b1ce8160722626800efdd4e8"
+predecessor_project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R4"
+predecessor_state = "CLOSED_BLOCKED"
+predecessor_terminal_result = "BLOCK_RUNTIME_IDENTITY"
+predecessor_immutable_historical_evidence = true
+predecessor_reopen_allowed = false
+implementation_authorized = false
+implementation_authorization_consumed = true
+implementation_completed = true
+implementation_authorized_after_closure = false
+second_implementation_phase_authorized = false
+
+m01_boundary_decision = "MATERIALIZATION_BY_CANONICAL_COPY_AND_IDENTITY_BOUND_SYMLINK_ONLY"
+m01_package_manager_invoked = false
+m01_runtime_rebuild_performed = false
+m01_derivation_workspace_used = false
+package_graph_derivation = "DSH_HEAL_PROFILES_MODULE_FALLBACK_CLOSURE_PLUS_STAGE_A_CONTRACT_PINNED_WORKSPACE_PACKAGES"
+profile_bytes_provenance = "PINNED_DSH_SOURCE_TEMPLATE_CONSTANTS_AT_COMMIT_99F6F02"
+loader_visible_unresolved_packages = 0
+skipped_declared_but_uninstalled_dependency_edges = 88
+skipped_dependency_edge_basis = "Declared dependencies with no installed directory under the pinned runtime. DSH's own healProfilesModuleFallback skips these identically, so none is loader-visible through the flat profile fallback; each is enumerated in the DSH_HOME manifest provenance."
+source_conflict_encountered = false
+img_colour_required_by_canonical_graph = false
+img_colour_present_in_pinned_store = true
+
+production_materializer_path = "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_production_dsh_home_materialization_and_requalification_v0/materializer/qntylab-materialize-stage-a-dsh-home.mjs"
+production_materializer_digest = "ce18ebb9bb65cc01a07509189437cd1041ad09afaaee5ba318a6e822d82a09be"
+production_materializer_requires_empty_destination = true
+production_stub_provider_allowed = false
+production_stub_provider_present = false
+dsh_home_manifest_schema_digest = "133d018700b0fc7a4de59d22bbcd1e87615d62b47582bc5a2a4e235d1fe1bcef"
+dsh_home_manifest_digest = "5356ba6df6e0f35a4cc90225e920e34ef25ce33e658f16f00ba5cb6b9eb704fb"
+home_a_digest = "5356ba6df6e0f35a4cc90225e920e34ef25ce33e658f16f00ba5cb6b9eb704fb"
+home_b_digest = "5356ba6df6e0f35a4cc90225e920e34ef25ce33e658f16f00ba5cb6b9eb704fb"
+determinism_verdict = "DETERMINISTIC"
+materialized_package_count = 251
+materialized_object_count = 255
+ambient_dsh_home_dependency_removed = true
+ambient_dsh_home_bytes_modified = 0
+ambient_root_bytes_modified = 0
+ambient_roots_used_as_authority = 0
+symlink_targets_outside_pinned_runtime_root = 0
+
+required_negative_control_count = 20
+executed_negative_control_count = 20
+passing_negative_control_count = 20
+supplementary_negative_control_count = 2
+supplementary_negative_controls = ["NC-19b root-widening manifest forgery", "NC-19c unrecorded object addition"]
+negative_controls_verdict = "20_OF_20_PASS"
+
+predecessor_qualified_launch_contract_digest = "a392f82efd5cf97e20a6ce4353597a8a7210e8638cc17e5a4209cc1003eee4be"
+a392_preserved_historically = true
+a392_remains_final_complete_live_contract = false
+successor_contract_issued_this_phase = true
+new_qualified_launch_contract_digest = "50bd776263d05e9f2fe3e026c5e8904a12fa257a1667d11c1e22ef32376c24de"
+successor_contract_grants_live_authority = false
+
+action_time_parity_receipt_present = true
+action_time_parity_verdict = "ACTION_TIME_PARITY_PASS"
+action_time_parity_stop_boundary = "IMMEDIATELY_BEFORE_REAL_SECRET_READ"
+single_production_preparation_path = true
+hidden_qualification_only_preparation = false
+offline_actual_dsh_qualification_clean = "PRODUCTION_OFFLINE_QUALIFICATION_PASS"
+offline_actual_dsh_qualification_repair = "PRODUCTION_OFFLINE_QUALIFICATION_PASS"
+actual_dsh_process_confirmed = true
+
+composite_launcher_digest = "6f212de0576127fea1dd2778a69c49a3b755a017a9d55f97f18b9057dc15c329"
+composite_launcher_modified = false
+pinned_dsh_commit = "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca"
+pinned_dsh_tree = "3bc8f89fe494a4755c188be354add4e8b1e7b188"
+pinned_dsh_tag = "dsh-v0.1.0-rc.7"
+runtime_manifest_digest = "0e09b9d9d977f73d146c4a35d497cc93bd046bae016e1b1a6a52b481f07731b3"
+executable_identity_digest = "ae07ece34c88b3ebaebd7452df8d136c82935f9c8ec9df16a40e50a2582a2fd9"
+runtime_manifest_digest_changed = false
+executable_identity_digest_changed = false
+runtime_rebuilt = false
+runtime_repatched = false
+runtime_bytes_modified = 0
+stage_a_package_bytes_modified = 0
+
+stale_test_repaired = true
+stale_test_file = "tests/test_dsh_stage_a_v1r3r2_one_episode_live_execution_authorization_v0r4.py"
+stale_test_replacement_name = "test_activation_artifact_entered_canonical_history_only_through_activation"
+stale_test_deleted = false
+stale_test_trivialized = false
+stale_test_production_semantics_changed = false
+
+secret_reads = 0
+claims_created = 0
+public_provider_requests = 0
+real_model_calls = 0
+real_codex_turns = 0
+real_claude_turns = 0
+real_child_turns = 0
+fixture_mutations = 0
+canonical_fixture_mutated = false
+spend_usd = 0.0
+
+live_authority_created = false
+live_execution_authorized = false
+v0r5_created = false
+v0r5_authorized = false
+stage_b_authorized = false
+scientific_execution_authorized = false
+qnty_runtime_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+promotion_authority = "NONE"
+broader_production_authority = "NONE"
+production_deployment_authorized = false
+qnty_agent_eval = "NOT_APPLICABLE"
+active_project_after_closure = "NONE"
+
+hostile_review_count = 1
+hostile_review_verdict = "PASS_NO_CRITICAL_HIGH_AFTER_TARGETED_REREVIEW"
+hostile_critical_total = 0
+hostile_high_total = 1
+hostile_medium_total = 3
+hostile_low_total = 2
+hostile_unrepaired_critical_total = 0
+hostile_unrepaired_high_total = 0
+hostile_high_repaired_total = 1
+hostile_medium_repaired_total = 3
+hostile_low_repaired_total = 2
+targeted_rereview_used = true
+targeted_rereview_count = 1
+targeted_rereview_scope = "HIGH_FINDING_REPAIR_SURFACE_ONLY"
+targeted_rereview_verdict = "PASS_NO_CRITICAL_HIGH"
+targeted_rereview_new_critical_total = 0
+targeted_rereview_new_high_total = 0
+targeted_rereview_new_low_total = 1
+targeted_rereview_low_accepted_without_repair = 1
+code_bytes_changed_after_rereview = 0
+
+known_stale_predecessor_assertions = [
+  "tests/test_dsh_stage_a_v1r3r2_production_dsh_home_materialization_authorization_v0.py::test_materializer_implementation_is_not_performed_during_authorization",
+  "tests/test_dsh_stage_a_v1r3r2_production_dsh_home_materialization_authorization_v0.py::test_stale_v0r4_test_repair_authority_is_narrow_and_justified",
+]
+known_stale_predecessor_assertion_count = 2
+known_stale_predecessor_assertion_basis = "Both assertions describe the AUTHORIZATION phase's own diff via _phase_changed_paths(), which diffs the working tree against canonical base 1913df6. Once the authorized implementation phase exists in the same tree that diff necessarily contains implementation paths, so both assertions are structurally unsatisfiable for the successor phase the same authorization mandates. Same staleness class as the V0R4 activation assertion."
+known_stale_predecessor_assertion_repair_authorized = false
+known_stale_predecessor_assertion_repair_basis = "The stale-test repair authority is scoped NARROW_TEST_ONLY to tests/test_dsh_stage_a_v1r3r2_one_episode_live_execution_authorization_v0r4.py and sets other_test_changes_authorized = false. This phase therefore reports the staleness rather than editing an artifact it is not authorized to touch."
+known_stale_predecessor_assertions_in_project_context_ci = false
+
+terminal_outcome = "DSH_STAGE_A_V1R3R2_PRODUCTION_DSH_HOME_MATERIALIZATION_AND_REQUALIFICATION_READY"
+next_action = "CLOSED_PASS: the production Stage-A DSH_HOME materializer is implemented, deterministic, identity-covered, and bound into a successor qualified launch contract that grants no live authority. The ambient scratch DSH_HOME dependency is removed and no ambient root was mutated. Any live episode requires a SEPARATE_FRESH_GIT_BACKED_V0R5_AUTHORIZATION; do not activate, execute, read the secret, create a claim, call a provider, invoke real children, spend, rebuild the runtime, modify the composite launcher, or grant Stage B, Qnty, scientific, trading, capital, promotion, or broader production authority."

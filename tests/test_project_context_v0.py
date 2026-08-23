@@ -154,10 +154,26 @@ def test_dsh_stage_a_v1_execution_closure_is_single_bounded_blocked_project() ->
         for record in registry["project"]
         if record["state"] == "ACTIVE"
     }
-    assert active_ids == {DSH_STAGE_A_V1R3R2_V0R4_EXECUTION_PROJECT_ID}
+    # V0R4 closed BLOCK_RUNTIME_IDENTITY, so no registry row remains ACTIVE.
+    assert active_ids == set()
     execution = next(record for record in registry["project"] if record["project_id"] == DSH_STAGE_A_V1_EXECUTION_PROJECT_ID)
     authorization = next(record for record in registry["project"] if record["project_id"] == DSH_STAGE_A_V1_AUTHORIZATION_PROJECT_ID)
+    v0r4 = next(record for record in registry["project"] if record["project_id"] == DSH_STAGE_A_V1R3R2_V0R4_EXECUTION_PROJECT_ID)
+    v0r3 = next(record for record in registry["project"] if record["project_id"] == DSH_STAGE_A_V1R3R2_V0R3_EXECUTION_PROJECT_ID)
 
+    assert v0r4["state"] == "CLOSED_BLOCKED"
+    assert v0r4["terminal_outcome"] == "BLOCK_RUNTIME_IDENTITY"
+    assert v0r4["active_project_after_closure"] == "NONE"
+    assert v0r4["effective_execution_authority"] is False
+    assert v0r4["implementation_authorized"] is False
+    assert v0r4["episode_claimed"] is False
+    assert v0r4["episode_consumed"] is False
+    assert v0r4["second_episode_authorized"] is False
+    assert v0r4["whole_episode_retry_allowed"] is False
+    assert v0r4["activation_phase_spend_usd"] == 0.0
+    _assert_project_is_not_active(registry, DSH_STAGE_A_V1R3R2_V0R4_EXECUTION_PROJECT_ID)
+    _assert_project_is_not_current_active(data, DSH_STAGE_A_V1R3R2_V0R4_EXECUTION_PROJECT_ID)
+    assert v0r3["state"] == "CLOSED_BLOCKED"
     assert data["active_project"] is None
     assert data["current_permitted_next_action"] == "No project implementation is currently authorized."
     assert execution["state"] == "CLOSED_BLOCKED"
@@ -295,17 +311,27 @@ def test_funding_incremental_implementation_freeze_is_closed_without_escalation(
     data = project_context.context_data(ROOT)
     _, _, registry = project_context.load_context_sources(ROOT)
     # The source-bound implementation freeze and the blocked Stage-A V1
-    # execution, V0R1, V0R2R1, and V0R3 live episodes are all closed. V0R2R1
-    # became canonically effective after PR #193 merged, then closed
+    # execution, V0R1, V0R2R1, V0R3, and V0R4 live episodes are all closed.
+    # V0R2R1 became canonically effective after PR #193 merged, then closed
     # BLOCK_RUNTIME_INFRA because this environment cannot materialize or launch
-    # the pinned DSH runtime. V0R3 then closed BLOCK_RUNTIME_IDENTITY before
-    # secret or runtime execution. V0R4 is the sole ACTIVE registry candidate,
-    # but its branch-local effective projection remains inactive until merge.
+    # the pinned DSH runtime. V0R3 and then V0R4 each closed
+    # BLOCK_RUNTIME_IDENTITY before secret or runtime execution, so no ACTIVE
+    # registry rows remain and no closed episode is reopened.
     assert {
         record["project_id"]
         for record in registry["project"]
         if record["state"] == "ACTIVE"
-    } == {DSH_STAGE_A_V1R3R2_V0R4_EXECUTION_PROJECT_ID}
+    } == set()
+    for closed_episode_id in (
+        DSH_STAGE_A_V1R3R2_EXECUTION_PROJECT_ID,
+        DSH_STAGE_A_V1R3R2_V0R2R1_EXECUTION_PROJECT_ID,
+        DSH_STAGE_A_V1R3R2_V0R3_EXECUTION_PROJECT_ID,
+        DSH_STAGE_A_V1R3R2_V0R4_EXECUTION_PROJECT_ID,
+    ):
+        episode = next(record for record in registry["project"] if record["project_id"] == closed_episode_id)
+        assert episode["state"] == "CLOSED_BLOCKED", closed_episode_id
+        _assert_project_is_not_active(registry, closed_episode_id)
+        _assert_project_is_not_current_active(data, closed_episode_id)
     assert data["active_project"] is None
     assert data["current_permitted_next_action"] == "No project implementation is currently authorized."
     _assert_project_is_not_active(registry, FUNDING_INCREMENTAL_IMPLEMENTATION_PROJECT_ID)

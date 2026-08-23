@@ -7310,3 +7310,72 @@ hostile_governance_low_total = 0
 targeted_governance_rereview_used = false
 terminal_outcome = "DSH_STAGE_A_V1R3R2_LAUNCH_CONTRACT_REQUALIFICATION_V0_CLOSED_PASS"
 next_action = "CLOSED_PASS: the historical e3b contract is preserved, the c98 candidate is mechanically reproducible under its predecessor envelope but is not accepted as the complete successor, and the requalified contract e16872fc1f419e5253d633bbdf35e936bb58e34a7636decb8eda688113658e82 binds the exact physical runtime plus frozen Stage-A policy. No live execution, claim, secret, provider/model, spend, Stage B, Qnty, scientific, trading, capital, promotion, or production authority is created. Loopback evidence is reused; no rebuild is required."
+
+[[project]]
+project_id = "DSH_STAGE_A_V1R3R2_COMPOSITE_LIVE_LAUNCHER_INTEGRATION_AND_REQUALIFICATION_V0"
+display_name = "DSH Stage-A V1R3R2 composite live-launcher integration and requalification V0"
+state = "CLOSED_PASS"
+authority_level = "BOUNDED_PRELIVE_COMPOSITE_LAUNCH_PATH_IMPLEMENTATION_AND_OFFLINE_REQUALIFICATION_ONLY"
+phase_type = "BOUNDED_PRELIVE_RUNTIME_POLICY_COMPOSITION_AND_REQUALIFICATION"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/PHASE.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/evidence/reproduction.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/evidence/negative_tests.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/evidence/contract.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/evidence/digests.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/evidence/qualification.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/evidence/compute-digests.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/launcher/qntylab-launch-dsh.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/test/composite-launcher.test.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/qualification/run-qualification.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/hostile_review.md",
+]
+canonical_origin_master = "36890e7487ed5038c3149d33ae3bfbee0335ae5e"
+implementation_authorized = false
+implementation_completed = true
+active_project_after_closure = "NONE"
+predecessor_project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R3"
+predecessor_state = "CLOSED_BLOCKED"
+predecessor_terminal_result = "BLOCK_RUNTIME_IDENTITY"
+predecessor_qualified_contract_digest = "e16872fc1f419e5253d633bbdf35e936bb58e34a7636decb8eda688113658e82"
+qualified_launch_contract_digest = "a392f82efd5cf97e20a6ce4353597a8a7210e8638cc17e5a4209cc1003eee4be"
+runtime_manifest_digest = "0e09b9d9d977f73d146c4a35d497cc93bd046bae016e1b1a6a52b481f07731b3"
+executable_identity_digest = "ae07ece34c88b3ebaebd7452df8d136c82935f9c8ec9df16a40e50a2582a2fd9"
+composite_launch_policy_digest = "7345ab145a0c98696ce8b9e6d815f4da98092f7be680467278464fb098a51589"
+physical_runtime_bytes_changed = false
+dsh_source_bytes_changed = false
+governed_dsh_patches_changed = false
+composite_launch_policy_changed = true
+live_execution_authorized = false
+claim_authorized = false
+real_secret_read_authorized = false
+real_provider_io_authorized = false
+stage_b_authorized = false
+scientific_execution_authorized = false
+qnty_runtime_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+promotion_authority = "NONE"
+episode_claimed = false
+episode_consumed = false
+rerun_authorized = false
+hostile_review_count = 1
+hostile_review_verdict = "PASS"
+hostile_governance_critical_total = 0
+hostile_governance_high_total = 0
+hostile_governance_medium_total = 0
+hostile_governance_low_total = 0
+targeted_governance_rereview_used = false
+terminal_outcome = "DSH_STAGE_A_V1R3R2_COMPOSITE_LIVE_LAUNCHER_INTEGRATION_AND_REQUALIFICATION_V0_CLOSED_PASS"
+terminal_outcome_basis = "The exact pinned physical runtime and executable identity were bound to a new composite launcher and the frozen Stage-A policy. Clean and bounded-repair disposable DSH processes passed through the composite preflight and spawn boundary using only loopback fake-provider substitution. The historical predecessor remains preserved but is not accepted as current."
+real_secret_reads = 0
+real_provider_requests = 0
+real_model_calls = 0
+real_codex_turns = 0
+real_claude_turns = 0
+claims_created = 0
+spend_usd = 0.0
+next_action = "CLOSED_PASS: a later separately authorized phase may construct one fresh live authorization bound ONLY to a392f82efd5cf97e20a6ce4353597a8a7210e8638cc17e5a4209cc1003eee4be. Do not create or execute it automatically. No live execution, claim, secret, provider/model, spend, Stage B, Qnty, scientific, trading, capital, or promotion authority is created here."

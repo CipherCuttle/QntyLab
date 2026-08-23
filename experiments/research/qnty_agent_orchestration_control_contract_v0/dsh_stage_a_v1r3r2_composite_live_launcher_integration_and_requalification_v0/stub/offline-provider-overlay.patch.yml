@@ -1,0 +1,28 @@
+# Additive loopback-only provider overlay.
+# The composite launcher always applies the canonical Stage-A policy first;
+# this overlay disables only the two raw native adapters and inserts explicit
+# local stubs under new IDs. The parent gate, child gate, and tool routes stay
+# supplied by the canonical Stage-A policy.
+- id: subagent-codex
+  disabled: true
+- id: subagent-claude-code
+  disabled: true
+- insert:
+    - id: qntylab-offline-raw-codex
+      name: '@qntylab/dsh-stage-a-stub-provider'
+      config:
+        providerName: codex
+        invocationPath: !!js process.env.QNTYLAB_DSH_STUB_INVOCATION_PATH
+        stubExecutable: !!js process.env.QNTYLAB_DSH_OFFLINE_STUB_EXECUTABLE
+        responseMode: !!js process.env.QNTYLAB_DSH_STUB_RESPONSE_MODE
+        env:
+          PATH: !!js process.env.QNTYLAB_DSH_NATIVE_PATH
+    - id: qntylab-offline-raw-claude
+      name: '@qntylab/dsh-stage-a-stub-provider'
+      config:
+        providerName: claude-code
+        invocationPath: !!js process.env.QNTYLAB_DSH_STUB_INVOCATION_PATH
+        stubExecutable: !!js process.env.QNTYLAB_DSH_OFFLINE_STUB_EXECUTABLE
+        responseMode: !!js process.env.QNTYLAB_DSH_STUB_RESPONSE_MODE
+        env:
+          PATH: !!js process.env.QNTYLAB_DSH_NATIVE_PATH

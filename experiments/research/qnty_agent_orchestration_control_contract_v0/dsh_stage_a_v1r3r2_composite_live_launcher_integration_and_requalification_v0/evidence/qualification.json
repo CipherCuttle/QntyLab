@@ -1,0 +1,321 @@
+{
+  "artifactType": "DSH_STAGE_A_V1R3R2_COMPOSITE_LAUNCHER_QUALIFICATION",
+  "schemaVersion": "dsh-stage-a-v1r3r2-composite-launcher-qualification-v0",
+  "projectId": "DSH_STAGE_A_V1R3R2_COMPOSITE_LIVE_LAUNCHER_INTEGRATION_AND_REQUALIFICATION_V0",
+  "qualificationMode": "BOUNDED_PRELIVE_COMPOSITE_LAUNCH_PATH_OFFLINE_LOOPBACK",
+  "receipts": [
+    {
+      "artifactType": "DSH_STAGE_A_V1R3R2_COMPOSITE_LOOPBACK_QUALIFICATION",
+      "schemaVersion": "dsh-stage-a-v1r3r2-composite-loopback-qualification-v0",
+      "projectId": "DSH_STAGE_A_V1R3R2_COMPOSITE_LIVE_LAUNCHER_INTEGRATION_AND_REQUALIFICATION_V0",
+      "scenario": "clean",
+      "qualifiedContractDigest": "a392f82efd5cf97e20a6ce4353597a8a7210e8638cc17e5a4209cc1003eee4be",
+      "actualDshProcessConfirmed": true,
+      "loopbackParent": "http://127.0.0.1:37193",
+      "physicalRuntimeVerification": "PASS",
+      "stageAPolicyVerification": "PASS",
+      "singleCompositePreflight": "PASS",
+      "singleCompositeSpawnBoundary": "PASS",
+      "canonicalStageAPolicyActive": true,
+      "parentBudgetGate": "PASS",
+      "childController": "PASS",
+      "claudeReadOnly": true,
+      "workspaceContainment": true,
+      "dshExitCode": 0,
+      "stdoutTail": "Qualification loopback response. No tool call.\n",
+      "stderrTail": "",
+      "loopbackParentWireRequests": 3,
+      "publicProviderRequests": 0,
+      "realModelCalls": 0,
+      "realCodexTurns": 0,
+      "realClaudeTurns": 0,
+      "fakeNativeChildInvocations": {
+        "codex": 1,
+        "claude": 1
+      },
+      "expectedFakeNativeChildInvocations": {
+        "codex": 1,
+        "claude": 1
+      },
+      "nativeExecutableIdentityMatches": true,
+      "nativeChildSentinelLeaks": 0,
+      "parentEnvironmentReceivedSentinel": true,
+      "parentBudget": {
+        "attempts_reserved": 3,
+        "authorized_spend_usd": "0.1352620",
+        "denials": [],
+        "price_schedule_id": "openai-gpt-5-mini-2026-08-22-4x-authorization-reserve-v0",
+        "reservations": [
+          {
+            "attempt": 1,
+            "authorized_cost_usd": "0.043380",
+            "cumulative_authorized_spend_usd": "0.043380",
+            "input_token_upper_bound": 10612,
+            "output_tokens_reserved": 4096,
+            "price_schedule_id": "openai-gpt-5-mini-2026-08-22-4x-authorization-reserve-v0"
+          },
+          {
+            "attempt": 2,
+            "authorized_cost_usd": "0.045020",
+            "cumulative_authorized_spend_usd": "0.088400",
+            "input_token_upper_bound": 12252,
+            "output_tokens_reserved": 4096,
+            "price_schedule_id": "openai-gpt-5-mini-2026-08-22-4x-authorization-reserve-v0"
+          },
+          {
+            "attempt": 3,
+            "authorized_cost_usd": "0.0468620",
+            "cumulative_authorized_spend_usd": "0.1352620",
+            "input_token_upper_bound": 14094,
+            "output_tokens_reserved": 4096,
+            "price_schedule_id": "openai-gpt-5-mini-2026-08-22-4x-authorization-reserve-v0"
+          }
+        ],
+        "schema_version": "dsh-stage-a-v1r3r2-prelive-parent-budget-v0"
+      },
+      "childState": {
+        "active_call": null,
+        "claude_calls_reserved": 1,
+        "codex_calls_reserved": 1,
+        "events": [
+          {
+            "event_type": "CHILD_RESERVED",
+            "role": "codex_initial",
+            "sequence": 1,
+            "state": "INITIAL_CODEX_RUNNING",
+            "token": "codex_initial-1",
+            "tool_name": "subagent_codex"
+          },
+          {
+            "event_type": "CHILD_COMPLETED",
+            "role": "codex_initial",
+            "sequence": 2,
+            "state": "AFTER_INITIAL_CODEX",
+            "token": "codex_initial-1"
+          },
+          {
+            "event_type": "CHILD_RESERVED",
+            "role": "claude_review",
+            "sequence": 3,
+            "state": "CLAUDE_REVIEW_RUNNING",
+            "token": "claude_review-3",
+            "tool_name": "subagent_claude_code"
+          },
+          {
+            "event_type": "CHILD_COMPLETED",
+            "role": "claude_review",
+            "sequence": 4,
+            "state": "AFTER_REVIEW_NO_C_H",
+            "token": "claude_review-3"
+          }
+        ],
+        "review": {
+          "closure_blocking": false,
+          "critical": [],
+          "high": [],
+          "low": [],
+          "medium": [],
+          "summary": "offline native stub review"
+        },
+        "schema_version": "dsh-stage-a-v1r3r2-prelive-child-state-v0",
+        "state": "AFTER_REVIEW_NO_C_H",
+        "terminal_outcome": "PASS_NO_CRITICAL_HIGH"
+      },
+      "offlineLocalClaimReceiptCreated": true,
+      "claimsCreated": 0,
+      "realSecretReads": 0,
+      "secretSentinelLeaks": [],
+      "spendUsd": 0,
+      "forbiddenRealSecretPath": "~/.secrets/openai_api_key_stage_a"
+    },
+    {
+      "artifactType": "DSH_STAGE_A_V1R3R2_COMPOSITE_LOOPBACK_QUALIFICATION",
+      "schemaVersion": "dsh-stage-a-v1r3r2-composite-loopback-qualification-v0",
+      "projectId": "DSH_STAGE_A_V1R3R2_COMPOSITE_LIVE_LAUNCHER_INTEGRATION_AND_REQUALIFICATION_V0",
+      "scenario": "repair",
+      "qualifiedContractDigest": "a392f82efd5cf97e20a6ce4353597a8a7210e8638cc17e5a4209cc1003eee4be",
+      "actualDshProcessConfirmed": true,
+      "loopbackParent": "http://127.0.0.1:44503",
+      "physicalRuntimeVerification": "PASS",
+      "stageAPolicyVerification": "PASS",
+      "singleCompositePreflight": "PASS",
+      "singleCompositeSpawnBoundary": "PASS",
+      "canonicalStageAPolicyActive": true,
+      "parentBudgetGate": "PASS",
+      "childController": "PASS",
+      "claudeReadOnly": true,
+      "workspaceContainment": true,
+      "dshExitCode": 0,
+      "stdoutTail": "Qualification loopback response. No tool call.\n",
+      "stderrTail": "",
+      "loopbackParentWireRequests": 5,
+      "publicProviderRequests": 0,
+      "realModelCalls": 0,
+      "realCodexTurns": 0,
+      "realClaudeTurns": 0,
+      "fakeNativeChildInvocations": {
+        "codex": 2,
+        "claude": 2
+      },
+      "expectedFakeNativeChildInvocations": {
+        "codex": 2,
+        "claude": 2
+      },
+      "nativeExecutableIdentityMatches": true,
+      "nativeChildSentinelLeaks": 0,
+      "parentEnvironmentReceivedSentinel": true,
+      "parentBudget": {
+        "attempts_reserved": 5,
+        "authorized_spend_usd": "0.2344560",
+        "denials": [],
+        "price_schedule_id": "openai-gpt-5-mini-2026-08-22-4x-authorization-reserve-v0",
+        "reservations": [
+          {
+            "attempt": 1,
+            "authorized_cost_usd": "0.043380",
+            "cumulative_authorized_spend_usd": "0.043380",
+            "input_token_upper_bound": 10612,
+            "output_tokens_reserved": 4096,
+            "price_schedule_id": "openai-gpt-5-mini-2026-08-22-4x-authorization-reserve-v0"
+          },
+          {
+            "attempt": 2,
+            "authorized_cost_usd": "0.045020",
+            "cumulative_authorized_spend_usd": "0.088400",
+            "input_token_upper_bound": 12252,
+            "output_tokens_reserved": 4096,
+            "price_schedule_id": "openai-gpt-5-mini-2026-08-22-4x-authorization-reserve-v0"
+          },
+          {
+            "attempt": 3,
+            "authorized_cost_usd": "0.0469780",
+            "cumulative_authorized_spend_usd": "0.1353780",
+            "input_token_upper_bound": 14210,
+            "output_tokens_reserved": 4096,
+            "price_schedule_id": "openai-gpt-5-mini-2026-08-22-4x-authorization-reserve-v0"
+          },
+          {
+            "attempt": 4,
+            "authorized_cost_usd": "0.0486180",
+            "cumulative_authorized_spend_usd": "0.1839960",
+            "input_token_upper_bound": 15850,
+            "output_tokens_reserved": 4096,
+            "price_schedule_id": "openai-gpt-5-mini-2026-08-22-4x-authorization-reserve-v0"
+          },
+          {
+            "attempt": 5,
+            "authorized_cost_usd": "0.050460",
+            "cumulative_authorized_spend_usd": "0.2344560",
+            "input_token_upper_bound": 17692,
+            "output_tokens_reserved": 4096,
+            "price_schedule_id": "openai-gpt-5-mini-2026-08-22-4x-authorization-reserve-v0"
+          }
+        ],
+        "schema_version": "dsh-stage-a-v1r3r2-prelive-parent-budget-v0"
+      },
+      "childState": {
+        "active_call": null,
+        "claude_calls_reserved": 2,
+        "codex_calls_reserved": 2,
+        "events": [
+          {
+            "event_type": "CHILD_RESERVED",
+            "role": "codex_initial",
+            "sequence": 1,
+            "state": "INITIAL_CODEX_RUNNING",
+            "token": "codex_initial-1",
+            "tool_name": "subagent_codex"
+          },
+          {
+            "event_type": "CHILD_COMPLETED",
+            "role": "codex_initial",
+            "sequence": 2,
+            "state": "AFTER_INITIAL_CODEX",
+            "token": "codex_initial-1"
+          },
+          {
+            "event_type": "CHILD_RESERVED",
+            "role": "claude_review",
+            "sequence": 3,
+            "state": "CLAUDE_REVIEW_RUNNING",
+            "token": "claude_review-3",
+            "tool_name": "subagent_claude_code"
+          },
+          {
+            "event_type": "CHILD_COMPLETED",
+            "role": "claude_review",
+            "sequence": 4,
+            "state": "AFTER_REVIEW_C_H",
+            "token": "claude_review-3"
+          },
+          {
+            "event_type": "CHILD_RESERVED",
+            "role": "codex_repair",
+            "sequence": 5,
+            "state": "CODEX_REPAIR_RUNNING",
+            "token": "codex_repair-5",
+            "tool_name": "subagent_codex"
+          },
+          {
+            "event_type": "CHILD_COMPLETED",
+            "role": "codex_repair",
+            "sequence": 6,
+            "state": "AFTER_REPAIR",
+            "token": "codex_repair-5"
+          },
+          {
+            "event_type": "CHILD_RESERVED",
+            "role": "claude_rereview",
+            "sequence": 7,
+            "state": "CLAUDE_REREVIEW_RUNNING",
+            "token": "claude_rereview-7",
+            "tool_name": "subagent_claude_code"
+          },
+          {
+            "event_type": "CHILD_COMPLETED",
+            "role": "claude_rereview",
+            "sequence": 8,
+            "state": "AFTER_REREVIEW",
+            "token": "claude_rereview-7"
+          }
+        ],
+        "review": {
+          "closure_blocking": false,
+          "critical": [],
+          "high": [],
+          "low": [],
+          "medium": [],
+          "summary": "offline native stub review"
+        },
+        "schema_version": "dsh-stage-a-v1r3r2-prelive-child-state-v0",
+        "state": "AFTER_REREVIEW",
+        "terminal_outcome": "PASS_AFTER_BOUNDED_REPAIR"
+      },
+      "offlineLocalClaimReceiptCreated": true,
+      "claimsCreated": 0,
+      "realSecretReads": 0,
+      "secretSentinelLeaks": [],
+      "spendUsd": 0,
+      "forbiddenRealSecretPath": "~/.secrets/openai_api_key_stage_a"
+    }
+  ],
+  "summary": {
+    "verdict": "PASS",
+    "actualDshProcess": true,
+    "physicalRuntimeVerification": true,
+    "stageAPolicyVerification": true,
+    "singleCompositePreflight": true,
+    "singleCompositeSpawnBoundary": true,
+    "canonicalStageAPolicyActive": true,
+    "cleanPathProcessExercised": true,
+    "repairPathProcessExercised": true,
+    "publicProviderRequests": 0,
+    "realModelCalls": 0,
+    "realCodexTurns": 0,
+    "realClaudeTurns": 0,
+    "realSecretReads": 0,
+    "claimsCreated": 0,
+    "spendUsd": 0,
+    "offlineLocalClaimReceipts": 2
+  }
+}

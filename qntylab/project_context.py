@@ -135,13 +135,20 @@ DSH_STAGE_A_V1R3R2_AUTHORIZATION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECU
 DSH_STAGE_A_V1R3R2_EXECUTION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R2R1"
 DSH_STAGE_A_V1R3R2_V0R3_AUTHORIZATION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_AUTHORIZATION_V0R3"
 DSH_STAGE_A_V1R3R2_V0R3_EXECUTION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R3"
+DSH_STAGE_A_V1R3R2_V0R4_AUTHORIZATION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_AUTHORIZATION_V0R4"
+DSH_STAGE_A_V1R3R2_V0R4_EXECUTION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R4"
 _FRESH_AUTHORIZATION_BINDINGS = {
     DSH_STAGE_A_V1R3R2_V0R1_EXECUTION_ID: DSH_STAGE_A_V1R3R2_V0R1_AUTHORIZATION_ID,
     DSH_STAGE_A_V1R3R2_EXECUTION_ID: DSH_STAGE_A_V1R3R2_AUTHORIZATION_ID,
     DSH_STAGE_A_V1R3R2_V0R3_EXECUTION_ID: DSH_STAGE_A_V1R3R2_V0R3_AUTHORIZATION_ID,
+    DSH_STAGE_A_V1R3R2_V0R4_EXECUTION_ID: DSH_STAGE_A_V1R3R2_V0R4_AUTHORIZATION_ID,
 }
 _FRESH_EXECUTION_IDS_WITH_V0R2R1_BINDING_RULES = frozenset(
-    {DSH_STAGE_A_V1R3R2_EXECUTION_ID, DSH_STAGE_A_V1R3R2_V0R3_EXECUTION_ID}
+    {
+        DSH_STAGE_A_V1R3R2_EXECUTION_ID,
+        DSH_STAGE_A_V1R3R2_V0R3_EXECUTION_ID,
+        DSH_STAGE_A_V1R3R2_V0R4_EXECUTION_ID,
+    }
 )
 _MISSING = object()
 
@@ -410,6 +417,7 @@ def _fresh_v0r1_binding_issues(
         issues.append("fresh V0R1 authorization candidate is not in canonical origin/master")
 
     is_v0r3 = record.get("project_id") == DSH_STAGE_A_V1R3R2_V0R3_EXECUTION_ID
+    is_v0r4 = record.get("project_id") == DSH_STAGE_A_V1R3R2_V0R4_EXECUTION_ID
     is_v0r2r1 = record.get("project_id") == DSH_STAGE_A_V1R3R2_EXECUTION_ID
     artifact_value = authorization.get("artifact")
     if not isinstance(artifact_value, str):
@@ -426,7 +434,7 @@ def _fresh_v0r1_binding_issues(
         )
         if authorization_document.get("project_id") != authorization.get("project_id"):
             issues.append("fresh V0R1 authorization artifact identity does not match activation")
-        if is_v0r3:
+        if is_v0r3 or is_v0r4:
             future_identity = _lookup(
                 authorization_document, ("fresh_identity", "future_activation_project_id")
             )
@@ -434,12 +442,25 @@ def _fresh_v0r1_binding_issues(
             future_identity = authorization_document.get("execution_project_id")
         if future_identity != activation.get("project_id"):
             issues.append("fresh authorization execution identity does not match activation")
-        if is_v0r3:
+        if is_v0r3 or is_v0r4:
             expected_content_sha = authorization.get("canonical_content_sha256")
             if not isinstance(expected_content_sha, str):
                 issues.append("fresh V0R3 authorization canonical content digest is missing")
             elif hashlib.sha256(authorization_path.read_bytes()).hexdigest() != expected_content_sha:
                 issues.append("fresh V0R3 authorization canonical content digest mismatch")
+            if is_v0r4:
+                canonical_auth_merge = authorization.get("canonical_merge")
+                if not isinstance(canonical_auth_merge, str) or not canonical_auth_merge:
+                    issues.append("fresh V0R4 authorization canonical merge is missing")
+                elif isinstance(expected_content_sha, str):
+                    canonical_authorization_bytes = _git_bytes(
+                        root,
+                        "show",
+                        f"{canonical_auth_merge}:{artifact_value}",
+                        check=False,
+                    )
+                    if hashlib.sha256(canonical_authorization_bytes).hexdigest() != expected_content_sha:
+                        issues.append("fresh V0R4 authorization canonical merge bytes mismatch")
             expected_blob_sha = authorization.get("git_blob_sha")
             if not isinstance(expected_blob_sha, str):
                 issues.append("fresh V0R3 authorization Git blob identity is missing")
@@ -497,7 +518,7 @@ def _fresh_v0r1_binding_issues(
                     for field, expected in authorized_contract.items():
                         if activation_contract.get(field) != expected:
                             issues.append(f"fresh V0R2R1 {contract_name} mismatch for {field}")
-        if is_v0r2r1 or is_v0r3:
+        if is_v0r2r1 or is_v0r3 or is_v0r4:
             authorized_secret = authorization_document.get("secret_binding_contract")
             activation_secret = activation.get("secret_binding_contract")
             if not isinstance(authorized_secret, dict) or not isinstance(activation_secret, dict):
@@ -516,7 +537,7 @@ def _fresh_v0r1_binding_issues(
                 issues.append("fresh V0R1 authorization must not self-activate")
         expected_candidate_base = (
             authorization.get("canonical_merge")
-            if is_v0r3
+            if is_v0r3 or is_v0r4
             else candidate_commit
         )
         if _lookup(activation, ("canonicalization", "candidate_base_sha")) != expected_candidate_base:
@@ -524,7 +545,7 @@ def _fresh_v0r1_binding_issues(
 
         contract = authorization_document.get("qualified_launch_contract")
         pinned = authorization_document.get("pinned_dsh_identity")
-        if is_v0r3:
+        if is_v0r3 or is_v0r4:
             source_identity = _lookup(authorization_document, ("runtime_binding", "source_identity"))
             if isinstance(source_identity, dict):
                 pinned = {
@@ -551,7 +572,7 @@ def _fresh_v0r1_binding_issues(
                         if isinstance(governed, dict)
                         else {}
                     )
-                elif not is_v0r2r1:
+                elif not (is_v0r2r1 or is_v0r4):
                     issues.append("fresh V0R1 qualified runtime repair binding is incomplete")
                     repairs = {}
             runtime_bindings = {
@@ -596,7 +617,7 @@ def _fresh_v0r1_binding_issues(
         else:
             retry_policy = authorized_parent.get("retry_policy")
             if not isinstance(retry_policy, dict):
-                if not (is_v0r2r1 or is_v0r3):
+                if not (is_v0r2r1 or is_v0r3 or is_v0r4):
                     issues.append("fresh V0R1 authorization retry policy binding is incomplete")
                 retry_policy = {}
             spend_authority = authorization_document.get("spend_authority")
@@ -613,7 +634,7 @@ def _fresh_v0r1_binding_issues(
             expected_provider_retry = retry_policy.get("provider_retry")
             actual_llm_retries = parent.get("llm_retries")
             actual_provider_retry = parent.get("provider_retry")
-            if is_v0r2r1 or is_v0r3:
+            if is_v0r2r1 or is_v0r3 or is_v0r4:
                 expected_llm_retries = authorized_parent.get("provider_internal_retries")
                 expected_provider_retry = authorized_parent.get("provider_internal_retries")
                 actual_llm_retries = parent.get("provider_internal_retries")
@@ -629,7 +650,7 @@ def _fresh_v0r1_binding_issues(
                 "provider_retry": (actual_provider_retry, expected_provider_retry),
                 "automatic_continuation": (
                     parent.get("automatic_continuation"),
-                    False if is_v0r2r1 or is_v0r3 else retry_policy.get("automatic_continuation"),
+                    False if is_v0r2r1 or is_v0r3 or is_v0r4 else retry_policy.get("automatic_continuation"),
                 ),
             }
             for label, (actual, expected) in parent_bindings.items():

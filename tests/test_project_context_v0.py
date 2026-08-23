@@ -24,6 +24,7 @@ DSH_STAGE_A_V1R1_EXECUTION_PROJECT_ID = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V
 DSH_STAGE_A_V1R2_EXECUTION_PROJECT_ID = "DSH_MULTI_AGENT_ORCHESTRATION_STAGE_A_V1R2_EXECUTION_V0"
 DSH_STAGE_A_V1R3R2_EXECUTION_PROJECT_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R1"
 DSH_STAGE_A_V1R3R2_V0R2R1_EXECUTION_PROJECT_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R2R1"
+DSH_STAGE_A_V1R3R2_V0R3_EXECUTION_PROJECT_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R3"
 
 
 def _assert_project_is_not_active(registry: dict, project_id: str) -> None:
@@ -147,16 +148,12 @@ def test_active_project_with_implementation_false_remains_unauthorized(tmp_path:
 def test_dsh_stage_a_v1_execution_closure_is_single_bounded_blocked_project() -> None:
     data = project_context.context_data(ROOT)
     _, _, registry = project_context.load_context_sources(ROOT)
-    active = [
-        record
+    active_ids = {
+        record["project_id"]
         for record in registry["project"]
         if record["state"] == "ACTIVE"
-        and record["project_id"] not in {
-            DSH_STAGE_A_V1R3R2_EXECUTION_PROJECT_ID,
-            DSH_STAGE_A_V1R3R2_V0R2R1_EXECUTION_PROJECT_ID,
-        }
-    ]
-    assert active == []
+    }
+    assert active_ids == {DSH_STAGE_A_V1R3R2_V0R3_EXECUTION_PROJECT_ID}
     execution = next(record for record in registry["project"] if record["project_id"] == DSH_STAGE_A_V1_EXECUTION_PROJECT_ID)
     authorization = next(record for record in registry["project"] if record["project_id"] == DSH_STAGE_A_V1_AUTHORIZATION_PROJECT_ID)
 
@@ -300,12 +297,13 @@ def test_funding_incremental_implementation_freeze_is_closed_without_escalation(
     # execution, V0R1, and V0R2R1 live episodes are all closed. V0R2R1 became
     # canonically effective after PR #193 merged, then closed BLOCK_RUNTIME_INFRA
     # because this environment cannot materialize or launch the pinned DSH
-    # runtime. No registry row is currently ACTIVE.
+    # runtime. The separate V0R3 activation is the only ACTIVE registry row;
+    # this branch-local candidate remains ineffective until canonical merge.
     assert {
         record["project_id"]
         for record in registry["project"]
         if record["state"] == "ACTIVE"
-    } == set()
+    } == {DSH_STAGE_A_V1R3R2_V0R3_EXECUTION_PROJECT_ID}
     assert data["active_project"] is None
     assert data["current_permitted_next_action"] == "No project implementation is currently authorized."
     _assert_project_is_not_active(registry, FUNDING_INCREMENTAL_IMPLEMENTATION_PROJECT_ID)

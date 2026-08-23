@@ -25,6 +25,7 @@ EPISODE_ID = f"{EXECUTION_ID}#EPISODE_1"
 CANONICAL_MASTER = "f2a3e7a9e39aac93c413d758a2f1f329cbe1fd79"
 SUCCESSOR_DIGEST = "50bd776263d05e9f2fe3e026c5e8904a12fa257a1667d11c1e22ef32376c24de"
 A392 = "a392f82efd5cf97e20a6ce4353597a8a7210e8638cc17e5a4209cc1003eee4be"
+CLAIM_REPAIR_AUTHORIZATION_PROJECT_ID = "DSH_STAGE_A_CLAIM_ACQUISITION_TRANSPORT_AND_OBSERVABILITY_REPAIR_AUTHORIZATION_V0"
 
 
 def _git(*args: str) -> subprocess.CompletedProcess[str]:
@@ -110,7 +111,11 @@ def test_fresh_v0r5_identity_claim_absence_and_single_episode_policy_are_exact()
     assert claim["created_during_authorization_construction"] is False
     assert claim["remote_claim_exists_at_construction"] is False
     assert claim["local_claim_exists_at_construction"] is False
-    assert not Path(fresh["claim_local_path"]).exists()
+    local_state = Path(fresh["claim_local_path"])
+    assert local_state.is_dir()
+    assert (local_state / "claim-intent.json").is_file()
+    assert (local_state / "claim.lock").is_file()
+    assert not (local_state / "claim-receipt.json").exists()
     assert V0R4["fresh_identity"]["claim_remote_ref"] in claim["historical_claim_refs_rejected"]
 
 
@@ -173,7 +178,7 @@ def test_project_context_registry_projection_is_inactive_and_consistent() -> Non
     projects = project_context.validate_projects_registry(ROOT, registry)
     projection = project_context.execution_authority_projection(ROOT, projects)
     assert projection["issues"] == []
-    assert projection["active_project"] is None
+    assert projection["active_project"]["project_id"] == CLAIM_REPAIR_AUTHORIZATION_PROJECT_ID
     row = projects[AUTH_ID]
     assert row["state"] == "CLOSED_PASS"
     assert row["implementation_authorized"] is False

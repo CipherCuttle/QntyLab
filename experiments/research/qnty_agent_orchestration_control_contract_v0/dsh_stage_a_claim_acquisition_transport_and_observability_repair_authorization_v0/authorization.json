@@ -1,0 +1,208 @@
+{
+  "artifact_type": "DSH_STAGE_A_CLAIM_ACQUISITION_TRANSPORT_AND_OBSERVABILITY_REPAIR_AUTHORIZATION",
+  "schema_version": "dsh-stage-a-claim-acquisition-transport-and-observability-repair-authorization-v0",
+  "project_id": "DSH_STAGE_A_CLAIM_ACQUISITION_TRANSPORT_AND_OBSERVABILITY_REPAIR_AUTHORIZATION_V0",
+  "display_name": "DSH Stage-A claim acquisition transport and observability repair authorization V0",
+  "phase_state": "ACTIVE_CANDIDATE",
+  "phase_type": "GOVERNANCE_ONLY_BOUNDED_REPAIR_AUTHORIZATION",
+  "authority_level": "BOUNDED_CLAIM_TRANSPORT_AND_OBSERVABILITY_REPAIR_ONLY",
+  "authorized_future_operation": "DSH_STAGE_A_CLAIM_ACQUISITION_TRANSPORT_AND_OBSERVABILITY_REPAIR_V0",
+  "authorization_state": "AUTHORIZED_IF_CANONICAL",
+  "authorization_effective": "AFTER_EXACT_CANONICAL_MERGE_ONLY",
+  "canonical_source_identity": {
+    "repository": "QntyLab",
+    "canonical_ref": "origin/master",
+    "canonical_master": "b9cfcb41e1cff199da77f68b347ef912866c2ed1",
+    "canonical_merge_parents": [
+      "8c348e3f559a191ef70cd7afa63d9b5fc2fce819",
+      "ec004b17fd23afbab1a72bb38779e8648079eb51"
+    ],
+    "predecessor_project_id": "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R5",
+    "predecessor_required_state": "CLOSED_BLOCKED",
+    "predecessor_terminal_outcome": "V0R5_LIVE_EPISODE_CLOSED_BLOCK_NEVER_REPLAY",
+    "predecessor_merge": "b9cfcb41e1cff199da77f68b347ef912866c2ed1",
+    "git_wins_over_prompt_memory_or_handoff": true,
+    "canonical_drift_behavior": "STOP_SOURCE_CONFLICT"
+  },
+  "successor_binding": {
+    "future_repair_project_id": "DSH_STAGE_A_CLAIM_ACQUISITION_TRANSPORT_AND_OBSERVABILITY_REPAIR_V0",
+    "future_repair_phase_is_separate": true,
+    "future_repair_requires_this_authorization_canonical_merge": true,
+    "effective_repair_authority": false,
+    "branch_local_candidate_does_not_self_authorize": true,
+    "future_repair_must_reconcile_canonical_source_again": true,
+    "future_repair_terminal_stop": "STOP_AFTER_ONE_CANDIDATE_COMMIT_OR_DRAFT_PR"
+  },
+  "future_repair_scope": {
+    "allowed_operations": [
+      "INSPECT_CANONICAL_EPISODE_CLAIM_IMPLEMENTATION",
+      "INSPECT_PRODUCTION_EQUIVALENT_GIT_REMOTE_REF_TRANSPORT",
+      "MODIFY_ONLY_CLAIM_ACQUISITION_AND_DIRECTLY_RELATED_OBSERVABILITY_CODE",
+      "MODIFY_DIRECTLY_RELATED_TESTS",
+      "RETAIN_SANITIZED_DIAGNOSTIC_RECEIPTS",
+      "IMPLEMENT_COMMITTED_CONFIRMED_NO_REMOTE_WRITE_AND_WRITE_STATE_UNKNOWN",
+      "MAKE_WRITE_STATE_UNKNOWN_FAIL_CLOSED",
+      "RUN_FOCUSED_OFFLINE_TESTS",
+      "RUN_BOUNDED_INTEGRATION_TESTS",
+      "RUN_ONE_POSITIVE_DISPOSABLE_CREATE_ONLY_CONTROL",
+      "RUN_ONE_DISPOSABLE_DUPLICATE_COLLISION_CONTROL",
+      "RUN_ONE_DISPOSABLE_CONFIRMED_NO_WRITE_CONTROL",
+      "SIMULATE_AMBIGUOUS_WRITE_STATE",
+      "ONE_INDEPENDENT_HOSTILE_REVIEW",
+      "ONE_TARGETED_REREVIEW_ONLY_AFTER_CRITICAL_OR_HIGH_REPAIR",
+      "CREATE_ONE_REPAIR_CANDIDATE_COMMIT_OR_DRAFT_PR"
+    ],
+    "diagnostic_namespace_prefix": "refs/heads/qntylab-diagnostics/claim-transport-v0/",
+    "diagnostic_refs_must_be_fresh_and_disposable": true,
+    "production_claim_namespace_mutation_allowed": false,
+    "v0r5_replay_allowed": false,
+    "v0r6_creation_allowed": false
+  },
+  "protected_historical_v0r5": {
+    "project_id": "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R5",
+    "terminal_state": "V0R5_LIVE_EPISODE_CLOSED_BLOCK_NEVER_REPLAY",
+    "claim_ref": "refs/heads/qntylab-claims/dsh-stage-a-v1r3r2-one-episode-live-execution-v0r5",
+    "state_dir": "/var/tmp/qntylab-claims/dsh-stage-a-v1r3r2-one-episode-live-execution-v0r5/episode-1",
+    "remote_claim_ref_mutation_allowed": false,
+    "local_state_mutation_allowed": false,
+    "intent_delete_allowed": false,
+    "lock_delete_allowed": false,
+    "receipt_repair_allowed": false,
+    "replay_allowed": false,
+    "second_episode_allowed": false,
+    "read_only_inspection_allowed": true
+  },
+  "claim_outcome_ontology": {
+    "COMMITTED": {
+      "meaning": "Evidence proves the intended disposable remote ref exists at the expected source SHA.",
+      "requires_expected_sha_match": true,
+      "execution_authority_granted": false
+    },
+    "CONFIRMED_NO_REMOTE_WRITE": {
+      "meaning": "Before and after evidence proves the attempted disposable operation did not create the target remote ref.",
+      "requires_before_absent": true,
+      "requires_after_absent": true,
+      "execution_authority_granted": false,
+      "production_retry_granted": false
+    },
+    "WRITE_STATE_UNKNOWN": {
+      "meaning": "Available evidence cannot prove committed or definitely-not-written.",
+      "fail_closed": true,
+      "production_retry_granted": false,
+      "execution_authority_granted": false
+    }
+  },
+  "observability_contract": {
+    "required_fields": [
+      "repository_identity",
+      "credential_free_remote_identity",
+      "target_ref",
+      "expected_source_sha",
+      "operation_stage",
+      "process_exit_code",
+      "timeout",
+      "sanitized_stderr",
+      "sanitized_stdout_if_useful",
+      "remote_ref_state_before",
+      "remote_ref_state_after",
+      "expected_sha",
+      "observed_sha",
+      "local_intent_state",
+      "local_receipt_state",
+      "classification",
+      "reason_code"
+    ],
+    "operation_stages": [
+      "PRECHECK",
+      "LOCAL_INTENT",
+      "REMOTE_WRITE_ATTEMPT",
+      "REMOTE_VERIFY",
+      "LOCAL_RECEIPT"
+    ],
+    "credential_redaction": {
+      "deterministic": true,
+      "tested": true,
+      "retain_passwords": false,
+      "retain_tokens": false,
+      "retain_authorization_headers": false,
+      "retain_credential_helper_contents": false,
+      "retain_secret_environment_values": false,
+      "retain_embedded_credentials_in_urls": false,
+      "dump_full_environment": false,
+      "dump_full_git_config": false
+    }
+  },
+  "diagnostic_network_authority": {
+    "authorization_phase_network_writes": 0,
+    "future_phase_network_writes_allowed": true,
+    "future_phase_write_scope": "DISPOSABLE_NON_PRODUCTION_DIAGNOSTIC_REFS_ONLY",
+    "future_phase_required_controls": [
+      "POSITIVE_CREATE_ONLY",
+      "DUPLICATE_NO_OVERWRITE",
+      "CONFIRMED_NO_REMOTE_WRITE",
+      "WRITE_STATE_UNKNOWN_FAIL_CLOSED"
+    ],
+    "production_claim_namespace_allowed": false,
+    "historical_v0r5_ref_allowed": false,
+    "diagnostic_cleanup_may_target_only_disposable_refs": true
+  },
+  "forbidden_authority": {
+    "secret_read_authorized": false,
+    "provider_io_authorized": false,
+    "model_execution_authorized": false,
+    "codex_authorized": false,
+    "claude_authorized": false,
+    "live_dsh_authorized": false,
+    "v0r6_authorized": false,
+    "stage_b_authorized": false,
+    "qnty_mutation_authorized": false,
+    "scientific_execution_authorized": false,
+    "trading_authorized": false,
+    "capital_authority": "NONE",
+    "promotion_authority": "NONE",
+    "broader_production_authority": "NONE",
+    "qnty_agent_eval": "NOT_APPLICABLE"
+  },
+  "review_policy": {
+    "focused_governance_checks_required": true,
+    "exactly_one_independent_hostile_review_required": true,
+    "critical_high_fix_pass_limit": 1,
+    "targeted_rereview_limit": 1,
+    "medium_low_findings_restart_phase": false,
+    "review_of_review_forbidden": true
+  },
+  "stop_conditions": [
+    "STOP_SOURCE_CONFLICT",
+    "STOP_IF_V0R5_PROTECTED_STATE_WOULD_BE_MUTATED",
+    "STOP_IF_SCOPE_WIDENS_BEYOND_CLAIM_TRANSPORT_AND_OBSERVABILITY",
+    "STOP_IF_WRITE_STATE_UNKNOWN_IS_NOT_FAIL_CLOSED",
+    "STOP_AFTER_ONE_CANDIDATE_COMMIT_OR_DRAFT_PR"
+  ],
+  "construction_receipts": {
+    "secret_reads": 0,
+    "diagnostic_network_writes": 0,
+    "production_claim_writes": 0,
+    "dsh_invocations": 0,
+    "provider_requests": 0,
+    "real_model_calls": 0,
+    "codex_turns": 0,
+    "claude_turns": 0,
+    "v0r5_mutations": 0,
+    "v0r6_created": false,
+    "spend_usd": "0"
+  },
+  "authority_firewall": {
+    "effective_repair_authority": false,
+    "authorization_effective_before_canonical_merge": false,
+    "production_claim_mutation_authorized": false,
+    "v0r5_replay_authorized": false,
+    "v0r5_reset_authorized": false,
+    "v0r5_delete_authorized": false,
+    "v0r5_repair_authorized": false,
+    "v0r6_authorized": false,
+    "live_dsh_authorized": false,
+    "active_project_after_closure": "NONE"
+  },
+  "next_action": "CANONICALIZE_THIS_AUTHORIZATION_THEN_BEGIN_ONE_BOUNDED_CLAIM_TRANSPORT_AND_OBSERVABILITY_REPAIR_PHASE",
+  "terminal_verdict": "DSH_STAGE_A_CLAIM_ACQUISITION_TRANSPORT_AND_OBSERVABILITY_REPAIR_AUTHORIZATION_V0_READY"
+}

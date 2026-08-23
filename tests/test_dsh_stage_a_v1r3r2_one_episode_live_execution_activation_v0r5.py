@@ -24,6 +24,7 @@ LOCAL_STATE = Path(
 )
 
 MASTER = "415d15e807204cdaf83b14cb86d04b52cf11e61d"
+CURRENT_CANONICAL_MASTER = "b9cfcb41e1cff199da77f68b347ef912866c2ed1"
 CANDIDATE = "96a66205f7737096eaa4aba3faff0d34ed8eb1ce"
 AUTH_PREDECESSOR = "f2a3e7a9e39aac93c413d758a2f1f329cbe1fd79"
 AUTHORIZATION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_AUTHORIZATION_V0R5"
@@ -54,9 +55,9 @@ def _git(*args: str) -> str:
     ).stdout.strip()
 
 
-def test_canonical_master_is_exact_and_candidate_is_its_pre_merge_parent() -> None:
+def test_current_canonical_master_and_historical_candidate_binding_are_distinct() -> None:
     activation = _load(ACTIVATION_PATH)
-    assert _git("rev-parse", "origin/master") == MASTER
+    assert _git("rev-parse", "origin/master") == CURRENT_CANONICAL_MASTER
     assert activation["canonicalization"]["candidate_base_sha"] == MASTER
     assert activation["authorization_identity"]["candidate_commit"] == CANDIDATE
     assert _git("merge-base", "--is-ancestor", CANDIDATE, MASTER) == ""
@@ -249,8 +250,11 @@ def test_remote_v0r5_claim_is_absent() -> None:
     assert _git("ls-remote", "origin", CLAIM_REF) == ""
 
 
-def test_local_v0r5_claim_is_absent() -> None:
-    assert not LOCAL_STATE.exists()
+def test_local_v0r5_claim_preserves_terminal_evidence() -> None:
+    assert LOCAL_STATE.is_dir()
+    assert (LOCAL_STATE / "claim-intent.json").is_file()
+    assert (LOCAL_STATE / "claim.lock").is_file()
+    assert not (LOCAL_STATE / "claim-receipt.json").exists()
 
 
 def test_activation_does_not_consume_or_retry_the_episode() -> None:
@@ -300,19 +304,21 @@ def test_activation_records_zero_spend() -> None:
     assert activation["parent_policy"]["hard_spend_cap_usd"] == "1.00"
 
 
-def test_registry_candidate_is_parity_consistent_but_not_effective_on_branch() -> None:
+def test_registry_preserves_closed_v0r5_and_current_authorization_candidate() -> None:
     _, _, registry = project_context.load_context_sources(ROOT)
     projects = project_context.validate_projects_registry(ROOT, registry)
     projection = project_context.execution_authority_projection(ROOT, projects)
     assert projection["issues"] == []
-    assert projection["active_project"] is None
+    assert projection["active_project"]["project_id"] == (
+        "DSH_STAGE_A_CLAIM_ACQUISITION_TRANSPORT_AND_OBSERVABILITY_REPAIR_AUTHORIZATION_V0"
+    )
     assert projection["identity_by_project"][EXECUTION_ID]["effective"] is False
     project = projects[EXECUTION_ID]
-    assert project["state"] == "ACTIVE"
-    assert project["candidate_state"] == "ACTIVE_CANDIDATE"
-    assert project["canonicalization_status"] == "AWAITING_EXACT_CANONICAL_MERGE"
-    assert project["implementation_authorized"] is True
-    assert project["implementation_completed"] is False
+    assert project["state"] == "CLOSED_BLOCKED"
+    assert project["candidate_state"] == "CLOSED_BLOCKED"
+    assert project["canonicalization_status"] == "CLOSED"
+    assert project["implementation_authorized"] is False
+    assert project["implementation_completed"] is True
     assert project["effective_execution_authority"] is False
 
 

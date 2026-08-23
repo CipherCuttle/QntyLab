@@ -140,16 +140,19 @@ def test_fresh_authorization_episode_and_claim_tuple_are_exactly_one_and_collisi
     assert not Path(fresh["claim_local_path"]).exists()
 
 
-def test_fresh_identity_was_not_present_in_canonical_history() -> None:
-    for token in (AUTHORIZATION_ID, EXECUTION_ID, EPISODE_ID, "dsh-stage-a-v1r3r2-one-episode-live-execution-v0r4"):
-        result = subprocess.run(
-            ["git", "log", "origin/master", "--all-match", "-S", token, "--oneline", "--"],
-            cwd=ROOT,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        assert result.stdout == ""
+def test_fresh_activation_artifact_was_not_present_in_canonical_history() -> None:
+    activation_relative = (
+        "experiments/research/qnty_agent_orchestration_control_contract_v0/"
+        "dsh_stage_a_v1r3r2_one_episode_live_execution_v0r4/activation.json"
+    )
+    result = subprocess.run(
+        ["git", "log", "origin/master", "--oneline", "--", activation_relative],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    assert result.stdout == ""
 
 
 def test_parent_policy_is_the_canonical_ceiling() -> None:

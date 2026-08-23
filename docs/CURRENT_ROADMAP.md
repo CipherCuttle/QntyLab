@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- None.
+- `DSH Stage-A V1R3R2 one-episode live execution activation V0R4` — `ACTIVE`. AFTER EXACT CANONICAL MERGE, ACTION-TIME V0R4 ONE-EPISODE EXECUTION ONLY. Do not execute during activation construction; do not read the secret, create a claim, invoke DSH, call a provider, or spend.
 
 ## Queued — not authorized
 

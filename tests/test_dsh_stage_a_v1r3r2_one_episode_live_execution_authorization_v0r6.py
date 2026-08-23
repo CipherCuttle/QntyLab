@@ -16,8 +16,10 @@ AUTH_PATH = ARTIFACT_ROOT / "authorization.json"
 AUTH = json.loads(AUTH_PATH.read_text(encoding="utf-8"))
 REPAIR_SOURCE = ROOT / "qntylab/dsh_stage_a_v1r3r2_prelive_enforcement.py"
 REPAIR_MERGE = "36e3085c18a747e3755097c97915f61f289d0835"
-CANONICAL_MASTER = "e2b97a1478f29e6db3cc1918f1e90ff8547565a1"
 REPAIR_CANDIDATE = "0178a1fd45984d1d71dec497b328078ebeae5a5a"
+AUTHORIZATION_BASE = "e2b97a1478f29e6db3cc1918f1e90ff8547565a1"
+AUTHORIZATION_CANDIDATE = "c668856fed89dbe327e230dbb94bb8835c19a834"
+CANONICAL_MASTER = "6a20d9cfb2c485d7f43ccc04141c6365b5add9a0"
 AUTH_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_AUTHORIZATION_V0R6"
 EXECUTION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R6"
 EPISODE_ID = f"{EXECUTION_ID}#EPISODE_1"
@@ -32,14 +34,14 @@ def _git(*args: str) -> subprocess.CompletedProcess[str]:
 
 def test_exact_canonical_repair_merge_and_parent_binding() -> None:
     assert _git("rev-parse", "origin/master").stdout.strip() == CANONICAL_MASTER
-    assert _git("rev-parse", "HEAD").stdout.strip() == CANONICAL_MASTER
+    assert _git("merge-base", "--is-ancestor", CANONICAL_MASTER, "HEAD").returncode == 0
     assert _git("rev-list", "--parents", "-n", "1", CANONICAL_MASTER).stdout.split() == [
         CANONICAL_MASTER,
-        REPAIR_MERGE,
-        REPAIR_CANDIDATE,
+        AUTHORIZATION_BASE,
+        AUTHORIZATION_CANDIDATE,
     ]
     identity = AUTH["canonical_source_identity"]
-    assert identity["canonical_master"] == CANONICAL_MASTER
+    assert identity["canonical_master"] == AUTHORIZATION_BASE
     assert identity["canonical_merge_parents"] == [REPAIR_MERGE, REPAIR_CANDIDATE]
     assert identity["predecessor_required_state"] == "CLOSED_PASS"
     binding = AUTH["repair_predecessor_binding"]
@@ -55,7 +57,7 @@ def test_repaired_episode_claim_source_blob_and_digest_are_frozen() -> None:
     assert identity["implementation_git_blob"] == _git(
         "rev-parse", f"{CANONICAL_MASTER}:qntylab/dsh_stage_a_v1r3r2_prelive_enforcement.py"
     ).stdout.strip()
-    assert identity["implementation_bound_to_canonical_master"] == CANONICAL_MASTER
+    assert identity["implementation_bound_to_canonical_master"] == AUTHORIZATION_BASE
     claim = AUTH["claim_contract"]
     assert claim["implementation_git_blob"] == identity["implementation_git_blob"]
     assert claim["implementation_source_sha256"] == identity["implementation_source_sha256"]
@@ -177,7 +179,7 @@ def test_authorization_has_zero_activity_and_cannot_self_activate() -> None:
     assert AUTH["canonicalization"]["merge_authority"] == "NO"
     auth_rel = "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_authorization_v0r6/authorization.json"
     activation_rel = "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0r6/activation.json"
-    assert _git("cat-file", "-e", f"{CANONICAL_MASTER}:{auth_rel}").returncode != 0
+    assert _git("cat-file", "-e", f"{CANONICAL_MASTER}:{auth_rel}").returncode == 0
     assert _git("cat-file", "-e", f"{CANONICAL_MASTER}:{activation_rel}").returncode != 0
 
 
@@ -189,7 +191,7 @@ def test_registry_and_generated_roadmap_bind_inactive_v0r6_authorization() -> No
     assert record["implementation_completed"] is True
     assert record["activation_exists"] is False
     assert record["effective_execution_authority"] is False
-    assert record["canonical_base_sha"] == CANONICAL_MASTER
+    assert record["canonical_base_sha"] == AUTHORIZATION_BASE
     assert record["canonical_predecessor_merge"] == REPAIR_MERGE
     assert record["authorization_artifact_sha256"] == hashlib.sha256(AUTH_PATH.read_bytes()).hexdigest()
     assert record["authorization_artifact_git_blob"] == _git(

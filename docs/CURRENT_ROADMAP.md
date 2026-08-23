@@ -8,6 +8,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Queued — not authorized
 
+- `DSH Stage-A V1R3R2 one-episode live execution activation V0R6 candidate` — `PLANNED_NOT_AUTHORIZED`. AFTER EXACT CANONICAL ACTIVATION MERGE ONLY: effective execution authority remains false until that exact merge. Do not activate, execute, read the secret, create a claim, invoke DSH, call a provider, spend, merge, or reuse V0R5.
 - `PROSPECTIVE_SHADOW` — `PLANNED_NOT_AUTHORIZED`. No implementation is authorized; require separate Git-backed authorization.
 - `QNTY_HANDOFF` — `PLANNED_NOT_AUTHORIZED`. No implementation is authorized unless downstream evidence separately earns it.
 - `REACTIVE_JIGSAW_V0` — `PLANNED_NOT_AUTHORIZED`. No implementation is authorized; require separate Git-backed authorization.

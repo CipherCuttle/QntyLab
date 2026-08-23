@@ -26,6 +26,8 @@ DSH_STAGE_A_V1R3R2_EXECUTION_PROJECT_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_E
 DSH_STAGE_A_V1R3R2_V0R2R1_EXECUTION_PROJECT_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R2R1"
 DSH_STAGE_A_V1R3R2_V0R3_EXECUTION_PROJECT_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R3"
 DSH_STAGE_A_V1R3R2_V0R4_EXECUTION_PROJECT_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R4"
+CLAIM_REPAIR_AUTHORIZATION_PROJECT_ID = "DSH_STAGE_A_CLAIM_ACQUISITION_TRANSPORT_AND_OBSERVABILITY_REPAIR_AUTHORIZATION_V0"
+CLAIM_REPAIR_AUTHORIZATION_NEXT_ACTION = "CANONICALIZE_THIS_AUTHORIZATION_THEN_BEGIN_ONE_BOUNDED_CLAIM_TRANSPORT_AND_OBSERVABILITY_REPAIR_PHASE"
 
 
 def _assert_project_is_not_active(registry: dict, project_id: str) -> None:
@@ -174,8 +176,8 @@ def test_dsh_stage_a_v1_execution_closure_is_single_bounded_blocked_project() ->
     _assert_project_is_not_active(registry, DSH_STAGE_A_V1R3R2_V0R4_EXECUTION_PROJECT_ID)
     _assert_project_is_not_current_active(data, DSH_STAGE_A_V1R3R2_V0R4_EXECUTION_PROJECT_ID)
     assert v0r3["state"] == "CLOSED_BLOCKED"
-    assert data["active_project"] is None
-    assert data["current_permitted_next_action"] == "No project implementation is currently authorized."
+    assert data["active_project"]["project_id"] == CLAIM_REPAIR_AUTHORIZATION_PROJECT_ID
+    assert data["current_permitted_next_action"] == CLAIM_REPAIR_AUTHORIZATION_NEXT_ACTION
     assert execution["state"] == "CLOSED_BLOCKED"
     assert execution["implementation_authorized"] is False
     assert execution["implementation_completed"] is True
@@ -227,8 +229,8 @@ def test_dsh_stage_a_v1r1_offline_qualification_is_closed_without_live_authority
     assert receipt["native_claude_child_runs"] == 0
     assert receipt["stage_a_fixture_runs"] == 0
     assert receipt["spend_usd"] == 0.0
-    assert data["active_project"] is None
-    assert data["current_permitted_next_action"] == "No project implementation is currently authorized."
+    assert data["active_project"]["project_id"] == CLAIM_REPAIR_AUTHORIZATION_PROJECT_ID
+    assert data["current_permitted_next_action"] == CLAIM_REPAIR_AUTHORIZATION_NEXT_ACTION
 
 
 def test_project_supersession_targets_self_and_cycles_fail(tmp_path: Path) -> None:
@@ -332,8 +334,8 @@ def test_funding_incremental_implementation_freeze_is_closed_without_escalation(
         assert episode["state"] == "CLOSED_BLOCKED", closed_episode_id
         _assert_project_is_not_active(registry, closed_episode_id)
         _assert_project_is_not_current_active(data, closed_episode_id)
-    assert data["active_project"] is None
-    assert data["current_permitted_next_action"] == "No project implementation is currently authorized."
+    assert data["active_project"]["project_id"] == CLAIM_REPAIR_AUTHORIZATION_PROJECT_ID
+    assert data["current_permitted_next_action"] == CLAIM_REPAIR_AUTHORIZATION_NEXT_ACTION
     _assert_project_is_not_active(registry, FUNDING_INCREMENTAL_IMPLEMENTATION_PROJECT_ID)
     _assert_project_is_not_current_active(data, FUNDING_INCREMENTAL_IMPLEMENTATION_PROJECT_ID)
     project = next(

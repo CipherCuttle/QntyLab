@@ -8320,3 +8320,64 @@ live_execution_performed = true
 terminal_outcome = "BLOCK_NEVER_REPLAY"
 terminal_outcome_basis = "The exact V0R5 action-time non-secret gates passed; the one live DSH process started after one secret read, then the create-only EpisodeClaim persisted durable local intent but did not complete the remote claim ref or local receipt. The partial claim state is terminal BLOCK_NEVER_REPLAY. No parent request, child turn, provider wire request, fixture test, fixture mutation, or spend occurred."
 next_action = "CLOSED_BLOCKED: BLOCK_NEVER_REPLAY. Preserve the durable local claim intent; do not delete, reset, repair, replay, start a second episode, or begin Stage B. No Qnty, scientific, trading, capital, promotion, broader production, or QntyAgentEval authority follows."
+
+[[project]]
+project_id = "DSH_STAGE_A_CLAIM_ACQUISITION_TRANSPORT_AND_OBSERVABILITY_REPAIR_AUTHORIZATION_V0"
+display_name = "DSH Stage-A claim acquisition transport and observability repair authorization V0"
+state = "ACTIVE"
+candidate_state = "ACTIVE_CANDIDATE"
+canonicalization_status = "AWAITING_EXACT_CANONICAL_MERGE"
+authority_level = "BOUNDED_CLAIM_TRANSPORT_AND_OBSERVABILITY_REPAIR_ONLY"
+phase_type = "GOVERNANCE_ONLY_BOUNDED_REPAIR_AUTHORIZATION"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_claim_acquisition_transport_and_observability_repair_authorization_v0/authorization.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_claim_acquisition_transport_and_observability_repair_authorization_v0/hostile_governance_review.md",
+  "tests/test_dsh_stage_a_claim_acquisition_transport_and_observability_repair_authorization_v0.py",
+]
+authorization_state = "AUTHORIZED_IF_CANONICAL"
+authorization_effective = "AFTER_EXACT_CANONICAL_MERGE_ONLY"
+canonical_base_sha = "b9cfcb41e1cff199da77f68b347ef912866c2ed1"
+canonical_predecessor_project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R5"
+canonical_predecessor_merge = "b9cfcb41e1cff199da77f68b347ef912866c2ed1"
+canonical_predecessor_merge_parents = [
+  "8c348e3f559a191ef70cd7afa63d9b5fc2fce819",
+  "ec004b17fd23afbab1a72bb38779e8648079eb51",
+]
+canonical_predecessor_required_state = "CLOSED_BLOCKED"
+canonical_predecessor_terminal_outcome = "V0R5_LIVE_EPISODE_CLOSED_BLOCK_NEVER_REPLAY"
+future_repair_project_id = "DSH_STAGE_A_CLAIM_ACQUISITION_TRANSPORT_AND_OBSERVABILITY_REPAIR_V0"
+future_repair_phase_separate = true
+effective_repair_authority = false
+implementation_authorized = true
+implementation_completed = false
+diagnostic_network_writes = 0
+production_claim_mutation_authorized = false
+secret_read_authorized = false
+provider_io_authorized = false
+model_execution_authorized = false
+live_dsh_authorized = false
+v0r6_authorized = false
+v0r5_replay_allowed = false
+v0r5_claim_reset_allowed = false
+v0r5_claim_delete_allowed = false
+v0r5_claim_repair_allowed = false
+v0r5_second_episode_allowed = false
+diagnostic_namespace = "refs/heads/qntylab-diagnostics/claim-transport-v0/"
+write_state_unknown_fail_closed = true
+confirmed_no_remote_write_grants_retry = false
+observability_redaction_deterministic = true
+observability_redaction_tested = true
+qnty_agent_eval = "NOT_APPLICABLE"
+active_project_after_closure = "NONE"
+hostile_review_count = 1
+hostile_review_verdict = "PASS"
+hostile_governance_critical_total = 0
+hostile_governance_high_total = 0
+hostile_governance_medium_total = 0
+hostile_governance_low_total = 0
+targeted_governance_rereview_used = false
+terminal_outcome = "DSH_STAGE_A_CLAIM_ACQUISITION_TRANSPORT_AND_OBSERVABILITY_REPAIR_AUTHORIZATION_V0_READY"
+next_action = "CANONICALIZE_THIS_AUTHORIZATION_THEN_BEGIN_ONE_BOUNDED_CLAIM_TRANSPORT_AND_OBSERVABILITY_REPAIR_PHASE"

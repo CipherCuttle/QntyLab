@@ -7,6 +7,7 @@ state remains the responsibility of :mod:`qntylab.research_ledger`.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import subprocess
@@ -132,10 +133,16 @@ DSH_STAGE_A_V1R3R2_V0R1_AUTHORIZATION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_
 DSH_STAGE_A_V1R3R2_V0R1_EXECUTION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R1"
 DSH_STAGE_A_V1R3R2_AUTHORIZATION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_AUTHORIZATION_V0R2R1"
 DSH_STAGE_A_V1R3R2_EXECUTION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R2R1"
+DSH_STAGE_A_V1R3R2_V0R3_AUTHORIZATION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_AUTHORIZATION_V0R3"
+DSH_STAGE_A_V1R3R2_V0R3_EXECUTION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R3"
 _FRESH_AUTHORIZATION_BINDINGS = {
     DSH_STAGE_A_V1R3R2_V0R1_EXECUTION_ID: DSH_STAGE_A_V1R3R2_V0R1_AUTHORIZATION_ID,
     DSH_STAGE_A_V1R3R2_EXECUTION_ID: DSH_STAGE_A_V1R3R2_AUTHORIZATION_ID,
+    DSH_STAGE_A_V1R3R2_V0R3_EXECUTION_ID: DSH_STAGE_A_V1R3R2_V0R3_AUTHORIZATION_ID,
 }
+_FRESH_EXECUTION_IDS_WITH_V0R2R1_BINDING_RULES = frozenset(
+    {DSH_STAGE_A_V1R3R2_EXECUTION_ID, DSH_STAGE_A_V1R3R2_V0R3_EXECUTION_ID}
+)
 _MISSING = object()
 
 # These are the fields that form one execution-authority view.  The activation
@@ -331,7 +338,7 @@ def _projection_parity_issues(
         field for field in _EXECUTION_PROJECTION_FIELDS if field[0] in _CLOSURE_PROJECTION_FIELDS
     )
     runtime_fields = _RUNTIME_IDENTITY_FIELDS
-    if record.get("project_id") == DSH_STAGE_A_V1R3R2_EXECUTION_ID:
+    if record.get("project_id") in _FRESH_EXECUTION_IDS_WITH_V0R2R1_BINDING_RULES:
         runtime_fields = tuple(
             field for field in runtime_fields if field[0] not in {"codex_repair_digest", "claude_repair_digest"}
         )
@@ -402,6 +409,8 @@ def _fresh_v0r1_binding_issues(
     ):
         issues.append("fresh V0R1 authorization candidate is not in canonical origin/master")
 
+    is_v0r3 = record.get("project_id") == DSH_STAGE_A_V1R3R2_V0R3_EXECUTION_ID
+    is_v0r2r1 = record.get("project_id") == DSH_STAGE_A_V1R3R2_EXECUTION_ID
     artifact_value = authorization.get("artifact")
     if not isinstance(artifact_value, str):
         issues.append("fresh V0R1 authorization artifact is missing")
@@ -417,9 +426,66 @@ def _fresh_v0r1_binding_issues(
         )
         if authorization_document.get("project_id") != authorization.get("project_id"):
             issues.append("fresh V0R1 authorization artifact identity does not match activation")
-        if authorization_document.get("execution_project_id") != activation.get("project_id"):
-            issues.append("fresh V0R1 authorization execution identity does not match activation")
-        if record.get("project_id") == DSH_STAGE_A_V1R3R2_EXECUTION_ID:
+        if is_v0r3:
+            future_identity = _lookup(
+                authorization_document, ("fresh_identity", "future_activation_project_id")
+            )
+        else:
+            future_identity = authorization_document.get("execution_project_id")
+        if future_identity != activation.get("project_id"):
+            issues.append("fresh authorization execution identity does not match activation")
+        if is_v0r3:
+            expected_content_sha = authorization.get("canonical_content_sha256")
+            if not isinstance(expected_content_sha, str):
+                issues.append("fresh V0R3 authorization canonical content digest is missing")
+            elif hashlib.sha256(authorization_path.read_bytes()).hexdigest() != expected_content_sha:
+                issues.append("fresh V0R3 authorization canonical content digest mismatch")
+            expected_blob_sha = authorization.get("git_blob_sha")
+            if not isinstance(expected_blob_sha, str):
+                issues.append("fresh V0R3 authorization Git blob identity is missing")
+            elif canonical_sha:
+                actual_blob_sha = _run_git(
+                    root, "rev-parse", f"{canonical_sha}:{artifact_value}", check=False
+                ).strip()
+                if actual_blob_sha != expected_blob_sha:
+                    issues.append("fresh V0R3 authorization Git blob identity mismatch")
+            qualified = authorization_document.get("qualified_launch_contract")
+            activation_qualified = activation.get("qualified_launch_contract")
+            if not isinstance(qualified, dict) or not isinstance(activation_qualified, dict):
+                issues.append("fresh V0R3 qualified launch contract binding is incomplete")
+            else:
+                for field in (
+                    "digest",
+                    "contract_artifact",
+                    "qualification_artifact",
+                    "contract_artifact_sha256",
+                    "qualification_artifact_sha256",
+                    "launch_policy_digest",
+                ):
+                    if activation_qualified.get(field) != qualified.get(field):
+                        issues.append(f"fresh V0R3 qualified launch contract mismatch for {field}")
+                for field, expected in (
+                    (qualified.get("contract_artifact"), qualified.get("contract_artifact_sha256")),
+                    (qualified.get("qualification_artifact"), qualified.get("qualification_artifact_sha256")),
+                ):
+                    if isinstance(field, str) and isinstance(expected, str):
+                        artifact_file = _authority_path(
+                            root, field, label="fresh V0R3 qualified contract artifact", snapshot=snapshot
+                        )
+                        if hashlib.sha256(artifact_file.read_bytes()).hexdigest() != expected:
+                            issues.append("fresh V0R3 qualified contract artifact digest mismatch")
+            auth_runtime = authorization_document.get("runtime_binding")
+            activation_profile = activation.get("profile_contract")
+            if not isinstance(auth_runtime, dict) or not isinstance(activation_profile, dict):
+                issues.append("fresh V0R3 runtime/profile binding is incomplete")
+            else:
+                if activation_profile.get("physical_profile") != auth_runtime.get("physical_profile"):
+                    issues.append("fresh V0R3 physical profile mismatch")
+                if activation_profile.get("live_profile") != auth_runtime.get("stage_a_live_profile"):
+                    issues.append("fresh V0R3 live profile mismatch")
+                if activation_profile.get("offline_qualification_patch_allowed_for_live") is not False:
+                    issues.append("fresh V0R3 offline qualification patch cannot be live-bound")
+        if is_v0r2r1:
             if activation.get("canonical_enforcement_bytes") != authorization_document.get("canonical_enforcement_bytes"):
                 issues.append("fresh V0R2R1 canonical enforcement bytes are not authorization-bound")
             for contract_name in ("profile_contract",):
@@ -431,14 +497,15 @@ def _fresh_v0r1_binding_issues(
                     for field, expected in authorized_contract.items():
                         if activation_contract.get(field) != expected:
                             issues.append(f"fresh V0R2R1 {contract_name} mismatch for {field}")
+        if is_v0r2r1 or is_v0r3:
             authorized_secret = authorization_document.get("secret_binding_contract")
             activation_secret = activation.get("secret_binding_contract")
             if not isinstance(authorized_secret, dict) or not isinstance(activation_secret, dict):
-                issues.append("fresh V0R2R1 secret binding contract is incomplete")
+                issues.append("fresh secret binding contract is incomplete")
             else:
                 for field, expected in authorized_secret.items():
                     if activation_secret.get(field) != expected:
-                        issues.append(f"fresh V0R2R1 secret binding mismatch for {field}")
+                        issues.append(f"fresh secret binding mismatch for {field}")
         auth_canonicalization = authorization_document.get("canonicalization")
         if not isinstance(auth_canonicalization, dict):
             issues.append("fresh V0R1 authorization canonicalization is missing")
@@ -447,20 +514,46 @@ def _fresh_v0r1_binding_issues(
                 issues.append("fresh V0R1 authorization future activation identity is not artifact-bound")
             if auth_canonicalization.get("authorization_does_not_activate") is not True:
                 issues.append("fresh V0R1 authorization must not self-activate")
-        if _lookup(activation, ("canonicalization", "candidate_base_sha")) != candidate_commit:
-            issues.append("fresh V0R1 activation candidate base is not authorization-bound")
+        expected_candidate_base = (
+            authorization.get("canonical_merge")
+            if is_v0r3
+            else candidate_commit
+        )
+        if _lookup(activation, ("canonicalization", "candidate_base_sha")) != expected_candidate_base:
+            issues.append("fresh authorization activation candidate base is not authorization-bound")
 
         contract = authorization_document.get("qualified_launch_contract")
         pinned = authorization_document.get("pinned_dsh_identity")
+        if is_v0r3:
+            source_identity = _lookup(authorization_document, ("runtime_binding", "source_identity"))
+            if isinstance(source_identity, dict):
+                pinned = {
+                    "repository": str(source_identity.get("remote", ""))
+                    .removeprefix("https://github.com/")
+                    .removesuffix(".git"),
+                    "commit": source_identity.get("commit"),
+                    "tree": source_identity.get("tree"),
+                    "tag": source_identity.get("tag"),
+                }
         runtime = activation.get("runtime_identity")
         if not isinstance(contract, dict) or not isinstance(pinned, dict) or not isinstance(runtime, dict):
             issues.append("fresh V0R1 qualified runtime binding is incomplete")
         else:
             repairs = contract.get("repair_digests")
             if not isinstance(repairs, dict):
-                if record.get("project_id") != DSH_STAGE_A_V1R3R2_EXECUTION_ID:
+                if is_v0r3:
+                    governed = _lookup(authorization_document, ("runtime_binding", "governed_patches"))
+                    repairs = (
+                        {
+                            "codex": governed.get("codex_executable_binding"),
+                            "claude": governed.get("claude_hard_read_only"),
+                        }
+                        if isinstance(governed, dict)
+                        else {}
+                    )
+                elif not is_v0r2r1:
                     issues.append("fresh V0R1 qualified runtime repair binding is incomplete")
-                repairs = {}
+                    repairs = {}
             runtime_bindings = {
                 "repository": (runtime.get("repository"), pinned.get("repository")),
                 "commit": (runtime.get("commit"), pinned.get("commit")),
@@ -503,7 +596,7 @@ def _fresh_v0r1_binding_issues(
         else:
             retry_policy = authorized_parent.get("retry_policy")
             if not isinstance(retry_policy, dict):
-                if record.get("project_id") != DSH_STAGE_A_V1R3R2_EXECUTION_ID:
+                if not (is_v0r2r1 or is_v0r3):
                     issues.append("fresh V0R1 authorization retry policy binding is incomplete")
                 retry_policy = {}
             spend_authority = authorization_document.get("spend_authority")
@@ -520,7 +613,7 @@ def _fresh_v0r1_binding_issues(
             expected_provider_retry = retry_policy.get("provider_retry")
             actual_llm_retries = parent.get("llm_retries")
             actual_provider_retry = parent.get("provider_retry")
-            if record.get("project_id") == DSH_STAGE_A_V1R3R2_EXECUTION_ID:
+            if is_v0r2r1 or is_v0r3:
                 expected_llm_retries = authorized_parent.get("provider_internal_retries")
                 expected_provider_retry = authorized_parent.get("provider_internal_retries")
                 actual_llm_retries = parent.get("provider_internal_retries")
@@ -536,7 +629,7 @@ def _fresh_v0r1_binding_issues(
                 "provider_retry": (actual_provider_retry, expected_provider_retry),
                 "automatic_continuation": (
                     parent.get("automatic_continuation"),
-                    False if record.get("project_id") == DSH_STAGE_A_V1R3R2_EXECUTION_ID else retry_policy.get("automatic_continuation"),
+                    False if is_v0r2r1 or is_v0r3 else retry_policy.get("automatic_continuation"),
                 ),
             }
             for label, (actual, expected) in parent_bindings.items():
@@ -582,7 +675,7 @@ def _fresh_v0r1_binding_issues(
     construction = activation.get("construction_receipts")
     if not isinstance(construction, dict):
         issues.append("fresh V0R1 construction receipts are missing")
-    elif record.get("project_id") == DSH_STAGE_A_V1R3R2_EXECUTION_ID:
+    elif record.get("project_id") in _FRESH_EXECUTION_IDS_WITH_V0R2R1_BINDING_RULES:
         expected_zeroes = {
             "claim_creations": 0,
             "external_provider_requests": 0,
@@ -595,9 +688,9 @@ def _fresh_v0r1_binding_issues(
         }
         for field, expected in expected_zeroes.items():
             if construction.get(field) != expected:
-                issues.append(f"fresh V0R2R1 construction receipt {field} must be {expected!r}")
+                issues.append(f"fresh activation construction receipt {field} must be {expected!r}")
         if construction.get("activation_artifacts_created") != 1:
-            issues.append("fresh V0R2R1 activation construction must create exactly one activation artifact")
+            issues.append("fresh activation construction must create exactly one activation artifact")
     else:
         for field in ("remote_claim_created", "local_claim_created", "episode_claimed", "episode_consumed"):
             if construction.get(field) is not False:

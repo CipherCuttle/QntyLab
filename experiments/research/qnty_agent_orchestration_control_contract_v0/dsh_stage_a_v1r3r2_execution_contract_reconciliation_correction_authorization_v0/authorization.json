@@ -1,0 +1,184 @@
+{
+  "artifact_type": "DSH_STAGE_A_V1R3R2_EXECUTION_CONTRACT_RECONCILIATION_CORRECTION_AUTHORIZATION",
+  "schema_version": "dsh-stage-a-v1r3r2-execution-contract-reconciliation-correction-authorization-v0",
+  "project_id": "DSH_STAGE_A_V1R3R2_EXECUTION_CONTRACT_RECONCILIATION_CORRECTION_AUTHORIZATION_V0",
+  "display_name": "DSH Stage-A V1R3R2 execution contract reconciliation correction authorization V0",
+  "phase_state": "CANDIDATE_GOVERNANCE_ONLY",
+  "phase_type": "governance_only_bounded_correction_authorization",
+  "authority_level": "AUTHORIZED_IF_CANONICAL",
+  "authority_decision": "B_PR217_CORRECTION_AUTHORIZATION_REQUIRED",
+  "authorization_state": "AUTHORIZED_IF_CANONICAL",
+  "authorization_effective": "AFTER_EXACT_CANONICAL_MERGE_ONLY",
+  "prior_candidate": {
+    "key": "PR217_HEAD",
+    "sha": "7fb7a70364727f99cd8f9da49552484e1b1aaea8",
+    "branch": "agent/dsh-stage-a-v1r3r2-one-episode-live-execution-v0r6-closure-task9",
+    "pr_number": 217,
+    "pr_state": "OPEN",
+    "pr_draft": true,
+    "pr_title": "DSH_STAGE_A_V1R3R2_EXECUTION_CONTRACT_RECONCILIATION_V0",
+    "merged": false,
+    "budget_consumed_action": "CREATE_ONE_CANDIDATE_COMMIT_AND_ONE_DRAFT_IMPLEMENTATION_PR",
+    "terminal_stop": "STOP_AFTER_ONE_CANDIDATE_COMMIT_AND_DRAFT_PR",
+    "effective_repair_authority_at_prior_candidate": false
+  },
+  "canonical_source_identity": {
+    "repository": "QntyLab",
+    "canonical_ref": "origin/master",
+    "canonical_master": "a87ecfda105b84669f3fef862496045284d0a655",
+    "canonical_merge_pr": "PR #216",
+    "canonical_merge_parents": [
+      "ded772d59c6135689ac4bda8878979721855a955",
+      "f73a15fb5cb84ace8c6ee1d58d60f4d39706fb49"
+    ],
+    "canonical_drift_behavior": "STOP_SOURCE_CONFLICT",
+    "git_wins_over_prompt_memory_or_handoff": true
+  },
+  "invalidating_evidence": [
+    {
+      "id": "C1",
+      "title": "Historical composite evidence mutated by PR #217",
+      "summary": "PR #217 head 7fb7a70364727f99cd8f9da49552484e1b1aaea8 modified protected historical composite evidence bytes (contract.json/digests.json): enforcement.py digest 5935aae551d1307d12e803a1caba52b83c7e7d19b53077e88f56d53210dc4555 -> 789a592f1da35b0afb07645947bc82696d361623a6150fc4ff37008b2961081f; COMPOSITE_LAUNCH_POLICY_DIGEST 7345ab145a0c98696ce8b9e6d815f4da98092f7be680467278464fb098a51589 -> fc4bbee747af5ef04ac20f87d22195f916f3736025e0f1c5e2a27fcfbd48c20a; qualifiedContractDigest a392f82efd5cf97e20a6ce4353597a8a7210e8638cc17e5a4209cc1003eee4be -> a918ae98a4724d0bfea68b9112358ebf7ab0609d666897558767cd81f0b720d5. Historical evidence must remain byte-for-byte immutable; invalidates PR #217."
+    },
+    {
+      "id": "H1",
+      "summary": "claim-source model still binds moving git HEAD",
+      "detail": "qntylab/dsh_stage_a_v1r3r2_prelive_enforcement.py:647 binds `git rev-parse HEAD` (line: source_head = self._git(\"rev-parse\", \"HEAD\").stdout.strip()); only claim-source-model.md documents the future EXACT_IMMUTABLE_COMMIT model."
+    },
+    {
+      "id": "H2",
+      "summary": "candidate-head CI fails (host ambient /var/tmp dependency)",
+      "detail": "GitHub candidate-head CI on PR #217 head FAILS; ACCEPTANCE-1 and ACCEPTANCE-7 fail with 'missing built CLI: /var/tmp/qntylab-dsh-runtime-v0-final/source/apps/cli/lib/bin.js'."
+    }
+  ],
+  "authorized_future_scope": {
+    "type": "death_list",
+    "allowed_operations": [
+      "RESTORE_HISTORICAL_CONTRACT_DIGESTS_BYTE_FOR_BYTE",
+      "CREATE_CURRENT_GENERATION_EVIDENCE_AT_NEW_PATH",
+      "IMPLEMENT_EXACT_COMMIT_CLAIM_SOURCE_SEAM",
+      "REPAIR_CI_REPRODUCIBILITY",
+      "UPDATE_FOCUSED_TESTS",
+      "ONE_INDEPENDENT_TARGETED_HOSTILE_REVIEW",
+      "AMEND_REPLACE_PR217_CANDIDATE"
+    ],
+    "operation_constraints": {
+      "RESTORE_HISTORICAL_CONTRACT_DIGESTS_BYTE_FOR_BYTE": {
+        "targets": [
+          "contract.json",
+          "digests.json"
+        ],
+        "semantics": "restore to canonical master bytes byte-for-byte; no re-anchoring"
+      },
+      "CREATE_CURRENT_GENERATION_EVIDENCE_AT_NEW_PATH": {
+        "semantics": "current-generation evidence only at new path; no rewrite of prior evidence"
+      },
+      "IMPLEMENT_EXACT_COMMIT_CLAIM_SOURCE_SEAM": {
+        "if_then_gated": true,
+        "gate": "qntylab/dsh_stage_a_v1r3r2_prelive_enforcement.py MAY be modified ONLY as the explicit exact-immutable-commit seam with CANONICAL_ANCESTRY/REVOCATION/RESOLVED_EXECUTION_INPUTS checks",
+        "no_bytes_for_unknown_future_merge_sha": true,
+        "no_origin_or_master_identity_binding": true
+      },
+      "REPAIR_CI_REPRODUCIBILITY": {
+        "target": "deterministic materialization; explicit host-reactive separation"
+      },
+      "UPDATE_FOCUSED_TESTS": {
+        "including_negative_test": "historical contract.json/digests.json match canonical master bytes"
+      },
+      "ONE_INDEPENDENT_TARGETED_HOSTILE_REVIEW": {
+        "count": 1
+      },
+      "AMEND_REPLACE_PR217_CANDIDATE": {
+        "single_final_candidate_commit": true,
+        "one_draft_pr": true,
+        "if_canonical_rules_require_one_candidate_identity": true
+      }
+    },
+    "forbidden_operations": [
+      "NO_MERGE",
+      "NO_V0R7",
+      "NO_LIVE_AUTHORIZATION",
+      "NO_SCIENTIFIC_EXECUTION",
+      "NO_REAL_SECRET_READ",
+      "NO_CLAIM_CREATION",
+      "NO_PROVIDER_CALL",
+      "NO_REPLAY_V0R5",
+      "NO_REPLAY_V0R6",
+      "NO_STAGE_B"
+    ]
+  },
+  "stop_conditions": [
+    "STOP_SOURCE_CONFLICT",
+    "STOP_IF_HISTORICAL_ARTIFACT_OR_LIVE_BOUNDARY_WOULD_BE_MUTATED",
+    "STOP_IF_SCOPE_WIDENS_BEYOND_AUTHORIZED_CORRECTION",
+    "STOP_AFTER_ONE_CANDIDATE_COMMIT_AND_DRAFT_PR",
+    "STOP_IF_ENFORCEMENT_PY_CHANGE_BEYOND_EXACT_COMMIT_SEAM"
+  ],
+  "reopen_semantics": {
+    "exists_because": "invalidating evidence appeared after a prior candidate (PR #217) was opened; this corrective authorization is the governance-only response",
+    "subsequent_reopen_requires": "new canonical merge"
+  },
+  "successor_binding": {
+    "future_repair_requires_this_authorization_canonical_merge": true,
+    "effective_repair_authority": false,
+    "branch_local_candidate_does_not_self_authorize": true,
+    "future_repair_must_reconcile_canonical_source_again": true
+  },
+  "budgets": {
+    "implementation_episode_budget": 1,
+    "candidate_commit_budget": 1,
+    "candidate_commit_amendable_in_place": true,
+    "critical_and_high_repair_budget": 1,
+    "targeted_rereview_limit": 1,
+    "review_of_review_forbidden": true,
+    "medium_low_findings_restart_phase": false
+  },
+  "live_boundary_counters": {
+    "real_secret_reads": 0,
+    "production_claims": 0,
+    "provider_calls": 0,
+    "live_dsh_invocations": 0,
+    "real_codex_turns": 0,
+    "real_claude_turns": 0,
+    "spend_usd": "0"
+  },
+  "construction_receipts": {
+    "secret_reads": 0,
+    "production_claim_writes": 0,
+    "diagnostic_claim_writes": 0,
+    "dsh_invocations": 0,
+    "provider_requests": 0,
+    "real_model_calls": 0,
+    "codex_turns": 0,
+    "claude_turns": 0,
+    "v0r6_mutations": 0,
+    "v0r7_created": false,
+    "spend_usd": "0"
+  },
+  "authority_firewall": {
+    "effective_repair_authority": false,
+    "authorization_effective_before_canonical_merge": false,
+    "production_claim_mutation_authorized": false,
+    "v0r5_replay_authorized": false,
+    "v0r6_replay_authorized": false,
+    "v0r7_authorized": false,
+    "live_dsh_authorized": false,
+    "no_merge_authority": true
+  },
+  "confirmed": [
+    "Canonical master a87ecfda105b84669f3fef862496045284d0a655 (PR #216 merge; parents ded772d59c6135689ac4bda8878979721855a955, f73a15fb5cb84ace8c6ee1d58d60f4d39706fb49).",
+    "PR #217 OPEN draft, head 7fb7a70364727f99cd8f9da49552484e1b1aaea8, NOT merged.",
+    "BOUNDED AUTHORITY CHECK = B (PR217_CORRECTION_AUTHORIZATION_REQUIRED); budget consumed; enforcement.py outside FROZEN_FILES_ALLOWED_TO_CHANGE; effective_repair_authority false.",
+    "The authority firewall remains: no secret reads, no provider calls, no claims, no model calls, no DSH invocation (counters zero).",
+    "This corrective artifact is candidate-only and does not self-authorize."
+  ],
+  "assumed": [
+    "Accidental-spelling untracked directory dsh_stage_stage_a_v1r3r2_..._reconciliation_v0 is non-canonical and not committed/reused/copied."
+  ],
+  "deferred": [
+    "No contract/digest/runtime/implementation byte is repaired in this phase.",
+    "No enforcement.py change; no historical restore; no CI repair; no test update; no live activity."
+  ],
+  "next_action": "CANONICALIZE_THIS_THEN_BEGIN_ONE_BOUNDED_CORRECTION",
+  "terminal_verdict": "DSH_STAGE_A_V1R3R2_EXECUTION_CONTRACT_RECONCILIATION_CORRECTION_AUTHORIZATION_V0_READY"
+}

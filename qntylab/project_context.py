@@ -137,6 +137,7 @@ DSH_STAGE_A_V1R3R2_V0R3_AUTHORIZATION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_
 DSH_STAGE_A_V1R3R2_V0R3_EXECUTION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R3"
 DSH_STAGE_A_V1R3R2_V0R4_AUTHORIZATION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_AUTHORIZATION_V0R4"
 DSH_STAGE_A_V1R3R2_V0R4_EXECUTION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R4"
+DSH_STAGE_A_V1R3R2_V0R6_EXECUTION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R6"
 _FRESH_AUTHORIZATION_BINDINGS = {
     DSH_STAGE_A_V1R3R2_V0R1_EXECUTION_ID: DSH_STAGE_A_V1R3R2_V0R1_AUTHORIZATION_ID,
     DSH_STAGE_A_V1R3R2_EXECUTION_ID: DSH_STAGE_A_V1R3R2_AUTHORIZATION_ID,
@@ -148,6 +149,7 @@ _FRESH_EXECUTION_IDS_WITH_V0R2R1_BINDING_RULES = frozenset(
         DSH_STAGE_A_V1R3R2_EXECUTION_ID,
         DSH_STAGE_A_V1R3R2_V0R3_EXECUTION_ID,
         DSH_STAGE_A_V1R3R2_V0R4_EXECUTION_ID,
+        DSH_STAGE_A_V1R3R2_V0R6_EXECUTION_ID,
     }
 )
 _MISSING = object()
@@ -210,6 +212,18 @@ _RUNTIME_IDENTITY_FIELDS = (
     ("superseded_digest_rejected", ("runtime_identity", "superseded_digest_rejected"), ("superseded_launch_digest_rejected",)),
     ("fixture_digest", ("fixture", "fixture_digest"), ("fixture_digest",)),
 )
+# V0R6 records the composite launcher policy digest flat as
+# composite_launch_policy_digest.  The registry-path override binds the
+# activation's nested launch_policy_digest to that composite field, scoped
+# strictly to the V0R6 execution id so no other row's registry vocabulary is
+# remapped.  (The V0R6 superseded digest lives only on the AUTHORIZATION row,
+# which this parity view does not bind, so the superseded binding is dropped
+# for exactly the V0R6 execution id inside _projection_parity_issues; the
+# entry below is retained to keep the override vocabulary explicit.)
+_V0R6_REGISTRY_PATH_OVERRIDES = {
+    "launch_policy_digest": ("composite_launch_policy_digest",),
+    "superseded_digest_rejected": ("superseded_launch_digest_rejected",),
+}
 _FRESH_AUTHORIZATION_FIELDS = (
     ("authorization_project_id", ("authorization_identity", "project_id"), ("authorization_project_id",)),
     ("authorization_candidate_commit", ("authorization_identity", "candidate_commit"), ("authorization_candidate_commit",)),
@@ -349,9 +363,22 @@ def _projection_parity_issues(
         runtime_fields = tuple(
             field for field in runtime_fields if field[0] not in {"codex_repair_digest", "claude_repair_digest"}
         )
+    registry_path_overrides = {}
+    if record.get("project_id") == DSH_STAGE_A_V1R3R2_V0R6_EXECUTION_ID:
+        registry_path_overrides = _V0R6_REGISTRY_PATH_OVERRIDES
+        # The V0R6 execution row predates the flat superseded-digest field.
+        # The rejected digest is recorded only on the V0R6 AUTHORIZATION row,
+        # which this parity view does not bind, so the flat binding cannot
+        # resolve for the V0R6 execution row.  Exclude it for exactly this
+        # execution id; every other row (V0R5, V0R2R1, V0R3, V0R4) still
+        # carries and enforces the flat superseded-launch-digest binding.
+        runtime_fields = tuple(
+            field for field in runtime_fields if field[0] != "superseded_digest_rejected"
+        )
     bindings = (*fields, *_EXECUTION_STATUS_FIELDS, *_AUTHORITY_FIREWALL_FIELDS, *runtime_fields)
     issues: list[str] = []
     for label, activation_path, registry_path in bindings:
+        registry_path = registry_path_overrides.get(label, registry_path)
         activation_value = _lookup(activation, activation_path)
         registry_value = _lookup(record, registry_path)
         if activation_value is _MISSING or registry_value is _MISSING:

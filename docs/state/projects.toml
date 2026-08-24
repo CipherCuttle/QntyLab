@@ -8513,6 +8513,10 @@ parent_provider_retries = 0
 parent_automatic_continuation = false
 parent_max_tokens = 4096
 spend_ceiling_usd = 1.0
+launch_policy_digest = "7345ab145a0c98696ce8b9e6d815f4da98092f7be680467278464fb098a51589"
+codex_repair_digest = "f89bf5833956f3c4202ca88a9285e39658976b29605fc1b63b7c62ebdd07fcb3"
+claude_repair_digest = "2b8277bf13e077651046e2527dc7aa092c3c9669cedc61eac1f742d9364a17e3"
+superseded_launch_digest_rejected = ["a392f82efd5cf97e20a6ce4353597a8a7210e8638cc17e5a4209cc1003eee4be"]
 codex_max_total = 2
 claude_max_total = 2
 claude_hard_read_only = true
@@ -8553,10 +8557,10 @@ next_action = "AFTER EXACT CANONICAL MERGE ONLY: construct a separate V0R6 activ
 
 [[project]]
 project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R6"
-display_name = "DSH Stage-A V1R3R2 one-episode live execution activation V0R6 candidate"
-state = "PLANNED_NOT_AUTHORIZED"
-candidate_state = "ACTIVE_CANDIDATE"
-canonicalization_status = "CANDIDATE_ONLY"
+display_name = "DSH Stage-A V1R3R2 one-episode live execution activation V0R6"
+state = "CLOSED_BLOCKED"
+candidate_state = "CLOSED_BLOCKED"
+canonicalization_status = "CLOSED"
 authority_level = "BOUNDED_ONE_EPISODE_DSH_STAGE_A_LIVE_EXECUTION_ONLY"
 phase_type = "BOUNDED_LIVE_EXECUTION_ACTIVATION_ONLY"
 authoritative_artifacts = [
@@ -8566,6 +8570,8 @@ authoritative_artifacts = [
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_authorization_v0r6/authorization.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0r6/activation.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0r6/hostile_implementation_review.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0r6/execution_evidence.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0r6/closure.md",
   "tests/test_dsh_stage_a_v1r3r2_one_episode_live_execution_activation_v0r6.py",
 ]
 authorization_state = "AUTHORIZED_IF_CANONICAL"
@@ -8580,6 +8586,7 @@ activation_artifact_project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_
 projection_contract = "ACTIVATION_REGISTRY_PROJECT_CONTEXT_CANONICAL_GIT_PARITY_V0"
 activation_exists = true
 activation_authorized = false
+activation_authorized_after_canonicalization = true
 effective_execution_authority = false
 implementation_authorized = false
 implementation_completed = true
@@ -8592,6 +8599,11 @@ canonical_predecessor_merge_parents = [
 ]
 canonical_predecessor_required_state = "CLOSED_PASS"
 canonical_predecessor_terminal_outcome = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_AUTHORIZATION_V0R6_READY"
+canonical_activation_merge = "4195433872140634784c404f88fa0c70a6bcfd11"
+canonical_activation_merge_parents = [
+  "6a20d9cfb2c485d7f43ccc04141c6365b5add9a0",
+  "35d2b49f17733a007a3d1af841ed223262e18636",
+]
 authorization_artifact_sha256 = "d7e5ae4861f6013697305aee18e0238d30c1d2f950796d4a93e04f1c2534560a"
 authorization_artifact_git_blob = "18889029dd443883563b28ceb7f81f45f0d5761e"
 activation_artifact = "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0r6/activation.json"
@@ -8677,12 +8689,26 @@ claude_mcp_servers = {}
 claude_agents = {}
 claude_plugins = []
 claude_persistence = false
+execution_closure_pr_budget = 1
 activation_artifacts_created = 1
 live_authority_created = false
 live_execution_authorized = false
 v0r6_created = false
 v0r6_activated = false
 live_execution_performed = false
+execution_evidence_artifact = "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0r6/execution_evidence.json"
+closure_artifact = "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0r6/closure.md"
+terminal_secret_reads = 0
+terminal_claim_attempted = false
+terminal_dsh_invocations = 0
+terminal_parent_requests = 0
+terminal_provider_wire_requests = 0
+terminal_codex_child_turns = 0
+terminal_claude_child_turns = 0
+terminal_fixture_mutations = 0
+terminal_spend_usd = 0.0
+terminal_non_secret_gate = "BLOCK_RUNTIME_IDENTITY"
+terminal_pre_secret = true
 stage_b_authorized = false
 scientific_execution_authorized = false
 qnty_runtime_authority = "NONE"
@@ -8700,5 +8726,6 @@ hostile_governance_high_total = 0
 hostile_governance_medium_total = 0
 hostile_governance_low_total = 0
 targeted_governance_rereview_used = false
-terminal_outcome = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_ACTIVATION_V0R6_CANDIDATE_PREPARED"
-next_action = "AFTER EXACT CANONICAL ACTIVATION MERGE ONLY: effective execution authority remains false until that exact merge. Do not activate, execute, read the secret, create a claim, invoke DSH, call a provider, spend, merge, or reuse V0R5."
+terminal_outcome = "V0R6_LIVE_EPISODE_CLOSED_BLOCKED_NO_REPLAY"
+terminal_outcome_basis = "The exact canonical activation merge topology was verified and fresh production DSH_HOME materialization passed, but successor contract recomputation failed closed with BLOCK_RUNTIME_IDENTITY and STOP_SOURCE_CONFLICT before fixture preparation, secret read, claim, DSH, provider I/O, or spend."
+next_action = "CLOSED_BLOCKED: V0R6_LIVE_EPISODE_CLOSED_BLOCKED_NO_REPLAY. Preserve the evidence; do not repair runtime or contract bytes, retry, replay, create V0R7, start a second episode, or begin an infrastructure loop."

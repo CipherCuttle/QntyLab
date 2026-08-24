@@ -30,20 +30,35 @@
     "effective_repair_authority": false,
     "branch_local_candidate_does_not_self_authorize": true,
     "future_repair_must_reconcile_canonical_source_again": true,
-    "future_repair_terminal_stop": "STOP_AFTER_ONE_CANDIDATE_COMMIT_OR_DRAFT_PR"
+    "future_repair_terminal_stop": "STOP_AFTER_ONE_CANDIDATE_COMMIT_AND_DRAFT_PR"
   },
   "future_repair_scope": {
     "allowed_operations": [
       "RECONCILE_CANONICAL_SOURCE_AGAIN_BEFORE_ANY_REPAIR",
-      "INSPECT_CANONICAL_EXECUTION_CONTRACT_AND_RUNTIME_IDENTITY",
-      "REPAIR_ONLY_EXECUTION_CONTRACT_AND_DIRECTLY_RELATED_DIGEST_IDENTITY",
-      "MODIFY_DIRECTLY_RELATED_TESTS",
-      "RETAIN_SANITIZED_DIAGNOSTIC_RECEIPTS",
-      "RUN_FOCUSED_OFFLINE_TESTS",
-      "RUN_BOUNDED_OFFLINE_INTEGRATION_TESTS",
-      "ONE_INDEPENDENT_HOSTILE_REVIEW",
-      "ONE_TARGETED_REREVIEW_ONLY_AFTER_CRITICAL_OR_HIGH_REPAIR",
-      "CREATE_ONE_REPAIR_CANDIDATE_COMMIT_OR_DRAFT_PR"
+      "RECONSTRUCT_COMPLETE_EXECUTION_DEPENDENCY_DAG",
+      "SEPARATE_HISTORICAL_VERIFICATION_FROM_CURRENT_CONTRACT_DERIVATION",
+      "COMPUTE_REVERSE_TRANSITIVE_INVALIDATION_MECHANICALLY",
+      "CREATE_NEW_CURRENT_GENERATION_CONTRACT_ARTIFACTS_WHERE_REQUIRED",
+      "PRESERVE_HISTORICAL_A392_50BD_AND_V0R5_V0R6_EVIDENCE_IMMUTABLE",
+      "REWIRE_PREPARE_PRODUCTION_LAUNCH_AND_DIRECTLY_RELATED_PRODUCTION_CONTRACT_SELECTION_TO_CURRENT_CONTRACT_ROOT",
+      "REWIRE_COMPOSITE_AND_IMMEDIATE_PRE_SPAWN_VERIFICATION_TO_CURRENT_CONTRACT_ROOT",
+      "REMOVE_STALE_HISTORICAL_CONTRACT_PATHS_FROM_CURRENT_PRODUCTION_TRUTH",
+      "ESTABLISH_EXACTLY_ONE_EPISODECLAIM_ACQUISITION_OWNER",
+      "VERIFY_AND_FREEZE_EXECUTABLE_SECRET_CLAIM_BUDGET_PROVIDER_CHILD_STATE_MACHINE",
+      "ENSURE_PROVIDER_IO_CANNOT_PRECEDE_CLAIM_COMMITTED",
+      "BIND_CLAIM_SOURCE_TO_EXACT_IMMUTABLE_COMMIT_SHA_WITH_SEPARATE_CANONICALITY_AND_REVOCATION_CHECKS",
+      "VERIFY_CLEAN_SOURCE_AND_WORKTREE_SEMANTICS_BEFORE_IRREVERSIBLE_CLAIM_BOUNDARY",
+      "VERIFY_ACTUAL_CURRENT_NODE_PYTHON_CODEX_CLAUDE_EXECUTABLE_IDENTITIES",
+      "DETERMINISTICALLY_VERIFY_OR_REMATERIALIZE_PINNED_DSH_RUNTIME_FROM_CANONICAL_RESOLVED_INPUTS_NON_LIVE",
+      "REPAIR_RUNTIME_AND_ACTION_TIME_CONTRACT_SELECTION_IF_REQUIRED_BY_RECONCILIATION",
+      "MAKE_DIRECTLY_REQUIRED_PROJECT_CONTEXT_PROJECTION_CHANGES",
+      "MAKE_DIRECTLY_REQUIRED_CI_CHANGES_TO_DISTINGUISH_CANDIDATE_HEAD_SYNTHETIC_PR_MERGE_RESULT_CANONICAL_MASTER",
+      "ADD_DEPENDENCY_CLOSURE_UNAFFECTED_NODE_AND_ACTION_TIME_PARITY_TESTS",
+      "RUN_COMPLETE_PRODUCTION_EQUIVALENT_NON_SECRET_PREFLIGHT",
+      "PERFORM_EXACTLY_ONE_INDEPENDENT_HOSTILE_SECURITY_REVIEW",
+      "REPAIR_CRITICAL_OR_HIGH_ONLY",
+      "PERFORM_AT_MOST_ONE_TARGETED_REREVIEW_IF_SUCH_REPAIR_OCCURRED",
+      "CREATE_ONE_CANDIDATE_COMMIT_AND_ONE_DRAFT_IMPLEMENTATION_PR"
     ],
     "forbidden_operations": [
       "REPLAY_V0R5",
@@ -88,7 +103,7 @@
   },
   "canonicalization": {
     "canonical_repository": "QntyLab",
-    "candidate_branch": "agent/dsh-stage-a-v1r3r2-execution-contract-reconciliation-authorization-v0",
+    "candidate_branch": "agent/dsh-stage-a-v1r3r2-one-episode-live-execution-v0r6-closure-task9",
     "candidate_artifact_path": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_execution_contract_reconciliation_authorization_v0/authorization.json",
     "candidate_base_sha": "ded772d59c6135689ac4bda8878979721855a955",
     "branch_local_artifact_does_not_self_authorize": true,
@@ -138,9 +153,9 @@
   "stop_conditions": [
     "STOP_SOURCE_CONFLICT",
     "STOP_IF_V0R6_PROTECTED_STATE_WOULD_BE_MUTATED",
-    "STOP_IF_SCOPE_WIDENS_BEYOND_EXECUTION_CONTRACT_RECONCILIATION",
-    "STOP_IF_REPAIRATION_WOULD_TOUCH_RUNTIME_OR_CONTRACT_IMPLEMENTATION",
-    "STOP_AFTER_ONE_CANDIDATE_COMMIT_OR_DRAFT_PR"
+    "STOP_IF_SCOPE_WIDENS_BEYOND_AUTHORIZED_EXECUTION_CONTRACT_RECONCILIATION",
+    "STOP_IF_HISTORICAL_ARTIFACT_OR_LIVE_BOUNDARY_WOULD_BE_MUTATED",
+    "STOP_AFTER_ONE_CANDIDATE_COMMIT_AND_DRAFT_PR"
   ],
   "construction_receipts": {
     "secret_reads": 0,
@@ -172,7 +187,8 @@
     "The canonical base ded772d59c6135689ac4bda8878979721855a955 is the PR #214 merge with parents 4195433872140634784c404f88fa0c70a6bcfd11 and 3dc9b1d28d2170fde33c09ba123ce81209acb505.",
     "The predecessor project DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R6 is CLOSED_BLOCKED with terminal outcome V0R6_LIVE_EPISODE_CLOSED_BLOCKED_NO_REPLAY.",
     "This authorization artifact is candidate-only and does not self-authorize; it is effective only after exact canonical merge.",
-    "All live-boundary counters are zero; this phase performs no secret read, claim, provider, DSH, Codex, Claude, or spend activity."
+    "All live-boundary counters are zero; this phase performs no secret read, claim, provider, DSH, Codex, Claude, or spend activity.",
+    "The candidate branch recorded in this artifact is the actual PR #216 head branch agent/dsh-stage-a-v1r3r2-one-episode-live-execution-v0r6-closure-task9; the exact commit SHA and canonical base ded772d59c6135689ac4bda8878979721855a955 are authoritative."
   ],
   "assumed": [
     "The accidental-spelling untracked directory dsh_stage_stage_a_v1r3r2_execution_contract_reconciliation_v0/ is non-canonical and is not reused or copied; it is left untouched.",

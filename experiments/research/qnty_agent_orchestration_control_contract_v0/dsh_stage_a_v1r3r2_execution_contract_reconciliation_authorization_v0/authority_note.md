@@ -50,3 +50,35 @@ This governance-only phase performs no future reconciliation, repairs no
 runtime/contract/digest bytes, and touches no live boundary. The accidental
 spelling untracked directory `dsh_stage_stage_a_v1r3r2_execution_contract_reconciliation_v0/`
 is non-canonical and is left untouched.
+
+## Authorized future repair scope (non-live, candidate-only)
+
+The future repair phase `DSH_STAGE_A_V1R3R2_EXECUTION_CONTRACT_RECONCILIATION_V0`
+is authorized, NON-LIVE, to perform the bounded class-level execution-contract
+reconciliation: reconstruct the complete execution dependency DAG; separate
+historical verification from current contract derivation; mechanically compute
+reverse-transitive invalidation; create new current-generation contract
+artifacts where required; preserve historical a392/50bd and V0R5/V0R6 evidence
+immutable; rewire prepare-production-launch and directly related production
+contract selection, and composite/immediate pre-spawn verification, to the
+CURRENT contract root; remove stale historical contract paths from current
+production truth; establish exactly one EpisodeClaim acquisition owner; verify
+and freeze the executable secret → claim → budget → provider → child state
+machine; ensure provider I/O cannot precede claim COMMITTED; bind claim source
+to an exact immutable commit SHA with separate canonicality/revocation checks;
+verify clean source/worktree semantics before the irreversible claim boundary;
+verify actual current Node/Python/Codex/Claude executable identities;
+deterministically verify or rematerialize the PINNED DSH runtime from canonical
+resolved inputs (NON-LIVE); repair runtime/action-time contract selection if
+required; make directly required Project Context projection and CI changes
+(distinguishing CANDIDATE_HEAD / SYNTHETIC_PR_MERGE_RESULT / CANONICAL_MASTER);
+add dependency-closure / unaffected-node / action-time parity tests; run the
+complete production-equivalent NON-SECRET preflight; perform exactly one
+independent hostile security review; repair Critical/High only; perform at most
+one targeted rereview if such repair occurred; create one candidate commit AND
+one draft implementation PR; then stop.
+
+This is NOT permission for unrelated refactors. Every mutation must be directly
+justified by the frozen execution-contract reconciliation objective. Historical
+a392/50bd and V0R5/V0R6 evidence remains immutable, and the live boundary
+remains zero/forbidden.

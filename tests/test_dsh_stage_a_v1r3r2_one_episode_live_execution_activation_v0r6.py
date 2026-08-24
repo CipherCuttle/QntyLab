@@ -22,7 +22,13 @@ V0R6_STATE = Path(
     "/var/tmp/qntylab-claims/dsh-stage-a-v1r3r2-one-episode-live-execution-v0r6/episode-1"
 )
 
+# The V0R6 activation authorization identity is frozen to the exact canonical
+# authorization merge that predates this closure PR.  The current canonical
+# master (post-closure) is a later commit whose parents are not the
+# authorization candidate pair; keep the activation-bound base constant
+# separate from the current canonical master exactly as the V0R5 test does.
 CANONICAL_MASTER = "6a20d9cfb2c485d7f43ccc04141c6365b5add9a0"
+CURRENT_CANONICAL_MASTER = "4195433872140634784c404f88fa0c70a6bcfd11"
 AUTHORIZATION_BASE = "e2b97a1478f29e6db3cc1918f1e90ff8547565a1"
 AUTHORIZATION_CANDIDATE = "c668856fed89dbe327e230dbb94bb8835c19a834"
 AUTHORIZATION_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_AUTHORIZATION_V0R6"
@@ -45,9 +51,9 @@ def _git(*args: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True)
 
 
-def test_canonical_merge_and_exact_authorization_bytes() -> None:
-    assert _git("rev-parse", "origin/master").stdout.strip() == CANONICAL_MASTER
-    assert _git("merge-base", "--is-ancestor", CANONICAL_MASTER, "HEAD").returncode == 0
+def test_current_canonical_master_and_frozen_authorization_identity_are_distinct() -> None:
+    assert _git("rev-parse", "origin/master").stdout.strip() == CURRENT_CANONICAL_MASTER
+    assert _git("merge-base", "--is-ancestor", CANONICAL_MASTER, CURRENT_CANONICAL_MASTER).returncode == 0
     assert _git("rev-list", "--parents", "-n", "1", CANONICAL_MASTER).stdout.split() == [
         CANONICAL_MASTER,
         AUTHORIZATION_BASE,
@@ -181,22 +187,30 @@ def test_v0r5_protection_and_future_policy_are_unchanged() -> None:
     }
 
 
-def test_registry_projection_keeps_candidate_out_of_effective_authority() -> None:
+def test_registry_records_terminal_closure_and_projection_is_clean() -> None:
     registry = tomllib.loads((ROOT / "docs/state/projects.toml").read_text(encoding="utf-8"))
     record = next(row for row in registry["project"] if row["project_id"] == EXECUTION_ID)
     activation = _load(ACTIVATION_PATH)
-    assert record["state"] == "PLANNED_NOT_AUTHORIZED"
-    assert record["candidate_state"] == "ACTIVE_CANDIDATE"
+    assert record["state"] == "CLOSED_BLOCKED"
+    assert record["candidate_state"] == "CLOSED_BLOCKED"
+    assert record["canonicalization_status"] == "CLOSED"
     assert record["activation_exists"] is True
     assert record["activation_authorized"] is False
+    assert record["activation_authorized_after_canonicalization"] is True
     assert record["effective_execution_authority"] is False
     assert record["v0r5_reused"] is False
     assert record["implementation_authorized"] is False
+    assert record["implementation_completed"] is True
+    assert record["active_project_after_closure"] == "NONE"
+    assert record["terminal_outcome"] == "V0R6_LIVE_EPISODE_CLOSED_BLOCKED_NO_REPLAY"
     assert record["canonical_base_sha"] == CANONICAL_MASTER
     assert record["canonical_predecessor_merge_parents"] == [AUTHORIZATION_BASE, AUTHORIZATION_CANDIDATE]
     assert record["authorization_artifact_sha256"] == AUTH_SHA256
     assert record["authorization_artifact_git_blob"] == AUTH_BLOB
+    assert record["canonical_activation_merge"] == CURRENT_CANONICAL_MASTER
     assert activation["authority_firewall"]["effective_execution_authority"] is False
+    artifact_names = {str(path).rsplit("/", 1)[-1] for path in record["authoritative_artifacts"]}
+    assert {"execution_evidence.json", "closure.md"} <= artifact_names
     _, _, loaded = project_context.load_context_sources(ROOT)
     projects = project_context.validate_projects_registry(ROOT, loaded)
     projection = project_context.execution_authority_projection(ROOT, projects)
@@ -204,5 +218,44 @@ def test_registry_projection_keeps_candidate_out_of_effective_authority() -> Non
     assert projection["active_project"] is None
     assert projection["identity_by_project"][EXECUTION_ID]["effective"] is False
     roadmap = (ROOT / "docs/CURRENT_ROADMAP.md").read_text(encoding="utf-8")
-    assert "DSH Stage-A V1R3R2 one-episode live execution activation V0R6 candidate" in roadmap
-    assert "effective execution authority remains false" in roadmap
+    assert "DSH Stage-A V1R3R2 one-episode live execution activation V0R6" in roadmap
+    assert "V0R6_LIVE_EPISODE_CLOSED_BLOCKED_NO_REPLAY" in roadmap
+
+
+def test_v0r6_terminal_closure_projection_reports_zero_issues() -> None:
+    """The V0R6 CLOSED_BLOCKED terminal closure must project cleanly.
+
+    This is the acceptance condition for the closure-projection repair: a
+    terminal closure row with execution_evidence.json + closure.md artifacts
+    projects with zero issues and no active project.
+    """
+    _, _, registry = project_context.load_context_sources(ROOT)
+    projects = project_context.validate_projects_registry(ROOT, registry)
+    projection = project_context.execution_authority_projection(ROOT, projects)
+    assert projection["issues"] == []
+    assert projection["active_project"] is None
+    record = projects[EXECUTION_ID]
+    assert record["state"] == "CLOSED_BLOCKED"
+    assert record["implementation_authorized"] is False
+    assert record["active_project_after_closure"] == "NONE"
+
+
+def test_non_v0r6_row_with_mismatched_digest_still_reports_issue() -> None:
+    """Global fail-closed parity must NOT be weakened by the V0R6 repair.
+
+    A non-V0R6 terminal-closure row with a genuine runtime-identity mismatch
+    (launch_policy_digest) must still report a projection issue.  The V0R5 row
+    is used because it is a real, immutable terminal-closure row; the mutation
+    is made on the in-memory record only, so no registry bytes change.
+    """
+    from qntylab import project_context as _context
+
+    _, _, registry = _context.load_context_sources(ROOT)
+    projects = _context.validate_projects_registry(ROOT, registry)
+    v0r5 = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R5"
+    record = dict(projects[v0r5])
+    assert record["state"] == "CLOSED_BLOCKED"
+    record["launch_policy_digest"] = "wrong"
+    projection = _context.execution_authority_projection(ROOT, {v0r5: record})
+    assert projection["active_project"] is None
+    assert any("launch_policy_digest" in issue for issue in projection["issues"])

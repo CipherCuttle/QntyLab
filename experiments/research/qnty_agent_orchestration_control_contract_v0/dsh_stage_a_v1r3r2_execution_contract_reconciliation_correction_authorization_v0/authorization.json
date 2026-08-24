@@ -48,7 +48,7 @@
     {
       "id": "H2",
       "summary": "candidate-head CI fails (host ambient /var/tmp dependency)",
-      "detail": "GitHub candidate-head CI on PR #217 head FAILS; ACCEPTANCE-1 and ACCEPTANCE-7 fail with 'missing built CLI: /var/tmp/qntylab-dsh-runtime-v0-final/source/apps/cli/lib/bin0.js'."
+      "detail": "GitHub candidate-head CI on PR #217 head FAILS; ACCEPTANCE-1 and ACCEPTANCE-7 fail with 'missing built CLI: /var/tmp/qntylab-dsh-runtime-v0-final/source/apps/cli/lib/bin.js'."
     }
   ],
   "authorized_future_scope": {

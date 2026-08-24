@@ -8794,3 +8794,65 @@ targeted_governance_rereview_used = false
 terminal_outcome = "ACTIVE_CANDIDATE"
 terminal_outcome_basis = "This governance-only authorization candidate binds to the exact canonical base ded772d59c6135689ac4bda8878979721855a955 (PR #214 merge) and the CLOSED_BLOCKED V0R6 predecessor. It is candidate-only, does not self-authorize, and performs zero live-boundary activity."
 next_action = "ACTIVE_CANDIDATE: This authorization is effective only after exact canonical merge. The future repair phase DSH_STAGE_A_V1R3R2_EXECUTION_CONTRACT_RECONCILIATION_V0 must independently reconcile the canonical source again before any repairation. Replay V0R5/V0R6, V0R7, another Stage-A live episode, Stage B, scientific execution, Qnty runtime, Qnty promotion, trading, capital, and broader production use remain unauthorized."
+
+[[project]]
+project_id = "DSH_STAGE_A_V1R3R2_EXECUTION_CONTRACT_RECONCILIATION_CORRECTION_AUTHORIZATION_V0"
+display_name = "DSH Stage-A V1R3R2 execution contract reconciliation correction authorization V0"
+state = "PLANNED_NOT_AUTHORIZED"
+candidate_state = "ACTIVE_CANDIDATE"
+canonicalization_status = "CANDIDATE_NOT_CANONICAL"
+authority_level = "AUTHORIZED_IF_CANONICAL"
+phase_type = "GOVERNANCE_ONLY_BOUNDED_CORRECTION_AUTHORIZATION"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_execution_contract_reconciliation_correction_authorization_v0/authorization.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_execution_contract_reconciliation_correction_authorization_v0/evidence_findings.md",
+  "tests/test_dsh_stage_a_v1r3r2_execution_contract_reconciliation_correction_authorization_v0.py",
+]
+authorization_state = "AUTHORIZED_IF_CANONICAL"
+authorization_effective = "AFTER_EXACT_CANONICAL_MERGE_ONLY"
+canonical_base_sha = "a87ecfda105b84669f3fef862496045284d0a655"
+canonical_predecessor_project_id = "DSH_STAGE_A_V1R3R2_EXECUTION_CONTRACT_RECONCILIATION_V0"
+canonical_predecessor_merge = "7fb7a70364727f99cd8f9da49552484e1b1aaea8"
+canonical_predecessor_pr = 217
+canonical_predecessor_required_state = "OPEN_DRAFT_NOT_MERGED"
+canonical_predecessor_terminal_outcome = "PR217_CORRECTION_AUTHORIZATION_REQUIRED"
+future_repair_project_id = "DSH_STAGE_A_V1R3R2_EXECUTION_CONTRACT_RECONCILIATION_V0"
+future_repair_phase_separate = true
+effective_repair_authority = false
+implementation_authorized = false
+implementation_completed = false
+authorization_artifact = "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_execution_contract_reconciliation_correction_authorization_v0/authorization.json"
+authorization_artifact_sha256 = "c2503286bc4af9385505c894f3fa20bf0c1b9161f1df5671943dd09f255d5a3b"
+secret_read_authorized = false
+provider_io_authorized = false
+model_execution_authorized = false
+live_dsh_authorized = false
+v0r7_authorized = false
+v0r5_replay_allowed = false
+v0r6_replay_allowed = false
+v0r6_claim_reset_allowed = false
+v0r6_claim_delete_allowed = false
+v0r6_claim_repair_allowed = false
+v0r6_second_episode_allowed = false
+stage_b_authorized = false
+scientific_execution_authorized = false
+qnty_runtime_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+promotion_authority = "NONE"
+broader_production_authority = "NONE"
+qnty_agent_eval = "NOT_APPLICABLE"
+active_project_after_closure = "NONE"
+hostile_review_count = 0
+hostile_review_verdict = "PENDING"
+hostile_governance_critical_total = 0
+hostile_governance_high_total = 0
+hostile_governance_medium_total = 0
+hostile_governance_low_total = 0
+targeted_governance_rereview_used = false
+terminal_outcome = "ACTIVE_CANDIDATE"
+terminal_outcome_basis = "This governance-only corrective authorization candidate binds to the exact canonical base a87ecfda105b84669f3fef862496045284d0a655 (PR #216 merge) and the OPEN DRAFT not-merged PR #217 predecessor. Candidate-only; does not self-authorize; zero live-boundary activity."
+next_action = "ACTIVE_CANDIDATE: This corrective authorization is effective only after exact canonical merge of this PR. The future correction phase (one bounded correction of C1/H1/H2) must independently reconcile the canonical source again before any repair. No merge, no repair, no live activity, no scope widening."

@@ -19,7 +19,7 @@ Decision: `B — PR217_CORRECTION_AUTHORIZATION_REQUIRED`
 - Only claim-source-model.md documents the future EXACT_IMMUTABLE_COMMIT model
 
 ## H2 — candidate-head CI reproducibility failure
-- Missing built CLI: `/var/tmp/qntylab-dsh-runtime-v0-final/source/apps/cli/lib/bin0.js`
+- Missing built CLI: `/var/tmp/qntylab-dsh-runtime-v0-final/source/apps/cli/lib/bin.js`
 - Failing checks: ACCEPTANCE-1, ACCEPTANCE-7 (host ambient /var/tmp dependency)
 
 ## Authority decision chain

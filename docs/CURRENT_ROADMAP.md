@@ -9,6 +9,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 ## Queued — not authorized
 
 - `DSH Stage-A V1R3R2 execution contract reconciliation authorization V0` — `PLANNED_NOT_AUTHORIZED`. ACTIVE_CANDIDATE: This authorization is effective only after exact canonical merge. The future repair phase DSH_STAGE_A_V1R3R2_EXECUTION_CONTRACT_RECONCILIATION_V0 must independently reconcile the canonical source again before any repairation. Replay V0R5/V0R6, V0R7, another Stage-A live episode, Stage B, scientific execution, Qnty runtime, Qnty promotion, trading, capital, and broader production use remain unauthorized.
+- `DSH Stage-A V1R3R2 execution contract reconciliation correction authorization V0` — `PLANNED_NOT_AUTHORIZED`. ACTIVE_CANDIDATE: This corrective authorization is effective only after exact canonical merge of this PR. The future correction phase (one bounded correction of C1/H1/H2) must independently reconcile the canonical source again before any repair. No merge, no repair, no live activity, no scope widening.
 - `PROSPECTIVE_SHADOW` — `PLANNED_NOT_AUTHORIZED`. No implementation is authorized; require separate Git-backed authorization.
 - `QNTY_HANDOFF` — `PLANNED_NOT_AUTHORIZED`. No implementation is authorized unless downstream evidence separately earns it.
 - `REACTIVE_JIGSAW_V0` — `PLANNED_NOT_AUTHORIZED`. No implementation is authorized; require separate Git-backed authorization.

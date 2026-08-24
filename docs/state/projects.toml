@@ -8729,3 +8729,68 @@ targeted_governance_rereview_used = false
 terminal_outcome = "V0R6_LIVE_EPISODE_CLOSED_BLOCKED_NO_REPLAY"
 terminal_outcome_basis = "The exact canonical activation merge topology was verified and fresh production DSH_HOME materialization passed, but successor contract recomputation failed closed with BLOCK_RUNTIME_IDENTITY and STOP_SOURCE_CONFLICT before fixture preparation, secret read, claim, DSH, provider I/O, or spend."
 next_action = "CLOSED_BLOCKED: V0R6_LIVE_EPISODE_CLOSED_BLOCKED_NO_REPLAY. Preserve the evidence; do not repair runtime or contract bytes, retry, replay, create V0R7, start a second episode, or begin an infrastructure loop."
+
+[[project]]
+project_id = "DSH_STAGE_A_V1R3R2_EXECUTION_CONTRACT_RECONCILIATION_AUTHORIZATION_V0"
+display_name = "DSH Stage-A V1R3R2 execution contract reconciliation authorization V0"
+state = "PLANNED_NOT_AUTHORIZED"
+candidate_state = "ACTIVE_CANDIDATE"
+canonicalization_status = "CANDIDATE_NOT_CANONICAL"
+authority_level = "AUTHORIZED_IF_CANONICAL"
+phase_type = "GOVERNANCE_ONLY_BOUNDED_REPAIR_AUTHORIZATION"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_execution_contract_reconciliation_authorization_v0/authorization.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_execution_contract_reconciliation_authorization_v0/authority_note.md",
+  "tests/test_dsh_stage_a_v1r3r2_execution_contract_reconciliation_authorization_v0.py",
+]
+authorization_state = "AUTHORIZED_IF_CANONICAL"
+authorization_effective = "AFTER_EXACT_CANONICAL_MERGE_ONLY"
+canonical_base_sha = "ded772d59c6135689ac4bda8878979721855a955"
+canonical_predecessor_project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R6"
+canonical_predecessor_merge = "ded772d59c6135689ac4bda8878979721855a955"
+canonical_predecessor_merge_parents = [
+  "4195433872140634784c404f88fa0c70a6bcfd11",
+  "3dc9b1d28d2170fde33c09ba123ce81209acb505",
+]
+canonical_predecessor_required_state = "CLOSED_BLOCKED"
+canonical_predecessor_terminal_outcome = "V0R6_LIVE_EPISODE_CLOSED_BLOCKED_NO_REPLAY"
+future_repair_project_id = "DSH_STAGE_A_V1R3R2_EXECUTION_CONTRACT_RECONCILIATION_V0"
+future_repair_phase_separate = true
+effective_repair_authority = false
+implementation_authorized = false
+implementation_completed = false
+authorization_artifact = "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_execution_contract_reconciliation_authorization_v0/authorization.json"
+authorization_artifact_sha256 = "ee20d5165ebda69fb7f78d3e0a046705ded3f2abe8340800596b991db94438d1"
+secret_read_authorized = false
+provider_io_authorized = false
+model_execution_authorized = false
+live_dsh_authorized = false
+v0r7_authorized = false
+v0r5_replay_allowed = false
+v0r6_replay_allowed = false
+v0r6_claim_reset_allowed = false
+v0r6_claim_delete_allowed = false
+v0r6_claim_repair_allowed = false
+v0r6_second_episode_allowed = false
+stage_b_authorized = false
+scientific_execution_authorized = false
+qnty_runtime_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+promotion_authority = "NONE"
+broader_production_authority = "NONE"
+qnty_agent_eval = "NOT_APPLICABLE"
+active_project_after_closure = "NONE"
+hostile_review_count = 0
+hostile_review_verdict = "PENDING"
+hostile_governance_critical_total = 0
+hostile_governance_high_total = 0
+hostile_governance_medium_total = 0
+hostile_governance_low_total = 0
+targeted_governance_rereview_used = false
+terminal_outcome = "ACTIVE_CANDIDATE"
+terminal_outcome_basis = "This governance-only authorization candidate binds to the exact canonical base ded772d59c6135689ac4bda8878979721855a955 (PR #214 merge) and the CLOSED_BLOCKED V0R6 predecessor. It is candidate-only, does not self-authorize, and performs zero live-boundary activity."
+next_action = "ACTIVE_CANDIDATE: This authorization is effective only after exact canonical merge. The future repair phase DSH_STAGE_A_V1R3R2_EXECUTION_CONTRACT_RECONCILIATION_V0 must independently reconcile the canonical source again before any repairation. Replay V0R5/V0R6, V0R7, another Stage-A live episode, Stage B, scientific execution, Qnty runtime, Qnty promotion, trading, capital, and broader production use remain unauthorized."

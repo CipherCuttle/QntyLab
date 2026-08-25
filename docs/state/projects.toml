@@ -66,6 +66,10 @@ authoritative_artifacts = [
   "docs/CURRENT_ROADMAP.md",
   "experiments/research/qntyspot_ink_shadow_performance_authorization_v0/authorization.json",
   "experiments/research/qntyspot_ink_shadow_performance_authorization_v0/hostile_governance_review.md",
+  "qntylab/qntyspot_ink_shadow_performance_prereg_v0.py",
+  "experiments/research/qntyspot_ink_shadow_performance_v0/preregistration.json",
+  "experiments/research/qntyspot_ink_shadow_performance_v0/hostile_scientific_design_review.md",
+  "tests/test_qntyspot_ink_shadow_performance_prereg_v0.py",
   "tests/test_qntyspot_ink_shadow_performance_authorization_v0.py",
 ]
 governing_authorization_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_AUTHORIZATION_V0"

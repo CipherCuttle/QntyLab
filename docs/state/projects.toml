@@ -66,11 +66,20 @@ authoritative_artifacts = [
   "docs/CURRENT_ROADMAP.md",
   "experiments/research/qntyspot_ink_shadow_performance_authorization_v0/authorization.json",
   "experiments/research/qntyspot_ink_shadow_performance_authorization_v0/hostile_governance_review.md",
+  "qntylab/qntyspot_ink_shadow_performance_prereg_v0.py",
+  "experiments/research/qntyspot_ink_shadow_performance_v0/preregistration.json",
+  "experiments/research/qntyspot_ink_shadow_performance_v0/hostile_scientific_design_review.md",
+  "experiments/research/qntyspot_ink_shadow_performance_v0/targeted_rereview.md",
+  "tests/test_qntyspot_ink_shadow_performance_prereg_v0.py",
   "tests/test_qntyspot_ink_shadow_performance_authorization_v0.py",
 ]
 governing_authorization_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_AUTHORIZATION_V0"
 governing_authorization_candidate_commit = "b0c132468d4e637fa0d3197044f588081ba025e1"
 governing_authorization_canonical_merge = "112e004ff516ef141a4dcf661d9ae4fe454aa85c"
+canonical_preregistration_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_V0_PREREGISTRATION"
+canonical_preregistration_status = "PREREGISTERED_NOT_EXECUTED"
+canonical_preregistration_digest = "27ce60c68133f40d9496df1db6009de07957ed8a9bd68b0715cc6c54fe05d18a"
+canonical_preregistration_canonicalization = "AFTER_EXACT_CANONICAL_MERGE_ONLY"
 qntyspot_source_commit = "b9a84c59bd43e7697ee970d2a7571647e5de4501"
 historical_data_cutoff_utc = "2026-08-25T17:02:37Z"
 authorized_operations = [
@@ -113,7 +122,13 @@ signing_authority = "NONE"
 promotion_authority = "NONE"
 implementation_authorized = false
 implementation_completed = false
-next_action = "After exact canonical merge and fresh clean worktree reconciliation, PREREGISTER one bounded design; then preserve the frozen DEV → candidate freeze → OUTER order. No market-data access, strategy_test, backtest, research-ledger mutation, QntySpot mutation, signing, approval, broadcast, trading, capital, or promotion is authorized by this activation candidate."
+targeted_rereview_used = true
+targeted_rereview_count = 1
+targeted_rereview_scope = "HIGH_FINDING_REPAIR_SURFACE_ONLY"
+targeted_rereview_verdict = "PASS_NO_CRITICAL_HIGH"
+targeted_rereview_new_critical_total = 0
+targeted_rereview_new_high_total = 0
+next_action = "After exact canonical merge and fresh clean worktree reconciliation, create the separate bounded QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_ACTIVATION phase. Do not acquire DEV data or run DEV from this preregistration branch; OUTER remains inaccessible until the frozen DEV selection gate. No market-data access, historical economic outcome inspection, strategy_test, backtest, research-ledger mutation, QntySpot mutation, signing, approval, broadcast, trading, capital, or promotion is authorized by this preregistration state."
 
 [[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_V2_PREREGISTRATION_V0"

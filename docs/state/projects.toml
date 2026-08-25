@@ -131,6 +131,71 @@ targeted_rereview_new_high_total = 0
 next_action = "After exact canonical merge and fresh clean worktree reconciliation, create the separate bounded QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_ACTIVATION phase. Do not acquire DEV data or run DEV from this preregistration branch; OUTER remains inaccessible until the frozen DEV selection gate. No market-data access, historical economic outcome inspection, strategy_test, backtest, research-ledger mutation, QntySpot mutation, signing, approval, broadcast, trading, capital, or promotion is authorized by this preregistration state."
 
 [[project]]
+project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_ACTIVATION_V0"
+display_name = "QntySpot Ink shadow performance DEV acquisition activation V0"
+state = "PLANNED_NOT_AUTHORIZED"
+authority_level = "BOUNDED_DEV_ACQUISITION_AUTHORIZATION_CANDIDATE_ONLY"
+phase_type = "GOVERNANCE_ONLY"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "qntylab.toml",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qntyspot_ink_shadow_performance_v0/preregistration.json",
+  "experiments/research/qntyspot_ink_shadow_performance_dev_acquisition_activation_v0/activation.json",
+  "experiments/research/qntyspot_ink_shadow_performance_dev_acquisition_activation_v0/hostile_governance_review.md",
+  "tests/test_qntyspot_ink_shadow_performance_dev_acquisition_activation_v0.py",
+]
+parent_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_V0"
+governing_authorization_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_AUTHORIZATION_V0"
+canonical_base_sha = "3617633b4f88d3669ab58229aa9ca9bf5c2bee9e"
+preregistration_candidate_sha = "74b1afb5bf49aadbf8e58caff58b7f31e387c918"
+preregistration_canonical_merge = "3617633b4f88d3669ab58229aa9ca9bf5c2bee9e"
+canonical_preregistration_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_V0_PREREGISTRATION"
+canonical_preregistration_status = "PREREGISTERED_NOT_EXECUTED"
+canonical_preregistration_digest = "27ce60c68133f40d9496df1db6009de07957ed8a9bd68b0715cc6c54fe05d18a"
+qntyspot_source_commit = "b9a84c59bd43e7697ee970d2a7571647e5de4501"
+historical_data_cutoff_utc = "2026-08-25T17:02:37Z"
+future_phase_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0"
+future_phase_separate = true
+future_phase_count = 1
+authorization_state = "AUTHORIZED_IF_CANONICAL"
+authorization_effective = "AFTER_EXACT_CANONICAL_MERGE_AND_FRESH_CLEAN_WORKTREE_ONLY"
+activation_effective_on_branch = false
+implementation_authorized = false
+implementation_completed = false
+scientific_execution_authorized = false
+market_data_access_authorized = false
+historical_economic_outcome_inspection_authorized = false
+backtest_authorized = false
+strategy_test_authorized = false
+research_ledger_mutation_authorized = false
+outer_data_acquired = false
+outer_outcome_inspected = false
+outer_evaluation_count = 0
+market_network_count = 0
+market_data_acquisition_count = 0
+historical_outcome_read_count = 0
+research_ledger_state_changed = false
+qntyspot_changed = false
+qntyspot_execution_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+signing_authority = "NONE"
+approval_authority = "NONE"
+broadcast_authority = "NONE"
+promotion_authority = "NONE"
+hostile_review_count = 1
+hostile_review_verdict = "PASS"
+hostile_governance_critical_total = 0
+hostile_governance_high_total = 0
+hostile_governance_medium_total = 0
+hostile_governance_low_total = 0
+targeted_governance_rereview_used = false
+terminal_outcome = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_ACTIVATION_V0_CANDIDATE_READY"
+next_action = "ACTIVE_CANDIDATE: effective only after exact canonical merge and fresh clean worktree reconciliation. The one future phase QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0 may then qualify outcome-blind sources and acquire DEV evidence only. Do not acquire OUTER, evaluate candidates, select a winner, inspect outcomes, mutate the ledger, modify QntySpot, trade, or use capital."
+
+[[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_V2_PREREGISTRATION_V0"
 display_name = "Jigsaw fast prospective signal discovery V2 capability-compiled preregistration"
 state = "CLOSED_PASS"

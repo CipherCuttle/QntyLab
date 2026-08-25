@@ -63,7 +63,8 @@ def test_canonical_registry_closes_authorization_and_preserves_parent_lineage():
     assert parent["governing_authorization_canonical_merge"] == "112e004ff516ef141a4dcf661d9ae4fe454aa85c"
     assert active["state"] == "ACTIVE"
     assert active["project_id"] == "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0"
-    assert active["implementation_authorized"] is False
+    assert active["implementation_authorized"] is True
+    assert active["market_data_access_authorized"] is True
     registry = tomllib.loads(PROJECTS_PATH.read_text(encoding="utf-8"))
     assert [row for row in registry["project"] if row["state"] == "ACTIVE"] == [active]
 

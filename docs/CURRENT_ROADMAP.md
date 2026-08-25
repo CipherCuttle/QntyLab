@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- `QntySpot Ink shadow performance research V0` — `ACTIVE`. After exact canonical merge and fresh clean worktree reconciliation, PREREGISTER one bounded design; then preserve the frozen DEV → candidate freeze → OUTER order. No market-data access, strategy_test, backtest, research-ledger mutation, QntySpot mutation, signing, approval, broadcast, trading, capital, or promotion is authorized by this activation candidate.
+- `QntySpot Ink shadow performance research V0` — `ACTIVE`. After exact canonical merge and fresh clean worktree reconciliation, create the separate bounded QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_ACTIVATION phase. Do not acquire DEV data or run DEV from this preregistration branch; OUTER remains inaccessible until the frozen DEV selection gate. No market-data access, historical economic outcome inspection, strategy_test, backtest, research-ledger mutation, QntySpot mutation, signing, approval, broadcast, trading, capital, or promotion is authorized by this preregistration state.
 
 ## Queued — not authorized
 

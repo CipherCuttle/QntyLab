@@ -1,6 +1,7 @@
 import ast
 import hashlib
 import json
+import tomllib
 from pathlib import Path
 
 import qntylab.qntyspot_ink_shadow_performance_prereg_v0 as prereg
@@ -12,6 +13,11 @@ ARTIFACT = ROOT / prereg.ARTIFACT
 
 def load():
     return json.loads(ARTIFACT.read_text(encoding="utf-8"))
+
+
+def load_project_state():
+    registry = tomllib.loads((ROOT / "docs/state/projects.toml").read_text(encoding="utf-8"))
+    return next(row for row in registry["project"] if row["project_id"] == "QNTYSPOT_INK_SHADOW_PERFORMANCE_V0")
 
 
 def test_digest_and_static_validator_are_self_consistent():
@@ -63,6 +69,36 @@ def test_canonical_binding_and_split_formula_are_frozen():
     assert split["minimums_days"] == {"total_calendar_history": 30, "dev": 18, "outer": 12}
     assert split["random_split"] is False
     assert split["boundary_may_move_after_outcomes"] is False
+
+
+def test_canonical_preregistration_state_has_separate_fail_closed_continuation():
+    project = load_project_state()
+    assert project["canonical_preregistration_project_id"] == prereg.PROJECT_ID
+    assert project["canonical_preregistration_status"] == "PREREGISTERED_NOT_EXECUTED"
+    assert project["canonical_preregistration_digest"] == "27ce60c68133f40d9496df1db6009de07957ed8a9bd68b0715cc6c54fe05d18a"
+    assert project["canonical_preregistration_canonicalization"] == "AFTER_EXACT_CANONICAL_MERGE_ONLY"
+    assert "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_ACTIVATION" in project["next_action"]
+    assert "PREREGISTER one bounded design" not in project["next_action"]
+    assert project["targeted_rereview_used"] is True
+    assert project["targeted_rereview_count"] == 1
+    assert project["targeted_rereview_new_critical_total"] == 0
+    assert project["targeted_rereview_new_high_total"] == 0
+
+
+def test_branch_local_data_and_execution_authority_remains_false():
+    project = load_project_state()
+    for key in (
+        "scientific_execution_authorized",
+        "market_data_access_authorized",
+        "historical_economic_outcome_inspection_authorized",
+        "backtest_authorized",
+        "strategy_test_authorized",
+        "research_ledger_mutation_authorized",
+        "implementation_authorized",
+    ):
+        assert project[key] is False
+    assert project["outer_rerun_authorized"] is False
+    assert project["qntyspot_source_commit"] == prereg.QNTYSPOT_SOURCE
 
 
 def test_outer_is_inaccessible_until_freeze_and_can_be_consumed_once():
@@ -225,10 +261,13 @@ def test_artifact_policy_excludes_results_ledger_events_and_live_output():
     assert policy["qntyspot_mutation_present"] is False
 
 
-def test_exactly_one_hostile_review_and_no_targeted_rereview():
+def test_exactly_one_hostile_review_and_one_separate_targeted_rereview():
     review = (ROOT / "experiments/research/qntyspot_ink_shadow_performance_v0/hostile_scientific_design_review.md").read_text(encoding="utf-8")
     assert review.count("Review count: exactly one.") == 1
     assert review.count("HOSTILE_REVIEW = PASS") == 1
     assert "Critical findings: 0" in review
     assert "High findings: 0" in review
-    assert "Targeted rereview: not required and not performed." in review
+    targeted = (ROOT / "experiments/research/qntyspot_ink_shadow_performance_v0/targeted_rereview.md").read_text(encoding="utf-8")
+    assert targeted.count("TARGETED_REREVIEW = PASS") == 1
+    assert targeted.count("Critical findings: 0") == 1
+    assert targeted.count("High findings: 0") == 1

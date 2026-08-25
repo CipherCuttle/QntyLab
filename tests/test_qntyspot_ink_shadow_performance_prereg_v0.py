@@ -77,7 +77,9 @@ def test_canonical_preregistration_state_has_separate_fail_closed_continuation()
     assert project["canonical_preregistration_status"] == "PREREGISTERED_NOT_EXECUTED"
     assert project["canonical_preregistration_digest"] == "27ce60c68133f40d9496df1db6009de07957ed8a9bd68b0715cc6c54fe05d18a"
     assert project["canonical_preregistration_canonicalization"] == "AFTER_EXACT_CANONICAL_MERGE_ONLY"
-    assert "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_ACTIVATION" in project["next_action"]
+    assert "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0" in project["next_action"]
+    assert "create the separate" not in project["next_action"].lower()
+    assert project["state"] == "CLOSED_PASS"
     assert "PREREGISTER one bounded design" not in project["next_action"]
     assert project["targeted_rereview_used"] is True
     assert project["targeted_rereview_count"] == 1

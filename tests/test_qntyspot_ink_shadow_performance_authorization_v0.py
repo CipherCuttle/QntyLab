@@ -19,9 +19,19 @@ def load_project():
     return next(row for row in registry["project"] if row["project_id"] == "QNTYSPOT_INK_SHADOW_PERFORMANCE_AUTHORIZATION_V0")
 
 
+def load_parent_project():
+    registry = tomllib.loads(PROJECTS_PATH.read_text(encoding="utf-8"))
+    return next(row for row in registry["project"] if row["project_id"] == "QNTYSPOT_INK_SHADOW_PERFORMANCE_V0")
+
+
 def load_active_project():
     registry = tomllib.loads(PROJECTS_PATH.read_text(encoding="utf-8"))
     return next(row for row in registry["project"] if row["project_id"] == "QNTYSPOT_INK_SHADOW_PERFORMANCE_V0")
+
+
+def load_successor_project():
+    registry = tomllib.loads(PROJECTS_PATH.read_text(encoding="utf-8"))
+    return next(row for row in registry["project"] if row["state"] == "ACTIVE")
 
 
 def test_branch_local_candidate_does_not_self_authorize():
@@ -39,19 +49,20 @@ def test_branch_local_candidate_does_not_self_authorize():
     assert gate["exact_candidate_commit_must_be_ancestor_of_canonical_master"] is True
 
 
-def test_canonical_registry_closes_authorization_and_activates_exactly_one_successor():
+def test_canonical_registry_closes_authorization_and_preserves_parent_lineage():
     authorization = load_project()
-    active = load_active_project()
+    parent = load_parent_project()
+    active = load_successor_project()
     assert authorization["state"] == "CLOSED_PASS"
     assert authorization["candidate_state"] == "CANONICAL_AUTHORIZATION_EFFECTIVE"
     assert authorization["canonicalization_status"] == "EXACT_CANONICAL_MERGE_VERIFIED"
     assert authorization["authorization_candidate_commit"] == "b0c132468d4e637fa0d3197044f588081ba025e1"
     assert authorization["authorization_canonical_merge"] == "112e004ff516ef141a4dcf661d9ae4fe454aa85c"
+    assert parent["state"] == "CLOSED_PASS"
+    assert parent["governing_authorization_project_id"] == authorization["project_id"]
+    assert parent["governing_authorization_canonical_merge"] == "112e004ff516ef141a4dcf661d9ae4fe454aa85c"
     assert active["state"] == "ACTIVE"
-    assert active["governing_authorization_project_id"] == authorization["project_id"]
-    assert active["governing_authorization_canonical_merge"] == "112e004ff516ef141a4dcf661d9ae4fe454aa85c"
-    assert active["qntyspot_source_commit"] == "b9a84c59bd43e7697ee970d2a7571647e5de4501"
-    assert active["historical_data_cutoff_utc"] == "2026-08-25T17:02:37Z"
+    assert active["project_id"] == "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0"
     assert active["implementation_authorized"] is False
     registry = tomllib.loads(PROJECTS_PATH.read_text(encoding="utf-8"))
     assert [row for row in registry["project"] if row["state"] == "ACTIVE"] == [active]

@@ -4,6 +4,8 @@ import subprocess
 import tomllib
 from pathlib import Path
 
+from qntylab import project_context
+
 
 ROOT = Path(__file__).resolve().parents[1]
 ACTIVATION_PATH = ROOT / "experiments/research/qntyspot_ink_shadow_performance_dev_acquisition_activation_v0/activation.json"
@@ -11,6 +13,7 @@ PREREG_PATH = ROOT / "experiments/research/qntyspot_ink_shadow_performance_v0/pr
 PROJECTS_PATH = ROOT / "docs/state/projects.toml"
 PROJECT_ID = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_ACTIVATION_V0"
 FUTURE_PHASE = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0"
+PARENT_PROJECT = "QNTYSPOT_INK_SHADOW_PERFORMANCE_V0"
 CANONICAL_BASE = "3617633b4f88d3669ab58229aa9ca9bf5c2bee9e"
 PREREG_CANDIDATE_SHA = "74b1afb5bf49aadbf8e58caff58b7f31e387c918"
 PREREG_DIGEST = "27ce60c68133f40d9496df1db6009de07957ed8a9bd68b0715cc6c54fe05d18a"
@@ -22,9 +25,13 @@ def load(path):
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def project_record():
+def projects():
     registry = tomllib.loads(PROJECTS_PATH.read_text(encoding="utf-8"))
-    return next(row for row in registry["project"] if row["project_id"] == PROJECT_ID)
+    return registry["project"]
+
+
+def project_record(project_id=PROJECT_ID):
+    return next(row for row in projects() if row["project_id"] == project_id)
 
 
 def test_canonical_master_and_preregistration_are_exact():
@@ -60,11 +67,19 @@ def test_exactly_one_future_phase_and_dev_only_scope():
     assert future["project_id"] == FUTURE_PHASE
     assert future["exactly_one_future_phase"] is True
     assert future["future_phase_count"] == 1
-    assert "ACQUIRE_DEV_EVIDENCE_ONLY" in future["allowed_operations"]
-    assert set(future["forbidden_operations"]) >= {
-        "ACQUIRE_OUTER", "EVALUATE_CANDIDATES", "SELECT_CANDIDATE", "INSPECT_OUTER",
-        "FINAL_PERFORMANCE_CLASSIFICATION", "AUTHORIZE_TRADING_OR_CAPITAL",
-    }
+    assert future["allowed_operations"] == [
+        "SOURCE_QUALIFICATION",
+        "ESTABLISH_T0_OUTCOME_BLIND",
+        "COMPUTE_DEV_END",
+        "ACQUIRE_DEV_EVIDENCE_ONLY",
+        "ACQUIRE_DEV_GAS_RECEIPTS_AS_PREREGISTERED",
+        "BUILD_DEV_INTEGRITY_MANIFEST",
+    ]
+    assert future["forbidden_operations"] == [
+        "ACQUIRE_OUTER", "INSPECT_OUTER", "EVALUATE_CANDIDATES", "SELECT_CANDIDATE",
+        "FREEZE_WINNER", "BACKTEST_OUTER", "FINAL_PERFORMANCE_CLASSIFICATION",
+        "TRADING", "CAPITAL", "SIGNING", "APPROVAL", "BROADCAST", "PROMOTION",
+    ]
     assert future["outer_remains_inaccessible"] is True
 
 
@@ -125,6 +140,7 @@ def test_future_activation_requires_exact_merge_and_does_not_self_authorize():
     assert gate["preregistration_canonical_merge"] == CANONICAL_BASE
     assert gate["candidate_branch_is_authority"] is False
     assert gate["branch_local_candidate_does_not_self_authorize"] is True
+    assert gate["exact_candidate_commit_must_be_ancestor_of_canonical_master"] is True
     assert gate["activation_effective_on_branch"] is False
     assert gate["effective_only_after_exact_canonical_merge"] is True
     assert gate["effective_only_in_fresh_clean_worktree_from_origin_master"] is True
@@ -133,7 +149,21 @@ def test_future_activation_requires_exact_merge_and_does_not_self_authorize():
 def test_registry_binding_and_review_receipt_are_exact():
     activation = load(ACTIVATION_PATH)
     project = project_record()
-    assert project["state"] == "PLANNED_NOT_AUTHORIZED"
+    assert activation["phase_state"] == "PLANNED_NOT_AUTHORIZED"
+    assert activation["candidate_state"] == "ACTIVE_CANDIDATE"
+    transition = activation["canonical_state_transition"]
+    assert transition == {
+        "candidate_phase_state": "PLANNED_NOT_AUTHORIZED",
+        "canonical_phase_state": "CLOSED_PASS",
+        "successor_project_id": FUTURE_PHASE,
+        "canonical_successor_state": "ACTIVE",
+        "exactly_one_successor": True,
+        "effective_only_after_exact_canonical_merge": True,
+        "effective_only_in_fresh_clean_worktree_from_origin_master": True,
+    }
+    assert project["state"] == "CLOSED_PASS"
+    assert project["candidate_state"] == "CANONICAL_TERMINAL_EFFECTIVE"
+    assert project["canonicalization_status"] == "EXACT_CANONICAL_MERGE_TRANSITION_DECLARED"
     assert project["implementation_authorized"] is False
     assert project["canonical_base_sha"] == CANONICAL_BASE
     assert project["canonical_preregistration_digest"] == PREREG_DIGEST
@@ -149,6 +179,9 @@ def test_registry_binding_and_review_receipt_are_exact():
     assert project["trading_authority"] == "NONE"
     assert project["capital_authority"] == "NONE"
     assert project["hostile_review_count"] == activation["review_policy"]["hostile_review_count"] == 1
+    assert project["targeted_governance_rereview_used"] is True
+    assert project["targeted_governance_rereview_count"] == activation["review_policy"]["targeted_rereview_count"] == 1
+    assert project["targeted_governance_rereview_verdict"] == "PASS_NO_CRITICAL_HIGH"
     assert project["hostile_review_verdict"] == "PASS"
     receipt = (ACTIVATION_PATH.parent / "hostile_governance_review.md").read_text(encoding="utf-8")
     assert receipt.count("HOSTILE_REVIEW = PASS") == 1
@@ -169,3 +202,96 @@ def test_activation_and_registry_do_not_mutate_scientific_or_ledger_state():
 
 def test_activation_artifact_is_present_and_digestable():
     assert hashlib.sha256(ACTIVATION_PATH.read_bytes()).hexdigest()
+
+
+def test_canonical_transition_has_exactly_one_active_successor_and_no_parent_loop():
+    registry = projects()
+    successors = [row for row in registry if row["project_id"] == FUTURE_PHASE]
+    assert len(successors) == 1
+    successor = successors[0]
+    assert successor["state"] == "ACTIVE"
+    assert project_record(PARENT_PROJECT)["state"] == "CLOSED_PASS"
+    parent_next_action = project_record(PARENT_PROJECT)["next_action"]
+    assert FUTURE_PHASE in parent_next_action
+    assert "create the separate" not in parent_next_action.lower()
+    assert "exact canonical merge" in parent_next_action
+    assert "fresh clean worktree" in parent_next_action
+    assert [row for row in registry if row["state"] == "ACTIVE"] == [successor]
+
+
+def test_successor_binding_and_authority_ceiling_are_exact():
+    successor = project_record(FUTURE_PHASE)
+    assert successor["project_id"] == FUTURE_PHASE
+    assert successor["governing_activation_project_id"] == PROJECT_ID
+    assert successor["parent_project_id"] == PARENT_PROJECT
+    assert successor["canonical_preregistration_digest"] == PREREG_DIGEST
+    assert successor["qntyspot_source_commit"] == QNTYSPOT_SOURCE
+    assert successor["historical_data_cutoff_utc"] == CUTOFF
+    assert successor["permitted_operations"] == [
+        "SOURCE_QUALIFICATION", "ESTABLISH_T0_OUTCOME_BLIND", "COMPUTE_DEV_END",
+        "ACQUIRE_DEV_EVIDENCE_ONLY", "ACQUIRE_DEV_GAS_RECEIPTS_AS_PREREGISTERED",
+        "BUILD_DEV_INTEGRITY_MANIFEST",
+    ]
+    assert successor["forbidden_operations"] == [
+        "ACQUIRE_OUTER", "INSPECT_OUTER", "EVALUATE_CANDIDATES", "SELECT_CANDIDATE",
+        "FREEZE_WINNER", "BACKTEST_OUTER", "FINAL_PERFORMANCE_CLASSIFICATION",
+        "TRADING", "CAPITAL", "SIGNING", "APPROVAL", "BROADCAST", "PROMOTION",
+    ]
+    assert successor["implementation_authorized"] is False
+    assert successor["scientific_execution_authorized"] is False
+    assert successor["market_data_access_authorized"] is False
+    assert successor["historical_economic_outcome_inspection_authorized"] is False
+    assert successor["backtest_authorized"] is False
+    assert successor["strategy_test_authorized"] is False
+    assert successor["research_ledger_mutation_authorized"] is False
+    assert successor["trading_authority"] == "NONE"
+    assert successor["capital_authority"] == "NONE"
+
+
+def test_successor_outer_firewall_and_construction_receipts_remain_zero():
+    successor = project_record(FUTURE_PHASE)
+    assert successor["outer_data_acquired"] is False
+    assert successor["outer_outcome_inspected"] is False
+    assert successor["outer_evaluation_count"] == 0
+    for key in (
+        "market_network_count", "market_data_acquisition_count", "historical_outcome_read_count",
+        "backtest_count", "strategy_test_count",
+    ):
+        assert successor[key] == 0
+    assert successor["research_ledger_state_changed"] is False
+    assert successor["qntyspot_changed"] is False
+
+
+def test_canonical_successor_is_recognized_as_the_single_project_context_active_project():
+    _, _, registry = project_context.load_context_sources(ROOT)
+    validated = project_context.validate_projects_registry(ROOT, registry)
+    projection = project_context.execution_authority_projection(ROOT, validated)
+    assert projection["issues"] == []
+    assert projection["active_project"]["project_id"] == FUTURE_PHASE
+
+
+def test_scientific_research_ledger_and_qntyspot_bytes_are_unchanged():
+    assert subprocess.run(
+        ["git", "diff", "--quiet", CANONICAL_BASE, "HEAD", "--", "qntylab/qntyspot_ink_shadow_performance_prereg_v0.py", PREREG_PATH.relative_to(ROOT)],
+        cwd=ROOT,
+        check=False,
+    ).returncode == 0
+    for pathspec in ("experiments/research/ledger", "qntyspot"):
+        assert subprocess.run(
+            ["git", "diff", "--name-only", CANONICAL_BASE, "HEAD", "--", pathspec],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+            check=True,
+        ).stdout == ""
+
+
+def test_exactly_one_targeted_rereview_passed_without_repeating_hostile_review():
+    rereview = (ACTIVATION_PATH.parent / "targeted_rereview.md").read_text(encoding="utf-8")
+    assert rereview.count("TARGETED_REREVIEW = PASS") == 1
+    assert rereview.count("CRITICAL = 0") == 1
+    assert rereview.count("HIGH = 0") == 1
+    assert "canonical state transition" in rereview.lower()
+    assert "parent continuation" in rereview.lower()
+    assert "branch-local self-authorization" in rereview.lower()
+    assert "outer firewall" in rereview.lower()

@@ -15,10 +15,20 @@
     "preregistration_canonical_merge": "3617633b4f88d3669ab58229aa9ca9bf5c2bee9e",
     "candidate_branch_is_authority": false,
     "branch_local_candidate_does_not_self_authorize": true,
+    "exact_candidate_commit_must_be_ancestor_of_canonical_master": true,
     "activation_effective_on_branch": false,
     "effective_only_after_exact_canonical_merge": true,
     "effective_only_in_fresh_clean_worktree_from_origin_master": true,
     "canonical_drift_behavior": "STOP_SOURCE_CONFLICT"
+  },
+  "canonical_state_transition": {
+    "candidate_phase_state": "PLANNED_NOT_AUTHORIZED",
+    "canonical_phase_state": "CLOSED_PASS",
+    "successor_project_id": "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0",
+    "canonical_successor_state": "ACTIVE",
+    "exactly_one_successor": true,
+    "effective_only_after_exact_canonical_merge": true,
+    "effective_only_in_fresh_clean_worktree_from_origin_master": true
   },
   "governing_binding": {
     "governing_authorization_project_id": "QNTYSPOT_INK_SHADOW_PERFORMANCE_AUTHORIZATION_V0",
@@ -54,20 +64,27 @@
     "exactly_one_future_phase": true,
     "future_phase_count": 1,
     "allowed_operations": [
-      "QUALIFY_OUTCOME_BLIND_SOURCES",
-      "DISCOVER_T0_MECHANICALLY",
+      "SOURCE_QUALIFICATION",
+      "ESTABLISH_T0_OUTCOME_BLIND",
+      "COMPUTE_DEV_END",
       "ACQUIRE_DEV_EVIDENCE_ONLY",
-      "PERSIST_REPLAYABLE_DEV_PACKAGE",
-      "REPORT_INSUFFICIENT_HISTORY_OR_DEV_PACKAGE_INTEGRITY_FAILURE"
+      "ACQUIRE_DEV_GAS_RECEIPTS_AS_PREREGISTERED",
+      "BUILD_DEV_INTEGRITY_MANIFEST"
     ],
     "forbidden_operations": [
       "ACQUIRE_OUTER",
+      "INSPECT_OUTER",
       "EVALUATE_CANDIDATES",
       "SELECT_CANDIDATE",
       "FREEZE_WINNER",
-      "INSPECT_OUTER",
+      "BACKTEST_OUTER",
       "FINAL_PERFORMANCE_CLASSIFICATION",
-      "AUTHORIZE_TRADING_OR_CAPITAL"
+      "TRADING",
+      "CAPITAL",
+      "SIGNING",
+      "APPROVAL",
+      "BROADCAST",
+      "PROMOTION"
     ],
     "outer_remains_inaccessible": true
   },
@@ -217,7 +234,10 @@
     "exactly_one_independent_hostile_review_required": true,
     "hostile_review_count": 1,
     "critical_high_fix_pass_limit": 1,
-    "targeted_rereview_only_if_critical_or_high_repaired": true
+    "targeted_rereview_only_if_critical_or_high_repaired": true,
+    "targeted_rereview_count": 1,
+    "targeted_rereview_scope": "CANONICAL_TRANSITION_PARENT_LOOP_BRANCH_SELF_AUTHORIZATION_DEV_ONLY_OUTER_FAIL_CLOSED",
+    "targeted_rereview_verdict": "PASS_NO_CRITICAL_HIGH"
   },
   "terminal_outcome": "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_ACTIVATION_V0_CANDIDATE_READY"
 }

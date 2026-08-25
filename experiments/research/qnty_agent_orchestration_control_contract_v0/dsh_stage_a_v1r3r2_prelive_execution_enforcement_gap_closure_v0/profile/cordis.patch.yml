@@ -66,6 +66,14 @@
         claimRef: !!js process.env.QNTYLAB_DSH_CLAIM_REF
         claimSourceRepo: !!js process.env.QNTYLAB_DSH_CLAIM_SOURCE_REPO
         sessionNonce: !!js process.env.QNTYLAB_DSH_SESSION_NONCE
+        # Claim binding — transported EXACTLY as supplied by the authorized
+        # launcher env (never transformed, never re-interpreted). Profile is
+        # transport only.
+        authorizedExecutionSourceSha: !!js process.env.QNTYLAB_DSH_AUTHORIZED_EXECUTION_SOURCE_SHA
+        executionContractRoot: !!js process.env.QNTYLAB_DSH_EXECUTION_CONTRACT_ROOT
+        runtimeIdentityDigest: !!js process.env.QNTYLAB_DSH_RUNTIME_IDENTITY_DIGEST
+        executableIdentityDigest: !!js process.env.QNTYLAB_DSH_EXECUTABLE_IDENTITY_DIGEST
+        revocationState: !!js process.env.QNTYLAB_DSH_REVOCATION_STATE
         qntyLabRoot: !!js process.env.QNTYLAB_ROOT
         pythonExecutable: !!js process.env.QNTYLAB_PYTHON
     - id: tool-subagent-codex

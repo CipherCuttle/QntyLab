@@ -18,6 +18,8 @@ import { join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { preflightLaunch, parseLauncherArgv } from '../../dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/launcher/qntylab-launch-dsh.mjs'
+import { executableIdentityFromManifest, runtimeIdentityFromManifest } from '../../dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/evidence/compute-digests.mjs'
+import { sha256Canonical } from '../../dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/evidence/canonical-json.mjs'
 import {
   DEFAULT_RUNTIME_MANIFEST,
   MaterializationError,
@@ -28,7 +30,16 @@ import {
 import { FIXTURE, computeFixtureIdentity, computeSuccessorContract } from '../contract/successor-contract.mjs'
 
 const PHASE = resolve(fileURLToPath(import.meta.url), '../..')
-export const SUCCESSOR_CONTRACT_ARTIFACT = join(PHASE, 'evidence/successor_contract.json')
+
+/**
+ * The CURRENT-generation successor artifact. Lives at a NEW path so the
+ * historical successor_contract.json (sha256 9bb1f217…) remains byte-identical
+ * and is never overwritten by current derivation.
+ */
+export const SUCCESSOR_CONTRACT_ARTIFACT = join(PHASE, 'evidence/successor_contract_v1r3r2_reconciliation_v0.json')
+
+/** The historical successor contract artifact, preserved and immutable. */
+export const HISTORICAL_SUCCESSOR_CONTRACT_ARTIFACT = join(PHASE, 'evidence/successor_contract.json')
 
 /** The real Stage-A secret. This module never reads it; the path stops before it. */
 export const REAL_SECRET_PATH = `${process.env.HOME ?? '/home/swirky'}/.secrets/openai_api_key_stage_a`
@@ -103,7 +114,8 @@ export function prepareProductionLaunch({
   }
   gates.DSH_HOME_IDENTITY = 'PASS'
 
-  // 3. SUCCESSOR CONTRACT, computed against the freshly materialized home
+  // 3. SUCCESSOR CONTRACT, computed against the freshly materialized home and
+  //    the CURRENT composite root (derived from CURRENT resolved inputs).
   const successor = computeSuccessorContract({
     homeManifest: materialization.identityBody,
     profileHome: materialization.destination,
@@ -111,21 +123,39 @@ export function prepareProductionLaunch({
     qntyLabRoot,
   })
   if (successor.contract.LIVE_AUTHORITY !== false) failWith('BLOCK_SUCCESSOR_CONTRACT', 'successor contract must not grant live authority')
-  // The frozen artifact is mandatory, not opportunistic: it is the binding that
-  // detects a substituted materializer or home identity, so its absence must
-  // fail closed rather than silently disable the check.
+  if (successor.currentCompositeRoot !== successor.contract.currentCompositeRoot) {
+    failWith('BLOCK_SUCCESSOR_CONTRACT', 'current composite root is not consistently derived')
+  }
+  // The CURRENT-generation artifact lives at a NEW path so the historical
+  // artifact (sha256 9bb1f217…) stays byte-identical. The artifact is mandatory,
+  // not opportunistic: it is the binding that detects a substituted materializer
+  // or home identity, so its absence must fail closed rather than silently
+  // disable the check.
   if (!existsSync(SUCCESSOR_CONTRACT_ARTIFACT)) {
-    failWith('BLOCK_SUCCESSOR_CONTRACT', `frozen successor contract artifact is missing: ${SUCCESSOR_CONTRACT_ARTIFACT}`)
+    failWith('BLOCK_SUCCESSOR_CONTRACT', `current successor contract artifact is missing: ${SUCCESSOR_CONTRACT_ARTIFACT}`)
   }
   const frozen = JSON.parse(readFileSync(SUCCESSOR_CONTRACT_ARTIFACT, 'utf8'))
   if (frozen.NEW_QUALIFIED_LAUNCH_CONTRACT_DIGEST !== successor.NEW_QUALIFIED_LAUNCH_CONTRACT_DIGEST) {
-    failWith('BLOCK_SUCCESSOR_CONTRACT', 'frozen successor contract artifact does not match recomputed component bytes')
+    failWith('BLOCK_SUCCESSOR_CONTRACT', 'current successor contract artifact does not match recomputed component bytes')
   }
   gates.SUCCESSOR_CONTRACT = 'PASS'
-  gates.RUNTIME_IDENTITY = successor.predecessorComposite.runtimeManifestDigest === '0e09b9d9d977f73d146c4a35d497cc93bd046bae016e1b1a6a52b481f07731b3' ? 'PASS' : 'FAIL'
-  gates.EXECUTABLE_IDENTITY = successor.predecessorComposite.executableIdentityDigest === 'ae07ece34c88b3ebaebd7452df8d136c82935f9c8ec9df16a40e50a2582a2fd9' ? 'PASS' : 'FAIL'
-  if (gates.RUNTIME_IDENTITY !== 'PASS') failWith('BLOCK_RUNTIME_IDENTITY', 'pinned runtime identity is not the frozen identity')
-  if (gates.EXECUTABLE_IDENTITY !== 'PASS') failWith('BLOCK_EXECUTABLE_IDENTITY', 'executable identity is not the frozen identity')
+
+  // Runtime/executable identity gates use EXPLICIT RESOLVED INPUTS — the
+  // runtime manifest body and executable fingerprint identity derived from the
+  // current runtime manifest — NOT hardcoded digest constants, and NOT values
+  // recovered circularly from the current root. See DAG acyclicity.
+  const runtimeDigest = sha256Canonical(runtimeIdentityFromManifest(
+    JSON.parse(readFileSync(runtimeManifestPath, 'utf8')),
+  ))
+  const executableDigest = sha256Canonical(executableIdentityFromManifest(
+    JSON.parse(readFileSync(runtimeManifestPath, 'utf8')),
+  ))
+  gates.RUNTIME_IDENTITY = successor.predecessorComposite.runtimeManifestDigest === runtimeDigest &&
+    successor.predecessorComposite.runtimeManifestDigest === successor.contract.runtimeManifestDigest ? 'PASS' : 'FAIL'
+  gates.EXECUTABLE_IDENTITY = successor.predecessorComposite.executableIdentityDigest === executableDigest &&
+    successor.predecessorComposite.executableIdentityDigest === successor.contract.executableIdentityDigest ? 'PASS' : 'FAIL'
+  if (gates.RUNTIME_IDENTITY !== 'PASS') failWith('BLOCK_RUNTIME_IDENTITY', 'pinned runtime identity is not the resolved manifest input')
+  if (gates.EXECUTABLE_IDENTITY !== 'PASS') failWith('BLOCK_EXECUTABLE_IDENTITY', 'executable identity is not the resolved manifest input')
 
   // 4. DISPOSABLE WORKSPACE. Created here, inside the single production
   //    preparation path, so no caller — qualification or live — has to create a
@@ -138,7 +168,7 @@ export function prepareProductionLaunch({
 
   // 5. PRODUCTION COMPOSITE PREFLIGHT — the exact qualified launcher boundary
   const args = parseLauncherArgv([
-    '--qualified-launch-contract-digest', successor.predecessorComposite.NEW_QUALIFIED_LAUNCH_CONTRACT_DIGEST,
+    '--qualified-launch-contract-digest', successor.currentCompositeRoot,
     '--runtime-manifest', runtimeManifestPath,
     '--workspace', workspace,
     '--dsh-home', materialization.destination,
@@ -160,7 +190,33 @@ export function prepareProductionLaunch({
   const fixture = prepareProductionFixture(fixtureDestination, { qntyLabRoot })
   gates.FIXTURE_IDENTITY = 'PASS'
 
-  // 8. STOP. The next operation a live episode would perform is the real secret
+  // 8. RESOLVED PRODUCTION IDENTITY — the claim-binding payload the ACTUAL sole
+  //    production claim owner consumes. These three values originate from THIS
+  //    SAME preparation execution and are mechanically derived (never stale
+  //    literals, never recovered from historical artifacts):
+  //      - executionContractRoot: the CURRENT composite root, re-derived from the
+  //        freshly materialized production home and the CURRENT resolved runtime
+  //        manifest (successor.currentCompositeRoot above).
+  //      - runtimeIdentityDigest / executableIdentityDigest: the resolved
+  //        manifest-derived identities computed in gates RUNTIME_IDENTITY /
+  //        EXECUTABLE_IDENTITY above.
+  //    Future-authority inputs (authorizedExecutionSourceSha, revocationState)
+  //    are intentionally NOT invented here: they remain future live invocation
+  //    inputs and stay out of preparation.
+  const resolvedProductionIdentity = Object.freeze({
+    executionContractRoot: successor.currentCompositeRoot,
+    runtimeIdentityDigest: runtimeDigest,
+    executableIdentityDigest: executableDigest,
+  })
+  if (!/^[0-9a-fA-F]{64}$/.test(resolvedProductionIdentity.executionContractRoot)) {
+    failWith('BLOCK_RUNTIME_IDENTITY', 'resolved execution contract root is not a valid sha256')
+  }
+  if (!/^[0-9a-fA-F]{64}$/.test(resolvedProductionIdentity.runtimeIdentityDigest)
+    || !/^[0-9a-fA-F]{64}$/.test(resolvedProductionIdentity.executableIdentityDigest)) {
+    failWith('BLOCK_RUNTIME_IDENTITY', 'resolved production identity digests are not valid sha256')
+  }
+
+  // 9. STOP. The next operation a live episode would perform is the real secret
   //    read. That boundary is not crossed here.
   gates.ALL_NON_SECRET_GATES = Object.values(gates).every(value => value === 'PASS') ? 'PASS' : 'FAIL'
 
@@ -172,6 +228,10 @@ export function prepareProductionLaunch({
     successor,
     fixture,
     workspaceReal,
+    // Resolved production identity for the claim binding. Consumed by the
+    // authorized Stage-A launcher transport; carried unchanged into the
+    // production claim owner.
+    resolvedProductionIdentity,
     stoppedBefore: 'REAL_SECRET_READ',
     realSecretPathNotRead: REAL_SECRET_PATH,
     counters: {

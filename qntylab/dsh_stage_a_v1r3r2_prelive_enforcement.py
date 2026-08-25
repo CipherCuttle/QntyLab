@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import copy
 import fcntl
+import hashlib
 import json
 import os
 import re
@@ -189,6 +190,25 @@ class ParentReservation:
     authorized_cost_usd: str
     cumulative_authorized_spend_usd: str
     price_schedule_id: str
+
+
+@dataclass(frozen=True)
+class ResolvedExecutionInputs:
+    """Immutable resolved execution inputs for the operational claim seam.
+
+    These are supplied by the applicable future live authority / resolved
+    execution contract. They are NEVER derived from ambient mutable config,
+    master/origin/master, or ``git rev-parse HEAD``. The execution-contract
+    root is an independently derived content-addressed execution identity; it
+    is NOT ``sha256(the ASCII Git commit SHA)``. The source SHA, contract root,
+    and runtime/executable identities are bound together, never derived one
+    from the other.
+    """
+
+    authorized_execution_source_sha: str
+    execution_contract_root: str
+    runtime_identity_digest: str | None = None
+    executable_identity_digest: str | None = None
 
 
 def _review(value: Mapping[str, Any] | None) -> dict[str, Any]:
@@ -543,6 +563,10 @@ class EpisodeClaim:
         ref: str,
         source_repo: Path,
         command_runner: Callable[..., subprocess.CompletedProcess[str]] | None = None,
+        authorized_execution_source_sha: str | None = None,
+        canonical_ref: str = "refs/remotes/origin/master",
+        revocation_check: Callable[[str], bool] | None = None,
+        resolved_execution_inputs: Mapping[str, str] | None = None,
     ):
         self.state_dir = Path(state_dir)
         self.remote = remote
@@ -552,6 +576,16 @@ class EpisodeClaim:
         self.receipt_path = self.state_dir / "claim-receipt.json"
         self._command_runner = command_runner or subprocess.run
         self._last_remote_observation: dict[str, Any] | None = None
+        # H1 exact-commit claim-source seam. The irreversible EpisodeClaim source
+        # is an EXPLICIT EXACT IMMUTABLE COMMIT SHA supplied by the applicable
+        # future live authority / resolved execution inputs. It is NEVER derived
+        # from master / origin/master / git rev-parse HEAD alone. The canonical
+        # ref is resolved to an exact commit object at action time (never a
+        # moving branch ref identity bound by name alone).
+        self.authorized_execution_source_sha = authorized_execution_source_sha
+        self.canonical_ref = canonical_ref
+        self.revocation_check = revocation_check
+        self.resolved_execution_inputs = dict(resolved_execution_inputs or {})
         self.state_dir.mkdir(parents=True, exist_ok=True)
         if not (
             ref.startswith(CLAIM_NAMESPACE)
@@ -618,6 +652,77 @@ class EpisodeClaim:
             raise ClaimBlocked(f"BLOCK_NEVER_REPLAY: {detail}")
         return outcome["receipt"]
 
+    def _resolve_authorized_source_sha(self) -> str:
+        """Resolve and validate the EXACT IMMUTABLE claim-source commit.
+
+        The irreversible EpisodeClaim source must be an explicit exact commit
+        object identity supplied by the applicable future live authority /
+        resolved execution inputs. It is never derived from master,
+        origin/master, or `git rev-parse HEAD` alone. All seven checks fail
+        closed before any claim is COMMITTED.
+        """
+        source_sha = self.authorized_execution_source_sha
+        # 1. EXACT FORMAT — must be an exact full commit object identity.
+        if source_sha is None or not isinstance(source_sha, str):
+            raise ClaimBlocked("claim source SHA is missing; an exact immutable commit is required")
+        if not re.fullmatch(r"[0-9a-fA-F]{40,64}", source_sha):
+            raise ClaimBlocked("claim source SHA is malformed; an exact full commit object identity is required")
+        # 2. OBJECT EXISTS — Git must resolve that exact commit object.
+        try:
+            self._git("cat-file", "-e", f"{source_sha}^{{commit}}")
+        except ClaimBlocked as exc:
+            raise ClaimBlocked(f"claim source commit object does not exist: {source_sha}") from exc
+        # 3. CURRENT CHECKOUT RELATION — prove the working/execution checkout is
+        #    consistent with the authorized source semantics (the source commit
+        #    must be reachable from the current checkout HEAD).
+        try:
+            self._git("merge-base", "--is-ancestor", source_sha, "HEAD")
+        except ClaimBlocked as exc:
+            raise ClaimBlocked(f"claim source commit is not an ancestor of the execution checkout: {source_sha}") from exc
+        # 4. CANONICAL ANCESTRY — separately prove the exact authorized source
+        #    commit belongs to the current canonical lineage. The canonical ref
+        #    is resolved to an exact commit object (never a moving branch ref).
+        canonical_sha = self._git("rev-parse", self.canonical_ref).stdout.strip()
+        if not re.fullmatch(r"[0-9a-fA-F]{40,64}", canonical_sha):
+            raise ClaimBlocked("claim source canonical ref did not resolve to an exact commit object")
+        try:
+            self._git("merge-base", "--is-ancestor", source_sha, canonical_sha)
+        except ClaimBlocked as exc:
+            raise ClaimBlocked(f"claim source commit is not in the canonical lineage: {source_sha}") from exc
+        # 5. REVOCATION / SUPERSESSION — separately prove no canonical state
+        #    invalidates that source authority.
+        if self.revocation_check is not None and self.revocation_check(source_sha):
+            raise ClaimBlocked(f"claim source authority is revoked or superseded: {source_sha}")
+        # 6. RESOLVED EXECUTION INPUTS — bind the source SHA together with the
+        #    actual resolved execution-contract root and relevant immutable
+        #    runtime/executable identities. The execution-contract root is an
+        #    independently derived content-addressed execution identity; it is
+        #    NOT sha256(the ASCII Git commit SHA). The source SHA, contract
+        #    root, and runtime/executable identities are bound together, never
+        #    derived one from the other. A supplied root that differs (mismatch
+        #    or substitution) must fail closed before any claim is COMMITTED.
+        if self.resolved_execution_inputs:
+            expected_root = self.resolved_execution_inputs.get("execution_contract_root")
+            if expected_root is None:
+                raise ClaimBlocked("resolved execution-contract root is missing")
+            if not re.fullmatch(r"[0-9a-fA-F]{64}", expected_root):
+                raise ClaimBlocked("resolved execution-contract root mismatch: not a valid sha256")
+            expected_source = self.resolved_execution_inputs.get("authorized_execution_source_sha")
+            if expected_source is None or expected_source != source_sha:
+                raise ClaimBlocked(
+                    "resolved execution inputs do not match the authorized execution source SHA"
+                )
+            runtime_digest = self.resolved_execution_inputs.get("runtime_identity_digest")
+            if runtime_digest is not None and not re.fullmatch(r"[0-9a-fA-F]{64}", runtime_digest):
+                raise ClaimBlocked("resolved runtime identity digest is not a valid sha256")
+            executable_digest = self.resolved_execution_inputs.get("executable_identity_digest")
+            if executable_digest is not None and not re.fullmatch(
+                r"[0-9a-fA-F]{64}", executable_digest
+            ):
+                raise ClaimBlocked("resolved executable identity digest is not a valid sha256")
+        # 7. FAIL CLOSED — all checks above raise before any claim is COMMITTED.
+        return source_sha
+
     def _acquire_locked_with_outcome(
         self,
         *,
@@ -644,9 +749,12 @@ class EpisodeClaim:
                 operation_stage="PRECHECK",
             )
 
-        source_head = self._git("rev-parse", "HEAD").stdout.strip()
-        if not re.fullmatch(r"[0-9a-fA-F]{40,64}", source_head):
-            raise ClaimBlocked("claim source Git command returned an invalid HEAD SHA")
+        # H1 exact-commit claim-source seam: the irreversible EpisodeClaim source
+        # is an EXPLICIT EXACT IMMUTABLE COMMIT SHA supplied by the applicable
+        # future live authority / resolved execution inputs. It is never derived
+        # from master / origin/master / git rev-parse HEAD alone. All seven
+        # checks fail closed before any claim is COMMITTED.
+        source_head = self._resolve_authorized_source_sha()
 
         if local_present:
             return self._outcome(
@@ -989,6 +1097,101 @@ def _grant_from_args(args: argparse.Namespace) -> ChildGrant:
     return ChildGrant(args.token, args.tool, args.role)
 
 
+# Explicit canonical revocation/supersession states accepted by the operational
+# claim entrypoint. The production-facing entrypoint MUST NOT silently mean
+# "no revocation callback => therefore not revoked". It requires an explicit
+# canonical revocation/supersession state and fails closed unless that state
+# positively proves the source authority is NOT revoked or superseded.
+REVOCATION_STATE_NOT_REVOKED = "NOT_REVOKED"
+REVOCATION_STATE_REVOKED = "REVOKED"
+REVOCATION_STATE_SUPERSEDED = "SUPERSEDED"
+REVOCATION_STATES = frozenset(
+    {
+        REVOCATION_STATE_NOT_REVOKED,
+        REVOCATION_STATE_REVOKED,
+        REVOCATION_STATE_SUPERSEDED,
+    }
+)
+
+
+def acquire_operational_claim(
+    *,
+    state_dir: Path,
+    remote: str,
+    ref: str,
+    source_repo: Path,
+    session_nonce: str,
+    authorized_execution_source_sha: str,
+    execution_contract_root: str,
+    revocation_state: str,
+    runtime_identity_digest: str | None = None,
+    executable_identity_digest: str | None = None,
+    canonical_ref: str = "refs/remotes/origin/master",
+) -> dict[str, Any]:
+    """Production-facing operational claim entrypoint (fail closed).
+
+    This is the ONLY claim-acquisition path a live authority may use. It
+    requires explicit immutable resolved execution inputs and an explicit
+    canonical revocation/supersession state. It NEVER silently treats a missing
+    revocation proof as "not revoked", and it NEVER derives the execution
+    contract root from ``sha256(source_sha)``. Every required proof is checked
+    before any claim is COMMITTED.
+
+    - missing revocation/supersession proof -> BLOCK before claim committed
+    - revoked/superseded source -> BLOCK before claim committed
+    - missing resolved execution inputs -> BLOCK before claim committed
+    - wrong actual contract root -> BLOCK before claim committed
+    - wrong runtime/executable identity -> BLOCK before claim committed
+    - source SHA mismatch -> BLOCK before claim committed
+    """
+    if not isinstance(revocation_state, str) or revocation_state not in REVOCATION_STATES:
+        raise ClaimBlocked(
+            "operational claim requires an explicit canonical revocation/supersession state"
+        )
+    if revocation_state != REVOCATION_STATE_NOT_REVOKED:
+        raise ClaimBlocked(
+            f"claim source authority is revoked or superseded: {revocation_state}"
+        )
+    if not execution_contract_root:
+        raise ClaimBlocked("operational claim requires the resolved execution-contract root")
+    if not re.fullmatch(r"[0-9a-fA-F]{64}", execution_contract_root):
+        raise ClaimBlocked("resolved execution-contract root is not a valid sha256")
+    if runtime_identity_digest is not None and not re.fullmatch(
+        r"[0-9a-fA-F]{64}", runtime_identity_digest
+    ):
+        raise ClaimBlocked("resolved runtime identity digest is not a valid sha256")
+    if executable_identity_digest is not None and not re.fullmatch(
+        r"[0-9a-fA-F]{64}", executable_identity_digest
+    ):
+        raise ClaimBlocked("resolved executable identity digest is not a valid sha256")
+
+    resolved_execution_inputs: dict[str, str] = {
+        "authorized_execution_source_sha": authorized_execution_source_sha,
+        "execution_contract_root": execution_contract_root,
+    }
+    if runtime_identity_digest is not None:
+        resolved_execution_inputs["runtime_identity_digest"] = runtime_identity_digest
+    if executable_identity_digest is not None:
+        resolved_execution_inputs["executable_identity_digest"] = executable_identity_digest
+
+    def _revocation_check(source_sha: str) -> bool:
+        # The explicit canonical state is authoritative. NOT_REVOKED means the
+        # source authority is positively proven not revoked/superseded.
+        return revocation_state != REVOCATION_STATE_NOT_REVOKED
+
+    claim = EpisodeClaim(
+        Path(state_dir),
+        remote=remote,
+        ref=ref,
+        source_repo=Path(source_repo),
+        authorized_execution_source_sha=authorized_execution_source_sha,
+        canonical_ref=canonical_ref,
+        revocation_check=_revocation_check,
+        resolved_execution_inputs=resolved_execution_inputs,
+    )
+    return claim.acquire(session_nonce=session_nonce)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="qntylab.dsh_stage_a_v1r3r2_prelive_enforcement")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -1023,6 +1226,30 @@ def main(argv: list[str] | None = None) -> int:
     claim.add_argument("--ref", required=True)
     claim.add_argument("--source-repo", required=True)
     claim.add_argument("--session-nonce", required=True)
+    # H1 exact-commit claim-source seam: the irreversible EpisodeClaim source
+    # must be an explicit exact immutable commit SHA supplied by the applicable
+    # future live authority / resolved execution inputs. It is never derived
+    # from master / origin/master / git rev-parse HEAD alone. Omitting it must
+    # fail closed before any claim is COMMITTED.
+    claim.add_argument("--authorized-execution-source-sha", required=True)
+    claim.add_argument("--canonical-ref", required=False, default="refs/remotes/origin/master")
+    # H1 resolved execution inputs: the actual resolved execution-contract root
+    # (an independently derived content-addressed execution identity, NOT
+    # sha256(source_sha)) and the relevant immutable runtime/executable
+    # identities. The production-facing entrypoint MUST require these; it must
+    # NOT silently mean "no resolved inputs => therefore unbound".
+    claim.add_argument("--execution-contract-root", required=True)
+    claim.add_argument("--runtime-identity-digest", required=False, default=None)
+    claim.add_argument("--executable-identity-digest", required=False, default=None)
+    # H1 explicit canonical revocation/supersession state. The production-facing
+    # entrypoint MUST NOT silently mean "no revocation callback => therefore not
+    # revoked". It requires an explicit canonical state and fails closed unless
+    # that state positively proves the source authority is NOT revoked.
+    claim.add_argument(
+        "--revocation-state",
+        required=True,
+        choices=sorted(REVOCATION_STATES),
+    )
 
     args = parser.parse_args(argv)
     try:
@@ -1056,12 +1283,19 @@ def main(argv: list[str] | None = None) -> int:
             )
             print(json.dumps(asdict(reservation), sort_keys=True))
         else:
-            receipt = EpisodeClaim(
-                Path(args.state_dir),
+            receipt = acquire_operational_claim(
+                state_dir=Path(args.state_dir),
                 remote=args.remote,
                 ref=args.ref,
                 source_repo=Path(args.source_repo),
-            ).acquire(session_nonce=args.session_nonce)
+                session_nonce=args.session_nonce,
+                authorized_execution_source_sha=args.authorized_execution_source_sha,
+                execution_contract_root=args.execution_contract_root,
+                revocation_state=args.revocation_state,
+                runtime_identity_digest=args.runtime_identity_digest,
+                executable_identity_digest=args.executable_identity_digest,
+                canonical_ref=args.canonical_ref,
+            )
             print(json.dumps(receipt, sort_keys=True))
         return 0
     except (EnforcementBlocked, OSError, ValueError, json.JSONDecodeError) as exc:

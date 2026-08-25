@@ -226,11 +226,18 @@ def claim_fixture(tmp_path: Path) -> tuple[Path, Path]:
 
 def _claim(tmp_path: Path, state: str = "state", suffix: str = "fresh") -> EpisodeClaim:
     remote, source = claim_fixture(tmp_path)
+    head = _git(source, "rev-parse", "HEAD")
     return EpisodeClaim(
         tmp_path / state,
         remote=str(remote),
         ref=f"refs/heads/qntylab-claims/offline-test-{suffix}",
         source_repo=source,
+        # H1 exact-commit claim-source seam: the source is an EXPLICIT exact
+        # immutable source SHA (the fixture head), never ambient HEAD. The
+        # canonical ref is the exact fixture commit object (deterministic
+        # scratch lineage; no remote-tracking ref needed).
+        authorized_execution_source_sha=head,
+        canonical_ref=head,
     )
 
 
@@ -246,6 +253,8 @@ def test_claim_fresh_remote_and_local_succeeds_then_restart_blocks_replay(tmp_pa
             remote=claim.remote,
             ref=claim.ref,
             source_repo=claim.source_repo,
+            authorized_execution_source_sha=claim.authorized_execution_source_sha,
+            canonical_ref=claim.canonical_ref,
         ).acquire(session_nonce="session-2")
 
 
@@ -257,6 +266,8 @@ def test_claim_remote_already_present_and_local_already_present_both_block(tmp_p
         remote=remote_claim.remote,
         ref=remote_claim.ref,
         source_repo=remote_claim.source_repo,
+        authorized_execution_source_sha=remote_claim.authorized_execution_source_sha,
+        canonical_ref=remote_claim.canonical_ref,
     )
     with pytest.raises(ClaimBlocked, match="BLOCK_NEVER_REPLAY"):
         contender.acquire(session_nonce="loser")
@@ -271,8 +282,16 @@ def test_claim_remote_already_present_and_local_already_present_both_block(tmp_p
 def test_claim_simultaneous_contenders_have_exactly_one_remote_winner(tmp_path: Path) -> None:
     remote, source = claim_fixture(tmp_path)
     ref = "refs/heads/qntylab-claims/offline-test-concurrent"
+    head = _git(source, "rev-parse", "HEAD")
     claims = [
-        EpisodeClaim(tmp_path / f"state-{index}", remote=str(remote), ref=ref, source_repo=source)
+        EpisodeClaim(
+            tmp_path / f"state-{index}",
+            remote=str(remote),
+            ref=ref,
+            source_repo=source,
+            authorized_execution_source_sha=head,
+            canonical_ref=head,
+        )
         for index in range(2)
     ]
     outcomes: list[str] = []
@@ -312,6 +331,8 @@ def test_claim_crash_or_ambiguous_result_never_reenables_transition(
             remote=claim.remote,
             ref=claim.ref,
             source_repo=claim.source_repo,
+            authorized_execution_source_sha=claim.authorized_execution_source_sha,
+            canonical_ref=claim.canonical_ref,
         ).acquire(session_nonce="session-2")
 
 
@@ -328,6 +349,7 @@ def test_claim_local_success_then_remote_failure_shape_blocks_without_remote_wri
 
 def test_claim_durable_intent_then_actual_remote_push_failure_blocks_restart(tmp_path: Path) -> None:
     _remote, source = claim_fixture(tmp_path)
+    head = _git(source, "rev-parse", "HEAD")
 
     class MissingRemoteClaim(EpisodeClaim):
         def remote_exists(self) -> bool:
@@ -338,6 +360,8 @@ def test_claim_durable_intent_then_actual_remote_push_failure_blocks_restart(tmp
         remote=str(tmp_path / "missing-remote.git"),
         ref="refs/heads/qntylab-claims/offline-test-remote-failure",
         source_repo=source,
+        authorized_execution_source_sha=head,
+        canonical_ref=head,
     )
     with pytest.raises(ClaimBlocked, match="remote create-only claim failed"):
         claim.acquire(session_nonce="session-1")
@@ -349,11 +373,14 @@ def test_claim_durable_intent_then_actual_remote_push_failure_blocks_restart(tmp
 
 def test_claim_ambiguous_remote_presence_blocks_without_writing_local_state(tmp_path: Path) -> None:
     _remote, source = claim_fixture(tmp_path)
+    head = _git(source, "rev-parse", "HEAD")
     claim = EpisodeClaim(
         tmp_path / "state",
         remote=str(tmp_path / "unreadable-remote.git"),
         ref="refs/heads/qntylab-claims/offline-test-ambiguous-presence",
         source_repo=source,
+        authorized_execution_source_sha=head,
+        canonical_ref=head,
     )
     with pytest.raises(ClaimBlocked, match="remote claim presence is ambiguous"):
         claim.acquire(session_nonce="session-1")

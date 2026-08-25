@@ -57,7 +57,9 @@ next_action = "CLOSED_PASS: the authorization is canonical and terminal. Its one
 [[project]]
 project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_V0"
 display_name = "QntySpot Ink shadow performance research V0"
-state = "ACTIVE"
+state = "CLOSED_PASS"
+candidate_state = "CANONICAL_CONTINUATION_BOUND"
+canonicalization_status = "EXACT_CANONICAL_MERGE_TRANSITION_DECLARED"
 authority_level = "BOUNDED_RESEARCH_AUTHORIZATION_ONLY"
 phase_type = "BOUNDED_RESEARCH_PHASE"
 authoritative_artifacts = [
@@ -128,7 +130,166 @@ targeted_rereview_scope = "HIGH_FINDING_REPAIR_SURFACE_ONLY"
 targeted_rereview_verdict = "PASS_NO_CRITICAL_HIGH"
 targeted_rereview_new_critical_total = 0
 targeted_rereview_new_high_total = 0
-next_action = "After exact canonical merge and fresh clean worktree reconciliation, create the separate bounded QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_ACTIVATION phase. Do not acquire DEV data or run DEV from this preregistration branch; OUTER remains inaccessible until the frozen DEV selection gate. No market-data access, historical economic outcome inspection, strategy_test, backtest, research-ledger mutation, QntySpot mutation, signing, approval, broadcast, trading, capital, or promotion is authorized by this preregistration state."
+continuation_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0"
+continuation_requires_exact_canonical_merge = true
+continuation_requires_fresh_clean_worktree = true
+next_action = "CLOSED_PASS: the preregistration continuation is closed and its separately bound DEV acquisition successor QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0 is the next canonical phase, effective only after exact canonical merge and fresh clean worktree reconciliation. The activation phase is terminal."
+
+[[project]]
+project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_ACTIVATION_V0"
+display_name = "QntySpot Ink shadow performance DEV acquisition activation V0"
+state = "CLOSED_PASS"
+candidate_state = "CANONICAL_TERMINAL_EFFECTIVE"
+canonicalization_status = "EXACT_CANONICAL_MERGE_TRANSITION_DECLARED"
+authority_level = "BOUNDED_DEV_ACQUISITION_AUTHORIZATION_CANDIDATE_ONLY"
+phase_type = "GOVERNANCE_ONLY"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "qntylab.toml",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qntyspot_ink_shadow_performance_v0/preregistration.json",
+  "experiments/research/qntyspot_ink_shadow_performance_dev_acquisition_activation_v0/activation.json",
+  "experiments/research/qntyspot_ink_shadow_performance_dev_acquisition_activation_v0/hostile_governance_review.md",
+  "experiments/research/qntyspot_ink_shadow_performance_dev_acquisition_activation_v0/targeted_rereview.md",
+  "tests/test_qntyspot_ink_shadow_performance_dev_acquisition_activation_v0.py",
+]
+parent_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_V0"
+governing_authorization_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_AUTHORIZATION_V0"
+canonical_base_sha = "3617633b4f88d3669ab58229aa9ca9bf5c2bee9e"
+preregistration_candidate_sha = "74b1afb5bf49aadbf8e58caff58b7f31e387c918"
+preregistration_canonical_merge = "3617633b4f88d3669ab58229aa9ca9bf5c2bee9e"
+canonical_preregistration_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_V0_PREREGISTRATION"
+canonical_preregistration_status = "PREREGISTERED_NOT_EXECUTED"
+canonical_preregistration_digest = "27ce60c68133f40d9496df1db6009de07957ed8a9bd68b0715cc6c54fe05d18a"
+qntyspot_source_commit = "b9a84c59bd43e7697ee970d2a7571647e5de4501"
+historical_data_cutoff_utc = "2026-08-25T17:02:37Z"
+future_phase_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0"
+future_phase_separate = true
+future_phase_count = 1
+authorization_state = "AUTHORIZED_IF_CANONICAL"
+authorization_effective = "AFTER_EXACT_CANONICAL_MERGE_AND_FRESH_CLEAN_WORKTREE_ONLY"
+activation_effective_on_branch = false
+candidate_branch_is_authority = false
+branch_local_candidate_does_not_self_authorize = true
+exact_candidate_commit_must_be_ancestor_of_canonical_master = true
+effective_only_after_exact_canonical_merge = true
+effective_only_in_fresh_clean_worktree_from_origin_master = true
+successor_state_after_exact_canonical_merge = "ACTIVE"
+implementation_authorized = false
+implementation_completed = false
+scientific_execution_authorized = false
+market_data_access_authorized = false
+historical_economic_outcome_inspection_authorized = false
+backtest_authorized = false
+strategy_test_authorized = false
+research_ledger_mutation_authorized = false
+outer_data_acquired = false
+outer_outcome_inspected = false
+outer_evaluation_count = 0
+market_network_count = 0
+market_data_acquisition_count = 0
+historical_outcome_read_count = 0
+research_ledger_state_changed = false
+qntyspot_changed = false
+qntyspot_execution_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+signing_authority = "NONE"
+approval_authority = "NONE"
+broadcast_authority = "NONE"
+promotion_authority = "NONE"
+hostile_review_count = 1
+hostile_review_verdict = "PASS"
+hostile_governance_critical_total = 0
+hostile_governance_high_total = 0
+hostile_governance_medium_total = 0
+hostile_governance_low_total = 0
+targeted_governance_rereview_used = true
+targeted_governance_rereview_count = 1
+targeted_governance_rereview_scope = "CANONICAL_TRANSITION_PARENT_LOOP_BRANCH_SELF_AUTHORIZATION_DEV_ONLY_OUTER_FAIL_CLOSED"
+targeted_governance_rereview_verdict = "PASS_NO_CRITICAL_HIGH"
+targeted_governance_rereview_new_critical_total = 0
+targeted_governance_rereview_new_high_total = 0
+terminal_outcome = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_ACTIVATION_V0_CANONICAL_CLOSED_PASS"
+next_action = "CLOSED_PASS: the activation is terminal after exact canonical merge. Its one separately bound successor QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0 is the next canonical phase; no new activation may be created."
+
+[[project]]
+project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0"
+display_name = "QntySpot Ink shadow performance DEV acquisition"
+state = "ACTIVE"
+authority_level = "BOUNDED_DEV_EVIDENCE_ACQUISITION_AND_SOURCE_QUALIFICATION_ONLY"
+phase_type = "BOUNDED_DEV_ACQUISITION_PHASE"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "qntylab.toml",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qntyspot_ink_shadow_performance_v0/preregistration.json",
+  "experiments/research/qntyspot_ink_shadow_performance_dev_acquisition_activation_v0/targeted_rereview.md",
+  "tests/test_qntyspot_ink_shadow_performance_dev_acquisition_activation_v0.py",
+]
+governing_activation_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_ACTIVATION_V0"
+parent_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_V0"
+canonical_preregistration_digest = "27ce60c68133f40d9496df1db6009de07957ed8a9bd68b0715cc6c54fe05d18a"
+qntyspot_source_commit = "b9a84c59bd43e7697ee970d2a7571647e5de4501"
+historical_data_cutoff_utc = "2026-08-25T17:02:37Z"
+canonical_base_sha = "3617633b4f88d3669ab58229aa9ca9bf5c2bee9e"
+candidate_branch_is_authority = false
+branch_local_candidate_does_not_self_authorize = true
+exact_candidate_commit_must_be_ancestor_of_canonical_master = true
+effective_only_after_exact_canonical_merge = true
+effective_only_in_fresh_clean_worktree_from_origin_master = true
+authorization_effective = "AFTER_EXACT_CANONICAL_MERGE_AND_FRESH_CLEAN_WORKTREE_ONLY"
+implementation_authorized = false
+implementation_completed = false
+permitted_operations = [
+  "SOURCE_QUALIFICATION",
+  "ESTABLISH_T0_OUTCOME_BLIND",
+  "COMPUTE_DEV_END",
+  "ACQUIRE_DEV_EVIDENCE_ONLY",
+  "ACQUIRE_DEV_GAS_RECEIPTS_AS_PREREGISTERED",
+  "BUILD_DEV_INTEGRITY_MANIFEST",
+]
+forbidden_operations = [
+  "ACQUIRE_OUTER",
+  "INSPECT_OUTER",
+  "EVALUATE_CANDIDATES",
+  "SELECT_CANDIDATE",
+  "FREEZE_WINNER",
+  "BACKTEST_OUTER",
+  "FINAL_PERFORMANCE_CLASSIFICATION",
+  "TRADING",
+  "CAPITAL",
+  "SIGNING",
+  "APPROVAL",
+  "BROADCAST",
+  "PROMOTION",
+]
+outer_data_acquired = false
+outer_outcome_inspected = false
+outer_evaluation_count = 0
+market_network_count = 0
+market_data_acquisition_count = 0
+historical_outcome_read_count = 0
+backtest_count = 0
+strategy_test_count = 0
+research_ledger_state_changed = false
+qntyspot_changed = false
+scientific_execution_authorized = false
+market_data_access_authorized = false
+historical_economic_outcome_inspection_authorized = false
+backtest_authorized = false
+strategy_test_authorized = false
+research_ledger_mutation_authorized = false
+trading_authority = "NONE"
+capital_authority = "NONE"
+signing_authority = "NONE"
+approval_authority = "NONE"
+broadcast_authority = "NONE"
+promotion_authority = "NONE"
+qntyspot_execution_authority = "NONE"
+next_action = "ACTIVE: the separately bound DEV acquisition successor is effective only after exact canonical merge and fresh clean worktree reconciliation. Qualify sources outcome-blind, establish T0, compute DEV_END, and acquire DEV evidence and preregistered gas receipts only; OUTER, candidate evaluation, selection, classification, trading, and capital remain forbidden."
 
 [[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_V2_PREREGISTRATION_V0"

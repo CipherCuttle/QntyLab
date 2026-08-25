@@ -1,0 +1,243 @@
+{
+  "artifact_type": "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_ACTIVATION",
+  "schema_version": "qntyspot-ink-shadow-performance-dev-acquisition-activation-v0",
+  "project_id": "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_ACTIVATION_V0",
+  "parent_project_id": "QNTYSPOT_INK_SHADOW_PERFORMANCE_V0",
+  "phase_state": "PLANNED_NOT_AUTHORIZED",
+  "candidate_state": "ACTIVE_CANDIDATE",
+  "phase_type": "GOVERNANCE_ONLY",
+  "authority_level": "BOUNDED_DEV_ACQUISITION_AUTHORIZATION_CANDIDATE_ONLY",
+  "canonicalization": {
+    "canonical_repository": "QntyLab",
+    "canonical_ref": "origin/master",
+    "expected_canonical_base_sha": "3617633b4f88d3669ab58229aa9ca9bf5c2bee9e",
+    "preregistration_candidate_sha": "74b1afb5bf49aadbf8e58caff58b7f31e387c918",
+    "preregistration_canonical_merge": "3617633b4f88d3669ab58229aa9ca9bf5c2bee9e",
+    "candidate_branch_is_authority": false,
+    "branch_local_candidate_does_not_self_authorize": true,
+    "exact_candidate_commit_must_be_ancestor_of_canonical_master": true,
+    "activation_effective_on_branch": false,
+    "effective_only_after_exact_canonical_merge": true,
+    "effective_only_in_fresh_clean_worktree_from_origin_master": true,
+    "canonical_drift_behavior": "STOP_SOURCE_CONFLICT"
+  },
+  "canonical_state_transition": {
+    "candidate_phase_state": "PLANNED_NOT_AUTHORIZED",
+    "canonical_phase_state": "CLOSED_PASS",
+    "successor_project_id": "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0",
+    "canonical_successor_state": "ACTIVE",
+    "exactly_one_successor": true,
+    "effective_only_after_exact_canonical_merge": true,
+    "effective_only_in_fresh_clean_worktree_from_origin_master": true
+  },
+  "governing_binding": {
+    "governing_authorization_project_id": "QNTYSPOT_INK_SHADOW_PERFORMANCE_AUTHORIZATION_V0",
+    "canonical_preregistration_project_id": "QNTYSPOT_INK_SHADOW_PERFORMANCE_V0_PREREGISTRATION",
+    "canonical_preregistration_status": "PREREGISTERED_NOT_EXECUTED",
+    "canonical_preregistration_digest": "27ce60c68133f40d9496df1db6009de07957ed8a9bd68b0715cc6c54fe05d18a",
+    "qntyspot_source_commit": "b9a84c59bd43e7697ee970d2a7571647e5de4501",
+    "historical_cutoff_utc": "2026-08-25T17:02:37Z"
+  },
+  "frozen_scientific_identity": {
+    "ink_chain_id": 57073,
+    "base_token": {
+      "symbol": "KRAKMASK",
+      "address": "0x32bcb803f696c99eb263d60a05cafd8689026575",
+      "decimals": 18
+    },
+    "quote_token": {
+      "symbol": "WETH9",
+      "display_symbol": "WETH",
+      "address": "0x4200000000000000000000000000000000000006",
+      "decimals": 18
+    },
+    "inkyswap_v2_factory": "0x458c5d5b75ccba22651d2c5b61cb1ea1e0b0f95d",
+    "inkyswap_v2_pool": "0xed11ed4b195e84ba9b74c4d6ce13b7a43b354264",
+    "candidate_family_count": 12,
+    "dev_outer_algorithm": "chronological 60/40 split defined by T0 + floor(0.60 * (T1 - T0))",
+    "outer_initial_access": "INACCESSIBLE",
+    "scientific_design_mutation": false
+  },
+  "authorized_future_phase": {
+    "project_id": "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0",
+    "purpose": "Establish only the DEV historical evidence package required by the canonical preregistration.",
+    "exactly_one_future_phase": true,
+    "future_phase_count": 1,
+    "allowed_operations": [
+      "SOURCE_QUALIFICATION",
+      "ESTABLISH_T0_OUTCOME_BLIND",
+      "COMPUTE_DEV_END",
+      "ACQUIRE_DEV_EVIDENCE_ONLY",
+      "ACQUIRE_DEV_GAS_RECEIPTS_AS_PREREGISTERED",
+      "BUILD_DEV_INTEGRITY_MANIFEST"
+    ],
+    "forbidden_operations": [
+      "ACQUIRE_OUTER",
+      "INSPECT_OUTER",
+      "EVALUATE_CANDIDATES",
+      "SELECT_CANDIDATE",
+      "FREEZE_WINNER",
+      "BACKTEST_OUTER",
+      "FINAL_PERFORMANCE_CLASSIFICATION",
+      "TRADING",
+      "CAPITAL",
+      "SIGNING",
+      "APPROVAL",
+      "BROADCAST",
+      "PROMOTION"
+    ],
+    "outer_remains_inaccessible": true
+  },
+  "dev_acquisition_scope": {
+    "permitted_evidence_classes": [
+      "canonical pool creation or initialization provenance needed for reconstructability",
+      "chronological pool reserve-changing events needed for exact KRAKMASK/WETH reserve states",
+      "block metadata needed for strict chronology and timestamps",
+      "transaction and receipt fields required by the frozen DEV gas rule",
+      "immutable source/provider provenance and acquisition receipts",
+      "chain metadata proving continuity, ordering, deduplication, and canonical block identity"
+    ],
+    "outcome_blind_source_selection": true,
+    "primary_execution_evidence": "direct canonical chain evidence",
+    "broadening_for_interesting_extra_data": false,
+    "chart_or_derivative_price_substitution": false
+  },
+  "source_qualification_contract": {
+    "fail_closed_before_full_acquisition": true,
+    "required_checks": [
+      "chain ID equals 57073",
+      "canonical pool address equals the frozen pool exactly",
+      "required historical block range is accessible",
+      "required-contract log retrieval works",
+      "block timestamps are retrievable",
+      "transaction receipts are retrievable when required by the gas rule",
+      "pagination and range limits are understood",
+      "repeated requests are deterministically equal where applicable",
+      "silent provider truncation is ruled out",
+      "canonical ordering can be reconstructed"
+    ],
+    "provider_choice_basis": "technical capability and integrity only; never observed returns",
+    "cross_provider_material_disagreement": "STOP_SOURCE_CONFLICT",
+    "reorg_or_canonical_block_ambiguity": "STOP_SOURCE_CONFLICT"
+  },
+  "dev_boundary_contract": {
+    "t0_definition": "first eligible canonical pool-state observation at or after historical reconstructability",
+    "t0_outcome_blind": true,
+    "t0_selection_by_returns_or_candidate_behavior": false,
+    "t1": "2026-08-25T17:02:37Z",
+    "dev_end_formula": "T0 + floor(0.60 * (T1 - T0))",
+    "dev_interval": "[T0, DEV_END]",
+    "outer_interval": "(DEV_END, T1]",
+    "minimum_history_days": {
+      "total_calendar_history": 30,
+      "dev": 18,
+      "outer": 12
+    },
+    "insufficient_history_state": "INSUFFICIENT_HISTORY"
+  },
+  "outer_firewall": {
+    "outer_data_acquired": false,
+    "outer_outcome_inspected": false,
+    "outer_evaluation_count": 0,
+    "request_boundary": "no source request may deliberately retrieve economic observations with timestamp > DEV_END",
+    "unavoidable_overfetch": "discard > DEV_END records immediately, record only count, and do not inspect or serialize economic values",
+    "preferred_query_boundary": "terminate ranges before DEV_END",
+    "outer_values_for_debugging_or_validation": false
+  },
+  "dataset_contract": {
+    "immutable_and_replayable": true,
+    "integer_atomic_reserve_storage": true,
+    "required_fields": [
+      "chain_id",
+      "block_number",
+      "block_hash",
+      "transaction_hash_when_applicable",
+      "transaction_index_when_applicable",
+      "log_index_when_applicable",
+      "timestamp",
+      "event_or_source_type",
+      "exact_integer_reserve_relevant_values",
+      "exact_pool_identity",
+      "acquisition_source_provider_identity"
+    ],
+    "canonical_event_identity": "deduplicate by canonical event identity",
+    "deterministic_order": ["block_number", "transaction_index", "log_index"],
+    "persist_block_hashes": true,
+    "material_cross_source_identity_disagreement": "STOP_SOURCE_CONFLICT"
+  },
+  "gas_evidence_contract": {
+    "mode": "DEV_DERIVED_IF_AVAILABLE_ELSE_SENSITIVITY",
+    "receipt_threshold": 30,
+    "sample_max": 30,
+    "sample_rule": "evenly spaced chronological valid DEV receipt indices",
+    "formula_mutable": false,
+    "p50_p90_rule_mutable": false,
+    "fallback_grid_mutable": false,
+    "fallback_selection_gas_mutable": false,
+    "gas_model_tuning": false
+  },
+  "manifest_contract": {
+    "immutable": true,
+    "required_fields": [
+      "acquisition_project_id",
+      "canonical_qntylab_source_sha",
+      "governing_activation_identity",
+      "preregistration_digest",
+      "qntyspot_source_sha",
+      "chain_id",
+      "pool_address",
+      "t0",
+      "dev_end",
+      "t1",
+      "source_identities",
+      "request_and_range_receipts",
+      "row_or_event_counts",
+      "min_max_block",
+      "min_max_timestamp",
+      "duplicate_count",
+      "discarded_outer_overfetch_count",
+      "integrity_checks",
+      "sha256_per_dataset_artifact",
+      "package_digest"
+    ],
+    "performance_metrics_allowed": false
+  },
+  "branch_firewall": {
+    "scientific_execution_authorized": false,
+    "market_data_access_authorized": false,
+    "historical_economic_outcome_inspection_authorized": false,
+    "backtest_authorized": false,
+    "strategy_test_authorized": false,
+    "research_ledger_mutation_authorized": false,
+    "qntyspot_changed": false,
+    "research_ledger_state_changed": false,
+    "trading_authority": "NONE",
+    "capital_authority": "NONE",
+    "qntyspot_execution_authority": "NONE",
+    "signing_authority": "NONE",
+    "approval_authority": "NONE",
+    "broadcast_authority": "NONE",
+    "promotion_authority": "NONE"
+  },
+  "construction_receipts": {
+    "market_network_count": 0,
+    "market_data_acquisition_count": 0,
+    "historical_outcome_read_count": 0,
+    "backtest_count": 0,
+    "strategy_test_count": 0,
+    "outer_evaluation_count": 0,
+    "research_ledger_state_changed": false,
+    "qntyspot_changed": false
+  },
+  "review_policy": {
+    "review_scope": "GOVERNANCE_AND_DATA_BOUNDARY_ONLY",
+    "exactly_one_independent_hostile_review_required": true,
+    "hostile_review_count": 1,
+    "critical_high_fix_pass_limit": 1,
+    "targeted_rereview_only_if_critical_or_high_repaired": true,
+    "targeted_rereview_count": 1,
+    "targeted_rereview_scope": "CANONICAL_TRANSITION_PARENT_LOOP_BRANCH_SELF_AUTHORIZATION_DEV_ONLY_OUTER_FAIL_CLOSED",
+    "targeted_rereview_verdict": "PASS_NO_CRITICAL_HIGH"
+  },
+  "terminal_outcome": "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_ACTIVATION_V0_CANDIDATE_READY"
+}

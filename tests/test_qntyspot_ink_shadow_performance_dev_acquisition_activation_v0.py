@@ -14,7 +14,8 @@ PROJECTS_PATH = ROOT / "docs/state/projects.toml"
 PROJECT_ID = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_ACTIVATION_V0"
 FUTURE_PHASE = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0"
 PARENT_PROJECT = "QNTYSPOT_INK_SHADOW_PERFORMANCE_V0"
-CANONICAL_BASE = "3617633b4f88d3669ab58229aa9ca9bf5c2bee9e"
+EXPECTED_CANONICAL_BASE = "3ef188452f077f246870dd647253b49c4a6691d3"
+ACTIVATION_CANONICAL_BASE = "3617633b4f88d3669ab58229aa9ca9bf5c2bee9e"
 PREREG_CANDIDATE_SHA = "74b1afb5bf49aadbf8e58caff58b7f31e387c918"
 PREREG_DIGEST = "27ce60c68133f40d9496df1db6009de07957ed8a9bd68b0715cc6c54fe05d18a"
 QNTYSPOT_SOURCE = "b9a84c59bd43e7697ee970d2a7571647e5de4501"
@@ -35,8 +36,8 @@ def project_record(project_id=PROJECT_ID):
 
 
 def test_canonical_master_and_preregistration_are_exact():
-    assert subprocess.run(["git", "rev-parse", "origin/master"], cwd=ROOT, text=True, capture_output=True, check=True).stdout.strip() == CANONICAL_BASE
-    assert subprocess.run(["git", "merge-base", "--is-ancestor", PREREG_CANDIDATE_SHA, CANONICAL_BASE], cwd=ROOT, check=False).returncode == 0
+    assert subprocess.run(["git", "rev-parse", "origin/master"], cwd=ROOT, text=True, capture_output=True, check=True).stdout.strip() == EXPECTED_CANONICAL_BASE
+    assert subprocess.run(["git", "merge-base", "--is-ancestor", PREREG_CANDIDATE_SHA, EXPECTED_CANONICAL_BASE], cwd=ROOT, check=False).returncode == 0
     prereg = load(PREREG_PATH)
     assert prereg["project_id"] == "QNTYSPOT_INK_SHADOW_PERFORMANCE_V0_PREREGISTRATION"
     assert prereg["status"] == "PREREGISTERED_NOT_EXECUTED"
@@ -135,9 +136,9 @@ def test_branch_firewall_receipts_and_authorities_are_zero_or_none():
 def test_future_activation_requires_exact_merge_and_does_not_self_authorize():
     activation = load(ACTIVATION_PATH)
     gate = activation["canonicalization"]
-    assert gate["expected_canonical_base_sha"] == CANONICAL_BASE
+    assert gate["expected_canonical_base_sha"] == ACTIVATION_CANONICAL_BASE
     assert gate["preregistration_candidate_sha"] == PREREG_CANDIDATE_SHA
-    assert gate["preregistration_canonical_merge"] == CANONICAL_BASE
+    assert gate["preregistration_canonical_merge"] == ACTIVATION_CANONICAL_BASE
     assert gate["candidate_branch_is_authority"] is False
     assert gate["branch_local_candidate_does_not_self_authorize"] is True
     assert gate["exact_candidate_commit_must_be_ancestor_of_canonical_master"] is True
@@ -165,7 +166,7 @@ def test_registry_binding_and_review_receipt_are_exact():
     assert project["candidate_state"] == "CANONICAL_TERMINAL_EFFECTIVE"
     assert project["canonicalization_status"] == "EXACT_CANONICAL_MERGE_TRANSITION_DECLARED"
     assert project["implementation_authorized"] is False
-    assert project["canonical_base_sha"] == CANONICAL_BASE
+    assert project["canonical_base_sha"] == ACTIVATION_CANONICAL_BASE
     assert project["canonical_preregistration_digest"] == PREREG_DIGEST
     assert project["future_phase_project_id"] == FUTURE_PHASE
     assert project["future_phase_count"] == 1
@@ -237,15 +238,46 @@ def test_successor_binding_and_authority_ceiling_are_exact():
         "FREEZE_WINNER", "BACKTEST_OUTER", "FINAL_PERFORMANCE_CLASSIFICATION",
         "TRADING", "CAPITAL", "SIGNING", "APPROVAL", "BROADCAST", "PROMOTION",
     ]
-    assert successor["implementation_authorized"] is False
+    assert successor["implementation_authorized"] is True
     assert successor["scientific_execution_authorized"] is False
-    assert successor["market_data_access_authorized"] is False
+    assert successor["market_data_access_authorized"] is True
     assert successor["historical_economic_outcome_inspection_authorized"] is False
     assert successor["backtest_authorized"] is False
     assert successor["strategy_test_authorized"] is False
     assert successor["research_ledger_mutation_authorized"] is False
-    assert successor["trading_authority"] == "NONE"
-    assert successor["capital_authority"] == "NONE"
+    for key in (
+        "trading_authority", "capital_authority", "signing_authority",
+        "approval_authority", "broadcast_authority", "promotion_authority",
+        "qntyspot_execution_authority",
+    ):
+        assert successor[key] == "NONE"
+
+
+def test_active_dev_authority_repair_is_narrow_and_preserves_all_receipts():
+    successor = project_record(FUTURE_PHASE)
+    assert successor["permitted_operations"] == [
+        "SOURCE_QUALIFICATION", "ESTABLISH_T0_OUTCOME_BLIND", "COMPUTE_DEV_END",
+        "ACQUIRE_DEV_EVIDENCE_ONLY", "ACQUIRE_DEV_GAS_RECEIPTS_AS_PREREGISTERED",
+        "BUILD_DEV_INTEGRITY_MANIFEST",
+    ]
+    assert successor["forbidden_operations"] == [
+        "ACQUIRE_OUTER", "INSPECT_OUTER", "EVALUATE_CANDIDATES", "SELECT_CANDIDATE",
+        "FREEZE_WINNER", "BACKTEST_OUTER", "FINAL_PERFORMANCE_CLASSIFICATION",
+        "TRADING", "CAPITAL", "SIGNING", "APPROVAL", "BROADCAST", "PROMOTION",
+    ]
+    assert successor["outer_data_acquired"] is False
+    assert successor["outer_outcome_inspected"] is False
+    assert successor["outer_evaluation_count"] == 0
+    assert successor["market_network_count"] == 0
+    assert successor["market_data_acquisition_count"] == 0
+    assert successor["historical_outcome_read_count"] == 0
+    assert successor["backtest_count"] == 0
+    assert successor["strategy_test_count"] == 0
+    assert successor["research_ledger_state_changed"] is False
+    assert successor["qntyspot_changed"] is False
+    assert successor["canonical_preregistration_digest"] == PREREG_DIGEST
+    assert successor["qntyspot_source_commit"] == QNTYSPOT_SOURCE
+    assert successor["historical_data_cutoff_utc"] == CUTOFF
 
 
 def test_successor_outer_firewall_and_construction_receipts_remain_zero():
@@ -272,13 +304,13 @@ def test_canonical_successor_is_recognized_as_the_single_project_context_active_
 
 def test_scientific_research_ledger_and_qntyspot_bytes_are_unchanged():
     assert subprocess.run(
-        ["git", "diff", "--quiet", CANONICAL_BASE, "HEAD", "--", "qntylab/qntyspot_ink_shadow_performance_prereg_v0.py", PREREG_PATH.relative_to(ROOT)],
+        ["git", "diff", "--quiet", EXPECTED_CANONICAL_BASE, "HEAD", "--", "qntylab/qntyspot_ink_shadow_performance_prereg_v0.py", PREREG_PATH.relative_to(ROOT)],
         cwd=ROOT,
         check=False,
     ).returncode == 0
     for pathspec in ("experiments/research/ledger", "qntyspot"):
         assert subprocess.run(
-            ["git", "diff", "--name-only", CANONICAL_BASE, "HEAD", "--", pathspec],
+            ["git", "diff", "--name-only", EXPECTED_CANONICAL_BASE, "HEAD", "--", pathspec],
             cwd=ROOT,
             text=True,
             capture_output=True,

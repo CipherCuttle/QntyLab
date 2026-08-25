@@ -241,7 +241,7 @@ exact_candidate_commit_must_be_ancestor_of_canonical_master = true
 effective_only_after_exact_canonical_merge = true
 effective_only_in_fresh_clean_worktree_from_origin_master = true
 authorization_effective = "AFTER_EXACT_CANONICAL_MERGE_AND_FRESH_CLEAN_WORKTREE_ONLY"
-implementation_authorized = false
+implementation_authorized = true
 implementation_completed = false
 permitted_operations = [
   "SOURCE_QUALIFICATION",
@@ -277,7 +277,7 @@ strategy_test_count = 0
 research_ledger_state_changed = false
 qntyspot_changed = false
 scientific_execution_authorized = false
-market_data_access_authorized = false
+market_data_access_authorized = true
 historical_economic_outcome_inspection_authorized = false
 backtest_authorized = false
 strategy_test_authorized = false

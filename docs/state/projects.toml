@@ -3589,6 +3589,51 @@ experiment_state = "EXECUTION_FAIL_CLOSED"
 next_action = "No V1 execution or rescue rerun is authorized. Any execution-plumbing qualification must be a separate synthetic non-experimental phase and cannot create V2 authority, runtime authority, scientific authority, Qnty NEXT_ACTION, trading authority, or capital authority."
 
 [[project]]
+project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_AUTHORIZATION_V0"
+display_name = "QntySpot Ink shadow performance research authorization V0"
+state = "PLANNED_NOT_AUTHORIZED"
+candidate_state = "ACTIVE_CANDIDATE"
+canonicalization_status = "CANDIDATE_NOT_CANONICAL"
+authority_level = "BOUNDED_RESEARCH_AUTHORIZATION_ONLY"
+phase_type = "GOVERNANCE_ONLY"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qntyspot_ink_shadow_performance_authorization_v0/authorization.json",
+  "experiments/research/qntyspot_ink_shadow_performance_authorization_v0/authority_note.md",
+  "experiments/research/qntyspot_ink_shadow_performance_authorization_v0/hostile_governance_review.md",
+  "tests/test_qntyspot_ink_shadow_performance_authorization_v0.py",
+]
+authorization_state = "AUTHORIZED_IF_CANONICAL"
+authorization_effective = "AFTER_EXACT_CANONICAL_MERGE_ONLY"
+canonical_base_sha = "a4738278f42f961ad2f2470fefff6688ccde6bb6"
+qntyspot_canonical_ref = "origin/main"
+qntyspot_canonical_commit = "b9a84c59bd43e7697ee970d2a7571647e5de4501"
+authorized_future_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_V0"
+authorized_future_phase_count = 1
+future_phase_separate = true
+historical_data_cutoff_utc = "2026-08-25T17:02:37Z"
+effective_research_authority = false
+implementation_authorized = false
+scientific_execution_authorized = false
+qntyspot_execution_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+signing_authority = "NONE"
+promotion_authority = "NONE"
+research_ledger_state_changed = false
+qntyspot_changed = false
+hostile_review_count = 1
+hostile_review_verdict = "PASS"
+targeted_governance_rereview_used = false
+authorization_artifact = "experiments/research/qntyspot_ink_shadow_performance_authorization_v0/authorization.json"
+authorization_artifact_sha256 = "98dff884199f3c976316dacd3a54106cd21b787e43852930dee13487b78b828a"
+terminal_outcome = "QNTYSPOT_INK_SHADOW_PERFORMANCE_AUTHORIZATION_V0_CANDIDATE_READY"
+terminal_outcome_basis = "This governance-only candidate binds exact canonical QntyLab and QntySpot commits, records the exact Ink source-derived market identity, grants one separate future research phase only, does not self-authorize on its branch, and records zero scientific, market, ledger, QntySpot, signing, broadcast, or capital activity."
+next_action = "ACTIVE_CANDIDATE: This authorization is effective only after exact canonical merge. After canonicalization, a fresh source reconciliation and a separately recorded QNTYSPOT_INK_SHADOW_PERFORMANCE_V0 phase are required. No implementation, data acquisition, backtest, outcome inspection, outer evaluation, prospective shadow, QntySpot mutation, trading, signing, approval, broadcast, or capital action is authorized here."
+
+[[project]]
 project_id = "SUBSCRIPTION_BACKED_PRODUCT_EXECUTION_PLUMBING_QUALIFICATION_V0"
 display_name = "Subscription-backed product execution plumbing qualification V0"
 state = "CLOSED_BLOCKED"

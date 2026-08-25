@@ -1,0 +1,200 @@
+{
+  "artifact_type": "QNTYSPOT_INK_SHADOW_PERFORMANCE_AUTHORIZATION",
+  "schema_version": "qntyspot-ink-shadow-performance-authorization-v0",
+  "project_id": "QNTYSPOT_INK_SHADOW_PERFORMANCE_AUTHORIZATION_V0",
+  "display_name": "QntySpot Ink shadow performance research authorization V0",
+  "phase_state": "CANDIDATE_GOVERNANCE_ONLY",
+  "state": "PLANNED_NOT_AUTHORIZED",
+  "candidate_state": "ACTIVE_CANDIDATE",
+  "canonicalization_status": "CANDIDATE_NOT_CANONICAL",
+  "phase_type": "GOVERNANCE_ONLY",
+  "authority_level": "BOUNDED_RESEARCH_AUTHORIZATION_ONLY",
+  "authorization_state": "AUTHORIZED_IF_CANONICAL",
+  "authorization_effective": "AFTER_EXACT_CANONICAL_MERGE_ONLY",
+  "implementation_authorized": false,
+  "authorization_effective_on_branch": false,
+  "branch_local_candidate_does_not_self_authorize": true,
+  "canonical_merge_required_before_future_phase": true,
+  "future_phase_requires_fresh_source_reconciliation": true,
+  "canonical_source_identity": {
+    "repository": "QntyLab",
+    "canonical_ref": "origin/master",
+    "canonical_base_sha": "a4738278f42f961ad2f2470fefff6688ccde6bb6",
+    "canonical_drift_behavior": "STOP_SOURCE_CONFLICT",
+    "git_wins_over_prompt_memory_or_handoff": true
+  },
+  "authorized_future_phase": {
+    "project_id": "QNTYSPOT_INK_SHADOW_PERFORMANCE_V0",
+    "phase_count": 1,
+    "phase_is_separate": true,
+    "purpose": "Evaluate whether a small preregistered QntySpot-style KRAKMASK/WETH ladder family has economic merit versus frozen baselines using historical constant-product AMM evidence.",
+    "historical_data_cutoff_utc": "2026-08-25T17:02:37Z",
+    "strictly_later_data_belongs_to": "A future prospective lineage, not this historical phase.",
+    "required_order": [
+      "PREREGISTER",
+      "DEFINE_CHRONOLOGICAL_DEV_OUTER",
+      "ACQUIRE_DEV",
+      "SELECT_AND_FREEZE_EXACTLY_ONE_CANDIDATE",
+      "ONLY_THEN_ACQUIRE_OUTER",
+      "RUN_EXACTLY_ONE_SEALED_OUTER_EVALUATION"
+    ],
+    "allowed_operations": [
+      "PREREGISTER_SMALL_KRAKMASK_WETH_LADDER_FAMILY",
+      "ESTABLISH_HISTORICAL_POOL_EVIDENCE",
+      "FREEZE_CHRONOLOGICAL_DEV_OUTER_BOUNDARIES",
+      "ACQUIRE_DEV_DATA",
+      "EVALUATE_PREREGISTERED_CANDIDATES_ON_DEV",
+      "FREEZE_EXACTLY_ONE_SELECTED_CANDIDATE",
+      "ACQUIRE_OUTER_ONLY_AFTER_CANDIDATE_FREEZE",
+      "RUN_EXACTLY_ONE_SEALED_OUTER_EVALUATION",
+      "CALCULATE_REPRODUCIBLE_COST_AWARE_ECONOMIC_METRICS",
+      "COMPARE_AGAINST_REQUIRED_FROZEN_BASELINES",
+      "PRODUCE_PROSPECTIVE_SHADOW_CONTINUATION_CONTRACT"
+    ],
+    "anti_leakage": {
+      "outer_reuse_after_results": false,
+      "candidate_alteration_after_freeze": false,
+      "silent_parameter_expansion": false,
+      "qualification_fixture_is_a_strategy": false,
+      "outer_acquisition_before_candidate_freeze": false,
+      "outer_evaluation_count": 1,
+      "failure_preserved": true
+    },
+    "candidate_family_constraints": {
+      "finite_and_preregistered": true,
+      "family_size_and_parameter_values": null,
+      "must_be_frozen_before_dev_outcome_access": true,
+      "parameter_selection_in_this_authorization": false,
+      "parameter_fishing_after_dev_outcome_access": false
+    },
+    "required_baselines": [
+      "HOLD_WETH",
+      "BUY_AND_HOLD_KRAKMASK",
+      "PERIODIC_DCA",
+      "DUMB_SYMMETRIC_GRID",
+      "SELECTED_QNTYSPOT_LADDER"
+    ],
+    "baseline_constraints": {
+      "identical_initial_wealth": true,
+      "identical_executable_market_semantics": true
+    },
+    "required_costs": [
+      "EXACT_AMM_FEE",
+      "INTENDED_SIZE_PRICE_IMPACT",
+      "EXPLICIT_GAS_TREATMENT_OR_SENSITIVITY",
+      "TURNOVER"
+    ],
+    "gross_price_movement_is_strategy_pnl": false
+  },
+  "qntyspot_source_binding": {
+    "repository": "QntySpot",
+    "canonical_ref": "origin/main",
+    "canonical_commit": "b9a84c59bd43e7697ee970d2a7571647e5de4501",
+    "canonical_drift_behavior": "STOP_SOURCE_CONFLICT",
+    "git_wins_over_prompt_memory_or_handoff": true,
+    "runtime_cross_repository_imports": false,
+    "derivation": {
+      "method": "AST literal extraction from qntyspot/ink.py at the exact canonical commit",
+      "source_path": "qntyspot/ink.py",
+      "source_git_blob": "07d4afa3f29119e72ca922910fb6ff9478b9ddb4",
+      "human_cross_check_path": "docs/INK_V0B.md",
+      "human_cross_check_git_blob": "2ef55ccfdb1dcb9a9bc93d390f3fc2eaabfd28b4",
+      "chat_values_are_authority": false,
+      "network_reads_performed": false
+    },
+    "ink_chain_id": 57073,
+    "krakmask": {
+      "symbol": "KRAKMASK",
+      "address": "0x32bcb803f696c99eb263d60a05cafd8689026575",
+      "decimals": 18
+    },
+    "weth": {
+      "symbol": "WETH9",
+      "address": "0x4200000000000000000000000000000000000006",
+      "decimals": 18
+    },
+    "inkyswap_v2_pool": "0xed11ed4b195e84ba9b74c4d6ce13b7a43b354264",
+    "inkyswap_v2_factory": "0x458c5d5b75ccba22651d2c5b61cb1ea1e0b0f95d",
+    "deployed_runtime_bytecode": {
+      "hash_algorithm": "SHA-256",
+      "sha256": "c5c2b764b882b8c18004fe5ce77d8649dd8c26cea265f663b16196708d22bf20",
+      "hashes_runtime_bytecode_bytes_not_hex_spelling": true
+    },
+    "v2_fee_semantics": {
+      "numerator": 997,
+      "denominator": 1000,
+      "fee_fraction": "3/1000",
+      "fee_percent": "0.3%"
+    }
+  },
+  "scientific_firewall": {
+    "trading_authority": "NONE",
+    "capital_authority": "NONE",
+    "qntyspot_execution_authority": "NONE",
+    "signing_authority": "NONE",
+    "promotion_authority": "NONE",
+    "scientific_execution_authority": "NONE",
+    "positive_result_is_proof_of_alpha": false,
+    "negative_result_must_be_preserved": true
+  },
+  "forbidden_operations_in_this_phase": [
+    "ACQUIRE_MARKET_DATA",
+    "INSPECT_HISTORICAL_ECONOMIC_OUTCOMES",
+    "RUN_BACKTEST",
+    "RUN_STRATEGY_TEST",
+    "PROPOSE_RESEARCH_LEDGER_STRATEGY_CANDIDATE",
+    "SELECT_LADDER_PARAMETERS",
+    "CALCULATE_PNL",
+    "CALCULATE_SHARPE",
+    "CALCULATE_DRAWDOWN",
+    "PERFORM_OUTER_EVALUATION",
+    "START_PROSPECTIVE_SHADOW",
+    "MODIFY_QNTYSPOT",
+    "READ_SECRETS",
+    "SIGN",
+    "APPROVE",
+    "BROADCAST",
+    "USE_LIVE_CAPITAL"
+  ],
+  "construction_receipts": {
+    "scientific_execution_count": 0,
+    "market_network_count": 0,
+    "external_market_data_requests": 0,
+    "historical_outcome_reads": 0,
+    "backtests": 0,
+    "strategy_tests": 0,
+    "research_ledger_trial_events": 0,
+    "research_ledger_candidate_events": 0,
+    "research_ledger_state_changed": false,
+    "qntyspot_changed": false,
+    "secret_reads": 0,
+    "signing_calls": 0,
+    "approval_calls": 0,
+    "broadcast_calls": 0,
+    "live_capital_calls": 0,
+    "outer_evaluations": 0,
+    "prospective_shadow_starts": 0,
+    "pnl_calculations": 0,
+    "sharpe_calculations": 0,
+    "drawdown_calculations": 0,
+    "spend_usd": "0"
+  },
+  "review_policy": {
+    "review_scope": "GOVERNANCE_ARTIFACT_ONLY",
+    "exactly_one_independent_hostile_review_required": true,
+    "critical_high_fix_pass_limit": 1,
+    "targeted_rereview_limit": 1,
+    "targeted_rereview_only_if_critical_high_fix": true,
+    "review_of_review_forbidden": true
+  },
+  "stop_conditions": [
+    "STOP_SOURCE_CONFLICT",
+    "STOP_IF_BRANCH_LOCAL_ARTIFACT_COULD_SELF_AUTHORIZE",
+    "STOP_IF_SCOPE_EXCEEDS_ONE_FUTURE_PHASE",
+    "STOP_IF_OUTER_LEAKAGE_CONTROL_IS_AMBIGUOUS",
+    "STOP_IF_TRADING_OR_CAPITAL_AUTHORITY_ESCALATES",
+    "STOP_IF_QNTYSPOT_MUTATION_AUTHORITY_APPEARS",
+    "STOP_AFTER_ONE_CANDIDATE_COMMIT_AND_DRAFT_PR"
+  ],
+  "terminal_verdict": "QNTYSPOT_INK_SHADOW_PERFORMANCE_AUTHORIZATION_V0_CANDIDATE_READY"
+}

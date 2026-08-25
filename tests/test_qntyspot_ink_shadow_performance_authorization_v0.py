@@ -19,6 +19,11 @@ def load_project():
     return next(row for row in registry["project"] if row["project_id"] == "QNTYSPOT_INK_SHADOW_PERFORMANCE_AUTHORIZATION_V0")
 
 
+def load_active_project():
+    registry = tomllib.loads(PROJECTS_PATH.read_text(encoding="utf-8"))
+    return next(row for row in registry["project"] if row["project_id"] == "QNTYSPOT_INK_SHADOW_PERFORMANCE_V0")
+
+
 def test_branch_local_candidate_does_not_self_authorize():
     auth = load_auth()
     assert auth["phase_state"] == "PLANNED_NOT_AUTHORIZED"
@@ -32,6 +37,24 @@ def test_branch_local_candidate_does_not_self_authorize():
     assert gate["candidate_branch_is_authority"] is False
     assert gate["branch_local_candidate_does_not_self_authorize"] is True
     assert gate["exact_candidate_commit_must_be_ancestor_of_canonical_master"] is True
+
+
+def test_canonical_registry_closes_authorization_and_activates_exactly_one_successor():
+    authorization = load_project()
+    active = load_active_project()
+    assert authorization["state"] == "CLOSED_PASS"
+    assert authorization["candidate_state"] == "CANONICAL_AUTHORIZATION_EFFECTIVE"
+    assert authorization["canonicalization_status"] == "EXACT_CANONICAL_MERGE_VERIFIED"
+    assert authorization["authorization_candidate_commit"] == "b0c132468d4e637fa0d3197044f588081ba025e1"
+    assert authorization["authorization_canonical_merge"] == "112e004ff516ef141a4dcf661d9ae4fe454aa85c"
+    assert active["state"] == "ACTIVE"
+    assert active["governing_authorization_project_id"] == authorization["project_id"]
+    assert active["governing_authorization_canonical_merge"] == "112e004ff516ef141a4dcf661d9ae4fe454aa85c"
+    assert active["qntyspot_source_commit"] == "b9a84c59bd43e7697ee970d2a7571647e5de4501"
+    assert active["historical_data_cutoff_utc"] == "2026-08-25T17:02:37Z"
+    assert active["implementation_authorized"] is False
+    registry = tomllib.loads(PROJECTS_PATH.read_text(encoding="utf-8"))
+    assert [row for row in registry["project"] if row["state"] == "ACTIVE"] == [active]
 
 
 def test_exact_canonical_base_binding():
@@ -84,7 +107,8 @@ def test_future_phase_is_unique_and_cutoff_is_frozen():
     registry = tomllib.loads(PROJECTS_PATH.read_text(encoding="utf-8"))
     ids = [row["project_id"] for row in registry["project"]]
     assert ids.count(auth["project_id"]) == 1
-    assert future["project_id"] not in ids
+    assert ids.count(future["project_id"]) == 1
+    assert load_active_project()["project_id"] == future["project_id"]
 
 
 def test_future_phase_anti_leakage_and_baselines_are_complete():
@@ -177,9 +201,40 @@ def test_qualification_fixture_is_not_a_strategy():
 
 def test_project_registry_and_artifact_digest_are_aligned():
     project = load_project()
-    assert project["state"] == "PLANNED_NOT_AUTHORIZED"
+    assert project["state"] == "CLOSED_PASS"
     assert project["implementation_authorized"] is False
     assert project["authorization_effective"] == "AFTER_EXACT_CANONICAL_MERGE_ONLY"
     assert project["hostile_review_count"] == 1
     assert project["hostile_review_verdict"] == "PASS"
     assert project["authorization_artifact_sha256"] == hashlib.sha256(AUTH_PATH.read_bytes()).hexdigest()
+
+
+def test_active_contract_preserves_scope_order_costs_and_firewall():
+    active = load_active_project()
+    assert active["authorized_operations"] == [
+        "PREREGISTER",
+        "DEFINE_CHRONOLOGICAL_DEV_OUTER",
+        "ACQUIRE_DEV",
+        "EVALUATE_PREREGISTERED_CANDIDATES_ON_DEV",
+        "SELECT_AND_FREEZE_EXACTLY_ONE_CANDIDATE",
+        "ONLY_THEN_ACQUIRE_OUTER",
+        "EXACTLY_ONE_OUTER_EVALUATION",
+        "RECONSTRUCT_METRICS",
+        "COMPARE_FROZEN_BASELINES",
+        "PRODUCE_PROSPECTIVE_SHADOW_CONTINUATION_CONTRACT",
+    ]
+    assert active["required_baselines"] == load_auth()["authorized_future_phase"]["required_baselines"]
+    assert set(active["required_costs"]) == set(load_auth()["authorized_future_phase"]["required_costs"])
+    assert active["outer_rerun_authorized"] is False
+    assert active["qualification_fixture_is_strategy"] is False
+    for key in (
+        "scientific_execution_authorized",
+        "market_data_access_authorized",
+        "historical_economic_outcome_inspection_authorized",
+        "backtest_authorized",
+        "strategy_test_authorized",
+        "research_ledger_mutation_authorized",
+    ):
+        assert active[key] is False
+    for key in ("qntyspot_execution_authority", "trading_authority", "capital_authority", "signing_authority", "promotion_authority"):
+        assert active[key] == "NONE"

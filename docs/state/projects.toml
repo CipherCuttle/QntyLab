@@ -3,9 +3,9 @@ schema_version = 1
 [[project]]
 project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_AUTHORIZATION_V0"
 display_name = "QntySpot Ink shadow performance research authorization V0"
-state = "PLANNED_NOT_AUTHORIZED"
-candidate_state = "ACTIVE_CANDIDATE"
-canonicalization_status = "CANDIDATE_NOT_CANONICAL"
+state = "CLOSED_PASS"
+candidate_state = "CANONICAL_AUTHORIZATION_EFFECTIVE"
+canonicalization_status = "EXACT_CANONICAL_MERGE_VERIFIED"
 authority_level = "BOUNDED_RESEARCH_AUTHORIZATION_ONLY"
 phase_type = "GOVERNANCE_ONLY"
 authoritative_artifacts = [
@@ -20,6 +20,9 @@ authoritative_artifacts = [
 authorization_state = "AUTHORIZED_IF_CANONICAL"
 authorization_effective = "AFTER_EXACT_CANONICAL_MERGE_ONLY"
 canonical_base_sha = "a4738278f42f961ad2f2470fefff6688ccde6bb6"
+authorization_candidate_commit = "b0c132468d4e637fa0d3197044f588081ba025e1"
+authorization_canonical_merge = "112e004ff516ef141a4dcf661d9ae4fe454aa85c"
+authorization_required_state = "CLOSED_PASS"
 future_phase_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_V0"
 future_phase_separate = true
 effective_future_phase_authority = false
@@ -48,9 +51,69 @@ hostile_governance_high_total = 0
 hostile_governance_medium_total = 0
 hostile_governance_low_total = 0
 targeted_governance_rereview_used = false
-terminal_outcome = "ACTIVE_CANDIDATE"
-terminal_outcome_basis = "Governance-only candidate for exactly one later QntySpot Ink shadow performance research phase. The branch-local candidate does not self-authorize; effectiveness requires exact canonical merge. Construction performed no scientific execution, market access, research-ledger mutation, QntySpot mutation, signing, approval, broadcast, trading, or capital use."
-next_action = "ACTIVE_CANDIDATE: publish one draft PR and stop. Do not merge or begin QNTYSPOT_INK_SHADOW_PERFORMANCE_V0."
+terminal_outcome = "CANONICAL_AUTHORIZATION_EFFECTIVE"
+next_action = "CLOSED_PASS: the authorization is canonical and terminal. Its one separately bound successor is QNTYSPOT_INK_SHADOW_PERFORMANCE_V0; do not begin that successor from this authorization row."
+
+[[project]]
+project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_V0"
+display_name = "QntySpot Ink shadow performance research V0"
+state = "ACTIVE"
+authority_level = "BOUNDED_RESEARCH_AUTHORIZATION_ONLY"
+phase_type = "BOUNDED_RESEARCH_PHASE"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qntyspot_ink_shadow_performance_authorization_v0/authorization.json",
+  "experiments/research/qntyspot_ink_shadow_performance_authorization_v0/hostile_governance_review.md",
+  "tests/test_qntyspot_ink_shadow_performance_authorization_v0.py",
+]
+governing_authorization_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_AUTHORIZATION_V0"
+governing_authorization_candidate_commit = "b0c132468d4e637fa0d3197044f588081ba025e1"
+governing_authorization_canonical_merge = "112e004ff516ef141a4dcf661d9ae4fe454aa85c"
+qntyspot_source_commit = "b9a84c59bd43e7697ee970d2a7571647e5de4501"
+historical_data_cutoff_utc = "2026-08-25T17:02:37Z"
+authorized_operations = [
+  "PREREGISTER",
+  "DEFINE_CHRONOLOGICAL_DEV_OUTER",
+  "ACQUIRE_DEV",
+  "EVALUATE_PREREGISTERED_CANDIDATES_ON_DEV",
+  "SELECT_AND_FREEZE_EXACTLY_ONE_CANDIDATE",
+  "ONLY_THEN_ACQUIRE_OUTER",
+  "EXACTLY_ONE_OUTER_EVALUATION",
+  "RECONSTRUCT_METRICS",
+  "COMPARE_FROZEN_BASELINES",
+  "PRODUCE_PROSPECTIVE_SHADOW_CONTINUATION_CONTRACT",
+]
+required_baselines = [
+  "HOLD_WETH",
+  "BUY_AND_HOLD_KRAKMASK",
+  "PERIODIC_DCA",
+  "DUMB_SYMMETRIC_GRID",
+  "SELECTED_QNTYSPOT_LADDER",
+]
+required_costs = [
+  "EXACT_AMM_FEE",
+  "INTENDED_SIZE_PRICE_IMPACT",
+  "EXPLICIT_GAS_TREATMENT_AND_SENSITIVITY",
+  "TURNOVER",
+]
+outer_rerun_authorized = false
+qualification_fixture_is_strategy = false
+scientific_execution_authorized = false
+market_data_access_authorized = false
+historical_economic_outcome_inspection_authorized = false
+backtest_authorized = false
+strategy_test_authorized = false
+research_ledger_mutation_authorized = false
+qntyspot_execution_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+signing_authority = "NONE"
+promotion_authority = "NONE"
+implementation_authorized = false
+implementation_completed = false
+next_action = "After exact canonical merge and fresh clean worktree reconciliation, PREREGISTER one bounded design; then preserve the frozen DEV → candidate freeze → OUTER order. No market-data access, strategy_test, backtest, research-ledger mutation, QntySpot mutation, signing, approval, broadcast, trading, capital, or promotion is authorized by this activation candidate."
 
 [[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_V2_PREREGISTRATION_V0"

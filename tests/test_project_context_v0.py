@@ -26,6 +26,7 @@ DSH_STAGE_A_V1R3R2_EXECUTION_PROJECT_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_E
 DSH_STAGE_A_V1R3R2_V0R2R1_EXECUTION_PROJECT_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R2R1"
 DSH_STAGE_A_V1R3R2_V0R3_EXECUTION_PROJECT_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R3"
 DSH_STAGE_A_V1R3R2_V0R4_EXECUTION_PROJECT_ID = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R4"
+QNTYSPOT_ACTIVE_PROJECT_ID = "QNTYSPOT_INK_SHADOW_PERFORMANCE_V0"
 CLAIM_REPAIR_AUTHORIZATION_PROJECT_ID = "DSH_STAGE_A_CLAIM_ACQUISITION_TRANSPORT_AND_OBSERVABILITY_REPAIR_AUTHORIZATION_V0"
 CLAIM_REPAIR_AUTHORIZATION_NEXT_ACTION = "No project implementation is currently authorized."
 
@@ -156,8 +157,9 @@ def test_dsh_stage_a_v1_execution_closure_is_single_bounded_blocked_project() ->
         for record in registry["project"]
         if record["state"] == "ACTIVE" and record.get("candidate_state") != "ACTIVE_CANDIDATE"
     }
-    # V0R4 closed BLOCK_RUNTIME_IDENTITY, so no registry row remains ACTIVE.
-    assert active_ids == set()
+    # V0R4 remains closed; the sole current ACTIVE row is the separately bound
+    # QntySpot research successor.
+    assert active_ids == {QNTYSPOT_ACTIVE_PROJECT_ID}
     execution = next(record for record in registry["project"] if record["project_id"] == DSH_STAGE_A_V1_EXECUTION_PROJECT_ID)
     authorization = next(record for record in registry["project"] if record["project_id"] == DSH_STAGE_A_V1_AUTHORIZATION_PROJECT_ID)
     v0r4 = next(record for record in registry["project"] if record["project_id"] == DSH_STAGE_A_V1R3R2_V0R4_EXECUTION_PROJECT_ID)
@@ -176,8 +178,8 @@ def test_dsh_stage_a_v1_execution_closure_is_single_bounded_blocked_project() ->
     _assert_project_is_not_active(registry, DSH_STAGE_A_V1R3R2_V0R4_EXECUTION_PROJECT_ID)
     _assert_project_is_not_current_active(data, DSH_STAGE_A_V1R3R2_V0R4_EXECUTION_PROJECT_ID)
     assert v0r3["state"] == "CLOSED_BLOCKED"
-    assert data["active_project"] is None
-    assert data["current_permitted_next_action"] == CLAIM_REPAIR_AUTHORIZATION_NEXT_ACTION
+    assert data["active_project"]["project_id"] == QNTYSPOT_ACTIVE_PROJECT_ID
+    assert data["current_permitted_next_action"].startswith("After exact canonical merge")
     assert execution["state"] == "CLOSED_BLOCKED"
     assert execution["implementation_authorized"] is False
     assert execution["implementation_completed"] is True
@@ -229,8 +231,8 @@ def test_dsh_stage_a_v1r1_offline_qualification_is_closed_without_live_authority
     assert receipt["native_claude_child_runs"] == 0
     assert receipt["stage_a_fixture_runs"] == 0
     assert receipt["spend_usd"] == 0.0
-    assert data["active_project"] is None
-    assert data["current_permitted_next_action"] == CLAIM_REPAIR_AUTHORIZATION_NEXT_ACTION
+    assert data["active_project"]["project_id"] == QNTYSPOT_ACTIVE_PROJECT_ID
+    assert data["current_permitted_next_action"].startswith("After exact canonical merge")
 
 
 def test_project_supersession_targets_self_and_cycles_fail(tmp_path: Path) -> None:
@@ -317,13 +319,13 @@ def test_funding_incremental_implementation_freeze_is_closed_without_escalation(
     # V0R2R1 became canonically effective after PR #193 merged, then closed
     # BLOCK_RUNTIME_INFRA because this environment cannot materialize or launch
     # the pinned DSH runtime. V0R3 and then V0R4 each closed
-    # BLOCK_RUNTIME_IDENTITY before secret or runtime execution, so no ACTIVE
-    # registry rows remain and no closed episode is reopened.
+    # BLOCK_RUNTIME_IDENTITY before secret or runtime execution, so no closed
+    # episode is reopened; the sole ACTIVE row is the QntySpot successor.
     assert {
         record["project_id"]
         for record in registry["project"]
         if record["state"] == "ACTIVE" and record.get("candidate_state") != "ACTIVE_CANDIDATE"
-    } == set()
+    } == {QNTYSPOT_ACTIVE_PROJECT_ID}
     for closed_episode_id in (
         DSH_STAGE_A_V1R3R2_EXECUTION_PROJECT_ID,
         DSH_STAGE_A_V1R3R2_V0R2R1_EXECUTION_PROJECT_ID,
@@ -334,8 +336,8 @@ def test_funding_incremental_implementation_freeze_is_closed_without_escalation(
         assert episode["state"] == "CLOSED_BLOCKED", closed_episode_id
         _assert_project_is_not_active(registry, closed_episode_id)
         _assert_project_is_not_current_active(data, closed_episode_id)
-    assert data["active_project"] is None
-    assert data["current_permitted_next_action"] == CLAIM_REPAIR_AUTHORIZATION_NEXT_ACTION
+    assert data["active_project"]["project_id"] == QNTYSPOT_ACTIVE_PROJECT_ID
+    assert data["current_permitted_next_action"].startswith("After exact canonical merge")
     _assert_project_is_not_active(registry, FUNDING_INCREMENTAL_IMPLEMENTATION_PROJECT_ID)
     _assert_project_is_not_current_active(data, FUNDING_INCREMENTAL_IMPLEMENTATION_PROJECT_ID)
     project = next(

@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- None.
+- `QntySpot Ink shadow performance research V0` — `ACTIVE`. After exact canonical merge and fresh clean worktree reconciliation, PREREGISTER one bounded design; then preserve the frozen DEV → candidate freeze → OUTER order. No market-data access, strategy_test, backtest, research-ledger mutation, QntySpot mutation, signing, approval, broadcast, trading, capital, or promotion is authorized by this activation candidate.
 
 ## Queued — not authorized
 
@@ -12,7 +12,6 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 - `DSH Stage-A V1R3R2 execution contract reconciliation correction authorization V0` — `PLANNED_NOT_AUTHORIZED`. ACTIVE_CANDIDATE: This corrective authorization is effective only after exact canonical merge of this PR. The future correction phase (one bounded correction of C1/H1/H2) must independently reconcile the canonical source again before any repair. No merge, no repair, no live activity, no scope widening.
 - `DSH Stage-A V1R3R2 production claim-owner integration correction authorization V0` — `PLANNED_NOT_AUTHORIZED`. ACTIVE_CANDIDATE: This corrective authorization is effective only after exact canonical merge of this PR. The future implementation phase (one bounded production claim-owner integration correction of the frozen H1 seam) must independently reconcile the canonical source again before any repair. No merge, no repair, no live activity, no scope widening, no new implementation PR.
 - `PROSPECTIVE_SHADOW` — `PLANNED_NOT_AUTHORIZED`. No implementation is authorized; require separate Git-backed authorization.
-- `QntySpot Ink shadow performance research authorization V0` — `PLANNED_NOT_AUTHORIZED`. ACTIVE_CANDIDATE: publish one draft PR and stop. Do not merge or begin QNTYSPOT_INK_SHADOW_PERFORMANCE_V0.
 - `QNTY_HANDOFF` — `PLANNED_NOT_AUTHORIZED`. No implementation is authorized unless downstream evidence separately earns it.
 - `REACTIVE_JIGSAW_V0` — `PLANNED_NOT_AUTHORIZED`. No implementation is authorized; require separate Git-backed authorization.
 - `ROUTER_DATASET_CONTRACT` — `PLANNED_NOT_AUTHORIZED`. No implementation is authorized; require separate Git-backed authorization.
@@ -125,6 +124,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 - `QntyLab Context Spine Orientation Completeness V0 OC-A authorization` — `CLOSED_PASS`. OC_A_READY_FOR_MERGE: after canonical closure/merge and fresh reconciliation, begin only the separately named OC-B implementation phase; do not begin OC-B before OC-A is canonical and closed or merged.
 - `QntyLab Context Spine Orientation Completeness V0 OC-B implementation` — `CLOSED_PASS`. OC_B_READY_FOR_MERGE: implementation is frozen and verified; open a PR, do not merge without separate authorization.
 - `QNTYLAB_PROJECT_CONTEXT_AND_AUTHORITY_REGISTRY_V0` — `CLOSED_PASS`. Project Context and Authority Registry V0 is complete; no further implementation is authorized by this closed phase.
+- `QntySpot Ink shadow performance research authorization V0` — `CLOSED_PASS`. CLOSED_PASS: the authorization is canonical and terminal. Its one separately bound successor is QNTYSPOT_INK_SHADOW_PERFORMANCE_V0; do not begin that successor from this authorization row.
 - `Qnty agent orchestration control contract V0 governance freeze` — `CLOSED_PASS`. After canonical merge, perform a fresh reconciliation, then begin exactly QNTY_AGENT_ORCHESTRATION_CONTROL_CONTRACT_V0_CONTRACT_ONLY_REPOSITORY_BOOTSTRAP.
 - `QntyAgentRuntime H01 machine-enforcement repair authorization` — `CLOSED_PASS`. After canonical merge, perform exactly one QNTY_AGENT_RUNTIME_CONTRACT_ONLY_BOOTSTRAP_H01_MACHINE_ENFORCEMENT_REPAIR_V0 phase; if any Critical or High remains after its one targeted re-review, terminate this bootstrap attempt permanently as QNTY_AGENT_RUNTIME_CONTRACT_BOOTSTRAP_H01_UNRESOLVED.
 - `QntyAgentRuntime H01 contract-only bootstrap canonical closure` — `CLOSED_PASS`. fresh bounded QntyAgentRuntime ecosystem-registration phase; not Stage-A directly

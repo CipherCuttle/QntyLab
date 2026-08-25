@@ -140,4 +140,4 @@ def test_canonical_repository_preserves_pr184_closed_block_authority() -> None:
     projects = project_context.validate_projects_registry(ROOT, registry)
     projection = project_context.execution_authority_projection(ROOT, projects)
     assert projection["issues"] == []
-    assert projection["active_project"] is None
+    assert projection["active_project"]["project_id"] == "QNTYSPOT_INK_SHADOW_PERFORMANCE_V0"

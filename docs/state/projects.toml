@@ -1,6 +1,58 @@
 schema_version = 1
 
 [[project]]
+project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_AUTHORIZATION_V0"
+display_name = "QntySpot Ink shadow performance research authorization V0"
+state = "PLANNED_NOT_AUTHORIZED"
+candidate_state = "ACTIVE_CANDIDATE"
+canonicalization_status = "CANDIDATE_NOT_CANONICAL"
+authority_level = "BOUNDED_RESEARCH_AUTHORIZATION_ONLY"
+phase_type = "GOVERNANCE_ONLY"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "qntylab.toml",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qntyspot_ink_shadow_performance_authorization_v0/authorization.json",
+  "experiments/research/qntyspot_ink_shadow_performance_authorization_v0/hostile_governance_review.md",
+  "tests/test_qntyspot_ink_shadow_performance_authorization_v0.py",
+]
+authorization_state = "AUTHORIZED_IF_CANONICAL"
+authorization_effective = "AFTER_EXACT_CANONICAL_MERGE_ONLY"
+canonical_base_sha = "a4738278f42f961ad2f2470fefff6688ccde6bb6"
+future_phase_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_V0"
+future_phase_separate = true
+effective_future_phase_authority = false
+implementation_authorized = false
+implementation_completed = false
+authorization_artifact = "experiments/research/qntyspot_ink_shadow_performance_authorization_v0/authorization.json"
+authorization_artifact_sha256 = "93008ebdfe36e137bacb243362de7b2bd9986aad1d944c285820294ac482df4f"
+canonical_qntyspot_ref = "origin/main"
+canonical_qntyspot_commit = "b9a84c59bd43e7697ee970d2a7571647e5de4501"
+historical_data_cutoff_utc = "2026-08-25T17:02:37Z"
+scientific_execution_authorized = false
+market_data_access_authorized = false
+backtest_authorized = false
+strategy_test_authorized = false
+research_ledger_state_changed = false
+qntyspot_mutation_authorized = false
+trading_authority = "NONE"
+capital_authority = "NONE"
+qntyspot_execution_authority = "NONE"
+signing_authority = "NONE"
+promotion_authority = "NONE"
+hostile_review_count = 1
+hostile_review_verdict = "PASS"
+hostile_governance_critical_total = 0
+hostile_governance_high_total = 0
+hostile_governance_medium_total = 0
+hostile_governance_low_total = 0
+targeted_governance_rereview_used = false
+terminal_outcome = "ACTIVE_CANDIDATE"
+terminal_outcome_basis = "Governance-only candidate for exactly one later QntySpot Ink shadow performance research phase. The branch-local candidate does not self-authorize; effectiveness requires exact canonical merge. Construction performed no scientific execution, market access, research-ledger mutation, QntySpot mutation, signing, approval, broadcast, trading, or capital use."
+next_action = "ACTIVE_CANDIDATE: publish one draft PR and stop. Do not merge or begin QNTYSPOT_INK_SHADOW_PERFORMANCE_V0."
+
+[[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_V2_PREREGISTRATION_V0"
 display_name = "Jigsaw fast prospective signal discovery V2 capability-compiled preregistration"
 state = "CLOSED_PASS"

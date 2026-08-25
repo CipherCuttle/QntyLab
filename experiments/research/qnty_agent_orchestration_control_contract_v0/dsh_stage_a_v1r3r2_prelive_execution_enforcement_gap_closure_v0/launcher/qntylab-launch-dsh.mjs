@@ -38,7 +38,22 @@ export { LaunchPlaneError, writeLaunchReceipt }
 const CANONICAL_POLICY_PATCH = join(PHASE, 'profile/cordis.patch.yml')
 const OFFLINE_STUB_PATCH = join(PHASE, 'stub/offline-stub.patch.yml')
 const OFFLINE_STUB_EXECUTABLE = join(PHASE, 'stub/native-child-stub.mjs')
+// MEDIUM-1 note: the claim-binding executionContractRoot is validated for
+// exact sha256 FORMAT at this transport seam. A cross-check against the
+// system-derived current composite root would require importing the composite
+// production computeDigests module, which demands the qualified DSH runtime
+// (not present on clean CI) — a silent skip would be a silent fallback, and a
+// hard fail would make the repository-deterministic E2E unrunnable in CI.
+// Therefore the FORMAT check plus the Python seam's resolved-inputs equality
+// (the frozen enforcement seam compares the transported root byte-for-byte
+// against the resolved execution inputs before any claim is COMMITTED) remain
+// the binding enforcement points for MEDIUM-1. No authority is invented.
 const QUALIFIED_CONTRACT_FLAG = '--qualified-launch-contract-digest'
+// The five claim-binding env keys are DELIBERATELY NOT in ALLOWED_EXTRA_ENV.
+// They are owned exclusively by the validated claimBinding payload and can
+// never be supplied through the ordinary extraEnv seam. A caller with ordinary
+// extraEnv control must not be able to overwrite the validated claim binding
+// after validateClaimBinding has run (HIGH-1).
 const ALLOWED_EXTRA_ENV = new Set([
   'OPENAI_API_KEY',
   'QNTYLAB_DSH_PARENT_BUDGET_STATE_PATH',
@@ -53,8 +68,85 @@ const ALLOWED_EXTRA_ENV = new Set([
   'QNTYLAB_DSH_STUB_RESPONSE_MODE',
 ])
 
-const digestFile = path => createHash('sha256').update(readFileSync(path)).digest('hex')
+// ------------------------------------------------ claim-binding transport ----
+//
+// THE CLAIM BINDING (frozen model, TWO provenance classes):
+//
+// A. RESOLVED PRODUCTION IDENTITY — must originate from the SAME
+//    prepareProductionLaunch execution that materialized the production home:
+//      - executionContractRoot      (actual mechanically derived current root)
+//      - runtimeIdentityDigest      (resolved runtime identity digest)
+//      - executableIdentityDigest   (resolved executable identity digest)
+//    These must NEVER be stale literals, never recovered from historical
+//    artifacts, and never computed from the source SHA.
+//
+// B. FUTURE LIVE AUTHORITY IDENTITY — only from an applicable future canonical
+//    live authorization:
+//      - authorizedExecutionSourceSha  (exact immutable commit object identity)
+//      - revocationState               (explicit canonical state, e.g. NOT_REVOKED)
+//    This repair builds the transport and the fail-closed seam; it NEVER
+//    invents a future live source SHA and NEVER declares a default
+//    NOT_REVOKED on its own.
+//
+// The launcher transports the COMPLETE binding as a single structured object to
+// the profile process via the allowlisted env vars below. There is NO
+// environment substitution anywhere in this phase (no shell-style ${VAR}
+// expansion): the profile process reads the exact values we placed in its env.
+const CLAIM_BINDING_ENV_KEYS = Object.freeze([
+  'QNTYLAB_DSH_AUTHORIZED_EXECUTION_SOURCE_SHA',
+  'QNTYLAB_DSH_EXECUTION_CONTRACT_ROOT',
+  'QNTYLAB_DSH_RUNTIME_IDENTITY_DIGEST',
+  'QNTYLAB_DSH_EXECUTABLE_IDENTITY_DIGEST',
+  'QNTYLAB_DSH_REVOCATION_STATE',
+])
 
+const SHA256_RE = /^[0-9a-fA-F]{64}$/
+const EXACT_COMMIT_RE = /^[0-9a-fA-F]{40,64}$/
+// Explicit canonical revocation/supersession states, mirroring the Python
+// enforcement seam. REVOKED/SUPERSEDED must fail closed in the guard.
+const REVOCATION_STATES = Object.freeze(['NOT_REVOKED', 'REVOKED', 'SUPERSEDED'])
+
+export function validateClaimBinding(binding) {
+  if (binding === undefined || binding === null || typeof binding !== 'object') {
+    throw new Error('BLOCK_CLAIM_BINDING: the claim binding payload is required')
+  }
+  // Allowlisted keys only — nothing is silently dropped, and no unknown key is
+  // ever transported.
+  for (const key of Object.keys(binding)) {
+    if (!CLAIM_BINDING_ENV_KEYS.includes(`QNTYLAB_DSH_${key.replace(/([A-Z])/g, '_$1').toUpperCase()}`)) {
+      throw new Error(`BLOCK_CLAIM_BINDING: unknown claim binding key is denied: ${key}`)
+    }
+  }
+  // Production-identity values are REQUIRED (non-empty, exact sha256 format).
+  for (const key of ['executionContractRoot', 'runtimeIdentityDigest', 'executableIdentityDigest']) {
+    const value = binding[key]
+    if (typeof value !== 'string' || !SHA256_RE.test(value)) {
+      throw new Error(`BLOCK_CLAIM_BINDING: ${key} is missing or not a valid sha256`)
+    }
+  }
+  // Future-authority values: source SHA is required and must be an exact
+  // immutable commit identity; revocation state is required and explicit.
+  const sourceSha = binding.authorizedExecutionSourceSha
+  if (typeof sourceSha !== 'string' || !EXACT_COMMIT_RE.test(sourceSha)) {
+    throw new Error('BLOCK_CLAIM_BINDING: authorizedExecutionSourceSha is missing or malformed; an exact immutable commit identity is required')
+  }
+  const revocation = binding.revocationState
+  if (typeof revocation !== 'string' || !REVOCATION_STATES.includes(revocation)) {
+    throw new Error('BLOCK_CLAIM_BINDING: revocationState is missing or not an explicit canonical state')
+  }
+  // NO environment substitution, no moving ref accepted as immutable source SHA,
+  // no default NOT_REVOKED: the payload is transported exactly as supplied.
+  return Object.freeze({ ...binding })
+}
+
+export const claimBindingEnv = binding => validateClaimBinding(binding)
+
+/** Env keys that carry the claim binding into the profile process. */
+export function claimBindingWithoutInvention() {
+  return [...CLAIM_BINDING_ENV_KEYS]
+}
+
+const digestFile = path => createHash('sha256').update(readFileSync(path)).digest('hex')
 function contained(root, candidate) {
   return candidate === root || candidate.startsWith(root.endsWith(sep) ? root : `${root}${sep}`)
 }
@@ -209,6 +301,13 @@ export function preflightLaunch(args, options = {}) {
 
 function validateExtraEnvironment(extraEnv) {
   for (const [key, value] of Object.entries(extraEnv)) {
+    if (CLAIM_BINDING_ENV_KEYS.includes(key)) {
+      // Claim-binding keys are owned exclusively by the validated claimBinding
+      // payload. They can never enter through the ordinary extraEnv seam, so a
+      // caller with extraEnv control cannot silently override a value that
+      // validateClaimBinding already produced and approved (HIGH-1).
+      throw new Error(`Stage-A claim-binding environment key cannot be supplied through extraEnv: ${key}`)
+    }
     if (!ALLOWED_EXTRA_ENV.has(key)) throw new Error(`Stage-A extra environment key is denied: ${key}`)
     if (typeof value !== 'string' || value.length === 0) {
       throw new Error(`Stage-A extra environment value is invalid: ${key}`)
@@ -238,11 +337,70 @@ export function selectedPolicyPatches(args, extraEnv, offlineProfilePatch) {
   return [OFFLINE_STUB_PATCH]
 }
 
+/**
+ * Build the complete child env the launcher hands to the DSH profile process.
+ *
+ * This is the SINGLE env-construction code path (also used by spawnDsh). The
+ * validated claim binding is applied AFTER extraEnv and a post-merge integrity
+ * re-check guarantees the five claim-binding values are byte-identical to the
+ * validated payload. Callers with ONLY ordinary extraEnv control cannot
+ * overwrite a validated claim-binding value (HIGH-1).
+ */
+export function buildSpawnEnv(args, { extraEnv = {}, offlineProfilePatch, claimBinding, immediate }) {
+  // extraEnv is validated on this shared seam as well (spawnDsh also validates,
+  // but the exported env builder must never accept claim-binding keys through
+  // the ordinary extraEnv seam either — HIGH-1 defense in depth).
+  validateExtraEnvironment(extraEnv)
+  // The claim binding must accompany every spawn. It is resolved against the
+  // allowlisted set and transported into the child env EXACTLY as supplied —
+  // the profile process never re-derives, re-substitutes, or defaults any of
+  // these values.
+  const validatedClaimBinding = validateClaimBinding(claimBinding)
+  const claimEnv = Object.fromEntries(
+    CLAIM_BINDING_ENV_KEYS.map(envKey => {
+      const field = claimBindingEnvKeyField(envKey)
+      return [envKey, validatedClaimBinding[field]]
+    }),
+  )
+  const resolved = immediate.fingerprints
+  const env = {
+    PATH: immediate.nativePath,
+    HOME: process.env.HOME ?? '',
+    DSH_HOME: args.dshHome,
+    QNTYLAB_ROOT: ROOT,
+    QNTYLAB_PYTHON: resolved.pythonExecutable.resolvedPath,
+    QNTYLAB_DSH_NATIVE_PATH: immediate.nativePath,
+    ...(offlineProfilePatch === undefined
+      ? {}
+      : { QNTYLAB_DSH_OFFLINE_STUB_EXECUTABLE: OFFLINE_STUB_EXECUTABLE }),
+    // extraEnv supplies ordinary non-claim runtime variables and is merged
+    // BEFORE the claim binding so nothing can shadow an approved claim-binding
+    // value.
+    ...extraEnv,
+    // The validated claim binding is applied LAST and is therefore
+    // authoritative in the final process env. Claim-binding keys are already
+    // excluded from extraEnv (validateExtraEnvironment above), so this ordering
+    // is a second independent guarantee that they are byte-exact to the
+    // validated binding by the time the child process starts.
+    ...claimEnv,
+  }
+  if (args.parentEndpoint) env.QNTYLAB_DSH_PARENT_ENDPOINT = args.parentEndpoint
+  // Post-merge integrity re-check: the five claim-binding env values must be
+  // byte-identical to the values validateClaimBinding approved. No silent
+  // fallback, no default NOT_REVOKED — any mismatch is a hard block.
+  for (const envKey of CLAIM_BINDING_ENV_KEYS) {
+    if (env[envKey] !== validatedClaimBinding[claimBindingEnvKeyField(envKey)]) {
+      throw new Error(`BLOCK_CLAIM_BINDING: transport env re-check failed for ${envKey}`)
+    }
+  }
+  return env
+}
+
 /** Phase-local Stage-A spawn boundary with an immediate identity recheck. */
 export function spawnDsh(
   args,
   preflightResult,
-  { extraEnv = {}, stdio = 'inherit', appArgs = [], offlineProfilePatch } = {},
+  { extraEnv = {}, stdio = 'inherit', appArgs = [], offlineProfilePatch, claimBinding } = {},
 ) {
   if (!Array.isArray(appArgs) || appArgs.some(value => typeof value !== 'string')) {
     throw new TypeError('Stage-A application arguments must be a string array')
@@ -259,20 +417,11 @@ export function spawnDsh(
     preflightResult?.cliDigest !== immediate.cliDigest
     || preflightResult?.workspaceReal !== immediate.workspaceReal
   ) throw new Error('BLOCK_RUNTIME_IDENTITY: supplied preflight receipt does not match immediate verification')
+  // The env is built by the SAME exported code path the enforcement E2E
+  // traverses, including the validated claim binding transport and the
+  // post-merge integrity re-check.
+  const env = buildSpawnEnv(args, { extraEnv, offlineProfilePatch, claimBinding, immediate })
   const resolved = immediate.fingerprints
-  const env = {
-    PATH: immediate.nativePath,
-    HOME: process.env.HOME ?? '',
-    DSH_HOME: args.dshHome,
-    QNTYLAB_ROOT: ROOT,
-    QNTYLAB_PYTHON: resolved.pythonExecutable.resolvedPath,
-    QNTYLAB_DSH_NATIVE_PATH: immediate.nativePath,
-    ...(offlineProfilePatch === undefined
-      ? {}
-      : { QNTYLAB_DSH_OFFLINE_STUB_EXECUTABLE: OFFLINE_STUB_EXECUTABLE }),
-    ...extraEnv,
-  }
-  if (args.parentEndpoint) env.QNTYLAB_DSH_PARENT_ENDPOINT = args.parentEndpoint
   return spawn(
     resolved.nodeExecutable.resolvedPath,
     [
@@ -282,5 +431,21 @@ export function spawnDsh(
       ...appArgs,
     ],
     { cwd: immediate.workspaceReal, env, stdio },
+  )
+}
+
+/** Map an allowlisted env key to its camelCase claim-binding field. */
+function claimBindingEnvKeyField(envKey) {
+  return envKey
+    .replace('QNTYLAB_DSH_', '')
+    .toLowerCase()
+    .replace(/_([a-z])/g, (_, letter) => letter.toUpperCase())
+}
+
+/** Claim-binding env mapping, exported for profile/config wiring. */
+export const claimBindingEnvVars = binding => {
+  const validated = validateClaimBinding(binding)
+  return Object.fromEntries(
+    CLAIM_BINDING_ENV_KEYS.map(envKey => [envKey, validated[claimBindingEnvKeyField(envKey)]]),
   )
 }

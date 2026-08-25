@@ -158,7 +158,11 @@ function initializeClaimGit(root) {
     '-C', source, '-c', 'user.name=prelive-offline',
     '-c', 'user.email=prelive-offline@example.invalid', 'commit', '-qm', 'offline seed',
   ])
-  return { source, remote }
+  // The exact immutable scratch source commit the offline claim binds to. The
+  // offline claim lineage (refs/remotes/origin/master in the source repo)
+  // resolves this exact commit; the operational claim seam verifies it.
+  const sourceSha = checked('git', ['-C', source, 'rev-parse', 'HEAD'])
+  return { source, remote, sourceSha }
 }
 
 function recursiveSentinelLeaks(root, sentinel) {
@@ -216,6 +220,18 @@ try {
     '--parent-endpoint', endpoint,
   ])
   const preflight = preflightLaunch(args, { forbiddenRoots: [ROOT] })
+  // The offline full-profile qualification supplies a SCRATCH claim binding:
+  // exact scratch source commit SHA (the seed commit pushed to the scratch
+  // bare remote) plus an explicit scratch revocation state. It never invents a
+  // future live source SHA and never defaults NOT_REVOKED; the values are
+  // transported by the launcher exactly as supplied.
+  const claimBinding = {
+    authorizedExecutionSourceSha: claim.sourceSha,
+    executionContractRoot: QUALIFIED_IDENTITY.NEW_QUALIFIED_LAUNCH_CONTRACT_DIGEST,
+    runtimeIdentityDigest: QUALIFIED_IDENTITY.NEW_RUNTIME_MANIFEST_DIGEST,
+    executableIdentityDigest: QUALIFIED_IDENTITY.NEW_EXECUTABLE_IDENTITY_DIGEST,
+    revocationState: 'NOT_REVOKED',
+  }
   const child = spawnDsh(args, preflight, {
     appArgs: [
       scenario === undefined
@@ -240,6 +256,7 @@ try {
       }),
     },
     offlineProfilePatch: scenario === undefined ? undefined : OFFLINE_STUB_PATCH,
+    claimBinding,
     stdio: ['ignore', 'pipe', 'pipe'],
   })
   let stdout = ''

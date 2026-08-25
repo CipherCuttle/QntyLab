@@ -1,0 +1,384 @@
+{
+  "artifactType": "DSH_STAGE_A_V1R3R2_COMPOSITE_QUALIFIED_LAUNCH_CONTRACT",
+  "schemaVersion": "dsh-stage-a-v1r3r2-composite-launch-contract-v0",
+  "projectId": "DSH_STAGE_A_V1R3R2_COMPOSITE_LIVE_LAUNCHER_INTEGRATION_AND_REQUALIFICATION_V0",
+  "predecessor": {
+    "qualifiedContractDigest": "e16872fc1f419e5253d633bbdf35e936bb58e34a7636decb8eda688113658e82",
+    "historicalContractPreserved": true,
+    "historicalContractPath": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_launch_contract_requalification_v0/evidence/contract.json"
+  },
+  "components": {
+    "runtimeIdentity": {
+      "phaseId": "DSH_RUNTIME_MATERIALIZATION_AND_LAUNCH_V0",
+      "sourceIdentity": {
+        "repository": "deepseek-ai/deepseek-harness",
+        "commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+        "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+        "tag": "dsh-v0.1.0-rc.7"
+      },
+      "packageManagerFingerprint": {
+        "declaredPackageManager": "pnpm@11.7.0",
+        "actualVersion": "11.7.0",
+        "executableDigest": "3655bc798f300951f2070fee411b337d626b0c3ae80c2d24c46ccac4595d4bf9"
+      },
+      "lockfileDigest": "f517dc3978d57531cda747df62a2abdde1df5b9f25415fcf1fc5d51f8b7547ea",
+      "patchDigests": [
+        "f89bf5833956f3c4202ca88a9285e39658976b29605fc1b63b7c62ebdd07fcb3",
+        "2b8277bf13e077651046e2527dc7aa092c3c9669cedc61eac1f742d9364a17e3"
+      ],
+      "builtCliDigest": "c0226687bb20f45c603ec6fe50f3de16d1c3510c3a803304ec575ef9bc366c62",
+      "builtCliRelativePath": "apps/cli/lib/bin.js",
+      "workspaceBundledChunkDigests": {
+        "apps/cli/lib/plugin-9h8shc4d.js": "6f4459da44f0e5bdb3c72471f4be0ee1929913be352baf8b0da7b700afc1804c",
+        "apps/cli/lib/profile-boot-BnJoK_kl.js": "778c5b338674d986a49972be920c965d28b2c8cac85364ae77f8587070397663",
+        "apps/cli/lib/profile-boot-DG5t9aNs.js": "f83ffea6a4d30cfbe02b41dabcc05104c4ad27bf79c74f601f0ddb6ccdf88969"
+      },
+      "claudeSdkIdentity": {
+        "package": "@anthropic-ai/claude-agent-sdk",
+        "version": "0.3.220",
+        "packageJsonDigest": "1c9d0905f64e126850efe4fc4e7244c604a0855de8d4c82aff78da6f1988bd08"
+      },
+      "buildCommand": "corepack pnpm@11.7.0 run build:lib"
+    },
+    "executableIdentity": {
+      "nodeExecutableDigest": "1bec56ef7cfa9a76f3e0b7c0a87f220eb73f23102b9c0b4c7529a3f7c3ce7c31",
+      "pythonExecutableDigest": "b8d8288faefdd300201f43fcf00f6f539a27218eeed3a3dff5ab10b9c4c99700",
+      "codexExecutableDigest": "ac2cfed85fb647d61e0150b8548102b330e4799d9d81ad5d354de701edf6b074",
+      "claudeExecutableDigest": "98226474f802e3094d6a86c5ade8883c16206d0fcb5c400b7401c800063e99d7"
+    },
+    "compositeLaunchPolicy": {
+      "schemaVersion": "dsh-stage-a-v1r3r2-composite-launch-policy-envelope-v0",
+      "projectId": "DSH_STAGE_A_V1R3R2_COMPOSITE_LIVE_LAUNCHER_INTEGRATION_AND_REQUALIFICATION_V0",
+      "predecessorQualifiedContractDigest": "e16872fc1f419e5253d633bbdf35e936bb58e34a7636decb8eda688113658e82",
+      "physicalRuntimeBinding": {
+        "sourceRemote": "https://github.com/deepseek-ai/deepseek-harness.git",
+        "sourceIdentity": {
+          "repository": "deepseek-ai/deepseek-harness",
+          "commit": "99f6f02fecdb7dff40c3fbc9470f5907c29f74ca",
+          "tree": "3bc8f89fe494a4755c188be354add4e8b1e7b188",
+          "tag": "dsh-v0.1.0-rc.7"
+        },
+        "runtimeManifestDigest": "0e09b9d9d977f73d146c4a35d497cc93bd046bae016e1b1a6a52b481f07731b3",
+        "executableIdentityDigest": "ae07ece34c88b3ebaebd7452df8d136c82935f9c8ec9df16a40e50a2582a2fd9",
+        "lockfileDigest": "f517dc3978d57531cda747df62a2abdde1df5b9f25415fcf1fc5d51f8b7547ea",
+        "builtCliDigest": "c0226687bb20f45c603ec6fe50f3de16d1c3510c3a803304ec575ef9bc366c62",
+        "physicalLauncher": {
+          "path": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_runtime_materialization_and_launch_v0/launcher/qntylab-launch-dsh.mjs",
+          "digest": "99c8181f22c59e37db313e0aa2bb26660c14e89224cbd5b43b6896abb5583039"
+        },
+        "materializer": {
+          "path": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_runtime_materialization_and_launch_v0/materializer/qntylab-materialize-dsh-runtime.mjs",
+          "version": "qntylab-dsh-materializer-v0",
+          "digest": "2706a011c66bdce11f64c8c6db062c44160e65dd763c10b74a6533d9ba7d9668"
+        },
+        "governedPatchDigests": [
+          "f89bf5833956f3c4202ca88a9285e39658976b29605fc1b63b7c62ebdd07fcb3",
+          "2b8277bf13e077651046e2527dc7aa092c3c9669cedc61eac1f742d9364a17e3"
+        ],
+        "builtCliRelativePath": "apps/cli/lib/bin.js"
+      },
+      "stageAPolicy": {
+        "schemaVersion": "dsh-stage-a-v1r3r2-composite-launch-policy-v0",
+        "projectId": "DSH_STAGE_A_V1R3R2_COMPOSITE_LIVE_LAUNCHER_INTEGRATION_AND_REQUALIFICATION_V0",
+        "predecessorQualifiedContractDigest": "e16872fc1f419e5253d633bbdf35e936bb58e34a7636decb8eda688113658e82",
+        "productionFileDigests": {
+          "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/stub/offline-provider-overlay.patch.yml": "d554918347e812b932cfb298141430ed22462493ac9db961d2bf564a59cfad54",
+          "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/evidence/canonical-json.mjs": "751202c0bd2149fb2ba19a0b40da8b95eec96ef77298b59fcf33f3b31c2b9e70",
+          "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/evidence/compute-digests.mjs": "80d0a369bdcb69b9e878fd13534971f267a39a32a110128a7d3709df30dcd4e5",
+          "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/launcher/qntylab-launch-dsh.mjs": "48b6adb3ad633ef39f126e8771cf9baee6a4cd69c7f12055b964d24a3c22b911",
+          "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/profile/cordis.patch.yml": "3a1048d5bf1d98014e5ed4de1dc2f58cc1b7f3d30ecdfb0199d8a3d17e67a76d",
+          "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/profile/qntylab-stage-a-gated-provider/lib/gated-provider.mjs": "6149cf6bf82b30f1e19aee455081edb1d7ee76071d0169250193bf69c0ee3776",
+          "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/profile/qntylab-stage-a-gated-provider/lib/index.js": "f9f435b6ceeaf9502c686b435056e308104ef68e175520ed139d655d5d5b7720",
+          "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/profile/qntylab-stage-a-gated-provider/package.json": "30d4ccbf89e35696bd9f1bfafa7bcf98a45e829725496b6a4c5c4a91c421d9c7",
+          "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/profile/qntylab-stage-a-parent-enforcement/lib/guard.mjs": "5e2f945c24d4137aa6de702d6d33e5cb10328137764ba773e1fd6ca5be7134cc",
+          "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/profile/qntylab-stage-a-parent-enforcement/lib/index.js": "1fd6c5aadc66cadc90517d22767e444adccf9674de34ab2cf4a9e63c21ce5c69",
+          "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/profile/qntylab-stage-a-parent-enforcement/package.json": "24f1104d6c2952ae247ffe9a8543eff239c159c67fa569c8070608227b14c7ab",
+          "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/stub/native-child-stub.mjs": "ba7171e1367d2e61fc9328240f240ac2936fef3746ce3f0d42e646731efb6e98",
+          "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/stub/offline-stub.patch.yml": "4dace55659bc087fe0c0fc2bdb69dc1a7e3669a97724bc0dc5c3da30f30fc174",
+          "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/stub/qntylab-stage-a-stub-provider/lib/index.js": "868876f68e692bfde5469b2ffb2611ce4344db63c9e057a1b84717a619d550dc",
+          "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/stub/qntylab-stage-a-stub-provider/package.json": "488ea3a7420488dcc04dc00f046239bd1d9ff18b91a7382dd60fc6e941c1af2e",
+          "qntylab/dsh_stage_a_v1r3r2_prelive_enforcement.py": "086b46126b198ece22ec415b26f00bc6be1a0078968b2cda0d87e6b89f281a88"
+        },
+        "canonicalPolicy": {
+          "path": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/profile/cordis.patch.yml",
+          "digest": "3a1048d5bf1d98014e5ed4de1dc2f58cc1b7f3d30ecdfb0199d8a3d17e67a76d"
+        },
+        "offlineProviderOverlay": {
+          "path": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/stub/offline-provider-overlay.patch.yml",
+          "digest": "d554918347e812b932cfb298141430ed22462493ac9db961d2bf564a59cfad54",
+          "composition": {
+            "mode": "canonical-policy-then-additive-provider-overlay",
+            "canonicalPolicyActive": true,
+            "changedIds": [
+              "subagent-codex",
+              "subagent-claude-code"
+            ]
+          }
+        },
+        "qualifiedDshHomeProfileDigests": {
+          "cordis.patch.yml": "ef189a8c27db6d63930aa3046a3040482e952eafcb7487c644d508e8d461f027",
+          "cordis.yml": "c300dcf2ebc5f02062d6591268d29d3db6fe45e0cb138f5467276fe2ba06076e",
+          "package.json": "563c0b6082748a6e93daad51514f01335c51fc9c44f5f88253383f18ac2557b5",
+          "pnpm-workspace.yaml": "ae7c5b68e2f157528e62885804e69e88583897b775e03c86fcbe52feaf498aba"
+        },
+        "qualifiedRuntimePackageTreeDigests": {
+          "dsh-llm": "81007276be7e45762a5c4d84ea1c743476b318ceedc6a561d44007ccb1b8cfc3",
+          "dsh-llm-pi-ai": "0c1c91b38d6566b9b40cb5d5b3934de7c626fa183ac999223ceb76d5c39ea948",
+          "dsh-subagent-claude-code": "66e1cb85e19623a329c3a3042d8b95d6b5a5f355ec1ecdd53fbe24230b9475f2",
+          "dsh-subagent-codex": "668240ad6efea07c08127bb872f2f3e57ace09295f02fd9e52ed67d6dbe7ac9a",
+          "dsh-subprocess": "7e07e7d6acf593426e0e8cf10ac1704630446b8a24e6ef8534bd65cf9764caf2",
+          "dsh-tool-subagent": "bfa1cb63c10b8065dc2c30c560ad89c4f24291faee5a2edc444af814be437e13"
+        },
+        "parentPolicy": {
+          "provider": "openai",
+          "model": "gpt-5-mini",
+          "route": "llm-pi-ai",
+          "agentLoopOnly": true,
+          "auxiliaryRoutesDenied": true,
+          "maximumLogicalRequests": 8,
+          "maximumOutputTokens": 4096,
+          "providerInternalRetries": 0,
+          "automaticContinuation": false,
+          "authorizedSpendCapUsd": "1.00",
+          "priceScheduleId": "openai-gpt-5-mini-2026-08-22-4x-authorization-reserve-v0",
+          "inputUsdPerMillion": "0.25",
+          "outputUsdPerMillion": "2.00",
+          "priceUncertaintyMultiplier": "4",
+          "nonTextModalitiesDenied": true,
+          "reservationBeforeAdapterIo": true
+        },
+        "childPolicy": {
+          "modelFacingTools": [
+            "subagent_codex",
+            "subagent_claude_code"
+          ],
+          "exactOrder": [
+            "codex_initial",
+            "claude_review",
+            "codex_repair_if_critical_high",
+            "claude_rereview_if_repaired"
+          ],
+          "codexMaximum": 2,
+          "claudeMaximum": 2,
+          "durableReservationBeforeRawProviderStart": true,
+          "crashAfterReservationFailsClosed": true,
+          "genericAlternateAndBackgroundRoutesDenied": true,
+          "rawExecutableResolutionRestrictedToPreflightedPath": true
+        },
+        "claimPolicy": {
+          "createOnlyRemoteGitRef": true,
+          "durableIntentBeforeRemotePush": true,
+          "exclusiveLocalReceipt": true,
+          "partialAmbiguousOrRestartStateBlocksReplay": true,
+          "compensationDeletionForbidden": true
+        },
+        "secretPolicy": {
+          "parentCredentialViaExactExtraEnvSeam": true,
+          "gateSubprocessEnvironmentAllowlisted": true,
+          "nativeChildCredentialScrubReliesOnBoundDshRuntime": true,
+          "qntyLabRootDerivedByLauncher": true,
+          "realSecretPathNeverUsedByOfflineQualification": true
+        },
+        "claudePolicy": {
+          "allowedTools": [
+            "Read",
+            "Glob",
+            "Grep"
+          ],
+          "tools": [
+            "Read",
+            "Glob",
+            "Grep"
+          ],
+          "disallowedTools": [
+            "Write",
+            "Edit",
+            "Bash",
+            "Agent",
+            "Task",
+            "mcp__*",
+            "AskUserQuestion",
+            "delegation"
+          ],
+          "permissionMode": "dontAsk",
+          "settingSources": [],
+          "strictMcpConfig": true,
+          "mcpServers": {},
+          "agents": {},
+          "plugins": [],
+          "persistence": false,
+          "writeAllowed": false,
+          "editAllowed": false,
+          "bashAllowed": false,
+          "agentAllowed": false,
+          "taskAllowed": false,
+          "mcpAllowed": false,
+          "delegationAllowed": false,
+          "askUserQuestionAllowed": false
+        },
+        "workspacePolicy": {
+          "realpathSymlinkAware": true,
+          "workspaceMustBeOutsideQntyLabRoot": true,
+          "workspaceMustBeOutsideRuntimeRoot": true,
+          "workspaceMustBeDisposable": true,
+          "noQntyLabOrQntyMutation": true
+        },
+        "orderingPolicy": [
+          "canonical-authority",
+          "activation",
+          "qualified-contract",
+          "physical-runtime-and-executable",
+          "workspace",
+          "budget-and-child-controls",
+          "non-secret-gates",
+          "real-secret-read",
+          "claim-creation",
+          "first-potentially-paid-provider-dispatch"
+        ],
+        "alternateRoutes": {
+          "providers": [],
+          "models": [],
+          "childTools": [
+            "subagent_codex",
+            "subagent_claude_code"
+          ],
+          "backgroundDelegation": false
+        }
+      },
+      "compositeLauncher": {
+        "path": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/launcher/qntylab-launch-dsh.mjs",
+        "digest": "bf0baf30cc5b6ca9206c0bf4ea6357cfc37fc60b11ddf1ee06e8a9f8b252634c"
+      },
+      "immediatePreSpawnRevalidation": {
+        "physicalManifest": true,
+        "executableIdentity": true,
+        "dshHomeProfile": true,
+        "stageAPolicyBytes": true,
+        "contractArtifact": true,
+        "suppliedPreflightReceiptRejectedUnlessMatching": true
+      },
+      "offlineQualification": {
+        "loopbackParentOnly": true,
+        "fakeSentinelCredentialOnly": true,
+        "canonicalStageAPolicyRemainsActive": true,
+        "additiveProviderOverlayOnly": true,
+        "realSecretPathForbidden": "~/.secrets/openai_api_key_stage_a",
+        "publicProviderRequests": 0,
+        "realModelCalls": 0,
+        "realChildTurns": 0,
+        "spendUsd": 0
+      },
+      "workspacePolicy": {
+        "realpathSymlinkAware": true,
+        "workspaceMustBeOutsideQntyLabRoot": true,
+        "workspaceMustBeOutsideRuntimeRoot": true,
+        "workspaceMustBeDisposable": true,
+        "noQntyLabOrQntyMutation": true
+      },
+      "secretClaimOrdering": {
+        "parentCredentialViaExactExtraEnvSeam": true,
+        "gateSubprocessEnvironmentAllowlisted": true,
+        "nativeChildCredentialScrubReliesOnBoundDshRuntime": true,
+        "qntyLabRootDerivedByLauncher": true,
+        "realSecretPathNeverUsedByOfflineQualification": true
+      },
+      "parentPolicy": {
+        "provider": "openai",
+        "model": "gpt-5-mini",
+        "route": "llm-pi-ai",
+        "agentLoopOnly": true,
+        "auxiliaryRoutesDenied": true,
+        "maximumLogicalRequests": 8,
+        "maximumOutputTokens": 4096,
+        "providerInternalRetries": 0,
+        "automaticContinuation": false,
+        "authorizedSpendCapUsd": "1.00",
+        "priceScheduleId": "openai-gpt-5-mini-2026-08-22-4x-authorization-reserve-v0",
+        "inputUsdPerMillion": "0.25",
+        "outputUsdPerMillion": "2.00",
+        "priceUncertaintyMultiplier": "4",
+        "nonTextModalitiesDenied": true,
+        "reservationBeforeAdapterIo": true
+      },
+      "childPolicy": {
+        "modelFacingTools": [
+          "subagent_codex",
+          "subagent_claude_code"
+        ],
+        "exactOrder": [
+          "codex_initial",
+          "claude_review",
+          "codex_repair_if_critical_high",
+          "claude_rereview_if_repaired"
+        ],
+        "codexMaximum": 2,
+        "claudeMaximum": 2,
+        "durableReservationBeforeRawProviderStart": true,
+        "crashAfterReservationFailsClosed": true,
+        "genericAlternateAndBackgroundRoutesDenied": true,
+        "rawExecutableResolutionRestrictedToPreflightedPath": true
+      },
+      "claudePolicy": {
+        "allowedTools": [
+          "Read",
+          "Glob",
+          "Grep"
+        ],
+        "tools": [
+          "Read",
+          "Glob",
+          "Grep"
+        ],
+        "disallowedTools": [
+          "Write",
+          "Edit",
+          "Bash",
+          "Agent",
+          "Task",
+          "mcp__*",
+          "AskUserQuestion",
+          "delegation"
+        ],
+        "permissionMode": "dontAsk",
+        "settingSources": [],
+        "strictMcpConfig": true,
+        "mcpServers": {},
+        "agents": {},
+        "plugins": [],
+        "persistence": false,
+        "writeAllowed": false,
+        "editAllowed": false,
+        "bashAllowed": false,
+        "agentAllowed": false,
+        "taskAllowed": false,
+        "mcpAllowed": false,
+        "delegationAllowed": false,
+        "askUserQuestionAllowed": false
+      },
+      "claimPolicy": {
+        "createOnlyRemoteGitRef": true,
+        "durableIntentBeforeRemotePush": true,
+        "exclusiveLocalReceipt": true,
+        "partialAmbiguousOrRestartStateBlocksReplay": true,
+        "compensationDeletionForbidden": true
+      }
+    }
+  },
+  "digests": {
+    "RUNTIME_MANIFEST_DIGEST": "0e09b9d9d977f73d146c4a35d497cc93bd046bae016e1b1a6a52b481f07731b3",
+    "EXECUTABLE_IDENTITY_DIGEST": "ae07ece34c88b3ebaebd7452df8d136c82935f9c8ec9df16a40e50a2582a2fd9",
+    "COMPOSITE_LAUNCH_POLICY_DIGEST": "018dda96bd3960b232d78a33e472a5161c112abd5e76dd954db19d47ace8e5d5"
+  },
+  "qualifiedContract": {
+    "projectId": "DSH_STAGE_A_V1R3R2_COMPOSITE_LIVE_LAUNCHER_INTEGRATION_AND_REQUALIFICATION_V0",
+    "predecessorQualifiedContractDigest": "e16872fc1f419e5253d633bbdf35e936bb58e34a7636decb8eda688113658e82",
+    "RUNTIME_MANIFEST_DIGEST": "0e09b9d9d977f73d146c4a35d497cc93bd046bae016e1b1a6a52b481f07731b3",
+    "EXECUTABLE_IDENTITY_DIGEST": "ae07ece34c88b3ebaebd7452df8d136c82935f9c8ec9df16a40e50a2582a2fd9",
+    "COMPOSITE_LAUNCH_POLICY_DIGEST": "018dda96bd3960b232d78a33e472a5161c112abd5e76dd954db19d47ace8e5d5",
+    "PHYSICAL_RUNTIME_BYTES_CHANGED": false,
+    "DSH_SOURCE_BYTES_CHANGED": false,
+    "GOVERNED_DSH_PATCHES_CHANGED": false,
+    "COMPOSITE_LAUNCH_POLICY_CHANGED": true
+  },
+  "qualifiedContractDigest": "cf1aff079d56428753bf8f58f1848839da35cfb9f75104fc1fd03cd13056c1e2"
+}

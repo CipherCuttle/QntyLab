@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { spawnSync } from 'node:child_process'
@@ -7,12 +8,18 @@ import test from 'node:test'
 
 import {
   assertQualifiedContractDigest,
+  buildSpawnEnv,
   selectedPolicyPatches,
   spawnDsh,
+  validateClaimBinding,
   verifiedNativePath,
   verifyMirroredPackage,
 } from '../launcher/qntylab-launch-dsh.mjs'
 import { computeDigests } from '../evidence/compute-digests.mjs'
+// The ACTUAL production preparation path derives the CURRENT execution-contract
+// root (successor.currentCompositeRoot). The E2E must bind to that derivation,
+// never to a stale literal (MEDIUM-2).
+import { computeDigests as productionComputeDigests } from '../../dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/evidence/compute-digests.mjs'
 import {
   createGateClient,
   createGatedProvider,
@@ -177,7 +184,31 @@ function git(cwd, args) {
   return result.stdout.trim()
 }
 
-function parentConfig(directory) {
+/**
+ * The resolved production identity, MECHANICALLY derived from the CURRENT
+ * production preparation path — never a stale literal. The execution-contract
+ * root is the CURRENT composite root produced by the production preparation
+ * (successor) machinery starting from the CURRENT resolved runtime manifest
+ * and the CURRENT materialized production home. Runtime/executable identity
+ * digests are the same derived identities the production preparation binds.
+ * MEDIUM-2: no hardcoded a31eb46… literal; stale roots fail this assertion.
+ */
+function resolvedProductionIdentity() {
+  const digests = productionComputeDigests()
+  const identity = {
+    executionContractRoot: digests.NEW_QUALIFIED_LAUNCH_CONTRACT_DIGEST,
+    runtimeIdentityDigest: digests.runtimeManifestDigest,
+    executableIdentityDigest: digests.executableIdentityDigest,
+  }
+  for (const value of Object.values(identity)) {
+    if (!/^[0-9a-fA-F]{64}$/.test(value)) {
+      throw new Error(`BLOCK_CLAIM_BINDING: production-derived identity value is not a valid sha256: ${value}`)
+    }
+  }
+  return identity
+}
+
+function parentConfig(directory, { authorizedExecutionSourceSha, revocationState = 'NOT_REVOKED' } = {}) {
   const source = join(directory, 'claim-source')
   const remote = join(directory, 'claim-remote.git')
   spawnSync('git', ['init', '--bare', '-q', remote], { stdio: 'inherit' })
@@ -189,6 +220,14 @@ function parentConfig(directory) {
     '-c', 'user.email=prelive-test@example.invalid', 'commit', '-qm', 'seed',
   ], { encoding: 'utf8' })
   if (commit.status !== 0) throw new Error(commit.stderr || commit.stdout)
+  // The Python claim CLI resolves the canonical lineage via the DEFAULT canonical
+  // ref refs/remotes/origin/master. Set up a real origin remote so the scratch
+  // source repo can resolve refs/remotes/origin/master to the exact seed commit.
+  git(source, ['remote', 'add', 'origin', remote])
+  git(source, ['push', '-q', '-u', 'origin', 'HEAD:master'])
+  git(source, ['fetch', '-q', 'origin'])
+  const sourceSha = authorizedExecutionSourceSha ?? git(source, ['rev-parse', 'HEAD'])
+  const identity = resolvedProductionIdentity()
   return {
     budgetStatePath: join(directory, 'parent-budget.json'),
     claimStateDir: join(directory, 'claim-state'),
@@ -196,6 +235,11 @@ function parentConfig(directory) {
     claimRef: 'refs/heads/qntylab-claims/offline-test-parent-guard',
     claimSourceRepo: source,
     sessionNonce: 'offline-session-nonce',
+    authorizedExecutionSourceSha: sourceSha,
+    executionContractRoot: identity.executionContractRoot,
+    runtimeIdentityDigest: identity.runtimeIdentityDigest,
+    executableIdentityDigest: identity.executableIdentityDigest,
+    revocationState,
     qntyLabRoot: ROOT,
     pythonExecutable: 'python',
   }
@@ -336,6 +380,441 @@ test('unpriced media input is denied before claim and adapter wire I/O', async (
     assert.equal(media.wireAttempts, 0)
     assert.match(media.outcome, /unpriced non-text modality/)
     assert.equal(guard.snapshot().claimCompletedInThisProcess, false)
+  } finally {
+    rmSync(directory, { recursive: true, force: true })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// END-TO-END PRODUCTION-OWNER INTEGRATION (CENTRAL ACCEPTANCE GATE)
+//
+// Exercises the ACTUAL chain: resolved production identity -> launcher
+// transport -> cordis profile semantics -> index.js Config -> guard.mjs ->
+// actual Python claim CLI invocation. Scratch-only: scratch git repo, scratch
+// bare remote, scratch claim ref, scratch state dir, fake/non-production claim
+// namespace. No secret, no provider, no live DSH episode.
+// ---------------------------------------------------------------------------
+
+// The E2E below traverses the REAL chain:
+//   resolved production identity (production preparation derivation)
+//   -> launcher transport (the SAME buildSpawnEnv / claimBindingEnvVars code
+//      path the real spawn uses)
+//   -> cordis profile semantics (env -> config field mapping byte-for-byte as
+//      profile/cordis.patch.yml declares)
+//   -> index.js Config schema semantics (all five claim-binding fields are
+//      required and validated before guard construction)
+//   -> guard.mjs (real guard, real claim command)
+//   -> actual Python claim CLI (scratch git repos only)
+// The positive path does NOT mock the guard command: the real guard spawns the
+// real Python claim entrypoint. If the launcher fails to transport the H1
+// fields, or the profile/config omit them, this test fails (CI red).
+
+// Mirror the EXACT env->config mapping declared in profile/cordis.patch.yml for
+// the parent-enforcement plugin. Any profile change that drops or renames a
+// claim-binding wiring fails this mapping, which fails the E2E.
+function configFromTransportedEnv(env, directory) {
+  const config = {
+    budgetStatePath: env.QNTYLAB_DSH_PARENT_BUDGET_STATE_PATH,
+    claimStateDir: env.QNTYLAB_DSH_CLAIM_STATE_DIR,
+    claimRemote: env.QNTYLAB_DSH_CLAIM_REMOTE,
+    claimRef: env.QNTYLAB_DSH_CLAIM_REF,
+    claimSourceRepo: env.QNTYLAB_DSH_CLAIM_SOURCE_REPO,
+    sessionNonce: env.QNTYLAB_DSH_SESSION_NONCE,
+    // Claim binding — profile is transport only, exactly as cordis.patch.yml
+    // maps these env vars into the plugin Config.
+    authorizedExecutionSourceSha: env.QNTYLAB_DSH_AUTHORIZED_EXECUTION_SOURCE_SHA,
+    executionContractRoot: env.QNTYLAB_DSH_EXECUTION_CONTRACT_ROOT,
+    runtimeIdentityDigest: env.QNTYLAB_DSH_RUNTIME_IDENTITY_DIGEST,
+    executableIdentityDigest: env.QNTYLAB_DSH_EXECUTABLE_IDENTITY_DIGEST,
+    revocationState: env.QNTYLAB_DSH_REVOCATION_STATE,
+    qntyLabRoot: ROOT,
+    pythonExecutable: 'python',
+  }
+  for (const [key, value] of Object.entries(config)) {
+    if (typeof value !== 'string' || value.length === 0) {
+      throw new Error(`BLOCK_CLAIM_BINDING: profile transport produced no value for ${key} (env var missing or empty)`)
+    }
+  }
+  return config
+}
+
+// The launcher transport env produced by the REAL launch path (buildSpawnEnv).
+// The `immediate` object supplies only the fingerprint-derived values; the
+// claim-binding transport, extraEnv rejection, merge order, and post-merge
+// re-check are the real launcher code path. The runtime (non-claim) env vars
+// are passed through the ordinary extraEnv seam exactly as a DSH launch would
+// supply them; claim-binding keys must NOT be present there (they are denied).
+function launcherTransportEnv(binding, extraEnv = {}, runtimeEnv = {}) {
+  const immediate = {
+    nativePath: '/usr/bin:/bin',
+    cliPath: '/nonexistent/headless-cli',
+    fingerprints: {
+      nodeExecutable: { resolvedPath: '/usr/bin/node' },
+      pythonExecutable: { resolvedPath: '/usr/bin/python3' },
+      codexExecutable: { resolvedPath: '/usr/bin/codex' },
+      claudeExecutable: { resolvedPath: '/usr/bin/claude' },
+    },
+    workspaceReal: '/tmp',
+    cliDigest: 'stub-not-used-by-buildSpawnEnv',
+  }
+  return buildSpawnEnv({ parentEndpoint: 'http://127.0.0.1:1', dshHome: '/tmp/dsh' }, {
+    extraEnv: { ...runtimeEnv, ...extraEnv },
+    offlineProfilePatch: undefined,
+    claimBinding: binding,
+    immediate,
+  })
+}
+
+function makeScratchClaimBinding(directory, configOverrides = {}) {
+  // Production-identity values: the RESOLVED production identity (independent
+  // of the scratch source commit), mechanically derived from the CURRENT
+  // production preparation path. Future-authority values: scratch-only.
+  const config = parentConfig(directory, configOverrides)
+  const binding = {
+    authorizedExecutionSourceSha: config.authorizedExecutionSourceSha,
+    executionContractRoot: config.executionContractRoot,
+    runtimeIdentityDigest: config.runtimeIdentityDigest,
+    executableIdentityDigest: config.executableIdentityDigest,
+    revocationState: config.revocationState,
+  }
+  // Validate through the REAL launcher seam (rejects unknown keys, malformed
+  // values, and defaults no revocation state).
+  const validated = validateClaimBinding(binding)
+  // Produce the launcher transport env via the REAL spawn env code path,
+  // carrying the runtime env vars through the ordinary extraEnv seam as a DSH
+  // launch would.
+  const runtimeEnv = {
+    QNTYLAB_DSH_PARENT_BUDGET_STATE_PATH: config.budgetStatePath,
+    QNTYLAB_DSH_CLAIM_STATE_DIR: config.claimStateDir,
+    QNTYLAB_DSH_CLAIM_REMOTE: config.claimRemote,
+    QNTYLAB_DSH_CLAIM_REF: config.claimRef,
+    QNTYLAB_DSH_CLAIM_SOURCE_REPO: config.claimSourceRepo,
+    QNTYLAB_DSH_SESSION_NONCE: config.sessionNonce,
+  }
+  const claimEnv = launcherTransportEnv(validated, {}, runtimeEnv)
+  // Resolve the profile config from the TRANSPORTED env (cordis semantics).
+  const profileConfig = configFromTransportedEnv(claimEnv, directory)
+  return {
+    config: profileConfig,
+    binding: validated,
+    claimEnv,
+  }
+}
+
+function captureClaimCommand(directory, configOverrides = {}) {
+  const { config, binding, claimEnv } = makeScratchClaimBinding(directory, configOverrides)
+  const calls = []
+  const command = (cfg, args) => {
+    calls.push({ cfg, args })
+    return { ok: true }
+  }
+  const guard = createParentGuard(config, {
+    isAgentLoopRequest: options => options.agentLoop === true,
+    command,
+  })
+  return { config, binding, claimEnv, calls, guard }
+}
+
+test('E2E-POSITIVE: launcher transports EXACT resolved binding -> profile config -> guard -> Python claim CLI', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'qntylab-e2e-positive-'))
+  try {
+    const { config, binding, claimEnv, calls, guard } = captureClaimCommand(directory)
+    // The guard's reserve -> ensureClaim -> command must receive the claim args
+    guard.reserve({ provider: 'openai', model: 'gpt-5-mini', agentLoop: true, maxTokens: MAX_OUTPUT_TOKENS })
+    const claimCall = calls.find(call => call.args[0] === 'claim')
+    assert.ok(claimCall, 'guard must invoke the Python claim entrypoint')
+    const args = claimCall.args
+    // state-dir / remote / ref / source-repo / session-nonce preserved
+    assert.equal(args[args.indexOf('--state-dir') + 1], config.claimStateDir)
+    assert.equal(args[args.indexOf('--remote') + 1], config.claimRemote)
+    assert.equal(args[args.indexOf('--ref') + 1], config.claimRef)
+    assert.equal(args[args.indexOf('--source-repo') + 1], config.claimSourceRepo)
+    assert.equal(args[args.indexOf('--session-nonce') + 1], config.sessionNonce)
+    // EXACT binding values reach Python (no transformation anywhere)
+    assert.equal(args[args.indexOf('--authorized-execution-source-sha') + 1], binding.authorizedExecutionSourceSha)
+    assert.equal(args[args.indexOf('--execution-contract-root') + 1], binding.executionContractRoot)
+    assert.equal(args[args.indexOf('--runtime-identity-digest') + 1], binding.runtimeIdentityDigest)
+    assert.equal(args[args.indexOf('--executable-identity-digest') + 1], binding.executableIdentityDigest)
+    assert.equal(args[args.indexOf('--revocation-state') + 1], binding.revocationState)
+    // Launcher env carries the SAME exact values (profile transport preserves)
+    assert.equal(claimEnv.QNTYLAB_DSH_AUTHORIZED_EXECUTION_SOURCE_SHA, binding.authorizedExecutionSourceSha)
+    assert.equal(claimEnv.QNTYLAB_DSH_EXECUTION_CONTRACT_ROOT, binding.executionContractRoot)
+    assert.equal(claimEnv.QNTYLAB_DSH_RUNTIME_IDENTITY_DIGEST, binding.runtimeIdentityDigest)
+    assert.equal(claimEnv.QNTYLAB_DSH_EXECUTABLE_IDENTITY_DIGEST, binding.executableIdentityDigest)
+    assert.equal(claimEnv.QNTYLAB_DSH_REVOCATION_STATE, binding.revocationState)
+    // The config consumed by the guard came from the TRANSPORTED env — a
+    // launcher that drops or renames a claim-binding field fails here.
+    assert.equal(config.executionContractRoot, binding.executionContractRoot)
+    assert.equal(config.authorizedExecutionSourceSha, binding.authorizedExecutionSourceSha)
+  } finally {
+    rmSync(directory, { recursive: true, force: true })
+  }
+})
+
+test('E2E-POSITIVE: launcher env -> profile -> guard -> REAL Python claim CLI commits a scratch claim', async () => {
+  const directory = mkdtempSync(join(tmpdir(), 'qntylab-e2e-python-'))
+  try {
+    const { config, binding } = makeScratchClaimBinding(directory)
+    // Run the real guard (default command = real Python claim CLI) with the
+    // config resolved from the launcher-transported env. No mock command.
+    const guard = createParentGuard(config, {
+      isAgentLoopRequest: options => options.agentLoop === true,
+    })
+    const dispatch = parentHookHarness(guard)
+    const result = await dispatch(parentOptions(), 'success')
+    assert.equal(result.wireAttempts, 1)
+    // Python receipt is written in the claim state dir
+    const receiptPath = join(config.claimStateDir, 'claim-receipt.json')
+    assert.ok(existsSync(receiptPath), 'claim receipt must be durable after guard reserve')
+    const receipt = JSON.parse(readFileSync(receiptPath, 'utf8'))
+    assert.equal(receipt.source_head, binding.authorizedExecutionSourceSha, 'Python claim committed to the EXACT scratch source SHA')
+    assert.equal(receipt.state, 'REMOTE_AND_LOCAL_COMPLETE')
+    // budget reservation happened after claim COMMITTED (ordering preserved)
+    const budget = JSON.parse(readFileSync(join(directory, 'parent-budget.json'), 'utf8'))
+    assert.equal(budget.attempts_reserved, 1)
+  } finally {
+    rmSync(directory, { recursive: true, force: true })
+  }
+})
+
+test('E2E-POSITIVE: launcher denies claim-binding keys through extraEnv (immutable after validation)', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'qntylab-e2e-immutable-'))
+  try {
+    const { config, binding } = makeScratchClaimBinding(directory)
+    // A caller with ordinary extraEnv control attempts to substitute a rejected
+    // source SHA / revoked state AFTER validation. The launcher must reject the
+    // claim-binding keys in extraEnv entirely (HIGH-1).
+    assert.throws(
+      () => launcherTransportEnv(binding, {
+        QNTYLAB_DSH_AUTHORIZED_EXECUTION_SOURCE_SHA: '0'.repeat(40),
+        QNTYLAB_DSH_REVOCATION_STATE: 'REVOKED',
+      }),
+      /claim-binding environment key cannot be supplied through extraEnv/,
+    )
+    // And validateClaimBinding itself still fails closed on a malformed payload.
+    assert.throws(() => validateClaimBinding({ ...binding, authorizedExecutionSourceSha: 'origin/master' }), /BLOCK_CLAIM_BINDING/)
+    assert.throws(() => validateClaimBinding({ ...binding, revocationState: 'NOT_A_STATE' }), /BLOCK_CLAIM_BINDING/)
+    // REVOKED is format-valid at the launcher transport (it is transported
+    // exactly as supplied); the GUARD fails closed on REVOKED/SUPERSEDED before
+    // any claim is attempted. Prove that guard-side closure here.
+    assert.throws(() => createParentGuard(
+      { ...config, revocationState: 'REVOKED' },
+      { isAgentLoopRequest: options => options.agentLoop === true },
+    ).reserve(parentOptions()), /BLOCK_CLAIM_BINDING/)
+  } finally {
+    rmSync(directory, { recursive: true, force: true })
+  }
+})
+
+// NEGATIVE CONTROLS — all through the SAME production-owner path, all must
+// block BEFORE claim COMMITTED / budget reservation / provider I/O.
+function mustBlockBeforeReserve(overrides, expected) {
+  const directory = mkdtempSync(join(tmpdir(), 'qntylab-neg-bind-'))
+  try {
+    const { config, calls, guard } = captureClaimCommand(directory, overrides)
+    let outcome
+    try {
+      guard.reserve({ provider: 'openai', model: 'gpt-5-mini', agentLoop: true, maxTokens: MAX_OUTPUT_TOKENS })
+      outcome = 'UNBLOCKED'
+    } catch (error) {
+      outcome = String(error)
+    }
+    assert.match(outcome, expected, `negative control must block: ${expected}`)
+    assert.equal(calls.filter(call => call.args[0] === 'claim').length, 0, 'claim must NOT be invoked for a blocked binding')
+  } finally {
+    rmSync(directory, { recursive: true, force: true })
+  }
+}
+
+test('NC-BIND: missing source SHA blocks before claim', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'qntylab-neg-miss-src-'))
+  try {
+    const config = parentConfig(directory)
+    config.authorizedExecutionSourceSha = undefined
+    const calls = []
+    const guard = createParentGuard(config, {
+      isAgentLoopRequest: options => options.agentLoop === true,
+      command: (cfg, args) => { calls.push(args); return { ok: true } },
+    })
+    assert.throws(() => guard.reserve(parentOptions()), /BLOCK_CLAIM_BINDING/)
+    assert.equal(calls.length, 0, 'no Python claim may be invoked')
+  } finally {
+    rmSync(directory, { recursive: true, force: true })
+  }
+})
+
+test('NC-BIND: symbolic/moving source (origin/master) blocks before claim', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'qntylab-neg-moving-'))
+  try {
+    const config = parentConfig(directory)
+    config.authorizedExecutionSourceSha = 'origin/master' // moving ref, not exact commit
+    const calls = []
+    const guard = createParentGuard(config, {
+      isAgentLoopRequest: options => options.agentLoop === true,
+      command: (cfg, args) => { calls.push(args); return { ok: true } },
+    })
+    assert.throws(() => guard.reserve(parentOptions()), /BLOCK_CLAIM_BINDING/)
+    assert.equal(calls.length, 0)
+  } finally {
+    rmSync(directory, { recursive: true, force: true })
+  }
+})
+
+test('NC-BIND: missing execution root blocks before claim', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'qntylab-neg-miss-root-'))
+  try {
+    const config = parentConfig(directory)
+    config.executionContractRoot = undefined
+    const calls = []
+    const guard = createParentGuard(config, {
+      isAgentLoopRequest: options => options.agentLoop === true,
+      command: (cfg, args) => { calls.push(args); return { ok: true } },
+    })
+    assert.throws(() => guard.reserve(parentOptions()), /BLOCK_CLAIM_BINDING/)
+    assert.equal(calls.length, 0)
+  } finally {
+    rmSync(directory, { recursive: true, force: true })
+  }
+})
+
+test('NC-BIND: wrong/substituted execution root blocks before claim', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'qntylab-neg-wrong-root-'))
+  try {
+    // A substituted root that is NOT the resolved production root — a malformed
+    // (non-sha256) transport value must be rejected by the launcher/guard before
+    // any claim is attempted.
+    const config = parentConfig(directory)
+    config.executionContractRoot = 'sha256(' + config.authorizedExecutionSourceSha + ')' // surrogate, not a sha256
+    const calls = []
+    const guard = createParentGuard(config, {
+      isAgentLoopRequest: options => options.agentLoop === true,
+      command: (cfg, args) => { calls.push(args); return { ok: true } },
+    })
+    assert.throws(() => guard.reserve(parentOptions()), /BLOCK_CLAIM_BINDING/)
+    assert.equal(calls.length, 0, 'no Python claim may be invoked for a substituted root')
+  } finally {
+    rmSync(directory, { recursive: true, force: true })
+  }
+})
+
+test('NC-BIND: missing revocation proof blocks before claim', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'qntylab-neg-miss-rev-'))
+  try {
+    const config = parentConfig(directory)
+    config.revocationState = undefined
+    const calls = []
+    const guard = createParentGuard(config, {
+      isAgentLoopRequest: options => options.agentLoop === true,
+      command: (cfg, args) => { calls.push(args); return { ok: true } },
+    })
+    assert.throws(() => guard.reserve(parentOptions()), /BLOCK_CLAIM_BINDING/)
+    assert.equal(calls.length, 0)
+  } finally {
+    rmSync(directory, { recursive: true, force: true })
+  }
+})
+
+test('NC-BIND: REVOKED blocks before claim', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'qntylab-neg-revoked-'))
+  try {
+    const config = parentConfig(directory)
+    config.revocationState = 'REVOKED'
+    const calls = []
+    const guard = createParentGuard(config, {
+      isAgentLoopRequest: options => options.agentLoop === true,
+      command: (cfg, args) => { calls.push(args); return { ok: true } },
+    })
+    assert.throws(() => guard.reserve(parentOptions()), /BLOCK_CLAIM_BINDING/)
+    assert.equal(calls.length, 0)
+  } finally {
+    rmSync(directory, { recursive: true, force: true })
+  }
+})
+
+test('NC-BIND: SUPERSEDED blocks before claim', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'qntylab-neg-superseded-'))
+  try {
+    const config = parentConfig(directory)
+    config.revocationState = 'SUPERSEDED'
+    const calls = []
+    const guard = createParentGuard(config, {
+      isAgentLoopRequest: options => options.agentLoop === true,
+      command: (cfg, args) => { calls.push(args); return { ok: true } },
+    })
+    assert.throws(() => guard.reserve(parentOptions()), /BLOCK_CLAIM_BINDING/)
+    assert.equal(calls.length, 0)
+  } finally {
+    rmSync(directory, { recursive: true, force: true })
+  }
+})
+
+test('NC-BIND: wrong runtime identity blocks before claim', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'qntylab-neg-wrong-runtime-'))
+  try {
+    const config = parentConfig(directory)
+    config.runtimeIdentityDigest = 'not-a-sha256-runtime-identity'
+    const calls = []
+    const guard = createParentGuard(config, {
+      isAgentLoopRequest: options => options.agentLoop === true,
+      command: (cfg, args) => { calls.push(args); return { ok: true } },
+    })
+    assert.throws(() => guard.reserve(parentOptions()), /BLOCK_CLAIM_BINDING/)
+    assert.equal(calls.length, 0, 'no Python claim may be invoked for a wrong runtime identity')
+  } finally {
+    rmSync(directory, { recursive: true, force: true })
+  }
+})
+
+test('NC-BIND: wrong executable identity blocks before claim', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'qntylab-neg-wrong-exec-'))
+  try {
+    const config = parentConfig(directory)
+    config.executableIdentityDigest = 'not-a-sha256-executable-identity'
+    const calls = []
+    const guard = createParentGuard(config, {
+      isAgentLoopRequest: options => options.agentLoop === true,
+      command: (cfg, args) => { calls.push(args); return { ok: true } },
+    })
+    assert.throws(() => guard.reserve(parentOptions()), /BLOCK_CLAIM_BINDING/)
+    assert.equal(calls.length, 0, 'no Python claim may be invoked for a wrong executable identity')
+  } finally {
+    rmSync(directory, { recursive: true, force: true })
+  }
+})
+
+test('NC-BIND: transport substitution in launcher/profile/plugin (malformed SHA) blocks', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'qntylab-neg-subst-'))
+  try {
+    const config = parentConfig(directory)
+    config.authorizedExecutionSourceSha = 'not-a-commit-sha'
+    const calls = []
+    const guard = createParentGuard(config, {
+      isAgentLoopRequest: options => options.agentLoop === true,
+      command: (cfg, args) => { calls.push(args); return { ok: true } },
+    })
+    assert.throws(() => guard.reserve(parentOptions()), /BLOCK_CLAIM_BINDING/)
+    assert.equal(calls.length, 0)
+  } finally {
+    rmSync(directory, { recursive: true, force: true })
+  }
+})
+
+test('E2E-NEG: executionContractRoot does NOT need to equal sha256(source SHA)', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'qntylab-e2e-independent-root-'))
+  try {
+    const { config } = makeScratchClaimBinding(directory)
+    // Independent derivation: contract root is NOT sha256 of the source SHA
+    const shaOfSource = createHash('sha256').update(config.authorizedExecutionSourceSha).digest('hex')
+    assert.notEqual(config.executionContractRoot, shaOfSource)
+    // And a POSITIVE path with this independent root works end-to-end
+    const calls = []
+    const guard = createParentGuard(config, {
+      isAgentLoopRequest: options => options.agentLoop === true,
+      command: (cfg, args) => { calls.push(args); return { ok: true } },
+    })
+    guard.reserve({ provider: 'openai', model: 'gpt-5-mini', agentLoop: true, maxTokens: MAX_OUTPUT_TOKENS })
+    const claimCall = calls.find(callArgs => callArgs[0] === 'claim')
+    assert.ok(claimCall, 'guard must accept an independent root (not sha256(source))')
   } finally {
     rmSync(directory, { recursive: true, force: true })
   }

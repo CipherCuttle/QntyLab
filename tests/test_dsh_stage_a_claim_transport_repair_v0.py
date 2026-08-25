@@ -49,18 +49,24 @@ def _fixture(tmp_path: Path) -> tuple[Path, Path, str]:
     return remote, source, head
 
 
-def _claim(tmp_path: Path, *, suffix: str, remote: Path, source: Path) -> EpisodeClaim:
+def _claim(tmp_path: Path, *, suffix: str, remote: Path, source: Path, head: str) -> EpisodeClaim:
+    # H1 exact-commit claim-source seam: the source is an EXPLICIT exact
+    # immutable source SHA (the fixture head), never ambient HEAD. The canonical
+    # ref is the exact fixture commit object itself (deterministic scratch
+    # lineage), so ancestry is provable without a remote-tracking ref.
     return EpisodeClaim(
         tmp_path / suffix,
         remote=str(remote),
         ref=f"{DIAGNOSTIC_CLAIM_NAMESPACE}{suffix}",
         source_repo=source,
+        authorized_execution_source_sha=head,
+        canonical_ref=head,
     )
 
 
 def test_positive_create_commits_and_independently_verifies_expected_sha(tmp_path: Path) -> None:
     remote, source, head = _fixture(tmp_path)
-    claim = _claim(tmp_path, suffix="positive", remote=remote, source=source)
+    claim = _claim(tmp_path, suffix="positive", remote=remote, source=source, head=head)
 
     outcome = claim.acquire_with_outcome(session_nonce="positive-session")
 
@@ -75,10 +81,10 @@ def test_positive_create_commits_and_independently_verifies_expected_sha(tmp_pat
 
 def test_duplicate_create_never_overwrites_existing_ref(tmp_path: Path) -> None:
     remote, source, head = _fixture(tmp_path)
-    first = _claim(tmp_path, suffix="duplicate", remote=remote, source=source)
+    first = _claim(tmp_path, suffix="duplicate", remote=remote, source=source, head=head)
     first.acquire(session_nonce="winner")
 
-    duplicate = _claim(tmp_path, suffix="duplicate-other-state", remote=remote, source=source)
+    duplicate = _claim(tmp_path, suffix="duplicate-other-state", remote=remote, source=source, head=head)
     duplicate.ref = first.ref
     outcome = duplicate.acquire_with_outcome(session_nonce="duplicate")
 
@@ -93,7 +99,7 @@ def test_duplicate_create_never_overwrites_existing_ref(tmp_path: Path) -> None:
 
 def test_different_source_sha_collision_is_fail_closed_without_overwrite(tmp_path: Path) -> None:
     remote, source, first_head = _fixture(tmp_path)
-    first = _claim(tmp_path, suffix="collision", remote=remote, source=source)
+    first = _claim(tmp_path, suffix="collision", remote=remote, source=source, head=first_head)
     first.acquire(session_nonce="winner")
 
     (source / "seed.txt").write_text("second\n", encoding="utf-8")
@@ -113,7 +119,8 @@ def test_different_source_sha_collision_is_fail_closed_without_overwrite(tmp_pat
         ],
         check=True,
     )
-    second = _claim(tmp_path, suffix="collision-other-state", remote=remote, source=source)
+    second_head = _git(source, "rev-parse", "HEAD").stdout.strip()
+    second = _claim(tmp_path, suffix="collision-other-state", remote=remote, source=source, head=second_head)
     second.ref = first.ref
     outcome = second.acquire_with_outcome(session_nonce="collision")
 
@@ -152,12 +159,14 @@ class _AmbiguousAfterFailure(_FailedPush):
 
 
 def test_confirmed_no_remote_write_requires_absent_before_and_after(tmp_path: Path) -> None:
-    remote, source, _head = _fixture(tmp_path)
+    remote, source, head = _fixture(tmp_path)
     claim = _FailedPush(
         tmp_path / "confirmed-no-write",
         remote=str(remote),
         ref=f"{DIAGNOSTIC_CLAIM_NAMESPACE}confirmed-no-write",
         source_repo=source,
+        authorized_execution_source_sha=head,
+        canonical_ref=head,
     )
 
     outcome = claim.acquire_with_outcome(session_nonce="failed-session")
@@ -172,12 +181,14 @@ def test_confirmed_no_remote_write_requires_absent_before_and_after(tmp_path: Pa
 
 
 def test_unknown_transport_state_fails_closed_without_receipt(tmp_path: Path) -> None:
-    remote, source, _head = _fixture(tmp_path)
+    remote, source, head = _fixture(tmp_path)
     claim = _AmbiguousAfterFailure(
         tmp_path / "unknown",
         remote=str(remote),
         ref=f"{DIAGNOSTIC_CLAIM_NAMESPACE}unknown",
         source_repo=source,
+        authorized_execution_source_sha=head,
+        canonical_ref=head,
     )
 
     outcome = claim.acquire_with_outcome(session_nonce="ambiguous-session")

@@ -13,6 +13,13 @@ export const PHYSICAL_PHASE = resolve(ROOT, 'experiments/research/qnty_agent_orc
 export const STAGE_A_PHASE = resolve(ROOT, 'experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0')
 export const MANIFEST_DEFAULT = join(PHYSICAL_PHASE, 'evidence/runtime_manifest.json')
 export const CONTRACT_PATH = join(PHASE, 'evidence/contract.json')
+// CURRENT-generation evidence must NEVER be written to the historical
+// contract.json / digests.json paths (immutable a392 lineage). The CLI main
+// block below writes current-generation evidence to an explicit NEW
+// reconciliation path so historical evidence stays byte-for-byte immutable.
+export const RECONCILIATION_PHASE = resolve(ROOT, 'experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_execution_contract_reconciliation_v0')
+export const CURRENT_CONTRACT_PATH = join(RECONCILIATION_PHASE, 'evidence/current_contract.json')
+export const CURRENT_DIGESTS_PATH = join(RECONCILIATION_PHASE, 'evidence/current_digests.json')
 export const PREDECESSOR_QUALIFIED_CONTRACT = 'e16872fc1f419e5253d633bbdf35e936bb58e34a7636decb8eda688113658e82'
 export const PROJECT_ID = 'DSH_STAGE_A_V1R3R2_COMPOSITE_LIVE_LAUNCHER_INTEGRATION_AND_REQUALIFICATION_V0'
 
@@ -33,6 +40,49 @@ const EXPECTED_EXECUTABLES = {
   pythonExecutableDigest: 'b8d8288faefdd300201f43fcf00f6f539a27218eeed3a3dff5ab10b9c4c99700',
   codexExecutableDigest: 'ac2cfed85fb647d61e0150b8548102b330e4799d9d81ad5d354de701edf6b074',
   claudeExecutableDigest: '98226474f802e3094d6a86c5ade8883c16206d0fcb5c400b7401c800063e99d7',
+}
+
+/**
+ * Explicit dependency manifest for the Stage-A execution-contract DAG.
+ *
+ * Each node lists every downstream node that consumes its output, so the
+ * reverse-transitive closure of any changed leaf is the complete set of nodes
+ * that MUST be invalidated and re-derived. This manifest exists to make the
+ * real reverse-transitive closure explicit and mechanically provable. It does
+ * NOT artificially reduce invalidation: a leaf change reaches every downstream
+ * node, exactly as the real content-addressed DAG requires.
+ */
+export const DEPENDENCY_MANIFEST = Object.freeze({
+  projectId: 'DSH_STAGE_A_V1R3R2_COMPOSITE_LIVE_LAUNCHER_INTEGRATION_AND_REQUALIFICATION_V0',
+  nodes: Object.freeze({
+    'qntylab/dsh_stage_a_v1r3r2_prelive_enforcement.py': Object.freeze({ downstream: Object.freeze(['stageAFileDigests']) }),
+    stageAFileDigests: Object.freeze({ downstream: Object.freeze(['stageAPolicy']) }),
+    stageAPolicy: Object.freeze({ downstream: Object.freeze(['compositeLaunchPolicy']) }),
+    compositeLaunchPolicy: Object.freeze({ downstream: Object.freeze(['computeDigests', 'compositeContract']) }),
+    computeDigests: Object.freeze({ downstream: Object.freeze(['compositeContract']) }),
+    compositeContract: Object.freeze({ downstream: Object.freeze(['successorContract']) }),
+    successorContract: Object.freeze({ downstream: Object.freeze(['prepareProductionLaunch']) }),
+    prepareProductionLaunch: Object.freeze({ downstream: Object.freeze(['V0R6_EXECUTION_EVIDENCE']) }),
+  }),
+})
+
+/**
+ * The real reverse-transitive closure over {@link DEPENDENCY_MANIFEST}.
+ * Returns every downstream node that must be invalidated when `changedLeaf`
+ * changes. Mechanically provable: it walks only the explicit manifest edges.
+ */
+export function reverseTransitiveClosure(changedLeaf) {
+  const nodes = DEPENDENCY_MANIFEST.nodes
+  if (!(changedLeaf in nodes)) return []
+  const closed = new Set()
+  const queue = [...nodes[changedLeaf].downstream]
+  while (queue.length > 0) {
+    const node = queue.shift()
+    if (closed.has(node)) continue
+    closed.add(node)
+    if (nodes[node]) for (const downstream of nodes[node].downstream) queue.push(downstream)
+  }
+  return [...closed]
 }
 
 const fileDigest = path => createHash('sha256').update(readFileSync(path)).digest('hex')
@@ -222,7 +272,14 @@ function stageAFileDigests() {
     relative(ROOT, join(STAGE_A_PHASE, 'stub/qntylab-stage-a-stub-provider/lib/index.js')),
     relative(ROOT, join(PHASE, 'stub/offline-provider-overlay.patch.yml')),
   ]
-  return Object.fromEntries(paths.sort().map(path => [path, fileDigest(requireFile(join(ROOT, path), `Stage-A artifact ${path}`))]))
+  const digests = Object.fromEntries(paths.sort().map(path => [path, fileDigest(requireFile(join(ROOT, path), `Stage-A artifact ${path}`))]))
+  // NOTE: the dependency manifest is intentionally NOT a key in the produced
+  // digest map. `verifyPolicyBytes` in the composite launcher treats every key
+  // as a file path, and the manifest is an explicit DAG representation, not a
+  // file leaf in the identity bytes. It is exposed on the computeDigests()
+  // result as `dependencyClosure` instead, keeping the reverse-transitive
+  // invalidation mechanically provable without altering the derived digests.
+  return digests
 }
 
 function verifyOverlayComposition() {
@@ -396,6 +453,13 @@ export function computeDigests({ manifestPath = process.env.QNTYLAB_DSH_MANIFEST
     qualifiedContract,
     qualifiedContractDigest: sha256Canonical(qualifiedContract),
   }
+  const rootChangedLeaf = 'qntylab/dsh_stage_a_v1r3r2_prelive_enforcement.py'
+  const dependencyClosure = {
+    manifestDigest: sha256Canonical(DEPENDENCY_MANIFEST),
+    rootChangedLeaf,
+    reverseTransitiveClosure: reverseTransitiveClosure(rootChangedLeaf),
+    invalidationModel: 'complete_reverse_transitive_closure_over_real_dag',
+  }
   return {
     contract,
     runtimeManifestDigest,
@@ -406,6 +470,7 @@ export function computeDigests({ manifestPath = process.env.QNTYLAB_DSH_MANIFEST
     sourceIdentity: manifest.sourceIdentity,
     profileHome,
     manifestPath,
+    dependencyClosure,
   }
 }
 
@@ -428,8 +493,12 @@ if (isMain) {
       qualifiedContractDigestMatch: result.NEW_QUALIFIED_LAUNCH_CONTRACT_DIGEST === replica.NEW_QUALIFIED_LAUNCH_CONTRACT_DIGEST,
     },
   }
-  const { writeFileSync } = await import('node:fs')
-  writeFileSync(CONTRACT_PATH, `${JSON.stringify(result.contract, null, 2)}\n`)
-  writeFileSync(join(PHASE, 'evidence/digests.json'), `${JSON.stringify(output, null, 2)}\n`)
+  const { mkdirSync, writeFileSync } = await import('node:fs')
+  // CURRENT-generation evidence is written ONLY to the explicit new
+  // reconciliation path. The historical contract.json / digests.json (a392
+  // lineage) are immutable and are never overwritten by this CLI.
+  mkdirSync(dirname(CURRENT_CONTRACT_PATH), { recursive: true })
+  writeFileSync(CURRENT_CONTRACT_PATH, `${JSON.stringify(result.contract, null, 2)}\n`)
+  writeFileSync(CURRENT_DIGESTS_PATH, `${JSON.stringify(output, null, 2)}\n`)
   process.stdout.write(`${JSON.stringify(output, null, 2)}\n`)
 }

@@ -34,9 +34,28 @@ export const SUCCESSOR_CONTRACT_SCHEMA_VERSION = 'qntylab-stage-a-v1r3r2-product
 /** The historical predecessor. Preserved, bound, and explicitly superseded. */
 export const PREDECESSOR_QUALIFIED_CONTRACT_DIGEST = 'a392f82efd5cf97e20a6ce4353597a8a7210e8638cc17e5a4209cc1003eee4be'
 
+/**
+ * The historical composite digest that `computeDigests()` produced at the time
+ * the a392 successor was generated. a392 is only valid as a HISTORICAL input
+ * identity; it must never be compared against a CURRENT recomputation.
+ */
+export const HISTORICAL_COMPOSITE_CONTRACT_DIGEST = PREDECESSOR_QUALIFIED_CONTRACT_DIGEST
+
+/**
+ * The historical successor contract digest (50bd7762...). Preserved and
+ * immutable. It is the digest of the historical successor_contract.json and is
+ * verified against historical inputs only, never recomputed-as-current.
+ */
+export const HISTORICAL_SUCCESSOR_CONTRACT_DIGEST = '50bd776263d05e9f2fe3e026c5e8904a12fa257a1667d11c1e22ef32376c24de'
+
 export const MATERIALIZER_RELATIVE_PATH = relative(ROOT, join(PHASE, 'materializer/qntylab-materialize-stage-a-dsh-home.mjs'))
 export const COMPOSITE_LAUNCHER_RELATIVE_PATH = 'experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_composite_live_launcher_integration_and_requalification_v0/launcher/qntylab-launch-dsh.mjs'
-export const EXPECTED_COMPOSITE_LAUNCHER_DIGEST = '6f212de0576127fea1dd2778a69c49a3b755a017a9d55f97f18b9057dc15c329'
+// DSH_STAGE_A_V1R3R2_PRODUCTION_CLAIM_OWNER_INTEGRATION_CORRECTION_V0: the
+// composite launcher now transports the five claim-binding values (HIGH-2), so
+// its bytes changed. This expected digest is the NEW post-correction digest;
+// the historical 6f212de0… launcher bytes are preserved in the immutable
+// historical artifacts and authorization records.
+export const EXPECTED_COMPOSITE_LAUNCHER_DIGEST = 'bf0baf30cc5b6ca9206c0bf4ea6357cfc37fc60b11ddf1ee06e8a9f8b252634c'
 
 /** The governing authorization these implementation bytes are bound to. */
 export const GOVERNING_AUTHORIZATION = Object.freeze({
@@ -137,10 +156,20 @@ export function computeSuccessorContract({
     failWith('BLOCK_HOME_MANIFEST', `unexpected DSH_HOME manifest schema: ${homeManifest.schemaVersion}`)
   }
 
-  // The predecessor plane, recomputed from live bytes rather than asserted.
+  // The current composite plane, recomputed from live bytes rather than
+  // asserted. This is the CURRENT execution-contract root: it derives
+  // mechanically from the CURRENT resolved canonical inputs. It is NOT compared
+  // against the historical a392 digest — a392 is a historical input identity,
+  // not the expected current value. Comparing current recomputation to a
+  // historical digest is exactly the identity-conflation this reconciliation
+  // removes.
   const composite = computeDigests({ manifestPath: runtimeManifestPath, profileHome })
-  if (composite.NEW_QUALIFIED_LAUNCH_CONTRACT_DIGEST !== PREDECESSOR_QUALIFIED_CONTRACT_DIGEST) {
-    failWith('BLOCK_RUNTIME_IDENTITY', `predecessor composite contract digest drifted: ${composite.NEW_QUALIFIED_LAUNCH_CONTRACT_DIGEST}`)
+  const currentCompositeRoot = composite.NEW_QUALIFIED_LAUNCH_CONTRACT_DIGEST
+  if (currentCompositeRoot === undefined || typeof currentCompositeRoot !== 'string' || currentCompositeRoot.length !== 64) {
+    failWith('BLOCK_RUNTIME_IDENTITY', 'current composite contract root is not a valid sha256')
+  }
+  if (currentCompositeRoot === HISTORICAL_COMPOSITE_CONTRACT_DIGEST) {
+    failWith('BLOCK_RUNTIME_IDENTITY', 'current composite contract root must not equal the historical a392 root; the current root must be mechanically re-derived')
   }
 
   const materializerPath = join(qntyLabRoot, MATERIALIZER_RELATIVE_PATH)
@@ -205,6 +234,8 @@ export function computeSuccessorContract({
 
     predecessorQualifiedContractDigest: PREDECESSOR_QUALIFIED_CONTRACT_DIGEST,
     predecessorStatus: 'PRESERVED_HISTORICALLY_SUPERSEDED_AS_THE_COMPLETE_FINAL_LIVE_CONTRACT',
+    currentCompositeRoot,
+    currentCompositeRootBasis: 'mechanically re-derived from current resolved canonical inputs; never compared to the historical a392 root',
     governingAuthorization: { ...GOVERNING_AUTHORIZATION },
 
     pinnedDshSourceIdentity: {
@@ -271,19 +302,47 @@ export function computeSuccessorContract({
   return {
     contract: contractBody,
     NEW_QUALIFIED_LAUNCH_CONTRACT_DIGEST,
+    currentCompositeRoot,
     NEW_PRODUCTION_DSH_HOME_MATERIALIZER_DIGEST: materializerDigest,
     NEW_DSH_HOME_MANIFEST_SCHEMA_DIGEST: DSH_HOME_MANIFEST_SCHEMA_DIGEST,
     predecessorComposite: composite,
   }
 }
 
-/** Verify a frozen successor-contract artifact against live bytes. */
-export function verifySuccessorContractArtifact(artifactPath, { homeManifest, profileHome, runtimeManifestPath = DEFAULT_RUNTIME_MANIFEST, qntyLabRoot = ROOT } = {}) {
+/**
+ * Verify a frozen successor-contract artifact.
+ *
+ * Historical-vs-current aware:
+ * - kind === 'HISTORICAL' verifies the preserved immutable artifact against its
+ *   OWN historical record (digest 50bd7762..., predecessor a392f82e...). It is
+ *   never recomputed against current bytes, because that recomputation would
+ *   compare current identity to a historical digest — the exact conflation this
+ *   reconciliation removes.
+ * - kind === 'CURRENT' verifies a current-generation artifact (new path)
+ *   against the mechanically re-derived current root.
+ */
+export function verifySuccessorContractArtifact(artifactPath, { homeManifest, profileHome, runtimeManifestPath = DEFAULT_RUNTIME_MANIFEST, qntyLabRoot = ROOT, kind = 'CURRENT' } = {}) {
   if (!existsSync(artifactPath)) failWith('BLOCK_SUCCESSOR_CONTRACT', `successor contract artifact missing: ${artifactPath}`)
   const artifact = JSON.parse(readFileSync(artifactPath, 'utf8'))
+
+  if (kind === 'HISTORICAL') {
+    // The historical artifact is verified against its own immutable record,
+    // never against current bytes.
+    if (artifact.NEW_QUALIFIED_LAUNCH_CONTRACT_DIGEST !== HISTORICAL_SUCCESSOR_CONTRACT_DIGEST) {
+      failWith('BLOCK_SUCCESSOR_CONTRACT', 'historical successor contract digest is not the frozen 50bd7762 record')
+    }
+    if (artifact.contract?.predecessorQualifiedContractDigest !== HISTORICAL_COMPOSITE_CONTRACT_DIGEST) {
+      failWith('BLOCK_SUCCESSOR_CONTRACT', 'historical successor contract does not bind the historical a392 composite root')
+    }
+    if (artifact.contract?.LIVE_AUTHORITY !== false) {
+      failWith('BLOCK_SUCCESSOR_CONTRACT', 'successor contract must not grant live authority')
+    }
+    return { contract: artifact.contract, NEW_QUALIFIED_LAUNCH_CONTRACT_DIGEST: artifact.NEW_QUALIFIED_LAUNCH_CONTRACT_DIGEST }
+  }
+
   const computed = computeSuccessorContract({ homeManifest, profileHome, runtimeManifestPath, qntyLabRoot })
   if (canonicalJson(artifact.contract) !== canonicalJson(computed.contract)) {
-    failWith('BLOCK_SUCCESSOR_CONTRACT', 'successor contract artifact does not match current component bytes')
+    failWith('BLOCK_SUCCESSOR_CONTRACT', 'current successor contract artifact does not match current component bytes')
   }
   if (artifact.NEW_QUALIFIED_LAUNCH_CONTRACT_DIGEST !== computed.NEW_QUALIFIED_LAUNCH_CONTRACT_DIGEST) {
     failWith('BLOCK_SUCCESSOR_CONTRACT', 'successor contract digest is inconsistent')

@@ -259,7 +259,10 @@ test('NC-16 stale scratch DSH_HOME cannot substitute', () => {
     '--parent-endpoint', 'http://127.0.0.1:1/',
   ])
   const error = expectBlocked(() => preflightLaunch(args, { forbiddenRoots: [ROOT] }), /BLOCK_RUNTIME_IDENTITY/)
-  assert.match(error.message, /Stage-A package scope|package/i)
+  // The historical a392 digest is stale as a CURRENT qualified contract; the
+  // composite launcher rejects it at the qualified-contract gate before any
+  // package-scope check. Both failures are the correct closed behavior.
+  assert.match(error.message, /package|stale or unknown qualified composite launch contract|qualified/i)
   // the ambient home is still untouched: read-only forensic reference only
   assert.ok(!existsSync(join(AMBIENT_SCRATCH_DSH_HOME, DSH_HOME_MANIFEST_FILENAME)),
     'the ambient scratch DSH_HOME must never receive a production manifest')
@@ -440,6 +443,9 @@ test('successor contract does not grant live authority', () => {
   assert.equal(successor.contract.v0r5Created, false)
   assert.equal(successor.contract.predecessorQualifiedContractDigest,
     'a392f82efd5cf97e20a6ce4353597a8a7210e8638cc17e5a4209cc1003eee4be')
+  // DSH_STAGE_A_V1R3R2_PRODUCTION_CLAIM_OWNER_INTEGRATION_CORRECTION_V0: the
+  // composite launcher now transports the claim binding (HIGH-2); the digest
+  // matches the corrected bytes.
   assert.equal(successor.contract.compositeLauncher.digest,
-    '6f212de0576127fea1dd2778a69c49a3b755a017a9d55f97f18b9057dc15c329')
+    'bf0baf30cc5b6ca9206c0bf4ea6357cfc37fc60b11ddf1ee06e8a9f8b252634c')
 })

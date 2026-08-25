@@ -1,0 +1,244 @@
+{
+  "artifact_type": "DSH_STAGE_A_V1R3R2_PRODUCTION_CLAIM_OWNER_INTEGRATION_CORRECTION_AUTHORIZATION",
+  "schema_version": "dsh-stage-a-v1r3r2-production-claim-owner-integration-correction-authorization-v0",
+  "project_id": "DSH_STAGE_A_V1R3R2_PRODUCTION_CLAIM_OWNER_INTEGRATION_CORRECTION_AUTHORIZATION_V0",
+  "display_name": "DSH Stage-A V1R3R2 production claim-owner integration correction authorization V0",
+  "phase_state": "CANDIDATE_GOVERNANCE_ONLY",
+  "phase_type": "governance_only_bounded_correction_authorization",
+  "authority_level": "AUTHORIZED_IF_CANONICAL",
+  "authority_decision": "B_PR217_CORRECTION_AUTHORIZATION_REQUIRED",
+  "authorization_state": "AUTHORIZED_IF_CANONICAL",
+  "authorization_effective": "AFTER_EXACT_CANONICAL_MERGE_ONLY",
+  "prior_candidate": {
+    "key": "PR217_HEAD",
+    "sha": "f5e41c2c24009b66ff906e14fbd439a3d9754a48",
+    "branch": "h1-repair-work",
+    "pr_number": 217,
+    "pr_state": "OPEN",
+    "pr_draft": true,
+    "pr_title": "DSH_STAGE_A_V1R3R2_EXECUTION_CONTRACT_RECONCILIATION_V0",
+    "merged": false,
+    "budget_consumed_action": "REPAIR_AND_REREVIEW_BUDGET_EXHAUSTED",
+    "terminal_stop": "PR217_CORRECTION_BLOCKED",
+    "effective_repair_authority_at_prior_candidate": false
+  },
+  "canonical_source_identity": {
+    "repository": "QntyLab",
+    "canonical_ref": "origin/master",
+    "canonical_master": "07f97f4c645c35bf7a17593ca093e50789c4d620",
+    "canonical_merge_pr": "PR #216",
+    "canonical_merge_parents": [
+      "ded772d59c6135689ac4bda8878979721855a955",
+      "f73a15fb5cb84ace8c6ee1d58d60f4d39706fb49"
+    ],
+    "canonical_drift_behavior": "STOP_SOURCE_CONFLICT",
+    "git_wins_over_prompt_memory_or_handoff": true
+  },
+  "root_cause_frozen": {
+    "summary": "The remaining production claim-owner path is: prepareProductionLaunch -> launcher extraEnv -> cordis.patch.yml -> parent-enforcement index.js Config -> guard.mjs ensureClaim() -> Python `claim` operational entrypoint. The Python operational claim entrypoint now correctly requires (1) authorized execution source SHA, (2) actual execution-contract root, (3) revocation/supersession state, (4) runtime identity digest, (5) executable identity digest; but every intermediate production layer only transports the legacy claim fields. Therefore the production sole claim-owner path fails closed before claim acquisition.",
+    "legacy_claim_fields_at_production_path": [
+      "QNTYLAB_DSH_CLAIM_STATE_DIR",
+      "QNTYLAB_DSH_CLAIM_REMOTE",
+      "QNTYLAB_DSH_CLAIM_REF",
+      "QNTYLAB_DSH_CLAIM_SOURCE_REPO",
+      "QNTYLAB_DSH_SESSION_NONCE"
+    ],
+    "production_boundary_layers": [
+      "preparation/prepare-production-launch.mjs",
+      "launcher/qntylab-launch-dsh.mjs",
+      "profile/cordis.patch.yml",
+      "profile/qntylab-stage-a-parent-enforcement/lib/index.js",
+      "profile/qntylab-stage-a-parent-enforcement/lib/guard.mjs",
+      "qntylab/dsh_stage_a_v1r3r2_prelive_enforcement.py claim operational entrypoint"
+    ]
+  },
+  "invalidating_evidence": [
+    {
+      "id": "H1",
+      "summary": "Python operational claim seam is hardened, but the sole production claim-owner path cannot supply its newly required inputs",
+      "detail": "The Python `claim` operational entrypoint now requires: authorized execution source SHA, actual execution-contract root, revocation/supersession state, runtime identity digest, executable identity digest. prepareProductionLaunch already derives the execution-contract root, runtime identity digest, and executable identity digest from resolved production inputs, but the Stage-A launcher ALLOWED_EXTRA_ENV, cordis.patch.yml, parent-enforcement index.js Config, and guard.mjs ensureClaim() still only transport the legacy claim fields. The exact interface that failed hostile review cannot be satisfied end-to-end; the production claim path fails closed before claim acquisition."
+    }
+  ],
+  "authorized_future_scope": {
+    "type": "death_list",
+    "allowed_operations": [
+      "PROPAGATE_RESOLVED_CLAIM_BINDING_FROM_PRODUCTION_PREPARATION",
+      "EXTEND_STAGE_A_LAUNCHER_CLAIM_BINDING_TRANSPORT",
+      "EXTEND_CORDIS_PARENT_ENFORCEMENT_CONFIG_BINDING",
+      "EXTEND_PARENT_ENFORCEMENT_CONFIG_SCHEMA",
+      "EXTEND_GUARD_CLAIM_CLI_ARGUMENT_WIRING",
+      "ADD_REAL_PRODUCTION_OWNER_END_TO_END_OFFLINE_TEST",
+      "ADD_REAL_PRODUCTION_OWNER_TEST_TO_CI",
+      "REPAIR_STALE_CLAIM_SOURCE_DOCUMENTATION",
+      "MECHANICALLY_REDERIVE_CURRENT_EXECUTION_CONTRACT_ROOT_AND_DEPENDENTS",
+      "AMEND_REPLACE_PR217_SINGLE_CANDIDATE",
+      "RUN_ONE_INDEPENDENT_HOSTILE_REVIEW",
+      "FIX_CRITICAL_HIGH_ONCE_IF_REQUIRED",
+      "RUN_AT_MOST_ONE_TARGETED_REREVIEW_IF_C_H_REPAIR_OCCURRED"
+    ],
+    "operation_constraints": {
+      "PROPAGATE_RESOLVED_CLAIM_BINDING_FROM_PRODUCTION_PREPARATION": {
+        "semantics": "The future implementation derives executionContractRoot, runtimeIdentityDigest, executableIdentityDigest from the SAME prepareProductionLaunch execution over resolved production inputs. Values are transported directly; no layer may silently substitute another value, and no stale constants or recomputation from unrelated source may be used."
+      },
+      "EXTEND_STAGE_A_LAUNCHER_CLAIM_BINDING_TRANSPORT": {
+        "target": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/launcher/qntylab-launch-dsh.mjs",
+        "semantics": "Extend ALLOWED_EXTRA_ENV and the validation transport so the resolved claim binding (Class A) plus future live authority identity (Class B) survive byte/value identical across the launcher."
+      },
+      "EXTEND_CORDIS_PARENT_ENFORCEMENT_CONFIG_BINDING": {
+        "target": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/profile/cordis.patch.yml",
+        "semantics": "Inject the resolved claim binding into the qntylab-stage-a-parent-enforcement plugin config; no value substitution."
+      },
+      "EXTEND_PARENT_ENFORCEMENT_CONFIG_SCHEMA": {
+        "target": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/profile/qntylab-stage-a-parent-enforcement/lib/index.js",
+        "semantics": "Config may only contain the claim-binding fields authorized here; no silent defaults for live-authority identity."
+      },
+      "EXTEND_GUARD_CLAIM_CLI_ARGUMENT_WIRING": {
+        "target": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/profile/qntylab-stage-a-parent-enforcement/lib/guard.mjs",
+        "semantics": "guard.mjs ensureClaim() must invoke the Python `claim` operational entrypoint with exactly authorized execution source SHA, actual execution-contract root, revocation/supersession state, runtime identity digest, executable identity digest; byte/value identical across transport."
+      },
+      "ADD_REAL_PRODUCTION_OWNER_END_TO_END_OFFLINE_TEST": {
+        "semantics": "Mandatory. Test the ACTUAL production claim-owner chain: real cordis profile semantics, parent-enforcement index.js, guard.mjs, and observe the actual Python claim invocation. Scratch Git repo + scratch claim remote/ref + fake/non-production claim namespace are permitted; no secret, no provider, no DSH live episode. Positive test proves the real production owner sends exactly: authorized execution source SHA, actual independent execution-contract root, runtime identity digest, executable identity digest, NOT_REVOKED proof/state to the Python operational entrypoint. Negative controls through the SAME production owner: missing source SHA -> BLOCK; missing execution root -> BLOCK; wrong execution root -> BLOCK; missing revocation proof -> BLOCK; REVOKED -> BLOCK; SUPERSEDED -> BLOCK; wrong runtime identity -> BLOCK; wrong executable identity -> BLOCK; transport substitution at launcher/profile/plugin layer -> BLOCK. All failures occur before claim COMMITTED, budget reservation, provider I/O."
+      },
+      "ADD_REAL_PRODUCTION_OWNER_TEST_TO_CI": {
+        "target": ".github/workflows/project-context.yml",
+        "semantics": "The real production-owner integration test MUST run in GitHub candidate-head CI. Do not rely only on Python EpisodeClaim unit tests or repository-deterministic contract inspection. The exact interface that failed hostile review must become an executable CI regression gate."
+      },
+      "REPAIR_STALE_CLAIM_SOURCE_DOCUMENTATION": {
+        "target": "reconciliation claim-source-model.md",
+        "semantics": "Update stale claim-source documentation to the two-provenance-class claim binding model; no historical artifact byte is mutated."
+      },
+      "MECHANICALLY_REDERIVE_CURRENT_EXECUTION_CONTRACT_ROOT_AND_DEPENDENTS": {
+        "semantics": "guard.mjs, index.js, cordis.patch.yml, launcher, and any other changed production leaf are content-bound inputs. Compute reverse-transitive closure mechanically, rederive every affected current-generation identity, prove unaffected nodes unchanged, produce a new POST_REPAIR_CURRENT_ROOT from final bytes. Do NOT freeze a31eb46... as the required post-repair root; a31eb46... is the current pre-repair root only."
+      },
+      "AMEND_REPLACE_PR217_SINGLE_CANDIDATE": {
+        "single_final_candidate_commit": true,
+        "one_draft_pr": true,
+        "draft_implementation_pr": "EXISTING_PR217_ONLY",
+        "no_new_implementation_pr": true,
+        "no_merge_authority": true
+      },
+      "RUN_ONE_INDEPENDENT_HOSTILE_REVIEW": {
+        "count": 1
+      },
+      "FIX_CRITICAL_HIGH_ONCE_IF_REQUIRED": {
+        "count": 1,
+        "trigger": "only if a Critical or High finding is returned by the one independent hostile review"
+      },
+      "RUN_AT_MOST_ONE_TARGETED_REREVIEW_IF_C_H_REPAIR_OCCURRED": {
+        "count": 1,
+        "trigger": "only if the Critical/High repair was required"
+      }
+    },
+    "production_binding_model": {
+      "two_provenance_classes": {
+        "A": "RESOLVED_PRODUCTION_IDENTITY: executionContractRoot, runtimeIdentityDigest, executableIdentityDigest — derived from the SAME prepareProductionLaunch execution, transported directly from resolved current production inputs. NOT copied from stale constants or recomputed from unrelated source.",
+        "B": "FUTURE_LIVE_AUTHORITY_IDENTITY: authorizedExecutionSourceSha, revocation/supersession proof/state — supplied by the applicable future canonical live authorization. NOT invented by the non-live reconciliation phase. No origin/master identity, no ambient HEAD identity, no hardcoded future merge SHA, no unconditional NOT_REVOKED default."
+      },
+      "no_static_current_root_as_universal_authority": true,
+      "no_static_not_revoked_default": true,
+      "all_values_byte_value_identical_across_transport": true,
+      "no_layer_may_silently_substitute": true
+    },
+    "forbidden_operations": [
+      "NO_MERGE",
+      "NO_V0R7",
+      "NO_LIVE_AUTHORIZATION",
+      "NO_SCIENTIFIC_EXECUTION",
+      "NO_REAL_SECRET_READ",
+      "NO_CLAIM_CREATION",
+      "NO_PROVIDER_CALL",
+      "NO_REPLAY_V0R5",
+      "NO_REPLAY_V0R6",
+      "NO_STAGE_B",
+      "NO_NEW_IMPLEMENTATION_PR",
+      "NO_HARDCODED_FUTURE_MERGE_SHA",
+      "NO_ORIGIN_OR_MASTER_IDENTITY_BINDING",
+      "NO_UNCONDITIONAL_NOT_REVOKED_DEFAULT",
+      "NO_MUTATION_OF_HISTORICAL_ARTIFACTS"
+    ]
+  },
+  "stop_conditions": [
+    "STOP_SOURCE_CONFLICT",
+    "STOP_IF_HISTORICAL_ARTIFACT_OR_LIVE_BOUNDARY_WOULD_BE_MUTATED",
+    "STOP_IF_SCOPE_WIDENS_BEYOND_AUTHORIZED_CORRECTION",
+    "STOP_AFTER_ONE_CANDIDATE_COMMIT_AND_AMENDED_DRAFT_PR",
+    "STOP_IF_PRODUCTION_OWNER_CI_GATE_IS_NOT_ADDED",
+    "STOP_IF_END_TO_END_OFFLINE_TEST_IS_ABSENT"
+  ],
+  "historical_firewall": {
+    "byte_identical_required": [
+      "historical composite contract.json",
+      "historical composite digests.json",
+      "historical successor_contract.json",
+      "V0R5 evidence",
+      "V0R6 evidence",
+      "prior execution receipts"
+    ],
+    "current_generation_evidence_changeable_only_by_deterministic_derivation": true
+  },
+  "live_firewall": {
+    "real_secret_reads": 0,
+    "production_claims": 0,
+    "provider_calls": 0,
+    "live_dsh_invocations": 0,
+    "real_codex_turns": 0,
+    "real_claude_turns": 0,
+    "spend_usd": "0"
+  },
+  "budgets": {
+    "implementation_episode_budget": 1,
+    "final_candidate_commit_budget": 1,
+    "draft_implementation_pr": "EXISTING_PR217_ONLY",
+    "hostile_review_budget": 1,
+    "critical_high_repair_budget": 1,
+    "targeted_rereview_budget": 1,
+    "targeted_rereview_trigger": "ONLY_IF_C_H_REPAIR_OCCURRED",
+    "review_of_review_forbidden": true,
+    "medium_low_findings_restart_phase": false
+  },
+  "construction_receipts": {
+    "secret_reads": 0,
+    "production_claim_writes": 0,
+    "diagnostic_claim_writes": 0,
+    "dsh_invocations": 0,
+    "provider_requests": 0,
+    "real_model_calls": 0,
+    "codex_turns": 0,
+    "claude_turns": 0,
+    "v0r6_mutations": 0,
+    "v0r7_created": false,
+    "spend_usd": "0"
+  },
+  "authority_firewall": {
+    "effective_repair_authority": false,
+    "authorization_effective_before_canonical_merge": false,
+    "production_claim_mutation_authorized": false,
+    "v0r5_replay_authorized": false,
+    "v0r6_replay_authorized": false,
+    "v0r7_authorized": false,
+    "live_dsh_authorized": false,
+    "no_merge_authority": true,
+    "implementation_authorized_on_branch": false,
+    "branch_local_artifact_does_not_self_authorize": true
+  },
+  "confirmed": [
+    "Canonical master 07f97f4c645c35bf7a17593ca093e50789c4d620 (origin/master); canonical base binds exactly this SHA.",
+    "PR #217 OPEN draft, head f5e41c2c24009b66ff906e14fbd439a3d9754a48, NOT merged; blocked predecessor binds exactly this head.",
+    "Previous correction authority: DSH_STAGE_A_V1R3R2_EXECUTION_CONTRACT_RECONCILIATION_CORRECTION_AUTHORIZATION_V0.",
+    "Previous repair/rereview budget EXHAUSTED; terminal result PR217_CORRECTION_BLOCKED.",
+    "Blocking High: Python operational claim seam is hardened, but the actual sole production claim owner cannot supply its newly required inputs.",
+    "BOUNDED AUTHORITY CHECK = B (PR217_FILE_CLAIM_OWNER_INTEGRATION_CORRECTION_AUTHORIZATION_REQUIRED); effective_repair_authority false; no live authority.",
+    "The authority firewall remains: no secret reads, no provider calls, no claims, no model calls, no DSH invocation (counters zero).",
+    "This corrective artifact is candidate-only and does not self-authorize; it is effective AFTER_EXACT_CANONICAL_MERGE_ONLY."
+  ],
+  "assumed": [
+    "accidental-spelling untracked directory dsh_stage_stage_a_v1r3r2_..._reconciliation_v0 is non-canonical and not committed/reused/copied."
+  ],
+  "deferred": [
+    "No contract/digest/runtime/implementation byte is repaired in this phase.",
+    "No launcher, cordis.patch.yml, index.js, guard.mjs, Python claim entrypoint, CI workflow, or documentation byte is modified in this phase.",
+    "No live activity; no claim acquisition; no provider I/O; no secret read."
+  ],
+  "next_action": "CANONICALIZE_THIS_THEN_BEGIN_ONE_BOUNDED_PRODUCTION_CLAIM_OWNER_INTEGRATION_CORRECTION",
+  "terminal_verdict": "DSH_STAGE_A_V1R3R2_PRODUCTION_CLAIM_OWNER_INTEGRATION_CORRECTION_AUTHORIZATION_V0_READY"
+}

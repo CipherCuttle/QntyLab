@@ -258,6 +258,15 @@ def test_registry_records_the_activation_candidate_and_projection_is_clean() -> 
     assert record["claim_ref"] == CLAIM_REF
     assert record["claim_state_dir"] == str(V0R7_STATE)
     assert record["hostile_review_count"] == 1
+    assert record["hostile_review_verdict"] == "HOSTILE_REVIEW_PASS"
+    assert record["hostile_governance_critical_total"] == 0
+    assert record["hostile_governance_high_total"] == 0
+    assert record["hostile_governance_medium_total"] == 0
+    assert record["hostile_governance_low_total"] == 2
+    assert record["targeted_governance_rereview_used"] is False
+    assert record["terminal_outcome"] == (
+        "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_ACTIVATION_V0R7_MERGE_READY"
+    )
     artifact_names = {str(path).rsplit("/", 1)[-1] for path in record["authoritative_artifacts"]}
     assert {"activation.json", "test_dsh_stage_a_v1r3r2_one_episode_live_execution_activation_v0r7.py"} <= (
         artifact_names
@@ -282,3 +291,13 @@ def test_registry_records_the_activation_candidate_and_projection_is_clean() -> 
     assert check.returncode == 0, check.stdout + check.stderr
     roadmap = (ROOT / "docs/CURRENT_ROADMAP.md").read_text(encoding="utf-8")
     assert "DSH Stage-A V1R3R2 one-episode live execution activation V0R7" in roadmap
+
+
+def test_activation_review_block_matches_durable_hostile_review_receipt() -> None:
+    review = _load(ACTIVATION_PATH)["review"]
+    assert review["verdict"] == "HOSTILE_REVIEW_PASS"
+    assert review["critical_findings"] == 0
+    assert review["high_findings"] == 0
+    assert review["medium_findings"] == 0
+    assert review["low_findings"] == 2
+    assert review["targeted_rereview_used"] is False

@@ -131,8 +131,12 @@ def test_registry_projection_matches_authorization_artifact() -> None:
     """9: registry projection matches the artifact keys/values."""
     record = _project_record()
     assert record["project_id"] == PROJECT_ID
-    assert record["state"] == "PLANNED_NOT_AUTHORIZED"
-    assert record["candidate_state"] == "ACTIVE_CANDIDATE"
+    assert record["state"] == "CLOSED_PASS"
+    assert record["candidate_state"] == "CANONICAL_AUTHORIZATION_EFFECTIVE"
+    assert record["canonicalization_status"] == "EXACT_CANONICAL_MERGE_VERIFIED"
+    assert record["canonical_authorization_merge"] == "3a0e1aa15c6c5d01a93dd7e3460dd3a736c46474"
+    assert record["repair_authority_was_effective"] is True
+    assert record["implementation_completed"] is True
     assert record["authorization_state"] == "AUTHORIZED_IF_CANONICAL"
     assert record["authorization_effective"] == "AFTER_EXACT_CANONICAL_MERGE_ONLY"
     assert record["effective_repair_authority"] is False

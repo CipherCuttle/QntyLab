@@ -230,8 +230,17 @@ def test_registry_projection_matches_authorization_artifact() -> None:
     """Registry projection matches the artifact keys/values."""
     record = _project_record()
     assert record["project_id"] == PROJECT_ID
-    assert record["state"] == "PLANNED_NOT_AUTHORIZED"
-    assert record["candidate_state"] == "ACTIVE_CANDIDATE"
+    assert record["state"] == "CLOSED_PASS"
+    assert record["candidate_state"] == "CANONICAL_AUTHORIZATION_EFFECTIVE"
+    assert record["canonicalization_status"] == "EXACT_CANONICAL_MERGE_VERIFIED"
+    assert record["canonical_authorization_merge"] == "3a0e1aa15c6c5d01a93dd7e3460dd3a736c46474"
+    assert record["repair_authority_was_effective"] is True
+    assert record["implementation_completed"] is True
+    assert record["implementation_project_id"] == "DSH_STAGE_A_V1R3R2_PRODUCTION_CLAIM_OWNER_INTEGRATION_CORRECTION_V0"
+    assert record["implementation_project_state"] == "CLOSED_PASS"
+    assert record["implementation_candidate_sha"] == "8ee3a671bc9be1d55811e701d0a2b82f3e1d39ee"
+    assert record["implementation_canonical_merge"] == "3a0e1aa15c6c5d01a93dd7e3460dd3a736c46474"
+    assert record["current_execution_contract_root"] == "cf1aff079d56428753bf8f58f1848839da35cfb9f75104fc1fd03cd13056c1e2"
     assert record["authorization_state"] == "AUTHORIZED_IF_CANONICAL"
     assert record["authorization_effective"] == "AFTER_EXACT_CANONICAL_MERGE_ONLY"
     assert record["effective_repair_authority"] is False
@@ -244,10 +253,12 @@ def test_registry_projection_matches_authorization_artifact() -> None:
 
 
 def test_roadmap_projection_includes_the_project() -> None:
-    """The generated roadmap (rendered from the registry) includes the new project as PLANNED_NOT_AUTHORIZED."""
+    """The generated roadmap (rendered from the registry) includes the project as CLOSED_PASS, not queued."""
     roadmap = (ROOT / "docs/CURRENT_ROADMAP.md").read_text(encoding="utf-8")
     assert PROJECT_ID in roadmap or "production claim-owner integration correction authorization" in roadmap
-    assert "PLANNED_NOT_AUTHORIZED" in roadmap
+    assert "CLOSED_PASS" in roadmap
+    queued_block = roadmap.split("## Queued — not authorized")[1].split("## Closed / stale")[0]
+    assert "production claim-owner integration correction authorization" not in queued_block
 
 
 def test_authority_note_mirrors_artifact() -> None:

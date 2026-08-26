@@ -433,3 +433,79 @@ The Funding Pressure → Future RV24 experiment remains a bounded exploratory
 predictive proposition. Even a positive `HIGH_MINUS_LOW_MEAN_RV24` result does
 not by itself establish causality, a trading edge, strategy-family authority,
 Router feature authority, or Qnty authority.
+
+## Operational Alignment Contract
+
+This section encodes operating policy only. It grants no execution, live,
+trading, capital, promotion, or implementation authority.
+
+**Optimization target.** The single optimization target for QntyLab work is
+expected decision-changing information per bounded research cost. Architecture
+completeness, governance sophistication, artifact count, agent count,
+orchestration capability, runtime elegance, speculative hardening, and similar
+quantities are not optimization targets and do not justify phases by
+themselves.
+
+**Mandatory phase questions.** Every non-trivial phase must concretely answer,
+before it starts:
+
+1. `WHAT_UNCERTAINTY_DOES_THIS_REDUCE?`
+2. `WHAT_DECISION_CHANGES_IF_POSITIVE?`
+3. `WHAT_DECISION_CHANGES_IF_NEGATIVE?`
+4. `WHAT_IS_THE_CHEAPEST_VALID_TEST?`
+5. `WHAT_STOPS_THIS_LINEAGE?`
+
+If any of these cannot be answered concretely, the phase must not be started.
+
+**Infrastructure foreign-key rule.** Any infrastructure, governance, or runtime
+repair phase must identify, all referring to a currently selected scientific
+question:
+
+- `BLOCKED_SCIENTIFIC_QUESTION`
+- `BLOCKING_FAILURE`
+- `WHY_THE_FAILURE_PREVENTS_THE_QUESTION`
+- `MINIMUM_REPAIR`
+- `CHEAPER_ALTERNATIVE_CONSIDERED`
+- `DECISION_UNLOCKED_BY_REPAIR`
+- `STOP_AFTER`
+
+If no named blocked scientific question exists, no infrastructure phase may be
+started. Insufficient reasons include: cleaner architecture, future flexibility,
+robustness in principle, nicer provenance, broader orchestration, more agent
+capability, generic hardening, possible future use, fixing DSH because it is
+broken, and reducing technical debt without a current scientific dependency.
+
+**North Star drift.** `NORTH_STAR_DRIFT = TRUE` when more than 3 of the last 10
+completed phases are infrastructure/governance-only without directly
+unblocking a named selected scientific question. While true, initiating
+infrastructure work stops; work returns to the cheapest information-bearing
+experiment.
+
+**Infrastructure loop.** `INFRA_LOOP = TRUE` when two consecutive phases attack
+substantially the same infrastructure blocker without a new market/scientific
+observation. Default dispositions are `SIMPLER_PATH`, `DEFER`, or `KILL`. A
+third attempt requires explicit new Git-backed authority plus proof that no
+cheaper scientific route exists.
+
+**Router/State entry discipline.** Entry into Router or State work requires all
+of: at least 3 economically useful surviving mechanism/sleeve families, a
+credible FLAT/ABSTAIN baseline, at least 1 genuinely prospective evidence
+stream, and an actual conditional-composition question not answerable by
+evaluating the sleeves directly. Until then, `ROUTER = DEFERRED` and
+`STATE = DEFERRED`.
+
+**DSH Stage-A disposition.** `DSH_STAGE_A_DISPOSITION = MAINTENANCE_ONLY`. DSH
+is no longer a roadmap destination. No new DSH authorization, repair,
+qualification, activation, execution, hardening, generalization, or
+orchestration project may be started merely because DSH itself is imperfect. A
+future DSH phase requires a named selected scientific question mechanically
+blocked by a concrete DSH defect AND no materially cheaper valid route.
+`NO_AUTOMATIC_V0R8 = true`.
+
+**Failure and negative evidence.** FAILURE IS INFORMATION. Failed frozen
+hypotheses are not auto-rescued; blocked implementations are not auto-repaired;
+broken tools are not auto-fixed. First ask whether the selected scientific
+question can proceed through a simpler valid route.
+
+**Complexity rule.** Simple baseline first. Complexity must earn itself through
+incremental information. Router and State cannot rescue weak signals.

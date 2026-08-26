@@ -294,3 +294,35 @@ It is a durable design philosophy only. All concrete work still requires the app
 The philosophy is informed by publicly documented work and ideas associated with Jim Simons (systematic model-driven discovery and research culture), John Tukey (exploratory data analysis), Claude Shannon (information theory), Richard Feynman (scientific integrity), Peter Huber (robust statistics), Benoit Mandelbrot (heavy tails in price changes), A. Philip Dawid (prequential probability and statistics), Abraham Wald (sequential analysis), Leo Breiman (the two cultures of statistical modeling), Edward O. Thorp (mathematical edge and risk), and John L. Kelly Jr. (information and capital growth).
 
 These names identify intellectual influences, not authorities whose views automatically determine any QntyLab design decision.
+
+## INFRASTRUCTURE IS NOT A RESEARCH RESULT
+
+Infrastructure, governance, and runtime work produce no scientific information
+by themselves. They are costs justified only by the research they unblock. This
+operational section restates the philosophy as phase-level policy; it grants no
+authority and changes no frozen artifact.
+
+**Five mandatory phase questions.** Before starting any non-trivial phase,
+answer concretely:
+
+1. `WHAT_UNCERTAINTY_DOES_THIS_REDUCE?`
+2. `WHAT_DECISION_CHANGES_IF_POSITIVE?`
+3. `WHAT_DECISION_CHANGES_IF_NEGATIVE?`
+4. `WHAT_IS_THE_CHEAPEST_VALID_TEST?`
+5. `WHAT_STOPS_THIS_LINEAGE?`
+
+A phase that cannot answer these is not started. An infrastructure, governance,
+or runtime repair phase additionally requires the foreign-key fields
+(`BLOCKED_SCIENTIFIC_QUESTION`, `BLOCKING_FAILURE`,
+`WHY_THE_FAILURE_PREVENTS_THE_QUESTION`, `MINIMUM_REPAIR`,
+`CHEAPER_ALTERNATIVE_CONSIDERED`, `DECISION_UNLOCKED_BY_REPAIR`, `STOP_AFTER`),
+all referring to a currently selected scientific question.
+
+**Failure-before-repair rule.** FAILURE IS INFORMATION. A failed frozen
+hypothesis is a result, not a defect to be rescued. A blocked implementation is
+a finding, not an automatic work order. A broken tool is first a question:
+can the selected scientific question proceed through a simpler valid route
+without it? Only when the answer is no — and the infrastructure foreign-key
+fields are concretely satisfied — does repair become eligible for authority.
+Complexity must earn itself through incremental information; simple baselines
+come first, and downstream composition layers cannot rescue weak signals.

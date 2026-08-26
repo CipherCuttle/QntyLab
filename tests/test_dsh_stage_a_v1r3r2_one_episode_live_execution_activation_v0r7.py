@@ -30,6 +30,7 @@ V0R7_STATE = Path(
 # canonical master IS the authorization merge (PR #227); the authorized
 # execution source is independently bound and must never be conflated with it.
 CURRENT_CANONICAL_MASTER = "908dfed34b5f22bb99e77c146a757a8e6299064c"
+ACTIVATION_MERGE = "1b0e936e9f1f696cd586e1cd1ea1bf3a5e1ae4c4"
 AUTHORIZATION_MERGE = "908dfed34b5f22bb99e77c146a757a8e6299064c"
 AUTHORIZATION_MERGE_PARENTS = [
     "2c0804aeecdf19923036f17531c0d43d433c4aa0",
@@ -62,7 +63,7 @@ def _git(*args: str) -> subprocess.CompletedProcess[str]:
 
 
 def test_current_canonical_master_and_frozen_authorization_identity() -> None:
-    assert _git("rev-parse", "origin/master").stdout.strip() == CURRENT_CANONICAL_MASTER
+    assert _git("rev-parse", "origin/master").stdout.strip() == ACTIVATION_MERGE
     assert (
         _git("merge-base", "--is-ancestor", AUTHORIZED_EXECUTION_SOURCE_SHA, CURRENT_CANONICAL_MASTER).returncode
         == 0
@@ -244,8 +245,9 @@ def test_registry_records_the_activation_candidate_and_projection_is_clean() -> 
     registry = tomllib.loads((ROOT / "docs/state/projects.toml").read_text(encoding="utf-8"))
     record = next(row for row in registry["project"] if row["project_id"] == EXECUTION_ID)
     auth_record = next(row for row in registry["project"] if row["project_id"] == AUTHORIZATION_ID)
-    assert record["state"] == "PLANNED_NOT_AUTHORIZED"
-    assert record["candidate_state"] == "ACTIVE_CANDIDATE"
+    assert record["state"] == "CLOSED_BLOCKED"
+    assert record["candidate_state"] == "CLOSED_BLOCKED"
+    assert record["canonicalization_status"] == "CLOSED"
     assert record["activation_exists"] is True
     assert record["activation_authorized"] is False
     assert record["activation_authorized_after_canonicalization"] is True
@@ -264,9 +266,14 @@ def test_registry_records_the_activation_candidate_and_projection_is_clean() -> 
     assert record["hostile_governance_medium_total"] == 0
     assert record["hostile_governance_low_total"] == 2
     assert record["targeted_governance_rereview_used"] is False
-    assert record["terminal_outcome"] == (
-        "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_ACTIVATION_V0R7_MERGE_READY"
-    )
+    assert record["terminal_outcome"] == "V0R7_EXECUTION_TERMINAL_FAILURE"
+    assert record["episode_claimed"] is False
+    assert record["episode_consumed"] is True
+    assert record["terminal_claim_attempted"] is False
+    assert record["terminal_provider_wire_requests"] == 0
+    assert record["terminal_spend_usd"] == 0.0
+    assert record["execution_evidence_artifact"].endswith("v0r7/execution_evidence.json")
+    assert record["closure_artifact"].endswith("v0r7/closure.md")
     artifact_names = {str(path).rsplit("/", 1)[-1] for path in record["authoritative_artifacts"]}
     assert {"activation.json", "test_dsh_stage_a_v1r3r2_one_episode_live_execution_activation_v0r7.py"} <= (
         artifact_names

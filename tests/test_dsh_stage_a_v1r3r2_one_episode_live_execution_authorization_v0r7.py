@@ -20,6 +20,7 @@ CANONICAL_MASTER = "2c0804aeecdf19923036f17531c0d43d433c4aa0"
 # after this authorization phase merged; keep the artifact-bound base constant
 # separate from the current canonical master exactly as the V0R6 test does.
 CURRENT_CANONICAL_MASTER = "908dfed34b5f22bb99e77c146a757a8e6299064c"
+ACTIVATION_MERGE = "1b0e936e9f1f696cd586e1cd1ea1bf3a5e1ae4c4"
 CANONICAL_PARENT1 = "3a0e1aa15c6c5d01a93dd7e3460dd3a736c46474"
 CANONICAL_PARENT2 = "835151b59c6113d11eeb82dd8017bf6809248733"
 EXECUTION_CONTRACT_ROOT = "cf1aff079d56428753bf8f58f1848839da35cfb9f75104fc1fd03cd13056c1e2"
@@ -35,7 +36,7 @@ def _git(*args: str) -> subprocess.CompletedProcess[str]:
 
 
 def test_exact_canonical_master_and_parent_binding() -> None:
-    assert _git("rev-parse", "origin/master").stdout.strip() == CURRENT_CANONICAL_MASTER
+    assert _git("rev-parse", "origin/master").stdout.strip() == ACTIVATION_MERGE
     assert _git("merge-base", "--is-ancestor", CANONICAL_MASTER, CURRENT_CANONICAL_MASTER).returncode == 0
     assert _git("merge-base", "--is-ancestor", CANONICAL_MASTER, "HEAD").returncode == 0
     assert _git("rev-list", "--parents", "-n", "1", CANONICAL_MASTER).stdout.split() == [

@@ -9440,9 +9440,9 @@ next_action = "AFTER EXACT CANONICAL MERGE ONLY: construct a separate V0R7 activ
 [[project]]
 project_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R7"
 display_name = "DSH Stage-A V1R3R2 one-episode live execution activation V0R7"
-state = "PLANNED_NOT_AUTHORIZED"
-candidate_state = "ACTIVE_CANDIDATE"
-canonicalization_status = "PENDING_EXACT_CANONICAL_MERGE"
+state = "CLOSED_BLOCKED"
+candidate_state = "CLOSED_BLOCKED"
+canonicalization_status = "CLOSED"
 authority_level = "BOUNDED_ONE_EPISODE_DSH_STAGE_A_LIVE_EXECUTION_ONLY"
 phase_type = "GOVERNANCE_ONLY_ACTIVATION_CONSTRUCTION"
 authoritative_artifacts = [
@@ -9451,6 +9451,9 @@ authoritative_artifacts = [
   "docs/CURRENT_ROADMAP.md",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_authorization_v0r7/authorization.json",
   "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0r7/activation.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0r7/hostile_implementation_review.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0r7/execution_evidence.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0r7/closure.md",
   "tests/test_dsh_stage_a_v1r3r2_one_episode_live_execution_activation_v0r7.py",
 ]
 authorization_state = "AUTHORIZED_IF_CANONICAL"
@@ -9463,6 +9466,11 @@ projection_contract = "ACTIVATION_REGISTRY_PROJECT_CONTEXT_CANONICAL_GIT_PARITY_
 activation_exists = true
 activation_authorized = false
 activation_authorized_after_canonicalization = true
+canonical_activation_merge = "1b0e936e9f1f696cd586e1cd1ea1bf3a5e1ae4c4"
+canonical_activation_merge_parents = [
+  "908dfed34b5f22bb99e77c146a757a8e6299064c",
+  "755cb755cd7dccc547a6c39b125e7cec51cd9fbc",
+]
 effective_execution_authority = false
 implementation_authorized = false
 implementation_completed = true
@@ -9501,9 +9509,9 @@ episode_generation = "V0R7"
 episode_id = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R7#EPISODE_1"
 episode_count = 1
 authorized_live_episodes = 1
-episode_started = false
+episode_started = true
 episode_claimed = false
-episode_consumed = false
+episode_consumed = true
 second_episode_authorized = false
 whole_episode_retry_allowed = false
 replay_allowed = false
@@ -9560,11 +9568,25 @@ claude_agents = {}
 claude_plugins = []
 claude_persistence = false
 activation_artifacts_created = 1
+execution_closure_pr_budget = 1
 live_authority_created = false
 live_execution_authorized = false
 v0r7_created = false
 v0r7_activated = false
-live_execution_performed = false
+live_execution_performed = true
+execution_evidence_artifact = "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0r7/execution_evidence.json"
+closure_artifact = "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_one_episode_live_execution_v0r7/closure.md"
+terminal_secret_reads = 1
+terminal_claim_attempted = false
+terminal_dsh_invocations = 1
+terminal_parent_requests = 0
+terminal_provider_wire_requests = 0
+terminal_codex_child_turns = 0
+terminal_claude_child_turns = 0
+terminal_fixture_mutations = 0
+terminal_spend_usd = 0.0
+terminal_failure_stage = "DSH_PROFILE_BOOT_PLUGIN_IMPORT"
+terminal_pre_claim = true
 stage_b_authorized = false
 scientific_execution_authorized = false
 qnty_runtime_authority = "NONE"
@@ -9582,5 +9604,6 @@ hostile_governance_high_total = 0
 hostile_governance_medium_total = 0
 hostile_governance_low_total = 2
 targeted_governance_rereview_used = false
-terminal_outcome = "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_ACTIVATION_V0R7_MERGE_READY"
-next_action = "AFTER EXACT CANONICAL MERGE OF THIS ACTIVATION BRANCH ONLY: exactly one action-time V0R7 live execution attempt bound to the exact canonical authorization bytes, the repaired claim primitive, and the qualified successor contract; no automatic V0R8. Do not execute before that merge, read the secret, create the claim, invoke DSH, call a provider, spend, replay V0R5/V0R6, or grant Stage B, Qnty, scientific, trading, capital, promotion, or broader production authority."
+terminal_outcome = "V0R7_EXECUTION_TERMINAL_FAILURE"
+terminal_outcome_basis = "The exact canonical activation merge 1b0e936e9f1f696cd586e1cd1ea1bf3a5e1ae4c4 was verified at action time and all non-secret gates passed, but the single authorized DSH invocation exited 1 (not timed out) when the profile boot crashed importing @qntylab/dsh-stage-a-parent-enforcement/lib/index.js:25 with TypeError: z.string(...).regex is not a function inside the frozen production implementation. The failure preceded guard ensureClaim(): the claim was never attempted, the remote claim ref and local episode state were absent before and after, provider logical/wire requests were zero, spend was USD 0.00, and the secret was read exactly once with parent-only injection and never logged or persisted. This is a production defect recorded unfixed."
+next_action = "CLOSED_BLOCKED: V0R7_EXECUTION_TERMINAL_FAILURE. Preserve the evidence; do not repair runtime or contract bytes, retry, replay, create a second episode or an automatic V0R8, or begin an infrastructure loop. DSH_STAGE_A disposition recommendation is MAINTENANCE_ONLY pending explicit future Git-backed authority; no Stage B, Qnty, scientific, trading, capital, promotion, or broader production authority exists."

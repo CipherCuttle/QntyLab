@@ -16,6 +16,10 @@ AUTH_PATH = ARTIFACT_ROOT / "authorization.json"
 AUTH = json.loads(AUTH_PATH.read_text(encoding="utf-8"))
 ENFORCEMENT_SOURCE = ROOT / "qntylab/dsh_stage_a_v1r3r2_prelive_enforcement.py"
 CANONICAL_MASTER = "2c0804aeecdf19923036f17531c0d43d433c4aa0"
+# The canonical master advanced to the exact authorization merge (PR #227)
+# after this authorization phase merged; keep the artifact-bound base constant
+# separate from the current canonical master exactly as the V0R6 test does.
+CURRENT_CANONICAL_MASTER = "908dfed34b5f22bb99e77c146a757a8e6299064c"
 CANONICAL_PARENT1 = "3a0e1aa15c6c5d01a93dd7e3460dd3a736c46474"
 CANONICAL_PARENT2 = "835151b59c6113d11eeb82dd8017bf6809248733"
 EXECUTION_CONTRACT_ROOT = "cf1aff079d56428753bf8f58f1848839da35cfb9f75104fc1fd03cd13056c1e2"
@@ -31,7 +35,8 @@ def _git(*args: str) -> subprocess.CompletedProcess[str]:
 
 
 def test_exact_canonical_master_and_parent_binding() -> None:
-    assert _git("rev-parse", "origin/master").stdout.strip() == CANONICAL_MASTER
+    assert _git("rev-parse", "origin/master").stdout.strip() == CURRENT_CANONICAL_MASTER
+    assert _git("merge-base", "--is-ancestor", CANONICAL_MASTER, CURRENT_CANONICAL_MASTER).returncode == 0
     assert _git("merge-base", "--is-ancestor", CANONICAL_MASTER, "HEAD").returncode == 0
     assert _git("rev-list", "--parents", "-n", "1", CANONICAL_MASTER).stdout.split() == [
         CANONICAL_MASTER,
@@ -207,7 +212,10 @@ def test_registry_and_generated_roadmap_bind_inactive_v0r7_authorization() -> No
     assert record["state"] == "PLANNED_NOT_AUTHORIZED"
     assert record["implementation_authorized"] is False
     assert record["implementation_completed"] is False
-    assert record["activation_exists"] is False
+    # The separate V0R7 activation candidate now exists on its own branch and
+    # is recorded by the registry; it does not self-authorize before its own
+    # exact canonical merge.
+    assert record["activation_exists"] is True
     assert record["effective_execution_authority"] is False
     assert record["canonical_base_sha"] == CANONICAL_MASTER
     assert record["canonical_predecessor_merge"] == CANONICAL_PARENT1

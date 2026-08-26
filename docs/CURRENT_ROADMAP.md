@@ -9,6 +9,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 ## Queued — not authorized
 
 - `DSH Stage-A V1R3R2 fresh one-episode live execution authorization V0R7` — `PLANNED_NOT_AUTHORIZED`. AFTER EXACT CANONICAL MERGE ONLY: construct a separate V0R7 activation bound to the exact authorization bytes and repaired claim implementation. Do not activate, execute, read the secret, create a claim, invoke DSH, call a provider, spend, merge, replay V0R5/V0R6, or grant Stage B, Qnty, scientific, trading, capital, promotion, or broader production authority.
+- `DSH Stage-A V1R3R2 one-episode live execution activation V0R7` — `PLANNED_NOT_AUTHORIZED`. AFTER EXACT CANONICAL MERGE OF THIS ACTIVATION BRANCH ONLY: exactly one action-time V0R7 live execution attempt bound to the exact canonical authorization bytes, the repaired claim primitive, and the qualified successor contract; no automatic V0R8. Do not execute before that merge, read the secret, create the claim, invoke DSH, call a provider, spend, replay V0R5/V0R6, or grant Stage B, Qnty, scientific, trading, capital, promotion, or broader production authority.
 - `PROSPECTIVE_SHADOW` — `PLANNED_NOT_AUTHORIZED`. No implementation is authorized; require separate Git-backed authorization.
 - `QNTY_HANDOFF` — `PLANNED_NOT_AUTHORIZED`. No implementation is authorized unless downstream evidence separately earns it.
 - `REACTIVE_JIGSAW_V0` — `PLANNED_NOT_AUTHORIZED`. No implementation is authorized; require separate Git-backed authorization.

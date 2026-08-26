@@ -1063,3 +1063,81 @@ def test_jfpv3_prospective_authorization_binds_immutable_r2_and_scientific_bytes
     for relative, expected_digest in expected.items():
         assert hashlib.sha256((ROOT / relative).read_bytes()).hexdigest() == expected_digest, relative
     assert not (ROOT / "data/jfp_v3_shadow/events.jsonl").exists()
+
+
+OPERATING_LOCK_PROJECT_ID = "QNTYLAB_NORTH_STAR_OPERATING_LOCK_V0"
+
+
+def _real_projects_registry() -> dict:
+    return project_context._load_toml(ROOT / "docs/state/projects.toml")
+
+
+def _operating_lock_record() -> dict:
+    registry = _real_projects_registry()
+    matches = [record for record in registry["project"] if record["project_id"] == OPERATING_LOCK_PROJECT_ID]
+    assert len(matches) == 1
+    return matches[0]
+
+
+def test_operating_lock_registry_remains_valid_and_projection_stable() -> None:
+    registry = _real_projects_registry()
+    by_id = project_context.validate_projects_registry(ROOT, registry)
+    assert OPERATING_LOCK_PROJECT_ID in by_id
+    assert project_context.render(ROOT, check=True) == 0
+
+
+def test_operating_lock_is_governance_only_and_authorizes_no_execution() -> None:
+    record = _operating_lock_record()
+    assert record["state"] == "CLOSED_PASS"
+    assert record["phase_type"] == "GOVERNANCE_ONLY_OPERATING_POLICY_LOCK"
+    assert record["authority_level"] == "GLOBAL_OPERATING_POLICY_ONLY"
+    assert record["implementation_authorized"] is False
+    assert record["scientific_execution_authorized"] is False
+    assert record["market_data_access_authorized"] is False
+    assert record["backtest_authorized"] is False
+    assert record["strategy_test_authorized"] is False
+    assert record["research_ledger_state_changed"] is False
+    assert record["trading_authority"] == "NONE"
+    assert record["capital_authority"] == "NONE"
+    assert record["promotion_authority"] == "NONE"
+
+
+def test_operating_lock_represents_dsh_maintenance_only_and_no_v0r8_authority() -> None:
+    record = _operating_lock_record()
+    assert record["dsh_stage_a_disposition"] == "MAINTENANCE_ONLY"
+    assert record["no_automatic_v0r8"] is True
+    assert record["v0r8_authority_created"] is False
+    assert record["future_dsh_work_requires_named_blocked_scientific_question"] is True
+
+
+def test_operating_lock_selects_jh01_v1_continuation_without_executing_it() -> None:
+    record = _operating_lock_record()
+    assert record["selected_immediate_scientific_continuation"] == (
+        "JH01_V1_OUTCOME_BLIND_PROSPECTIVE_INCREMENTAL_FORECAST_VALUE_CONTINUATION"
+    )
+    assert record["jh01_freeze_deadline_utc"] == "2026-09-01T00:00:00Z"
+    # The governance phase itself performs no JH01 scientific work.
+    assert record["scientific_execution_authorized"] is False
+    assert record["historical_economic_outcome_inspection_authorized"] is False
+
+
+def test_operating_lock_keeps_router_and_state_deferred_and_unauthorized() -> None:
+    record = _operating_lock_record()
+    assert record["router_status"] == "DEFERRED"
+    assert record["state_status"] == "DEFERRED"
+    registry = _real_projects_registry()
+    for deferred_id in ("ROUTER_DATASET_CONTRACT", "ROUTER_FIXTURE_V0", "STATE_SNAPSHOT_V0"):
+        states = [entry["state"] for entry in registry["project"] if entry["project_id"] == deferred_id]
+        assert states == ["PLANNED_NOT_AUTHORIZED"], deferred_id
+
+
+def test_operating_lock_policy_sections_are_appended_to_companion_adrs() -> None:
+    adr0005 = (ROOT / "docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md").read_text(encoding="utf-8")
+    adr0006 = (ROOT / "docs/ADR/0006-qntylab-research-design-philosophy.md").read_text(encoding="utf-8")
+    assert "## Operational Alignment Contract" in adr0005
+    assert "NORTH_STAR_DRIFT" in adr0005
+    assert "INFRA_LOOP" in adr0005
+    assert "NO_AUTOMATIC_V0R8" in adr0005
+    assert "INFRASTRUCTURE IS NOT A RESEARCH RESULT" in adr0006
+    assert "WHAT_IS_THE_CHEAPEST_VALID_TEST?" in adr0006
+    assert "Failure-before-repair rule" in adr0006

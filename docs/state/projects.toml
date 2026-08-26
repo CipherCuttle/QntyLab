@@ -9607,3 +9607,60 @@ targeted_governance_rereview_used = false
 terminal_outcome = "V0R7_EXECUTION_TERMINAL_FAILURE"
 terminal_outcome_basis = "The exact canonical activation merge 1b0e936e9f1f696cd586e1cd1ea1bf3a5e1ae4c4 was verified at action time and all non-secret gates passed, but the single authorized DSH invocation exited 1 (not timed out) when the profile boot crashed importing @qntylab/dsh-stage-a-parent-enforcement/lib/index.js:25 with TypeError: z.string(...).regex is not a function inside the frozen production implementation. The failure preceded guard ensureClaim(): the claim was never attempted, the remote claim ref and local episode state were absent before and after, provider logical/wire requests were zero, spend was USD 0.00, and the secret was read exactly once with parent-only injection and never logged or persisted. This is a production defect recorded unfixed."
 next_action = "CLOSED_BLOCKED: V0R7_EXECUTION_TERMINAL_FAILURE. Preserve the evidence; do not repair runtime or contract bytes, retry, replay, create a second episode or an automatic V0R8, or begin an infrastructure loop. DSH_STAGE_A disposition recommendation is MAINTENANCE_ONLY pending explicit future Git-backed authority; no Stage B, Qnty, scientific, trading, capital, promotion, or broader production authority exists."
+
+[[project]]
+project_id = "QNTYLAB_NORTH_STAR_OPERATING_LOCK_V0"
+display_name = "QntyLab North Star operating lock V0"
+state = "CLOSED_PASS"
+candidate_state = "OPERATING_POLICY_RECORDED"
+canonicalization_status = "PENDING_HOSTILE_REVIEW_BEFORE_CANONICAL_MERGE"
+authority_level = "GLOBAL_OPERATING_POLICY_ONLY"
+phase_type = "GOVERNANCE_ONLY_OPERATING_POLICY_LOCK"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md",
+  "docs/ADR/0006-qntylab-research-design-philosophy.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "tests/test_project_context_v0.py",
+]
+implementation_authorized = false
+scientific_execution_authorized = false
+market_data_access_authorized = false
+historical_economic_outcome_inspection_authorized = false
+backtest_authorized = false
+strategy_test_authorized = false
+research_ledger_state_changed = false
+trading_authority = "NONE"
+capital_authority = "NONE"
+promotion_authority = "NONE"
+qnty_execution_authority = "NONE"
+optimization_target = "EXPECTED_DECISION_CHANGING_INFORMATION_PER_BOUNDED_RESEARCH_COST"
+mandatory_phase_questions = [
+  "WHAT_UNCERTAINTY_DOES_THIS_REDUCE?",
+  "WHAT_DECISION_CHANGES_IF_POSITIVE?",
+  "WHAT_DECISION_CHANGES_IF_NEGATIVE?",
+  "WHAT_IS_THE_CHEAPEST_VALID_TEST?",
+  "WHAT_STOPS_THIS_LINEAGE?",
+]
+infrastructure_foreign_key_required_fields = [
+  "BLOCKED_SCIENTIFIC_QUESTION",
+  "BLOCKING_FAILURE",
+  "WHY_THE_FAILURE_PREVENTS_THE_QUESTION",
+  "MINIMUM_REPAIR",
+  "CHEAPER_ALTERNATIVE_CONSIDERED",
+  "DECISION_UNLOCKED_BY_REPAIR",
+  "STOP_AFTER",
+]
+dsh_stage_a_disposition = "MAINTENANCE_ONLY"
+no_automatic_v0r8 = true
+v0r8_authority_created = false
+future_dsh_work_requires_named_blocked_scientific_question = true
+selected_immediate_scientific_continuation = "JH01_V1_OUTCOME_BLIND_PROSPECTIVE_INCREMENTAL_FORECAST_VALUE_CONTINUATION"
+jh01_freeze_deadline_utc = "2026-09-01T00:00:00Z"
+router_status = "DEFERRED"
+state_status = "DEFERRED"
+north_star_drift_threshold = "MORE_THAN_3_OF_LAST_10_COMPLETED_PHASES_INFRASTRUCTURE_OR_GOVERNANCE_ONLY_WITHOUT_UNBLOCKING_A_NAMED_SELECTED_SCIENTIFIC_QUESTION"
+infra_loop_rule = "TWO_CONSECUTIVE_PHASES_ON_THE_SAME_INFRASTRUCTURE_BLOCKER_WITHOUT_A_NEW_MARKET_OR_SCIENTIFIC_OBSERVATION_DEFAULTS_TO_SIMPLER_PATH_DEFER_OR_KILL"
+terminal_outcome = "OPERATING_POLICY_LOCK_RECORDED_NO_SCIENTIFIC_EXECUTION_AUTHORIZED"
+next_action = "CLOSED_PASS: operating policy only; this phase authorizes no scientific execution, market-data access, backtest, ledger mutation, or implementation. Immediate selected scientific continuation is JH01 V1 outcome-blind prospective incremental forecast-value continuation with freeze deadline 2026-09-01T00:00:00Z. DSH_STAGE_A_DISPOSITION is MAINTENANCE_ONLY with NO_AUTOMATIC_V0R8; any future DSH phase requires a named blocked scientific question and no materially cheaper valid route. ROUTER and STATE remain DEFERRED."

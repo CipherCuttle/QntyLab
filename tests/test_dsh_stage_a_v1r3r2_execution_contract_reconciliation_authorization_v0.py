@@ -131,10 +131,18 @@ def test_forbidden_scope_is_explicit() -> None:
 
 def test_registry_and_generated_roadmap_bind_the_candidate() -> None:
     record = _project_record()
-    assert record["state"] == "PLANNED_NOT_AUTHORIZED"
-    assert record["candidate_state"] == "ACTIVE_CANDIDATE"
+    assert record["state"] == "CLOSED_PASS"
+    assert record["candidate_state"] == "CANONICAL_AUTHORIZATION_EFFECTIVE"
     assert record["authorization_state"] == "AUTHORIZED_IF_CANONICAL"
     assert record["authorization_effective"] == "AFTER_EXACT_CANONICAL_MERGE_ONLY"
+    assert record["canonicalization_status"] == "EXACT_CANONICAL_MERGE_VERIFIED"
+    assert record["canonical_authorization_merge"] == "3a0e1aa15c6c5d01a93dd7e3460dd3a736c46474"
+    assert record["canonical_authorization_merge_parents"] == [
+        "abdaf42f67038ef970b2c233ad80baa1643ea6de",
+        "8ee3a671bc9be1d55811e701d0a2b82f3e1d39ee",
+    ]
+    assert record["repair_authority_was_effective"] is True
+    assert record["implementation_completed"] is True
     assert record["effective_repair_authority"] is False
     assert record["implementation_authorized"] is False
     assert record["canonical_base_sha"] == CANONICAL_MASTER
@@ -154,7 +162,8 @@ def test_registry_and_generated_roadmap_bind_the_candidate() -> None:
 
     roadmap = (ROOT / "docs/CURRENT_ROADMAP.md").read_text(encoding="utf-8")
     assert "DSH Stage-A V1R3R2 execution contract reconciliation authorization V0" in roadmap
-    assert "ACTIVE_CANDIDATE: This authorization is effective only after exact canonical merge." in roadmap
+    assert "CLOSED_PASS: reconciliation is canonical and terminal" in roadmap
+    assert "DSH Stage-A V1R3R2 execution contract reconciliation authorization V0" not in roadmap.split("## Queued — not authorized")[1].split("## ")[0]
     assert "RUN_V0R7" not in roadmap
     assert "RUN_LIVE_DSH" not in roadmap
     assert "REPLAY_V0R5" not in roadmap

@@ -9024,9 +9024,14 @@ next_action = "CLOSED_BLOCKED: V0R6_LIVE_EPISODE_CLOSED_BLOCKED_NO_REPLAY. Prese
 [[project]]
 project_id = "DSH_STAGE_A_V1R3R2_EXECUTION_CONTRACT_RECONCILIATION_AUTHORIZATION_V0"
 display_name = "DSH Stage-A V1R3R2 execution contract reconciliation authorization V0"
-state = "PLANNED_NOT_AUTHORIZED"
-candidate_state = "ACTIVE_CANDIDATE"
-canonicalization_status = "CANDIDATE_NOT_CANONICAL"
+state = "CLOSED_PASS"
+candidate_state = "CANONICAL_AUTHORIZATION_EFFECTIVE"
+canonicalization_status = "EXACT_CANONICAL_MERGE_VERIFIED"
+canonical_authorization_merge = "3a0e1aa15c6c5d01a93dd7e3460dd3a736c46474"
+canonical_authorization_merge_parents = [
+  "abdaf42f67038ef970b2c233ad80baa1643ea6de",
+  "8ee3a671bc9be1d55811e701d0a2b82f3e1d39ee",
+]
 authority_level = "AUTHORIZED_IF_CANONICAL"
 phase_type = "GOVERNANCE_ONLY_BOUNDED_REPAIR_AUTHORIZATION"
 authoritative_artifacts = [
@@ -9051,8 +9056,9 @@ canonical_predecessor_terminal_outcome = "V0R6_LIVE_EPISODE_CLOSED_BLOCKED_NO_RE
 future_repair_project_id = "DSH_STAGE_A_V1R3R2_EXECUTION_CONTRACT_RECONCILIATION_V0"
 future_repair_phase_separate = true
 effective_repair_authority = false
+repair_authority_was_effective = true
 implementation_authorized = false
-implementation_completed = false
+implementation_completed = true
 authorization_artifact = "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_execution_contract_reconciliation_authorization_v0/authorization.json"
 authorization_artifact_sha256 = "ee20d5165ebda69fb7f78d3e0a046705ded3f2abe8340800596b991db94438d1"
 secret_read_authorized = false
@@ -9082,16 +9088,21 @@ hostile_governance_high_total = 0
 hostile_governance_medium_total = 0
 hostile_governance_low_total = 0
 targeted_governance_rereview_used = false
-terminal_outcome = "ACTIVE_CANDIDATE"
-terminal_outcome_basis = "This governance-only authorization candidate binds to the exact canonical base ded772d59c6135689ac4bda8878979721855a955 (PR #214 merge) and the CLOSED_BLOCKED V0R6 predecessor. It is candidate-only, does not self-authorize, and performs zero live-boundary activity."
-next_action = "ACTIVE_CANDIDATE: This authorization is effective only after exact canonical merge. The future repair phase DSH_STAGE_A_V1R3R2_EXECUTION_CONTRACT_RECONCILIATION_V0 must independently reconcile the canonical source again before any repairation. Replay V0R5/V0R6, V0R7, another Stage-A live episode, Stage B, scientific execution, Qnty runtime, Qnty promotion, trading, capital, and broader production use remain unauthorized."
+terminal_outcome = "DSH_STAGE_A_V1R3R2_EXECUTION_CONTRACT_RECONCILIATION_AUTHORIZATION_V0_CANONICAL_CLOSED_PASS"
+terminal_outcome_basis = "Canonical CLOSED_PASS: this execution-contract reconciliation authorization is canonical and consumed, merged exactly as 3a0e1aa15c6c5d01a93dd7e3460dd3a736c46474 (PR #217) with final implementation candidate 8ee3a671bc9be1d55811e701d0a2b82f3e1d39ee and repaired canonical current execution-contract root cf1aff079d56428753bf8f58f1848839da35cfb9f75104fc1fd03cd13056c1e2, zero live-boundary activity."
+next_action = "CLOSED_PASS: reconciliation is canonical and terminal; no live execution is authorized by this closure. A LATER phase MAY construct exactly ONE fresh separately Git-backed bounded Stage-A V1R3R2 one-episode live execution authorization against the repaired canonical current-generation execution contract — NOT created in this phase, must NOT be called active yet."
 
 [[project]]
 project_id = "DSH_STAGE_A_V1R3R2_EXECUTION_CONTRACT_RECONCILIATION_CORRECTION_AUTHORIZATION_V0"
 display_name = "DSH Stage-A V1R3R2 execution contract reconciliation correction authorization V0"
-state = "PLANNED_NOT_AUTHORIZED"
-candidate_state = "ACTIVE_CANDIDATE"
-canonicalization_status = "CANDIDATE_NOT_CANONICAL"
+state = "CLOSED_PASS"
+candidate_state = "CANONICAL_AUTHORIZATION_EFFECTIVE"
+canonicalization_status = "EXACT_CANONICAL_MERGE_VERIFIED"
+canonical_authorization_merge = "3a0e1aa15c6c5d01a93dd7e3460dd3a736c46474"
+canonical_authorization_merge_parents = [
+  "abdaf42f67038ef970b2c233ad80baa1643ea6de",
+  "8ee3a671bc9be1d55811e701d0a2b82f3e1d39ee",
+]
 authority_level = "AUTHORIZED_IF_CANONICAL"
 phase_type = "GOVERNANCE_ONLY_BOUNDED_CORRECTION_AUTHORIZATION"
 authoritative_artifacts = [
@@ -9113,8 +9124,9 @@ canonical_predecessor_terminal_outcome = "PR217_CORRECTION_AUTHORIZATION_REQUIRE
 future_repair_project_id = "DSH_STAGE_A_V1R3R2_EXECUTION_CONTRACT_RECONCILIATION_V0"
 future_repair_phase_separate = true
 effective_repair_authority = false
+repair_authority_was_effective = true
 implementation_authorized = false
-implementation_completed = false
+implementation_completed = true
 authorization_artifact = "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_execution_contract_reconciliation_correction_authorization_v0/authorization.json"
 authorization_artifact_sha256 = "c2503286bc4af9385505c894f3fa20bf0c1b9161f1df5671943dd09f255d5a3b"
 secret_read_authorized = false
@@ -9144,16 +9156,26 @@ hostile_governance_high_total = 0
 hostile_governance_medium_total = 0
 hostile_governance_low_total = 0
 targeted_governance_rereview_used = false
-terminal_outcome = "ACTIVE_CANDIDATE"
-terminal_outcome_basis = "This governance-only corrective authorization candidate binds to the exact canonical base a87ecfda105b84669f3fef862496045284d0a655 (PR #216 merge) and the OPEN DRAFT not-merged PR #217 predecessor. Candidate-only; does not self-authorize; zero live-boundary activity."
-next_action = "ACTIVE_CANDIDATE: This corrective authorization is effective only after exact canonical merge of this PR. The future correction phase (one bounded correction of C1/H1/H2) must independently reconcile the canonical source again before any repair. No merge, no repair, no live activity, no scope widening."
+terminal_outcome = "DSH_STAGE_A_V1R3R2_EXECUTION_CONTRACT_RECONCILIATION_CORRECTION_AUTHORIZATION_V0_CANONICAL_CLOSED_PASS"
+terminal_outcome_basis = "Canonical CLOSED_PASS: this execution-contract reconciliation correction authorization is canonical and consumed, merged exactly as 3a0e1aa15c6c5d01a93dd7e3460dd3a736c46474 (PR #217) with final implementation candidate 8ee3a671bc9be1d55811e701d0a2b82f3e1d39ee and repaired canonical current execution-contract root cf1aff079d56428753bf8f58f1848839da35cfb9f75104fc1fd03cd13056c1e2, zero live-boundary activity."
+next_action = "CLOSED_PASS: reconciliation correction is canonical and terminal; no live execution is authorized by this closure. A LATER phase MAY construct exactly ONE fresh separately Git-backed bounded Stage-A V1R3R2 one-episode live execution authorization against the repaired canonical current-generation execution contract — NOT created in this phase, must NOT be called active yet."
 
 [[project]]
 project_id = "DSH_STAGE_A_V1R3R2_PRODUCTION_CLAIM_OWNER_INTEGRATION_CORRECTION_AUTHORIZATION_V0"
 display_name = "DSH Stage-A V1R3R2 production claim-owner integration correction authorization V0"
-state = "PLANNED_NOT_AUTHORIZED"
-candidate_state = "ACTIVE_CANDIDATE"
-canonicalization_status = "CANDIDATE_NOT_CANONICAL"
+state = "CLOSED_PASS"
+candidate_state = "CANONICAL_AUTHORIZATION_EFFECTIVE"
+canonicalization_status = "EXACT_CANONICAL_MERGE_VERIFIED"
+canonical_authorization_merge = "3a0e1aa15c6c5d01a93dd7e3460dd3a736c46474"
+canonical_authorization_merge_parents = [
+  "abdaf42f67038ef970b2c233ad80baa1643ea6de",
+  "8ee3a671bc9be1d55811e701d0a2b82f3e1d39ee",
+]
+implementation_project_id = "DSH_STAGE_A_V1R3R2_PRODUCTION_CLAIM_OWNER_INTEGRATION_CORRECTION_V0"
+implementation_project_state = "CLOSED_PASS"
+implementation_candidate_sha = "8ee3a671bc9be1d55811e701d0a2b82f3e1d39ee"
+implementation_canonical_merge = "3a0e1aa15c6c5d01a93dd7e3460dd3a736c46474"
+current_execution_contract_root = "cf1aff079d56428753bf8f58f1848839da35cfb9f75104fc1fd03cd13056c1e2"
 authority_level = "AUTHORIZED_IF_CANONICAL"
 phase_type = "GOVERNANCE_ONLY_BOUNDED_CORRECTION_AUTHORIZATION"
 authoritative_artifacts = [
@@ -9175,8 +9197,9 @@ canonical_predecessor_terminal_outcome = "PR217_CORRECTION_BLOCKED"
 future_repair_project_id = "DSH_STAGE_A_V1R3R2_PRODUCTION_CLAIM_OWNER_INTEGRATION_CORRECTION_V0"
 future_repair_phase_separate = true
 effective_repair_authority = false
+repair_authority_was_effective = true
 implementation_authorized = false
-implementation_completed = false
+implementation_completed = true
 authorization_artifact = "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_production_claim_owner_integration_correction_authorization_v0/authorization.json"
 authorization_artifact_sha256 = "81dab1054151eb87b9a11a917fdd883e940236792fca2f4221d6f731b53631c9"
 secret_read_authorized = false
@@ -9206,6 +9229,54 @@ hostile_governance_high_total = 0
 hostile_governance_medium_total = 0
 hostile_governance_low_total = 0
 targeted_governance_rereview_used = false
-terminal_outcome = "ACTIVE_CANDIDATE"
-terminal_outcome_basis = "This governance-only production claim-owner integration correction authorization candidate binds to the exact canonical base 07f97f4c645c35bf7a17593ca093e50789c4d620 (PR #216 merge) and the OPEN DRAFT not-merged PR #217 predecessor (head f5e41c2c24009b66ff906e14fbd439a3d9754a48), whose repair/rereview budget is exhausted (PR217_CORRECTION_BLOCKED). Candidate-only; does not self-authorize; effective only after exact canonical merge; zero live-boundary activity."
-next_action = "ACTIVE_CANDIDATE: This corrective authorization is effective only after exact canonical merge of this PR. The future implementation phase (one bounded production claim-owner integration correction of the frozen H1 seam) must independently reconcile the canonical source again before any repair. No merge, no repair, no live activity, no scope widening, no new implementation PR."
+terminal_outcome = "DSH_STAGE_A_V1R3R2_PRODUCTION_CLAIM_OWNER_INTEGRATION_CORRECTION_AUTHORIZATION_V0_CANONICAL_CLOSED_PASS"
+terminal_outcome_basis = "Canonical CLOSED_PASS: this production claim-owner integration correction authorization is canonical and consumed, merged exactly as 3a0e1aa15c6c5d01a93dd7e3460dd3a736c46474 (PR #217) with final implementation candidate 8ee3a671bc9be1d55811e701d0a2b82f3e1d39ee, repaired canonical current execution-contract root cf1aff079d56428753bf8f58f1848839da35cfb9f75104fc1fd03cd13056c1e2, and canonical implementation project DSH_STAGE_A_V1R3R2_PRODUCTION_CLAIM_OWNER_INTEGRATION_CORRECTION_V0 = CLOSED_PASS, zero live-boundary activity."
+next_action = "CLOSED_PASS: production claim-owner integration correction is canonical and terminal; no live execution is authorized by this closure. A LATER phase MAY construct exactly ONE fresh separately Git-backed bounded Stage-A V1R3R2 one-episode live execution authorization against the repaired canonical current-generation execution contract — NOT created in this phase, must NOT be called active yet."
+
+[[project]]
+project_id = "DSH_STAGE_A_V1R3R2_PRODUCTION_CLAIM_OWNER_INTEGRATION_CORRECTION_V0"
+display_name = "DSH Stage-A V1R3R2 production claim-owner integration correction V0"
+state = "CLOSED_PASS"
+candidate_state = "CANONICAL_TERMINAL_EFFECTIVE"
+canonicalization_status = "CLOSED"
+authority_level = "BOUNDED_PRODUCTION_CLAIM_OWNER_INTEGRATION_CORRECTION_ONLY"
+phase_type = "OFFLINE_PRODUCTION_CLAIM_OWNER_INTEGRATION_CORRECTION"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_execution_contract_reconciliation_v0/claim-source-model.md",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_execution_contract_reconciliation_v0/evidence/current_contract.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_execution_contract_reconciliation_v0/evidence/current_digests.json",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_execution_contract_reconciliation_v0/record-current-successor.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_execution_contract_reconciliation_v0/test/repository-deterministic.test.mjs",
+  "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_production_dsh_home_materialization_and_requalification_v0/preparation/prepare-production-launch.mjs",
+  ".github/workflows/project-context.yml",
+]
+authorization_project_id = "DSH_STAGE_A_V1R3R2_PRODUCTION_CLAIM_OWNER_INTEGRATION_CORRECTION_AUTHORIZATION_V0"
+authorization_effective = "AFTER_EXACT_CANONICAL_MERGE_ONLY"
+implementation_authorized = false
+implementation_completed = true
+final_implementation_candidate = "8ee3a671bc9be1d55811e701d0a2b82f3e1d39ee"
+canonical_implementation_merge = "3a0e1aa15c6c5d01a93dd7e3460dd3a736c46474"
+canonical_implementation_merge_parents = [
+  "abdaf42f67038ef970b2c233ad80baa1643ea6de",
+  "8ee3a671bc9be1d55811e701d0a2b82f3e1d39ee",
+]
+current_execution_contract_root = "cf1aff079d56428753bf8f58f1848839da35cfb9f75104fc1fd03cd13056c1e2"
+governing_authorization_state = "CLOSED_PASS"
+v0r7_authorized = false
+live_dsh_authorized = false
+stage_b_authorized = false
+secret_read_authorized = false
+provider_io_authorized = false
+model_execution_authorized = false
+scientific_execution_authorized = false
+qnty_runtime_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+promotion_authority = "NONE"
+active_project_after_closure = "NONE"
+terminal_outcome = "DSH_STAGE_A_V1R3R2_PRODUCTION_CLAIM_OWNER_INTEGRATION_CORRECTION_V0_CLOSED_PASS"
+terminal_outcome_basis = "Canonical CLOSED_PASS: production claim-owner integration correction is canonical and terminal, merged exactly as 3a0e1aa15c6c5d01a93dd7e3460dd3a736c46474 (PR #217), final implementation candidate 8ee3a671bc9be1d55811e701d0a2b82f3e1d39ee, and repaired canonical current execution-contract root cf1aff079d56428753bf8f58f1848839da35cfb9f75104fc1fd03cd13056c1e2; zero live-boundary activity."
+next_action = "CLOSED_PASS: the production claim-owner integration correction is canonical and terminal; no live execution is authorized by this closure. A LATER phase MAY construct exactly ONE fresh separately Git-backed bounded Stage-A V1R3R2 one-episode live execution authorization against the repaired canonical current-generation execution contract — NOT created in this phase, must NOT be called active yet."

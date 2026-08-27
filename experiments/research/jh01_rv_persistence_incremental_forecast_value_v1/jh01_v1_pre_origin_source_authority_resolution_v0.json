@@ -1,0 +1,39 @@
+{
+  "artifact": "jh01_v1_pre_origin_source_authority_resolution_v0",
+  "artifact_version": "V0",
+  "phase": "JH01_V1_PRE_ORIGIN_SOURCE_AUTHORITY_RESOLUTION_V0",
+  "created_utc_date": "2026-08-27",
+  "resolution_verdict": "JH01_V1_EXISTING_CAMPAIGN_REPAIR_AUTHORIZED",
+  "source_contract_identity": "BINANCE_USD_M_PERPETUAL_1H_LOGICAL_CLOSE",
+  "source_contract_binding_statement": "The frozen JH01 V1 source contract binds only the semantic observation identity BINANCE_USD_M_PERPETUAL_1H_LOGICAL_CLOSE plus the generic Bar/validate_bars admission boundary; it does NOT bind the monthly data.binance.vision archive transport, which is one admitted helper (bars_from_authenticated_archive) and not an exclusive contract.",
+  "provenance_classification": "RAW_PROVIDER_RESPONSE_PLUS_DETERMINISTIC_DIGEST_SUFFICIENT",
+  "provenance_basis": "No V1 frozen text requires an externally published Binance archive CHECKSUM; raw provider response plus deterministic digest is sufficient provenance.",
+  "target_commit_rule": "For every real JH01 V1 origin publication, target_commit MUST be the full SHA of the canonical origin/master commit that the operating worktree is pinned to at record time; PublicationRuntime readback equality and AttestationExpectation.target_commit == signed_target_commit remain the mechanical enforcement.",
+  "change_classification": "UNBOUND_OPERATIONAL_ADAPTER",
+  "authorized_next_phase": "JH01_V1_PRE_ORIGIN_PRODUCTION_PATH_REPAIR_V0",
+  "bounded_scope": [
+    "minimum same-hour Binance USD-M source adapter",
+    "minimum production record_due caller",
+    "already-resolved target_commit rule application",
+    "systemd user timer",
+    "synthetic/temp-state end-to-end proof",
+    "one hostile review"
+  ],
+  "bounded_scope_constraint": "no real origin before 2026-09-15T00:00:00Z",
+  "preserved_identities": {
+    "qualified_recorder_identity": "4f5e1791be9f17c1871f9b510329a1632412e028d2a84223fa59e83bbe95ec1a",
+    "wrapper_implementation_identity": "1176037ff0d3102afc67670202154970e4af1491cff1cd19bc9526c9c9d67c41",
+    "source_contract_identity": "BINANCE_USD_M_PERPETUAL_1H_LOGICAL_CLOSE"
+  },
+  "authority_statements": {
+    "no_new_execution_authority": "This phase creates no new execution authority beyond the already-existing forward collection authority.",
+    "frozen_bytes_unchanged": "preregistration.json, the recorder module (qntylab/jh01_v1_prospective_recorder_implementation_v0.py), and the wrapper module (qntylab/jh01_v1_prospective_operation_v0.py) bytes are unchanged by this phase.",
+    "outcome_firewall_counters_zero": "All outcome firewall counters remain zero in this phase."
+  },
+  "evidence_references": [
+    "qntylab/jh01_v1_prospective_recorder_implementation_v0.py",
+    "qntylab/jh01_v1_prospective_operation_v0.py",
+    "tests/test_project_context_v0.py",
+    "tests/test_jh01_v1_prospective_operation_v0.py"
+  ]
+}

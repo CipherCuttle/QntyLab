@@ -29,6 +29,15 @@ Documentation=file:///home/swirky/DevHub/repos/QntyLab/ops/systemd/user/README.m
 
 [Service]
 Type=oneshot
+# H-01 repair: every non-secret runtime prerequisite is explicit.  The unit
+# never relies on the interactive shell environment.  No secrets here.
+#   QNTYLAB_JH01_SIGSTORE_VERIFIER: persistent identity-proved V0R3 verifier
+#     (built from qualifications/jh01_v0r3 with GOPROXY=off; identity manifest
+#     at ~/.local/opt/jh01-v0r3-verifier/build_identity.json).
+#   PATH/HOME: cover git, bwrap, python3, and the user state dirs.
+Environment=QNTYLAB_JH01_SIGSTORE_VERIFIER=/home/swirky/.local/opt/jh01-v0r3-verifier/bin/verify-v0r3-generic
+Environment=PATH=/usr/bin:/bin
+Environment=HOME=/home/swirky
 # H1 repair: pin the start timeout explicitly (never inherit the
 # version-dependent DefaultTimeoutStartSec).  Sizing: consecutive triggers are
 # 15 minutes apart, so an 840 s (14 min) bound guarantees a running attempt can
@@ -38,8 +47,12 @@ Type=oneshot
 # correct due origin.  Digest-verified archive reuse (source adapter cache)
 # makes warm attempts far cheaper than this bound.  See README.md.
 TimeoutStartSec=840
-WorkingDirectory=/home/swirky/DevHub/repos/QntyLab
-ExecStart=/bin/sh -c 'exec /usr/bin/python3 -m qntylab.jh01_v1_prospective_production_caller_v0 --record-due --root /home/swirky/DevHub/repos/QntyLab --now "$(date -u +%%Y-%%m-%%dT%%H:00:00Z)"'
+# H-02 repair: run against the dedicated canonical operational checkout (a
+# detached non-development git worktree synchronized fast-forward-only to
+# origin/master with frozen-source identity gates), never the development
+# checkout.  --go-binary is the pinned absolute Go 1.26.0 toolchain.
+WorkingDirectory=/home/swirky/DevHub/repos/QntyLab-jh01-operational
+ExecStart=/bin/sh -c 'exec /usr/bin/python3 -m qntylab.jh01_v1_prospective_production_caller_v0 --record-due --root /home/swirky/DevHub/repos/QntyLab-jh01-operational --go-binary /home/swirky/.local/opt/go-1.26.0/bin/go --now "$(date -u +%%Y-%%m-%%dT%%H:00:00Z)"'
 SuccessExitStatus=3
 StandardOutput=journal
 StandardError=journal

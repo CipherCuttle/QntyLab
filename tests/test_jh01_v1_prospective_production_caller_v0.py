@@ -31,6 +31,11 @@ ROOT = Path(__file__).resolve().parents[1]
 PINNED = "c" * 40
 
 
+def _noop_sync(root):
+    """Existing unit tests exercise fixture checkouts, not the operational one."""
+    return PINNED
+
+
 def fake_run_git(*, head: str = PINNED, remote: str = PINNED, porcelain: str = ""):
     def run_git(args):
         command = [str(part) for part in args]
@@ -105,6 +110,7 @@ def call_record_due(tmp_path: Path, *, now: datetime, transport=None, run_git=No
         transport_factory=(lambda: transport) if transport is not None else None,
         verifier=FakeVerifier(),
         offline_reverify=lambda package: recorder.verify_retention_package(package),
+        sync_checkout=_noop_sync,
     )
 
 
@@ -150,6 +156,7 @@ def test_cli_record_due_before_origin_exits_nonzero(tmp_path, capsys):
         fetch_klines=synthetic_fetch_klines(),
         verifier=FakeVerifier(),
         offline_reverify=lambda package: None,
+        sync_checkout=_noop_sync,
     )
     assert rc == 3
     assert json.loads(capsys.readouterr().out)["origin_state"] == "NOT_DUE"
@@ -236,6 +243,7 @@ def test_record_due_default_provider_uses_digest_verified_cache_under_state_dir(
         transport_factory=lambda: FakeTransport(ORIGIN),
         verifier=FakeVerifier(),
         offline_reverify=lambda package: recorder.verify_retention_package(package),
+        sync_checkout=_noop_sync,
     )
     assert receipt["origin_state"] == "RECORDED"
     cache_dir = tmp_path / "state" / "jh01_v1_source_archive_cache_v0"

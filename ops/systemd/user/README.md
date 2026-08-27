@@ -12,7 +12,8 @@ Runs the frozen production caller in `--record-due` mode:
 
 ```
 /usr/bin/python3 -m qntylab.jh01_v1_prospective_production_caller_v0 \
-  --record-due --root /home/swirky/DevHub/repos/QntyLab \
+  --record-due --root /home/swirky/DevHub/repos/QntyLab-jh01-operational \
+  --go-binary /home/swirky/.local/opt/go-1.26.0/bin/go \
   --now "$(date -u +%Y-%m-%dT%H:00:00Z)"
 ```
 
@@ -29,6 +30,77 @@ Runs the frozen production caller in `--record-due` mode:
   is ever needed it must come from the user environment or a systemd
   credentials mechanism (`LoadCredential=`) — never hardcoded.
 - Logging goes to the user journal (`stdout`/`stderr`), no secrets.
+
+## Dedicated canonical operational checkout (H-02)
+
+The service never runs against the human development checkout. It runs in a
+dedicated detached non-development git worktree:
+
+```
+/home/swirky/DevHub/repos/QntyLab-jh01-operational
+```
+
+Created once with:
+
+```bash
+git -C /home/swirky/DevHub/repos/QntyLab worktree add --detach \
+  /home/swirky/DevHub/repos/QntyLab-jh01-operational origin/master
+```
+
+Before every real attempt, the caller synchronizes this worktree with a
+fail-closed, fast-forward-only policy (`qntylab/jh01_v1_operational_checkout_v0.py`):
+
+1. `git fetch origin` (fail closed on failure);
+2. tracked worktree must be clean (fail closed when dirty);
+3. HEAD is detached onto EXACTLY `origin/master`; if HEAD is not an ancestor
+   of `origin/master` (diverged), the attempt FAILS CLOSED before any market
+   data acquisition or publication. No force reset; the development checkout
+   is never touched;
+4. BEFORE any network effects, the frozen recorder and wrapper file digests
+   are verified against the exact frozen identities; any mismatch raises
+   `STOP_SOURCE_CONFLICT`.
+
+The caller then independently re-verifies `HEAD == origin/master` and a clean
+tracked worktree (`canonical_target_commit`) against the operational root.
+
+## Unattended verifier and explicit Go toolchain (H-01)
+
+- **Go:** the unit passes `--go-binary /home/swirky/.local/opt/go-1.26.0/bin/go`
+  explicitly. The caller re-proves existence and `go version go1.26.0` at
+  resolution time and fails closed otherwise.
+- **Sigstore verifier:** `Environment=QNTYLAB_JH01_SIGSTORE_VERIFIER` points to
+  the persistent verifier
+  `~/.local/opt/jh01-v0r3-verifier/bin/verify-v0r3-generic`, built from the
+  already-qualified frozen source `qualifications/jh01_v0r3` with
+  `GOPROXY=off` (no network), `-trimpath -buildvcs=false` (reproducible). Its
+  build identity manifest `~/.local/opt/jh01-v0r3-verifier/build_identity.json`
+  records the sha256 of `main.go`/`go.mod`/`go.sum`, the Go version, and the
+  binary sha256; resolution re-verifies all three and FAILS CLOSED on any
+  mismatch (a missing binary/manifest is rebuilt from the pinned source).
+  Rebuild manually with:
+
+  ```bash
+  cd /home/swirky/DevHub/repos/QntyLab-jh01-operational/qualifications/jh01_v0r3
+  GOPROXY=off GOFLAGS=-mod=mod /home/swirky/.local/opt/go-1.26.0/bin/go \
+    build -trimpath -buildvcs=false \
+    -o ~/.local/opt/jh01-v0r3-verifier/bin/verify-v0r3-generic .
+  ```
+
+  (Prefer letting the caller rebuild: it also rewrites the identity manifest.)
+
+## Re-arm procedure (after any stop)
+
+```bash
+# 1. Prove the operational checkout is canonical and clean:
+git -C /home/swirky/DevHub/repos/QntyLab-jh01-operational fetch origin
+git -C /home/swirky/DevHub/repos/QntyLab-jh01-operational status --porcelain
+git -C /home/swirky/DevHub/repos/QntyLab-jh01-operational rev-parse HEAD origin/master
+
+# 2. Re-install updated units, then:
+systemctl --user daemon-reload
+systemctl --user enable --now jh01-v1-prospective-record.timer
+systemctl --user list-timers jh01-v1-prospective-record.timer
+```
 
 ## Scheduling strategy
 

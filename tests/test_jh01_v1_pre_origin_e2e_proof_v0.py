@@ -141,6 +141,11 @@ def origin_event_count(state_dir: Path, event_type: str) -> int:
     )
 
 
+def _noop_sync(root):
+    """Fixture tests exercise synthetic checkouts, not the operational one."""
+    return PINNED
+
+
 def call_record_due(
     tmp_path: Path,
     *,
@@ -161,6 +166,7 @@ def call_record_due(
         transport_factory=(lambda: transport) if transport is not None else None,
         verifier=FakeVerifier(),
         offline_reverify=lambda package: recorder.verify_retention_package(package),
+        sync_checkout=_noop_sync,
     )
 
 
@@ -359,6 +365,7 @@ def test_proof_12_not_due_before_origin_fails_closed_with_zero_writes(tmp_path, 
         fetch_klines=synthetic_fetch_klines(capture=captured),
         verifier=FakeVerifier(),
         offline_reverify=lambda package: None,
+        sync_checkout=_noop_sync,
     )
     assert rc == 3
     verdict = json.loads(capsys.readouterr().out)

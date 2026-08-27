@@ -29,6 +29,16 @@ from typing import Any, Callable, Sequence
 from . import jh01_v1_prospective_operation_v0 as operation
 from . import jh01_v1_prospective_recorder_implementation_v0 as recorder
 from . import jh01_v1_prospective_source_adapter_v0 as adapter
+from . import jh01_v1_prospective_runtime_defaults_v0 as defaults
+from .jh01_v1_operational_checkout_v0 import OperationalCheckoutBlocked
+from .jh01_v1_prospective_runtime_defaults_v0 import RuntimeDefaultBlocked
+
+
+def _default_sync_operational_checkout(root: Path) -> str:
+    """H-02 default: synchronize the dedicated operational worktree to origin/master."""
+    from .jh01_v1_operational_checkout_v0 import sync_operational_checkout
+
+    return sync_operational_checkout(root)
 
 REAL_STATE_DIRNAME = "jh01_v1_real_prospective_operation_v0"
 LEDGER_FILENAME = "jh01_v1_operation_events.jsonl"
@@ -150,9 +160,15 @@ def record_due(
     transport_factory: TransportFactory | None = None,
     verifier: recorder.AttestationVerifier | None = None,
     offline_reverify: operation.OfflineReverify | None = None,
-    go_binary: Path = Path("go"),
+    go_binary: Path | None = None,
+    sync_checkout: Callable[[Path], str] | None = _default_sync_operational_checkout,
 ) -> dict[str, Any]:
     """Full production path; the only mode reaching real collection/publication."""
+    if sync_checkout is not None:
+        # H-02: synchronize the dedicated operational checkout to exactly
+        # origin/master (fast-forward-only) and gate the frozen source
+        # identities BEFORE any acquisition or publication effect.
+        sync_checkout(root)
     target_commit = canonical_target_commit(run_git or make_run_git(root))
     operation_obj = operation.Operation(root, state_dir)
     state, origin = _due(operation_obj, now=now)
@@ -174,20 +190,24 @@ def record_due(
         archive_provider=archive_provider,
         fetch_klines=fetch_klines,
     )
+    cell = defaults.ExpectationCell()
+    resolved_verifier = verifier if verifier is not None else recorder.ExternalSigstoreVerifier(defaults.resolve_verifier(go_binary=go_binary))
     runtime = recorder.PublicationRuntime(
         (transport_factory or (lambda: recorder.GitHubReleaseTransport()))(),
-        verifier if verifier is not None else _default_verifier(),
+        defaults.ExpectationCapturingVerifier(resolved_verifier, cell),
     )
-    offline = offline_reverify or (lambda package: recorder.offline_reverify_v0r3_qualified_package(root, go_binary=go_binary))
+    if offline_reverify is not None:
+        offline = offline_reverify
+    else:
+        # C-01: the production default re-verifies the EXACT current retention
+        # package created by Operation._record_due against the expected policy
+        # derived from the SAME online attestation expectation.  The
+        # historical V0R3 canary is never substituted.
+        offline = defaults.current_package_offline_reverify(
+            root, go_binary=defaults.resolve_go_binary(go_binary), cell=cell
+        )
     receipt = operation_obj.record_due(now=now, bars=bars, runtime=runtime, target_commit=target_commit, offline_reverify=offline)
     return {**receipt, "target_commit": target_commit}
-
-
-def _default_verifier() -> recorder.AttestationVerifier:
-    executable = os.environ.get("QNTYLAB_JH01_SIGSTORE_VERIFIER")
-    if not executable:
-        raise CallerBlocked("ATTESTATION_VERIFIER_REQUIRED: set QNTYLAB_JH01_SIGSTORE_VERIFIER or inject a verifier")
-    return recorder.ExternalSigstoreVerifier(Path(executable))
 
 
 def main(
@@ -199,6 +219,7 @@ def main(
     transport_factory: TransportFactory | None = None,
     verifier: recorder.AttestationVerifier | None = None,
     offline_reverify: operation.OfflineReverify | None = None,
+    sync_checkout: Callable[[Path], str] | None = _default_sync_operational_checkout,
 ) -> int:
     parser = argparse.ArgumentParser(description="JH01 V1 prospective production caller")
     mode = parser.add_mutually_exclusive_group(required=True)
@@ -208,7 +229,7 @@ def main(
     parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument("--state-dir", type=Path, default=None, help="defaults to the real campaign state dir binding")
     parser.add_argument("--now", required=True, help="UTC timestamp (hour-aligned)")
-    parser.add_argument("--go-binary", type=Path, default=Path("go"))
+    parser.add_argument("--go-binary", type=Path, default=None, help="explicit Go toolchain (default: pinned absolute go1.26.0 path)")
     args = parser.parse_args(argv)
     state_dir = args.state_dir or default_state_dir()
     now = operation._instant(args.now)
@@ -228,6 +249,7 @@ def main(
             archive_provider=archive_provider, fetch_klines=fetch_klines,
             transport_factory=transport_factory, verifier=verifier,
             offline_reverify=offline_reverify, go_binary=args.go_binary,
+            sync_checkout=sync_checkout,
         )
         print(json.dumps(receipt, sort_keys=True))
         if receipt.get("origin_state") == operation.DueState.NOT_DUE.value:
@@ -236,7 +258,7 @@ def main(
         if receipt.get("origin_state") == operation.DueState.RECORDED.value and recovery != "IDEMPOTENT_AUTHORITATIVE_RECOVERY":
             return 0
         return 0 if recovery == "IDEMPOTENT_AUTHORITATIVE_RECOVERY" else 2
-    except (CallerBlocked, operation.OperationBlocked, recorder.RecorderBlocked, adapter.SourceAdapterBlocked) as exc:
+    except (CallerBlocked, operation.OperationBlocked, recorder.RecorderBlocked, adapter.SourceAdapterBlocked, RuntimeDefaultBlocked, OperationalCheckoutBlocked) as exc:
         print(json.dumps({"blocked": type(exc).__name__, "reason": str(exc)}, sort_keys=True))
         return 2
 

@@ -1,0 +1,34 @@
+# JH01 V1 prospective campaign — record-due schedule (systemd USER timer)
+#
+# Installs to ~/.config/systemd/user/ (see README.md in this directory).
+#
+# SCHEDULING STRATEGY (rationale):
+# The frozen campaign cadence is daily origins, FIRST_LIVE_ORIGIN=2026-09-15
+# through LAST_LIVE_ORIGIN=2027-09-14, each origin owning the UTC window
+# [t, t+1h). systemd calendar expressions on this systemd build do not accept
+# a cross-year date range in one component, so the schedule is a plain daily
+# recurrence at four bounded attempts INSIDE each hourly window:
+#   00:05, 00:20, 00:35, 00:50 UTC.
+# Safety before/after the campaign does NOT come from the calendar; it comes
+# from the frozen caller's fail-closed semantics:
+#   - NOT_DUE (exit 3) before 2026-09-15T00:00:00Z and outside [t, t+1h);
+#   - missed windows are terminal for that origin (no catch-up).
+# Persistent=false is mandatory: a missed trigger must never be re-attempted
+# after its valid window. AccuracySec=1s and RandomizedDelaySec=0 keep every
+# trigger deterministic and strictly inside its window.
+
+[Unit]
+Description=JH01 V1 prospective record-due schedule (daily UTC origin windows)
+
+[Timer]
+OnCalendar=*-*-* 00:05:00 UTC
+OnCalendar=*-*-* 00:20:00 UTC
+OnCalendar=*-*-* 00:35:00 UTC
+OnCalendar=*-*-* 00:50:00 UTC
+Persistent=false
+AccuracySec=1s
+RandomizedDelaySec=0
+Unit=jh01-v1-prospective-record.service
+
+[Install]
+WantedBy=timers.target

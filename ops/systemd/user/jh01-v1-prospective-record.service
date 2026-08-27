@@ -1,0 +1,46 @@
+# JH01 V1 prospective campaign — record-due oneshot (systemd USER unit)
+#
+# Installs to ~/.config/systemd/user/ (see README.md in this directory).
+# This unit ONLY invokes the frozen production caller CLI. It cannot activate
+# the campaign: activation is not exposed by the caller's CLI surface.
+#
+# Secrets policy: no tokens/secrets are passed via Environment=. The caller
+# relies on credential discovery from the inherited user session environment
+# (e.g. gh auth). If a token env var is ever required it MUST come from the
+# user environment or a systemd credentials mechanism (LoadCredential=),
+# never hardcoded here.
+#
+# NOTE on --now: the caller requires --now (UTC, hour-aligned). It must be
+# computed at trigger time, so ExecStart wraps the direct python invocation
+# in /bin/sh -c 'exec ...'. The interpreter, module invocation, and all paths
+# remain absolute. "%" is escaped as "%%" per systemd.unit(5) specifiers.
+#
+# Exit codes (frozen caller semantics):
+#   0 = recorded / IDEMPOTENT_AUTHORITATIVE_RECOVERY (harmless no-op)
+#   2 = blocked (fail-closed)
+#   3 = NOT_DUE (fail-closed outside [t, t+1h) or before first live origin)
+# SuccessExitStatus=3 marks the expected fail-closed NOT_DUE outcome as
+# non-failure so daily out-of-window triggers do not register as failed units.
+# Any other nonzero status remains a visible failure in the journal.
+
+[Unit]
+Description=JH01 V1 prospective campaign record-due (production caller)
+Documentation=file:///home/swirky/DevHub/repos/QntyLab/ops/systemd/user/README.md
+
+[Service]
+Type=oneshot
+# H1 repair: pin the start timeout explicitly (never inherit the
+# version-dependent DefaultTimeoutStartSec).  Sizing: consecutive triggers are
+# 15 minutes apart, so an 840 s (14 min) bound guarantees a running attempt can
+# never overlap the next attempt slot; each of the four bounded attempts
+# therefore keeps its own full window budget.  --now is pinned at trigger time,
+# so an attempt started at 00:50 that finishes after 01:00 still evaluates the
+# correct due origin.  Digest-verified archive reuse (source adapter cache)
+# makes warm attempts far cheaper than this bound.  See README.md.
+TimeoutStartSec=840
+WorkingDirectory=/home/swirky/DevHub/repos/QntyLab
+ExecStart=/bin/sh -c 'exec /usr/bin/python3 -m qntylab.jh01_v1_prospective_production_caller_v0 --record-due --root /home/swirky/DevHub/repos/QntyLab --now "$(date -u +%%Y-%%m-%%dT%%H:00:00Z)"'
+SuccessExitStatus=3
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=jh01-v1-prospective-record

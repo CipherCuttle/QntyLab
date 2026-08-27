@@ -6,7 +6,10 @@ never touched.
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
+from email.message import Message
 from hashlib import sha256
+import io
+from urllib.error import HTTPError, URLError
 
 import pytest
 
@@ -18,6 +21,7 @@ from tests._jh01_v1_prospective_fixtures import (
     ORIGIN,
     PANEL,
     REQUIRED_CLOSE_COUNT,
+    archive_zip_bytes,
     kline_row,
     synthetic_archive_provider,
     synthetic_fetch_klines,
@@ -137,6 +141,168 @@ def test_missing_hour_rejected_as_source_gap():
 def test_absent_archive_month_fails_closed_instead_of_silent_acceptance():
     with pytest.raises(recorder.RecorderBlocked):
         materialize(archive_provider=synthetic_archive_provider(missing_months=frozenset({(2026, 3)})))
+
+
+class _FakeResponse:
+    def __init__(self, payload: bytes, status: int = 200):
+        self._payload = payload
+        self.status = status
+
+    def read(self) -> bytes:
+        return self._payload
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc_info):
+        return False
+
+
+def _http_error_opener(code: int):
+    def opener(request, timeout=None):
+        raise HTTPError(request.full_url, code, "Error", Message(), io.BytesIO(b""))
+    return opener
+
+
+def test_default_archive_provider_http_404_maps_to_absent_month():
+    # H2 repair: urlopen raises HTTPError on 404; the default provider must map
+    # it to None (absent month) instead of a transport failure.
+    assert adapter.default_archive_provider(symbol=PANEL[0], year=2026, month=3, opener=_http_error_opener(404)) is None
+
+
+def test_default_archive_provider_other_http_errors_fail_closed():
+    for code in (403, 500):
+        with pytest.raises(adapter.SourceAdapterBlocked, match="archive transport failure"):
+            adapter.default_archive_provider(symbol=PANEL[0], year=2026, month=3, opener=_http_error_opener(code))
+
+
+def test_default_archive_provider_url_error_fails_closed():
+    def opener(request, timeout=None):
+        raise URLError("connection refused")
+    with pytest.raises(adapter.SourceAdapterBlocked, match="archive transport failure"):
+        adapter.default_archive_provider(symbol=PANEL[0], year=2026, month=3, opener=opener)
+
+
+def test_default_archive_provider_success_path_returns_zip_and_checksum():
+    zip_bytes, checksum_text = archive_zip_bytes(PANEL[0], 2026, 3)
+
+    def opener(request, timeout=None):
+        payload = zip_bytes if str(request.full_url).endswith(".zip") else checksum_text.encode("utf-8")
+        return _FakeResponse(payload)
+
+    provided = adapter.default_archive_provider(symbol=PANEL[0], year=2026, month=3, opener=opener)
+    assert provided == (zip_bytes, checksum_text)
+
+
+def test_absent_archive_via_http_404_composition_succeeds_through_rest_tail():
+    # Designed resilience chain: every monthly archive 404s -> provider returns
+    # None -> the REST tail covers the entire required window -> frozen
+    # validate_bars admits the composed bar set.
+    def provider(*, symbol: str, year: int, month: int):
+        return adapter.default_archive_provider(symbol=symbol, year=year, month=month, opener=_http_error_opener(404))
+
+    def full_window_fetch(*, symbol: str, start_ms: int, end_ms: int, interval: str):
+        index = PANEL.index(symbol)
+        rows = []
+        close = FIRST_REQUIRED
+        while close <= ORIGIN:
+            open_ms = int((close - timedelta(hours=1)).timestamp() * 1000)
+            if start_ms <= open_ms <= end_ms:
+                rows.append(kline_row(close, index))
+            close += timedelta(hours=1)
+        return rows
+
+    bars = adapter.materialize_origin_bars(
+        origin=ORIGIN,
+        first_required_close=FIRST_REQUIRED,
+        archive_provider=provider,
+        fetch_klines=full_window_fetch,
+    )
+    assert len(bars) == len(PANEL) * REQUIRED_CLOSE_COUNT
+    ordered = recorder.validate_bars(bars, panel=PANEL, origin=ORIGIN, first_required_close=FIRST_REQUIRED)
+    assert ordered == bars
+
+
+def test_cached_archive_provider_reuses_only_digest_verified_entries(tmp_path, monkeypatch):
+    zip_bytes, checksum_text = archive_zip_bytes(PANEL[0], 2026, 3)
+    downloads: list[tuple[str, int, int]] = []
+
+    def fake_default(*, symbol: str, year: int, month: int):
+        downloads.append((symbol, year, month))
+        return zip_bytes, checksum_text
+
+    monkeypatch.setattr(adapter, "default_archive_provider", fake_default)
+    provider = adapter.cached_archive_provider(tmp_path / "cache")
+
+    first = provider(symbol=PANEL[0], year=2026, month=3)
+    assert first == (zip_bytes, checksum_text)
+    assert len(downloads) == 1
+    assert list((tmp_path / "cache").iterdir()), "verified download was not persisted"
+
+    # Second attempt: served from cache, zero re-downloads.
+    second = provider(symbol=PANEL[0], year=2026, month=3)
+    assert second == (zip_bytes, checksum_text)
+    assert len(downloads) == 1
+
+
+def test_cached_archive_provider_discards_corrupt_cache_entry(tmp_path, monkeypatch):
+    zip_bytes, checksum_text = archive_zip_bytes(PANEL[0], 2026, 3)
+    downloads: list[tuple[str, int, int]] = []
+
+    def fake_default(*, symbol: str, year: int, month: int):
+        downloads.append((symbol, year, month))
+        return zip_bytes, checksum_text
+
+    monkeypatch.setattr(adapter, "default_archive_provider", fake_default)
+    provider = adapter.cached_archive_provider(tmp_path / "cache")
+    provider(symbol=PANEL[0], year=2026, month=3)
+
+    # Flip one byte inside the cached zip: reuse must be refused and the entry
+    # repaired through a fresh authenticated download.
+    corrupted = next(path for path in (tmp_path / "cache").iterdir() if path.suffix == ".zip")
+    data = bytearray(corrupted.read_bytes())
+    data[0] ^= 0xFF
+    corrupted.write_bytes(bytes(data))
+
+    result = provider(symbol=PANEL[0], year=2026, month=3)
+    assert result == (zip_bytes, checksum_text)
+    assert len(downloads) == 2
+    assert corrupted.read_bytes() == zip_bytes
+
+
+def test_cached_archive_provider_never_persists_unverified_download(tmp_path, monkeypatch):
+    bad_bytes = b"unverified-bytes"
+    bogus_checksum = f"{'0' * 64}  {PANEL[0]}-1h-2026-03.zip"
+    downloads: list[tuple[str, int, int]] = []
+
+    def fake_default(*, symbol: str, year: int, month: int):
+        downloads.append((symbol, year, month))
+        return bad_bytes, bogus_checksum
+
+    monkeypatch.setattr(adapter, "default_archive_provider", fake_default)
+    provider = adapter.cached_archive_provider(tmp_path / "cache")
+
+    # Digest-unverifiable download is passed through unchanged (the frozen
+    # archive admission fails closed downstream) but never persisted.
+    assert provider(symbol=PANEL[0], year=2026, month=3) == (bad_bytes, bogus_checksum)
+    assert list((tmp_path / "cache").iterdir()) == []
+
+
+def test_cached_archive_provider_passes_absent_month_through_without_caching(tmp_path, monkeypatch):
+    downloads: list[tuple[str, int, int]] = []
+
+    def fake_default(*, symbol: str, year: int, month: int):
+        downloads.append((symbol, year, month))
+        return None
+
+    monkeypatch.setattr(adapter, "default_archive_provider", fake_default)
+    provider = adapter.cached_archive_provider(tmp_path / "cache")
+
+    assert provider(symbol=PANEL[0], year=2026, month=3) is None
+    assert list((tmp_path / "cache").iterdir()) == []
+    # Absent months are not negatively cached: the next attempt re-probes.
+    assert provider(symbol=PANEL[0], year=2026, month=3) is None
+    assert len(downloads) == 2
 
 
 def test_manifest_digest_deterministically_regenerated():

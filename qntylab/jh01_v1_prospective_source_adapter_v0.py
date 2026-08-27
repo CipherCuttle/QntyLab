@@ -20,7 +20,9 @@ Source policy (single venue, single endpoint, fail closed):
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
+from hashlib import sha256
 import json
+from pathlib import Path
 from typing import Any, Callable, Sequence
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
@@ -182,9 +184,57 @@ def default_archive_provider(
             if response.status != 200:
                 raise SourceAdapterBlocked("archive CHECKSUM unavailable")
             checksum_text = response.read().decode("utf-8")
-    except (HTTPError, URLError, TimeoutError) as exc:
+    except HTTPError as exc:
+        if exc.code == 404:
+            # Absent archive object: the designed composition contract maps a
+            # 404 to ``None`` so the uncovered closes fall to the REST tail
+            # (and finally fail closed via ``validate_bars`` if unfilled).
+            return None
+        raise SourceAdapterBlocked(f"archive transport failure: {exc}") from exc
+    except (URLError, TimeoutError) as exc:
         raise SourceAdapterBlocked(f"archive transport failure: {exc}") from exc
     return zip_bytes, checksum_text
+
+
+def cached_archive_provider(cache_dir: Path) -> ArchiveProvider:
+    """Digest-verified archive reuse across record-due attempts.
+
+    Fetched monthly archives are persisted under a URL-digest-addressed path in
+    ``cache_dir`` together with their published CHECKSUM text.  A cached entry
+    is reused only when its bytes hash to the digest published in the stored
+    CHECKSUM; a missing or unverifiable entry falls through to a fresh
+    authenticated download.  Unverified bytes are never persisted and never
+    enter the composition path.
+    """
+    cache_dir.mkdir(parents=True, exist_ok=True)
+
+    def provider(*, symbol: str, year: int, month: int) -> tuple[bytes, str] | None:
+        base = ARCHIVE_ZIP_URL.format(symbol=symbol, year=year, month=month)
+        key = sha256(base.encode("utf-8")).hexdigest()
+        zip_path = cache_dir / f"{key}.zip"
+        checksum_path = cache_dir / f"{key}.CHECKSUM"
+        if zip_path.is_file() and checksum_path.is_file():
+            zip_bytes = zip_path.read_bytes()
+            checksum_text = checksum_path.read_text("utf-8")
+            published = checksum_text.split()[0] if checksum_text.split() else ""
+            if len(published) == 64 and published == sha256(zip_bytes).hexdigest():
+                return zip_bytes, checksum_text
+            # Corrupt or unverifiable cache entry: discard and re-download.
+            zip_path.unlink(missing_ok=True)
+            checksum_path.unlink(missing_ok=True)
+        provided = default_archive_provider(symbol=symbol, year=year, month=month)
+        if provided is None:
+            return None
+        zip_bytes, checksum_text = provided
+        published = checksum_text.split()[0] if checksum_text.split() else ""
+        if len(published) == 64 and published == sha256(zip_bytes).hexdigest():
+            zip_path.write_bytes(zip_bytes)
+            checksum_path.write_text(checksum_text, encoding="utf-8")
+        # Digest-unverifiable downloads are returned unmodified so the frozen
+        # archive admission fails closed exactly as the uncached path would.
+        return provided
+
+    return provider
 
 
 def materialize_origin_bars(
@@ -238,6 +288,7 @@ def materialize_origin_bars(
 __all__ = [
     "ARCHIVE_ZIP_URL", "ArchiveProvider", "FetchKlines", "INTERVAL", "REST_ENDPOINT",
     "SourceAdapterBlocked", "completed_archive_months", "default_archive_provider",
-    "default_fetch_klines", "frozen_panel", "materialize_origin_bars", "request_bounds",
+    "cached_archive_provider", "default_fetch_klines", "frozen_panel",
+    "materialize_origin_bars", "request_bounds",
     "rest_bar_from_row",
 ]

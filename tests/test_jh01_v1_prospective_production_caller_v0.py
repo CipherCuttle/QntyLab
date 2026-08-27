@@ -21,6 +21,7 @@ from tests._jh01_v1_prospective_fixtures import (
     FIRST_REQUIRED,
     ORIGIN,
     REQUIRED_CLOSE_COUNT,
+    archive_zip_bytes,
     synthetic_archive_provider,
     synthetic_fetch_klines,
 )
@@ -211,6 +212,38 @@ def test_cli_status_composes_preflight_and_campaign_status_read_only(tmp_path, c
     assert summary["campaign_status"]["completed_origin_count"] == 0
     assert summary["campaign_status"]["next_required_origin"] == "2026-09-15T00:00:00Z"
     assert summary["campaign_status"]["next_origin_due_state"] == "NOT_DUE"
+
+
+def test_record_due_default_provider_uses_digest_verified_cache_under_state_dir(tmp_path, monkeypatch):
+    # H1 repair wiring: with no injected provider (the production path), the
+    # caller must wrap downloads in the digest-verified cache rooted inside
+    # this campaign's state dir.  Called directly (not via call_record_due,
+    # which substitutes a synthetic provider for None).
+    activate_real_campaign(tmp_path)
+    downloads: list[tuple[str, int, int]] = []
+
+    def fake_default(*, symbol: str, year: int, month: int):
+        downloads.append((symbol, year, month))
+        return archive_zip_bytes(symbol, year, month)
+
+    monkeypatch.setattr(adapter, "default_archive_provider", fake_default)
+    receipt = caller.record_due(
+        ROOT,
+        tmp_path / "state",
+        now=ORIGIN + timedelta(minutes=1),
+        run_git=fake_run_git(),
+        fetch_klines=synthetic_fetch_klines(),
+        transport_factory=lambda: FakeTransport(ORIGIN),
+        verifier=FakeVerifier(),
+        offline_reverify=lambda package: recorder.verify_retention_package(package),
+    )
+    assert receipt["origin_state"] == "RECORDED"
+    cache_dir = tmp_path / "state" / "jh01_v1_source_archive_cache_v0"
+    assert cache_dir.is_dir()
+    persisted = list(cache_dir.iterdir())
+    assert persisted, "verified archives were not persisted under the state dir"
+    assert len({path.stem for path in persisted}) * 2 == len(persisted)  # .zip + .CHECKSUM pairs
+    assert len(downloads) > 0
 
 
 def test_cli_dry_readiness_reports_ready_without_publication(tmp_path, capsys):

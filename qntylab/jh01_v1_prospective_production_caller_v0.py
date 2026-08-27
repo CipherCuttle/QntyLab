@@ -162,6 +162,12 @@ def record_due(
     if state is not operation.DueState.DUE or origin is None:
         raise CallerBlocked(f"record-due refused in due state {state.value}")
     required = first_required_close(root)
+    if archive_provider is None:
+        # H1 repair: reuse digest-verified monthly archives across attempts so
+        # a full materialization fits the one-hour DUE window budget.  The
+        # cache lives inside this campaign's state dir and never reuses bytes
+        # without checksum verification (see adapter.cached_archive_provider).
+        archive_provider = adapter.cached_archive_provider(state_dir / "jh01_v1_source_archive_cache_v0")
     bars = adapter.materialize_origin_bars(
         origin=origin,
         first_required_close=required,

@@ -192,6 +192,97 @@ def test_verifier_resolution_explicit_env_override(tmp_path, monkeypatch):
 
 
 # ---------------------------------------------------------------------------
+# Proof 1b (V0R2 final runtime closure): the SYSTEMD default verifier path.
+# The env-override test above is a library capability only; it is NOT evidence
+# for the systemd path.  The systemd unit must set NO verifier override env
+# and the unattended default resolution must run the full identity gate.
+# ---------------------------------------------------------------------------
+
+SERVICE_UNIT = ROOT / "ops" / "systemd" / "user" / "jh01-v1-prospective-record.service"
+INSTALLED_UNIT = Path.home() / ".config" / "systemd" / "user" / "jh01-v1-prospective-record.service"
+SYSTEMD_GO_BINARY = Path("/home/swirky/.local/opt/go-1.26.0/bin/go")
+
+
+def test_systemd_unit_sets_no_verifier_override_and_keeps_explicit_go():
+    """SYSTEMD_VERIFIER_OVERRIDE = ABSENT in the repo (and installed) unit."""
+    units = [SERVICE_UNIT]
+    if INSTALLED_UNIT.is_file():
+        units.append(INSTALLED_UNIT)
+    for unit in units:
+        lines = unit.read_text().splitlines()
+        override_lines = [
+            line for line in lines
+            if line.strip().startswith("Environment=") and "QNTYLAB_JH01_SIGSTORE_VERIFIER" in line
+        ]
+        assert override_lines == [], f"{unit} must not set the verifier override env"
+        exec_lines = [line for line in lines if line.strip().startswith("ExecStart=")]
+        assert exec_lines, f"{unit} missing ExecStart"
+        assert any(
+            "--go-binary /home/swirky/.local/opt/go-1.26.0/bin/go" in line for line in exec_lines
+        ), f"{unit} must keep the explicit pinned --go-binary"
+        # No interactive shell environment required: PATH/HOME pinned.
+        assert any(line.strip() == "Environment=PATH=/usr/bin:/bin" for line in lines)
+        assert any(line.strip() == "Environment=HOME=/home/swirky" for line in lines)
+
+
+def test_systemd_default_verifier_resolution_identity_gate(tmp_path, monkeypatch):
+    """The exact unattended resolution used by systemd: NO env override.
+
+    ``resolve_verifier(go_binary=<pinned go>)`` with
+    ``QNTYLAB_JH01_SIGSTORE_VERIFIER`` absent must: (1) pass on a valid
+    persistent binary + identity manifest, (2) block on binary tampering,
+    (3) block on frozen verifier source drift, (4) deterministically rebuild
+    offline from the qualified source when binary/manifest are missing,
+    (5) require no interactive shell environment, and (6) require no
+    ``QNTYLAB_JH01_SIGSTORE_VERIFIER`` override.
+    """
+    monkeypatch.delenv("QNTYLAB_JH01_SIGSTORE_VERIFIER", raising=False)
+    install_dir = tmp_path / "systemd-verifier-install"
+
+    # (4) missing binary/manifest => deterministic offline rebuild.
+    resolved = defaults.resolve_verifier(
+        go_binary=SYSTEMD_GO_BINARY, qualified_source=QUALIFIED_SOURCE, install_dir=install_dir
+    )
+    assert resolved == install_dir / "bin" / "verify-v0r3-generic"
+    manifest_path = install_dir / "build_identity.json"
+    manifest = json.loads(manifest_path.read_text())
+    assert manifest["binary_sha256"] == sha256(resolved.read_bytes()).hexdigest()
+    assert manifest["go_version"].startswith("go version go1.26.0")
+    assert set(manifest["source_sha256"]) == {"main.go", "go.mod", "go.sum"}
+
+    # (1) valid persistent binary + identity manifest => PASS (reuse, no rebuild).
+    manifest_before = manifest_path.read_text()
+    assert defaults.resolve_verifier(
+        go_binary=SYSTEMD_GO_BINARY, qualified_source=QUALIFIED_SOURCE, install_dir=install_dir
+    ) == resolved
+    assert manifest_path.read_text() == manifest_before
+
+    # (2) tampered persistent binary => BLOCKED.
+    resolved.write_bytes(b"tampered")
+    with pytest.raises(defaults.RuntimeDefaultBlocked, match="binary identity mismatch"):
+        defaults.resolve_verifier(
+            go_binary=SYSTEMD_GO_BINARY, qualified_source=QUALIFIED_SOURCE, install_dir=install_dir
+        )
+
+    # (3) changed frozen verifier source => BLOCKED (a present-but-mismatched
+    # binary is never silently rebuilt over).
+    drifted_source = tmp_path / "drifted-jh01-v0r3"
+    drifted_source.mkdir()
+    for name in defaults.VERIFIER_SOURCE_FILES:
+        (drifted_source / name).write_bytes((QUALIFIED_SOURCE / name).read_bytes())
+    main_go = drifted_source / "main.go"
+    main_go.write_text(main_go.read_text() + "\n// drifted\n")
+    with pytest.raises(defaults.RuntimeDefaultBlocked, match="source identity mismatch"):
+        defaults.resolve_verifier(
+            go_binary=SYSTEMD_GO_BINARY, qualified_source=drifted_source, install_dir=install_dir
+        )
+
+    # (5)+(6) the whole resolution above ran with no interactive shell
+    # environment assumptions and with the override env var absent.
+    assert os.environ.get("QNTYLAB_JH01_SIGSTORE_VERIFIER") is None
+
+
+# ---------------------------------------------------------------------------
 # Proof 2: explicit Go path (exists, go1.26.0), fail-closed otherwise
 # ---------------------------------------------------------------------------
 

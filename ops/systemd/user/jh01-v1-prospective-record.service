@@ -29,13 +29,18 @@ Documentation=file:///home/swirky/DevHub/repos/QntyLab/ops/systemd/user/README.m
 
 [Service]
 Type=oneshot
-# H-01 repair: every non-secret runtime prerequisite is explicit.  The unit
-# never relies on the interactive shell environment.  No secrets here.
-#   QNTYLAB_JH01_SIGSTORE_VERIFIER: persistent identity-proved V0R3 verifier
-#     (built from qualifications/jh01_v0r3 with GOPROXY=off; identity manifest
-#     at ~/.local/opt/jh01-v0r3-verifier/build_identity.json).
+# H-01 repair (V0R2 final runtime closure): every non-secret runtime
+# prerequisite is explicit.  The unit never relies on the interactive shell
+# environment.  No secrets here.
+#   QNTYLAB_JH01_SIGSTORE_VERIFIER is deliberately NOT set here.  An env
+#     override bypasses the source/binary identity gate in
+#     resolve_verifier(); the systemd default path MUST go through the
+#     deterministic persistent-verifier resolution instead, which builds
+#     from frozen qualifications/jh01_v0r3 source if absent (GOPROXY=off),
+#     records source SHA256 / Go version / binary SHA256, verifies source
+#     and binary identity before reuse, and fails closed on source drift or
+#     binary tampering.  The env override remains a library capability only.
 #   PATH/HOME: cover git, bwrap, python3, and the user state dirs.
-Environment=QNTYLAB_JH01_SIGSTORE_VERIFIER=/home/swirky/.local/opt/jh01-v0r3-verifier/bin/verify-v0r3-generic
 Environment=PATH=/usr/bin:/bin
 Environment=HOME=/home/swirky
 # H1 repair: pin the start timeout explicitly (never inherit the

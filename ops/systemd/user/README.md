@@ -63,21 +63,27 @@ fail-closed, fast-forward-only policy (`qntylab/jh01_v1_operational_checkout_v0.
 The caller then independently re-verifies `HEAD == origin/master` and a clean
 tracked worktree (`canonical_target_commit`) against the operational root.
 
-## Unattended verifier and explicit Go toolchain (H-01)
+## Unattended verifier and explicit Go toolchain (H-01, V0R2 final closure)
 
 - **Go:** the unit passes `--go-binary /home/swirky/.local/opt/go-1.26.0/bin/go`
   explicitly. The caller re-proves existence and `go version go1.26.0` at
   resolution time and fails closed otherwise.
-- **Sigstore verifier:** `Environment=QNTYLAB_JH01_SIGSTORE_VERIFIER` points to
-  the persistent verifier
+- **Sigstore verifier:** the unit deliberately sets **NO**
+  `QNTYLAB_JH01_SIGSTORE_VERIFIER` environment override. An env override is
+  treated by `resolve_verifier()` as an explicit path and bypasses the
+  source/binary identity gate; the systemd default path MUST NOT use it. The
+  override remains a library capability only. Instead, the unattended default
+  resolution (`resolve_verifier(go_binary=<pinned go>)` with no env override)
+  uses the deterministic persistent verifier
   `~/.local/opt/jh01-v0r3-verifier/bin/verify-v0r3-generic`, built from the
   already-qualified frozen source `qualifications/jh01_v0r3` with
   `GOPROXY=off` (no network), `-trimpath -buildvcs=false` (reproducible). Its
   build identity manifest `~/.local/opt/jh01-v0r3-verifier/build_identity.json`
   records the sha256 of `main.go`/`go.mod`/`go.sum`, the Go version, and the
   binary sha256; resolution re-verifies all three and FAILS CLOSED on any
-  mismatch (a missing binary/manifest is rebuilt from the pinned source).
-  Rebuild manually with:
+  mismatch (source drift or binary tampering; a present-but-mismatched binary
+  is never silently rebuilt over). A missing binary/manifest is rebuilt
+  deterministically from the pinned source. Rebuild manually with:
 
   ```bash
   cd /home/swirky/DevHub/repos/QntyLab-jh01-operational/qualifications/jh01_v0r3
@@ -88,13 +94,51 @@ tracked worktree (`canonical_target_commit`) against the operational root.
 
   (Prefer letting the caller rebuild: it also rewrites the identity manifest.)
 
-## Re-arm procedure (after any stop)
+## One-time post-merge bootstrap of the operational checkout (V0R2)
+
+The operational checkout currently sits on pre-#232 `origin/master` and cannot
+self-synchronize until it contains the sync code once. After PR #232 becomes
+canonical on `origin/master`, perform this ONE-TIME bootstrap from the human
+development checkout (this is the only manual step; afterwards the caller's
+`sync_operational_checkout(...)` owns all future drift handling automatically):
 
 ```bash
-# 1. Prove the operational checkout is canonical and clean:
+# 1. Fetch and require a clean tracked state in the operational checkout:
 git -C /home/swirky/DevHub/repos/QntyLab-jh01-operational fetch origin
 git -C /home/swirky/DevHub/repos/QntyLab-jh01-operational status --porcelain
-git -C /home/swirky/DevHub/repos/QntyLab-jh01-operational rev-parse HEAD origin/master
+#    MUST print nothing (clean tracked worktree). Stop on any output.
+
+# 2. Require current HEAD is an ancestor of origin/master (fast-forwardable):
+git -C /home/swirky/DevHub/repos/QntyLab-jh01-operational \
+  merge-base --is-ancestor HEAD origin/master && echo ANCESTOR_OK
+
+# 3. Detach onto EXACTLY origin/master and mechanically require equality:
+git -C /home/swirky/DevHub/repos/QntyLab-jh01-operational checkout --detach origin/master
+test "$(git -C /home/swirky/DevHub/repos/QntyLab-jh01-operational rev-parse HEAD)" \
+  = "$(git -C /home/swirky/DevHub/repos/QntyLab-jh01-operational rev-parse origin/master)" \
+  && echo HEAD_EQUALS_ORIGIN_MASTER
+
+# 4. Verify the frozen identities in the freshly bootstrapped checkout:
+#    RECORDER 4f5e1791be9f17c1871f9b510329a1632412e028d2a84223fa59e83bbe95ec1a
+#    WRAPPER  1176037ff0d3102afc67670202154970e4af1491cff1cd19bc9526c9c9d67c41
+sha256sum /home/swirky/DevHub/repos/QntyLab-jh01-operational/qntylab/jh01_v1_prospective_recorder_implementation_v0.py \
+          /home/swirky/DevHub/repos/QntyLab-jh01-operational/qntylab/jh01_v1_prospective_operation_v0.py
+```
+
+After this one-time bootstrap, `sync_operational_checkout(...)` handles all
+future `origin/master` drift automatically (fail-closed, fast-forward-only).
+
+## Re-arm procedure (ONLY after merge + one-time post-merge bootstrap)
+
+Current timer state: `DISABLED_AWAITING_POST_MERGE_BOOTSTRAP`. The timer was
+disabled pre-merge (`systemctl --user disable --now
+jh01-v1-prospective-record.timer`) because the operational checkout cannot
+import the caller until it contains the sync code once. Do NOT re-enable
+before PR #232 is merged AND the one-time post-merge bootstrap above has
+succeeded.
+
+```bash
+# 1. Complete the one-time post-merge bootstrap section above (all checks OK).
 
 # 2. Re-install updated units, then:
 systemctl --user daemon-reload

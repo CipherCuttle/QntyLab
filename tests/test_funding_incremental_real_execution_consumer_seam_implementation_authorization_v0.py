@@ -29,15 +29,30 @@ def test_closure_is_blocked_and_grants_no_authority():
 def test_frozen_bindings_and_source_bytes_are_unchanged():
     assert ANALYSIS["canonical_master"] == "60cec2646d4d6602e0ad33d0d4fc84edc2f272b9"
     assert ANALYSIS["frozen_bindings"]["preregistration_status"] == "PREREGISTERED_NOT_EXECUTED"
+    # The executor source digest was authorized to evolve by the CLOSED_PASS
+    # executor_identity_supersession_core_extraction_authorization_v0 (the
+    # historical V0 bytes remain immutable at commit f6f12994...); the live
+    # executor binding is therefore re-pointed to the successor identity in
+    # implementation_v1/implementation_manifest.json.  The frozen analysis
+    # artifact's historical value is still checked for the record.
+    assert ANALYSIS["frozen_bindings"]["executor_source_sha256"] == (
+        "b894d4d9316bed6f8c4f7171b32692aff7b1f0eb32abd686a33fdb38425a7490"
+    )
+    successor_manifest = json.loads(
+        (
+            ROOT
+            / "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/implementation_v1/implementation_manifest.json"
+        ).read_text(encoding="utf-8")
+    )
     paths = {
-        "executor_source_sha256": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py",
-        "v2_source_sha256": "qntylab/jigsaw_funding_pressure_execution_v2.py",
-        "foundation_source_sha256": "qntylab/jigsaw_funding_pressure_execution_foundation_v0.py",
-        "preregistration_file_sha256": "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/preregistration.json",
+        successor_manifest["successor_source_sha256"]: "qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py",
+        ANALYSIS["frozen_bindings"]["v2_source_sha256"]: "qntylab/jigsaw_funding_pressure_execution_v2.py",
+        ANALYSIS["frozen_bindings"]["foundation_source_sha256"]: "qntylab/jigsaw_funding_pressure_execution_foundation_v0.py",
+        ANALYSIS["frozen_bindings"]["preregistration_file_sha256"]: "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/preregistration.json",
     }
-    for field, relative_path in paths.items():
+    for expected_digest, relative_path in paths.items():
         digest = hashlib.sha256((ROOT / relative_path).read_bytes()).hexdigest()
-        assert digest == ANALYSIS["frozen_bindings"][field]
+        assert digest == expected_digest
 
 
 def test_frozen_executor_rejects_real_execution_label():

@@ -47,6 +47,13 @@ def test_boundary_repair_is_governance_only_and_non_escalating() -> None:
     repair = _project(REPAIR_PROJECT_ID)
     assert repair["state"] == "CLOSED_PASS"
     assert repair["phase_type"] == "GOVERNANCE_ONLY"
+    assert repair["canonicalization_status"] == "EXACT_CANONICAL_MERGE_VERIFIED"
+    assert repair["canonical_merge"] == "b2b24ef59a09a5aa039e7afeb0afa6f0610e8f87"
+    assert repair["canonical_merge_pr"] == 235
+    assert repair["hostile_review_count"] == 1
+    assert repair["hostile_review_verdict"] == "HOSTILE_REVIEW_PASS"
+    assert repair["hostile_governance_critical_total"] == 0
+    assert repair["hostile_governance_high_total"] == 0
     assert repair["qntylab_repository_identity"] == "CipherCuttle/QntyLab"
     assert repair["qntyspot_repository_identity"] == "CipherCuttle/QntySpot"
     assert repair["active_project_after_closure"] == "NONE"
@@ -74,6 +81,13 @@ def test_boundary_repair_is_governance_only_and_non_escalating() -> None:
 
 def test_historical_receipts_are_byte_preserved_and_transition_remains_provenance() -> None:
     closure = json.loads(CLOSURE_PATH.read_text(encoding="utf-8"))
+    assert closure["phase_state"] == "CLOSED_PASS_CANONICAL_MERGED"
+    assert closure["canonical_merge"] == "b2b24ef59a09a5aa039e7afeb0afa6f0610e8f87"
+    assert closure["canonical_merge_pr"] == 235
+    assert closure["review"]["independent_hostile_review_count"] == 1
+    assert closure["review"]["verdict"] == "PASS_NO_CRITICAL_HIGH"
+    assert closure["review"]["critical_findings"] == 0
+    assert closure["review"]["high_findings"] == 0
     for relative_path, expected in closure["preserved_provenance"].items():
         actual = hashlib.sha256((ROOT / relative_path).read_bytes()).hexdigest()
         assert f"sha256:{actual}" == expected, relative_path
@@ -95,3 +109,14 @@ def test_project_context_has_no_active_authority_and_roadmap_is_current() -> Non
     assert data["current_permitted_next_action"] == "No project implementation is currently authorized."
     assert data["authority_conflicts_or_warnings"] == []
     assert project_context.render(ROOT, check=True) == 0
+
+
+def test_historical_qntyspot_rows_do_not_reactivate_archived_successor() -> None:
+    for project_id in (
+        "QNTYSPOT_INK_SHADOW_PERFORMANCE_V0",
+        "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_ACTIVATION_V0",
+    ):
+        next_action = _project(project_id)["next_action"]
+        assert "was archived by the canonical QntyLab/QntySpot boundary repair" in next_action
+        assert "is the next canonical phase" not in next_action
+        assert "no new activation or DEV acquisition may be created" in next_action or "new separately Git-backed bounded research authorization" in next_action

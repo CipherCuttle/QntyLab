@@ -1082,6 +1082,12 @@ def test_operating_lock_registry_remains_valid_and_projection_stable() -> None:
     registry = _real_projects_registry()
     by_id = project_context.validate_projects_registry(ROOT, registry)
     assert OPERATING_LOCK_PROJECT_ID in by_id
+    record = by_id[OPERATING_LOCK_PROJECT_ID]
+    assert record["canonicalization_status"] == "EXACT_CANONICAL_MERGE_VERIFIED"
+    assert record["canonical_policy_merge"] == "d7d13c49deccf54fabccde01bb3bf34c1491e5b5"
+    assert record["canonical_policy_merge_pr"] == 230
+    assert "commit the one-shot activation before that origin" in record["next_action"]
+    assert "do not collect or evaluate an origin before its due window" in record["next_action"]
     assert project_context.render(ROOT, check=True) == 0
 
 

@@ -133,7 +133,7 @@ targeted_rereview_new_high_total = 0
 continuation_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0"
 continuation_requires_exact_canonical_merge = true
 continuation_requires_fresh_clean_worktree = true
-next_action = "CLOSED_PASS: the preregistration continuation is closed and its separately bound DEV acquisition successor QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0 is the next canonical phase, effective only after exact canonical merge and fresh clean worktree reconciliation. The activation phase is terminal."
+next_action = "CLOSED_PASS: historical QntySpot research continuation is closed. Its previously bound DEV-acquisition successor QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0 was archived by the canonical QntyLab/QntySpot boundary repair; the activation phase is terminal. Preserve all historical receipts. Any future QntyLab evaluation of QntySpot requires a new separately Git-backed bounded research authorization."
 
 [[project]]
 project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_ACTIVATION_V0"
@@ -212,7 +212,7 @@ targeted_governance_rereview_verdict = "PASS_NO_CRITICAL_HIGH"
 targeted_governance_rereview_new_critical_total = 0
 targeted_governance_rereview_new_high_total = 0
 terminal_outcome = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_ACTIVATION_V0_CANONICAL_CLOSED_PASS"
-next_action = "CLOSED_PASS: the activation is terminal after exact canonical merge. Its one separately bound successor QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0 is the next canonical phase; no new activation may be created."
+next_action = "CLOSED_PASS: the activation is terminal after exact canonical merge. Its previously bound successor QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0 was archived by the canonical QntyLab/QntySpot boundary repair; no new activation or DEV acquisition may be created. Any future QntyLab evaluation of QntySpot requires a new separately Git-backed bounded research authorization."
 
 [[project]]
 project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0"
@@ -9619,7 +9619,9 @@ project_id = "QNTYLAB_NORTH_STAR_OPERATING_LOCK_V0"
 display_name = "QntyLab North Star operating lock V0"
 state = "CLOSED_PASS"
 candidate_state = "OPERATING_POLICY_RECORDED"
-canonicalization_status = "CANDIDATE_MERGE_READY_PENDING_CANONICAL_MERGE"
+canonicalization_status = "EXACT_CANONICAL_MERGE_VERIFIED"
+canonical_policy_merge = "d7d13c49deccf54fabccde01bb3bf34c1491e5b5"
+canonical_policy_merge_pr = 230
 hostile_review_count = 1
 hostile_review_verdict = "HOSTILE_REVIEW_PASS"
 hostile_governance_critical_total = 0
@@ -9676,7 +9678,7 @@ state_status = "DEFERRED"
 north_star_drift_threshold = "MORE_THAN_3_OF_LAST_10_COMPLETED_PHASES_INFRASTRUCTURE_OR_GOVERNANCE_ONLY_WITHOUT_UNBLOCKING_A_NAMED_SELECTED_SCIENTIFIC_QUESTION"
 infra_loop_rule = "TWO_CONSECUTIVE_PHASES_ON_THE_SAME_INFRASTRUCTURE_BLOCKER_WITHOUT_A_NEW_MARKET_OR_SCIENTIFIC_OBSERVATION_DEFAULTS_TO_SIMPLER_PATH_DEFER_OR_KILL"
 terminal_outcome = "OPERATING_POLICY_LOCK_RECORDED_NO_SCIENTIFIC_EXECUTION_AUTHORIZED"
-next_action = "CLOSED_PASS: operating policy only; this phase authorizes no scientific execution, market-data access, backtest, ledger mutation, or implementation. Immediate selected scientific continuation is JH01 V1 outcome-blind prospective incremental forecast-value continuation with freeze deadline 2026-09-01T00:00:00Z. DSH_STAGE_A_DISPOSITION is MAINTENANCE_ONLY with NO_AUTOMATIC_V0R8; any future DSH phase requires a named blocked scientific question and no materially cheaper valid route. ROUTER and STATE remain DEFERRED."
+next_action = "CLOSED_PASS: canonical operating policy is effective from merge d7d13c49deccf54fabccde01bb3bf34c1491e5b5. This phase grants no scientific execution, market-data access, backtest, ledger mutation, implementation, DSH V0R8, Router, State, Qnty, trading, promotion, or capital authority. JH01 V1 remains the selected continuation; its preregistration was canonically merged before the 2026-09-01 freeze deadline, and its first origin remains 2026-09-15T00:00:00Z. If real operation is separately authorized, commit the one-shot activation before that origin; do not collect or evaluate an origin before its due window."
 
 [[project]]
 project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_SCOPE_BOUNDARY_REPAIR_V0"
@@ -9684,6 +9686,9 @@ display_name = "QntySpot research scope-boundary repair V0"
 state = "CLOSED_PASS"
 authority_level = "GOVERNANCE_ONLY_CROSS_REPOSITORY_BOUNDARY_REPAIR"
 phase_type = "GOVERNANCE_ONLY"
+canonicalization_status = "EXACT_CANONICAL_MERGE_VERIFIED"
+canonical_merge = "b2b24ef59a09a5aa039e7afeb0afa6f0610e8f87"
+canonical_merge_pr = 235
 authoritative_artifacts = [
   "docs/ADR/0007-ecosystem-role-boundary-and-context-spine-governance.md",
   "docs/state/projects.toml",
@@ -9714,7 +9719,11 @@ qntyspot_execution_authority = "NONE"
 trading_authority = "NONE"
 capital_authority = "NONE"
 promotion_authority = "NONE"
-hostile_review_count = 0
-hostile_review_verdict = "PENDING_INDEPENDENT_PR_REVIEW"
+hostile_review_count = 1
+hostile_review_verdict = "HOSTILE_REVIEW_PASS"
+hostile_governance_critical_total = 0
+hostile_governance_high_total = 0
+hostile_governance_medium_total = 0
+hostile_governance_low_total = 0
 targeted_rereview_used = false
-next_action = "CLOSED_PASS candidate: canonicalize this governance-only boundary repair after one independent hostile PR review. The former QntySpot DEV-acquisition row is archived with all historical receipts preserved and all remaining QntyLab implementation and market-data authority revoked. No QntySpot repository mutation, scientific execution, data access, backtest, ledger mutation, trading, promotion, or capital authority is created. Any future QntyLab evaluation of QntySpot requires a new separately Git-backed bounded research authorization."
+next_action = "CLOSED_PASS: canonical boundary repair merged in b2b24ef59a09a5aa039e7afeb0afa6f0610e8f87 after one independent hostile review with zero Critical/High findings. The former QntySpot DEV-acquisition row is archived with all historical receipts preserved and all remaining QntyLab implementation and market-data authority revoked. No QntySpot repository mutation, scientific execution, data access, backtest, ledger mutation, trading, promotion, or capital authority is created. Any future QntyLab evaluation of QntySpot requires a new separately Git-backed bounded research authorization."

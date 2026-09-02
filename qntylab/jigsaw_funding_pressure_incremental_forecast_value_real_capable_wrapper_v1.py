@@ -10,6 +10,16 @@ never receive real outcomes and it fails closed with
 :class:`UnauthorizedExecutionError` absent a canonical evaluation
 authorization artifact.
 
+Step 1 does NOT trust caller-supplied bytes.  Provenance repair phase
+``FUNDING_INCREMENTAL_EXECUTOR_EVALUATION_PROVENANCE_REPAIR_V0`` moved
+authorization authentication into
+:mod:`qntylab.jigsaw_funding_pressure_incremental_forecast_value_evaluation_authorization_provenance_v1`,
+which reads the authorization only from the canonical repository's Git object
+database, at a fixed tracked path, in the checked-out canonical commit, and
+only after two immutable QntyLab anchor commits are proven ancestors of
+``HEAD``.  A caller-supplied ``authorization_path`` can only *point at* that
+one canonical artifact; it can never introduce bytes.
+
 Claim-before-outcome ordering is structural and cannot be reversed:
 
 1. validate the canonical evaluation authorization;
@@ -46,22 +56,23 @@ from qntylab.jigsaw_funding_pressure_incremental_forecast_value_executor_v0 impo
     IncrementalForecastEvaluation,
     ForecastRow,
 )
+from qntylab import (
+    jigsaw_funding_pressure_incremental_forecast_value_evaluation_authorization_provenance_v1 as _provenance,
+)
 
-PROJECT_ID = "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_REAL_CAPABLE_WRAPPER_V1"
+PROJECT_ID = _provenance.REAL_CAPABLE_WRAPPER_PROJECT_ID
 WRAPPER_KIND = "REAL_CAPABLE"
 
 #: The canonical evaluation authorization that would license a real run.
 #: It is Git-backed and does NOT exist yet; its absence is the primary
-#: fail-closed boundary of this wrapper.
+#: fail-closed boundary of this wrapper.  Authentication of these bytes to
+#: canonical QntyLab Git identity lives in :mod:`_provenance`.
 CANONICAL_EVALUATION_AUTHORIZATION_RELATIVE_PATH = (
-    "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/"
-    "evaluation_execution_authorization_v0/authorization.json"
+    _provenance.CANONICAL_EVALUATION_AUTHORIZATION_RELATIVE_PATH
 )
 
-REQUIRED_AUTHORIZATION_ARTIFACT_TYPE = (
-    "FUNDING_INCREMENTAL_REAL_EVALUATION_EXECUTION_AUTHORIZATION"
-)
-REQUIRED_AUTHORIZATION_STATE = "CLOSED_PASS"
+REQUIRED_AUTHORIZATION_ARTIFACT_TYPE = _provenance.REQUIRED_AUTHORIZATION_ARTIFACT_TYPE
+REQUIRED_AUTHORIZATION_STATE = _provenance.REQUIRED_AUTHORIZATION_STATE
 
 #: Deterministic attestation of what this wrapper did NOT do in this phase.
 REAL_CAPABLE_PHASE_ATTESTATION = MappingProxyType(
@@ -78,6 +89,8 @@ REAL_CAPABLE_PHASE_ATTESTATION = MappingProxyType(
         "AUTHORIZATION_CLAIM_CONSUMED": False,
         "POST_CLAIM_CRASH_REPLAY_AUTHORIZED": False,
         "CANONICAL_EVALUATION_AUTHORIZATION_EXISTS": False,
+        "AUTHORIZATION_PROVENANCE_BINDING": "CANONICAL_QNTYLAB_GIT_IDENTITY",
+        "CALLER_SUPPLIED_AUTHORIZATION_BYTES_TRUSTED": False,
         "GOVERNING_PREREGISTRATION_PROJECT_ID": GOVERNING_PREREGISTRATION_PROJECT_ID,
         "GOVERNING_PREREGISTRATION_DIGEST": GOVERNING_PREREGISTRATION_DIGEST,
         "DOWNSTREAM_AUTHORITY": "NONE",
@@ -90,66 +103,26 @@ def _repository_root() -> Path:
     return Path(__file__).resolve().parents[1]
 
 
-def _load_authorization(path: Path) -> Mapping[str, object]:
-    try:
-        raw = path.read_bytes()
-    except OSError as error:
-        raise UnauthorizedExecutionError(
-            "canonical evaluation authorization is absent; real execution fails closed "
-            f"({CANONICAL_EVALUATION_AUTHORIZATION_RELATIVE_PATH}): {error}"
-        ) from error
-    try:
-        document = json.loads(raw.decode("utf-8"))
-    except (UnicodeDecodeError, json.JSONDecodeError) as error:
-        raise UnauthorizedExecutionError(
-            f"canonical evaluation authorization is not valid JSON: {error}"
-        ) from error
-    if not isinstance(document, dict):
-        raise UnauthorizedExecutionError("canonical evaluation authorization must be a JSON object")
-    return document
-
-
 def validate_canonical_evaluation_authorization(
     authorization_path: str | Path | None = None,
 ) -> Mapping[str, object]:
-    """Step 1 -- validate the canonical evaluation authorization.
+    """Step 1 -- authenticate the canonical evaluation authorization.
 
-    Fails closed with :class:`UnauthorizedExecutionError` when the artifact
-    is absent, malformed, of the wrong type, not CLOSED_PASS, not bound to
-    the frozen preregistration digest, or not bound to this wrapper's
-    real-capable consumer seam.  No row is touched and no core invocation
-    happens before this succeeds.
+    Delegates to
+    :func:`_provenance.authenticate_canonical_evaluation_authorization`, which
+    reads the authorization only from canonical QntyLab Git history (never
+    caller bytes) and fails closed with :class:`UnauthorizedExecutionError`
+    on caller path substitution, symlink/traversal, wrong repository, wrong
+    commit, wrong tree/blob, wrong artifact path, modified bytes,
+    worktree-local replacement, a missing canonical artifact, malformed
+    authorization, or a mismatched preregistration/wrapper identity.  No row
+    is touched and no core invocation happens before this succeeds -- and it
+    never succeeds at this phase, because the canonical artifact does not
+    exist.
     """
-    root = _repository_root()
-    path = (
-        Path(authorization_path)
-        if authorization_path is not None
-        else root / CANONICAL_EVALUATION_AUTHORIZATION_RELATIVE_PATH
+    return _provenance.authenticate_canonical_evaluation_authorization(
+        authorization_path, root=_repository_root()
     )
-    document = _load_authorization(path)
-    if document.get("artifact_type") != REQUIRED_AUTHORIZATION_ARTIFACT_TYPE:
-        raise UnauthorizedExecutionError(
-            "canonical evaluation authorization artifact_type mismatch: "
-            f"expected {REQUIRED_AUTHORIZATION_ARTIFACT_TYPE!r}, got {document.get('artifact_type')!r}"
-        )
-    if document.get("state") != REQUIRED_AUTHORIZATION_STATE:
-        raise UnauthorizedExecutionError(
-            "canonical evaluation authorization is not CLOSED_PASS: "
-            f"got {document.get('state')!r}"
-        )
-    if document.get("scientific_execution_authorized") is not True:
-        raise UnauthorizedExecutionError(
-            "canonical evaluation authorization does not grant scientific execution authority"
-        )
-    if document.get("governing_preregistration_digest") != GOVERNING_PREREGISTRATION_DIGEST:
-        raise UnauthorizedExecutionError(
-            "canonical evaluation authorization is not bound to the frozen preregistration digest"
-        )
-    if document.get("real_capable_wrapper_project_id") != PROJECT_ID:
-        raise UnauthorizedExecutionError(
-            "canonical evaluation authorization is not bound to this real-capable wrapper"
-        )
-    return document
 
 
 def _consume_irreversible_one_shot_claim(

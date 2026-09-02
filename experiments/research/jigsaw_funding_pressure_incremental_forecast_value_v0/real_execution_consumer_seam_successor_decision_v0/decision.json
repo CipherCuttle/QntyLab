@@ -1,0 +1,163 @@
+{
+  "artifact_type": "FUNDING_INCREMENTAL_REAL_EXECUTION_CONSUMER_SEAM_SUCCESSOR_DECISION",
+  "schema_version": "funding-incremental-real-execution-consumer-seam-successor-decision-v0",
+  "phase_id": "FUNDING_INCREMENTAL_REAL_EXECUTION_CONSUMER_SEAM_SUCCESSOR_DECISION_V0",
+  "project_id": "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_REAL_EXECUTION_CONSUMER_SEAM_SUCCESSOR_DECISION_V0",
+  "decision_state": "CLOSED_PASS",
+  "verdict": "A_SEPARATELY_GOVERNED_SUCCESSOR_SEAM_IS_JUSTIFIED_FOR_ONE_IMPLEMENTATION_PHASE_ONLY",
+  "governance_only": true,
+  "scientific_execution_authorized": false,
+  "evaluation_authorization_required": true,
+  "authorization_count": {
+    "later_implementation_phases_authorized": 1,
+    "scientific_evaluation_phases_authorized": 0
+  },
+  "canonical_predecessor": {
+    "closure_path": "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/real_execution_consumer_seam_implementation_authorization_v0/closure.json",
+    "closure_sha256": "e4418ca21b74bec9199fd28d25219d3947f3298a21b5364f96d3d052409df2d6",
+    "required_state": "CLOSED_BLOCKED",
+    "required_unchanged": true,
+    "preserved_findings": {
+      "root_cause": "FROZEN_INCREMENTAL_CORE_NOT_REUSABLE_FROM_EXTERNAL_REAL_CONSUMER",
+      "hostile_review_critical_findings": 3,
+      "later_implementation_phases_authorized": 0,
+      "scientific_execution_authorized": false,
+      "evaluation_origins_consumed": 0,
+      "next_action": "STOP"
+    },
+    "relationship": "This decision cites the closure; it does not reopen, amend, replace, or reuse the prior authorization."
+  },
+  "pr239_boundary": {
+    "pull_request": 239,
+    "phase_identity": "FUNDING_INCREMENTAL_EXECUTOR_REAL_ROW_CONSUMER_AND_EXACTLY_ONCE_RECORDING_V0",
+    "status_required": "REMAIN_UNMERGED",
+    "treated_as_authorized_implementation": false,
+    "included_in_this_authorization": false
+  },
+  "why_original_seam_was_blocked": [
+    "The frozen incremental computation was not reusable from an external real consumer under its existing explicit execution-mode contract.",
+    "A truthful real path would have required either changing frozen source behavior or duplicating the algorithm; neither was established as a safe implementation seam.",
+    "A private internal call would bypass a load-bearing invariant rather than establish a public, typed, authority-bound real boundary.",
+    "Real rows could not remain explicitly real under the current executor contract without weakening the frozen semantics.",
+    "The canonical hostile review recorded three critical findings, so the prior implementation authorization closed blocked with no later implementation or scientific authority."
+  ],
+  "options": [
+    {
+      "option_id": "FROZEN_SOURCE_REFACTOR",
+      "disposition": "REJECT",
+      "reason": "It would mutate or semantically risk the frozen executor and would make the V0 source bytes no longer the immutable reference. No source refactor is authorized by this decision."
+    },
+    {
+      "option_id": "SEPARATELY_GOVERNED_SUCCESSOR_SEAM",
+      "disposition": "RECOMMEND",
+      "reason": "A new, explicitly named seam can be reviewed as one bounded implementation phase with typed authority inputs, exact semantic-equivalence gates, and a hard firewall against scientific execution."
+    },
+    {
+      "option_id": "ABANDON_REAL_CONSUMER_PATH",
+      "disposition": "NOT_SELECTED",
+      "reason": "Keep as the terminal disposition if any acceptance gate fails, but the narrow successor has enough architectural value to justify one implementation attempt under the constraints below."
+    }
+  ],
+  "authorized_successor_implementation": {
+    "phase_id": "FUNDING_INCREMENTAL_REAL_EXECUTION_CONSUMER_SEAM_SUCCESSOR_IMPLEMENTATION_V0",
+    "implementation_count": 1,
+    "scope": [
+      "Create one separately named successor seam and its offline verification artifacts.",
+      "Expose one public boundary that accepts only a typed authority-bound input envelope and a typed forecast-row batch; raw rows, untyped mappings, and private entrypoints are not admissible inputs.",
+      "Keep the frozen V0 executor and all frozen V0 evidence byte-identical; the successor may establish a mechanically equivalent shared computation only if the original frozen bytes remain the immutable oracle and result semantics are preserved.",
+      "Preserve valid-result, invalid-input, numerical-runtime, ordering, and failure semantics of the frozen V0 computation; no V2 result contract may stand in for the V0 incremental result contract.",
+      "Implement deterministic exactly-once recording with an explicit idempotency key, replay identity, duplicate suppression, and fail-closed conflict handling."
+    ],
+    "out_of_scope": [
+      "Scientific evaluation, result production, or claim of validation.",
+      "Real data, outcomes, providers, claims, or evaluation origins.",
+      "Any change to JH01, DSH, Router, State, Qnty, or QntySpot.",
+      "Any pinning of an expected canonical authorization commit or SHA-256.",
+      "Any merge, activation, deployment, live run, or downstream authority."
+    ]
+  },
+  "authority_boundary": {
+    "implementation_authority_granted": "Exactly one future implementation phase with the identity and scope above.",
+    "scientific_authority_granted": false,
+    "pre_evaluation_prohibitions": [
+      "Do not read, acquire, interpret, or persist real data or outcomes.",
+      "Do not invoke or access any provider.",
+      "Do not create, consume, or validate claims.",
+      "Do not read, consume, or advance any evaluation origin.",
+      "Do not construct a real-execution authority envelope until a separate evaluation authorization exists."
+    ],
+    "required_separate_authorization": "A later, separately named scientific evaluation authorization must independently authorize any real input, outcome, provider, claim, or evaluation-origin access. This decision cannot be cited as that authorization.",
+    "authority_leakage_prohibited": [
+      "ROUTER_AUTHORITY",
+      "QNTY_AUTHORITY",
+      "TRADING_AUTHORITY",
+      "CAPITAL_AUTHORITY"
+    ]
+  },
+  "load_bearing_invariants": {
+    "typed_authority_bound_inputs": {
+      "required": true,
+      "minimum_fields": [
+        "successor_phase_id",
+        "authority_scope",
+        "authority_receipt_digest",
+        "frozen_contract_identity",
+        "input_batch_identity"
+      ],
+      "construction_rule": "Only a validated authority-bound constructor may create the input envelope; a caller cannot select a real mode by string or bypass the envelope with a private call."
+    },
+    "claim_before_outcome": {
+      "required": true,
+      "ordering": "AUTHORITY_AND_CLAIM_ACCEPTED -> INPUT_INTERPRETATION -> OUTCOME_INTERPRETATION -> RESULT_RECORD",
+      "failure_rule": "If authority or claim acceptance is absent, outcome interpretation and result recording must not occur."
+    },
+    "deterministic_exactly_once_recording": {
+      "required": true,
+      "record_identity": "successor_phase_id + authority_receipt_digest + input_batch_identity",
+      "replay_rule": "A byte-identical replay returns the original record identity without a second record.",
+      "conflict_rule": "A same-identity replay with different content fails closed and records no outcome."
+    },
+    "entrypoint_and_contract_rules": [
+      "Use only the public successor boundary; private-entrypoint bypasses are prohibited.",
+      "The V0 incremental result contract remains authoritative for equivalence; V2 primitives may not substitute a V2 result contract.",
+      "A real row may never be relabeled as SYNTHETIC_VALIDATION to pass a gate.",
+      "No implicit fallback, current-materializer laundering, panel substitution, schedule drift, or boundary-date reinterpretation is permitted."
+    ]
+  },
+  "acceptance_gates": [
+    "The cited predecessor closure remains byte-identical and CLOSED_BLOCKED; PR #239 remains unmerged and is not the implementation under review.",
+    "The successor has the exact phase identity above and changes no frozen V0 source, preregistration, evidence, result artifact, JH01, DSH, Router, State, Qnty, or QntySpot artifact.",
+    "Static review proves one public typed authority boundary, no private-entrypoint bypass, no V2-contract substitution, and fail-closed rejection of untyped or unauthorized inputs.",
+    "Offline synthetic fixtures prove frozen V0 result and failure semantics, including deterministic numerical behavior and invalid-input handling, without accessing real data, outcomes, providers, claims, or evaluation origins.",
+    "Instrumentation proves claim-before-outcome ordering: no outcome interpretation or result record is reachable before accepted authority and claim state.",
+    "Deterministic exactly-once tests prove stable record identity, idempotent replay, duplicate suppression, and fail-closed conflicting replay.",
+    "A single hostile review finds no unresolved critical or high issue and produces a terminal closure receipt."
+  ],
+  "kill_criteria": [
+    "Any frozen V0 byte, frozen evidence, preregistration, or result-semantic drift.",
+    "Any private-entrypoint bypass, V2 result-contract substitution, synthetic relabeling, implicit fallback, or authority laundering.",
+    "Any untyped authority input, claim-after-outcome ordering, duplicate record, nondeterministic record, or non-fail-closed conflict.",
+    "Any access to real data, outcomes, providers, claims, or evaluation origins before a separate evaluation authorization.",
+    "Any modification to JH01, DSH, Router, State, Qnty, or QntySpot, or any attempt to pin an expected canonical authorization commit or SHA-256.",
+    "Any unresolved critical or high finding at the single review boundary.",
+    "On any kill criterion, close the successor phase BLOCKED or ABANDONED; create no scientific authorization and do not reopen it through repair."
+  ],
+  "one_review_lifecycle": {
+    "review_count": 1,
+    "review_type": "single hostile review of the bounded successor implementation",
+    "allowed_states": [
+      "PROPOSED",
+      "IMPLEMENTATION_IN_REVIEW",
+      "CLOSED_PASS",
+      "CLOSED_BLOCKED",
+      "CLOSED_ABANDONED"
+    ],
+    "terminal_rule": "The first review produces the terminal closure; there is no targeted rereview, repair continuation, automatic reopen, or second implementation phase.",
+    "new_work_rule": "Any change to identity, scope, authority, or a killed gate requires a new separately governed decision."
+  },
+  "non_authorizations": [
+    "This decision is not a scientific evaluation authorization.",
+    "This decision does not authorize PR #239 or any code from the old consumer-seam authorization.",
+    "This decision does not authorize data access, outcome access, provider access, claim access, origin consumption, or a downstream trading/execution path."
+  ]
+}

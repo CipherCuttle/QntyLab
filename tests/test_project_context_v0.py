@@ -1091,6 +1091,23 @@ def test_operating_lock_registry_remains_valid_and_projection_stable() -> None:
     assert project_context.render(ROOT, check=True) == 0
 
 
+def test_jh01_pre_origin_production_path_is_recorded_without_escalation() -> None:
+    data = project_context.context_data(ROOT)
+    _, _, registry = project_context.load_context_sources(ROOT)
+    project = next(record for record in registry["project"] if record["project_id"] == "JH01_V1_PRE_ORIGIN_PRODUCTION_PATH_REPAIR_V0")
+    assert project["state"] == "CLOSED_PASS"
+    assert project["phase_type"] == "IMPLEMENTATION"
+    assert project["canonical_merge"] == "9dc77968918cf5e83d3ecd8693730af9adf66c9c"
+    assert project["canonical_merge_pr"] == 232
+    assert project["implementation_completed"] is True
+    assert project["implementation_authorized"] is False
+    assert project["real_activation_performed_by_this_phase"] is False
+    assert project["market_data_accessed"] is False
+    assert project["scientific_evaluation_performed"] is False
+    assert project["downstream_authority"] == "NONE"
+    assert data["active_project"] is None
+
+
 def test_operating_lock_is_governance_only_and_authorizes_no_execution() -> None:
     record = _operating_lock_record()
     assert record["state"] == "CLOSED_PASS"

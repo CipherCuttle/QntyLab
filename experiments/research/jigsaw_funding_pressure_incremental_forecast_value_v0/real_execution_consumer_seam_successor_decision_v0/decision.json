@@ -70,7 +70,7 @@
     ],
     "out_of_scope": [
       "Scientific evaluation, result production, or claim of validation.",
-      "Real data, outcomes, providers, claims, or evaluation origins.",
+      "Real data, outcomes, providers, real claims, or evaluation origins; only the bounded ephemeral synthetic ordering fixture is allowed for offline instrumentation.",
       "Any change to JH01, DSH, Router, State, Qnty, or QntySpot.",
       "Any pinning of an expected canonical authorization commit or SHA-256.",
       "Any merge, activation, deployment, live run, or downstream authority."
@@ -82,10 +82,24 @@
     "pre_evaluation_prohibitions": [
       "Do not read, acquire, interpret, or persist real data or outcomes.",
       "Do not invoke or access any provider.",
-      "Do not create, consume, or validate claims.",
+      "Real claims and real claim consumption remain prohibited.",
+      "Do not create any persistent authorization claim.",
       "Do not read, consume, or advance any evaluation origin.",
-      "Do not construct a real-execution authority envelope until a separate evaluation authorization exists."
+      "Do not construct a real-execution authority envelope until a separate evaluation authorization exists.",
+      "The only permitted claim-like test object is the explicitly defined ephemeral synthetic ordering fixture; it is not a real claim, is not persisted, is not consumed, and cannot authorize execution."
     ],
+    "synthetic_ordering_fixture": {
+      "permitted": true,
+      "identity": "EPHEMERAL_SYNTHETIC_ORDERING_FIXTURE_ONLY",
+      "purpose": "offline ordering instrumentation only",
+      "ephemeral": true,
+      "non_consuming": true,
+      "not_a_real_claim": true,
+      "persisted": false,
+      "persistent_authorization_claim_created": false,
+      "authorizes_execution": false,
+      "accesses_real_data_outcomes_providers_or_origins": false
+    },
     "required_separate_authorization": "A later, separately named scientific evaluation authorization must independently authorize any real input, outcome, provider, claim, or evaluation-origin access. This decision cannot be cited as that authorization.",
     "authority_leakage_prohibited": [
       "ROUTER_AUTHORITY",
@@ -108,8 +122,9 @@
     },
     "claim_before_outcome": {
       "required": true,
-      "ordering": "AUTHORITY_AND_CLAIM_ACCEPTED -> INPUT_INTERPRETATION -> OUTCOME_INTERPRETATION -> RESULT_RECORD",
-      "failure_rule": "If authority or claim acceptance is absent, outcome interpretation and result recording must not occur."
+      "ordering": "AUTHORITY_ACCEPTED -> EPHEMERAL_SYNTHETIC_ORDERING_FIXTURE_ACCEPTED -> INPUT_INTERPRETATION -> OUTCOME_INTERPRETATION -> RESULT_RECORD",
+      "fixture_rule": "The synthetic fixture is only an ephemeral, non-consuming ordering sentinel; it is not a real claim, is not persisted, and cannot authorize execution.",
+      "failure_rule": "If authority or the permitted synthetic ordering sentinel is absent, outcome interpretation and result recording must not occur."
     },
     "deterministic_exactly_once_recording": {
       "required": true,
@@ -128,8 +143,8 @@
     "The cited predecessor closure remains byte-identical and CLOSED_BLOCKED; PR #239 remains unmerged and is not the implementation under review.",
     "The successor has the exact phase identity above and changes no frozen V0 source, preregistration, evidence, result artifact, JH01, DSH, Router, State, Qnty, or QntySpot artifact.",
     "Static review proves one public typed authority boundary, no private-entrypoint bypass, no V2-contract substitution, and fail-closed rejection of untyped or unauthorized inputs.",
-    "Offline synthetic fixtures prove frozen V0 result and failure semantics, including deterministic numerical behavior and invalid-input handling, without accessing real data, outcomes, providers, claims, or evaluation origins.",
-    "Instrumentation proves claim-before-outcome ordering: no outcome interpretation or result record is reachable before accepted authority and claim state.",
+    "Offline synthetic fixtures prove frozen V0 result and failure semantics, including deterministic numerical behavior and invalid-input handling, without accessing real data, outcomes, providers, real claims, or evaluation origins.",
+    "Offline instrumentation proves claim-before-outcome ordering using only the permitted ephemeral, non-consuming synthetic ordering fixture: no outcome interpretation or result record is reachable before accepted authority and fixture state; the fixture is not persisted and cannot authorize execution.",
     "Deterministic exactly-once tests prove stable record identity, idempotent replay, duplicate suppression, and fail-closed conflicting replay.",
     "A single hostile review finds no unresolved critical or high issue and produces a terminal closure receipt."
   ],
@@ -137,7 +152,8 @@
     "Any frozen V0 byte, frozen evidence, preregistration, or result-semantic drift.",
     "Any private-entrypoint bypass, V2 result-contract substitution, synthetic relabeling, implicit fallback, or authority laundering.",
     "Any untyped authority input, claim-after-outcome ordering, duplicate record, nondeterministic record, or non-fail-closed conflict.",
-    "Any access to real data, outcomes, providers, claims, or evaluation origins before a separate evaluation authorization.",
+    "Any access to real data, outcomes, providers, real claims, or evaluation origins before a separate evaluation authorization; any persistent authorization claim creation or real claim consumption.",
+    "Any synthetic ordering fixture persisted, consumed as authorization, treated as a real claim, or used outside offline ordering instrumentation.",
     "Any modification to JH01, DSH, Router, State, Qnty, or QntySpot, or any attempt to pin an expected canonical authorization commit or SHA-256.",
     "Any unresolved critical or high finding at the single review boundary.",
     "On any kill criterion, close the successor phase BLOCKED or ABANDONED; create no scientific authorization and do not reopen it through repair."
@@ -158,6 +174,6 @@
   "non_authorizations": [
     "This decision is not a scientific evaluation authorization.",
     "This decision does not authorize PR #239 or any code from the old consumer-seam authorization.",
-    "This decision does not authorize data access, outcome access, provider access, claim access, origin consumption, or a downstream trading/execution path."
+    "This decision does not authorize real data access, outcome access, provider access, real claim access, origin consumption, or a downstream trading/execution path; it permits only the bounded ephemeral synthetic ordering fixture for offline instrumentation."
   ]
 }

@@ -109,3 +109,14 @@ def test_project_context_has_no_active_authority_and_roadmap_is_current() -> Non
     assert data["current_permitted_next_action"] == "No project implementation is currently authorized."
     assert data["authority_conflicts_or_warnings"] == []
     assert project_context.render(ROOT, check=True) == 0
+
+
+def test_historical_qntyspot_rows_do_not_reactivate_archived_successor() -> None:
+    for project_id in (
+        "QNTYSPOT_INK_SHADOW_PERFORMANCE_V0",
+        "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_ACTIVATION_V0",
+    ):
+        next_action = _project(project_id)["next_action"]
+        assert "was archived by the canonical QntyLab/QntySpot boundary repair" in next_action
+        assert "is the next canonical phase" not in next_action
+        assert "no new activation or DEV acquisition may be created" in next_action or "new separately Git-backed bounded research authorization" in next_action

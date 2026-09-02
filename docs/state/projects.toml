@@ -133,7 +133,7 @@ targeted_rereview_new_high_total = 0
 continuation_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0"
 continuation_requires_exact_canonical_merge = true
 continuation_requires_fresh_clean_worktree = true
-next_action = "CLOSED_PASS: the preregistration continuation is closed and its separately bound DEV acquisition successor QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0 is the next canonical phase, effective only after exact canonical merge and fresh clean worktree reconciliation. The activation phase is terminal."
+next_action = "CLOSED_PASS: historical QntySpot research continuation is closed. Its previously bound DEV-acquisition successor QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0 was archived by the canonical QntyLab/QntySpot boundary repair; the activation phase is terminal. Preserve all historical receipts. Any future QntyLab evaluation of QntySpot requires a new separately Git-backed bounded research authorization."
 
 [[project]]
 project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_ACTIVATION_V0"
@@ -212,7 +212,7 @@ targeted_governance_rereview_verdict = "PASS_NO_CRITICAL_HIGH"
 targeted_governance_rereview_new_critical_total = 0
 targeted_governance_rereview_new_high_total = 0
 terminal_outcome = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_ACTIVATION_V0_CANONICAL_CLOSED_PASS"
-next_action = "CLOSED_PASS: the activation is terminal after exact canonical merge. Its one separately bound successor QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0 is the next canonical phase; no new activation may be created."
+next_action = "CLOSED_PASS: the activation is terminal after exact canonical merge. Its previously bound successor QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0 was archived by the canonical QntyLab/QntySpot boundary repair; no new activation or DEV acquisition may be created. Any future QntyLab evaluation of QntySpot requires a new separately Git-backed bounded research authorization."
 
 [[project]]
 project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0"

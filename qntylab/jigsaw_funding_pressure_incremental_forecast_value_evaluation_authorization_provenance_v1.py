@@ -8,18 +8,38 @@ JSON field *values*, with no proof that the bytes came from canonical
 QntyLab Git history.  A caller could therefore point the wrapper at an
 arbitrary local JSON file.
 
-This module is the repository-native repair.  It never trusts caller bytes:
-the authorization document is always read from the Git object database of the
-canonical repository, at a fixed tracked path, in the checked-out canonical
-commit, and only after two immutable QntyLab anchor commits have been proven
-to be ancestors of ``HEAD``.  A caller-supplied ``authorization_path`` is
-accepted only as a redundant pointer that must ``realpath``-resolve to the
-exact canonical artifact; it can never introduce bytes.
+This module is the repository-native repair.  It never trusts caller bytes,
+the current ``HEAD``, a caller-provided commit, a mutable remote URL, or
+self-attested JSON as the root of trust.  The root of trust is an explicitly
+pinned immutable canonical commit, ``EXPECTED_CANONICAL_AUTHORIZATION_COMMIT``.
+The authorization document is always read from the Git object database at
+``EXPECTED_CANONICAL_AUTHORIZATION_COMMIT:<fixed path>`` -- never from ``HEAD``,
+a descendant of the historical anchors, a different branch/tree, or a
+worktree-local file.  A caller-supplied ``authorization_path`` is accepted
+only as a redundant pointer that must ``realpath``-resolve to the exact
+canonical artifact; it can never introduce bytes and can never select the
+resolution commit.
 
-The canonical evaluation authorization artifact DOES NOT EXIST at this phase,
-so :func:`authenticate_canonical_evaluation_authorization` always fails closed
-with :class:`UnauthorizedExecutionError` today.  This phase creates no
-authorization and grants no scientific-execution authority.
+The pinned commit must itself be present and resolvable, and -- when the
+current checkout is newer -- an ancestor of the checked-out commit.  The two
+historical QntyLab anchor commits are retained as a defence-in-depth lineage
+check against the *pinned* commit, and the canonical remote URL is retained as
+a contextual check only.
+
+P1 repair (PR #238 targeted re-review): the previous revision resolved from
+``HEAD:<path>`` and merely required the historical anchors to be ancestors of
+``HEAD`` plus a canonical-looking ``origin`` URL.  A local clone that already
+contains the old anchors could forge a descendant commit, set ``origin`` to
+the expected URL, add an authorization artifact, and pass.  Pinning the
+resolution commit closes that hole.
+
+The canonical evaluation authorization artifact DOES NOT EXIST at this phase
+and no commit is pinned (``EXPECTED_CANONICAL_AUTHORIZATION_COMMIT`` and
+``EXPECTED_CANONICAL_AUTHORIZATION_SHA256`` are both ``None``), so
+:func:`authenticate_canonical_evaluation_authorization` always fails closed
+with :class:`UnauthorizedExecutionError` today for two independent reasons.
+This phase creates no authorization and grants no scientific-execution
+authority.
 
 Repository-native mechanisms reused (no network service, registry, database,
 or new dependency): ``git rev-parse --verify``, ``git cat-file``,
@@ -65,10 +85,10 @@ REAL_CAPABLE_WRAPPER_PROJECT_ID = (
     "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_REAL_CAPABLE_WRAPPER_V1"
 )
 
-#: Immutable QntyLab anchor commits.  Both must be ancestors of ``HEAD`` for a
-#: checkout to count as canonical QntyLab history.  An unrelated repository
-#: does not contain these object IDs, so the ancestry proof below is also the
-#: repository-identity proof and is fully deterministic and offline.
+#: Immutable QntyLab anchor commits.  Retained as a defence-in-depth lineage
+#: check: both must be ancestors of the *pinned* canonical authorization commit
+#: (not merely of ``HEAD``).  An unrelated repository does not contain these
+#: object IDs.  They are NOT, on their own, the root of trust any more.
 PREREGISTRATION_ANCHOR_COMMIT = "d2f1839c286ec0407eefd02d878a1b16572bd902"
 HISTORICAL_V0_ORACLE_ANCHOR_COMMIT = "f6f12994d65c3dfeaf7839de560e58ad99547c62"
 CANONICAL_ANCHOR_COMMITS = (
@@ -76,12 +96,20 @@ CANONICAL_ANCHOR_COMMITS = (
     HISTORICAL_V0_ORACLE_ANCHOR_COMMIT,
 )
 
+#: The exact immutable canonical commit the authorization artifact is resolved
+#: from (``EXPECTED_CANONICAL_AUTHORIZATION_COMMIT:<fixed path>``).  This is the
+#: root of trust.  It is ``None`` at this phase: no commit is pinned, so no
+#: authorization -- however well formed, however canonically committed, and
+#: whatever ``HEAD`` points at -- is ever accepted.  Pinning it is a reviewed
+#: source change.  A caller cannot supply or override it.
+EXPECTED_CANONICAL_AUTHORIZATION_COMMIT: str | None = None
+
 #: SHA-256 of the exact canonical authorization blob bytes that a future
 #: real-evaluation authorization phase will license.  It is ``None`` at this
 #: phase: no digest is pinned, so no authorization -- however well formed and
 #: however canonically committed -- is ever accepted.  Pinning this constant
-#: is a reviewed source change and is the second key alongside the canonical
-#: Git artifact itself.  It is what binds "the accepted bytes" to an expected
+#: is a reviewed source change and is the second key alongside the pinned
+#: canonical commit.  It is what binds "the accepted bytes" to an expected
 #: content digest (a file cannot carry its own hash).
 EXPECTED_CANONICAL_AUTHORIZATION_SHA256: str | None = None
 
@@ -164,8 +192,13 @@ def _canonical_remote_locator(raw: str) -> str | None:
     return f"github.com/{parts[0]}/{parts[1]}"
 
 
-def _require_repository_identity(root: Path) -> None:
-    """Reject a wrong repository: ``.git`` metadata, canonical remote, anchors."""
+def _require_contextual_repository_locator(root: Path) -> None:
+    """Contextual check only -- NOT the root of trust (that is the pinned commit).
+
+    Confirms usable Git metadata and that ``origin`` looks like canonical
+    QntyLab.  A mutable remote URL is deliberately not trusted to establish
+    canonicality on its own; :func:`_resolve_pinned_canonical_commit` does that.
+    """
     if not (root / ".git").exists():
         raise UnauthorizedExecutionError(
             f"no usable Git metadata at {root}: real evaluation provenance fails closed"
@@ -176,24 +209,62 @@ def _require_repository_identity(root: Path) -> None:
         raise UnauthorizedExecutionError(
             "canonical repository identity is unverifiable: remote.origin.url is absent or ambiguous"
         )
-    locator = _canonical_remote_locator(lines[0])
-    if locator != CANONICAL_REPOSITORY_LOCATOR:
+    if _canonical_remote_locator(lines[0]) != CANONICAL_REPOSITORY_LOCATOR:
         raise UnauthorizedExecutionError(
             "wrong repository identity: remote.origin.url does not resolve to "
             f"{CANONICAL_REPOSITORY_LOCATOR!r}"
         )
-    head = _git_text(root, "rev-parse", "--verify", "HEAD^{commit}", check=False)
+
+
+def _resolve_pinned_canonical_commit(root: Path) -> str:
+    """Resolve, and fully validate, the pinned canonical resolution commit.
+
+    The authorization is read from this commit and no other.  Fails closed
+    when no commit is pinned, when the pinned object is absent or is not a
+    commit, when it does not verify to an immutable object id, when it is
+    neither the current checkout nor an ancestor of it, or when a historical
+    anchor is not an ancestor of it.
+    """
+    pinned = EXPECTED_CANONICAL_AUTHORIZATION_COMMIT
+    if pinned is None:
+        raise UnauthorizedExecutionError(
+            "no expected canonical authorization commit is pinned in the wrapper source; "
+            "real execution fails closed"
+        )
+    if not isinstance(pinned, str) or not _FULL_SHA1.match(pinned):
+        raise UnauthorizedExecutionError(
+            "expected canonical authorization commit is not a full 40-hex commit id"
+        )
+    if _git_text(root, "cat-file", "-t", pinned, check=False) != "commit":
+        raise UnauthorizedExecutionError(
+            "pinned canonical authorization commit is not present or resolvable in this repository"
+        )
+    verified = _git_text(
+        root, "rev-parse", "--verify", "--quiet", f"{pinned}^{{commit}}", check=False
+    )
+    if verified != pinned:
+        raise UnauthorizedExecutionError(
+            "pinned canonical authorization commit did not verify to an immutable commit object"
+        )
+    head = _git_text(root, "rev-parse", "--verify", "--quiet", "HEAD^{commit}", check=False)
     if not _FULL_SHA1.match(head):
         raise UnauthorizedExecutionError("HEAD does not resolve to a commit object")
+    if head != pinned and not _git_ok(root, "merge-base", "--is-ancestor", pinned, head):
+        raise UnauthorizedExecutionError(
+            "pinned canonical authorization commit is neither the current checkout nor an "
+            "ancestor of it; an unpinned, divergent, or forged descendant commit is refused"
+        )
     for anchor in CANONICAL_ANCHOR_COMMITS:
         if _git_text(root, "cat-file", "-t", anchor, check=False) != "commit":
             raise UnauthorizedExecutionError(
                 f"wrong repository identity: canonical anchor {anchor} is not a commit in this repository"
             )
-        if not _git_ok(root, "merge-base", "--is-ancestor", anchor, head):
+        if not _git_ok(root, "merge-base", "--is-ancestor", anchor, pinned):
             raise UnauthorizedExecutionError(
-                f"wrong commit: canonical anchor {anchor} is not an ancestor of HEAD"
+                f"wrong repository identity: canonical anchor {anchor} is not an ancestor of the "
+                "pinned canonical authorization commit"
             )
+    return pinned
 
 
 def _guard_caller_supplied_path(root: Path, authorization_path: str | Path | None) -> None:
@@ -220,38 +291,59 @@ def _guard_caller_supplied_path(root: Path, authorization_path: str | Path | Non
 
 
 def _canonical_blob(root: Path, resolution_commit: str) -> tuple[str, bytes]:
-    """The authorization blob OID and bytes at the canonical path in ``resolution_commit``.
+    """The authorization blob OID and bytes at the canonical path IN ``resolution_commit``.
 
-    Fails closed when the canonical artifact is absent from canonical history --
-    which is the permanent state at this phase.
+    The tree entry is read from the pinned commit itself (``git ls-tree``), not
+    from the worktree index, so a worktree-local file, a different branch, or a
+    later ``HEAD`` tree cannot supply or hide it.  Fails closed when the
+    artifact is absent from the pinned commit -- the permanent state today.
     """
-    spec = f"{resolution_commit}:{CANONICAL_EVALUATION_AUTHORIZATION_RELATIVE_PATH}"
-    blob_oid = _git_text(root, "rev-parse", "--verify", "--quiet", spec, check=False)
-    if not _FULL_SHA1.match(blob_oid):
+    entry = _git_text(
+        root,
+        "ls-tree",
+        "--full-tree",
+        resolution_commit,
+        "--",
+        CANONICAL_EVALUATION_AUTHORIZATION_RELATIVE_PATH,
+        check=False,
+    )
+    if not entry:
         raise UnauthorizedExecutionError(
-            "no canonical evaluation authorization exists in canonical QntyLab Git history "
+            "no canonical evaluation authorization exists at the pinned canonical commit "
             f"({CANONICAL_EVALUATION_AUTHORIZATION_RELATIVE_PATH} at {resolution_commit}); "
             "real execution fails closed"
         )
-    if _git_text(root, "cat-file", "-t", blob_oid, check=False) != "blob":
+    meta = entry.partition("\t")[0].split()
+    if len(meta) != 3:
+        raise UnauthorizedExecutionError("canonical evaluation authorization tree entry is unreadable")
+    mode, kind, blob_oid = meta
+    if kind != "blob" or not _FULL_SHA1.match(blob_oid):
         raise UnauthorizedExecutionError(
-            "canonical evaluation authorization path does not resolve to a Git blob"
+            "canonical evaluation authorization path does not resolve to a Git blob at the pinned commit"
         )
-    if not _git_ok(root, "ls-files", "--error-unmatch", CANONICAL_EVALUATION_AUTHORIZATION_RELATIVE_PATH):
+    if mode == "120000":
         raise UnauthorizedExecutionError(
-            "canonical evaluation authorization path is not tracked at HEAD"
-        )
-    canonical_path = root / CANONICAL_EVALUATION_AUTHORIZATION_RELATIVE_PATH
-    if canonical_path.is_symlink():
-        raise UnauthorizedExecutionError(
-            "canonical evaluation authorization path is a symlink; a regular tracked blob is required"
+            "canonical evaluation authorization path is a symlink in the pinned tree; "
+            "a regular blob is required"
         )
     blob_bytes = _git(root, "cat-file", "blob", blob_oid, check=True)
-    if canonical_path.exists() and canonical_path.read_bytes() != blob_bytes:
-        raise UnauthorizedExecutionError(
-            "worktree copy of the canonical evaluation authorization diverges from the "
-            "canonical Git blob; worktree-local replacement is refused"
-        )
+    # The resolution is purely the pinned Git object; the worktree is never a
+    # source.  As a defence-in-depth tamper signal, when the checkout is
+    # exactly AT the pinned commit the on-disk copy must match it (a worktree
+    # ahead of the pinned commit legitimately differs and is not checked).
+    canonical_path = root / CANONICAL_EVALUATION_AUTHORIZATION_RELATIVE_PATH
+    head = _git_text(root, "rev-parse", "--verify", "--quiet", "HEAD^{commit}", check=False)
+    if head == resolution_commit:
+        if canonical_path.is_symlink():
+            raise UnauthorizedExecutionError(
+                "canonical evaluation authorization path is a symlink in the worktree; "
+                "a regular tracked blob is required"
+            )
+        if canonical_path.is_file() and canonical_path.read_bytes() != blob_bytes:
+            raise UnauthorizedExecutionError(
+                "worktree copy of the canonical evaluation authorization diverges from the pinned "
+                "canonical Git blob; worktree-local replacement is refused"
+            )
     return blob_oid, blob_bytes
 
 
@@ -329,10 +421,12 @@ def authenticate_canonical_evaluation_authorization(
 ) -> dict[str, Any]:
     """Authenticate the canonical evaluation authorization to QntyLab Git identity.
 
-    Fails closed with :class:`UnauthorizedExecutionError` on: caller path
-    substitution, symlink/traversal, wrong repository, wrong commit, wrong
-    tree/blob, wrong artifact path, modified bytes, worktree-local
-    replacement, a missing canonical artifact, malformed authorization, and a
+    Fails closed with :class:`UnauthorizedExecutionError` on: no pinned commit,
+    a pinned commit that is absent / not a commit / not an ancestor of the
+    current checkout, a forged or divergent descendant commit, caller path
+    substitution, symlink/traversal, wrong repository, wrong tree/blob, wrong
+    artifact path, modified bytes, worktree-local replacement, a missing
+    canonical artifact at the pinned commit, malformed authorization, and a
     mismatched preregistration or wrapper identity.  No claim, evidence,
     ``ForecastRow``, shared core or result recording is touched here.
 
@@ -342,10 +436,8 @@ def authenticate_canonical_evaluation_authorization(
     """
     resolved_root = (root or _repository_root()).resolve()
     _guard_caller_supplied_path(resolved_root, authorization_path)
-    _require_repository_identity(resolved_root)
-    resolution_commit = _git_text(resolved_root, "rev-parse", "--verify", "HEAD^{commit}", check=False)
-    if not _FULL_SHA1.match(resolution_commit):
-        raise UnauthorizedExecutionError("HEAD does not resolve to a commit object")
+    _require_contextual_repository_locator(resolved_root)
+    resolution_commit = _resolve_pinned_canonical_commit(resolved_root)
     blob_oid, blob_bytes = _canonical_blob(resolved_root, resolution_commit)
     blob_sha256 = hashlib.sha256(blob_bytes).hexdigest()
     if EXPECTED_CANONICAL_AUTHORIZATION_SHA256 is None:
@@ -365,6 +457,7 @@ def authenticate_canonical_evaluation_authorization(
         "authenticated": True,
         "repository": CANONICAL_REPOSITORY_LOCATOR,
         "resolution_commit": resolution_commit,
+        "pinned_commit": resolution_commit,
         "artifact_path": CANONICAL_EVALUATION_AUTHORIZATION_RELATIVE_PATH,
         "blob_sha1": blob_oid,
         "blob_sha256": blob_sha256,
@@ -374,29 +467,36 @@ def authenticate_canonical_evaluation_authorization(
 
 
 def canonical_authorization_exists(*, root: Path | None = None) -> bool:
-    """True only when a canonical authorization blob is present in canonical history.
+    """True only when a canonical authorization blob is present at the pinned commit.
 
-    Deterministic, offline, side-effect free.  ``False`` at this phase.
+    Deterministic, offline, side-effect free.  ``False`` at this phase (no
+    commit is pinned).
     """
+    if EXPECTED_CANONICAL_AUTHORIZATION_COMMIT is None:
+        return False
     resolved_root = (root or _repository_root()).resolve()
     try:
-        _require_repository_identity(resolved_root)
-        resolution_commit = _git_text(
-            resolved_root, "rev-parse", "--verify", "HEAD^{commit}", check=False
+        _require_contextual_repository_locator(resolved_root)
+        pinned = _resolve_pinned_canonical_commit(resolved_root)
+        entry = _git_text(
+            resolved_root,
+            "ls-tree",
+            "--full-tree",
+            pinned,
+            "--",
+            CANONICAL_EVALUATION_AUTHORIZATION_RELATIVE_PATH,
+            check=False,
         )
-        if not _FULL_SHA1.match(resolution_commit):
-            return False
-        spec = f"{resolution_commit}:{CANONICAL_EVALUATION_AUTHORIZATION_RELATIVE_PATH}"
-        blob_oid = _git_text(resolved_root, "rev-parse", "--verify", "--quiet", spec, check=False)
     except UnauthorizedExecutionError:
         return False
-    return bool(_FULL_SHA1.match(blob_oid))
+    return bool(entry)
 
 
 __all__ = [
     "CANONICAL_ANCHOR_COMMITS",
     "CANONICAL_EVALUATION_AUTHORIZATION_RELATIVE_PATH",
     "CANONICAL_REPOSITORY_LOCATOR",
+    "EXPECTED_CANONICAL_AUTHORIZATION_COMMIT",
     "EXPECTED_CANONICAL_AUTHORIZATION_SHA256",
     "HISTORICAL_V0_ORACLE_ANCHOR_COMMIT",
     "PREREGISTRATION_ANCHOR_COMMIT",

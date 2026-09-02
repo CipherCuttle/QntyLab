@@ -16,6 +16,7 @@ clone.
 from __future__ import annotations
 
 import hashlib
+import inspect
 import json
 import subprocess
 from pathlib import Path
@@ -81,6 +82,15 @@ def _pin_digest(monkeypatch, payload: bytes) -> str:
     return digest
 
 
+def _pin_commit(monkeypatch, commit: str) -> str:
+    monkeypatch.setattr(provenance, "EXPECTED_CANONICAL_AUTHORIZATION_COMMIT", commit)
+    return commit
+
+
+def _head(root: Path) -> str:
+    return _git(root, "rev-parse", "HEAD")
+
+
 @pytest.fixture(scope="session")
 def _base_clone(tmp_path_factory) -> Path:
     base = tmp_path_factory.mktemp("provenance-base") / "qntylab"
@@ -122,13 +132,22 @@ def test_real_repo_has_no_canonical_authorization_and_fails_closed():
         real_capable.run_real_capable_evaluation()
 
 
-def test_pinned_digest_is_absent_at_this_phase():
-    """This phase creates no authorization: no content digest may be pinned."""
+def test_pinned_digest_and_commit_are_absent_at_this_phase():
+    """This phase creates no authorization: neither key may be pinned."""
     assert provenance.EXPECTED_CANONICAL_AUTHORIZATION_SHA256 is None
+    assert provenance.EXPECTED_CANONICAL_AUTHORIZATION_COMMIT is None
 
 
-def test_missing_canonical_artifact_in_canonical_clone(canonical_repo):
-    with pytest.raises(UnauthorizedExecutionError, match="no canonical evaluation authorization exists"):
+def test_no_pinned_commit_fails_closed_before_anything_else(canonical_repo):
+    _commit_file(canonical_repo, CANON_REL, _canonical_bytes(_good_document()), "auth present")
+    assert provenance.EXPECTED_CANONICAL_AUTHORIZATION_COMMIT is None
+    with pytest.raises(UnauthorizedExecutionError, match="no expected canonical authorization commit is pinned"):
+        provenance.authenticate_canonical_evaluation_authorization(root=canonical_repo)
+
+
+def test_missing_canonical_artifact_at_the_pinned_commit(canonical_repo, monkeypatch):
+    _pin_commit(monkeypatch, _head(canonical_repo))  # a real commit that lacks the artifact
+    with pytest.raises(UnauthorizedExecutionError, match="no canonical evaluation authorization exists at the pinned"):
         provenance.authenticate_canonical_evaluation_authorization(root=canonical_repo)
 
 
@@ -146,15 +165,16 @@ def test_caller_supplied_arbitrary_path_is_refused(tmp_path):
         real_capable.run_real_capable_evaluation(authorization_path=str(forged))
 
 
-def test_caller_supplied_valid_json_at_the_wrong_path_is_refused(canonical_repo):
+def test_caller_supplied_valid_json_at_the_wrong_path_is_refused(canonical_repo, monkeypatch):
     wrong = "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/wrong_authorization.json"
     _commit_file(canonical_repo, wrong, _canonical_bytes(_good_document()), "wrong path")
+    _pin_commit(monkeypatch, _head(canonical_repo))
     with pytest.raises(UnauthorizedExecutionError, match="does not resolve to the canonical"):
         provenance.authenticate_canonical_evaluation_authorization(
             canonical_repo / wrong, root=canonical_repo
         )
-    # ...and with no override the canonical path is still empty => fail closed.
-    with pytest.raises(UnauthorizedExecutionError, match="no canonical evaluation authorization exists"):
+    # ...and with no override the canonical path is still empty at the pinned commit.
+    with pytest.raises(UnauthorizedExecutionError, match="no canonical evaluation authorization exists at the pinned"):
         provenance.authenticate_canonical_evaluation_authorization(root=canonical_repo)
 
 
@@ -180,6 +200,7 @@ def test_canonical_path_committed_as_symlink_is_refused(canonical_repo, monkeypa
     target.symlink_to(canonical_repo / "real_auth_payload.json")
     _git(canonical_repo, "add", "--", CANON_REL, "real_auth_payload.json")
     _git(canonical_repo, "commit", "--quiet", "-m", "symlink at canonical path")
+    _pin_commit(monkeypatch, _head(canonical_repo))
     _pin_digest(monkeypatch, _canonical_bytes(_good_document()))
     with pytest.raises(UnauthorizedExecutionError, match="symlink"):
         provenance.authenticate_canonical_evaluation_authorization(root=canonical_repo)
@@ -198,7 +219,10 @@ def test_wrong_repository_identity_is_refused(tmp_path, monkeypatch):
     _git(alien, "config", "user.name", "alien")
     _git(alien, "remote", "add", "origin", CANONICAL_REMOTE_URL)
     _commit_file(alien, CANON_REL, _canonical_bytes(_good_document()), "alien authorization")
+    _pin_commit(monkeypatch, _head(alien))  # a real commit in the alien repo
     _pin_digest(monkeypatch, _canonical_bytes(_good_document()))
+    # The alien repo lacks the QntyLab anchor objects, so anchor lineage against
+    # the pinned commit fails -- a canonical-looking origin URL cannot rescue it.
     with pytest.raises(UnauthorizedExecutionError, match="wrong repository identity"):
         provenance.authenticate_canonical_evaluation_authorization(root=alien)
 
@@ -212,22 +236,89 @@ def test_non_canonical_remote_origin_is_refused(canonical_repo, monkeypatch):
 
 
 # --------------------------------------------------------------------------
-# 4 -- wrong commit / changed blob bytes / wrong tree
+# 4 -- pinned-commit binding: forged descendant / wrong commit / wrong tree
 # --------------------------------------------------------------------------
 
 
-def test_authorization_only_in_a_non_head_commit_is_refused(canonical_repo, monkeypatch):
-    payload = _canonical_bytes(_good_document())
-    _commit_file(canonical_repo, CANON_REL, payload, "add canonical authorization")
-    with_auth = _git(canonical_repo, "rev-parse", "HEAD")
-    _git(canonical_repo, "rm", "--quiet", "--", CANON_REL)
-    _git(canonical_repo, "commit", "--quiet", "-m", "remove authorization")
-    _pin_digest(monkeypatch, payload)
-    # HEAD no longer carries the artifact even though a prior commit did.
-    with pytest.raises(UnauthorizedExecutionError, match="no canonical evaluation authorization exists"):
+def test_forged_local_descendant_commit_is_rejected(canonical_repo, monkeypatch):
+    """The P1 regression: the old-anchor + canonical-URL + descendant attack.
+
+    Pin to a legitimate ancestor commit that has no authorization.  Then forge
+    a descendant commit that DOES add one and set ``origin`` to the expected
+    URL (the exact preconditions of the old bug).  Resolution reads the pinned
+    ancestor, so the forged descendant cannot supply the artifact.
+    """
+    pinned_ancestor = _head(canonical_repo)
+    _commit_file(canonical_repo, CANON_REL, _canonical_bytes(_good_document()), "FORGED descendant")
+    assert _git(canonical_repo, "cat-file", "-t", f"HEAD:{CANON_REL}") == "blob"  # present at HEAD
+    assert provenance._git_ok(  # old weak precondition still holds
+        canonical_repo, "merge-base", "--is-ancestor",
+        provenance.PREREGISTRATION_ANCHOR_COMMIT, _head(canonical_repo),
+    )
+    _pin_commit(monkeypatch, pinned_ancestor)
+    _pin_digest(monkeypatch, _canonical_bytes(_good_document()))
+    with pytest.raises(UnauthorizedExecutionError, match="no canonical evaluation authorization exists at the pinned"):
         provenance.authenticate_canonical_evaluation_authorization(root=canonical_repo)
-    # Proof the artifact really was valid at the earlier commit.
-    assert _git(canonical_repo, "cat-file", "-t", f"{with_auth}:{CANON_REL}") == "blob"
+
+
+def test_valid_looking_artifact_on_a_different_commit_is_rejected(canonical_repo, monkeypatch):
+    """Artifact committed at commit A; pin a later commit B that removed it."""
+    payload = _canonical_bytes(_good_document())
+    _commit_file(canonical_repo, CANON_REL, payload, "authorization in commit A")
+    commit_a = _head(canonical_repo)
+    _git(canonical_repo, "rm", "--quiet", "--", CANON_REL)
+    _git(canonical_repo, "commit", "--quiet", "-m", "commit B removes the authorization")
+    commit_b = _head(canonical_repo)
+    _pin_commit(monkeypatch, commit_b)
+    _pin_digest(monkeypatch, payload)
+    with pytest.raises(UnauthorizedExecutionError, match="no canonical evaluation authorization exists at the pinned"):
+        provenance.authenticate_canonical_evaluation_authorization(root=canonical_repo)
+    # The artifact really is a valid blob at A -- just not at the pinned commit B.
+    assert _git(canonical_repo, "cat-file", "-t", f"{commit_a}:{CANON_REL}") == "blob"
+
+
+def test_pinned_commit_not_an_ancestor_of_head_is_rejected(canonical_repo, monkeypatch):
+    mainline_start = _head(canonical_repo)
+    _commit_file(canonical_repo, "mainline.txt", b"main\n", "advance mainline")
+    mainline_head = _head(canonical_repo)
+    _git(canonical_repo, "checkout", "--quiet", "--detach", mainline_start)
+    _commit_file(canonical_repo, CANON_REL, _canonical_bytes(_good_document()), "divergent branch with auth")
+    divergent = _head(canonical_repo)
+    _git(canonical_repo, "checkout", "--quiet", "--detach", mainline_head)  # checkout does NOT contain divergent
+    _pin_commit(monkeypatch, divergent)
+    _pin_digest(monkeypatch, _canonical_bytes(_good_document()))
+    with pytest.raises(UnauthorizedExecutionError, match="neither the current checkout nor an ancestor of it"):
+        provenance.authenticate_canonical_evaluation_authorization(root=canonical_repo)
+
+
+def test_missing_pinned_commit_fails_closed(canonical_repo, monkeypatch):
+    _commit_file(canonical_repo, CANON_REL, _canonical_bytes(_good_document()), "auth present at HEAD")
+    _pin_commit(monkeypatch, "deadbeef" * 5)  # well-formed 40-hex, not an object in this repo
+    _pin_digest(monkeypatch, _canonical_bytes(_good_document()))
+    with pytest.raises(UnauthorizedExecutionError, match="not present or resolvable"):
+        provenance.authenticate_canonical_evaluation_authorization(root=canonical_repo)
+
+
+def test_malformed_pinned_commit_constant_fails_closed(canonical_repo, monkeypatch):
+    _pin_commit(monkeypatch, "not-a-sha")
+    with pytest.raises(UnauthorizedExecutionError, match="not a full 40-hex commit id"):
+        provenance.authenticate_canonical_evaluation_authorization(root=canonical_repo)
+
+
+def test_caller_cannot_override_the_pinned_commit(canonical_repo, monkeypatch):
+    payload = _canonical_bytes(_good_document())
+    _commit_file(canonical_repo, CANON_REL, payload, "auth at HEAD")
+    head = _head(canonical_repo)
+    # No parameter exists for the resolution commit.
+    params = set(inspect.signature(provenance.authenticate_canonical_evaluation_authorization).parameters)
+    assert params == {"authorization_path", "root"}
+    for kw in ("commit", "resolution_commit", "pinned_commit", "expected_commit"):
+        with pytest.raises(TypeError):
+            provenance.authenticate_canonical_evaluation_authorization(root=canonical_repo, **{kw: head})
+    # With no pinned constant it still fails closed even though HEAD is canonical.
+    _pin_digest(monkeypatch, payload)
+    with pytest.raises(UnauthorizedExecutionError, match="no expected canonical authorization commit is pinned"):
+        provenance.authenticate_canonical_evaluation_authorization(root=canonical_repo)
 
 
 def test_changed_blob_bytes_break_the_pinned_digest(canonical_repo, monkeypatch):
@@ -236,13 +327,15 @@ def test_changed_blob_bytes_break_the_pinned_digest(canonical_repo, monkeypatch)
     tampered = dict(good)
     tampered["note"] = "cosmetically altered but still valid JSON with the right fields"
     _commit_file(canonical_repo, CANON_REL, _canonical_bytes(tampered), "tampered authorization")
+    _pin_commit(monkeypatch, _head(canonical_repo))
     _pin_digest(monkeypatch, good_payload)  # pin the digest of the *unmodified* bytes
     with pytest.raises(UnauthorizedExecutionError, match="do not match the pinned content digest"):
         provenance.authenticate_canonical_evaluation_authorization(root=canonical_repo)
 
 
-def test_well_formed_authorization_without_a_pinned_digest_still_fails_closed(canonical_repo):
-    _commit_file(canonical_repo, CANON_REL, _canonical_bytes(_good_document()), "auth, no pin")
+def test_well_formed_authorization_without_a_pinned_digest_still_fails_closed(canonical_repo, monkeypatch):
+    _commit_file(canonical_repo, CANON_REL, _canonical_bytes(_good_document()), "auth, commit pinned only")
+    _pin_commit(monkeypatch, _head(canonical_repo))
     assert provenance.EXPECTED_CANONICAL_AUTHORIZATION_SHA256 is None
     with pytest.raises(UnauthorizedExecutionError, match="no expected canonical authorization digest is pinned"):
         provenance.authenticate_canonical_evaluation_authorization(root=canonical_repo)
@@ -256,6 +349,7 @@ def test_well_formed_authorization_without_a_pinned_digest_still_fails_closed(ca
 def test_malformed_authorization_bytes_are_refused(canonical_repo, monkeypatch):
     payload = b'{"artifact_type": "FUNDING_INCREMENTAL_REAL_EVALUATION_EXECUTION_AUTHORIZATION"'  # truncated
     _commit_file(canonical_repo, CANON_REL, payload, "malformed authorization")
+    _pin_commit(monkeypatch, _head(canonical_repo))
     _pin_digest(monkeypatch, payload)
     with pytest.raises(UnauthorizedExecutionError, match="malformed"):
         provenance.authenticate_canonical_evaluation_authorization(root=canonical_repo)
@@ -276,6 +370,7 @@ def test_mismatched_identity_fields_are_refused(canonical_repo, monkeypatch, mut
     document.update(mutation)
     payload = _canonical_bytes(document)
     _commit_file(canonical_repo, CANON_REL, payload, "mismatched authorization")
+    _pin_commit(monkeypatch, _head(canonical_repo))
     _pin_digest(monkeypatch, payload)
     with pytest.raises(UnauthorizedExecutionError, match=expected):
         provenance.authenticate_canonical_evaluation_authorization(root=canonical_repo)
@@ -290,6 +385,7 @@ def test_mismatched_self_attested_git_binding_is_refused(canonical_repo, monkeyp
     document["canonical_git_binding"][binding_key] = "NOT_THE_CANONICAL_VALUE"
     payload = _canonical_bytes(document)
     _commit_file(canonical_repo, CANON_REL, payload, "bad git binding")
+    _pin_commit(monkeypatch, _head(canonical_repo))
     _pin_digest(monkeypatch, payload)
     with pytest.raises(UnauthorizedExecutionError, match=f"canonical_git_binding.{binding_key} mismatch"):
         provenance.authenticate_canonical_evaluation_authorization(root=canonical_repo)
@@ -300,49 +396,73 @@ def test_absent_self_attested_git_binding_is_refused(canonical_repo, monkeypatch
     document.pop("canonical_git_binding")
     payload = _canonical_bytes(document)
     _commit_file(canonical_repo, CANON_REL, payload, "no git binding")
+    _pin_commit(monkeypatch, _head(canonical_repo))
     _pin_digest(monkeypatch, payload)
     with pytest.raises(UnauthorizedExecutionError, match="missing its canonical_git_binding"):
         provenance.authenticate_canonical_evaluation_authorization(root=canonical_repo)
 
 
 # --------------------------------------------------------------------------
-# 6 -- positive control: the verifier is not vacuously failing
+# 6 -- positive control: an EXPLICITLY PINNED commit authenticates
 # --------------------------------------------------------------------------
 
 
-def test_positive_control_authenticates_inside_a_disposable_clone(canonical_repo, monkeypatch):
-    """A fully canonical artifact authenticates -- proving deterministic verification.
+def test_positive_control_with_an_explicitly_pinned_commit(canonical_repo, monkeypatch):
+    """A canonical artifact at an explicitly pinned commit authenticates.
 
-    This happens only inside a throwaway ``tmp_path`` clone; canonical QntyLab
-    history is untouched and no authorization is created there.
+    Throwaway ``tmp_path`` clone only; canonical QntyLab history is untouched
+    and no authorization is created there.  The positive control pins an exact
+    commit -- never "any descendant of the anchors".
     """
     payload = _canonical_bytes(_good_document())
     _commit_file(canonical_repo, CANON_REL, payload, "canonical authorization")
-    resolution_commit = _git(canonical_repo, "rev-parse", "HEAD")
-    blob_oid = _git(canonical_repo, "rev-parse", "--verify", f"HEAD:{CANON_REL}")
+    pinned = _git(canonical_repo, "rev-parse", "HEAD")
+    blob_oid = _git(canonical_repo, "rev-parse", "--verify", f"{pinned}:{CANON_REL}")
+    _pin_commit(monkeypatch, pinned)
     digest = _pin_digest(monkeypatch, payload)
 
     receipt = provenance.authenticate_canonical_evaluation_authorization(root=canonical_repo)
-    provenance_block = receipt["_canonical_git_provenance"]
-    assert provenance_block == {
+    assert receipt["_canonical_git_provenance"] == {
         "authenticated": True,
         "repository": provenance.CANONICAL_REPOSITORY_LOCATOR,
-        "resolution_commit": resolution_commit,
+        "resolution_commit": pinned,
+        "pinned_commit": pinned,
         "artifact_path": CANON_REL,
         "blob_sha1": blob_oid,
         "blob_sha256": digest,
         "anchor_commits": list(provenance.CANONICAL_ANCHOR_COMMITS),
     }
-    # An accepted path override that DOES resolve to the canonical artifact is fine.
-    receipt_again = provenance.authenticate_canonical_evaluation_authorization(
+    # A path override that DOES resolve to the canonical artifact is still fine.
+    again = provenance.authenticate_canonical_evaluation_authorization(
         canonical_repo / CANON_REL, root=canonical_repo
     )
-    assert receipt_again["_canonical_git_provenance"]["authenticated"] is True
+    assert again["_canonical_git_provenance"]["authenticated"] is True
 
 
-def test_positive_control_then_worktree_replacement_is_refused(canonical_repo, monkeypatch):
+def test_head_may_advance_beyond_the_pinned_commit(canonical_repo, monkeypatch):
+    """HEAD advancing past the pinned commit is fine; the pinned blob stays the source."""
+    payload = _canonical_bytes(_good_document())
+    _commit_file(canonical_repo, CANON_REL, payload, "canonical authorization (pinned)")
+    pinned = _git(canonical_repo, "rev-parse", "HEAD")
+    _pin_commit(monkeypatch, pinned)
+    _pin_digest(monkeypatch, payload)
+
+    # Advance HEAD well beyond the pinned commit, including editing the file.
+    _commit_file(canonical_repo, "later_change.txt", b"later\n", "advance HEAD (1)")
+    (canonical_repo / CANON_REL).write_bytes(b'{"tampered later":true}\n')
+    _git(canonical_repo, "add", "--", CANON_REL)
+    _git(canonical_repo, "commit", "--quiet", "-m", "advance HEAD (2): rewrite the file")
+    assert _git(canonical_repo, "rev-parse", "HEAD") != pinned
+
+    receipt = provenance.authenticate_canonical_evaluation_authorization(root=canonical_repo)
+    assert receipt["_canonical_git_provenance"]["resolution_commit"] == pinned
+    assert receipt["_canonical_git_provenance"]["blob_sha256"] == hashlib.sha256(payload).hexdigest()
+
+
+def test_pinned_positive_control_then_worktree_replacement_is_refused(canonical_repo, monkeypatch):
     payload = _canonical_bytes(_good_document())
     _commit_file(canonical_repo, CANON_REL, payload, "canonical authorization")
+    _pin_commit(monkeypatch, _head(canonical_repo))
     _pin_digest(monkeypatch, payload)
     assert provenance.authenticate_canonical_evaluation_authorization(root=canonical_repo)["_canonical_git_provenance"]["authenticated"]
     # Replace the worktree copy without committing: worktree-local swap.
@@ -382,27 +502,44 @@ def test_provenance_failure_precedes_claim_evidence_rows_core_and_recording(monk
 
 @pytest.mark.parametrize(
     "scenario",
-    ["missing_artifact", "wrong_path_override", "no_pinned_digest", "identity_mismatch"],
+    [
+        "no_pinned_commit",
+        "forged_descendant",
+        "missing_artifact_at_pinned",
+        "wrong_path_override",
+        "no_pinned_digest",
+        "identity_mismatch",
+    ],
 )
 def test_downstream_never_runs_for_any_provenance_rejection(canonical_repo, monkeypatch, scenario):
     monkeypatch.setattr(real_capable, "_repository_root", lambda: canonical_repo)
     calls = _wire_downstream_spies(monkeypatch)
     kwargs: dict = {"claim_transport": object(), "frozen_evidence": object()}
 
-    if scenario == "missing_artifact":
-        pass
+    if scenario == "no_pinned_commit":
+        _commit_file(canonical_repo, CANON_REL, _canonical_bytes(_good_document()), "auth, unpinned")
+    elif scenario == "forged_descendant":
+        ancestor = _head(canonical_repo)
+        _commit_file(canonical_repo, CANON_REL, _canonical_bytes(_good_document()), "FORGED descendant")
+        _pin_commit(monkeypatch, ancestor)
+        _pin_digest(monkeypatch, _canonical_bytes(_good_document()))
+    elif scenario == "missing_artifact_at_pinned":
+        _pin_commit(monkeypatch, _head(canonical_repo))
     elif scenario == "wrong_path_override":
+        _pin_commit(monkeypatch, _head(canonical_repo))
         wrong = canonical_repo / "experiments" / "wrong.json"
         wrong.parent.mkdir(parents=True, exist_ok=True)
         wrong.write_bytes(_canonical_bytes(_good_document()))
         kwargs["authorization_path"] = str(wrong)
     elif scenario == "no_pinned_digest":
         _commit_file(canonical_repo, CANON_REL, _canonical_bytes(_good_document()), "auth")
+        _pin_commit(monkeypatch, _head(canonical_repo))
     elif scenario == "identity_mismatch":
         document = _good_document()
         document["real_capable_wrapper_project_id"] = "OTHER"
         payload = _canonical_bytes(document)
         _commit_file(canonical_repo, CANON_REL, payload, "auth")
+        _pin_commit(monkeypatch, _head(canonical_repo))
         _pin_digest(monkeypatch, payload)
 
     with pytest.raises(UnauthorizedExecutionError):

@@ -1,0 +1,52 @@
+{
+  "schema_version": "qntyspot-scope-boundary-repair-v0",
+  "project_id": "QNTYSPOT_INK_SHADOW_PERFORMANCE_SCOPE_BOUNDARY_REPAIR_V0",
+  "phase_state": "CLOSED_PASS_CANDIDATE_PENDING_CANONICAL_MERGE",
+  "canonical_base_sha": "9dc77968918cf5e83d3ecd8693730af9adf66c9c",
+  "repository_boundary": {
+    "qntylab": "CipherCuttle/QntyLab",
+    "qntyspot": "CipherCuttle/QntySpot",
+    "invariant": "QntyLab produces research evidence. QntySpot owns its product runtime and roadmap. Neither repository owns the other."
+  },
+  "disposition": {
+    "project_id": "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0",
+    "prior_state": "ACTIVE",
+    "current_state": "ARCHIVED",
+    "qntylab_role": "HISTORICAL_RESEARCH_PROVENANCE_ONLY",
+    "active_project_after_closure": "NONE",
+    "future_qntylab_evaluation_requires_new_git_backed_authorization": true
+  },
+  "preserved_provenance": {
+    "experiments/research/qntyspot_ink_shadow_performance_authorization_v0/authorization.json": "sha256:93008ebdfe36e137bacb243362de7b2bd9986aad1d944c285820294ac482df4f",
+    "experiments/research/qntyspot_ink_shadow_performance_v0/preregistration.json": "sha256:336941d76541dadf29cf92639de6315d7d6c9736d9accb7f21174f1e097690a2",
+    "experiments/research/qntyspot_ink_shadow_performance_dev_acquisition_activation_v0/activation.json": "sha256:9c8d4532fc4aa0f11bc70a766e928941de4447678d8a954a3c2bac5030268a76",
+    "qntylab/qntyspot_ink_shadow_performance_prereg_v0.py": "sha256:f1b83cb35e1b64312f8ef0c9a783c565a9118a1e867d47794e73cf9cd489f958"
+  },
+  "authority_firewall": {
+    "implementation_authorized": false,
+    "scientific_execution_authorized": false,
+    "market_data_access_authorized": false,
+    "historical_economic_outcome_inspection_authorized": false,
+    "backtest_authorized": false,
+    "strategy_test_authorized": false,
+    "research_ledger_mutation_authorized": false,
+    "qntyspot_repository_mutation_authorized": false,
+    "qntyspot_execution_authority": "NONE",
+    "trading_authority": "NONE",
+    "capital_authority": "NONE",
+    "promotion_authority": "NONE"
+  },
+  "receipts": {
+    "historical_receipts_preserved": true,
+    "historical_scientific_artifacts_mutated": false,
+    "qntyspot_repository_mutated": false,
+    "research_ledger_state_changed": false,
+    "market_data_accessed": false,
+    "scientific_execution_performed": false
+  },
+  "review": {
+    "independent_hostile_review_count": 0,
+    "verdict": "PENDING_INDEPENDENT_PR_REVIEW",
+    "targeted_rereview_used": false
+  }
+}

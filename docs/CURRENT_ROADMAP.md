@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- `QntySpot Ink shadow performance DEV acquisition` — `ACTIVE`. ACTIVE: the separately bound DEV acquisition successor is effective only after exact canonical merge and fresh clean worktree reconciliation. Qualify sources outcome-blind, establish T0, compute DEV_END, and acquire DEV evidence and preregistered gas receipts only; OUTER, candidate evaluation, selection, classification, trading, and capital remain forbidden.
+- None.
 
 ## Queued — not authorized
 
@@ -130,6 +130,8 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 - `QNTYLAB_PROJECT_CONTEXT_AND_AUTHORITY_REGISTRY_V0` — `CLOSED_PASS`. Project Context and Authority Registry V0 is complete; no further implementation is authorized by this closed phase.
 - `QntySpot Ink shadow performance research authorization V0` — `CLOSED_PASS`. CLOSED_PASS: the authorization is canonical and terminal. Its one separately bound successor is QNTYSPOT_INK_SHADOW_PERFORMANCE_V0; do not begin that successor from this authorization row.
 - `QntySpot Ink shadow performance DEV acquisition activation V0` — `CLOSED_PASS`. CLOSED_PASS: the activation is terminal after exact canonical merge. Its one separately bound successor QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0 is the next canonical phase; no new activation may be created.
+- `QntySpot Ink shadow performance DEV acquisition` — `ARCHIVED`. ARCHIVED: preserve the historical QntySpot research authorization, preregistration, activation, and source bindings as immutable provenance. QntySpot remains a separate repository and product roadmap; this QntyLab row grants no implementation, market-data, scientific-execution, QntySpot-runtime, trading, or capital authority. Any future QntyLab evaluation of QntySpot requires a new separately Git-backed bounded research authorization.
+- `QntySpot research scope-boundary repair V0` — `CLOSED_PASS`. CLOSED_PASS candidate: canonicalize this governance-only boundary repair after one independent hostile PR review. The former QntySpot DEV-acquisition row is archived with all historical receipts preserved and all remaining QntyLab implementation and market-data authority revoked. No QntySpot repository mutation, scientific execution, data access, backtest, ledger mutation, trading, promotion, or capital authority is created. Any future QntyLab evaluation of QntySpot requires a new separately Git-backed bounded research authorization.
 - `QntySpot Ink shadow performance research V0` — `CLOSED_PASS`. CLOSED_PASS: the preregistration continuation is closed and its separately bound DEV acquisition successor QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0 is the next canonical phase, effective only after exact canonical merge and fresh clean worktree reconciliation. The activation phase is terminal.
 - `Qnty agent orchestration control contract V0 governance freeze` — `CLOSED_PASS`. After canonical merge, perform a fresh reconciliation, then begin exactly QNTY_AGENT_ORCHESTRATION_CONTROL_CONTRACT_V0_CONTRACT_ONLY_REPOSITORY_BOOTSTRAP.
 - `QntyAgentRuntime H01 machine-enforcement repair authorization` — `CLOSED_PASS`. After canonical merge, perform exactly one QNTY_AGENT_RUNTIME_CONTRACT_ONLY_BOOTSTRAP_H01_MACHINE_ENFORCEMENT_REPAIR_V0 phase; if any Critical or High remains after its one targeted re-review, terminate this bootstrap attempt permanently as QNTY_AGENT_RUNTIME_CONTRACT_BOOTSTRAP_H01_UNRESOLVED.

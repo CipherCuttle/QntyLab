@@ -31,7 +31,11 @@ def load_active_project():
 
 def load_successor_project():
     registry = tomllib.loads(PROJECTS_PATH.read_text(encoding="utf-8"))
-    return next(row for row in registry["project"] if row["state"] == "ACTIVE")
+    return next(
+        row
+        for row in registry["project"]
+        if row["project_id"] == "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0"
+    )
 
 
 def test_branch_local_candidate_does_not_self_authorize():
@@ -52,7 +56,7 @@ def test_branch_local_candidate_does_not_self_authorize():
 def test_canonical_registry_closes_authorization_and_preserves_parent_lineage():
     authorization = load_project()
     parent = load_parent_project()
-    active = load_successor_project()
+    successor = load_successor_project()
     assert authorization["state"] == "CLOSED_PASS"
     assert authorization["candidate_state"] == "CANONICAL_AUTHORIZATION_EFFECTIVE"
     assert authorization["canonicalization_status"] == "EXACT_CANONICAL_MERGE_VERIFIED"
@@ -61,12 +65,14 @@ def test_canonical_registry_closes_authorization_and_preserves_parent_lineage():
     assert parent["state"] == "CLOSED_PASS"
     assert parent["governing_authorization_project_id"] == authorization["project_id"]
     assert parent["governing_authorization_canonical_merge"] == "112e004ff516ef141a4dcf661d9ae4fe454aa85c"
-    assert active["state"] == "ACTIVE"
-    assert active["project_id"] == "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0"
-    assert active["implementation_authorized"] is True
-    assert active["market_data_access_authorized"] is True
+    assert successor["state"] == "ARCHIVED"
+    assert successor["project_id"] == "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0"
+    assert successor["historical_canonical_state"] == "ACTIVE"
+    assert successor["historical_activation_receipt_preserved"] is True
+    assert successor["implementation_authorized"] is False
+    assert successor["market_data_access_authorized"] is False
     registry = tomllib.loads(PROJECTS_PATH.read_text(encoding="utf-8"))
-    assert [row for row in registry["project"] if row["state"] == "ACTIVE"] == [active]
+    assert [row for row in registry["project"] if row["state"] == "ACTIVE"] == []
 
 
 def test_exact_canonical_base_binding():

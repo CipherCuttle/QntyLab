@@ -47,6 +47,13 @@ def test_boundary_repair_is_governance_only_and_non_escalating() -> None:
     repair = _project(REPAIR_PROJECT_ID)
     assert repair["state"] == "CLOSED_PASS"
     assert repair["phase_type"] == "GOVERNANCE_ONLY"
+    assert repair["canonicalization_status"] == "EXACT_CANONICAL_MERGE_VERIFIED"
+    assert repair["canonical_merge"] == "b2b24ef59a09a5aa039e7afeb0afa6f0610e8f87"
+    assert repair["canonical_merge_pr"] == 235
+    assert repair["hostile_review_count"] == 1
+    assert repair["hostile_review_verdict"] == "HOSTILE_REVIEW_PASS"
+    assert repair["hostile_governance_critical_total"] == 0
+    assert repair["hostile_governance_high_total"] == 0
     assert repair["qntylab_repository_identity"] == "CipherCuttle/QntyLab"
     assert repair["qntyspot_repository_identity"] == "CipherCuttle/QntySpot"
     assert repair["active_project_after_closure"] == "NONE"
@@ -74,6 +81,13 @@ def test_boundary_repair_is_governance_only_and_non_escalating() -> None:
 
 def test_historical_receipts_are_byte_preserved_and_transition_remains_provenance() -> None:
     closure = json.loads(CLOSURE_PATH.read_text(encoding="utf-8"))
+    assert closure["phase_state"] == "CLOSED_PASS_CANONICAL_MERGED"
+    assert closure["canonical_merge"] == "b2b24ef59a09a5aa039e7afeb0afa6f0610e8f87"
+    assert closure["canonical_merge_pr"] == 235
+    assert closure["review"]["independent_hostile_review_count"] == 1
+    assert closure["review"]["verdict"] == "PASS_NO_CRITICAL_HIGH"
+    assert closure["review"]["critical_findings"] == 0
+    assert closure["review"]["high_findings"] == 0
     for relative_path, expected in closure["preserved_provenance"].items():
         actual = hashlib.sha256((ROOT / relative_path).read_bytes()).hexdigest()
         assert f"sha256:{actual}" == expected, relative_path

@@ -1,8 +1,10 @@
 {
   "schema_version": "qntyspot-scope-boundary-repair-v0",
   "project_id": "QNTYSPOT_INK_SHADOW_PERFORMANCE_SCOPE_BOUNDARY_REPAIR_V0",
-  "phase_state": "CLOSED_PASS_CANDIDATE_PENDING_CANONICAL_MERGE",
+  "phase_state": "CLOSED_PASS_CANONICAL_MERGED",
   "canonical_base_sha": "9dc77968918cf5e83d3ecd8693730af9adf66c9c",
+  "canonical_merge": "b2b24ef59a09a5aa039e7afeb0afa6f0610e8f87",
+  "canonical_merge_pr": 235,
   "repository_boundary": {
     "qntylab": "CipherCuttle/QntyLab",
     "qntyspot": "CipherCuttle/QntySpot",
@@ -45,8 +47,10 @@
     "scientific_execution_performed": false
   },
   "review": {
-    "independent_hostile_review_count": 0,
-    "verdict": "PENDING_INDEPENDENT_PR_REVIEW",
+    "independent_hostile_review_count": 1,
+    "verdict": "PASS_NO_CRITICAL_HIGH",
+    "critical_findings": 0,
+    "high_findings": 0,
     "targeted_rereview_used": false
   }
 }

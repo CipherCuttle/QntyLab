@@ -9678,7 +9678,7 @@ state_status = "DEFERRED"
 north_star_drift_threshold = "MORE_THAN_3_OF_LAST_10_COMPLETED_PHASES_INFRASTRUCTURE_OR_GOVERNANCE_ONLY_WITHOUT_UNBLOCKING_A_NAMED_SELECTED_SCIENTIFIC_QUESTION"
 infra_loop_rule = "TWO_CONSECUTIVE_PHASES_ON_THE_SAME_INFRASTRUCTURE_BLOCKER_WITHOUT_A_NEW_MARKET_OR_SCIENTIFIC_OBSERVATION_DEFAULTS_TO_SIMPLER_PATH_DEFER_OR_KILL"
 terminal_outcome = "OPERATING_POLICY_LOCK_RECORDED_NO_SCIENTIFIC_EXECUTION_AUTHORIZED"
-next_action = "CLOSED_PASS: canonical operating policy is effective from merge d7d13c49deccf54fabccde01bb3bf34c1491e5b5. This phase grants no scientific execution, market-data access, backtest, ledger mutation, implementation, DSH V0R8, Router, State, Qnty, trading, promotion, or capital authority. JH01 V1 remains the selected continuation; its preregistration was canonically merged before the 2026-09-01 freeze deadline, and its first origin remains 2026-09-15T00:00:00Z. Do not activate or evaluate before that origin; any real activation remains separately bounded and exactly one-shot."
+next_action = "CLOSED_PASS: canonical operating policy is effective from merge d7d13c49deccf54fabccde01bb3bf34c1491e5b5. This phase grants no scientific execution, market-data access, backtest, ledger mutation, implementation, DSH V0R8, Router, State, Qnty, trading, promotion, or capital authority. JH01 V1 remains the selected continuation; its preregistration was canonically merged before the 2026-09-01 freeze deadline, and its first origin remains 2026-09-15T00:00:00Z. If real operation is separately authorized, commit the one-shot activation before that origin; do not collect or evaluate an origin before its due window."
 
 [[project]]
 project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_SCOPE_BOUNDARY_REPAIR_V0"

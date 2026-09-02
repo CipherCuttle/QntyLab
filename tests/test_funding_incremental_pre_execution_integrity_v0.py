@@ -210,8 +210,11 @@ def test_implementation_identity_is_bound_to_exact_immutable_digests(receipt):
     assert identity["governing_preregistration_digest"] == (
         "d7ec718ab14e73d2aea24749a22caa2921fd81b8a336e2f2eaffb30ae1e992ef"
     )
+    # Authorized identity supersession: the live executor digest moved from
+    # the historical V0 value b894d4d9... to the successor digest bound in
+    # implementation_v1/implementation_manifest.json (core extraction V1).
     assert identity["executor_sha256"] == (
-        "b894d4d9316bed6f8c4f7171b32692aff7b1f0eb32abd686a33fdb38425a7490"
+        "1ffcfeb959cfc547fcda96384c1c8f58b3f5cbc174c5d535324480ede312e8c6"
     )
     assert identity["v2_sha256"] == "d603e747952d31d1fa87df463b9c739bc495a4e94597c2be0f93c02c678fbbc6"
     assert identity["foundation_v0_sha256"] == (
@@ -267,7 +270,7 @@ def test_origin_schedule_still_declares_exactly_244_evaluation_origins():
 def test_the_executor_self_reports_the_frozen_identity():
     identity = ex.implementation_identity()
     assert identity["implementation_source_sha256"] == (
-        "b894d4d9316bed6f8c4f7171b32692aff7b1f0eb32abd686a33fdb38425a7490"
+        "1ffcfeb959cfc547fcda96384c1c8f58b3f5cbc174c5d535324480ede312e8c6"
     )
     assert identity["execution_modes"] == ["SYNTHETIC_VALIDATION"]
     assert identity["downstream_authority"] == "NONE"

@@ -86,8 +86,19 @@ FROZEN_PREREGISTRATION_STATUS = "PREREGISTERED_NOT_EXECUTED"
 FROZEN_EXECUTOR_RELATIVE_PATH = (
     "qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py"
 )
-FROZEN_EXECUTOR_SHA256 = (
+#: Authorized identity supersession (phase
+#: FUNDING_INCREMENTAL_EXECUTOR_CORE_EXTRACTION_AND_SUCCESSOR_IMPLEMENTATION_V1):
+#: the executor source was mechanically rewired onto the shared scientific
+#: core, so its live source digest changed from the historical V0 value
+#: (immutable at commit f6f12994d65c3dfeaf7839de560e58ad99547c62) to the
+#: successor digest bound in implementation_v1/implementation_manifest.json.
+#: The historical digest itself is NOT mutated anywhere and remains bound
+#: below as HISTORICAL_V0_EXECUTOR_SHA256.
+HISTORICAL_V0_EXECUTOR_SHA256 = (
     "b894d4d9316bed6f8c4f7171b32692aff7b1f0eb32abd686a33fdb38425a7490"
+)
+FROZEN_EXECUTOR_SHA256 = (
+    "1ffcfeb959cfc547fcda96384c1c8f58b3f5cbc174c5d535324480ede312e8c6"
 )
 FROZEN_EXECUTOR_TEST_RELATIVE_PATH = (
     "tests/test_jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py"
@@ -469,6 +480,19 @@ def verify_implementation_identity(root: Path = ROOT) -> dict:
     if source_binding["governing_preregistration_file_sha256"] != FROZEN_PREREGISTRATION_FILE_SHA256:
         raise ImplementationIdentityError("source binding names different preregistration bytes")
     for relative_path, expected in source_binding["implementation_source_sha256"].items():
+        if relative_path == FROZEN_EXECUTOR_RELATIVE_PATH:
+            # Authorized identity supersession (phase
+            # FUNDING_INCREMENTAL_EXECUTOR_CORE_EXTRACTION_AND_SUCCESSOR_IMPLEMENTATION_V1):
+            # the frozen implementation_v0 artifact still records the
+            # historical V0 digest, and that record is asserted unchanged
+            # below; the LIVE worktree executor is instead verified against
+            # the successor digest via FROZEN_EXECUTOR_SHA256 in the
+            # _SOURCE_SHA256 pass above.
+            if expected != HISTORICAL_V0_EXECUTOR_SHA256:
+                raise ImplementationIdentityError(
+                    "frozen source binding executor record mutated or laundered"
+                )
+            continue
         if source_digests.get(relative_path) != expected:
             raise ImplementationIdentityError(
                 f"source binding disagrees with the worktree for {relative_path}"

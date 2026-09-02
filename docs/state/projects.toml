@@ -217,8 +217,8 @@ next_action = "CLOSED_PASS: the activation is terminal after exact canonical mer
 [[project]]
 project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0"
 display_name = "QntySpot Ink shadow performance DEV acquisition"
-state = "ACTIVE"
-authority_level = "BOUNDED_DEV_EVIDENCE_ACQUISITION_AND_SOURCE_QUALIFICATION_ONLY"
+state = "ARCHIVED"
+authority_level = "HISTORICAL_EXTERNAL_SYSTEM_RESEARCH_PROVENANCE_ONLY"
 phase_type = "BOUNDED_DEV_ACQUISITION_PHASE"
 authoritative_artifacts = [
   "AGENTS.md",
@@ -241,8 +241,14 @@ exact_candidate_commit_must_be_ancestor_of_canonical_master = true
 effective_only_after_exact_canonical_merge = true
 effective_only_in_fresh_clean_worktree_from_origin_master = true
 authorization_effective = "AFTER_EXACT_CANONICAL_MERGE_AND_FRESH_CLEAN_WORKTREE_ONLY"
-implementation_authorized = true
+implementation_authorized = false
 implementation_completed = false
+historical_canonical_state = "ACTIVE"
+historical_activation_receipt_preserved = true
+scope_boundary_disposition = "ARCHIVED_FROM_QNTYLAB_ACTIVE_ROADMAP"
+external_repository_identity = "CipherCuttle/QntySpot"
+qntylab_current_role = "HISTORICAL_RESEARCH_PROVENANCE_ONLY"
+future_reactivation_requires_separate_git_backed_qntylab_authorization = true
 permitted_operations = [
   "SOURCE_QUALIFICATION",
   "ESTABLISH_T0_OUTCOME_BLIND",
@@ -277,7 +283,7 @@ strategy_test_count = 0
 research_ledger_state_changed = false
 qntyspot_changed = false
 scientific_execution_authorized = false
-market_data_access_authorized = true
+market_data_access_authorized = false
 historical_economic_outcome_inspection_authorized = false
 backtest_authorized = false
 strategy_test_authorized = false
@@ -289,7 +295,7 @@ approval_authority = "NONE"
 broadcast_authority = "NONE"
 promotion_authority = "NONE"
 qntyspot_execution_authority = "NONE"
-next_action = "ACTIVE: the separately bound DEV acquisition successor is effective only after exact canonical merge and fresh clean worktree reconciliation. Qualify sources outcome-blind, establish T0, compute DEV_END, and acquire DEV evidence and preregistered gas receipts only; OUTER, candidate evaluation, selection, classification, trading, and capital remain forbidden."
+next_action = "ARCHIVED: preserve the historical QntySpot research authorization, preregistration, activation, and source bindings as immutable provenance. QntySpot remains a separate repository and product roadmap; this QntyLab row grants no implementation, market-data, scientific-execution, QntySpot-runtime, trading, or capital authority. Any future QntyLab evaluation of QntySpot requires a new separately Git-backed bounded research authorization."
 
 [[project]]
 project_id = "JIGSAW_FAST_PROSPECTIVE_SIGNAL_DISCOVERY_V2_PREREGISTRATION_V0"
@@ -9671,3 +9677,44 @@ north_star_drift_threshold = "MORE_THAN_3_OF_LAST_10_COMPLETED_PHASES_INFRASTRUC
 infra_loop_rule = "TWO_CONSECUTIVE_PHASES_ON_THE_SAME_INFRASTRUCTURE_BLOCKER_WITHOUT_A_NEW_MARKET_OR_SCIENTIFIC_OBSERVATION_DEFAULTS_TO_SIMPLER_PATH_DEFER_OR_KILL"
 terminal_outcome = "OPERATING_POLICY_LOCK_RECORDED_NO_SCIENTIFIC_EXECUTION_AUTHORIZED"
 next_action = "CLOSED_PASS: operating policy only; this phase authorizes no scientific execution, market-data access, backtest, ledger mutation, or implementation. Immediate selected scientific continuation is JH01 V1 outcome-blind prospective incremental forecast-value continuation with freeze deadline 2026-09-01T00:00:00Z. DSH_STAGE_A_DISPOSITION is MAINTENANCE_ONLY with NO_AUTOMATIC_V0R8; any future DSH phase requires a named blocked scientific question and no materially cheaper valid route. ROUTER and STATE remain DEFERRED."
+
+[[project]]
+project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_SCOPE_BOUNDARY_REPAIR_V0"
+display_name = "QntySpot research scope-boundary repair V0"
+state = "CLOSED_PASS"
+authority_level = "GOVERNANCE_ONLY_CROSS_REPOSITORY_BOUNDARY_REPAIR"
+phase_type = "GOVERNANCE_ONLY"
+authoritative_artifacts = [
+  "docs/ADR/0007-ecosystem-role-boundary-and-context-spine-governance.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qntyspot_ink_shadow_performance_scope_boundary_repair_v0/closure.json",
+  "tests/test_qntyspot_ink_shadow_performance_authorization_v0.py",
+  "tests/test_qntyspot_ink_shadow_performance_dev_acquisition_activation_v0.py",
+  "tests/test_qntyspot_ink_shadow_performance_scope_boundary_repair_v0.py",
+]
+canonical_base_sha = "9dc77968918cf5e83d3ecd8693730af9adf66c9c"
+qntylab_repository_identity = "CipherCuttle/QntyLab"
+qntyspot_repository_identity = "CipherCuttle/QntySpot"
+reclassified_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0"
+reclassified_project_state = "ARCHIVED"
+active_project_after_closure = "NONE"
+boundary_invariant = "QNTYLAB_PRODUCES_RESEARCH_EVIDENCE_QNTYSPOT_OWNS_ITS_PRODUCT_RUNTIME_AND_ROADMAP_NEITHER_REPOSITORY_OWNS_THE_OTHER"
+historical_receipts_preserved = true
+historical_scientific_artifacts_mutated = false
+qntyspot_repository_mutated = false
+research_ledger_state_changed = false
+implementation_authorized = false
+scientific_execution_authorized = false
+market_data_access_authorized = false
+historical_economic_outcome_inspection_authorized = false
+backtest_authorized = false
+strategy_test_authorized = false
+qntyspot_execution_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+promotion_authority = "NONE"
+hostile_review_count = 0
+hostile_review_verdict = "PENDING_INDEPENDENT_PR_REVIEW"
+targeted_rereview_used = false
+next_action = "CLOSED_PASS candidate: canonicalize this governance-only boundary repair after one independent hostile PR review. The former QntySpot DEV-acquisition row is archived with all historical receipts preserved and all remaining QntyLab implementation and market-data authority revoked. No QntySpot repository mutation, scientific execution, data access, backtest, ledger mutation, trading, promotion, or capital authority is created. Any future QntyLab evaluation of QntySpot requires a new separately Git-backed bounded research authorization."

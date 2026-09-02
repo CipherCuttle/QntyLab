@@ -205,19 +205,21 @@ def test_activation_artifact_is_present_and_digestable():
     assert hashlib.sha256(ACTIVATION_PATH.read_bytes()).hexdigest()
 
 
-def test_canonical_transition_has_exactly_one_active_successor_and_no_parent_loop():
+def test_historical_transition_is_preserved_while_current_successor_is_archived():
     registry = projects()
     successors = [row for row in registry if row["project_id"] == FUTURE_PHASE]
     assert len(successors) == 1
     successor = successors[0]
-    assert successor["state"] == "ACTIVE"
+    assert successor["state"] == "ARCHIVED"
+    assert successor["historical_canonical_state"] == "ACTIVE"
+    assert successor["historical_activation_receipt_preserved"] is True
     assert project_record(PARENT_PROJECT)["state"] == "CLOSED_PASS"
     parent_next_action = project_record(PARENT_PROJECT)["next_action"]
     assert FUTURE_PHASE in parent_next_action
     assert "create the separate" not in parent_next_action.lower()
     assert "exact canonical merge" in parent_next_action
     assert "fresh clean worktree" in parent_next_action
-    assert [row for row in registry if row["state"] == "ACTIVE"] == [successor]
+    assert [row for row in registry if row["state"] == "ACTIVE"] == []
 
 
 def test_successor_binding_and_authority_ceiling_are_exact():
@@ -238,9 +240,9 @@ def test_successor_binding_and_authority_ceiling_are_exact():
         "FREEZE_WINNER", "BACKTEST_OUTER", "FINAL_PERFORMANCE_CLASSIFICATION",
         "TRADING", "CAPITAL", "SIGNING", "APPROVAL", "BROADCAST", "PROMOTION",
     ]
-    assert successor["implementation_authorized"] is True
+    assert successor["implementation_authorized"] is False
     assert successor["scientific_execution_authorized"] is False
-    assert successor["market_data_access_authorized"] is True
+    assert successor["market_data_access_authorized"] is False
     assert successor["historical_economic_outcome_inspection_authorized"] is False
     assert successor["backtest_authorized"] is False
     assert successor["strategy_test_authorized"] is False
@@ -294,12 +296,12 @@ def test_successor_outer_firewall_and_construction_receipts_remain_zero():
     assert successor["qntyspot_changed"] is False
 
 
-def test_canonical_successor_is_recognized_as_the_single_project_context_active_project():
+def test_archived_successor_is_not_project_context_active_authority():
     _, _, registry = project_context.load_context_sources(ROOT)
     validated = project_context.validate_projects_registry(ROOT, registry)
     projection = project_context.execution_authority_projection(ROOT, validated)
     assert projection["issues"] == []
-    assert projection["active_project"]["project_id"] == FUTURE_PHASE
+    assert projection["active_project"] is None
 
 
 def test_scientific_research_ledger_and_qntyspot_bytes_are_unchanged():

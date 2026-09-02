@@ -2419,6 +2419,62 @@ canonicalization_required_before_effect = true
 next_action = "CLOSED_PASS: portable user-scoped JH01 V1 operation state binding is recorded without creating runtime state or consuming activation. Merge this binding, then execute exactly one real activation under the existing authority."
 
 [[project]]
+project_id = "JH01_V1_PRE_ORIGIN_PRODUCTION_PATH_REPAIR_V0"
+display_name = "JH01 V1 pre-origin production path repair"
+state = "CLOSED_PASS"
+authority_level = "PRE_ORIGIN_PRODUCTION_PATH_IMPLEMENTATION_ONLY"
+phase_type = "IMPLEMENTATION"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/specs/jh01_v1_pre_origin_production_path_repair_hostile_review_v0.md",
+  "ops/systemd/user/README.md",
+  "ops/systemd/user/jh01-v1-prospective-record.service",
+  "ops/systemd/user/jh01-v1-prospective-record.timer",
+  "qntylab/jh01_v1_operational_checkout_v0.py",
+  "qntylab/jh01_v1_prospective_production_caller_v0.py",
+  "qntylab/jh01_v1_prospective_runtime_defaults_v0.py",
+  "qntylab/jh01_v1_prospective_source_adapter_v0.py",
+  "tests/_jh01_v1_prospective_fixtures.py",
+  "tests/test_jh01_v1_pre_origin_e2e_proof_v0.py",
+  "tests/test_jh01_v1_prospective_production_caller_v0.py",
+  "tests/test_jh01_v1_prospective_production_default_path_v0.py",
+  "tests/test_jh01_v1_prospective_source_adapter_v0.py",
+]
+canonical_base_sha = "3d7483a2bdee0883db21176bd2673df561814169"
+implementation_candidate = "913a00a611a6e8e04bef686a83b704a11948c214"
+canonical_merge = "9dc77968918cf5e83d3ecd8693730af9adf66c9c"
+canonical_merge_pr = 232
+selected_north_star_continuation = "JH01_V1_OUTCOME_BLIND_PROSPECTIVE_INCREMENTAL_FORECAST_VALUE_CONTINUATION"
+qualified_recorder_identity = "4f5e1791be9f17c1871f9b510329a1632412e028d2a84223fa59e83bbe95ec1a"
+wrapper_implementation_identity = "1176037ff0d3102afc67670202154970e4af1491cff1cd19bc9526c9c9d67c41"
+production_caller_implemented = true
+source_adapter_implemented = true
+operational_checkout_identity_gate_implemented = true
+systemd_timer_and_service_present = true
+real_v1_armed_but_inactive_target_state = true
+real_activation_performed_by_this_phase = false
+market_data_accessed = false
+real_forecast_executed = false
+scientific_evaluation_performed = false
+implementation_authorized = false
+implementation_completed = true
+downstream_authority = "NONE"
+qnty_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+promotion_authority = "NONE"
+hostile_review_count = 2
+hostile_review_verdict = "PASS_NO_OPEN_CRITICAL_HIGH"
+hostile_governance_critical_total = 0
+hostile_governance_high_total = 0
+targeted_rereview_used = true
+targeted_rereview_count = 1
+targeted_rereview_verdict = "PASS_NO_OPEN_CRITICAL_HIGH"
+next_action = "CLOSED_PASS: the merged JH01 pre-origin production path is recorded as completed implementation. It creates no new scientific or downstream authority; preserve the frozen recorder/wrapper identities, keep collection fail-closed before the first origin, and do not alter the operational path without a new bounded Git-backed phase."
+
+[[project]]
 project_id = "QNTY_EDGE_DISCOVERY_ORDER_FLOW_V0_EXECUTION"
 display_name = "Order-Flow V0 historical execution authorization readiness"
 state = "CLOSED_BLOCKED"

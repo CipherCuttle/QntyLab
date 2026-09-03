@@ -1,0 +1,444 @@
+[
+  {
+    "finding_id": "CI-1",
+    "domain": "D1",
+    "severity": "HIGH",
+    "classification": "CALLER_ASSERTED_PROVENANCE",
+    "path": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py",
+    "lines_or_symbol": "_assemble_incremental_forecast_evaluation (565-712), NO_REAL_EXECUTION_ATTESTATION (135-154), payload embedding (684)",
+    "claim": "Provenance of an evaluation is derived entirely from caller-supplied inputs: ForecastRow carries no provenance field, execution_mode is a caller string, and the result payload embeds the static all-false NO_REAL_EXECUTION_ATTESTATION constants regardless of row origin. Any caller routing real rows through the unguarded private assembly obtains a digest-bearing result that asserts REAL_EVIDENCE_EXECUTION_PERFORMED=False and SYNTHETIC-only provenance.",
+    "evidence": [
+      "executor_v0.py:303-318 ForecastRow fields: origin/target_completion/funding_percentile/rv24_target/rv24_lags -- no provenance field",
+      "executor_v0.py:565-567 _assemble_incremental_forecast_evaluation(rows, mode: str) performs no execution-mode guard (guard only in run_incremental_forecast_evaluation:715-724)",
+      "executor_v0.py:684 payload['no_real_execution_attestation'] = dict(sorted(NO_REAL_EXECUTION_ATTESTATION.items())) -- static constants, not derived from rows",
+      "executor_v0.py:169-180 require_authorized_execution_mode: 'This is defence in depth, not the primary boundary'"
+    ],
+    "risk": "Real/synthetic relabeling: a laundered evaluation would be internally attested as never having touched real evidence and its result_digest would vouch for that attestation.",
+    "recommended_disposition": "Bind provenance to the assembly input (e.g. derive attestation from row factory identity or add a validated provenance field) or make the private assembly enforce AUTHORIZED_EXECUTION_MODES like the public entrypoint.",
+    "implementation_authorized": false
+  },
+  {
+    "finding_id": "CI-2",
+    "domain": "D1",
+    "severity": "MEDIUM",
+    "classification": "CALLER_ASSERTED_PROVENANCE",
+    "path": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_synthetic_wrapper_v1.py",
+    "lines_or_symbol": "run_synthetic_validation_evaluation (74-84)",
+    "claim": "The synthetic-only contract is enforced only by comparing a caller-supplied execution_mode string to EXECUTION_MODE_SYNTHETIC_VALIDATION; rows are accepted as-is with no provenance inspection (PC-3 verdict: mode enforcement, not provenance proof).",
+    "evidence": [
+      "synthetic_wrapper_v1.py:64-71 require_synthetic_validation_mode compares execution_mode != EXECUTION_MODE_SYNTHETIC_VALIDATION",
+      "synthetic_wrapper_v1.py:83-84 mode = require_synthetic_validation_mode(execution_mode); return run_incremental_forecast_evaluation(rows, execution_mode=mode)",
+      "No code path in the wrapper inspects row origin or data classification"
+    ],
+    "risk": "The wrapper name and attestation (SYNTHETIC_ROWS_ONLY=True) suggest a provenance guarantee that is actually a caller-asserted mode string.",
+    "recommended_disposition": "Document that synthetic-only is enforced at execution-mode level only, or add row-level provenance validation.",
+    "implementation_authorized": false
+  },
+  {
+    "finding_id": "CI-3",
+    "domain": "D1",
+    "severity": "INFO",
+    "classification": "VERIFIED_PROVENANCE",
+    "path": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_evaluation_authorization_provenance_v1.py",
+    "lines_or_symbol": "authenticate_canonical_evaluation_authorization (417+), _canonical_blob (293-345), _resolve_pinned_canonical_commit (219-268)",
+    "claim": "Positive control: authorization provenance is independently verified against canonical Git identity -- pinned commit resolution via git cat-file/rev-parse, blob read from the Git object database (never worktree), and explicit refusal of worktree-local replacement or symlink divergence.",
+    "evidence": [
+      "provenance_v1.py:297 'from the worktree index, so a worktree-local file, a different branch, or a'",
+      "provenance_v1.py:329 blob_bytes = _git(root, 'cat-file', 'blob', blob_oid, check=True)",
+      "provenance_v1.py:339-345 symlink and worktree-divergence refusals",
+      "Runtime check: canonical_authorization_exists() -> False (artifact absent; fail-closed boundary confirmed live)"
+    ],
+    "risk": "None identified; this is the strongest provenance boundary in the codebase.",
+    "recommended_disposition": "Retain as the canonical model for authorization authentication.",
+    "implementation_authorized": false
+  },
+  {
+    "finding_id": "CI-4",
+    "domain": "D1",
+    "severity": "INFO",
+    "classification": "VERIFIED_PROVENANCE",
+    "path": "qntylab/jigsaw_funding_pressure_execution_foundation_v0.py",
+    "lines_or_symbol": "provenance baseline checks (272-303), VerifiedFundingEvent/VerifiedBarOpenClose types",
+    "claim": "Evidence-level provenance in the foundation layer is verified against a provenance baseline requiring exactly one digest-matched raw-evidence entry per symbol before any Verified* type is produced.",
+    "evidence": [
+      "foundation_v0.py:272 'expected exactly one funding raw-evidence entry for {symbol} in provenance baseline'",
+      "foundation_v0.py:287,303 analogous OHLCV and leading-edge requirements"
+    ],
+    "risk": "None identified.",
+    "recommended_disposition": "No action.",
+    "implementation_authorized": false
+  },
+  {
+    "finding_id": "CI-5",
+    "domain": "D1",
+    "severity": "LOW",
+    "classification": "CALLER_ASSERTED_PROVENANCE",
+    "path": "qntylab/jigsaw_funding_pressure_incremental_pre_execution_integrity_v0.py",
+    "lines_or_symbol": "reconcile (735) synthetic_rows_factory=None",
+    "claim": "Synthetic row production is a caller-injected factory callable; the integrity layer reconciles outputs but the synthetic classification of the produced rows is asserted by which factory the caller supplies.",
+    "evidence": [
+      "pre_execution_integrity_v0.py:735 def reconcile(..., synthetic_rows_factory=None, ...)"
+    ],
+    "risk": "A caller supplying a factory that reads real outcomes would be labeled synthetic by construction site rather than by content.",
+    "recommended_disposition": "Bind factory identity/digest into reconciliation receipts.",
+    "implementation_authorized": false
+  },
+  {
+    "finding_id": "CI-6",
+    "domain": "D2",
+    "severity": "INFO",
+    "classification": "DURABLE_CROSS_PROCESS",
+    "path": "qntylab/jigsaw_funding_pressure_execution_foundation_v0.py",
+    "lines_or_symbol": "claim_authorization_once (873-888), AtMostOnceClaimTransport (852-864)",
+    "claim": "Exactly-once claim is delegated to a remote git-ref creation (POST git/refs fails 409/422 on existing ref, disambiguated by exact-match GET), which is a durable cross-process side effect; however the transport is only ever exercised against a mocked HTTP boundary in this phase.",
+    "evidence": [
+      "foundation_v0.py:856-861 'GitHubRestRemoteClaimTransport ... calls GitHub's POST /repos/{owner}/{repo}/git/refs, which fails with 409/422 ... It is constructed and exercised only against a mocked HTTP boundary in this phase'",
+      "foundation_v0.py:874-877 'A second claim attempt against the same authorization_id -- even with the identical sha -- must observe ALREADY_CONSUMED'",
+      "foundation_v0.py:882-883 any transport failure fails closed"
+    ],
+    "risk": "Durability depends on the injected transport; a non-GitHub transport implementation would silently downgrade the guarantee.",
+    "recommended_disposition": "Require transport implementations to declare their durability class.",
+    "implementation_authorized": false
+  },
+  {
+    "finding_id": "CI-7",
+    "domain": "D2",
+    "severity": "MEDIUM",
+    "classification": "DECLARED_BUT_NOT_IMPLEMENTED",
+    "path": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_real_capable_wrapper_v1.py",
+    "lines_or_symbol": "_record_exactly_one_result (208-217)",
+    "claim": "The designated result-persistence seam computes a claim digest, then discards it ('_ = claim_digest  # recorded with the result by the future persistence seam') and returns the result unchanged -- no result is recorded anywhere. Documented module prose ('record exactly one result', lines 30, 245) overstates the implementation.",
+    "evidence": [
+      "real_capable_wrapper_v1.py:212-216 claim_digest = hashlib.sha256(...); result.result_digest; _ = claim_digest  # recorded with the result by the future persistence seam",
+      "real_capable_wrapper_v1.py:245 '# Step 6 -- record exactly one result.'",
+      "real_capable_wrapper_v1.py:87-88 attestation SCIENTIFIC_RESULT_RECORDED: False, TRIAL_COMPLETION_RECORDED: False (honest at the attestation level)"
+    ],
+    "risk": "If the future authorization envelope activates this wrapper without adding persistence, a claimed execution would leave no durable trace -- post-hoc replay detection would be impossible.",
+    "recommended_disposition": "Implement the persistence seam before the canonical authorization artifact can ever exist; until then treat as latent debt (steps 2-6 unreachable today).",
+    "implementation_authorized": false
+  },
+  {
+    "finding_id": "CI-8",
+    "domain": "D2",
+    "severity": "INFO",
+    "classification": "DURABLE_CROSS_PROCESS",
+    "path": "qntylab/research_ledger.py",
+    "lines_or_symbol": "CANDIDATES_PATH/DECISIONS_PATH (17-18), trials jsonl (325), duplicate detection (645-677)",
+    "claim": "Positive control: the research ledger is an append-only cross-process JSONL store on disk with duplicate event_id / duplicate-proposal validation -- a genuinely durable exactly-once-style record layer.",
+    "evidence": [
+      "research_ledger.py:17-18 RESEARCH_ROOT / 'candidates.jsonl', 'decisions.jsonl'",
+      "research_ledger.py:645 'duplicate event_id', 649 'duplicate candidate proposal ID', 652 'duplicate variant proposal'"
+    ],
+    "risk": "None identified for the ledger itself (single-writer assumptions apply).",
+    "recommended_disposition": "No action.",
+    "implementation_authorized": false
+  },
+  {
+    "finding_id": "CI-9",
+    "domain": "D2",
+    "severity": "LOW",
+    "classification": "PROCESS_LOCAL_ONLY",
+    "path": "qntylab/breadth_v2_input_bundle.py",
+    "lines_or_symbol": "_PRICE_SOURCE_CACHE (133), _FUNDING_SOURCE_CACHE (158), _PRICE_CLIP_CACHE (208), _FUNDING_CLIP_CACHE (228)",
+    "claim": "Module-level dict caches hold computed source/clip state process-locally; names are honest ('_CACHE') and no exactly-once/persistence semantics are claimed, but no restart or multi-worker limitation is documented at the definition sites.",
+    "evidence": [
+      "breadth_v2_input_bundle.py:133 _PRICE_SOURCE_CACHE[cache_key] = result",
+      "breadth_v2_input_bundle.py:208 _PRICE_CLIP_CACHE[price_key] = cached_price"
+    ],
+    "risk": "Cache-only; incorrect results cannot persist across processes. Minor: undocumented multi-worker memory behavior.",
+    "recommended_disposition": "Optionally document process-local scope in module docstring.",
+    "implementation_authorized": false
+  },
+  {
+    "finding_id": "CI-10",
+    "domain": "D2",
+    "severity": "MEDIUM",
+    "classification": "PROCESS_LOCAL_ONLY",
+    "path": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_consumer_seam_successor_v0.py (branch agent/funding-incremental-real-execution-consumer-seam-successor-implementation-v0 only; NOT in master HEAD)",
+    "lines_or_symbol": "_RECORDS (324), record/replay logic (391-409, 434-437)",
+    "claim": "PC-2 source confirmed on the #241 branch: exactly-once record/replay is backed by a module-local dict guarded by an RLock. A process restart or a second worker observes an empty _RECORDS and can re-CLAIM. The module docstring does disclose 'its exactly-once ledger is process-local', so the limitation is documented, but the exactly-once property is not durable (PC-2 verdict: confirmed on branch; master HEAD contains no module-local dict-backed exactly-once claim -- only honestly-named caches, see CI-9).",
+    "evidence": [
+      "branch file line 324: _RECORDS: dict[str, _StoredRecord] = {}",
+      "branch file line 325: _RECORD_LOCK = RLock()",
+      "branch file lines 391-402 existing = _RECORDS.get(identity); _RECORDS[identity] = stored",
+      "branch file lines 6-7 docstring: 'its exactly-once ledger is process-local and ...'",
+      "master check: no _RECORDS/_SEEN/_STATE/_CONSUMED/_CLAIMED module dicts exist in qntylab/ at HEAD (grep returned only test fixtures and cache names)"
+    ],
+    "risk": "Exactly-once semantics silently degrade to per-process at-most-once under restart/multi-worker; documented, but consumers reading 'ExactlyOnceConflictError' may over-trust.",
+    "recommended_disposition": "If the successor seam is ever merged, back the record ledger with the durable research-ledger JSONL or a git-ref claim, or rename the guarantee to process-local at-most-once.",
+    "implementation_authorized": false
+  },
+  {
+    "finding_id": "CI-11",
+    "domain": "D3",
+    "severity": "MEDIUM",
+    "classification": "SEMANTIC_BYPASS",
+    "path": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_real_capable_wrapper_v1.py",
+    "lines_or_symbol": "_invoke_successor_shared_core (196-205)",
+    "claim": "The real-capable wrapper imports the private _assemble_incremental_forecast_evaluation from the executor, bypassing run_incremental_forecast_evaluation and therefore the require_authorized_execution_mode guard (PC-4 verdict component). The wrapper substitutes its own Git-authenticated authorization as the mode source, so the bypass is intentional and currently unreachable (step 1 fails closed because the canonical artifact does not exist), but the private seam itself performs no guard.",
+    "evidence": [
+      "real_capable_wrapper_v1.py:196-198 from qntylab.jigsaw_funding_pressure_incremental_forecast_value_executor_v0 import _assemble_incremental_forecast_evaluation (inside function body)",
+      "real_capable_wrapper_v1.py:200-205 mode = authorization.get('execution_mode'); ... return _assemble_incremental_forecast_evaluation(rows, mode)",
+      "executor_v0.py:715-724 the guard exists only in the public entrypoint"
+    ],
+    "risk": "Latent: any future code copying this pattern obtains an unguarded evaluation assembly. Reachability today requires the non-existent canonical authorization artifact.",
+    "recommended_disposition": "Promote a guarded assembly variant (mode validated) into the executor's public API and have the wrapper call it.",
+    "implementation_authorized": false
+  },
+  {
+    "finding_id": "CI-12",
+    "domain": "D3",
+    "severity": "LOW",
+    "classification": "SAFE_INTERNAL_USE",
+    "path": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py",
+    "lines_or_symbol": "imports (59-117)",
+    "claim": "The executor imports 13 underscore-prefixed math symbols (_LN_10, _decimal, _design, _erf_series, _erfc_continued_fraction, _exact, _one_minus, _pi, _PI_DIGITS, _NORMAL_TAIL_*) from core_v1. Cross-module private use, but within the same frozen family as part of the authorized 'mechanical VERBATIM move' of the core; no authority or provenance semantics attach to these symbols.",
+    "evidence": [
+      "executor_v0.py:88-99 underscore imports from jigsaw_funding_pressure_incremental_forecast_value_core_v1",
+      "executor_v0.py:11-24 core extraction supersession docstring"
+    ],
+    "risk": "Minor: private names are de facto shared API within the family; future core refactors could break the executor silently.",
+    "recommended_disposition": "Either publish the shared math constants/functions or add a family-internal compatibility test (tests/test_funding_incremental_executor_core_extraction_successor_v1.py CORE_MATH_FUNCTIONS partially covers this).",
+    "implementation_authorized": false
+  },
+  {
+    "finding_id": "CI-13",
+    "domain": "D3",
+    "severity": "LOW",
+    "classification": "PUBLIC_CONTRACT_BYPASS",
+    "path": "qntylab/pit_instrument_catalog.py, qntylab/pit_research_admission.py, qntylab/pit_universe_composition.py, qntylab/r1_acquisition_bom_v3.py",
+    "lines_or_symbol": "pit_instrument_catalog.py:16, pit_research_admission.py:58, pit_universe_composition.py:81, r1_acquisition_bom_v3.py:14",
+    "claim": "Production modules import private validators (_require_identity, _require_non_empty, _require_timestamp from evidence_claim_split; _segments from r1_input_bom) across module boundaries -- a public-contract bypass of the underscore convention, though the functions are pure validators with no authority semantics.",
+    "evidence": [
+      "pit_instrument_catalog.py:16 from qntylab.evidence_claim_split import _require_identity, _require_non_empty, _require_timestamp",
+      "pit_research_admission.py:58 from qntylab.evidence_claim_split import _require_identity, _require_timestamp",
+      "r1_acquisition_bom_v3.py:14 from qntylab.r1_input_bom import _segments"
+    ],
+    "risk": "Private helpers can change without notice; no safety property is weakened today.",
+    "recommended_disposition": "Promote shared validators to public names or a shared internal module with an explicit contract.",
+    "implementation_authorized": false
+  },
+  {
+    "finding_id": "CI-14",
+    "domain": "D3",
+    "severity": "INFO",
+    "classification": "TEST_ONLY",
+    "path": "tests/",
+    "lines_or_symbol": "test_breadth_v2_family_decision.py:7, test_breadth_v2_terminal_metrics.py:3, test_jfp03_v0r3_prefix_materialization.py:482-483, tests/test_lab.py:9,13, and ~10 more",
+    "claim": "The remaining cross-module private-name imports are confined to tests (e.g. _relative_value_diagnostics, _single_asset_cell, _strategy_warmup_bars, _write_json_exclusive, _perp_splits, _one) -- conventional white-box testing, no production bypass.",
+    "evidence": [
+      "tests/test_jfp03_v0r3_prefix_materialization.py:482-483 attr use of module._write_json_exclusive / module._replace_json",
+      "tests/test_curated_breadth_screen_sleeves_v1.py:13 from qntylab.strategy_test import _strategy_warmup_bars, _validate_positions"
+    ],
+    "risk": "None beyond test coupling.",
+    "recommended_disposition": "No action.",
+    "implementation_authorized": false
+  },
+  {
+    "finding_id": "CI-15",
+    "domain": "D4",
+    "severity": "MEDIUM",
+    "classification": "MISLEADING_NAME",
+    "path": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_real_capable_wrapper_v1.py",
+    "lines_or_symbol": "_record_exactly_one_result (208-217) + docstring claims (23-35, 245-246)",
+    "claim": "A caller reading the name and the six-step docstring would infer that an exactly-once persistent result record exists (step 6); in reality nothing is written and the claim digest is explicitly discarded. Same underlying defect as CI-7 flagged here as an API-semantics violation: the strongest safety property a caller could infer (durable exactly-once result recording) does not exist.",
+    "evidence": [
+      "real_capable_wrapper_v1.py:30 docstring '6. record exactly one result.'",
+      "real_capable_wrapper_v1.py:216 '_ = claim_digest  # recorded with the result by the future persistence seam'",
+      "Contrast: REAL_CAPABLE_PHASE_ATTESTATION honestly reports SCIENTIFIC_RESULT_RECORDED: False"
+    ],
+    "risk": "Future maintainers wiring downstream consumers to step 6 would assume a durable receipt that is never produced.",
+    "recommended_disposition": "Rename to _bind_claim_digest_to_result (or similar) until persistence is implemented, or implement the persistence seam.",
+    "implementation_authorized": false
+  },
+  {
+    "finding_id": "CI-16",
+    "domain": "D4",
+    "severity": "MEDIUM",
+    "classification": "MISLEADING_NAME",
+    "path": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py",
+    "lines_or_symbol": "NO_REAL_EXECUTION_ATTESTATION (135-154) embedded in results (684)",
+    "claim": "The name implies a verified negative ('no real execution was performed'), but the mapping is a compile-time constant embedded verbatim into any evaluation payload, including any evaluation assembled from arbitrary caller rows via the private assembly. It records intent of the module, not an observation of the run.",
+    "evidence": [
+      "executor_v0.py:135-154 static MappingProxyType with all False constants",
+      "executor_v0.py:684 payload['no_real_execution_attestation'] = dict(sorted(NO_REAL_EXECUTION_ATTESTATION.items()))",
+      "executor_v0.py:133 'Frozen, machine-readable statement of what this implementation freeze did NOT do.'"
+    ],
+    "risk": "Downstream consumers may treat the embedded attestation as run-level evidence of provenance (over-trust), especially given it is covered by result_digest.",
+    "recommended_disposition": "Document explicitly that the attestation is a module-level freeze statement, not a per-run observation; ideally derive per-run values from assembly inputs.",
+    "implementation_authorized": false
+  },
+  {
+    "finding_id": "CI-17",
+    "domain": "D4",
+    "severity": "INFO",
+    "classification": "SAFE_INTERNAL_USE",
+    "path": "qntylab/",
+    "lines_or_symbol": "ForecastRow (executor_v0.py:303), IncrementalForecastEvaluation (507-531), V2AuthorizationEnvelope (v2:317-320), AuthorityBoundInputEnvelope (branch file, frozen+slots)",
+    "claim": "Positive control: names carrying frozen/immutable/canonical semantics are matched by frozen=True, slots=True dataclasses, MappingProxyType freezes, and digest bindings; the one object.__setattr__ in master (prospective_deribit_dvol_live_smoke.py:86) is a benign freeze (MappingProxyType of sorted headers).",
+    "evidence": [
+      "executor_v0.py:303 @dataclass(frozen=True, slots=True) class ForecastRow",
+      "v2:317 @dataclass(frozen=True, slots=True) class V2AuthorizationEnvelope",
+      "grep HEAD: only object.__setattr__ hit is prospective_deribit_dvol_live_smoke.py:86"
+    ],
+    "risk": "None identified.",
+    "recommended_disposition": "No action.",
+    "implementation_authorized": false
+  },
+  {
+    "finding_id": "CI-18",
+    "domain": "D5",
+    "severity": "INFO",
+    "classification": "CALLER_SELECTABLE_BUT_SAFE",
+    "path": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py",
+    "lines_or_symbol": "require_authorized_execution_mode (169-180), AUTHORIZED_EXECUTION_MODES (131)",
+    "claim": "execution_mode is a caller-selectable string, but the accepted set is frozen to the single value SYNTHETIC_VALIDATION and any other value raises UnauthorizedExecutionError before row validation; the module additionally owns no reader capable of producing real rows (structural defence).",
+    "evidence": [
+      "executor_v0.py:130-131 EXECUTION_MODE_SYNTHETIC_VALIDATION = 'SYNTHETIC_VALIDATION'; AUTHORIZED_EXECUTION_MODES = (EXECUTION_MODE_SYNTHETIC_VALIDATION,)",
+      "executor_v0.py:175-180 fail-closed raise on any other mode",
+      "executor_v0.py:26-34 'it contains no data reader, no network client, and no evidence loader'"
+    ],
+    "risk": "Low; the residual risk is the unguarded private assembly (CI-11).",
+    "recommended_disposition": "No action beyond CI-11 remediation.",
+    "implementation_authorized": false
+  },
+  {
+    "finding_id": "CI-19",
+    "domain": "D5",
+    "severity": "MEDIUM",
+    "classification": "DERIVED_FROM_VERIFIED_ARTIFACT",
+    "path": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_real_capable_wrapper_v1.py",
+    "lines_or_symbol": "_invoke_successor_shared_core (200-205)",
+    "claim": "The real-capable wrapper takes execution_mode from the Git-authenticated canonical authorization (verified artifact, so not caller-selectable), but then accepts any non-empty string and passes it straight into the private assembly without enum membership validation; the mode would be embedded into the result payload and digest as-is.",
+    "evidence": [
+      "real_capable_wrapper_v1.py:200-204 mode = authorization.get('execution_mode'); if not isinstance(mode, str) or not mode: raise",
+      "real_capable_wrapper_v1.py:205 return _assemble_incremental_forecast_evaluation(rows, mode)",
+      "executor_v0.py:661 payload['execution_mode'] = mode (embedded into result digest)"
+    ],
+    "risk": "Latent: when the authorization artifact eventually exists, a malformed or unexpected mode string in it would flow into result identity unchecked (e.g. lowercase 'synthetic_validation' would bypass nothing today because the wrapper does not compare against AUTHORIZED_EXECUTION_MODES).",
+    "recommended_disposition": "Validate the authorization's execution_mode against an explicit whitelist before assembly.",
+    "implementation_authorized": false
+  },
+  {
+    "finding_id": "CI-20",
+    "domain": "D5",
+    "severity": "INFO",
+    "classification": "CANONICALLY_BOUND",
+    "path": "qntylab/jigsaw_funding_pressure_execution_v2.py",
+    "lines_or_symbol": "validate_v2_authorization (344-351), attest_v2_runtime (360-391)",
+    "claim": "Positive control: authority strings in the V2 envelope (reviewed_executor_candidate_sha, canonical_runtime_merge_sha, executor_source_sha256, contract digest) are caller-supplied strings but are canonically bound -- validated against Git object identity, HEAD equality, clean worktree, required ancestor commits, and byte-identical runtime source before any computation; the one-shot claim gates evidence access (execute_authorized_frozen_experiment_v2:402-410).",
+    "evidence": [
+      "v2:367-372 head != authorization...canonical_runtime_merge_sha -> RuntimeAttestationError",
+      "v2:380-389 runtime byte digest vs authorized digest and candidate bytes equality",
+      "v2:406-409 outcome is not ClaimOutcome.CLAIMED -> AtMostOnceClaimError before evidence_loader() runs"
+    ],
+    "risk": "None identified at this boundary.",
+    "recommended_disposition": "No action.",
+    "implementation_authorized": false
+  },
+  {
+    "finding_id": "CI-21",
+    "domain": "D6",
+    "severity": "INFO",
+    "classification": "SAFE_INTERNAL_USE",
+    "path": "qntylab/",
+    "lines_or_symbol": "repo-wide AST scan (scan_candidates.json d6_hardening)",
+    "claim": "Positive control: hardening posture is strong. No mutable default arguments, no frozen-dataclass subclassing, no __dict__ assignment, and no object.__new__/object.__setattr__ outside a single benign freeze in master qntylab/. Authority/provenance dataclasses use frozen=True + slots=True and revalidate at consumption (validate_forecast_rows at assembly entry; validate_v2_authorization before computation).",
+    "evidence": [
+      "scan output d6_hardening: no d6_mutable_default or d6_frozen_subclass tags emitted for qntylab/",
+      "executor_v0.py:573 validated = validate_forecast_rows(rows) inside _assemble_incremental_forecast_evaluation",
+      "v2:344-351 validate_v2_authorization revalidates digest bindings from the envelope"
+    ],
+    "risk": "None identified.",
+    "recommended_disposition": "No action.",
+    "implementation_authorized": false
+  },
+  {
+    "finding_id": "CI-22",
+    "domain": "D6",
+    "severity": "LOW",
+    "classification": "SAFE_INTERNAL_USE",
+    "path": "qntylab/jigsaw_funding_pressure_execution_v2.py",
+    "lines_or_symbol": "validate_v2_authorization (347-348)",
+    "claim": "dataclasses.replace is used to graft caller-envelope SHAs onto the canonical binding expectations before validation. The replaced fields are then independently re-validated against Git runtime identity (attest_v2_runtime), so the mutation cannot forge authority; noted only because expectations derived from the envelope reduce independence between the compared values.",
+    "evidence": [
+      "v2:347-349 expected = foundation.canonical_authorization_binding_expectations(executor_source_sha256=envelope.foundation.executor_source_sha256); expected = dataclasses.replace(expected, reviewed_executor_candidate_sha=..., canonical_runtime_merge_sha=...); foundation.validate_authorization_envelope(envelope.foundation, expected)",
+      "v2:371-389 independent Git/byte re-verification of the same SHAs"
+    ],
+    "risk": "Minimal; defense in depth exists in attest_v2_runtime.",
+    "recommended_disposition": "No action; document the double-check relationship.",
+    "implementation_authorized": false
+  },
+  {
+    "finding_id": "CI-23",
+    "domain": "PC",
+    "severity": "HIGH",
+    "classification": "CALLER_ASSERTED_PROVENANCE",
+    "path": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_consumer_seam_successor_v0.py (branch agent/funding-incremental-real-execution-consumer-seam-successor-implementation-v0, commit cd999bc/d181d12; NOT in master HEAD)",
+    "lines_or_symbol": "ForecastRowBatch.from_offline_synthetic_rows (200-216)",
+    "claim": "PC-1 CONFIRMED on the #241 branch: the sole input constructor unconditionally stamps object.__setattr__(instance, 'synthetic_only', True) regardless of row origin. Provenance is forced by the factory name, not verified from bytes: a caller passing real ForecastRow values to from_offline_synthetic_rows obtains a batch labeled synthetic_only=True with a valid content digest over those real rows; _interpret_input (364) then checks only batch.synthetic_only is not True. Master check: structurally similar constructor-forced provenance is NOT present at HEAD -- the only object.__setattr__ is a benign MappingProxyType freeze (prospective_deribit_dvol_live_smoke.py:86) and no synthetic_only symbol exists in master qntylab/.",
+    "evidence": [
+      "branch file line 197: synthetic_only: bool (field of frozen slots dataclass)",
+      "branch file line 215: object.__setattr__(instance, 'synthetic_only', True) inside from_offline_synthetic_rows",
+      "branch file line 364: if batch.synthetic_only is not True: raise AuthorityBoundaryError",
+      "branch file lines 205-210: only checks rows are ForecastRow instances and computes digests; no provenance verification",
+      "master: git grep synthetic_only qntylab/ at HEAD -> no hits; ls qntylab | grep consumer_seam -> NOT_IN_HEAD"
+    ],
+    "risk": "Synthetic provenance laundering: real outcomes could be laundered into an 'offline synthetic batch' with a self-consistent digest and a synthetic-only authority envelope.",
+    "recommended_disposition": "Keep the branch unmerged; if the successor seam is revived, derive synthetic_only from verified row origin (e.g. authenticated factory receipt) rather than constructor identity.",
+    "implementation_authorized": false
+  },
+  {
+    "finding_id": "CI-24",
+    "domain": "PC",
+    "severity": "INFO",
+    "classification": "NOT_APPLICABLE",
+    "path": "qntylab/ (master HEAD)",
+    "lines_or_symbol": "repo-wide grep + AST module-state scan",
+    "claim": "PC-2 master-side verdict: current master code contains no module-local dict/set-backed exactly-once claim. The only mutable module-level dicts in qntylab/ are honestly-named process-local caches (breadth_v2_input_bundle.py:133/158/208/228) and constant lookup tables; durable exactly-once is implemented via the remote git-ref claim transport (CI-6) and the append-only research ledger (CI-8). The _RECORDS defect exists only on the unmerged #241 branch (CI-10).",
+    "evidence": [
+      "grep '(_RECORDS|_SEEN|_STATE|_CACHE|_CONSUMED|_CLAIMED)\\[' qntylab/*.py -> only breadth_v2_input_bundle caches",
+      "research_ledger.py:17-18,645-677 durable JSONL with duplicate detection",
+      "foundation_v0.py:873-888 remote ref-based claim"
+    ],
+    "risk": "None on master.",
+    "recommended_disposition": "No action on master; guard CI-10 when the branch is revisited.",
+    "implementation_authorized": false
+  },
+  {
+    "finding_id": "CI-25",
+    "domain": "PC",
+    "severity": "MEDIUM",
+    "classification": "CALLER_ASSERTED_PROVENANCE",
+    "path": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_synthetic_wrapper_v1.py",
+    "lines_or_symbol": "require_synthetic_validation_mode (64-71), run_synthetic_validation_evaluation (74-84)",
+    "claim": "PC-3 verdict: the synthetic wrapper's contract only enforces execution mode (string equality against SYNTHETIC_VALIDATION); it does NOT independently prove row provenance. It performs no origin verification, no factory authentication, and no data classification check; rows are taken on trust. The synthetic-only attestation record (SYNTHETIC_ROWS_ONLY: True) describes wrapper configuration, not verified input provenance.",
+    "evidence": [
+      "synthetic_wrapper_v1.py:66 if execution_mode != EXECUTION_MODE_SYNTHETIC_VALIDATION: raise UnauthorizedExecutionError",
+      "synthetic_wrapper_v1.py:84 return run_incremental_forecast_evaluation(rows, execution_mode=mode) -- rows passed unmodified",
+      "synthetic_wrapper_v1.py:45-47 attestation 'SYNTHETIC_ROWS_ONLY': True, 'REAL_ROWS_ACCEPTED': False (no code enforces REAL_ROWS_ACCEPTED=False)"
+    ],
+    "risk": "Moderate: mitigated structurally because the shared executor itself has no real-data reader (executor_v0.py:26-34), so the wrapper cannot fetch real evidence; laundering requires a caller to construct rows externally (see CI-1).",
+    "recommended_disposition": "Document the mode-only enforcement explicitly, or add row-provenance verification.",
+    "implementation_authorized": false
+  },
+  {
+    "finding_id": "CI-26",
+    "domain": "PC",
+    "severity": "MEDIUM",
+    "classification": "DECLARED_BUT_NOT_IMPLEMENTED",
+    "path": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_real_capable_wrapper_v1.py",
+    "lines_or_symbol": "steps 2-6 (128-246), step 1 (106-125, 236)",
+    "claim": "PC-4 verdict: (a) _invoke_successor_shared_core uses the private _assemble_incremental_forecast_evaluation, bypassing the public guarded entrypoint (CI-11); (b) _record_exactly_one_result claims persistence but records nothing (CI-7/CI-15); (c) claimed persistence does not exist anywhere in the module -- no file, ledger, or transport write occurs; (d) the wrapper is currently unreachable: step 1 delegates to the Git-identity authenticator whose canonical artifact does not exist (canonical_authorization_exists() -> False verified at runtime), so steps 2-6 cannot execute. Classification: latent design debt, NOT a reachable authority violation today. It would become reachable only if the canonical authorization artifact is committed AND a claim transport plus frozen-evidence factory are supplied through the supported lifecycle path -- exactly the path that would also expose CI-7's missing persistence.",
+    "evidence": [
+      "real_capable_wrapper_v1.py:236 authorization = validate_canonical_evaluation_authorization(authorization_path) (first statement of run_real_capable_evaluation)",
+      "provenance_v1.py:37-39 module docstring 'the canonical evaluation authorization artifact ... does not exist anywhere in the repository at this phase, so step 1 always fails closed today and steps 2-6 are unreachable'",
+      "runtime: python -c canonical_authorization_exists() -> False",
+      "real_capable_wrapper_v1.py:216 '_ = claim_digest' (discarded)",
+      "real_capable_wrapper_v1.py:176-179 no factory bound to evidence -> fail closed"
+    ],
+    "risk": "Latent debt compounding: activation of the authority envelope without implementing persistence and mode validation would create a reachable authority violation in one lifecycle step.",
+    "recommended_disposition": "Before any canonical authorization artifact is created: implement step 6 persistence, validate the authorization execution_mode whitelist, and route assembly through a guarded public executor API. Until then no code change is required; keep the artifact absent.",
+    "implementation_authorized": false
+  }
+]

@@ -1,0 +1,138 @@
+{
+ "audit": "QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0",
+ "repo_head": "be291300abb70f3ffc6ba0dd8b1bea570daf5377",
+ "domain": 14,
+ "context": {
+  "pr": 241,
+  "branch": "agent/funding-incremental-real-execution-consumer-seam-successor-implementation-v0",
+  "commits": [
+   "cd999bc90191c43f42044f0f5fe47c2471614965",
+   "d181d12096e19c1dbe2f89585e73b8f8f7b6b21f"
+  ],
+  "merged": false,
+  "tests_added_on_branch": [
+   "tests/test_funding_incremental_real_execution_consumer_seam_successor_v0.py"
+  ]
+ },
+ "p1_findings": [
+  {
+   "p1": "a_from_offline_synthetic_rows_forces_synthetic_only_true_on_arbitrary_rows",
+   "defect": "ForecastRowBatch.from_offline_synthetic_rows accepts any sequence of typed ForecastRow values and unconditionally sets synthetic_only=True (branch module lines ~203-215), so rows of arbitrary provenance are laundered into a batch attested as synthetic.",
+   "gap_class": "MISSING_ADVERSARIAL_PROVENANCE_TEST",
+   "why_tests_passed": [
+    "FIXTURE_ASSUMES_CONTRACT: every batch in the test file is built via seam.ForecastRowBatch.from_offline_synthetic_rows(build_rows(...)) (test helper _batch), i.e. the sole constructor is also the defect; the tests trust the constructor name as the provenance statement.",
+    "ASSERTION_TOO_WEAK: test_typed_authority_boundary_preserves_frozen_result_and_ordering asserts synthetic behavior only indirectly (result_digest equality with the frozen executor run in EXECUTION_MODE_SYNTHETIC_VALIDATION); no test feeds a row whose origin field is a real/evidence origin and asserts rejection, because the seam's origin-interpretation helper _identity_scalar copies origin through without any origin allow-list check.",
+    "OVERFIT_TO_IMPLEMENTATION: tests assert structural properties (single public function, forbidden attribute names, manifest fields) but never the provenance invariant that inputs carrying non-synthetic origins must fail closed at the batch boundary."
+   ],
+   "gap_tags": [
+    "MISSING_ADVERSARIAL_PROVENANCE_TEST",
+    "ASSERTION_TOO_WEAK",
+    "FIXTURE_ASSUMES_CONTRACT",
+    "OVERFIT_TO_IMPLEMENTATION"
+   ]
+  },
+  {
+   "p1": "b_records_process_local_dict_claimed_exactly_once",
+   "defect": "Exactly-once persistence is implemented as a process-local dict (_RECORDS at branch module line ~324, guarded by an RLock) and presented in ordering events/manifest as exactly-once recording; a process restart silently loses the ledger and re-records, and two processes each keep their own ledger.",
+   "gap_class": "MISSING_RESTART_TEST",
+   "why_tests_passed": [
+    "FIXTURE_ASSUMES_CONTRACT: the autouse fixture isolated_ephemeral_record_store clears seam._RECORDS around every test, normalizing ledger reset as expected behavior and never testing persistence across any state boundary.",
+    "MISSING_RESTART_TEST: no test re-imports the module, reloads it, or runs a second interpreter to observe that prior records vanish.",
+    "MISSING_MULTIPROCESS_TEST: no test runs consume_forecast_batch from two processes against the same record identity; the RLock only serializes threads within one process, so exactly-once holds only in-process and no test detects the multi-process divergence.",
+    "ASSERTION_TOO_WEAK: replay tests (test_typed_authority_boundary..., test_batch_and_record_serialization...) assert replayed is True for an in-process second call, which is satisfied equally by a dict lookup and by durable exactly-once storage; the manifest test asserts exactly_once.wall_clock_dependency is False but no test asserts the storage substrate survives process death."
+   ],
+   "gap_tags": [
+    "MISSING_RESTART_TEST",
+    "MISSING_MULTIPROCESS_TEST",
+    "ASSERTION_TOO_WEAK",
+    "FIXTURE_ASSUMES_CONTRACT"
+   ]
+  }
+ ],
+ "master_blind_spot_probes": {
+  "method": "regex probes over tests/*.py at HEAD be291300 (filenames only, deterministic)",
+  "probes": {
+   "module_private_state_asserts": [
+    "test_pit_universe_composition_v0.py"
+   ],
+   "monkeypatch_of_qntylab_modules": [
+    "test_prospective_deribit_dvol_live_smoke.py",
+    "test_research_ledger.py",
+    "test_strategy_test.py"
+   ],
+   "multiprocess_or_restart_coverage": [],
+   "direct_authority_or_provenance_construction": [
+    "test_funding_incremental_executor_core_extraction_differential_v1.py",
+    "test_funding_incremental_executor_core_extraction_successor_v1.py",
+    "test_funding_incremental_pre_execution_integrity_v0.py",
+    "test_funding_incremental_real_execution_consumer_seam_implementation_authorization_v0.py",
+    "test_jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py"
+   ],
+   "exactly_once_or_replay_asserts": [
+    "test_breadth_v2_sealed_observation_sync.py",
+    "test_context_spine_foundation_v0.py",
+    "test_dsh_stage_a_v1_hard_gated_profile.py",
+    "test_dsh_stage_a_v1r3r2_one_episode_live_execution_authorization_v0r4.py",
+    "test_dsh_stage_a_v1r3r2_one_episode_live_execution_authorization_v0r6.py",
+    "test_dsh_stage_a_v1r3r2_production_dsh_home_materialization_authorization_v0.py",
+    "test_funding_incremental_real_execution_consumer_seam_successor_closure_v0.py",
+    "test_jfp_v3_shadow.py",
+    "test_jh01_v1_pre_origin_e2e_proof_v0.py",
+    "test_jh01_v1_prospective_production_caller_v0.py",
+    "test_jigsaw_funding_pressure_execution_v2.py",
+    "test_jigsaw_synthesis_v0.py",
+    "test_pinned_dsh_codex_write_path_materialization_v0.py",
+    "test_pit_universe_composition_v0.py",
+    "test_r1_source_structure_recognition_amendment_v1.py",
+    "test_research_data_spine_v0.py",
+    "test_subscription_backed_native_product_execution_qualification_v0.py"
+   ]
+  },
+  "interpretation": {
+   "module_private_state_asserts": "tests reaching into module-level private dicts/state directly (same class as the _RECORDS fixture clearing in #241): 1 file(s)",
+   "monkeypatch_of_qntylab_modules": "tests monkeypatching qntylab module attributes (authority/behavior seams swappable in-test): 3 file(s)",
+   "multiprocess_or_restart_coverage": "nearly all hits are subprocess-based fixtures for external tools (pinned DSH, dvol smoke), not multiprocess/restart tests of claim/exactly-once paths: 0 file(s)",
+   "direct_authority_or_provenance_construction": "tests constructing objects with authority/provenance-bearing fields directly: 5 file(s)",
+   "exactly_once_or_replay_asserts": "tests asserting replay/exactly-once behavior; most only exercise in-process replay of happy paths: 17 file(s)"
+  }
+ },
+ "invariant_test_recommendations": [
+  {
+   "invariant": "PROVENANCE_CONSTRUCTOR_HONESTY: any constructor or wrapper that marks data as synthetic/offline must reject rows whose origin/provenance fields indicate real evidence or non-synthetic acquisition; a type check is not a provenance check.",
+   "proposed_detection_strategy": "For every factory with a synthetic/offline/offline-only name, generate adversarial inputs: take the standard fixture rows and flip origin-like fields to real-world identifiers (e.g. exchange trade timestamps, evidence paths, acquired dataset digests); assert the constructor or the boundary call fails closed with a provenance error. Also assert synthetic_only cannot be set on batches whose rows carry real-origin markers.",
+   "would_have_caught": "PR #241 P1(a): from_offline_synthetic_rows laundering arbitrary rows as synthetic_only."
+  },
+  {
+   "invariant": "EXACTLY_ONCE_SURVIVES_PROCESS_BOUNDARY: any record path claimed exactly-once must produce identical state (no duplicate records, no lost records) after process restart and across concurrent processes.",
+   "proposed_detection_strategy": "Run the recording path in a child process, then in a fresh child process replay the same record identity and assert replayed=True with identical canonical record; run two child processes racing the same identity and assert exactly one record exists afterwards. Reject any ledger implemented purely as in-process memory by injecting a module reload between calls.",
+   "would_have_caught": "PR #241 P1(b): _RECORDS process-local dict presented as exactly-once persistence."
+  },
+  {
+   "invariant": "NO_MODULE_DICT_STATE_FOR_PERSISTENCE: durable state must live outside the Python module namespace; tests must never need to clear module-private dicts for isolation.",
+   "proposed_detection_strategy": "Static test-lint invariant: forbid test fixtures that clear/patch module-private dicts (_NAME patterns) of qntylab modules; pair with a runtime invariant that persistence APIs expose a storage substrate handle (file/db path) whose existence is asserted.",
+   "would_have_caught": "PR #241 P1(b) and the same pattern in other modules whose tests clear private state to reset persistence."
+  },
+  {
+   "invariant": "AUTHORITY_FIELDS_ARE_FACTORY_ONLY_AND_MEANINGFUL: authority/attestation flags (synthetic_only, authority_scope, execution_mode, attestation maps) must be derived from verified inputs, not constants stamped by the constructor, and negative-attestation maps must be cross-checked against what the code actually touches.",
+   "proposed_detection_strategy": "Property test: for each attested-negative flag (real_data_accessed=False etc.), attach canary instrumentation (e.g. sandboxed filesystem/network hooks or monkeypatched io primitives) and execute the public boundary; assert canaries never fire while attestation stays negative. Additionally require that flag-setting code paths reference input-derived evidence, via AST check that the flag is not a constant True assigned in a factory.",
+   "would_have_caught": "PR #241 P1(a) (synthetic_only=True constant) and attestation drift in future offline seams."
+  },
+  {
+   "invariant": "REPLAY_CONFLICT_NEGATIVE_PATH: presenting the same record identity with different content must fail closed not only in-process but after restart (the durable record must win).",
+   "proposed_detection_strategy": "Reuse the restart harness from the exactly-once invariant: record identity I with content A, restart, present identity I with content B, assert conflict error, then present A again and assert replayed=True.",
+   "would_have_caught": "PR #241 conflict test only covered the in-process dict; the restart variant would have exposed the non-persistence."
+  },
+  {
+   "invariant": "HAPPY_PATH_ONLY_TEST_SMELL: tests of authority/attestation-bearing seams must include at least one negative input per authority axis (origin, outcome access, provider access, claim access).",
+   "proposed_detection_strategy": "Coverage-matrix lint: for each module with an attestation map, require tests referencing each negative axis; CI check fails if a seam module's test file contains zero references to rejection of non-synthetic origins or unauthorized axes.",
+   "would_have_caught": "Both #241 P1s: the test file contains fail-closed tests for untyped inputs but none for provenance-real inputs, and none for storage-substrate failure."
+  },
+  {
+   "invariant": "MANIFEST_CLAIMS_ARE_TESTABLE_BEHAVIOR: every claim in an implementation manifest (exactly_once, wall_clock_dependency, offline_firewall) must map to at least one behavioral test, not just a JSON field equality assert.",
+   "proposed_detection_strategy": "Cross-reference lint: extract boolean claim keys from experiments/research/**/implementation_manifest.json files; require matching test names/keywords in the bound test file; report manifests whose claims are only string-compared in tests.",
+   "would_have_caught": "PR #241: manifest asserted exactly_once semantics while tests only verified JSON field values."
+  }
+ ],
+ "no_tests_added": true,
+ "method": "git diff master...d181d120 for branch tests; manual reading of branch test file and branch module source; regex probes over tests/*.py at HEAD; invariant classes derived from P1 mechanisms, not phase specifics."
+}

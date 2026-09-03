@@ -1,0 +1,155 @@
+{
+  "HAS_MAKEFILE": false,
+  "HAS_PYPROJECT": false,
+  "HAS_SETUP_CFG": false,
+  "HAS_SETUP_PY": false,
+  "HAS_TOX_INI": false,
+  "audit": "QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0",
+  "candidate_existence_at_repo_root": {
+    ".black": false,
+    ".flake8": false,
+    ".isort.cfg": false,
+    ".mypy.ini": false,
+    ".pre-commit-config.yaml": false,
+    ".ruff.toml": false,
+    "Makefile": false,
+    "Pipfile": false,
+    "conftest.py": false,
+    "mypy.ini": false,
+    "noxfile.py": false,
+    "poetry.lock": false,
+    "pyproject.toml": false,
+    "pyrightconfig.json": false,
+    "pytest.ini": false,
+    "ruff.toml": false,
+    "setup.cfg": false,
+    "setup.py": false,
+    "tox.ini": false
+  },
+  "candidates_found_anywhere_tracked": {},
+  "ci_bootstrap_sequence": [
+    {
+      "command": "actions/checkout@v4",
+      "kind": "uses",
+      "line": 60
+    },
+    {
+      "command": "actions/setup-python@v5",
+      "kind": "uses",
+      "line": 69
+    },
+    {
+      "command": "python -m pip install pytest requests",
+      "kind": "run",
+      "line": 72
+    },
+    {
+      "command": "python -m qntylab.project_context doctor --strict",
+      "kind": "run",
+      "line": 73
+    },
+    {
+      "command": "python -m qntylab.project_context render --check",
+      "kind": "run",
+      "line": 74
+    },
+    {
+      "command": "python -m qntylab.project_context spine > /dev/null",
+      "kind": "run",
+      "line": 75
+    },
+    {
+      "command": "python -m qntylab.project_context brief > /dev/null",
+      "kind": "run",
+      "line": 76
+    },
+    {
+      "command": "python -m qntylab.research_ledger doctor",
+      "kind": "run",
+      "line": 77
+    },
+    {
+      "command": "python -m pytest -q tests/test_project_context_v0.py tests/test_context_spine_foundation_v0.py tests/test_context_spine_brief_v0.py tests/test_context_spine_ori",
+      "kind": "run",
+      "line": 81
+    },
+    {
+      "command": "node --test experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_execution_contract_reconciliation_v0/test/repository-determinis",
+      "kind": "run",
+      "line": 89
+    },
+    {
+      "command": "actions/setup-node@v4",
+      "kind": "uses",
+      "line": 122
+    },
+    {
+      "command": "node --test experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/test/prelive-enfor",
+      "kind": "run",
+      "line": 255
+    }
+  ],
+  "documented_verify_lines": [
+    {
+      "excerpt": "python -m pytest -q",
+      "file": "README.md",
+      "line": 65
+    }
+  ],
+  "pytest_config_location": {
+    "conftest_py_tracked": false,
+    "pyproject.toml": false,
+    "pytest.ini": false,
+    "qntylab.toml": true,
+    "setup.cfg": false
+  },
+  "qntylab_toml_structure": {
+    "bytes": 585,
+    "lines": 18,
+    "sections": {
+      "authority": [
+        "current_roadmap",
+        "ecosystem_catalog",
+        "global_architecture_registry",
+        "project_registry",
+        "research_ledger_root"
+      ],
+      "bootstrap": [
+        "context_command",
+        "context_spine_command",
+        "research_context_command"
+      ],
+      "data": [
+        "future_registry",
+        "registry_status"
+      ],
+      "repository_id": "str",
+      "schema_version": "int"
+    },
+    "top_level_keys": [
+      "authority",
+      "bootstrap",
+      "data",
+      "repository_id",
+      "schema_version"
+    ]
+  },
+  "repo_head": "be291300abb70f3ffc6ba0dd8b1bea570daf5377",
+  "requirements_files": [
+    {
+      "bytes": 78,
+      "content": [
+        "# Frozen V0 materialization and verified local Parquet reader.",
+        "polars==1.32.3"
+      ],
+      "name": "requirements-data-spine-v0.txt"
+    },
+    {
+      "bytes": 19,
+      "content": [
+        "websockets==16.1.1"
+      ],
+      "name": "requirements-dvol-v0-live-smoke.txt"
+    }
+  ]
+}

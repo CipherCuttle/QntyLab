@@ -1,0 +1,920 @@
+{
+  "audit": "QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0",
+  "bytes_by_top_level_directory": {
+    "(root)": 9043,
+    ".github": 21671,
+    "data": 21093250,
+    "docs": 1217157,
+    "experiments": 72935668,
+    "ops": 17725,
+    "qntylab": 2454793,
+    "qualifications": 85001,
+    "tests": 2638602
+  },
+  "generated_looking_artifacts": [
+    {
+      "bytes": 4642245,
+      "path": "data/derived/focused_trend_validation_v1/BTCUSDT-spot-1h-2023-halt-normalized.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 4477484,
+      "path": "data/derived/focused_trend_validation_v1/ETHUSDT-spot-1h-2023-halt-normalized.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 4215272,
+      "path": "data/derived/focused_trend_validation_v1/SOLUSDT-spot-1h-2023-halt-normalized.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 369044,
+      "path": "data/raw/ALICEUSDT-perp-funding-events.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 368617,
+      "path": "data/raw/APEUSDT-perp-funding-events.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 601362,
+      "path": "data/raw/API3USDT-perp-funding-events.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 367324,
+      "path": "data/raw/APTUSDT-perp-funding-events.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 369759,
+      "path": "data/raw/BCHUSDT-perp-funding-events.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 363052,
+      "path": "data/raw/CHRUSDT-perp-funding-events.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 366006,
+      "path": "data/raw/CHZUSDT-perp-funding-events.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 365842,
+      "path": "data/raw/ETCUSDT-perp-funding-events.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 366204,
+      "path": "data/raw/GMTUSDT-perp-funding-events.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 367655,
+      "path": "data/raw/INJUSDT-perp-funding-events.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 365000,
+      "path": "data/raw/LDOUSDT-perp-funding-events.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 368575,
+      "path": "data/raw/LINKUSDT-perp-funding-events.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 366161,
+      "path": "data/raw/LTCUSDT-perp-funding-events.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 362697,
+      "path": "data/raw/ONEUSDT-perp-funding-events.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 363625,
+      "path": "data/raw/OPUSDT-perp-funding-events.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 460037,
+      "path": "data/raw/REEFUSDT-perp-funding-events.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 368198,
+      "path": "data/raw/SANDUSDT-perp-funding-events.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 368059,
+      "path": "data/raw/TRXUSDT-perp-funding-events.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 366943,
+      "path": "data/raw/XLMUSDT-perp-funding-events.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 366503,
+      "path": "data/raw/XRPUSDT-perp-funding-events.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 15458,
+      "path": "docs/forensics/QNTY_QNTYLAB_CAPABILITY_MATRIX_V1.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 576746,
+      "path": "experiments/data/breadth_v2_dev_input_v0_to_v0r1_transitions.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 662518,
+      "path": "experiments/data/r1_acquisition_semantics_closure_v1.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 686702,
+      "path": "experiments/data/r1_acquisition_semantics_closure_v2.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 847977,
+      "path": "experiments/data/r1_historical_instance_domain.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 843446,
+      "path": "experiments/data/r1_historical_instance_domain_v2.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 1462583,
+      "path": "experiments/data/r1_population_input_required_domain.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 1444917,
+      "path": "experiments/data/r1_population_input_required_domain_v2.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 162632,
+      "path": "experiments/data/r1_population_market_availability.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 194072,
+      "path": "experiments/data/r1_population_market_availability_v2.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 5298859,
+      "path": "experiments/data/r1_population_raw_acquisition_bom_v3.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 257409,
+      "path": "experiments/data/r1_raw_storage_footprint_v1.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 128596,
+      "path": "experiments/data/sprint_v2_pre_outcome_dataset_manifest.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 93503,
+      "path": "experiments/research/candidates.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 672722,
+      "path": "experiments/research/corpus_index.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 61250,
+      "path": "experiments/research/decisions.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 2996,
+      "path": "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/synthetic_canary_corrective_v0/release_attestation.sigstore.json",
+      "reasons": [
+        "sigstore_in_path"
+      ]
+    },
+    {
+      "bytes": 34634,
+      "path": "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/synthetic_canary_corrective_v0/trusted_root.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 2996,
+      "path": "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/synthetic_canary_v0/release_attestation.sigstore.json",
+      "reasons": [
+        "sigstore_in_path"
+      ]
+    },
+    {
+      "bytes": 34634,
+      "path": "experiments/research/jh01_rv_persistence_incremental_forecast_value_v1/synthetic_canary_v0/trusted_root.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 303605,
+      "path": "experiments/research/jh01_rv_persistence_temporal_replication_v0/materialization/materialization_receipt.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 1056574,
+      "path": "experiments/research/jigsaw_external_replication_execution_v0/missingness_telemetry.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 668485,
+      "path": "experiments/research/jigsaw_external_replication_input_materialization_v0/source_receipts.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 166959,
+      "path": "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/materialization_receipt.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 166386,
+      "path": "experiments/research/jigsaw_fast_prospective_signal_discovery_v0/materialization/per_source_manifest.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 137701,
+      "path": "experiments/research/jigsaw_fast_prospective_signal_discovery_v2/implementation_v0/origin_schedule.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 791912,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/ALICEUSDT-perp-1h.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 833706,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/APEUSDT-perp-1h.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 850866,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/API3USDT-perp-1h.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 921564,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/APTUSDT-perp-1h.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 859355,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/BCHUSDT-perp-1h.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 833294,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/CHRUSDT-perp-1h.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 903257,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/CHZUSDT-perp-1h.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 860816,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/ETCUSDT-perp-1h.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 902188,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/GMTUSDT-perp-1h.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 1018028,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/INJUSDT-perp-1h.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 948076,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/LDOUSDT-perp-1h.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 867244,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/LINKUSDT-perp-1h.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 821858,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/LTCUSDT-perp-1h.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 906482,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/ONEUSDT-perp-1h.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 1039771,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/OPUSDT-perp-1h.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 953373,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/REEFUSDT-perp-1h.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 895976,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/SANDUSDT-perp-1h.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 905472,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/TRXUSDT-perp-1h.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 901142,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/XLMUSDT-perp-1h.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 878858,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/XRPUSDT-perp-1h.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 1419,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v1/source_bar_extension.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 265984,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/provenance_baseline_v0.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 225988,
+      "path": "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_production_dsh_home_materialization_and_requalification_v0/evidence/dsh_home_manifest.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 244,
+      "path": "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_write_path_materialization_v0/d4_attempts.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 580,
+      "path": "experiments/research/qnty_agent_orchestration_control_contract_v0/pinned_dsh_codex_write_path_materialization_v0r1/d4_attempts.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 87578,
+      "path": "experiments/research/qnty_agent_orchestration_control_contract_v0/subscription_backed_codex_app_server_write_path_diagnostic_v0/sanitized_rpc_trace.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 640275,
+      "path": "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/blocked_window_forensics.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 2334260,
+      "path": "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/coverage_census.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 1345605,
+      "path": "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/source_manifest.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 336508,
+      "path": "experiments/research/summaries/curated_breadth_screen_v1_cells.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 17795,
+      "path": "experiments/research/summaries/curated_breadth_screen_v1_variants.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 9081,
+      "path": "experiments/research/summaries/first_batch_summary_compact.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 10316,
+      "path": "experiments/research/summaries/focused_trend_validation_v1_2023_holdout_cells.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 2208,
+      "path": "experiments/research/summaries/focused_trend_validation_v1_2023_holdout_variants.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 14124,
+      "path": "experiments/research/summaries/h002_h003_followup_v1_summary_compact.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 667747,
+      "path": "experiments/research/trial_index.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 4099903,
+      "path": "experiments/research/trials/2026.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 15655624,
+      "path": "experiments/results/breadth_v2_development_v0/BREADTH_V2_DEVELOPMENT_DECISION_V0.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 1087367,
+      "path": "experiments/results/breadth_v2_development_v0/BREADTH_V2_DEVELOPMENT_EXECUTION_MANIFEST_V0.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 302274,
+      "path": "experiments/results/sprint_v0_results.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 7507,
+      "path": "experiments/results/sprint_v0_summary.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 244845,
+      "path": "experiments/results/sprint_v1_perp_results.json",
+      "reasons": [
+        "json_over_100KB"
+      ]
+    },
+    {
+      "bytes": 9152,
+      "path": "experiments/results/sprint_v1_perp_summary.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 3109,
+      "path": "qualifications/jh01_v0r3/retention/release_attestation.sigstore.json",
+      "reasons": [
+        "sigstore_in_path"
+      ]
+    },
+    {
+      "bytes": 34634,
+      "path": "qualifications/jh01_v0r3/retention/trusted_root.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 1233,
+      "path": "tests/fixtures/daily_market_BTCUSDT_1h.csv",
+      "reasons": [
+        "csv_extension"
+      ]
+    },
+    {
+      "bytes": 739,
+      "path": "tests/fixtures/dvol_v0/blocked_deribit_session.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 809,
+      "path": "tests/fixtures/dvol_v0/skipped_deribit_session.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    },
+    {
+      "bytes": 2380,
+      "path": "tests/fixtures/dvol_v0/valid_deribit_session.jsonl",
+      "reasons": [
+        "jsonl_extension"
+      ]
+    }
+  ],
+  "git_count_objects_vH": {
+    "count": "186",
+    "garbage": "0",
+    "in-pack": "12492",
+    "packs": "3",
+    "prune-packable": "110",
+    "size": "2.05 MiB",
+    "size-garbage": "0 bytes",
+    "size-pack": "85.86 MiB"
+  },
+  "largest_50_tracked_files": [
+    {
+      "bytes": 15655624,
+      "path": "experiments/results/breadth_v2_development_v0/BREADTH_V2_DEVELOPMENT_DECISION_V0.json"
+    },
+    {
+      "bytes": 5298859,
+      "path": "experiments/data/r1_population_raw_acquisition_bom_v3.json"
+    },
+    {
+      "bytes": 4642245,
+      "path": "data/derived/focused_trend_validation_v1/BTCUSDT-spot-1h-2023-halt-normalized.csv"
+    },
+    {
+      "bytes": 4477484,
+      "path": "data/derived/focused_trend_validation_v1/ETHUSDT-spot-1h-2023-halt-normalized.csv"
+    },
+    {
+      "bytes": 4215272,
+      "path": "data/derived/focused_trend_validation_v1/SOLUSDT-spot-1h-2023-halt-normalized.csv"
+    },
+    {
+      "bytes": 4099903,
+      "path": "experiments/research/trials/2026.jsonl"
+    },
+    {
+      "bytes": 2334260,
+      "path": "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/coverage_census.json"
+    },
+    {
+      "bytes": 1462583,
+      "path": "experiments/data/r1_population_input_required_domain.json"
+    },
+    {
+      "bytes": 1444917,
+      "path": "experiments/data/r1_population_input_required_domain_v2.json"
+    },
+    {
+      "bytes": 1345605,
+      "path": "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/source_manifest.json"
+    },
+    {
+      "bytes": 1087367,
+      "path": "experiments/results/breadth_v2_development_v0/BREADTH_V2_DEVELOPMENT_EXECUTION_MANIFEST_V0.json"
+    },
+    {
+      "bytes": 1056574,
+      "path": "experiments/research/jigsaw_external_replication_execution_v0/missingness_telemetry.csv"
+    },
+    {
+      "bytes": 1039771,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/OPUSDT-perp-1h.csv"
+    },
+    {
+      "bytes": 1018028,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/INJUSDT-perp-1h.csv"
+    },
+    {
+      "bytes": 953373,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/REEFUSDT-perp-1h.csv"
+    },
+    {
+      "bytes": 948076,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/LDOUSDT-perp-1h.csv"
+    },
+    {
+      "bytes": 921564,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/APTUSDT-perp-1h.csv"
+    },
+    {
+      "bytes": 906482,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/ONEUSDT-perp-1h.csv"
+    },
+    {
+      "bytes": 905472,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/TRXUSDT-perp-1h.csv"
+    },
+    {
+      "bytes": 903257,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/CHZUSDT-perp-1h.csv"
+    },
+    {
+      "bytes": 902188,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/GMTUSDT-perp-1h.csv"
+    },
+    {
+      "bytes": 901142,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/XLMUSDT-perp-1h.csv"
+    },
+    {
+      "bytes": 895976,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/SANDUSDT-perp-1h.csv"
+    },
+    {
+      "bytes": 878858,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/XRPUSDT-perp-1h.csv"
+    },
+    {
+      "bytes": 867244,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/LINKUSDT-perp-1h.csv"
+    },
+    {
+      "bytes": 860816,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/ETCUSDT-perp-1h.csv"
+    },
+    {
+      "bytes": 859355,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/BCHUSDT-perp-1h.csv"
+    },
+    {
+      "bytes": 850866,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/API3USDT-perp-1h.csv"
+    },
+    {
+      "bytes": 847977,
+      "path": "experiments/data/r1_historical_instance_domain.json"
+    },
+    {
+      "bytes": 843446,
+      "path": "experiments/data/r1_historical_instance_domain_v2.json"
+    },
+    {
+      "bytes": 833706,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/APEUSDT-perp-1h.csv"
+    },
+    {
+      "bytes": 833294,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/CHRUSDT-perp-1h.csv"
+    },
+    {
+      "bytes": 821858,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/LTCUSDT-perp-1h.csv"
+    },
+    {
+      "bytes": 791912,
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/ALICEUSDT-perp-1h.csv"
+    },
+    {
+      "bytes": 686702,
+      "path": "experiments/data/r1_acquisition_semantics_closure_v2.json"
+    },
+    {
+      "bytes": 672722,
+      "path": "experiments/research/corpus_index.json"
+    },
+    {
+      "bytes": 668485,
+      "path": "experiments/research/jigsaw_external_replication_input_materialization_v0/source_receipts.json"
+    },
+    {
+      "bytes": 667747,
+      "path": "experiments/research/trial_index.json"
+    },
+    {
+      "bytes": 662518,
+      "path": "experiments/data/r1_acquisition_semantics_closure_v1.json"
+    },
+    {
+      "bytes": 640275,
+      "path": "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/blocked_window_forensics.json"
+    },
+    {
+      "bytes": 601362,
+      "path": "data/raw/API3USDT-perp-funding-events.jsonl"
+    },
+    {
+      "bytes": 576993,
+      "path": "docs/state/projects.toml"
+    },
+    {
+      "bytes": 576746,
+      "path": "experiments/data/breadth_v2_dev_input_v0_to_v0r1_transitions.json"
+    },
+    {
+      "bytes": 460037,
+      "path": "data/raw/REEFUSDT-perp-funding-events.jsonl"
+    },
+    {
+      "bytes": 369759,
+      "path": "data/raw/BCHUSDT-perp-funding-events.jsonl"
+    },
+    {
+      "bytes": 369044,
+      "path": "data/raw/ALICEUSDT-perp-funding-events.jsonl"
+    },
+    {
+      "bytes": 368617,
+      "path": "data/raw/APEUSDT-perp-funding-events.jsonl"
+    },
+    {
+      "bytes": 368575,
+      "path": "data/raw/LINKUSDT-perp-funding-events.jsonl"
+    },
+    {
+      "bytes": 368198,
+      "path": "data/raw/SANDUSDT-perp-funding-events.jsonl"
+    },
+    {
+      "bytes": 368059,
+      "path": "data/raw/TRXUSDT-perp-funding-events.jsonl"
+    }
+  ],
+  "method": "git ls-files -z + os.path.getsize on worktree; -1 marks tracked-but-missing worktree paths",
+  "repo_head": "be291300abb70f3ffc6ba0dd8b1bea570daf5377",
+  "total_tracked_bytes": 100472910,
+  "tracked_csv_weight_total_bytes": 32709614,
+  "tracked_file_count": 4115,
+  "tracked_json_jsonl_weight_total_bytes": 59972906
+}

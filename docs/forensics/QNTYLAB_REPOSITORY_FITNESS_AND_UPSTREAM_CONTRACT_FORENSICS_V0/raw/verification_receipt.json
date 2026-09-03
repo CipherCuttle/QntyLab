@@ -1,0 +1,64 @@
+{
+  "audit": "QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0",
+  "subtask": "ARTIFACT_SYNTHESIS_AND_VERIFICATION",
+  "repo_head": "be291300abb70f3ffc6ba0dd8b1bea570daf5377",
+  "branch": "audit/qntylab-repository-fitness-and-upstream-contract-forensics-v0",
+  "verify_commands": [
+    {
+      "command": "python -m qntylab.project_context doctor --strict",
+      "exit_code": 0,
+      "stdout": "project context ok",
+      "result": "PASS"
+    },
+    {
+      "command": "python -m qntylab.project_context render --check",
+      "exit_code": 0,
+      "stdout": "roadmap current",
+      "result": "PASS_UNCHANGED_UNAFFECTED",
+      "note": "audit does not alter state sources; render output identical to pre-audit expectation"
+    }
+  ],
+  "json_validation": [
+    {"artifact": "repository_metrics.json", "validator": "python -m json.tool", "result": "VALID"},
+    {"artifact": "inventory.json", "validator": "python -m json.tool", "result": "VALID"},
+    {"artifact": "deletion_matrix.json", "validator": "python -m json.tool", "result": "VALID"},
+    {"artifact": "deletion_matrix.json vs raw/deletion_matrix.json", "validator": "python dict equality", "result": "IDENTICAL_VERBATIM_COPY"}
+  ],
+  "git_state": {
+    "git_status_porcelain_v1": "?? docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/",
+    "only_forensics_dir_untracked": true,
+    "git_diff_name_status_origin_master_HEAD": "(empty)",
+    "nothing_committed": true
+  },
+  "non_authority_lines": {
+    "RUNTIME_SOURCE_CHANGED": "NO",
+    "FROZEN_ARTIFACT_CHANGED": "NO",
+    "PROJECT_AUTHORITY_CHANGED": "NO",
+    "SCIENTIFIC_EXECUTION": "NO",
+    "REAL_DATA_ACCESSED": "NO",
+    "OUTCOMES_ACCESSED": "NO",
+    "PROVIDERS_ACCESSED": "NO",
+    "REAL_CLAIMS_ACCESSED_OR_CONSUMED": "NO",
+    "EVALUATION_ORIGINS_CONSUMED": 0,
+    "ROUTER_QNTY_QNTYSPOT_TRADING_CAPITAL_AUTHORITY": "NONE",
+    "GIT_HISTORY_REWRITTEN": "NO",
+    "FILES_DELETED": 0
+  },
+  "synthesized_artifacts": [
+    "repository_metrics.json",
+    "inventory.json",
+    "deletion_matrix.json",
+    "agent_context_target.md",
+    "report.md",
+    "raw/verification_receipt.json",
+    "synthesize.py (deterministic generator used to produce the top-level JSON artifacts from raw/)"
+  ],
+  "inventory_totals": {
+    "finding_count": 40,
+    "contract_findings_carried": 26,
+    "derived_findings_added": 14,
+    "severity_counts": {"HIGH": 2, "MEDIUM": 17, "LOW": 11, "INFO": 10},
+    "critical_on_master": 0,
+    "note": "Both HIGH findings are latent/branch-only (CI-1 latent unguarded private assembly; CI-23 provenance laundering on unmerged PR #241). Master has NO reachable authority violation (fail-closed)."
+  }
+}

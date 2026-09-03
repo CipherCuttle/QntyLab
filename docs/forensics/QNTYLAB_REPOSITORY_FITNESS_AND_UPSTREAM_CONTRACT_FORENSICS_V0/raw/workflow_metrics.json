@@ -1,0 +1,278 @@
+{
+  "JOB_COUNT": 1,
+  "STEP_COUNT": 19,
+  "TOTAL_WORKFLOW_BYTES": 21201,
+  "TOTAL_WORKFLOW_LINES": 323,
+  "WORKFLOW_COUNT": 1,
+  "audit": "QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0",
+  "duplicated_setup_step_occurrences": {
+    "actions/checkout": 1,
+    "actions/setup-node": 1,
+    "actions/setup-python": 1,
+    "pip_install_commands": 1
+  },
+  "inline_scripts_over_30_lines": [
+    {
+      "end_line": 194,
+      "file": ".github/workflows/project-context.yml",
+      "language": "shell",
+      "run_block_lines": 68,
+      "start_line": 125,
+      "step_name": "CI fixture: provision pinned DSH runtime at the frozen manifest path"
+    },
+    {
+      "end_line": 254,
+      "file": ".github/workflows/project-context.yml",
+      "language": "shell",
+      "run_block_lines": 58,
+      "start_line": 194,
+      "step_name": "CI fixture: materialize qualified Stage-A DSH_HOME"
+    },
+    {
+      "end_line": 311,
+      "file": ".github/workflows/project-context.yml",
+      "language": "shell",
+      "run_block_lines": 40,
+      "start_line": 270,
+      "step_name": "CI provenance receipt (deterministic, non-claim, non-secret)"
+    }
+  ],
+  "per_workflow": [
+    {
+      "bytes": 21201,
+      "file": ".github/workflows/project-context.yml",
+      "job_count": 1,
+      "lines": 323,
+      "step_count": 19,
+      "triggers": [
+        "pull_request",
+        "push",
+        "workflow_dispatch"
+      ]
+    }
+  ],
+  "project_context_yml": {
+    "note": "span_lines counts every YAML line inside the step span, first-match priority classification on step name + run text",
+    "rule_priority": [
+      "RESEARCH_LEDGER",
+      "PROJECT_CONTEXT_CORE",
+      "FUNDING_JFP_JH01",
+      "HISTORICAL_REPAIR_REGRESSION",
+      "DSH",
+      "RUNTIME_PROVISIONING"
+    ],
+    "steps": [
+      {
+        "end_line": 60,
+        "name": "Resolve identity mode",
+        "run_block_lines": 19,
+        "run_preview_first_line": "if [ -n \"${{ github.event.inputs.identity_mode }}\" ]; then",
+        "span_lines": 22,
+        "start_line": 39,
+        "subsystem": "RUNTIME_PROVISIONING",
+        "uses": "actions/checkout@v4"
+      },
+      {
+        "end_line": 64,
+        "name": "Record identity mode",
+        "run_block_lines": 0,
+        "run_preview_first_line": null,
+        "span_lines": 5,
+        "start_line": 60,
+        "subsystem": "OTHER_SUBSYSTEM",
+        "uses": "actions/checkout@v4"
+      },
+      {
+        "end_line": 69,
+        "name": "Record identity mode",
+        "run_block_lines": 4,
+        "run_preview_first_line": "echo \"IDENTITY_MODE=${{ steps.identity.outputs.mode }}\" >> \"$GITHUB_ENV\"",
+        "span_lines": 6,
+        "start_line": 64,
+        "subsystem": "RUNTIME_PROVISIONING",
+        "uses": "actions/setup-python@v5"
+      },
+      {
+        "end_line": 72,
+        "name": null,
+        "run_block_lines": 1,
+        "run_preview_first_line": "python -m pip install pytest requests",
+        "span_lines": 4,
+        "start_line": 69,
+        "subsystem": "RUNTIME_PROVISIONING",
+        "uses": "actions/setup-python@v5"
+      },
+      {
+        "end_line": 73,
+        "name": null,
+        "run_block_lines": 1,
+        "run_preview_first_line": "python -m pip install pytest requests",
+        "span_lines": 2,
+        "start_line": 72,
+        "subsystem": "RUNTIME_PROVISIONING",
+        "uses": null
+      },
+      {
+        "end_line": 74,
+        "name": null,
+        "run_block_lines": 1,
+        "run_preview_first_line": "python -m qntylab.project_context doctor --strict",
+        "span_lines": 2,
+        "start_line": 73,
+        "subsystem": "PROJECT_CONTEXT_CORE",
+        "uses": null
+      },
+      {
+        "end_line": 75,
+        "name": null,
+        "run_block_lines": 1,
+        "run_preview_first_line": "python -m qntylab.project_context render --check",
+        "span_lines": 2,
+        "start_line": 74,
+        "subsystem": "PROJECT_CONTEXT_CORE",
+        "uses": null
+      },
+      {
+        "end_line": 76,
+        "name": null,
+        "run_block_lines": 1,
+        "run_preview_first_line": "python -m qntylab.project_context spine > /dev/null",
+        "span_lines": 2,
+        "start_line": 75,
+        "subsystem": "PROJECT_CONTEXT_CORE",
+        "uses": null
+      },
+      {
+        "end_line": 77,
+        "name": null,
+        "run_block_lines": 1,
+        "run_preview_first_line": "python -m qntylab.project_context brief > /dev/null",
+        "span_lines": 2,
+        "start_line": 76,
+        "subsystem": "PROJECT_CONTEXT_CORE",
+        "uses": null
+      },
+      {
+        "end_line": 81,
+        "name": null,
+        "run_block_lines": 1,
+        "run_preview_first_line": "python -m qntylab.research_ledger doctor",
+        "span_lines": 5,
+        "start_line": 77,
+        "subsystem": "RESEARCH_LEDGER",
+        "uses": null
+      },
+      {
+        "end_line": 88,
+        "name": "A. Repository-deterministic reconciliation checks",
+        "run_block_lines": 1,
+        "run_preview_first_line": "python -m pytest -q tests/test_project_context_v0.py tests/test_context_spine_foundation_v0.py tests/test_context_spine_",
+        "span_lines": 8,
+        "start_line": 81,
+        "subsystem": "PROJECT_CONTEXT_CORE",
+        "uses": null
+      },
+      {
+        "end_line": 122,
+        "name": "A. Repository-deterministic reconciliation checks",
+        "run_block_lines": 1,
+        "run_preview_first_line": "node --test experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_execution_contract_reco",
+        "span_lines": 35,
+        "start_line": 88,
+        "subsystem": "DSH",
+        "uses": "actions/setup-node@v4"
+      },
+      {
+        "end_line": 125,
+        "name": "CI fixture: provision pinned DSH runtime at the frozen manifest path",
+        "run_block_lines": 0,
+        "run_preview_first_line": null,
+        "span_lines": 4,
+        "start_line": 122,
+        "subsystem": "DSH",
+        "uses": "actions/setup-node@v4"
+      },
+      {
+        "end_line": 194,
+        "name": "CI fixture: provision pinned DSH runtime at the frozen manifest path",
+        "run_block_lines": 68,
+        "run_preview_first_line": "set -euo pipefail",
+        "span_lines": 70,
+        "start_line": 125,
+        "subsystem": "HISTORICAL_REPAIR_REGRESSION",
+        "uses": null
+      },
+      {
+        "end_line": 254,
+        "name": "CI fixture: materialize qualified Stage-A DSH_HOME",
+        "run_block_lines": 58,
+        "run_preview_first_line": "set -euo pipefail",
+        "span_lines": 61,
+        "start_line": 194,
+        "subsystem": "HISTORICAL_REPAIR_REGRESSION",
+        "uses": null
+      },
+      {
+        "end_line": 258,
+        "name": "A-claim. Production-owner claim-binding integration (repository-deterministic)",
+        "run_block_lines": 1,
+        "run_preview_first_line": "node --test experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enfor",
+        "span_lines": 5,
+        "start_line": 254,
+        "subsystem": "DSH",
+        "uses": null
+      },
+      {
+        "end_line": 270,
+        "name": "CI fixture removal before step B",
+        "run_block_lines": 11,
+        "run_preview_first_line": "set -euo pipefail",
+        "span_lines": 13,
+        "start_line": 258,
+        "subsystem": "DSH",
+        "uses": null
+      },
+      {
+        "end_line": 311,
+        "name": "CI provenance receipt (deterministic, non-claim, non-secret)",
+        "run_block_lines": 40,
+        "run_preview_first_line": "echo \"CI_FIXTURE_PURPOSE=REPOSITORY_DETERMINISTIC_A_CLAIM_INPUT_ONLY\"",
+        "span_lines": 42,
+        "start_line": 270,
+        "subsystem": "DSH",
+        "uses": null
+      },
+      {
+        "end_line": 323,
+        "name": "B. Host-qualified runtime preflight (reports GitHub vs host scope)",
+        "run_block_lines": 11,
+        "run_preview_first_line": "echo \"CI_REPRODUCIBILITY_SPLIT=REPOSITORY_DETERMINISTIC_CHECK_ON_GITHUB\"",
+        "span_lines": 13,
+        "start_line": 311,
+        "subsystem": "HISTORICAL_REPAIR_REGRESSION",
+        "uses": null
+      }
+    ],
+    "subsystem_line_counts": {
+      "DSH": 99,
+      "HISTORICAL_REPAIR_REGRESSION": 144,
+      "OTHER_SUBSYSTEM": 5,
+      "PROJECT_CONTEXT_CORE": 16,
+      "RESEARCH_LEDGER": 5,
+      "RUNTIME_PROVISIONING": 34
+    }
+  },
+  "pytest_invocation_lines": [
+    {
+      "excerpt": "python -m pytest -q tests/test_project_context_v0.py tests/test_context_spine_foundation_v0.py tests/test_context_spine_brief_v0.py tests/test_context_spine_ori",
+      "file": ".github/workflows/project-context.yml",
+      "line": 81,
+      "selected_by_path": true
+    }
+  ],
+  "pytest_selection": {
+    "selected_by_path": true,
+    "wholesale": false
+  },
+  "repo_head": "be291300abb70f3ffc6ba0dd8b1bea570daf5377"
+}

@@ -1,0 +1,208 @@
+{
+  "audit": "QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0",
+  "code_test_module_counts": {
+    "duplicated_function_machinery_entries": 122,
+    "go_main": {
+      "bytes": 5287,
+      "func_count": 3,
+      "line_count": 146,
+      "path": "qualifications/jh01_v0r3/main.go"
+    },
+    "near_duplicate_name_families": 4,
+    "note": "file counts measured via git ls-files at HEAD be291300; classification distribution from raw/module_inventory.json",
+    "qntylab_classification_distribution": {
+      "FROZEN_HISTORICAL_EVIDENCE": 64,
+      "FROZEN_ORACLE": 8,
+      "GOVERNANCE_SUPPORT": 6,
+      "LIVE_RUNTIME_CODE": 15,
+      "POSSIBLE_DEAD_CODE": 5,
+      "TEST_SUPPORT": 35
+    },
+    "qntylab_python_modules": 133,
+    "tracked_test_files_tests_dir": 227,
+    "tracked_test_python_files": 215,
+    "zero_inbound_orphan_candidates": 10
+  },
+  "context_size": {
+    "AGENTS_MD_BYTES": 2805,
+    "BRIEF_BYTES": 14468,
+    "BRIEF_LINES": 118,
+    "BRIEF_TRUNCATED": true,
+    "CURRENT_ROADMAP_BYTES": 68959,
+    "DUPLICATIVE_AUTHORITY_PROSE_BYTES_AGENTS_README_ROADMAP": 77057,
+    "PROJECTS_TOML_BYTES": 576993,
+    "PROJECTS_TOML_LINES": 9933,
+    "PROJECT_CONTEXT_PY_BYTES": 110441,
+    "README_BYTES": 5293,
+    "SPINE_BYTES": 50150,
+    "SPINE_LINES": 1,
+    "SPINE_MODE": {
+      "mode": "single_line",
+      "single_line_bytes": 50150
+    }
+  },
+  "deletion_candidates": {
+    "candidate_count": 42,
+    "classification_distribution": {
+      "DELETE_BLOCKED_BY_ACTIVE_USE": 8,
+      "DELETE_BLOCKED_BY_FROZEN_BINDING": 28,
+      "DELETE_SAFE": 6
+    },
+    "delete_safe_count": 6
+  },
+  "note": "Consolidated from raw/ outputs only; no scans were re-run. Byte counts are worktree/CI-stdout measurements at HEAD be291300.",
+  "packaging": {
+    "HAS_CONFTEST_PY": false,
+    "HAS_MAKEFILE": false,
+    "HAS_PYPROJECT": false,
+    "HAS_PYTEST_INI": false,
+    "HAS_SETUP_CFG": false,
+    "HAS_SETUP_PY": false,
+    "HAS_TOX_INI": false,
+    "documented_verify": [
+      {
+        "excerpt": "python -m pytest -q",
+        "file": "README.md",
+        "line": 65
+      }
+    ],
+    "pytest_config_location": {
+      "conftest_py_tracked": false,
+      "pyproject.toml": false,
+      "pytest.ini": false,
+      "qntylab.toml": true,
+      "setup.cfg": false
+    },
+    "qntylab_toml_bytes": 585,
+    "requirements_files": [
+      "requirements-data-spine-v0.txt",
+      "requirements-dvol-v0-live-smoke.txt"
+    ]
+  },
+  "project_state": {
+    "active_non_terminal_state": "BLOCKED",
+    "distinct_authority_field_names": 474,
+    "distinct_field_names_observed": 2186,
+    "next_action_length": {
+      "max": 2640,
+      "median": 319,
+      "min": 40,
+      "p90": 638,
+      "records_over_500_chars": 30,
+      "records_with_next_action": 149
+    },
+    "non_terminal_records": 10,
+    "planned_records": 9,
+    "records_referencing_authoritative_artifacts": 149,
+    "records_with_hash_bindings": 118,
+    "repo_wide_projects_toml_references": 73,
+    "state_distribution": {
+      "ARCHIVED": 1,
+      "BLOCKED": 1,
+      "CLOSED_BLOCKED": 38,
+      "CLOSED_NEGATIVE": 2,
+      "CLOSED_PASS": 98,
+      "PLANNED_NOT_AUTHORIZED": 9
+    },
+    "terminal_records": 139,
+    "total_project_records": 149
+  },
+  "repo_head": "be291300abb70f3ffc6ba0dd8b1bea570daf5377",
+  "sources": {
+    "code_test_module_counts": "raw/module_inventory.json",
+    "context_size": "raw/context_metrics.json",
+    "deletion_candidates": "raw/deletion_matrix.json",
+    "packaging": "raw/packaging_metrics.json",
+    "project_state_size_and_counts": "raw/context_metrics.json + raw/projects_toml_metrics.json",
+    "test_gaps": "raw/test_gap_findings.json",
+    "tracked_repo_byte_weight": "raw/repo_byte_weight.json",
+    "workflow_size": "raw/workflow_metrics.json"
+  },
+  "tracked_repo_byte_weight": {
+    "bytes_by_top_level_directory": {
+      "(root)": 9043,
+      ".github": 21671,
+      "data": 21093250,
+      "docs": 1217157,
+      "experiments": 72935668,
+      "ops": 17725,
+      "qntylab": 2454793,
+      "qualifications": 85001,
+      "tests": 2638602
+    },
+    "experiments_share_pct": 72.6,
+    "generated_looking_artifact_count": 98,
+    "git_count_objects": {
+      "count": "186",
+      "garbage": "0",
+      "in-pack": "12492",
+      "packs": "3",
+      "prune-packable": "110",
+      "size": "2.05 MiB",
+      "size-garbage": "0 bytes",
+      "size-pack": "85.86 MiB"
+    },
+    "largest_tracked_file": {
+      "bytes": 15655624,
+      "path": "experiments/results/breadth_v2_development_v0/BREADTH_V2_DEVELOPMENT_DECISION_V0.json"
+    },
+    "total_tracked_bytes": 100472910,
+    "total_tracked_mib": 95.8,
+    "tracked_csv_bytes": 32709614,
+    "tracked_file_count": 4115,
+    "tracked_json_jsonl_bytes": 59972906
+  },
+  "workflow": {
+    "historical_repair_plus_dsh_share_of_step_spans_pct": 80.2,
+    "historical_repair_plus_dsh_span_lines": 243,
+    "inline_scripts_over_30_lines": [
+      {
+        "end_line": 194,
+        "file": ".github/workflows/project-context.yml",
+        "language": "shell",
+        "run_block_lines": 68,
+        "start_line": 125,
+        "step_name": "CI fixture: provision pinned DSH runtime at the frozen manifest path"
+      },
+      {
+        "end_line": 254,
+        "file": ".github/workflows/project-context.yml",
+        "language": "shell",
+        "run_block_lines": 58,
+        "start_line": 194,
+        "step_name": "CI fixture: materialize qualified Stage-A DSH_HOME"
+      },
+      {
+        "end_line": 311,
+        "file": ".github/workflows/project-context.yml",
+        "language": "shell",
+        "run_block_lines": 40,
+        "start_line": 270,
+        "step_name": "CI provenance receipt (deterministic, non-claim, non-secret)"
+      }
+    ],
+    "job_count": 1,
+    "lines_outside_core_and_ledger": 302,
+    "note_93pct_task_spec_figure": "Measured: DSH+HISTORICAL_REPAIR_REGRESSION = 243 of 303 step-span lines (80.2%); 302 of 323 total YAML lines (93.5%) sit outside PROJECT_CONTEXT_CORE (16 lines) and RESEARCH_LEDGER (5 lines) combined.",
+    "project_context_core_share_of_total_lines_pct": 5.0,
+    "project_context_core_span_lines": 16,
+    "pytest_selection": {
+      "selected_by_path": true,
+      "wholesale": false
+    },
+    "research_ledger_span_lines": 5,
+    "step_count": 19,
+    "step_span_lines_total": 303,
+    "subsystem_span_lines": {
+      "DSH": 99,
+      "HISTORICAL_REPAIR_REGRESSION": 144,
+      "OTHER_SUBSYSTEM": 5,
+      "PROJECT_CONTEXT_CORE": 16,
+      "RESEARCH_LEDGER": 5,
+      "RUNTIME_PROVISIONING": 34
+    },
+    "total_bytes": 21201,
+    "total_lines": 323,
+    "workflow_count": 1
+  }
+}

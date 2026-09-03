@@ -1,0 +1,77 @@
+{
+  "AGENTS_MD_BYTES": 2805,
+  "BRIEF_BYTES": 14468,
+  "BRIEF_LINES": 118,
+  "BRIEF_TRUNCATED": true,
+  "CURRENT_ROADMAP_BYTES": 68959,
+  "CURRENT_ROADMAP_LINES": 161,
+  "DUPLICATIVE_SIGNAL": {
+    "byte_weight_agents_readme_roadmap": 77057,
+    "invariant_phrase_counts": {
+      "AGENTS.md": {
+        "authority": 3,
+        "exploratory only": 0,
+        "exploratory-only": 1,
+        "no trading": 0,
+        "prohibited": 0,
+        "source_conflict": 1
+      },
+      "CURRENT_ROADMAP.md": {
+        "authority": 89,
+        "exploratory only": 0,
+        "exploratory-only": 0,
+        "no trading": 0,
+        "prohibited": 1,
+        "source_conflict": 0
+      },
+      "README.md": {
+        "authority": 8,
+        "exploratory only": 1,
+        "exploratory-only": 0,
+        "no trading": 0,
+        "prohibited": 0,
+        "source_conflict": 0
+      }
+    },
+    "note": "raw case-insensitive substring counts; no interpretation",
+    "phrases": [
+      "exploratory-only",
+      "exploratory only",
+      "no trading",
+      "authority",
+      "source_conflict",
+      "prohibited"
+    ]
+  },
+  "PROJECTS_TOML_BYTES": 576993,
+  "PROJECTS_TOML_LINES": 9933,
+  "PROJECT_CONTEXT_PY_BYTES": 110441,
+  "PROJECT_COUNT_ACTIVE": 1,
+  "PROJECT_COUNT_IN_REVIEW": 0,
+  "PROJECT_COUNT_PLANNED": 9,
+  "PROJECT_COUNT_TERMINAL": 139,
+  "PROJECT_COUNT_TOTAL": 149,
+  "README_BYTES": 5293,
+  "SPINE_BYTES": 50150,
+  "SPINE_LINES": 1,
+  "SPINE_LINES_OR_SINGLE_LINE_BYTES": {
+    "mode": "single_line",
+    "single_line_bytes": 50150
+  },
+  "STATE_CLASSIFICATION": {
+    "non_terminal": 1,
+    "planned": 9,
+    "rule": "CLOSED_*/SEALED/ARCHIVED=terminal; PLANNED_*=planned; else non_terminal",
+    "terminal": 139
+  },
+  "STATE_VOCABULARY": {
+    "ARCHIVED": 1,
+    "BLOCKED": 1,
+    "CLOSED_BLOCKED": 38,
+    "CLOSED_NEGATIVE": 2,
+    "CLOSED_PASS": 98,
+    "PLANNED_NOT_AUTHORIZED": 9
+  },
+  "audit": "QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0",
+  "repo_head": "be291300abb70f3ffc6ba0dd8b1bea570daf5377"
+}

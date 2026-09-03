@@ -7,6 +7,7 @@ forensics directory. Pure stdlib; no network; no timestamps.
 """
 import collections
 import json
+import os
 import shutil
 
 BASE = "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0"
@@ -28,7 +29,13 @@ pk = json.load(open(RAW + "/packaging_metrics.json"))
 bw = json.load(open(RAW + "/repo_byte_weight.json"))
 mi = json.load(open(RAW + "/module_inventory.json"))
 tg = json.load(open(RAW + "/test_gap_findings.json"))
-dm = json.load(open(RAW + "/deletion_matrix.json"))
+# Canonical deletion matrix is the top-level deletion_matrix.json; the
+# raw/ verbatim copy was removed from the repo in the evidence-slimming
+# pass. Fall back to the canonical location when the raw copy is absent.
+try:
+    dm = json.load(open(RAW + "/deletion_matrix.json"))
+except FileNotFoundError:
+    dm = json.load(open(BASE + "/deletion_matrix.json"))
 cf = json.load(open(RAW + "/contract_findings.json"))
 
 # ---------------------------------------------------------------- repository_metrics.json
@@ -157,12 +164,16 @@ rm = {
 dump(rm, BASE + "/repository_metrics.json")
 
 # ---------------------------------------------------------------- inventory.json
-SCHEMA = ["finding_id", "domain", "severity", "classification", "path", "lines_or_symbol",
-          "claim", "evidence", "risk", "recommended_disposition", "implementation_authorized"]
+SCHEMA = ["finding_id", "domain", "severity", "classification", "path",
+          "lines_or_symbol", "claim", "evidence", "risk", "recommended_disposition",
+          "implementation_authorized"]
+# Optional extension field: contract findings CI-1/CI-23 carry an explicit
+# "reachability" marker (LATENT_ON_MASTER / BRANCH_ONLY); it is not required
+# on every finding, so it is intentionally excluded from the SCHEMA check.
 
 
 def norm(f):
-    return {
+    out = {
         "finding_id": f["finding_id"],
         "domain": f["domain"],
         "severity": f["severity"],
@@ -176,6 +187,9 @@ def norm(f):
         "implementation_authorized": False,
         "source_raw": "raw/contract_findings.json",
     }
+    if f.get("reachability"):
+        out["reachability"] = f["reachability"]
+    return out
 
 
 findings = [norm(f) for f in cf]
@@ -530,8 +544,16 @@ inv = {
 }
 dump(inv, BASE + "/inventory.json")
 
-# ---------------------------------------------------------------- deletion_matrix.json verbatim
-shutil.copyfile(RAW + "/deletion_matrix.json", BASE + "/deletion_matrix.json")
+# ---------------------------------------------------------------- deletion_matrix.json
+# The canonical deletion matrix is the top-level deletion_matrix.json. The
+# raw/ verbatim copy was removed in the evidence-slimming pass, so the copy
+# step only runs when a raw copy is present (e.g. regenerated from an
+# earlier scanner run); otherwise the canonical file is left untouched.
+if os.path.exists(RAW + "/deletion_matrix.json"):
+    shutil.copyfile(RAW + "/deletion_matrix.json", BASE + "/deletion_matrix.json")
+else:
+    print("raw/deletion_matrix.json absent; canonical deletion_matrix.json "
+          "left unchanged")
 
 print("severity:", dict(sorted(sev.items())))
 print("domains:", dict(sorted(dom.items())))

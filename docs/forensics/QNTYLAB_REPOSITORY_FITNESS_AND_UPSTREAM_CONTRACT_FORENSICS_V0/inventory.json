@@ -18,7 +18,7 @@
   "finding_count": 40,
   "findings": [
     {
-      "claim": "Provenance of an evaluation is derived entirely from caller-supplied inputs: ForecastRow carries no provenance field, execution_mode is a caller string, and the result payload embeds the static all-false NO_REAL_EXECUTION_ATTESTATION constants regardless of row origin. Any caller routing real rows through the unguarded private assembly obtains a digest-bearing result that asserts REAL_EVIDENCE_EXECUTION_PERFORMED=False and SYNTHETIC-only provenance.",
+      "claim": "LATENT_ON_MASTER: this defect exists on master but is currently unreachable through the guarded public entrypoint (run_incremental_forecast_evaluation:715-724 enforces the execution-mode guard); it manifests only via private-entrypoint bypass (_assemble_incremental_forecast_evaluation). Provenance of an evaluation is derived entirely from caller-supplied inputs: ForecastRow carries no provenance field, execution_mode is a caller string, and the result payload embeds the static all-false NO_REAL_EXECUTION_ATTESTATION constants regardless of row origin. Any caller routing real rows through the unguarded private assembly obtains a digest-bearing result that asserts REAL_EVIDENCE_EXECUTION_PERFORMED=False and SYNTHETIC-only provenance.",
       "classification": "CALLER_ASSERTED_PROVENANCE",
       "domain": "D1",
       "evidence": [
@@ -31,6 +31,7 @@
       "implementation_authorized": false,
       "lines_or_symbol": "_assemble_incremental_forecast_evaluation (565-712), NO_REAL_EXECUTION_ATTESTATION (135-154), payload embedding (684)",
       "path": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py",
+      "reachability": "LATENT_ON_MASTER",
       "recommended_disposition": "Bind provenance to the assembly input (e.g. derive attestation from row factory identity or add a validated provenance field) or make the private assembly enforce AUTHORIZED_EXECUTION_MODES like the public entrypoint.",
       "risk": "Real/synthetic relabeling: a laundered evaluation would be internally attested as never having touched real evidence and its result_digest would vouch for that attestation.",
       "severity": "HIGH",
@@ -410,7 +411,7 @@
       "source_raw": "raw/contract_findings.json"
     },
     {
-      "claim": "PC-1 CONFIRMED on the #241 branch: the sole input constructor unconditionally stamps object.__setattr__(instance, 'synthetic_only', True) regardless of row origin. Provenance is forced by the factory name, not verified from bytes: a caller passing real ForecastRow values to from_offline_synthetic_rows obtains a batch labeled synthetic_only=True with a valid content digest over those real rows; _interpret_input (364) then checks only batch.synthetic_only is not True. Master check: structurally similar constructor-forced provenance is NOT present at HEAD -- the only object.__setattr__ is a benign MappingProxyType freeze (prospective_deribit_dvol_live_smoke.py:86) and no synthetic_only symbol exists in master qntylab/.",
+      "claim": "BRANCH_ONLY on unmerged PR #241; NOT present on master and not canonicalized. PC-1 CONFIRMED on the #241 branch: the sole input constructor unconditionally stamps object.__setattr__(instance, 'synthetic_only', True) regardless of row origin. Provenance is forced by the factory name, not verified from bytes: a caller passing real ForecastRow values to from_offline_synthetic_rows obtains a batch labeled synthetic_only=True with a valid content digest over those real rows; _interpret_input (364) then checks only batch.synthetic_only is not True. Master check: structurally similar constructor-forced provenance is NOT present at HEAD -- the only object.__setattr__ is a benign MappingProxyType freeze (prospective_deribit_dvol_live_smoke.py:86) and no synthetic_only symbol exists in master qntylab/.",
       "classification": "CALLER_ASSERTED_PROVENANCE",
       "domain": "PC",
       "evidence": [
@@ -424,6 +425,7 @@
       "implementation_authorized": false,
       "lines_or_symbol": "ForecastRowBatch.from_offline_synthetic_rows (200-216)",
       "path": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_consumer_seam_successor_v0.py (branch agent/funding-incremental-real-execution-consumer-seam-successor-implementation-v0, commit cd999bc/d181d12; NOT in master HEAD)",
+      "reachability": "BRANCH_ONLY",
       "recommended_disposition": "Keep the branch unmerged; if the successor seam is revived, derive synthetic_only from verified row origin (e.g. authenticated factory receipt) rather than constructor identity.",
       "risk": "Synthetic provenance laundering: real outcomes could be laundered into an 'offline synthetic batch' with a self-consistent digest and a synthetic-only authority envelope.",
       "severity": "HIGH",

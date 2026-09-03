@@ -9,14 +9,17 @@ Branch: `audit/qntylab-repository-fitness-and-upstream-contract-forensics-v0`
 were deleted, nothing is implemented, and nothing in this directory is
 canonical.
 
-> **Headline: no CRITICAL findings on master.** The merged inventory
+> **Headline: 0 CRITICAL. 2 HIGH: CI-1 is latent on master; CI-23 is
+> branch-only on unmerged PR #241. No currently reachable authority violation
+> was identified on master.** The merged inventory
 > ([`inventory.json`](inventory.json), 40 findings) contains **2 HIGH** and
-> **0 CRITICAL** findings. Both HIGH findings are latent/branch-only:
-> [CI-1](#2-criticalhigh-bugs) (latent unguarded private assembly that could
-> embed a digest attesting synthetic-only provenance) and
-> [CI-23](#2-criticalhigh-bugs) (provenance laundering on **unmerged PR #241**,
-> not reachable on master). **Current master has NO reachable authority
-> violation — it fails closed.**
+> **0 CRITICAL** findings:
+> [CI-1](#2-criticalhigh-bugs) exists on master but is latent — currently
+> unreachable through the guarded public entrypoint and manifesting only via
+> private-entrypoint bypass — while
+> [CI-23](#2-criticalhigh-bugs) is provenance laundering on **unmerged
+> PR #241**, not present on master and not canonicalized. **Current master has
+> NO currently reachable authority violation — it fails closed.**
 
 ---
 
@@ -59,12 +62,14 @@ finding list: [`inventory.json`](inventory.json). Deletion evidence:
 
 ## 2. Critical/High bugs
 
-**0 CRITICAL. 2 HIGH.** Neither is a reachable authority violation on master.
+**0 CRITICAL. 2 HIGH: CI-1 is latent on master; CI-23 is branch-only on
+unmerged PR #241.** No currently reachable authority violation was identified
+on master.
 
 | ID | Severity | Domain | Path | Claim (condensed) | Reachable on master? |
 |---|---|---|---|---|---|
-| CI-1 | HIGH | D1 | [`qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py`](../../qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py) | `_assemble_incremental_forecast_evaluation` (private, lines 565–712) performs no execution-mode guard; payload embeds static all-false `NO_REAL_EXECUTION_ATTESTATION` constants (line 684) regardless of row origin. Any caller routing real rows through the unguarded private assembly obtains a digest-bearing result attesting synthetic-only provenance. | **Latent** — the guard exists on the public entrypoint (`run_incremental_forecast_evaluation:715-724`); the defect requires a future caller to bypass it (see CI-11/CI-26, which do exactly that but are currently unreachable). |
-| CI-23 | HIGH | PC | `qntylab/jigsaw_funding_pressure_incremental_forecast_value_consumer_seam…` (PR #241 branch) | Provenance laundering on **unmerged PR #241** (`agent/funding-incremental-real-execution-consumer-seam-successor-implementation-v0`, commits `cd999bc`/`d181d120`): `ForecastRowBatch.from_offline_synthetic_rows` accepts arbitrary rows and unconditionally sets `synthetic_only=True`, laundering arbitrary provenance into a batch attested as synthetic. | **No — branch-only.** PR #241 is `merged=false` (`raw/test_gap_findings.json: context`). |
+| CI-1 | HIGH | D1 | [`qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py`](../../qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py) | `LATENT_ON_MASTER` — `_assemble_incremental_forecast_evaluation` (private, lines 565–712) performs no execution-mode guard; payload embeds static all-false `NO_REAL_EXECUTION_ATTESTATION` constants (line 684) regardless of row origin. Any caller routing real rows through the unguarded private assembly obtains a digest-bearing result attesting synthetic-only provenance. | **Latent on master** — exists on master but currently unreachable through the guarded public entrypoint (`run_incremental_forecast_evaluation:715-724`); manifests only via private-entrypoint bypass, which requires a future caller (see CI-11/CI-26, which do exactly that but are currently unreachable). |
+| CI-23 | HIGH | PC | `qntylab/jigsaw_funding_pressure_incremental_forecast_value_consumer_seam…` (PR #241 branch) | `BRANCH_ONLY` — Provenance laundering on **unmerged PR #241** (`agent/funding-incremental-real-execution-consumer-seam-successor-implementation-v0`, commits `cd999bc`/`d181d120`): `ForecastRowBatch.from_offline_synthetic_rows` accepts arbitrary rows and unconditionally sets `synthetic_only=True`, laundering arbitrary provenance into a batch attested as synthetic. Not present on master; not canonicalized. | **No — branch-only.** PR #241 is `merged=false` (`raw/test_gap_findings.json: context`). |
 
 Master disposition: **fail-closed**. CI-24 (PC domain) records explicitly that
 the branch-only machinery is *not applicable* at master HEAD. The remaining
@@ -201,9 +206,9 @@ Domain D13 findings (BYT-1..BYT-2):
 
 ## 9. Deletion/consolidation candidates
 
-[`deletion_matrix.json`](deletion_matrix.json) (verbatim copy of
-[`raw/deletion_matrix.json`](raw/deletion_matrix.json)): 42 candidates, 12
-reference checks each.
+[`deletion_matrix.json`](deletion_matrix.json) (canonical copy; the former
+verbatim `raw/deletion_matrix.json` duplicate was removed in the
+evidence-slimming pass): 42 candidates, 12 reference checks each.
 
 | Classification | Count | Meaning |
 |---|---:|---|

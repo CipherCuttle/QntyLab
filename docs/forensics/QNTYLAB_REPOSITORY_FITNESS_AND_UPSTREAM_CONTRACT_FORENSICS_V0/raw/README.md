@@ -3,31 +3,84 @@
 Forensic artifacts only. Nothing in this directory is production code; do not
 import it from `qntylab/` or reference it from canonical state.
 
-## Contents
+## Canonical audit outputs (top level of this forensics directory)
 
-| File | Domain | What it measures |
-|---|---|---|
-| `context_metrics.json` | 7 | Context spine weight: AGENTS.md / README / roadmap / projects.toml sizes, `brief` + `spine` stdout sizes and truncation flag, project state counts and vocabulary, invariant-phrase occurrence counts |
-| `projects_toml_metrics.json` | 8 | `docs/state/projects.toml` record inventory: state distribution, terminal/non-terminal split, field frequency, authority-field NONE counts, `next_action` length distribution, artifact/hash bindings, top-10 prose records, repo-wide `projects.toml` references (file:line) |
-| `workflow_metrics.json` | 9 | `.github/workflows/` inventory: per-workflow lines/bytes/triggers/jobs/steps, `project-context.yml` subsystem line split, inline scripts > 30 lines, duplicated setup steps, pytest selection mode |
-| `packaging_metrics.json` | 10 | Packaging/config existence inventory (pyproject/setup/Makefile/tox/lint configs), pytest config location, `qntylab.toml` structure, requirements files, CI bootstrap sequence, documented verify commands |
-| `repo_byte_weight.json` | 13 | Tracked byte weight via `git ls-files -z`: total, per top-level directory, largest 50 files, generated-looking artifacts, CSV/JSON totals, `git count-objects -vH` |
-| `module_inventory.json` | 11 | Inventory of all 133 `qntylab/*.py` modules (+ `qualifications/jh01_v0r3/main.go`): bytes, line counts, top-level defs/classes, AST qntylab import graph, inbound test imports, zero-inbound orphan candidates, near-duplicate version-suffix name families, duplicated function machinery (same name, similar body length across 2+ modules), one classification per module (LIVE_RUNTIME_CODE / LIVE_TOOLING / FROZEN_ORACLE / FROZEN_HISTORICAL_EVIDENCE / GOVERNANCE_SUPPORT / TEST_SUPPORT / POSSIBLE_DUPLICATE / POSSIBLE_DEAD_CODE) with evidence, cross-referenced against `docs/state/projects.toml` and `experiments/research/` |
-| `deletion_matrix.json` | 12 | For every deletion/consolidation candidate (module orphans, largest tracked artifacts from `repo_byte_weight.json`, `docs/status/` files): 12 reference checks (PYTHON_IMPORT_REFERENCES, DOCSTRING_PROSE_REFERENCES, TEST_REFERENCES, PROJECT_REGISTRY_REFERENCES, AUTHORITATIVE_ARTIFACT_REFERENCES, HASH_BINDINGS, PREREGISTRATION_BINDINGS, CLOSURE_REFERENCES, ADR_REFERENCES, RESEARCH_LEDGER_REFERENCES, CI_REFERENCES, GENERATED_VIEW_REFERENCES), each `{count, evidence_paths[]}`, plus KEEP/CONSOLIDATE/ARCHIVE/DELETE classification. DELETE_SAFE requires zero load-bearing references across all checks |
-| `test_gap_findings.json` | 14 | PR #241 (unmerged, commits `cd999bc`/`d181d120`) test-effectiveness forensics: tests added on the branch, why each of the two P1 contract failures slipped through (per-finding gap classes and mechanisms), repository-wide blind-spot probes over `tests/*.py` at HEAD, and 7 repository-wide INVARIANT TEST recommendations (invariant + detection strategy + what it would have caught). No tests were added |
-| `scan_metrics.py` | — | The single deterministic generator for domains 7/8/9/10/13 (pure stdlib) |
-| `scan_slim_tests.py` | — | Deterministic stdlib-only generator for domains 11/12/14 (`module_inventory.json`, `deletion_matrix.json`, `test_gap_findings.json`) |
+The canonical audit outputs live one directory up, NOT in `raw/`:
 
-## How to re-run
+| File | Role |
+|---|---|
+| [`../inventory.json`](../inventory.json) | merged 40-finding inventory (26 contract findings + 14 derived findings), `finding_count=40`, `severity_counts={HIGH:2, MEDIUM:17, LOW:11, INFO:10}` |
+| [`../repository_metrics.json`](../repository_metrics.json) | consolidated repository weight/context/code/CI/packaging metrics |
+| [`../deletion_matrix.json`](../deletion_matrix.json) | canonical deletion/consolidation matrix: 42 candidates × 12 reference checks, `DELETE_SAFE=6` |
+| [`../agent_context_target.md`](../agent_context_target.md) | agent-context improvement target |
+| [`../report.md`](../report.md) | synthesis report |
+| [`verification_receipt.json`](verification_receipt.json) | verification receipt recorded at synthesis time (historical; see note below) |
 
-From the repository root, on the audited commit (HEAD `be291300`, branch
-`audit/qntylab-repository-fitness-and-upstream-contract-forensics-v0`):
+## Evidence-slimming pass (what changed after synthesis)
+
+Two files that were present at synthesis time were removed from the repo in
+the bounded pre-merge slimming pass:
+
+- `raw/scan_candidates.json` — a 3.0 MB exploratory candidate dump produced by
+  [`scan_contracts.py`](scan_contracts.py). It was an already-consumed
+  intermediate: the high-level CI/PC findings in
+  [`contract_findings.json`](contract_findings.json) record the verdicts, not
+  the raw grep lists. The scanner still runs the identical scan logic; the
+  dump write is now opt-in (`SCAN_CANDIDATES_WRITE=1`) and the dump is
+  intentionally NOT committed (regenerable via `scan_contracts.py`).
+- `raw/deletion_matrix.json` — a byte-identical verbatim copy of the canonical
+  top-level [`../deletion_matrix.json`](../deletion_matrix.json) (byte
+  equality was proven with `cmp` before removal; recorded in
+  [`verification_receipt.json`](verification_receipt.json)). The canonical
+  deletion matrix is now ONLY the top-level
+  [`../deletion_matrix.json`](../deletion_matrix.json).
+
+[`synthesize.py`](../synthesize.py) was adjusted accordingly: it reads the
+deletion matrix from `raw/` only as a fallback and otherwise uses the
+canonical top-level file, so canonical synthesis works without either removed
+dump at re-run time.
+
+## Classification of remaining raw snapshots
+
+| File | Classification |
+|---|---|
+| `contract_findings.json` | `CANONICAL_SNAPSHOT_EVIDENCE` — source of the 26 CI-*/PC-* findings; carries audit-time evidence lines that are not regenerable from any scanner alone |
+| `context_metrics.json` | `CANONICAL_SNAPSHOT_EVIDENCE` — measured stdout sizes/truncation flags of `project_context brief`/`spine` at the audited base commit; deterministic only for that tree |
+| `projects_toml_metrics.json` | `CANONICAL_SNAPSHOT_EVIDENCE` — measured `docs/state/projects.toml` record inventory at the audited base commit |
+| `workflow_metrics.json` | `CANONICAL_SNAPSHOT_EVIDENCE` — measured `.github/workflows/` line/step inventory at the audited base commit |
+| `packaging_metrics.json` | `CANONICAL_SNAPSHOT_EVIDENCE` — measured packaging/config existence inventory at the audited base commit |
+| `repo_byte_weight.json` | `CANONICAL_SNAPSHOT_EVIDENCE` — measured tracked byte weight via `git ls-files` at the audited base commit; changes whenever the tracked tree changes |
+| `module_inventory.json` | `CANONICAL_SNAPSHOT_EVIDENCE` — measured module inventory + classification at the audited base commit (regenerable deterministically for the same tree via `scan_slim_tests.py`, but the retained file is the audited evidence) |
+| `test_gap_findings.json` | `CANONICAL_SNAPSHOT_EVIDENCE` — PR #241 test-effectiveness forensics; includes the `merged=false` context for CI-23 |
+| `verification_receipt.json` | `CANONICAL_SNAPSHOT_EVIDENCE` — synthesis-time verification receipt (historical record; not rewritten by the slimming pass) |
+
+No remaining raw file is classified
+`DETERMINISTICALLY_REGENERABLE_INTERMEDIATE` — the only such file
+(`scan_candidates.json`) was removed in the slimming pass. No further removal
+was made: every remaining file fails at least one of the five removal
+conditions (conservative disposition).
+
+## How to re-run the scanners
+
+Scanners are rerun against the audited base commit
+`be291300abb70f3ffc6ba0dd8b1bea570daf5377`. Checkout that commit (or create a
+worktree), run the scanner, and compare output against the retained snapshot:
 
 ```bash
-# Domains 7/8/9/10/13
+# Example with a temporary worktree
+git worktree add /tmp/qntylab-audit-base be291300abb70f3ffc6ba0dd8b1bea570daf5377
+cd /tmp/qntylab-audit-base
+
+# Domains 7/8/9/10/13 (context/projects.toml/workflow/packaging/byte-weight)
 python docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/raw/scan_metrics.py
+
 # Domains 11/12/14 (module inventory, deletion matrix, test-gap findings)
 python docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/raw/scan_slim_tests.py
+
+# Contract-integrity candidate scan (exploratory; dump write is opt-in)
+SCAN_CANDIDATES_WRITE=1 python docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/raw/scan_contracts.py
+
+# Then diff against the retained snapshots in this directory.
 ```
 
 Requirements: Python >= 3.11 (uses `tomllib`), a clean checkout of the audited
@@ -35,7 +88,7 @@ commit. No network, no timestamps, no dependencies beyond the stdlib.
 
 ### Determinism notes
 
-- All JSON is written with `sort_keys=True`, fixed indent, trailing newline.
+- All JSON is written with fixed indent and trailing newline.
 - No timestamps or randomness are emitted.
 - `context_metrics.json` shells out to `python -m qntylab.project_context brief`
   and `... spine` and records stdout byte/line counts only; these are
@@ -45,8 +98,25 @@ commit. No network, no timestamps, no dependencies beyond the stdlib.
   state (e.g. after committing these forensic artifacts themselves) changes
   the tracked-file numbers. Byte-identical reproduction requires the same
   tracked tree.
-- Two consecutive runs on the same tree were diffed byte-identical
-  (verification receipt in the audit summary).
+
+## Warning: later-tree reruns do NOT reproduce audited metrics
+
+**Rerunning the scanners on a later tree does NOT reproduce the audited
+metrics exactly.** All retained metrics and findings are audited at the base
+SHA `be291300abb70f3ffc6ba0dd8b1bea570daf5377` ONLY. Byte weights, module
+counts, workflow line counts, `projects.toml` record counts, and context
+spine sizes all change as the repository evolves; a rerun on `master` or any
+newer commit measures that tree, not the audited one. Any comparison must
+first check out the base SHA.
+
+## Note on edited raw snapshot
+
+[`contract_findings.json`](contract_findings.json) was edited in the
+evidence-slimming pass: CI-1 and CI-23 prose was updated (reachability
+markers `LATENT_ON_MASTER` / `BRANCH_ONLY` added and claim prefixes aligned)
+to correct the HIGH-finding reachability wording. Severities, classifications,
+evidence, risks, and dispositions are otherwise unchanged. The retained file
+remains the snapshot evidence for the 26 contract findings.
 
 ## Method notes / known heuristics
 

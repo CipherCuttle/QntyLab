@@ -3,6 +3,12 @@
 
 Stdlib only. Emits raw/scan_candidates.json with per-domain hit lists over
 qntylab/*.py and tests/*.py. Read-only; writes only the candidates JSON.
+
+The scan_candidates.json dump is an exploratory intermediate and is NOT
+committed to the repository. Writing it is opt-in: set the environment
+variable SCAN_CANDIDATES_WRITE=1 to persist the dump. Without it the
+scanner runs the identical scan and prints only the per-domain summary
+(the summary is what canonical synthesis consumes).
 """
 import ast
 import json
@@ -223,8 +229,13 @@ def main():
         result["d6_hardening"].extend(hardening_scan(tree, rel, lines))
         result["d1_provenance_params"].extend(provenance_params(tree, rel))
 
-    with open(OUT, "w", encoding="utf-8") as f:
-        json.dump(result, f, indent=1)
+    if os.environ.get("SCAN_CANDIDATES_WRITE") == "1":
+        with open(OUT, "w", encoding="utf-8") as f:
+            json.dump(result, f, indent=1)
+        print(f"wrote {OUT}")
+    else:
+        print("scan_candidates.json not written "
+              "(set SCAN_CANDIDATES_WRITE=1 to persist the dump)")
     summary = {k: len(v) for k, v in result.items() if isinstance(v, list)}
     print(json.dumps(summary, indent=1))
 

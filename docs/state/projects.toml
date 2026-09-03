@@ -4783,6 +4783,84 @@ active_project_after_closure = "NONE"
 next_action = "CLOSED_BLOCKED: do not implement the seam, create a scientific authorization, acquire data, or run the 244-origin evaluation. Reopen only under a separately governed scientific-source refactor or successor-seam decision."
 
 [[project]]
+project_id = "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_REAL_EXECUTION_CONSUMER_SEAM_SUCCESSOR_DECISION_V0"
+phase_id = "FUNDING_INCREMENTAL_REAL_EXECUTION_CONSUMER_SEAM_SUCCESSOR_DECISION_V0"
+display_name = "Funding-pressure incremental real-execution consumer seam successor decision V0"
+state = "CLOSED_PASS"
+candidate_state = "CANONICAL_GOVERNANCE_DECISION"
+canonicalization_status = "CLOSED"
+authority_level = "GOVERNANCE_AUTHORIZATION_FOR_ONE_SUCCESSOR_IMPLEMENTATION_ONLY"
+phase_type = "GOVERNANCE_ONLY"
+governance_only = true
+authoritative_artifacts = [
+  "AGENTS.md",
+  "qntylab.toml",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/real_execution_consumer_seam_successor_decision_v0/decision.json",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/real_execution_consumer_seam_implementation_authorization_v0/closure.json",
+  "tests/test_funding_incremental_real_execution_consumer_seam_successor_decision_v0.py",
+]
+decision_artifact = "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/real_execution_consumer_seam_successor_decision_v0/decision.json"
+decision_artifact_sha256 = "dac2051e751953bf2958bf4a3fb9371a713fce75290291afc9b8f4f01a39a9dc"
+predecessor_project_id = "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_REAL_EXECUTION_CONSUMER_SEAM_IMPLEMENTATION_AUTHORIZATION_V0"
+predecessor_state = "CLOSED_BLOCKED"
+predecessor_closure_path = "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/real_execution_consumer_seam_implementation_authorization_v0/closure.json"
+predecessor_closure_sha256 = "e4418ca21b74bec9199fd28d25219d3947f3298a21b5364f96d3d052409df2d6"
+predecessor_closure_unchanged = true
+predecessor_registry_entry_unchanged = true
+later_implementation_phase = "FUNDING_INCREMENTAL_REAL_EXECUTION_CONSUMER_SEAM_SUCCESSOR_IMPLEMENTATION_V0"
+later_implementation_phase_project_id = "FUNDING_INCREMENTAL_REAL_EXECUTION_CONSUMER_SEAM_SUCCESSOR_IMPLEMENTATION_V0"
+later_implementation_phases_authorized = 1
+future_phase_separate = true
+future_phase_count = 1
+effective_future_phase_authority = true
+implementation_authorized = false
+implementation_completed = false
+current_phase_implementation_performed = false
+scientific_evaluation_phases_authorized = 0
+scientific_evaluation_authorized = false
+scientific_execution_authorized = false
+data_access_authorized = false
+real_data_access_authorized = false
+market_data_access_authorized = false
+outcome_access_authorized = false
+provider_access_authorized = false
+provider_authority = "NONE"
+claim_access_authorized = false
+claim_authority = "NONE"
+persistent_authorization_claim_creation_authorized = false
+evaluation_origin_access_authorized = false
+origin_authority = "NONE"
+evaluation_origins_consumed = 0
+synthetic_ordering_fixture_permitted = true
+synthetic_ordering_fixture_ephemeral = true
+synthetic_ordering_fixture_non_consuming = true
+synthetic_ordering_fixture_is_real_claim = false
+synthetic_ordering_fixture_persisted = false
+synthetic_ordering_fixture_authorizes_execution = false
+frozen_v0_bytes_preserved = true
+frozen_v0_result_semantics_preserved = true
+claim_before_outcome_required = true
+deterministic_exactly_once_recording_required = true
+private_entrypoint_bypass_prohibited = true
+v2_result_contract_substitution_prohibited = true
+pr239_number = 239
+pr239_unmerged = true
+pr239_authorized = false
+pr239_included_in_this_authorization = false
+router_authority = "NONE"
+qnty_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+state_snapshot_authority = "NONE"
+downstream_authority = "NONE"
+active_project_after_closure = "NONE"
+hostile_review_count = 1
+targeted_rereview_used = false
+next_action = "CLOSED_PASS: this governance-only decision permits exactly one separately named successor implementation phase, with no current implementation, scientific evaluation, real data, outcome, provider, claim, origin, Router, Qnty, trading, or capital authority. PR #239 remains unmerged and unauthorized."
+
+[[project]]
 project_id = "PINNED_DSH_CODEX_TERMINAL_ERROR_PERMISSION_POLICY_FORENSICS_AUTHORIZATION_V0"
 display_name = "Pinned DSH Codex terminal-error permission-policy forensics authorization V0"
 state = "CLOSED_PASS"

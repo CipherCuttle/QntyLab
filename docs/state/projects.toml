@@ -4864,7 +4864,7 @@ next_action = "CLOSED_PASS: this governance-only decision permits exactly one se
 project_id = "FUNDING_INCREMENTAL_REAL_EXECUTION_CONSUMER_SEAM_SUCCESSOR_IMPLEMENTATION_V0"
 phase_id = "FUNDING_INCREMENTAL_REAL_EXECUTION_CONSUMER_SEAM_SUCCESSOR_IMPLEMENTATION_V0"
 display_name = "Funding incremental real-execution consumer seam successor implementation V0"
-state = "CLOSED_PASS"
+state = "IMPLEMENTATION_IN_REVIEW"
 authority_level = "OFFLINE_SYNTHETIC_ORDERING_INSTRUMENTATION_ONLY"
 phase_type = "SUCCESSOR_CONSUMER_SEAM_IMPLEMENTATION"
 authoritative_artifacts = [
@@ -4873,8 +4873,6 @@ authoritative_artifacts = [
   "docs/CURRENT_ROADMAP.md",
   "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/real_execution_consumer_seam_successor_decision_v0/decision.json",
   "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/consumer_seam_successor_v0/implementation_manifest.json",
-  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/consumer_seam_successor_v0/hostile_review.md",
-  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/consumer_seam_successor_v0/closure.json",
   "qntylab/jigsaw_funding_pressure_incremental_forecast_value_consumer_seam_successor_v0.py",
   "tests/test_funding_incremental_real_execution_consumer_seam_successor_v0.py",
 ]
@@ -4920,13 +4918,10 @@ qnty_authority = "NONE"
 trading_authority = "NONE"
 capital_authority = "NONE"
 downstream_authority = "NONE"
-hostile_review_count = 1
-hostile_review_verdict = "PASS"
-hostile_review_critical = 0
-hostile_review_high = 0
+hostile_review_count = 0
 targeted_rereview_used = false
 active_project_after_closure = "NONE"
-next_action = "CLOSED_PASS: offline successor seam implemented and reviewed. Do not create scientific execution authority, access real data/outcomes/providers/claims/origins, or infer Router/Qnty/trading/capital authority from this phase."
+next_action = "IMPLEMENTATION_IN_REVIEW: implementation is ready for exactly one terminal hostile review. The first hostile review determines terminal closure; no repair or rereview follows. No scientific execution authority, real data/outcome/provider/claim/origin access, or Router/Qnty/trading/capital authority is granted."
 
 [[project]]
 project_id = "PINNED_DSH_CODEX_TERMINAL_ERROR_PERMISSION_POLICY_FORENSICS_AUTHORIZATION_V0"

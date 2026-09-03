@@ -10,6 +10,7 @@ import ast
 import dataclasses
 import hashlib
 import json
+import tomllib
 from decimal import Context, Decimal, ROUND_DOWN, localcontext
 from pathlib import Path
 
@@ -24,6 +25,8 @@ ROOT = Path(__file__).resolve().parents[1]
 FROZEN_RESULT_DIGEST = "sha256:1fca55ebdbe5c4d5b835cb65f87930755d231449c924eae912b522bd04b53ea2"
 FROZEN_PREREG_SHA256 = "42b96afae80e55611bcd9786169050520525fbc5534b9f94c72ed867380ba9cf"
 FROZEN_EXECUTOR_SHA256 = "1ffcfeb959cfc547fcda96384c1c8f58b3f5cbc174c5d535324480ede312e8c6"
+SUCCESSOR_PROJECT_ID = "FUNDING_INCREMENTAL_REAL_EXECUTION_CONSUMER_SEAM_SUCCESSOR_IMPLEMENTATION_V0"
+SUCCESSOR_ARTIFACT_ROOT = ROOT / "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/consumer_seam_successor_v0"
 
 
 @pytest.fixture(autouse=True)
@@ -41,6 +44,56 @@ def _batch(seed: int = 20240101) -> seam.ForecastRowBatch:
 
 def _envelope(batch: seam.ForecastRowBatch) -> seam.AuthorityBoundInputEnvelope:
     return seam.AuthorityBoundInputEnvelope.for_offline_synthetic_batch(batch)
+
+
+def _successor_project_record() -> dict:
+    registry = tomllib.loads((ROOT / "docs/state/projects.toml").read_text(encoding="utf-8"))
+    matches = [record for record in registry["project"] if record["project_id"] == SUCCESSOR_PROJECT_ID]
+    assert len(matches) == 1
+    return matches[0]
+
+
+def test_successor_is_implemented_but_waiting_for_its_single_terminal_review():
+    record = _successor_project_record()
+    authoritative_artifacts = record["authoritative_artifacts"]
+
+    assert record["state"] == "IMPLEMENTATION_IN_REVIEW"
+    assert record["implementation_count"] == 1
+    assert record["implementation_completed"] is True
+    assert record["hostile_review_count"] == 0
+    assert "hostile_review_verdict" not in record
+    assert "hostile_review_critical" not in record
+    assert "hostile_review_high" not in record
+    assert record["targeted_rereview_used"] is False
+    assert "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/consumer_seam_successor_v0/hostile_review.md" not in authoritative_artifacts
+    assert "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/consumer_seam_successor_v0/closure.json" not in authoritative_artifacts
+    assert "exactly one terminal hostile review" in record["next_action"]
+
+    assert (SUCCESSOR_ARTIFACT_ROOT / "implementation_manifest.json").is_file()
+    assert not (SUCCESSOR_ARTIFACT_ROOT / "hostile_review.md").exists()
+    assert not (SUCCESSOR_ARTIFACT_ROOT / "closure.json").exists()
+    assert (ROOT / "qntylab/jigsaw_funding_pressure_incremental_forecast_value_consumer_seam_successor_v0.py").is_file()
+
+    for field in (
+        "implementation_authorized",
+        "scientific_evaluation_authorized",
+        "scientific_execution_authorized",
+        "data_access_authorized",
+        "real_data_access_authorized",
+        "market_data_access_authorized",
+        "outcome_access_authorized",
+        "provider_access_authorized",
+        "claim_access_authorized",
+        "synthetic_ordering_fixture_authorizes_execution",
+        "real_outcome_access_performed",
+        "scientific_execution_performed",
+        "new_data_acquisition_performed",
+        "scientific_result_created",
+        "trial_completion_recorded",
+    ):
+        assert record[field] is False, field
+    for field in ("router_authority", "qnty_authority", "trading_authority", "capital_authority", "downstream_authority"):
+        assert record[field] == "NONE", field
 
 
 def test_typed_authority_boundary_preserves_frozen_result_and_ordering():
@@ -246,3 +299,4 @@ def test_successor_manifest_binds_its_source_and_authority_artifacts():
     assert manifest["ordering"]["events"] == list(seam.ORDERING_EVENTS)
     assert manifest["exactly_once"]["wall_clock_dependency"] is False
     assert manifest["offline_firewall"]["scientific_execution_performed"] is False
+    assert manifest["verification"]["single_hostile_review_required"] is True

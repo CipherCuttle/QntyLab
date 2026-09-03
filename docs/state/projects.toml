@@ -4861,6 +4861,76 @@ targeted_rereview_used = false
 next_action = "CLOSED_PASS: this governance-only decision permits exactly one separately named successor implementation phase, with no current implementation, scientific evaluation, real data, outcome, provider, claim, origin, Router, Qnty, trading, or capital authority. PR #239 remains unmerged and unauthorized."
 
 [[project]]
+project_id = "FUNDING_INCREMENTAL_REAL_EXECUTION_CONSUMER_SEAM_SUCCESSOR_IMPLEMENTATION_V0"
+phase_id = "FUNDING_INCREMENTAL_REAL_EXECUTION_CONSUMER_SEAM_SUCCESSOR_IMPLEMENTATION_V0"
+display_name = "Funding-pressure incremental real-execution consumer seam successor implementation V0"
+state = "CLOSED_BLOCKED"
+authority_level = "GOVERNANCE_ONLY"
+phase_type = "SOURCE_BOUND_IMPLEMENTATION"
+governance_only = true
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/real_execution_consumer_seam_successor_decision_v0/decision.json",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/real_execution_consumer_seam_successor_implementation_v0/hostile_review.md",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/real_execution_consumer_seam_successor_implementation_v0/closure.json",
+  "qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py",
+  "tests/test_funding_incremental_real_execution_consumer_seam_successor_closure_v0.py",
+]
+governing_decision_project_id = "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_REAL_EXECUTION_CONSUMER_SEAM_SUCCESSOR_DECISION_V0"
+governing_decision_artifact = "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/real_execution_consumer_seam_successor_decision_v0/decision.json"
+governing_decision_artifact_sha256 = "dac2051e751953bf2958bf4a3fb9371a713fce75290291afc9b8f4f01a39a9dc"
+governing_decision_unchanged = true
+predecessor_project_id = "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_REAL_EXECUTION_CONSUMER_SEAM_SUCCESSOR_DECISION_V0"
+predecessor_state = "CLOSED_PASS"
+canonical_master = "542f8afe73355cf8636e296fb75105053aef40a6"
+closure_artifact = "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/real_execution_consumer_seam_successor_implementation_v0/closure.json"
+hostile_review_receipt = "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/real_execution_consumer_seam_successor_implementation_v0/hostile_review.md"
+reviewed_pr = 241
+reviewed_candidate_commit = "d181d12096e19c1dbe2f89585e73b8f8f7b6b21f"
+implementation_candidate_existed = true
+implementation_candidate_reviewed = true
+implementation_candidate_failed_review = true
+implementation_candidate_canonicalized = false
+implementation_candidate_merged = false
+candidate_source_on_canonical_master = false
+implementation_completed = false
+terminal_review_count = 1
+hostile_review_count = 1
+hostile_review_type = "SINGLE_TERMINAL_HOSTILE_REVIEW"
+codex_review_id = 5103186304
+hostile_review_blocking_findings = 2
+hostile_review_blocking_finding_ids = [3925566255, 3925566262]
+blocking_finding_1_id = "SYNTHETIC_PROVENANCE_LAUNDERING"
+blocking_finding_1_review_comment_id = 3925566255
+blocking_finding_2_id = "EXACTLY_ONCE_IS_PROCESS_LOCAL"
+blocking_finding_2_review_comment_id = 3925566262
+targeted_rereview_count = 0
+targeted_rereview_used = false
+repair_after_review_performed = false
+terminal_reason = "hostile review failed required invariants"
+frozen_v0_bytes_changed = false
+frozen_v0_result_semantics_changed = false
+real_data_accessed = false
+outcomes_accessed = false
+providers_accessed = false
+real_claims_accessed_or_consumed = false
+evaluation_origins_consumed = 0
+scientific_execution_performed = false
+scientific_authorization_created = false
+implementation_authorized = false
+later_implementation_phases_authorized = 0
+pr241_merged = false
+pr239_authorized = false
+router_authority = "NONE"
+qnty_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+downstream_authority = "NONE"
+active_project_after_closure = "NONE"
+next_action = "CLOSED_BLOCKED: The successor implementation candidate was reviewed once and failed terminal review because the synthetic boundary could launder arbitrary ForecastRows as synthetic validation and process-local idempotency did not establish lifecycle-level exactly-once behavior. PR #241 remains unmerged. No repair, rereview, scientific authorization, or downstream authority is permitted under this phase."
+
+[[project]]
 project_id = "PINNED_DSH_CODEX_TERMINAL_ERROR_PERMISSION_POLICY_FORENSICS_AUTHORIZATION_V0"
 display_name = "Pinned DSH Codex terminal-error permission-policy forensics authorization V0"
 state = "CLOSED_PASS"

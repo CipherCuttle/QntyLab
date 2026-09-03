@@ -1,0 +1,71 @@
+{
+  "artifact_type": "FUNDING_INCREMENTAL_REAL_EXECUTION_CONSUMER_SEAM_SUCCESSOR_IMPLEMENTATION_CLOSURE",
+  "schema_version": "funding-incremental-real-consumer-seam-successor-implementation-closure-v0",
+  "phase_id": "FUNDING_INCREMENTAL_REAL_EXECUTION_CONSUMER_SEAM_SUCCESSOR_IMPLEMENTATION_V0",
+  "project_id": "FUNDING_INCREMENTAL_REAL_EXECUTION_CONSUMER_SEAM_SUCCESSOR_IMPLEMENTATION_V0",
+  "state": "CLOSED_BLOCKED",
+  "verdict": "FUNDING_INCREMENTAL_REAL_EXECUTION_CONSUMER_SEAM_SUCCESSOR_IMPLEMENTATION_V0 = CLOSED_BLOCKED",
+  "terminal_reason": "hostile review failed required invariants",
+  "governing_decision": {
+    "phase_id": "FUNDING_INCREMENTAL_REAL_EXECUTION_CONSUMER_SEAM_SUCCESSOR_DECISION_V0",
+    "artifact_path": "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/real_execution_consumer_seam_successor_decision_v0/decision.json",
+    "artifact_sha256": "dac2051e751953bf2958bf4a3fb9371a713fce75290291afc9b8f4f01a39a9dc",
+    "state": "CLOSED_PASS",
+    "required_unchanged": true
+  },
+  "canonical_master_verified": true,
+  "canonical_master": "542f8afe73355cf8636e296fb75105053aef40a6",
+  "reviewed_implementation": {
+    "pull_request": 241,
+    "candidate_commit": "d181d12096e19c1dbe2f89585e73b8f8f7b6b21f",
+    "candidate_implementation_canonicalized": false,
+    "candidate_implementation_merged": false,
+    "candidate_source_on_canonical_master": false,
+    "referenced_only_by_historical_commit_hash": true
+  },
+  "hostile_review": {
+    "count": 1,
+    "review_type": "single terminal hostile review",
+    "codex_review_id": 5103186304,
+    "receipt_path": "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/real_execution_consumer_seam_successor_implementation_v0/hostile_review.md",
+    "blocking_findings": 2,
+    "blocking": [
+      {
+        "severity": "P1",
+        "review_comment_id": 3925566255,
+        "finding_id": "SYNTHETIC_PROVENANCE_LAUNDERING",
+        "summary": "The public constructor accepts ordinary ForecastRow objects without verifiable synthetic provenance and unconditionally sets synthetic_only=True, so real observations can be wrapped as SYNTHETIC_VALIDATION via the synthetic constructor and passed to the frozen executor. Violates kill criteria against synthetic relabeling, authority laundering, and real-data admission through the synthetic ordering boundary."
+      },
+      {
+        "severity": "P1",
+        "review_comment_id": 3925566262,
+        "finding_id": "EXACTLY_ONCE_IS_PROCESS_LOCAL",
+        "summary": "Exactly-once recording is process-local: the module-local _RECORDS dict means a restart or a second worker re-evaluates the same record identity; no lifecycle-level deterministic exactly-once or duplicate suppression is established."
+      }
+    ],
+    "targeted_rereview_count": 0,
+    "targeted_rereview_used": false,
+    "repair_after_review_performed": false
+  },
+  "terminal_review_count": 1,
+  "candidate_existed": true,
+  "candidate_reviewed": true,
+  "candidate_failed_review": true,
+  "candidate_never_canonicalized": true,
+  "implementation_completed": false,
+  "later_implementation_phases_authorized": 0,
+  "frozen_v0_bytes_changed": false,
+  "real_data_accessed": false,
+  "outcomes_accessed": false,
+  "providers_accessed": false,
+  "real_claims_accessed_or_consumed": false,
+  "evaluation_origins_consumed": 0,
+  "scientific_execution_performed": false,
+  "scientific_authorization_created": false,
+  "pr239_authorized": false,
+  "router_authority": "NONE",
+  "qnty_authority": "NONE",
+  "trading_authority": "NONE",
+  "capital_authority": "NONE",
+  "next_action": "STOP"
+}

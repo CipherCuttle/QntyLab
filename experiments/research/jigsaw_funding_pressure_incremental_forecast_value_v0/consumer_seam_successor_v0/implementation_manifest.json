@@ -1,0 +1,80 @@
+{
+  "artifact_type": "FUNDING_INCREMENTAL_REAL_EXECUTION_CONSUMER_SEAM_SUCCESSOR_IMPLEMENTATION_MANIFEST",
+  "schema_version": "funding-incremental-real-execution-consumer-seam-successor-manifest-v0",
+  "phase_id": "FUNDING_INCREMENTAL_REAL_EXECUTION_CONSUMER_SEAM_SUCCESSOR_IMPLEMENTATION_V0",
+  "project_id": "FUNDING_INCREMENTAL_REAL_EXECUTION_CONSUMER_SEAM_SUCCESSOR_IMPLEMENTATION_V0",
+  "source_path": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_consumer_seam_successor_v0.py",
+  "source_sha256": "40f737eaf43dd655f7fbdbc6af7ad533378b6d3eec5fe1f22ef1cabf32d112ac",
+  "decision_artifact": {
+    "path": "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/real_execution_consumer_seam_successor_decision_v0/decision.json",
+    "sha256": "dac2051e751953bf2958bf4a3fb9371a713fce75290291afc9b8f4f01a39a9dc"
+  },
+  "predecessor_closure": {
+    "path": "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/real_execution_consumer_seam_implementation_authorization_v0/closure.json",
+    "sha256": "e4418ca21b74bec9199fd28d25219d3947f3298a21b5364f96d3d052409df2d6",
+    "required_state": "CLOSED_BLOCKED",
+    "unchanged": true
+  },
+  "frozen_contract": {
+    "executor_path": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py",
+    "executor_sha256": "1ffcfeb959cfc547fcda96384c1c8f58b3f5cbc174c5d535324480ede312e8c6",
+    "shared_core_path": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_core_v1.py",
+    "shared_core_sha256": "56d6233ef99fc87475542b4e41bad600144394fb18ee2943234f1f117b4c9d80",
+    "preregistration_path": "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/preregistration.json",
+    "preregistration_sha256": "42b96afae80e55611bcd9786169050520525fbc5534b9f94c72ed867380ba9cf",
+    "preregistration_digest": "d7ec718ab14e73d2aea24749a22caa2921fd81b8a336e2f2eaffb30ae1e992ef",
+    "result_type": "IncrementalForecastEvaluation",
+    "result_schema_sha256": "0eb5029002fe472035023b9d73b4d852cf1a3f18a2693ed3454e5167cca2871f",
+    "v0_result_semantics_preserved": true
+  },
+  "public_boundary": {
+    "module": "qntylab.jigsaw_funding_pressure_incremental_forecast_value_consumer_seam_successor_v0.py",
+    "function": "consume_forecast_batch",
+    "accepted_types": ["AuthorityBoundInputEnvelope", "ForecastRowBatch"],
+    "private_executor_entrypoint_bypass": false,
+    "caller_selected_execution_mode": false,
+    "raw_mapping_inputs_rejected": true
+  },
+  "ordering": {
+    "events": [
+      "AUTHORITY_ACCEPTED",
+      "EPHEMERAL_SYNTHETIC_ORDERING_FIXTURE_ACCEPTED",
+      "INPUT_INTERPRETATION",
+      "OUTCOME_INTERPRETATION",
+      "RESULT_RECORD"
+    ],
+    "fixture_identity": "EPHEMERAL_SYNTHETIC_ORDERING_FIXTURE_ONLY",
+    "fixture_ephemeral": true,
+    "fixture_non_consuming": true,
+    "fixture_persisted": false,
+    "fixture_authorizes_execution": false
+  },
+  "exactly_once": {
+    "record_identity_formula": "successor_phase_id + authority_receipt_digest + input_batch_identity",
+    "identity_delimiter": "|",
+    "content_serialization": "canonical JSON with sorted keys, compact separators, UTF-8 newline",
+    "wall_clock_dependency": false,
+    "replay_returns_original_identity": true,
+    "same_identity_different_content_fails_closed": true,
+    "storage": "process-local in-memory only"
+  },
+  "offline_firewall": {
+    "real_data_accessed": false,
+    "outcomes_accessed": false,
+    "providers_accessed": false,
+    "real_claims_accessed_or_consumed": false,
+    "evaluation_origins_consumed": 0,
+    "persistent_authorization_claim_created": false,
+    "scientific_execution_performed": false,
+    "router_authority": "NONE",
+    "qnty_authority": "NONE",
+    "trading_authority": "NONE",
+    "capital_authority": "NONE"
+  },
+  "verification": {
+    "focused_test_path": "tests/test_funding_incremental_real_execution_consumer_seam_successor_v0.py",
+    "differential_oracle_path": "tests/test_funding_incremental_executor_core_extraction_differential_v1.py",
+    "frozen_artifact_byte_checks_required": true,
+    "single_hostile_review_required": true
+  }
+}

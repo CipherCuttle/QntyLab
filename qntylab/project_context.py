@@ -30,6 +30,7 @@ PROJECT_STATES = frozenset(
         "ACTIVE",
         "BLOCKED",
         "RESULT_PENDING_RECORDING",
+        "IMPLEMENTATION_IN_REVIEW",
         "CLOSED_PASS",
         "CLOSED_NEGATIVE",
         "CLOSED_BLOCKED",
@@ -1646,6 +1647,18 @@ def context_data(
         ),
         key=lambda record: record["project_id"],
     )
+    implementation_in_review = sorted(
+        (
+            {
+                "project_id": record["project_id"],
+                "display_name": record.get("display_name", record["project_id"]),
+                "next_action": record["next_action"],
+            }
+            for record in projects.values()
+            if record["state"] == "IMPLEMENTATION_IN_REVIEW"
+        ),
+        key=lambda record: record["project_id"],
+    )
     stale = sorted(
         (
             {"project_id": record["project_id"], "state": record["state"], "next_action": record["next_action"]}
@@ -1663,6 +1676,7 @@ def context_data(
         "current_global_companions": global_companions,
         "active_project": active,
         "current_permitted_next_action": active["next_action"] if active else "No project implementation is currently authorized.",
+        "implementation_in_review_projects": implementation_in_review,
         "queued_but_unauthorized_projects": queued,
         "superseded_or_stale_planning": stale,
         "research_ledger": _research_summary(root, config),
@@ -1685,7 +1699,12 @@ def _roadmap_bytes(
         snapshot = _snapshot_for(root, snapshot)
         _, _, projects_registry = load_context_sources(root, snapshot=snapshot)
         projects = validate_projects_registry(root, projects_registry, snapshot=snapshot)
-    groups = (("Active", "ACTIVE"), ("Queued — not authorized", "PLANNED_NOT_AUTHORIZED"), ("Closed / stale", None))
+    groups = (
+        ("Active", "ACTIVE"),
+        ("Implementation in review", "IMPLEMENTATION_IN_REVIEW"),
+        ("Queued — not authorized", "PLANNED_NOT_AUTHORIZED"),
+        ("Closed / stale", None),
+    )
     lines = [
         "# GENERATED — DO NOT EDIT BY HAND",
         "",
@@ -1797,7 +1816,21 @@ def context_text(data: dict[str, Any]) -> str:
         )
     else:
         lines.append("- None.")
-    lines.extend(("", f"- Active project: `{active['project_id'] if active else 'none'}`.", f"- Permitted next action: {data['current_permitted_next_action']}", "", "## Queued but not authorized", ""))
+    lines.extend(
+        (
+            "",
+            f"- Active project: `{active['project_id'] if active else 'none'}`.",
+            f"- Permitted next action: {data['current_permitted_next_action']}",
+            "",
+            "## Implementation in review",
+            "",
+        )
+    )
+    if data["implementation_in_review_projects"]:
+        lines.extend(f"- `{item['display_name']}`" for item in data["implementation_in_review_projects"])
+    else:
+        lines.append("- None.")
+    lines.extend(("", "## Queued but not authorized", ""))
     if data["queued_but_unauthorized_projects"]:
         lines.extend(f"- `{item['display_name']}`" for item in data["queued_but_unauthorized_projects"])
     else:

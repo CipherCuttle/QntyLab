@@ -4992,6 +4992,95 @@ critical_high_rereviews_used = 0
 next_action = "CLOSED_PASS: this governance-only decision permits exactly one separately named hardening implementation phase, with no current implementation, scientific evaluation, real data, outcome, provider, claim consumption, or downstream authority. Execute FUNDING_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_IMPLEMENTATION_V0 as a separate governance-compliant implementation task within the decision's authorized_implementation_surfaces after this decision PR merges; do not begin it inside this decision task."
 
 [[project]]
+project_id = "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_IMPLEMENTATION_V0"
+phase_id = "FUNDING_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_IMPLEMENTATION_V0"
+display_name = "Funding-pressure incremental contract-integrity hardening implementation V0"
+state = "CLOSED_BLOCKED"
+decision_state = "CLOSED_BLOCKED"
+implementation_state = "CLOSED_BLOCKED"
+review_lifecycle_state = "CLOSED_BLOCKED"
+candidate_state = "TERMINAL_CLOSURE_RECORDED"
+canonicalization_status = "NOT_CANONICALIZED"
+authority_level = "NO_AUTHORITY"
+phase_type = "IMPLEMENTATION"
+governance_only = false
+implementation_authorized = false
+implementation_completed = false
+implementation_reviewed = true
+implementation_canonicalized = false
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/contract_integrity_hardening_decision_v0/decision.json",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/contract_integrity_hardening_decision_v0/implementation_closure.json",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/contract_integrity_hardening_decision_v0/implementation_review_receipts.md",
+  "tests/test_funding_incremental_contract_integrity_hardening_implementation_closure_v0.py",
+]
+governing_decision_project_id = "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_DECISION_V0"
+governing_decision_artifact = "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/contract_integrity_hardening_decision_v0/decision.json"
+governing_decision_artifact_sha256 = "712cda5d4e82414ab095deecabaa7d2af054bc7b97ab5cbd394c9fdbeda32a23"
+governing_decision_state = "CLOSED_PASS"
+governing_decision_unchanged = true
+canonical_master = "12202259845ada4f9876288426fed91aba5b6861"
+canonical_parent = "12202259845ada4f9876288426fed91aba5b6861"
+closure_artifact = "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/contract_integrity_hardening_decision_v0/implementation_closure.json"
+review_receipts = "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/contract_integrity_hardening_decision_v0/implementation_review_receipts.md"
+reviewed_pr = 245
+reviewed_pr_branch = "agent/funding-incremental-contract-integrity-hardening-implementation-v0"
+reviewed_candidate_commit = "a6200d3e3d1ae2cffc44cca1d1db5d626239452c"
+repaired_candidate_commit = "db6a6c6ed5102019300066edfdf4d4d9402f111a"
+implementation_candidate_existed = true
+implementation_candidate_reviewed = true
+implementation_candidate_failed_review = true
+implementation_candidate_canonicalized = false
+implementation_candidate_merged = false
+candidate_source_on_canonical_master = false
+implementation_completed_phase = false
+initial_hostile_review_count = 1
+initial_hostile_review_github_review_id = "PRR_kwDOTo27Xs8AAAABMQI3yw"
+initial_high_count = 4
+initial_critical_count = 0
+hostile_review_blocking_finding_threads = ["PRRT_kwDOTo27Xs6fbIjW", "PRRT_kwDOTo27Xs6fbIjc", "PRRT_kwDOTo27Xs6fbIjd", "PRRT_kwDOTo27Xs6fbIjh"]
+bounded_repair_used = true
+targeted_rereview_used = true
+targeted_rereview_github_review_id = "PRR_kwDOTo27Xs8AAAABMQ8rww"
+targeted_rereview_high_count = 1
+targeted_rereview_remaining_finding_thread = "PRRT_kwDOTo27Xs6fcsAd"
+repair_budget_exhausted = true
+further_repair_authorized = false
+further_rereview_authorized = false
+pr245_merge_authorized = false
+pr245_merged = false
+terminal_reason = "the one permitted independent hostile review returned four High findings, the one permitted bounded Critical/High repair was performed, and the one permitted targeted Critical/High re-review returned one remaining High finding (the implementation-only governance decision must not authenticate as evaluation authority); the review/repair budget is exhausted"
+frozen_executor_v0_mutable = false
+frozen_executor_v0_sha256 = "1ffcfeb959cfc547fcda96384c1c8f58b3f5cbc174c5d535324480ede312e8c6"
+frozen_real_capable_wrapper_v1_mutable = false
+frozen_real_capable_wrapper_v1_sha256 = "b0d30af9f6def297c23981c554d6c2224ff1736a491db009a9d8ce7fcc9a9b2e"
+frozen_v0_bytes_changed = false
+scientific_execution_authorized = false
+scientific_evaluation_authorized = false
+real_data_access_authorized = false
+outcome_access_authorized = false
+provider_access_authorized = false
+claim_access_authorized = false
+claim_consumption_authorized = false
+real_capable_path_activation_authorized = false
+scientific_execution_performed = false
+real_data_accessed = false
+outcomes_accessed = false
+providers_accessed = false
+real_claims_accessed_or_consumed = false
+pr241_wholesale_reuse = false
+router_authority = "NONE"
+qnty_authority = "NONE"
+qntyspot_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+downstream_authority = "NONE"
+active_project_after_closure = "NONE"
+next_action = "CLOSED_BLOCKED: the implementation lifecycle of FUNDING_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_IMPLEMENTATION_V0 is exhausted. The original candidate a6200d3e3d1ae2cffc44cca1d1db5d626239452c failed one independent hostile review with four High findings; the one bounded repair (db6a6c6ed5102019300066edfdf4d4d9402f111a) was followed by one targeted Critical/High re-review returning one remaining High finding: the implementation-only governance decision must not be authenticated as evaluation authority, and the execution path must remain fail-closed until a separately governed canonical evaluation authorization exists. No further repair, rereview, or implementation phase is authorized; PR #245 remains unmerged and must be closed without merging; no implementation source from PR #245 is canonical. No scientific execution, real data, outcome, provider, claim consumption, real-capable wrapper activation, Router, Qnty, QntySpot, trading, or capital authority exists."
+
+[[project]]
 project_id = "PINNED_DSH_CODEX_TERMINAL_ERROR_PERMISSION_POLICY_FORENSICS_AUTHORIZATION_V0"
 display_name = "Pinned DSH Codex terminal-error permission-policy forensics authorization V0"
 state = "CLOSED_PASS"

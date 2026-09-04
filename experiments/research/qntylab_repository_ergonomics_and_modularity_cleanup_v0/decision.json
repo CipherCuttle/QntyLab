@@ -6,8 +6,8 @@
   "phase_id": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_DECISION_V0",
   "project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0",
   "phase_type": "GOVERNANCE_ONLY",
-  "state": "OPEN_INDEPENDENT_HOSTILE_REVIEW",
-  "decision_state": "OPEN_INDEPENDENT_HOSTILE_REVIEW",
+  "state": "READY_FOR_TARGETED_CRITICAL_HIGH_REREVIEW",
+  "decision_state": "READY_FOR_TARGETED_CRITICAL_HIGH_REREVIEW",
   "authority": "CANONICAL_QNTYLAB_GIT_IDENTITY_GOVERNANCE_ONLY",
   "governance_only": true,
   "canonical_parent": "7b1f00d7ae975aa26029e70fab190ea2b16effdc",
@@ -56,7 +56,7 @@
       "objective": "Implement the bounded deterministic agent context packet per the DESIGN ONLY target in docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/agent_context_target.md: a fixed-field, deterministic, self-describing packet with an 8192-byte hard cap enforced fail-closed (non-zero exit on overflow, never silent truncation), ~7000-byte typical target, additive to brief/spine/projects.toml which remain canonical and untouched.",
       "allowed_paths": ["qntylab/agent_context_packet_v0.py (new)", "tests/test_qntylab_agent_context_packet_v0.py (new; may be split into same-prefix files)", "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/ (increment artifacts)", "docs/state/projects.toml (registration only)", "docs/CURRENT_ROADMAP.md (via python -m qntylab.project_context render)"],
       "forbidden_paths": ["qntylab/project_context.py", "docs/state/projects.toml rendering semantics (registration rows only)", "brief/spine output bytes", ".github/**", "all frozen/hash-bound modules", "docs/forensics/**"],
-      "acceptance_criteria": ["packet bytes <= 8192 always; typical <= 7000", "overflow fails closed with non-zero exit; no silent truncation anywhere", "fixed field schema; unknown/missing fields are render errors", "packet is additive: brief, spine, and docs/state/projects.toml outputs byte-unchanged", "DEFAULT_AGENT_CONTEXT_REDUCTION_PERCENT >= 95 vs the old cold-start orientation surface (docs/state/projects.toml = 586444 B at canonical parent), computed as (1 - packet_bytes / 586444) * 100", "packet is deterministic for identical HEAD + worktree state"],
+      "acceptance_criteria": ["packet bytes <= 8192 always; typical <= 7000", "overflow fails closed with non-zero exit; no silent truncation anywhere", "fixed field schema; unknown/missing fields are render errors", "C1 renderer-semantics contract: C1 MUST NOT modify qntylab/project_context.py, brief rendering implementation, spine rendering implementation, or projects.toml schema/rendering semantics; C1 MAY create only its explicitly authorized registration row and the generated roadmap delta required by that registration; for an identical canonical input tree / identical registry bytes, pre-existing brief and spine renderer outputs MUST remain byte-identical (SAME_INPUT -> SAME_OLD_RENDERER_OUTPUT); the expected C1 registration and generated-roadmap deltas are explicitly excluded from repository-byte-identity comparisons; C1 packet generation must not mutate canonical state", "DEFAULT_AGENT_CONTEXT_REDUCTION_PERCENT >= 95 vs the old cold-start orientation surface (docs/state/projects.toml = 586444 B at canonical parent), computed as (1 - packet_bytes / 586444) * 100", "packet is deterministic for identical HEAD + worktree state"],
       "verification_commands": ["python -m pytest -q tests/test_qntylab_agent_context_packet_v0.py", "python -m qntylab.project_context doctor --strict", "python -m qntylab.project_context render --check"],
       "completion_state": "CLOSED_PASS",
       "dependencies": []
@@ -176,15 +176,36 @@
     "safety_invariants": ["python -m qntylab.project_context doctor --strict PASS", "python -m qntylab.project_context render --check PASS", "python -m qntylab.research_ledger doctor PASS", "scientific authority unchanged (all authority fields remain NONE across every increment)", "frozen bytes unchanged (all hash-bound artifacts byte-identical to canonical parent)"]
   },
   "state_lifecycle": {
-    "closed_pass_rule": "STATE = CLOSED_PASS is recorded ONLY after the full lifecycle: all six increments closed per increment_completion_lifecycle AND the umbrella hostile review closed with no unresolved Critical/High findings.",
-    "governance_pr_state": "OPEN_INDEPENDENT_HOSTILE_REVIEW",
-    "governance_pr_rule": "In this governance PR the registry row's validator-constrained `state` uses the canonical PROJECT_STATES vocabulary (PLANNED_NOT_AUTHORIZED) because the fail-closed validator does not accept review-stage states, while the lifecycle truth is carried by `decision_state` = OPEN_INDEPENDENT_HOSTILE_REVIEW and `review_lifecycle_current_stage` = ONE_INDEPENDENT_HOSTILE_REVIEW in both decision.json and the registry row; these flip mechanically to CLOSED_PASS/CLOSED only at closure."
+    "closed_pass_rule": "GOVERNANCE_DECISION_CLOSED_PASS_RULE: The umbrella governance decision reaches CLOSED_PASS after its own governance review lifecycle closes with no unresolved Critical/High findings. C1-C6 completion states are implementation-program progress and do not gate governance-decision closure. CLOSED_PASS authorizes exactly the six enumerated increments and nothing else.",
+    "governance_pr_state": "READY_FOR_TARGETED_CRITICAL_HIGH_REREVIEW",
+    "governance_pr_rule": "In this governance PR the registry row's validator-constrained `state` uses the canonical PROJECT_STATES vocabulary (PLANNED_NOT_AUTHORIZED) because the fail-closed validator does not accept review-stage states, and the registry `state` remains PLANNED_NOT_AUTHORIZED until final closure, while the lifecycle truth is carried by `decision_state` = READY_FOR_TARGETED_CRITICAL_HIGH_REREVIEW and `review_lifecycle_current_stage` = READY_FOR_TARGETED_CRITICAL_HIGH_REREVIEW in both decision.json and the registry row; these flip mechanically to CLOSED_PASS/CLOSED only at closure."
+  },
+  "lifecycle_separation": {
+    "governance_decision_lifecycle": ["IMPLEMENT_GOVERNANCE_DECISION", "TEST_GOVERNANCE_ARTIFACTS", "ONE_INDEPENDENT_HOSTILE_REVIEW", "BOUNDED_REPAIR_IF_NEEDED", "TARGETED_REREVIEW_IF_NEEDED", "CLOSED_PASS"],
+    "cleanup_program_increment_lifecycles": "C1-C6 each execute independently under the already-closed umbrella authority after governance CLOSED_PASS, per increment_completion_lifecycle",
+    "rule": "The six implementation increments MUST NOT be prerequisites for the governance decision itself to become CLOSED_PASS. Increment dependencies (C1->C2, C1->C3, C2/C3/C4/C5->C6) are dependencies BETWEEN IMPLEMENTATION INCREMENTS, not prerequisites for governance authorization."
   },
   "review_lifecycle": {
     "policy": "NORMAL_BOUNDED_COMPLETION_NOT_TERMINAL_ONE_REVIEW",
     "stages": ["IMPLEMENT_GOVERNANCE_DECISION", "TEST_GOVERNANCE_ARTIFACTS", "ONE_INDEPENDENT_HOSTILE_REVIEW", "OPTIONAL_BOUNDED_REPAIR_PLUS_ONE_TARGETED_REREVIEW_FOR_CRITICAL_HIGH", "CLOSED_PASS_OR_CLOSED_BLOCKED"],
-    "current_stage": "ONE_INDEPENDENT_HOSTILE_REVIEW",
+    "current_stage": "READY_FOR_TARGETED_CRITICAL_HIGH_REREVIEW",
+    "hostile_review_count": 1,
+    "hostile_review_id": "PRR_kwDOTo27Xs8AAAABMRPxcA",
+    "hostile_reviewed_commit": "f1e7821b11fb87574771694c322ffb8442ebfccc",
+    "original_critical_count": 0,
+    "original_high_count": 2,
+    "original_findings": [
+      {"severity": "HIGH", "thread_id": "PRRT_kwDOTo27Xs6fdZ14", "finding": "P1-A circular governance closure: the closed_pass_rule made CLOSED_PASS depend on all six increments closing, making C1 impossible to start canonically."},
+      {"severity": "HIGH", "thread_id": "PRRT_kwDOTo27Xs6fdZ16", "finding": "P1-B impossible C1 acceptance criterion: C1 required a projects.toml registration plus a generated roadmap delta while demanding brief, spine, and projects.toml outputs byte-unchanged."}
+    ],
+    "bounded_repair_used": true,
+    "targeted_rereview_required": true,
+    "targeted_rereview_used": false,
     "critical_high_rereviews_used": 0,
+    "repair_history": [
+      {"repair": 1, "commit": "3c91278cd6b6471bab2bb65d0782aa92203f075e", "scope": "C5 pre-deletion reference-reproof gate (PRE_DELETION_REFERENCE_REPROOF_GATE) added to the C5 objective and acceptance criteria; finding from the local review pass", "status": "RESOLVED_PENDING_REREVIEW"},
+      {"repair": 2, "commit": "THIS_COMMIT", "scope": "P1-A (thread PRRT_kwDOTo27Xs6fdZ14): governance-decision lifecycle separated from cleanup-program increment lifecycles via lifecycle_separation and the rewritten closed_pass_rule; P1-B (thread PRRT_kwDOTo27Xs6fdZ16): C1 global byte-identity criterion replaced with the SAME_INPUT -> SAME_OLD_RENDERER_OUTPUT renderer-semantics contract", "status": "RESOLVED_PENDING_REREVIEW"}
+    ],
     "hostile_review_scope": "ONE bounded independent hostile review focused on exactly these seven risk axes: (1) FROZEN_ORACLE_MUTATION_RISK, (2) SCIENTIFIC_AUTHORITY_LEAKAGE_RISK, (3) OPEN_PR_CONTAMINATION_RISK, (4) CONTEXT_SEMANTICS_REGRESSION_RISK (silent truncation, brief/spine/render drift), (5) LOAD_BEARING_DELETION_RISK, (6) CI_DEV_LOOP_BREAKAGE_RISK, (7) SCOPE_CREEP_RISK.",
     "repair_rule": "Critical/High findings get ONE bounded repair plus AT MOST ONE targeted rereview; then the review closes regardless of outcome."
   },
@@ -218,7 +239,7 @@
     "decision_state": "CLOSED_PASS",
     "note": "The hardening decision V0 closed CLOSED_PASS and its implementation phase FUNDING_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_IMPLEMENTATION_V0 closed CLOSED_BLOCKED at canonical parent 7b1f00d7ae975aa26029e70fab190ea2b16effdc. This decision cites it as naming/lifecycle precedent only; it does not reopen, amend, replace, or succeed it."
   },
-  "next_action": "OPEN_INDEPENDENT_HOSTILE_REVIEW: this governance-only decision authorizes exactly six bounded non-scientific ergonomics increments. After this decision PR merges, execute FIRST QNTYLAB_AGENT_CONTEXT_PACKET_V0 (C1) as a separate governance-compliant implementation task within its allowed_paths; C2-C6 must NOT start during the governance PR. No scientific evaluation, real data, provider, claim consumption, or downstream authority exists or is created.",
+  "next_action": "ONE_TARGETED_REREVIEW_OF_P1_A_AND_P1_B",
   "verify_receipts": {
     "canonical_head_sha256_verified": "7b1f00d7ae975aa26029e70fab190ea2b16effdc",
     "git_rev_parse_head": "7b1f00d7ae975aa26029e70fab190ea2b16effdc",

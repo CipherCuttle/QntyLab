@@ -75,8 +75,13 @@ def test_decision_identity_and_open_review_state() -> None:
     # PROJECT_STATES); the review lifecycle vocabulary lives in decision_state, which the
     # registry validator does not constrain.
     assert record["state"] == "PLANNED_NOT_AUTHORIZED"
-    assert record["decision_state"] == decision["decision_state"] == "OPEN_INDEPENDENT_HOSTILE_REVIEW"
-    assert decision["decision_state"] == decision["state"] == "OPEN_INDEPENDENT_HOSTILE_REVIEW"
+    assert (
+        record["decision_state"]
+        == decision["decision_state"]
+        == "READY_FOR_TARGETED_CRITICAL_HIGH_REREVIEW"
+    )
+    assert decision["decision_state"] == decision["state"] == "READY_FOR_TARGETED_CRITICAL_HIGH_REREVIEW"
+    assert decision["state"] != "CLOSED_PASS"
     assert decision["authority"] == "CANONICAL_QNTYLAB_GIT_IDENTITY_GOVERNANCE_ONLY"
     assert decision["canonical_parent"] == CANONICAL_PARENT
     assert decision["forensic_audit_identity"] == FORENSIC_AUDIT_IDENTITY
@@ -272,8 +277,10 @@ def test_registry_entry_consistency() -> None:
         "downstream_authority",
     ):
         assert record[field] == "NONE"
-    assert record["review_lifecycle_current_stage"] == "ONE_INDEPENDENT_HOSTILE_REVIEW"
+    assert record["review_lifecycle_current_stage"] == "READY_FOR_TARGETED_CRITICAL_HIGH_REREVIEW"
+    assert record["targeted_rereview_required"] is True
     assert record["critical_high_rereviews_used"] == 0
+    assert record["next_action"] == "ONE_TARGETED_REREVIEW_OF_P1_A_AND_P1_B"
     assert record["canonical_parent"] == decision["canonical_parent"] == CANONICAL_PARENT
 
 
@@ -317,3 +324,125 @@ def test_c5_pre_deletion_reference_reproof_gate() -> None:
         "necessary but NOT sufficient" in criterion for criterion in criteria
     )
     assert "PRE_DELETION_REFERENCE_REPROOF_GATE" in c5["objective"]
+
+
+HOSTILE_REVIEW_PATH = ROOT / (
+    "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/hostile_review.json"
+)
+EXPECTED_HOSTILE_REVIEW = {
+    "REVIEW_TYPE": "INDEPENDENT_HOSTILE_REVIEW",
+    "REVIEW_ID": "PRR_kwDOTo27Xs8AAAABMRPxcA",
+    "REVIEWED_COMMIT": "f1e7821b11fb87574771694c322ffb8442ebfccc",
+    "CRITICAL": 0,
+    "HIGH": 2,
+    "P1_A_THREAD": "PRRT_kwDOTo27Xs6fdZ14",
+    "P1_B_THREAD": "PRRT_kwDOTo27Xs6fdZ16",
+    "BOUNDED_REPAIR_USED": True,
+    "TARGETED_REREVIEW_REQUIRED": True,
+    "TARGETED_REREVIEW_USED": False,
+    "STATE": "REPAIR_COMPLETE_AWAITING_TARGETED_REREVIEW",
+}
+
+
+def test_governance_decision_lifecycle_not_gated_by_increments() -> None:
+    decision = _decision()
+    state_lifecycle = decision["state_lifecycle"]
+    separation = decision["lifecycle_separation"]
+
+    # The circular closure prerequisite is gone from state_lifecycle.
+    assert "all six increments closed" not in state_lifecycle["closed_pass_rule"]
+    assert "do not gate governance-decision closure" in state_lifecycle["closed_pass_rule"]
+    assert "MUST NOT be prerequisites" in separation["rule"]
+    assert "BETWEEN IMPLEMENTATION INCREMENTS" in separation["rule"]
+    assert separation["governance_decision_lifecycle"][-1] == "CLOSED_PASS"
+    assert "C1-C6 each execute independently" in separation["cleanup_program_increment_lifecycles"]
+
+    # Increment graph edges are unchanged and remain between-increment dependencies.
+    graph = decision["increment_graph"]
+    edges = set()
+    for edge in graph["edges"]:
+        src, dst = edge.split(" -> ")
+        edges.add((src, dst))
+    assert edges == EXPECTED_EDGES
+
+
+def test_c1_renderer_semantics_contract() -> None:
+    decision = _decision()
+    c1 = next(
+        increment
+        for increment in decision["authorized_implementation_increments"]
+        if increment["increment_id"] == "C1"
+    )
+    criteria = c1["acceptance_criteria"]
+
+    # No criterion requires global repository byte identity any more.
+    for criterion in criteria:
+        assert "outputs byte-unchanged" not in criterion
+    contract = next(
+        criterion for criterion in criteria if "SAME_INPUT -> SAME_OLD_RENDERER_OUTPUT" in criterion
+    )
+    # Fixed pre-C1 input gives byte-identical legacy renderer output.
+    assert "identical canonical input tree / identical registry bytes" in contract
+    assert "pre-existing brief and spine renderer outputs MUST remain byte-identical" in contract
+    # The one authorized registration row and the generated roadmap delta are allowed.
+    assert "explicitly authorized registration row" in contract
+    assert "generated roadmap delta" in contract
+    assert "explicitly excluded from repository-byte-identity comparisons" in contract
+    # Renderer semantics are protected.
+    assert "MUST NOT modify qntylab/project_context.py" in contract
+    assert "brief rendering implementation" in contract
+    assert "spine rendering implementation" in contract
+    assert "projects.toml schema/rendering semantics" in contract
+    # Packet generation must not mutate canonical state.
+    assert "must not mutate canonical state" in contract
+
+
+def test_c1_forbidden_paths_protect_renderers() -> None:
+    decision = _decision()
+    c1 = next(
+        increment
+        for increment in decision["authorized_implementation_increments"]
+        if increment["increment_id"] == "C1"
+    )
+
+    forbidden = c1["forbidden_paths"]
+    assert any("qntylab/project_context.py" in path for path in forbidden)
+    assert any("brief/spine output bytes" in path for path in forbidden)
+    assert any("projects.toml rendering semantics" in path for path in forbidden)
+
+
+def test_hostile_review_receipt() -> None:
+    assert HOSTILE_REVIEW_PATH.is_file()
+    receipt = json.loads(HOSTILE_REVIEW_PATH.read_text(encoding="utf-8"))
+    assert receipt == EXPECTED_HOSTILE_REVIEW
+
+
+def test_decision_state_awaiting_rereview() -> None:
+    decision = _decision()
+    review_lifecycle = decision["review_lifecycle"]
+
+    assert review_lifecycle["current_stage"] == "READY_FOR_TARGETED_CRITICAL_HIGH_REREVIEW"
+    assert review_lifecycle["targeted_rereview_used"] is False
+    assert review_lifecycle["bounded_repair_used"] is True
+    assert review_lifecycle["hostile_review_count"] == 1
+    assert review_lifecycle["original_critical_count"] == 0
+    assert review_lifecycle["original_high_count"] == 2
+    assert decision["next_action"] == "ONE_TARGETED_REREVIEW_OF_P1_A_AND_P1_B"
+    assert decision["state"] != "CLOSED_PASS"
+    assert decision["decision_state"] != "CLOSED_PASS"
+    # No finding is marked fully resolved before the targeted rereview.
+    for entry in review_lifecycle["repair_history"]:
+        assert entry["status"] == "RESOLVED_PENDING_REREVIEW"
+
+
+def test_registry_lifecycle_consistency() -> None:
+    decision = _decision()
+    record = _record(PROJECT_ID)
+
+    assert record["review_lifecycle_current_stage"] == "READY_FOR_TARGETED_CRITICAL_HIGH_REREVIEW"
+    assert record["targeted_rereview_required"] is True
+    assert record["critical_high_rereviews_used"] == 0
+    assert record["next_action"] == "ONE_TARGETED_REREVIEW_OF_P1_A_AND_P1_B"
+    assert record["state"] == "PLANNED_NOT_AUTHORIZED"
+    live_sha256 = hashlib.sha256(DECISION_PATH.read_bytes()).hexdigest()
+    assert live_sha256 == record["decision_artifact_sha256"]

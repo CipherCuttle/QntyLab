@@ -10087,7 +10087,7 @@ project_id = "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0"
 phase_id = "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_DECISION_V0"
 display_name = "QntyLab repository ergonomics and modularity cleanup decision V0"
 state = "PLANNED_NOT_AUTHORIZED"
-decision_state = "OPEN_INDEPENDENT_HOSTILE_REVIEW"
+decision_state = "READY_FOR_TARGETED_CRITICAL_HIGH_REREVIEW"
 candidate_state = "CANONICAL_GOVERNANCE_DECISION"
 canonicalization_status = "NOT_CANONICALIZED"
 authority_level = "GOVERNANCE_AUTHORIZATION_FOR_SIX_BOUNDED_ERGONOMIC_IMPLEMENTATION_INCREMENTS_ONLY"
@@ -10102,7 +10102,7 @@ authoritative_artifacts = [
   "tests/test_qntylab_repository_ergonomics_and_modularity_cleanup_decision_v0.py",
 ]
 decision_artifact = "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/decision.json"
-decision_artifact_sha256 = "f9d15da5a539c4b7a86f3cc59baefdd400f9a86bbae6ae0c0ec2aa9115e2bd08"
+decision_artifact_sha256 = "39b2cc9202438a42038c8c190edd29fe4b12db4e7059a43bc6de03ef2d9d7b1c"
 canonical_parent = "7b1f00d7ae975aa26029e70fab190ea2b16effdc"
 forensic_audit_identity = "QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0"
 forensic_audit_commit = "be291300abb70f3ffc6ba0dd8b1bea570daf5377"
@@ -10128,6 +10128,7 @@ capital_authority = "NONE"
 downstream_authority = "NONE"
 active_project_after_closure = "NONE"
 review_lifecycle_policy = "NORMAL_BOUNDED_COMPLETION_NOT_TERMINAL_ONE_REVIEW"
-review_lifecycle_current_stage = "ONE_INDEPENDENT_HOSTILE_REVIEW"
+review_lifecycle_current_stage = "READY_FOR_TARGETED_CRITICAL_HIGH_REREVIEW"
+targeted_rereview_required = true
 critical_high_rereviews_used = 0
-next_action = "OPEN_INDEPENDENT_HOSTILE_REVIEW: this governance-only decision authorizes exactly six bounded non-scientific ergonomics increments (C1 packet, C2 project_context modularization, C3 CI split, C4 tooling normalization, C5 proven-safe slimming, C6 fitness functions) with zero scientific, real-data, provider, claim, trading, capital, Qnty, QntySpot, or router authority. After merge, execute FIRST QNTYLAB_AGENT_CONTEXT_PACKET_V0 as a separate governance-compliant implementation task; C2-C6 must not start during the governance PR."
+next_action = "ONE_TARGETED_REREVIEW_OF_P1_A_AND_P1_B"

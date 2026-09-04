@@ -1,0 +1,278 @@
+{
+  "artifact_type": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_DECISION",
+  "schema_version": "qntylab-repository-ergonomics-and-modularity-cleanup-decision-v0",
+  "created_from_branch": "governance/qntylab-repository-ergonomics-and-modularity-cleanup-v0",
+  "phase": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_DECISION_V0",
+  "phase_id": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_DECISION_V0",
+  "project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0",
+  "phase_type": "GOVERNANCE_ONLY",
+  "state": "CLOSED_PASS",
+  "decision_state": "CLOSED_PASS",
+  "authority": "CANONICAL_QNTYLAB_GIT_IDENTITY_GOVERNANCE_ONLY",
+  "governance_only": true,
+  "canonical_parent": "7b1f00d7ae975aa26029e70fab190ea2b16effdc",
+  "forensic_audit_identity": "QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0",
+  "forensic_audit_commit": "be291300abb70f3ffc6ba0dd8b1bea570daf5377",
+  "purpose": "Authorize exactly six bounded, non-scientific repository ergonomics and modularity implementation increments for QntyLab: (C1) a bounded deterministic agent context packet, (C2) modularization of qntylab/project_context.py, (C3) a dev-loop/CI split, (C4) Python tooling normalization, (C5) proven delete-safe slimming, and (C6) repository ergonomics fitness functions. The objective is to reduce the cold-start agent context surface, bound the project-context and CI monoliths, normalize tooling, remove only forensically proven-safe dead weight, and freeze the gains as executable fitness functions — with zero scientific authority, zero frozen-output mutation, and zero open-PR contamination. This is an ergonomics and modularity umbrella only; it grants no research, evaluation, execution, claim, or trading authority of any kind.",
+  "frozen_first_principles": {
+    "CURRENT_STATE_IS_NOT_HISTORY": {"required": true, "rule": "The live worktree and canonical master HEAD are the only operative state; closed projects, frozen evidence, and cold history are read-only context, never a basis for re-deriving current authority."},
+    "SECURITY_BY_SMALL_TRUSTED_CORE": {"required": true, "rule": "Security-relevant semantics (authority checks, fail-closed gates, hash bindings) stay in a small, auditable trusted core; ergonomics work must shrink, not grow, the surface that must be trusted."},
+    "INFORMATION_HIDING": {"required": true, "rule": "Module boundaries hide implementation detail behind stable interfaces; modularization (C2) must reduce cross-module knowledge, not relocate it."},
+    "POINTERS_OVER_COPIES": {"required": true, "rule": "Context surfaces carry path+line+hash pointers into canonical state, never duplicated copies of state or invariant prose; the packet (C1) points, it does not restate."},
+    "COLD_HISTORY": {"required": true, "rule": "Terminal project records, frozen runs, and historical evidence stay cold: never loaded by default, never rewritten, never migrated to archive/LFS/DVC under this decision."},
+    "EXECUTABLE_ARCHITECTURE": {"required": true, "rule": "Every architectural constraint this decision imposes is enforced by an executable check (fitness functions, C6), not by prose alone."},
+    "SMALL_BOUNDED_CHANGES": {"required": true, "rule": "Each increment is one bounded completion lifecycle with fixed allowed/forbidden surfaces; no unbounded subphase loops, no scope creep, no follow-on increments beyond the six enumerated."}
+  },
+  "measured_baseline": {
+    "canonical_parent": "7b1f00d7ae975aa26029e70fab190ea2b16effdc",
+    "remeasured_at_canonical_parent": {
+      "docs_state_projects_toml_bytes": 586444,
+      "docs_current_roadmap_bytes": 70632,
+      "qntylab_project_context_py_bytes": 110441,
+      "qntylab_python_modules": 133,
+      "ci_workflow_path": ".github/workflows/project-context.yml",
+      "ci_workflow_count": 1,
+      "ci_workflow_lines": 322,
+      "pyproject_toml_exists": false,
+      "context_spine": {"project_rows": 151, "state_distribution": {"CLOSED_PASS": 99, "CLOSED_BLOCKED": 39, "PLANNED_NOT_AUTHORIZED": 9, "CLOSED_NEGATIVE": 2, "BLOCKED": 1, "ARCHIVED": 1}, "qntylab_modules_projected": 133, "project_code_references": 84},
+      "brief_truncated_bytes": 14100,
+      "research_ledger": {"candidates": 61, "trials": 1874, "active_survivors": 0, "ergonomics_cleanup_packet_ledger_entries": 0}
+    },
+    "forensic_audit_reference": {
+      "identity": "QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0",
+      "audit_head": "be291300abb70f3ffc6ba0dd8b1bea570daf5377",
+      "artifacts": ["docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/agent_context_target.md", "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json", "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/repository_metrics.json", "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/report.md", "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/inventory.json"],
+      "audit_head_numbers": {"projects_toml_bytes": 576993, "projects_toml_lines": 9933, "brief_bytes": 14468, "brief_truncated": true, "spine_bytes": 50150, "spine_lines": 1, "workflow_total_lines": 323, "workflow_step_span_lines": 303, "project_context_core_span_lines": 16, "deletion_candidates": 42, "delete_safe": 6, "delete_blocked_by_frozen_binding": 28, "delete_blocked_by_active_use": 8},
+      "note": "Audit numbers were measured at the audit branch HEAD be291300; the canonical-parent numbers above were re-measured at 7b1f00d7ae975aa26029e70fab190ea2b16effdc and are the binding baseline for acceptance metrics."
+    }
+  },
+  "authorized_implementation_increment_count": 6,
+  "scientific_evaluation_phase_count": 0,
+  "first_implementation_after_governance": "QNTYLAB_AGENT_CONTEXT_PACKET_V0",
+  "authorized_implementation_increments": [
+    {
+      "increment_id": "C1",
+      "phase_id": "QNTYLAB_AGENT_CONTEXT_PACKET_V0",
+      "objective": "Implement the bounded deterministic agent context packet per the DESIGN ONLY target in docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/agent_context_target.md: a fixed-field, deterministic, self-describing packet with an 8192-byte hard cap enforced fail-closed (non-zero exit on overflow, never silent truncation), ~7000-byte typical target, additive to brief/spine/projects.toml which remain canonical and untouched.",
+      "allowed_paths": ["qntylab/agent_context_packet_v0.py (new)", "tests/test_qntylab_agent_context_packet_v0.py (new; may be split into same-prefix files)", "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/ (increment artifacts)", "docs/state/projects.toml (registration only)", "docs/CURRENT_ROADMAP.md (via python -m qntylab.project_context render)"],
+      "forbidden_paths": ["qntylab/project_context.py", "docs/state/projects.toml rendering semantics (registration rows only)", "brief/spine output bytes", ".github/**", "all frozen/hash-bound modules", "docs/forensics/**"],
+      "acceptance_criteria": ["packet bytes <= 8192 always; typical <= 7000", "overflow fails closed with non-zero exit; no silent truncation anywhere", "fixed field schema; unknown/missing fields are render errors", "C1 renderer-semantics contract: C1 MUST NOT modify qntylab/project_context.py, brief rendering implementation, spine rendering implementation, or projects.toml schema/rendering semantics; C1 MAY create only its explicitly authorized registration row and the generated roadmap delta required by that registration; for an identical canonical input tree / identical registry bytes, pre-existing brief and spine renderer outputs MUST remain byte-identical (SAME_INPUT -> SAME_OLD_RENDERER_OUTPUT); the expected C1 registration and generated-roadmap deltas are explicitly excluded from repository-byte-identity comparisons; C1 packet generation must not mutate canonical state", "DEFAULT_AGENT_CONTEXT_REDUCTION_PERCENT >= 95 vs the old cold-start orientation surface (docs/state/projects.toml = 586444 B at canonical parent), computed as (1 - packet_bytes / 586444) * 100", "packet is deterministic for identical HEAD + worktree state"],
+      "verification_commands": ["python -m pytest -q tests/test_qntylab_agent_context_packet_v0.py", "python -m qntylab.project_context doctor --strict", "python -m qntylab.project_context render --check"],
+      "completion_state": "CLOSED_PASS",
+      "dependencies": []
+    },
+    {
+      "increment_id": "C2",
+      "phase_id": "PROJECT_CONTEXT_MODULARIZATION_V0",
+      "objective": "Decompose qntylab/project_context.py (110441 B) into bounded modules with zero CLI behavior change: generic machinery separated from DSH-specific identities, with DSH-specific identities in the generic core reduced to exactly 0.",
+      "allowed_paths": ["qntylab/project_context.py (refactor)", "new qntylab/project_context_* sibling modules or a qntylab/project_context/ package (new)", "new tests/ files for module boundaries", "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/ (increment artifacts)", "docs/state/projects.toml (registration only)", "docs/CURRENT_ROADMAP.md (via render)"],
+      "forbidden_paths": ["any change to brief/spine/doctor/render CLI stdout bytes", "qntylab/agent_context_packet_v0.py semantics (C1 surface)", "all frozen/hash-bound modules", "docs/forensics/**", ".github/**"],
+      "acceptance_criteria": ["bytes before (110441) and after recorded in the increment closure artifact", "generic vs validator LOC recorded in the increment closure", "DSH-specific identities in generic core == 0, enforced by test", "all pre-existing tests pass unmodified", "doctor --strict PASS and render --check PASS", "CLI stdout for brief/spine/doctor/render byte-identical to pre-refactor captures"],
+      "verification_commands": ["python -m pytest -q", "python -m qntylab.project_context doctor --strict", "python -m qntylab.project_context render --check"],
+      "completion_state": "CLOSED_PASS",
+      "dependencies": ["C1"]
+    },
+    {
+      "increment_id": "C3",
+      "phase_id": "DEV_LOOP_CI_SPLIT_V0",
+      "objective": "Split the single 322-line .github/workflows/project-context.yml into a core dev-loop workflow (doctor --strict, render --check, research ledger doctor, core pytest) and a heavy replay workflow (DSH + historical repair regression), preserving provenance-receipt semantics; lines/jobs/steps and wall times are measured and recorded BEFORE any percentage targets are frozen.",
+      "allowed_paths": [".github/workflows/ (new workflow files + modification of project-context.yml)", "new tests/ files asserting workflow structure", "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/ (increment artifacts)", "docs/state/projects.toml (registration only)", "docs/CURRENT_ROADMAP.md (via render)"],
+      "forbidden_paths": ["removing doctor --strict, render --check, or research-ledger doctor from CI", "changing frozen test-selection semantics", "escalating permissions, secrets, or triggers beyond current semantics", "qntylab/ runtime modules", "docs/forensics/**"],
+      "acceptance_criteria": ["core workflow lines/jobs/steps measured and recorded before freezing percentages", "heavy replay lines measured and recorded before freezing percentages", "wall times for core vs heavy paths measured and recorded before freezing percentages", "render --check PASS; doctor --strict PASS", "total CI coverage of the current workflow is preserved across the split (no test silently dropped)"],
+      "verification_commands": ["python -m pytest -q", "python -m qntylab.project_context doctor --strict", "python -m qntylab.project_context render --check"],
+      "completion_state": "CLOSED_PASS",
+      "dependencies": ["C1"]
+    },
+    {
+      "increment_id": "C4",
+      "phase_id": "PYTHON_TOOLING_NORMALIZATION_V0",
+      "objective": "Normalize Python tooling configuration: introduce pyproject.toml holding tool configuration only (test/lint configuration consolidation), with no packaging metadata and no dependency changes.",
+      "allowed_paths": ["pyproject.toml (new; tool configuration only)", "requirements-*.txt (normalization comments only)", "new tests/ files if needed", "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/ (increment artifacts)", "docs/state/projects.toml (registration only)", "docs/CURRENT_ROADMAP.md (via render)"],
+      "forbidden_paths": ["dependency version changes in any requirements file", "packaging/publishing metadata (name, version, entry points, build backend)", "install behavior changes", ".github/** (C3 surface)", "qntylab/ runtime modules", "docs/forensics/**"],
+      "acceptance_criteria": ["python -m pytest -q collects and passes identically before/after", "no runtime import or behavior change", "documented verify command (README.md: python -m pytest -q) unchanged", "pyproject.toml contains no [project] packaging table"],
+      "verification_commands": ["python -m pytest -q", "python -m qntylab.project_context doctor --strict"],
+      "completion_state": "CLOSED_PASS",
+      "dependencies": []
+    },
+    {
+      "increment_id": "C5",
+      "phase_id": "PROVEN_DELETE_SAFE_SLIMMING_V0",
+      "objective": "Delete exactly the six DELETE_SAFE candidates from docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json and nothing else; all 36 blocked candidates (28 DELETE_BLOCKED_BY_FROZEN_BINDING + 8 DELETE_BLOCKED_BY_ACTIVE_USE) are retained. Each deletion additionally requires the PRE_DELETION_REFERENCE_REPROOF_GATE: the 12-category reference-check battery re-run with zero load-bearing references on current canonical master HEAD.",
+      "allowed_paths": ["DELETE (exactly): docs/status/QNTYLAB_DVOL_V0_PHASE1B_EVIDENCE_RETENTION_REPAIR.md", "DELETE (exactly): docs/status/QNTYLAB_DVOL_V0_PHASE1B_LIVE_SOURCE_SMOKE.md", "DELETE (exactly): qntylab/jfp03_v0r1_input_materialization.py", "DELETE (exactly): qntylab/jigsaw_cross_sectional_dispersion_execution_v0.py", "DELETE (exactly): qntylab/jigsaw_external_replication_execution_v0.py", "DELETE (exactly): qntylab/jigsaw_external_replication_input_materialization_v0.py", "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/ (increment artifacts)", "docs/state/projects.toml (registration only)", "docs/CURRENT_ROADMAP.md (via render)"],
+      "forbidden_paths": ["any of the 36 blocked candidates (28 frozen-binding + 8 active-use)", "any frozen/hash-bound file", "git history rewrite of any kind", "archive/LFS/DVC migration", "qntylab/ modules other than the four listed deletions", "docs/forensics/**"],
+      "acceptance_criteria": ["proven_safe_deleted == 6 and the deleted set equals the six listed paths exactly", "blocked_retained == 36 (28 frozen-binding + 8 active-use), verified by test", "qntylab module count before (133) and after recorded", "tracked python bytes before/after recorded", "full test suite green; doctor --strict PASS; render --check PASS", "PRE_DELETION_REFERENCE_REPROOF_GATE: before deleting each of the six paths, re-run the full 12-category reference-check battery (PYTHON_IMPORT_REFERENCES, DOCSTRING_PROSE_REFERENCES, TEST_REFERENCES, PROJECT_REGISTRY_REFERENCES, AUTHORITATIVE_ARTIFACT_REFERENCES, HASH_BINDINGS, PREREGISTRATION_BINDINGS, CLOSURE_REFERENCES, ADR_REFERENCES, RESEARCH_LEDGER_REFERENCES, CI_REFERENCES, GENERATED_VIEW_REFERENCES) against CURRENT canonical master HEAD and record zero load-bearing references per path in the C5 increment closure artifact; any non-zero load-bearing reference reclassifies the path as blocked and stops the increment for that path", "the DELETE_SAFE classification from the forensic audit (anchored at be291300abb70f3ffc6ba0dd8b1bea570daf5377) is necessary but NOT sufficient; deletion requires the current-master re-proof above per path"],
+      "verification_commands": ["python -m pytest -q", "python -m qntylab.project_context doctor --strict", "python -m qntylab.project_context render --check"],
+      "completion_state": "CLOSED_PASS",
+      "dependencies": []
+    },
+    {
+      "increment_id": "C6",
+      "phase_id": "REPOSITORY_ERGONOMICS_FITNESS_FUNCTIONS_V0",
+      "objective": "Add fail-closed fitness-function tests that permanently enforce the ergonomics gains: packet byte cap and reduction percent, project_context modularity metrics, CI shape metrics, slimming invariants, and the safety invariants (doctor --strict, render --check, research ledger doctor, scientific authority unchanged, frozen bytes unchanged).",
+      "allowed_paths": ["tests/test_qntylab_repository_ergonomics_fitness_functions_v0.py (new; may be split into same-prefix files)", "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/ (increment artifacts)", "docs/state/projects.toml (registration only)", "docs/CURRENT_ROADMAP.md (via render)"],
+      "forbidden_paths": ["qntylab/ runtime modules beyond surfaces already authorized by C1-C5", "weakening or deleting any fitness assertion", "docs/forensics/**", "frozen/hash-bound modules"],
+      "acceptance_criteria": ["every metric in acceptance_metrics is enforced by at least one executable test", "all fitness tests green", "no fitness test can be satisfied by weakening a safety invariant"],
+      "verification_commands": ["python -m pytest -q", "python -m qntylab.project_context doctor --strict", "python -m qntylab.project_context render --check", "python -m qntylab.research_ledger doctor"],
+      "completion_state": "CLOSED_PASS",
+      "dependencies": ["C2", "C3", "C4", "C5"]
+    }
+  ],
+  "increment_completion_lifecycle": {
+    "rule": "Each increment has exactly ONE bounded completion lifecycle: IMPLEMENT -> TEST -> ONE INDEPENDENT REVIEW -> bounded Critical/High repair -> at most ONE targeted rereview -> CLOSED_PASS or CLOSED_BLOCKED. No unbounded subphase loops; a blocked increment is terminal for that increment and requires new governance to revisit.",
+    "completion_state": "CLOSED_PASS",
+    "closure_record": "each increment closure is recorded in docs/state/projects.toml as its own project row with governing_decision_project_id = QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0"
+  },
+  "increment_graph": {
+    "edges": ["C1 -> C2", "C1 -> C3", "C2 -> C6", "C3 -> C6", "C4 -> C6", "C5 -> C6"],
+    "independence": "C4 and C5 have no dependencies and are independent of C2 and C3; they may proceed in parallel with C2/C3 only while their diffs stay within their own allowed_paths and never conflict on shared files.",
+    "terminal_increment": "C6",
+    "c6_requires": ["C2", "C3", "C4", "C5"],
+    "c1_transitivity": "C1 is required by C6 transitively through C2 and C3.",
+    "acyclic": true
+  },
+  "out_of_scope": {
+    "SCIENTIFIC_EVALUATION_PHASES_AUTHORIZED": 0,
+    "REAL_DATA_AUTHORITY": "NONE",
+    "PROVIDER_AUTHORITY": "NONE",
+    "CLAIM_AUTHORITY": "NONE",
+    "TRADING_AUTHORITY": "NONE",
+    "CAPITAL_AUTHORITY": "NONE",
+    "QNTY_AUTHORITY": "NONE",
+    "QNTYSPOT_AUTHORITY": "NONE",
+    "ROUTER_AUTHORITY": "NONE",
+    "real_data_access_authorized": false,
+    "outcome_access_authorized": false,
+    "provider_access_authorized": false,
+    "claim_consumption_authorized": false,
+    "scientific_execution_authorized": false,
+    "forbidden_operations": ["no frozen output modification (any hash-bound or frozen evidence artifact)", "no oracle semantics change", "no git history rewrite", "no frozen/hash-bound deletion (the 28 DELETE_BLOCKED_BY_FROZEN_BINDING candidates and all hash-pinned modules)", "no PR #239 or PR #241 repair", "no PR #245 revival", "no archive/LFS/DVC migration", "no render --check breakage", "no generated summary replacing canonical state (docs/state/projects.toml and its projections remain canonical)", "no funding-contract successor", "no revival of the CLOSED_BLOCKED hardening implementation FUNDING_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_IMPLEMENTATION_V0"],
+    "explicit_non_authorizations": ["Frozen output modification.", "Oracle semantics change.", "Git history rewrite.", "Frozen/hash-bound deletion.", "PR #239 or PR #241 repair.", "PR #245 revival.", "Archive/LFS/DVC migration.", "render --check breakage.", "Generated summary replacing canonical state.", "Funding-contract successor.", "Revival of the CLOSED_BLOCKED hardening implementation FUNDING_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_IMPLEMENTATION_V0.", "Scientific evaluation, new hypotheses, backtests.", "Real market data, outcome observation, evidence access.", "Provider access, live DSH execution, new DSH episodes.", "Claim consumption, trading, capital.", "Qnty runtime, QntySpot, or Router authority.", "New evaluation authorization."]
+  },
+  "open_pr_isolation": {
+    "isolated_prs": [241, 239, 189, 6],
+    "merge_authority": "NONE",
+    "repair_authority": "NONE",
+    "rereview_authority": "NONE",
+    "cherrypick_authority": "NONE",
+    "lineage_rule": "All work on this umbrella derives lineage ONLY from canonical master 7b1f00d7ae975aa26029e70fab190ea2b16effdc; no commit from any open PR may be cherry-picked, merged, or used as a base.",
+    "reuse_rule": "Individual ideas from open PRs may be independently re-derived only if they satisfy this decision; no reuse is authorized merely because code exists on an open PR. No source from failed/noncanonical PR #245 may be copied wholesale."
+  },
+  "review_tiers": {
+    "LOW_RISK_ERGONOMIC_CHANGE": {
+      "applies_when": "the increment diff stays entirely within its allowed_paths and touches no authority-bearing, frozen, or fail-closed semantics",
+      "lifecycle": ["IMPLEMENT", "TEST", "ONE_INDEPENDENT_REVIEW", "BOUNDED_CRITICAL_HIGH_REPAIR", "AT_MOST_ONE_TARGETED_REREVIEW", "CLOSED_PASS_OR_CLOSED_BLOCKED"]
+    },
+    "AUTHORITY_OR_SECURITY_SEMANTIC_CHANGE": {
+      "action": "STOP",
+      "rule": "NOT authorized by this umbrella. Any change touching authority interpretation, fail-closed behavior, canonical source precedence, scientific admission semantics, claim semantics, provider/live-execution admission, frozen outputs, oracle semantics, or projects.toml schema semantics beyond row registration requires a separate governance decision. The implementing agent must stop and escalate rather than proceed."
+    }
+  },
+  "acceptance_metrics": {
+    "packet": {"hard_cap_bytes": 8192, "typical_target_bytes": 7000, "no_silent_truncation": true, "fail_closed_on_overflow": true},
+    "DEFAULT_AGENT_CONTEXT_REDUCTION_PERCENT": {"minimum": 95, "basis": "old cold-start orientation surface = docs/state/projects.toml bytes at canonical parent = 586444", "formula": "(1 - packet_bytes / 586444) * 100"},
+    "project_context_modularity": {"bytes_before": 110441, "bytes_after": "RECORDED_AT_C2_CLOSURE", "generic_vs_validator_loc": "RECORDED_AT_C2_CLOSURE", "dsh_specific_identities_in_generic_core": 0},
+    "ci": {"core_workflow_lines": "MEASURED_BEFORE_FREEZING", "core_workflow_jobs": "MEASURED_BEFORE_FREEZING", "core_workflow_steps": "MEASURED_BEFORE_FREEZING", "heavy_replay_lines": "MEASURED_BEFORE_FREEZING", "wall_times": "MEASURED_BEFORE_FREEZING", "rule": "no percentage target may be frozen until before/after lines, jobs, steps, and wall times are measured and recorded"},
+    "slimming": {"modules_before": 133, "modules_after": "RECORDED_AT_C5_CLOSURE", "tracked_python_bytes_before": "RECORDED_AT_C5_CLOSURE", "tracked_python_bytes_after": "RECORDED_AT_C5_CLOSURE", "proven_safe_deleted": 6, "blocked_retained": 36},
+    "safety_invariants": ["python -m qntylab.project_context doctor --strict PASS", "python -m qntylab.project_context render --check PASS", "python -m qntylab.research_ledger doctor PASS", "scientific authority unchanged (all authority fields remain NONE across every increment)", "frozen bytes unchanged (all hash-bound artifacts byte-identical to canonical parent)"]
+  },
+  "state_lifecycle": {
+    "closed_pass_rule": "GOVERNANCE_DECISION_CLOSED_PASS_RULE: The umbrella governance decision reaches CLOSED_PASS after its own governance review lifecycle closes with no unresolved Critical/High findings. C1-C6 completion states are implementation-program progress and do not gate governance-decision closure. CLOSED_PASS authorizes exactly the six enumerated increments and nothing else.",
+    "governance_pr_state": "CLOSED_PASS",
+    "governance_pr_rule": "In this governance PR the registry row's validator-constrained `state` uses the canonical PROJECT_STATES vocabulary (PLANNED_NOT_AUTHORIZED) because the fail-closed validator does not accept review-stage states, and the registry `state` remains PLANNED_NOT_AUTHORIZED until final closure, while the lifecycle truth is carried by `decision_state` = READY_FOR_TARGETED_CRITICAL_HIGH_REREVIEW and `review_lifecycle_current_stage` = READY_FOR_TARGETED_CRITICAL_HIGH_REREVIEW in both decision.json and the registry row; these flip mechanically to CLOSED_PASS/CLOSED only at closure."
+  },
+  "lifecycle_separation": {
+    "governance_decision_lifecycle": ["IMPLEMENT_GOVERNANCE_DECISION", "TEST_GOVERNANCE_ARTIFACTS", "ONE_INDEPENDENT_HOSTILE_REVIEW", "BOUNDED_REPAIR_IF_NEEDED", "TARGETED_REREVIEW_IF_NEEDED", "CLOSED_PASS"],
+    "cleanup_program_increment_lifecycles": "C1-C6 each execute independently under the already-closed umbrella authority after governance CLOSED_PASS, per increment_completion_lifecycle",
+    "rule": "The six implementation increments MUST NOT be prerequisites for the governance decision itself to become CLOSED_PASS. Increment dependencies (C1->C2, C1->C3, C2/C3/C4/C5->C6) are dependencies BETWEEN IMPLEMENTATION INCREMENTS, not prerequisites for governance authorization."
+  },
+  "review_lifecycle": {
+    "policy": "NORMAL_BOUNDED_COMPLETION_NOT_TERMINAL_ONE_REVIEW",
+    "stages": ["IMPLEMENT_GOVERNANCE_DECISION", "TEST_GOVERNANCE_ARTIFACTS", "ONE_INDEPENDENT_HOSTILE_REVIEW", "OPTIONAL_BOUNDED_REPAIR_PLUS_ONE_TARGETED_REREVIEW_FOR_CRITICAL_HIGH", "CLOSED_PASS_OR_CLOSED_BLOCKED"],
+    "current_stage": "CLOSED",
+    "hostile_review_count": 1,
+    "hostile_review_id": "PRR_kwDOTo27Xs8AAAABMRPxcA",
+    "hostile_reviewed_commit": "f1e7821b11fb87574771694c322ffb8442ebfccc",
+    "original_critical_count": 0,
+    "original_high_count": 2,
+    "original_findings": [
+      {"severity": "HIGH", "thread_id": "PRRT_kwDOTo27Xs6fdZ14", "finding": "P1-A circular governance closure: the closed_pass_rule made CLOSED_PASS depend on all six increments closing, making C1 impossible to start canonically."},
+      {"severity": "HIGH", "thread_id": "PRRT_kwDOTo27Xs6fdZ16", "finding": "P1-B impossible C1 acceptance criterion: C1 required a projects.toml registration plus a generated roadmap delta while demanding brief, spine, and projects.toml outputs byte-unchanged."}
+    ],
+    "bounded_repair_used": true,
+    "targeted_rereview_required": true,
+    "targeted_rereview_used": true,
+    "critical_high_rereviews_used": 1,
+    "targeted_rereview_evidence": {
+      "evidence_type": "CODEX_NO_SUGGESTIONS_PR_REACTION",
+      "candidate_commit": "11fec95f128fb77474ec5dfc1db4741db1d8f9af",
+      "request_comment_id": 5547555705,
+      "requested_at": "2026-09-04T23:19:12Z",
+      "reaction_id": 489574661,
+      "reaction": "+1",
+      "reaction_created_at": "2026-09-04T23:21:24Z",
+      "reaction_actor": "chatgpt-codex-connector[bot]",
+      "formal_review_object_invented": false,
+      "formal_rereview_id": null,
+      "new_critical_count": 0,
+      "new_high_count": 0,
+      "p1_a_cleared": true,
+      "p1_b_cleared": true,
+      "targeted_rereview_pass": true
+    },
+    "repair_history": [
+      {"repair": 1, "commit": "3c91278cd6b6471bab2bb65d0782aa92203f075e", "scope": "C5 pre-deletion reference-reproof gate (PRE_DELETION_REFERENCE_REPROOF_GATE) added to the C5 objective and acceptance criteria; finding from the local review pass", "status": "RESOLVED_CLEARED_BY_TARGETED_REREVIEW"},
+      {"repair": 2, "commit": "11fec95f128fb77474ec5dfc1db4741db1d8f9af", "scope": "P1-A (thread PRRT_kwDOTo27Xs6fdZ14): governance-decision lifecycle separated from cleanup-program increment lifecycles via lifecycle_separation and the rewritten closed_pass_rule; P1-B (thread PRRT_kwDOTo27Xs6fdZ16): C1 global byte-identity criterion replaced with the SAME_INPUT -> SAME_OLD_RENDERER_OUTPUT renderer-semantics contract", "status": "RESOLVED_CLEARED_BY_TARGETED_REREVIEW"}
+    ],
+    "hostile_review_scope": "ONE bounded independent hostile review focused on exactly these seven risk axes: (1) FROZEN_ORACLE_MUTATION_RISK, (2) SCIENTIFIC_AUTHORITY_LEAKAGE_RISK, (3) OPEN_PR_CONTAMINATION_RISK, (4) CONTEXT_SEMANTICS_REGRESSION_RISK (silent truncation, brief/spine/render drift), (5) LOAD_BEARING_DELETION_RISK, (6) CI_DEV_LOOP_BREAKAGE_RISK, (7) SCOPE_CREEP_RISK.",
+    "repair_rule": "Critical/High findings get ONE bounded repair plus AT MOST ONE targeted rereview; then the review closes regardless of outcome."
+  },
+  "acceptance_gates": [
+    "python -m qntylab.project_context doctor --strict passes.",
+    "python -m qntylab.project_context render --check passes.",
+    "python -m qntylab.research_ledger doctor passes.",
+    "Focused governance tests (this decision test plus tests/test_project_context_v0.py) are green.",
+    "The diff is limited to authorized surfaces: this decision directory, its test file, one projects.toml registration entry, and the generated docs/CURRENT_ROADMAP.md.",
+    "No increment other than C1 is started inside this governance PR, and C1 itself is NOT started in this PR."
+  ],
+  "kill_criteria": [
+    "Any frozen or hash-bound output modified.",
+    "Any oracle semantics change.",
+    "Any git history rewrite.",
+    "Any deletion outside the six proven-safe paths.",
+    "Any repair, merge, or cherry-pick touching PRs #241, #239, #189, or #6.",
+    "Any revival of PR #245 or of the CLOSED_BLOCKED hardening implementation.",
+    "Any archive/LFS/DVC migration.",
+    "render --check broken or a generated summary replacing canonical state.",
+    "Any scientific evaluation, real data, provider, claim, trading, capital, Qnty, QntySpot, or router authority.",
+    "Any funding-contract successor created under this umbrella.",
+    "Scope creep beyond the six enumerated increments."
+  ],
+  "safety_firewall": {
+    "summary": "Zero scientific authority; all eight authority axes NONE; frozen and hash-bound bytes immutable; fail-closed semantics (doctor --strict, render --check, research_ledger doctor, packet overflow) preserved or strengthened, never weakened; open PRs isolated; deletion bounded to the six proven-safe paths; lineage only from canonical master.",
+    "fail_closed_semantics_untouchable": ["doctor --strict", "render --check", "research_ledger doctor", "packet overflow exit", "all existing authority gates in qntylab/"]
+  },
+  "canonical_predecessor": {
+    "decision_path": "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/contract_integrity_hardening_decision_v0/decision.json",
+    "decision_state": "CLOSED_PASS",
+    "note": "The hardening decision V0 closed CLOSED_PASS and its implementation phase FUNDING_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_IMPLEMENTATION_V0 closed CLOSED_BLOCKED at canonical parent 7b1f00d7ae975aa26029e70fab190ea2b16effdc. This decision cites it as naming/lifecycle precedent only; it does not reopen, amend, replace, or succeed it."
+  },
+  "next_action": "IMPLEMENT_QNTYLAB_AGENT_CONTEXT_PACKET_V0",
+  "unresolved_critical": 0,
+  "unresolved_high": 0,
+  "final_review_disposition": "CLOSED_PASS",
+  "c1_authorized": true,
+  "c2_start_authorized_now": false,
+  "c3_start_authorized_now": false,
+  "c6_start_authorized": false,
+  "c4_c5_parallelism_rule": "C4 and C5 have no dependencies and may proceed in parallel with C2/C3 only while their diffs stay within their own allowed_paths and never conflict on shared files, per increment_graph.independence.",
+  "verify_receipts": {
+    "canonical_head_sha256_verified": "7b1f00d7ae975aa26029e70fab190ea2b16effdc",
+    "git_rev_parse_head": "7b1f00d7ae975aa26029e70fab190ea2b16effdc",
+    "branch": "governance/qntylab-repository-ergonomics-and-modularity-cleanup-v0",
+    "worktree_clean_at_canonical_parent": true,
+    "forensic_audit_head": "be291300abb70f3ffc6ba0dd8b1bea570daf5377",
+    "registry_hardening_closure_verified": "docs/state/projects.toml records FUNDING_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_IMPLEMENTATION_V0 as CLOSED_BLOCKED (canonical CLOSED_BLOCKED closure present at canonical parent)",
+    "research_ledger_context": "61 candidates, 1874 trials, no active survivors; no ledger entries for ergonomics/cleanup/packet projects",
+    "reuse_preflight": {"REUSE_PREFLIGHT": "REQUIRED", "DISPOSITION": "NEW_JUSTIFIED", "note": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/ does not exist and follows the experiments/research/<snake_case_v0>/ naming precedent; no existing capability covers the six-increment ergonomics umbrella."}
+  }
+}

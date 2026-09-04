@@ -281,3 +281,39 @@ def test_no_ephemeral_references() -> None:
     serialized = DECISION_PATH.read_bytes().decode("utf-8").lower()
     for forbidden in FORBIDDEN_EPHEMERAL_SUBSTRINGS:
         assert forbidden not in serialized
+
+
+def test_c5_pre_deletion_reference_reproof_gate() -> None:
+    decision = _decision()
+    c5 = next(
+        increment
+        for increment in decision["authorized_implementation_increments"]
+        if increment["increment_id"] == "C5"
+    )
+
+    criteria = c5["acceptance_criteria"]
+    assert any("PRE_DELETION_REFERENCE_REPROOF_GATE" in criterion for criterion in criteria)
+
+    gate_criterion = next(
+        criterion for criterion in criteria if "PRE_DELETION_REFERENCE_REPROOF_GATE" in criterion
+    )
+    for category in (
+        "PYTHON_IMPORT_REFERENCES",
+        "DOCSTRING_PROSE_REFERENCES",
+        "TEST_REFERENCES",
+        "PROJECT_REGISTRY_REFERENCES",
+        "AUTHORITATIVE_ARTIFACT_REFERENCES",
+        "HASH_BINDINGS",
+        "PREREGISTRATION_BINDINGS",
+        "CLOSURE_REFERENCES",
+        "ADR_REFERENCES",
+        "RESEARCH_LEDGER_REFERENCES",
+        "CI_REFERENCES",
+        "GENERATED_VIEW_REFERENCES",
+    ):
+        assert category in gate_criterion
+    assert "CURRENT canonical master HEAD" in gate_criterion
+    assert any(
+        "necessary but NOT sufficient" in criterion for criterion in criteria
+    )
+    assert "PRE_DELETION_REFERENCE_REPROOF_GATE" in c5["objective"]

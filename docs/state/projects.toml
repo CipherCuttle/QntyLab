@@ -10102,7 +10102,7 @@ authoritative_artifacts = [
   "tests/test_qntylab_repository_ergonomics_and_modularity_cleanup_decision_v0.py",
 ]
 decision_artifact = "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/decision.json"
-decision_artifact_sha256 = "cfdc32a8ad364fd161c7f99d327d24356cb4d2163401864264ef4dce30bfaf5f"
+decision_artifact_sha256 = "f9d15da5a539c4b7a86f3cc59baefdd400f9a86bbae6ae0c0ec2aa9115e2bd08"
 canonical_parent = "7b1f00d7ae975aa26029e70fab190ea2b16effdc"
 forensic_audit_identity = "QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0"
 forensic_audit_commit = "be291300abb70f3ffc6ba0dd8b1bea570daf5377"

@@ -1,0 +1,129 @@
+{
+  "artifact_type": "FUNDING_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_IMPLEMENTATION_TERMINAL_CLOSURE",
+  "schema_version": "funding-incremental-contract-integrity-hardening-implementation-terminal-closure-v0",
+  "phase": "FUNDING_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_IMPLEMENTATION_V0",
+  "project_id": "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_IMPLEMENTATION_V0",
+  "state": "CLOSED_BLOCKED",
+  "final_disposition": "CLOSED_BLOCKED",
+  "terminal_reason": "the one permitted independent hostile review returned four High findings, the one permitted bounded Critical/High repair was performed, and the one permitted targeted Critical/High re-review returned one remaining High finding; the review/repair budget of the governing decision lifecycle is exhausted",
+  "governing_decision": {
+    "artifact_path": "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/contract_integrity_hardening_decision_v0/decision.json",
+    "sha256": "712cda5d4e82414ab095deecabaa7d2af054bc7b97ab5cbd394c9fdbeda32a23",
+    "state": "CLOSED_PASS",
+    "canonical_parent": "12202259845ada4f9876288426fed91aba5b6861",
+    "review_lifecycle_rule": "one independent hostile review decides CLOSED_PASS or CLOSED_BLOCKED; only critical/high findings permit the optional bounded repair plus one targeted rereview"
+  },
+  "canonical_master": "12202259845ada4f9876288426fed91aba5b6861",
+  "initial_hostile_review": {
+    "count": 1,
+    "review_type": "INDEPENDENT_HOSTILE_REVIEW",
+    "github_review_id": "PRR_kwDOTo27Xs8AAAABMQI3yw",
+    "reviewed_candidate_commit": "a6200d3e3d1ae2cffc44cca1d1db5d626239452c",
+    "critical": 0,
+    "high": 4,
+    "medium": 0,
+    "low": 0,
+    "verdict": "REPAIR_REQUIRED",
+    "findings": [
+      {
+        "id": "H1",
+        "thread": "PRRT_kwDOTo27Xs6fbIjW",
+        "severity": "HIGH",
+        "title": "Forgeable authorization token",
+        "summary": "OfflineAuthorizationToken could be directly instantiated with attacker-controlled values and the boundary treated isinstance(token, OfflineAuthorizationToken) as proof of authority; authority was self-attested, not independently authenticated."
+      },
+      {
+        "id": "H2",
+        "thread": "PRRT_kwDOTo27Xs6fbIjc",
+        "severity": "HIGH",
+        "title": "Caller-selected Git is not canonical authority",
+        "summary": "The authorization verifier accepted caller-supplied repository/commit/path/expected digest, so a throwaway repository with self-consistent attacker bytes satisfied it; the requester must never choose the trust root."
+      },
+      {
+        "id": "H3",
+        "thread": "PRRT_kwDOTo27Xs6fbIjd",
+        "severity": "HIGH",
+        "title": "Synthetic provenance must come from fixture evidence",
+        "summary": "The factory accepted arbitrary ForecastRows plus an arbitrary caller-named fixture identity and elevated them to OFFLINE_SYNTHETIC_FIXTURE verified provenance; hashing after labeling is provenance laundering, not proof of synthetic origin."
+      },
+      {
+        "id": "H4",
+        "thread": "PRRT_kwDOTo27Xs6fbIjh",
+        "severity": "HIGH",
+        "title": "Git anchor must bind the actual rows",
+        "summary": "The Git-anchored receipt authenticated blob A and separately hashed caller-presented rows B without establishing that A binds B; unrelated rows could borrow a blob's identity."
+      }
+    ]
+  },
+  "bounded_repair": {
+    "used": true,
+    "repaired_candidate_commit": "db6a6c6ed5102019300066edfdf4d4d9402f111a",
+    "repaired_on_branch": "agent/funding-incremental-contract-integrity-hardening-implementation-v0",
+    "candidate_implementation_canonicalized": false,
+    "scope": "authority re-authentication against source-pinned canonical Git (CI-3 model), pinned synthetic fixture contract, artifact-bound Git-anchored row digests; frozen V0 bytes unchanged"
+  },
+  "targeted_critical_high_rereview": {
+    "used": true,
+    "count": 1,
+    "github_review_id": "PRR_kwDOTo27Xs8AAAABMQ8rww",
+    "reviewed_candidate_commit": "db6a6c6ed5102019300066edfdf4d4d9402f111a",
+    "critical": 0,
+    "high": 1,
+    "verdict": "REPAIR_REQUIRED",
+    "remaining_findings": [
+      {
+        "id": "R1",
+        "thread": "PRRT_kwDOTo27Xs6fcsAd",
+        "severity": "HIGH",
+        "title": "Keep the implementation decision from granting execution",
+        "summary": "The repaired boundary authenticates the implementation-only governance decision as if it were evaluation authority. That decision authorizes zero scientific-evaluation phases and records scientific_execution_authorized=false; therefore the execution path must remain fail-closed until a separately governed canonical evaluation authorization exists."
+      }
+    ]
+  },
+  "review_budget": {
+    "initial_hostile_review_count": 1,
+    "initial_high_count": 4,
+    "bounded_repair_used": true,
+    "targeted_critical_high_rereview_used": true,
+    "targeted_rereview_high_count": 1,
+    "repair_budget_exhausted": true,
+    "further_repair_authorized": false,
+    "further_rereview_authorized": false
+  },
+  "pull_request": {
+    "number": 245,
+    "branch": "agent/funding-incremental-contract-integrity-hardening-implementation-v0",
+    "merge_authorized": false,
+    "merged": false,
+    "closed_without_merge_after_closure_canonicalization": true,
+    "stays_as_non_canonical_source_evidence": true
+  },
+  "frozen_v0": {
+    "executor_v0_sha256": "1ffcfeb959cfc547fcda96384c1c8f58b3f5cbc174c5d535324480ede312e8c6",
+    "real_capable_wrapper_v1_sha256": "b0d30af9f6def297c23981c554d6c2224ff1736a491db009a9d8ce7fcc9a9b2e",
+    "bytes_changed": false
+  },
+  "authority": {
+    "scientific_execution_authorized": false,
+    "scientific_evaluation_authorized": false,
+    "real_data_access_authorized": false,
+    "outcome_access_authorized": false,
+    "provider_access_authorized": false,
+    "claim_access_authorized": false,
+    "claim_consumption_authorized": false,
+    "real_capable_path_activation_authorized": false,
+    "further_implementation_phase_authorized": false,
+    "router_authority": "NONE",
+    "qnty_authority": "NONE",
+    "qntyspot_authority": "NONE",
+    "trading_authority": "NONE",
+    "capital_authority": "NONE",
+    "downstream_authority": "NONE"
+  },
+  "review_receipts": {
+    "initial_hostile_review": "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/contract_integrity_hardening_decision_v0/implementation_review_receipts.md",
+    "targeted_rereview": "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/contract_integrity_hardening_decision_v0/implementation_review_receipts.md",
+    "non_canonical_source_evidence": "PR #245 branch agent/funding-incremental-contract-integrity-hardening-implementation-v0 (reachable through Git/PR history only)"
+  },
+  "next_action": "STOP"
+}

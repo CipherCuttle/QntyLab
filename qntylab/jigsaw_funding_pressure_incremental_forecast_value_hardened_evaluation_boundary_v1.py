@@ -18,15 +18,28 @@ scan policy is documented at ``GRANDFATHERED_PRIVATE_ASSEMBLY_LOCATIONS``.
 Structural independence thesis (invariants
 ``PROVENANCE_CONSTRUCTOR_HONESTY`` and ``EXECUTION_MODE_IS_NOT_PROVENANCE``):
 
-* EXECUTION AUTHORITY is represented by :class:`OfflineAuthorizationToken`,
-  obtainable only from :func:`offline_authorization_check`, which fails closed
-  unless caller-pinned authorization bytes, read via local ``git`` at a pinned
-  commit, hash to the caller-pinned digest.  A mode string, a constructor
-  name, a boolean, or a caller statement is NEVER accepted as provenance.
+* EXECUTION AUTHORITY is authenticated, never attested.  The trust root is
+  fixed by reviewed source constants (``EXPECTED_CANONICAL_AUTHORIZATION_COMMIT``
+  + ``EXPECTED_CANONICAL_AUTHORIZATION_SHA256`` + canonical anchor commits +
+  canonical repository locator + the fixed canonical artifact path), following
+  the CI-3 model of
+  :mod:`qntylab.jigsaw_funding_pressure_incremental_forecast_value_evaluation_authorization_provenance_v1`.
+  The caller supplies NO repository, commit, path or digest.  A token
+  (:class:`OfflineAuthorizationToken`) is a DESCRIPTIVE RECEIPT only: at
+  admission time the boundary independently re-reads the canonical
+  authorization bytes from the pinned canonical commit via local ``git`` and
+  refuses any token whose binding does not exactly match the freshly
+  re-authenticated canonical grant.  No arrow runs from a caller assertion to
+  verified state.
 * INPUT PROVENANCE is represented by :class:`VerifiedInputProvenance`, a
-  frozen receipt producible only through the two offline, independently
-  checkable factories of this module (synthetic fixture and git-anchored).
-  Receipts are verified by recomputation; a mismatch raises
+  frozen receipt.  Synthetic provenance can be issued ONLY from fixture bytes
+  that match a source-pinned :class:`SyntheticFixtureContract` (fixture bytes
+  digest AND resulting row digest are pinned constants); there is NO
+  constructor that accepts arbitrary pre-existing ``ForecastRow`` values and
+  elevates them to verified synthetic provenance.  Git-anchored provenance
+  binds the row content digest that is authenticated INSIDE the committed
+  artifact bytes; presented rows must hash to exactly that digest.
+  Verification recomputes everything and fails closed with
   :class:`ProvenanceRejectedError`.
 * SEMANTIC EVALUATION MODE is passed through opaquely to the frozen
   entrypoint, which retains its own guard.  Provenance identity never depends
@@ -190,6 +203,132 @@ def sha256_hex(data: bytes) -> str:
 
 
 # ==========================================================================
+# SECTION 0a -- canonical authority constants (the trust root is SOURCE-PINNED)
+# ==========================================================================
+#
+# The caller NEVER selects the trust root.  Every binding below is a reviewed
+# source constant derived from the merged governing decision (CI-3 model of
+# ``jigsaw_funding_pressure_incremental_forecast_value_evaluation_authorization_provenance_v1``):
+# canonical repository identity, the fixed canonical authorization artifact
+# path, the pinned immutable canonical commit, the pinned artifact bytes
+# digest, the immutable anchor-commit lineage, and the governing decision
+# identity fields the artifact must carry.  A throwaway repository cannot
+# reconstruct this combination, and no caller parameter can substitute any of
+# these values.
+
+#: Canonical GitHub locator of QntyLab (contextual check only; the pinned
+#: commit below is the root of trust).
+CANONICAL_REPOSITORY_LOCATOR = "github.com/CipherCuttle/QntyLab"
+
+#: Fixed, tracked path of the canonical authorization artifact: the merged
+#: governing decision of this implementation phase.  A caller cannot override
+#: which path the bytes are read from.
+CANONICAL_AUTHORIZATION_ARTIFACT_RELATIVE_PATH = (
+    "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/"
+    "contract_integrity_hardening_decision_v0/decision.json"
+)
+
+#: The exact immutable canonical commit the authorization artifact is resolved
+#: from: the merge commit of the governing decision (PR #244, canonical parent
+#: of the implementation branch).  This is the root of trust; a caller cannot
+#: supply or override it.
+EXPECTED_CANONICAL_AUTHORIZATION_COMMIT = "12202259845ada4f9876288426fed91aba5b6861"
+
+#: SHA-256 of the exact canonical authorization blob bytes (the governing
+#: decision document) at the pinned canonical commit.  A file cannot carry its
+#: own hash; this pin binds "the accepted bytes" to the reviewed decision.
+EXPECTED_CANONICAL_AUTHORIZATION_SHA256 = (
+    "712cda5d4e82414ab095deecabaa7d2af054bc7b97ab5cbd394c9fdbeda32a23"
+)
+
+#: Immutable QntyLab anchor commits retained as a defence-in-depth lineage
+#: check: both must be ancestors of the pinned canonical authorization commit.
+#: An unrelated repository does not contain these object IDs.
+PREREGISTRATION_ANCHOR_COMMIT = "d2f1839c286ec0407eefd02d878a1b16572bd902"
+HISTORICAL_V0_ORACLE_ANCHOR_COMMIT = "f6f12994d65c3dfeaf7839de560e58ad99547c62"
+CANONICAL_ANCHOR_COMMITS = (
+    PREREGISTRATION_ANCHOR_COMMIT,
+    HISTORICAL_V0_ORACLE_ANCHOR_COMMIT,
+)
+
+#: Fixed grant identity of this phase's canonical grant.  A token describing
+#: any other grant is a forged receipt.
+CANONICAL_GRANT_IDENTITY = (
+    "FUNDING_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_IMPLEMENTATION_V0"
+    "::HARDENED_EVALUATION_BOUNDARY_V1::CANONICAL_GIT_GRANT_V0"
+)
+
+#: Field bindings the canonical authorization artifact (the governing decision)
+#: must carry.  The decision is a governance-only artifact: it grants exactly
+#: one bounded NON-scientific implementation phase and no scientific
+#: evaluation, real-data, outcome, or provider authority.
+REQUIRED_AUTHORIZATION_ARTIFACT_TYPE = "FUNDING_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_DECISION"
+REQUIRED_AUTHORIZATION_STATE = "CLOSED_PASS"
+REQUIRED_AUTHORIZED_LATER_IMPLEMENTATION_PHASE = (
+    "FUNDING_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_IMPLEMENTATION_V0"
+)
+REQUIRED_SELECTED_ARCHITECTURE = (
+    "OPTION_B_PRESERVE_FROZEN_V0_ORACLE_VERSIONED_HARDENED_SUCCESSOR"
+)
+
+# ==========================================================================
+# SECTION 0b -- pinned synthetic fixture contract (provenance trust root)
+# ==========================================================================
+#
+# OFFLINE_SYNTHETIC_FIXTURE provenance is issued ONLY from fixture bytes whose
+# identity, schema, bytes digest and resulting row content digest are pinned
+# here as reviewed source constants.  There is deliberately exactly ONE
+# admissible synthetic fixture in this phase; admitting a new fixture is a
+# reviewed source change (a governance act), never a caller option.  Arbitrary
+# pre-existing ``ForecastRow`` values can NEVER be elevated to verified
+# synthetic provenance.
+
+
+@dataclass(frozen=True, slots=True)
+class SyntheticFixtureContract:
+    """Source-pinned trust root for one synthetic fixture.
+
+    Every field is a reviewed constant.  A fixture whose bytes do not hash to
+    ``fixture_sha256``, whose identity/schema differs, or whose decoded rows do
+    not hash to ``row_content_digest`` is refused; no caller parameter can
+    relax any of these bindings.
+    """
+
+    fixture_identity: str
+    schema_identity: str
+    fixture_sha256: str
+    row_content_digest: str
+    factory_identity: str
+    row_count: int
+
+
+#: The canonical fixture identity and schema of the single admissible fixture.
+SYNTHETIC_FIXTURE_IDENTITY = "HARDENED_BOUNDARY_SYNTHETIC_FIXTURE_V0"
+SYNTHETIC_FIXTURE_SCHEMA_IDENTITY = "ForecastRowV0/offline-synthetic-fixture/1"
+
+#: SHA-256 of the exact canonical fixture bytes, and the canonical row content
+#: digest of the rows those bytes deterministically decode to.  Both pins were
+#: derived from the frozen deterministic row grid of the invariant suite.
+EXPECTED_SYNTHETIC_FIXTURE_SHA256 = (
+    "5f48eb5adf5cbb3ca9ada65a93f22cf3700d5269a65fb2aeb67c08166670cf22"
+)
+EXPECTED_SYNTHETIC_FIXTURE_ROW_CONTENT_DIGEST = (
+    "sha256:fab6423260a03178f783822dffb80cb9a79ea614bd764dd9ef88e96f4445b034"
+)
+EXPECTED_SYNTHETIC_FIXTURE_ROW_COUNT = 609
+
+#: The pinned contract instance (the only synthetic trust root of this module).
+CANONICAL_SYNTHETIC_FIXTURE_CONTRACT = SyntheticFixtureContract(
+    fixture_identity=SYNTHETIC_FIXTURE_IDENTITY,
+    schema_identity=SYNTHETIC_FIXTURE_SCHEMA_IDENTITY,
+    fixture_sha256=EXPECTED_SYNTHETIC_FIXTURE_SHA256,
+    row_content_digest=EXPECTED_SYNTHETIC_FIXTURE_ROW_CONTENT_DIGEST,
+    factory_identity="offline_synthetic_fixture_factory_v1/" + SYNTHETIC_FIXTURE_IDENTITY,
+    row_count=EXPECTED_SYNTHETIC_FIXTURE_ROW_COUNT,
+)
+
+
+# ==========================================================================
 # SECTION 1 -- exception hierarchy (fail closed, distinct)
 # ==========================================================================
 
@@ -276,8 +415,9 @@ class VerifiedInputProvenance:
         return payload
 
 
-_SCHEMA_IDENTITY_SYNTHETIC = "ForecastRowV0/offline-synthetic-fixture/1"
-_SCHEMA_IDENTITY_GIT_ANCHORED = "ForecastRowV0/git-anchored/1"
+_SCHEMA_IDENTITY_SYNTHETIC = SYNTHETIC_FIXTURE_SCHEMA_IDENTITY
+GIT_ANCHORED_BUNDLE_SCHEMA_IDENTITY = "ForecastRowV0/git-anchored/1"
+_SCHEMA_IDENTITY_GIT_ANCHORED = GIT_ANCHORED_BUNDLE_SCHEMA_IDENTITY
 
 
 def _row_payload(row: ForecastRow) -> dict[str, Any]:
@@ -307,39 +447,124 @@ def _require_rows(rows: Sequence[ForecastRow]) -> tuple[ForecastRow, ...]:
     return materialized
 
 
-def make_offline_synthetic_fixture_receipt(
-    rows: Sequence[ForecastRow], *, fixture_identity: str, batch_identity: str
-) -> VerifiedInputProvenance:
-    """Build a deterministic ``OFFLINE_SYNTHETIC_FIXTURE`` provenance receipt.
+def decode_synthetic_fixture_rows(fixture_bytes: bytes) -> tuple[ForecastRow, ...]:
+    """Authenticate fixture bytes against the pinned contract, then decode rows.
 
-    The factory binds the exact rows it is handed: ``content_digest`` is
-    recomputed from the rows at call time, and the anchor's ``fixture_digest``
-    is the digest of a deterministic fixture descriptor (kind + fixture
-    identity + schema identity).  No timestamp, randomness or environment
-    state enters any field.
+    This is the ONLY way synthetic rows acquire verified provenance: the bytes
+    are authenticated FIRST (pinned identity, schema, and bytes digest), then
+    deterministically decoded into ``ForecastRow`` values, then the decoded
+    rows must hash to the pinned row content digest.  Arbitrary pre-existing
+    rows can never enter through here, and arbitrary fixture bytes can never
+    authenticate (both pins are reviewed source constants).
     """
-    if not isinstance(fixture_identity, str) or not fixture_identity:
-        raise ProvenanceRejectedError("fixture_identity must be a non-empty string")
+    contract = CANONICAL_SYNTHETIC_FIXTURE_CONTRACT
+    if not isinstance(fixture_bytes, (bytes, bytearray)):
+        raise ProvenanceRejectedError("fixture material must be bytes")
+    fixture_bytes = bytes(fixture_bytes)
+    actual_fixture_sha256 = sha256_hex(fixture_bytes)
+    if actual_fixture_sha256 != contract.fixture_sha256:
+        raise ProvenanceRejectedError(
+            f"synthetic fixture bytes digest mismatch: contract pins {contract.fixture_sha256}, "
+            f"presented bytes hash to {actual_fixture_sha256}; unauthenticated fixture material "
+            "cannot gain verified provenance"
+        )
+    try:
+        document = json.loads(fixture_bytes.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ProvenanceRejectedError(f"synthetic fixture is malformed: {exc}") from exc
+    if not isinstance(document, dict):
+        raise ProvenanceRejectedError("synthetic fixture must be a JSON object")
+    required_keys = {"fixture_identity", "schema_identity", "rows"}
+    if set(document) != required_keys:
+        raise ProvenanceRejectedError(
+            f"synthetic fixture fields {sorted(set(document) ^ required_keys)} are missing or unexpected"
+        )
+    if document["fixture_identity"] != contract.fixture_identity:
+        raise ProvenanceRejectedError(
+            f"synthetic fixture identity mismatch: contract pins {contract.fixture_identity!r}, "
+            f"fixture declares {document['fixture_identity']!r}"
+        )
+    if document["schema_identity"] != contract.schema_identity:
+        raise ProvenanceRejectedError(
+            f"synthetic fixture schema mismatch: contract pins {contract.schema_identity!r}, "
+            f"fixture declares {document['schema_identity']!r}"
+        )
+    raw_rows = document["rows"]
+    if not isinstance(raw_rows, list) or not raw_rows:
+        raise ProvenanceRejectedError("synthetic fixture rows must be a non-empty JSON array")
+    row_keys = {"origin", "target_completion", "funding_percentile", "rv24_target", "rv24_lags"}
+    decoded: list[ForecastRow] = []
+    for index, raw_row in enumerate(raw_rows):
+        if not isinstance(raw_row, dict) or set(raw_row) != row_keys:
+            raise ProvenanceRejectedError(
+                f"synthetic fixture row {index} does not match the pinned row schema"
+            )
+        for key in ("origin", "target_completion", "funding_percentile", "rv24_target"):
+            if not isinstance(raw_row[key], str):
+                raise ProvenanceRejectedError(f"synthetic fixture row {index} field {key!r} must be a string")
+        if not isinstance(raw_row["rv24_lags"], list) or not all(
+            isinstance(lag, str) for lag in raw_row["rv24_lags"]
+        ):
+            raise ProvenanceRejectedError(f"synthetic fixture row {index} rv24_lags must be strings")
+        try:
+            decoded.append(
+                ForecastRow(
+                    origin=raw_row["origin"],
+                    target_completion=raw_row["target_completion"],
+                    funding_percentile=Fraction(raw_row["funding_percentile"]),
+                    rv24_target=Decimal(raw_row["rv24_target"]),
+                    rv24_lags=tuple(Decimal(lag) for lag in raw_row["rv24_lags"]),
+                )
+            )
+        except (ValueError, ArithmeticError) as exc:
+            raise ProvenanceRejectedError(
+                f"synthetic fixture row {index} could not be decoded: {exc}"
+            ) from exc
+    rows = tuple(decoded)
+    actual_row_digest = _rows_content_digest(rows)
+    if actual_row_digest != contract.row_content_digest:
+        raise ProvenanceRejectedError(
+            f"synthetic fixture row content digest mismatch: contract pins "
+            f"{contract.row_content_digest}, decoded rows hash to {actual_row_digest}"
+        )
+    if len(rows) != contract.row_count:
+        raise ProvenanceRejectedError(
+            f"synthetic fixture row count mismatch: contract pins {contract.row_count}, "
+            f"decoded {len(rows)}"
+        )
+    return rows
+
+
+def make_offline_synthetic_fixture_receipt_from_authenticated_fixture(
+    fixture_bytes: bytes, *, batch_identity: str
+) -> VerifiedInputProvenance:
+    """Issue a verified ``OFFLINE_SYNTHETIC_FIXTURE`` receipt from fixture bytes.
+
+    The fixture bytes are authenticated against :data:`CANONICAL_SYNTHETIC_FIXTURE_CONTRACT`
+    (bytes digest, identity, schema) and deterministically decoded; the receipt
+    binds the resulting rows via their recomputed content digest, which must
+    equal the pinned row content digest.  ``batch_identity`` is the only
+    caller-supplied field and is descriptive only -- it can never select rows,
+    fixture identity, or any digest.
+    """
     if not isinstance(batch_identity, str) or not batch_identity:
         raise ProvenanceRejectedError("batch_identity must be a non-empty string")
-    materialized = _require_rows(rows)
+    contract = CANONICAL_SYNTHETIC_FIXTURE_CONTRACT
+    rows = decode_synthetic_fixture_rows(fixture_bytes)
+    content_digest = _rows_content_digest(rows)
+    if content_digest != contract.row_content_digest:  # defence in depth
+        raise ProvenanceRejectedError("decoded fixture rows do not match the pinned row content digest")
     anchor = {
-        "fixture_digest": "sha256:"
-        + sha256_hex(
-            canonical_json_bytes(
-                {
-                    "fixture_identity": fixture_identity,
-                    "provenance_kind": PROVENANCE_KIND_OFFLINE_SYNTHETIC_FIXTURE,
-                    "schema_identity": _SCHEMA_IDENTITY_SYNTHETIC,
-                }
-            )
-        )
+        "fixture_identity": contract.fixture_identity,
+        "fixture_sha256": contract.fixture_sha256,
+        "row_content_digest": contract.row_content_digest,
+        "schema_identity": contract.schema_identity,
     }
     payload = {
         "provenance_kind": PROVENANCE_KIND_OFFLINE_SYNTHETIC_FIXTURE,
-        "factory_identity": "offline_synthetic_fixture_factory_v1/" + fixture_identity,
-        "content_digest": _rows_content_digest(materialized),
-        "schema_identity": _SCHEMA_IDENTITY_SYNTHETIC,
+        "factory_identity": contract.factory_identity,
+        "content_digest": content_digest,
+        "schema_identity": contract.schema_identity,
         "batch_identity": batch_identity,
         "anchor": anchor,
     }
@@ -351,9 +576,13 @@ def verify_offline_synthetic_fixture_receipt(
 ) -> tuple[ForecastRow, ...]:
     """Fail closed unless ``receipt`` genuinely binds exactly ``rows``.
 
-    Independently recomputes the row digest and the receipt self-digest from
-    the presented rows and receipt fields.  Any kind, digest or schema mismatch
-    raises :class:`ProvenanceRejectedError`.
+    Independently recomputes the row digest from the presented rows and checks
+    that the receipt's anchor EXACTLY equals the pinned synthetic fixture
+    contract (identity, bytes digest, schema, row digest), that the row digest
+    equals the pinned row content digest, and that the receipt self-digest is
+    intact.  A self-consistent hand-built receipt is therefore worthless: it
+    cannot reproduce the pinned contract anchor.  Any mismatch raises
+    :class:`ProvenanceRejectedError`.
     """
     if not isinstance(receipt, VerifiedInputProvenance):
         raise ProvenanceRejectedError("receipt must be a VerifiedInputProvenance")
@@ -362,6 +591,23 @@ def verify_offline_synthetic_fixture_receipt(
             f"receipt provenance kind is {receipt.provenance_kind!r}, "
             f"expected {PROVENANCE_KIND_OFFLINE_SYNTHETIC_FIXTURE!r}"
         )
+    contract = CANONICAL_SYNTHETIC_FIXTURE_CONTRACT
+    expected_anchor = {
+        "fixture_identity": contract.fixture_identity,
+        "fixture_sha256": contract.fixture_sha256,
+        "row_content_digest": contract.row_content_digest,
+        "schema_identity": contract.schema_identity,
+    }
+    if dict(receipt.anchor) != expected_anchor:
+        raise ProvenanceRejectedError(
+            "synthetic fixture receipt anchor does not match the pinned fixture contract; "
+            "the receipt is forged or was issued for a different (unpinned) fixture"
+        )
+    if receipt.factory_identity != contract.factory_identity:
+        raise ProvenanceRejectedError(
+            f"synthetic fixture receipt factory identity {receipt.factory_identity!r} does not "
+            f"match the pinned factory identity {contract.factory_identity!r}"
+        )
     materialized = _require_rows(rows)
     actual_content = _rows_content_digest(materialized)
     if receipt.content_digest != actual_content:
@@ -369,9 +615,69 @@ def verify_offline_synthetic_fixture_receipt(
             f"row content digest mismatch: receipt claims {receipt.content_digest}, "
             f"rows hash to {actual_content}"
         )
+    if receipt.content_digest != contract.row_content_digest:
+        raise ProvenanceRejectedError(
+            f"receipt row content digest does not match the pinned fixture contract digest "
+            f"{contract.row_content_digest}"
+        )
     if receipt.receipt_digest != _receipt_digest(receipt.to_receipt_payload()):
         raise ProvenanceRejectedError("receipt digest does not match its own fields; receipt is forged or torn")
     return materialized
+
+
+def git_anchored_artifact_bytes(rows: Sequence[ForecastRow]) -> bytes:
+    """Author the canonical ``GIT_ANCHORED`` artifact bundle for ``rows``.
+
+    The committed artifact itself must carry the row content digest, so the
+    Git-anchored receipt can verify that the AUTHENTICATED artifact bytes bind
+    the exact presented rows (no blob A can ever provenance rows B).  The
+    bundle is deterministic canonical JSON over the row payloads.
+    """
+    materialized = _require_rows(rows)
+    return canonical_json_bytes(
+        {
+            "provenance_kind": PROVENANCE_KIND_GIT_ANCHORED,
+            "row_content_digest": _rows_content_digest(materialized),
+            "schema_identity": GIT_ANCHORED_BUNDLE_SCHEMA_IDENTITY,
+        }
+    )
+
+
+def _parse_git_anchored_bundle(blob_bytes: bytes) -> str:
+    """Parse the authenticated artifact bundle and return its row content digest.
+
+    The artifact must be a canonical JSON object with exactly the fields
+    ``provenance_kind``, ``row_content_digest`` and ``schema_identity``; any
+    other shape, kind, schema, or a non-hex digest fails closed.  The returned
+    digest is the one AUTHENTICATED INSIDE the artifact bytes -- the caller
+    must require exact equality with the digest of the presented rows.
+    """
+    try:
+        document = json.loads(blob_bytes.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ProvenanceRejectedError(f"git-anchored artifact is not a canonical bundle: {exc}") from exc
+    if not isinstance(document, dict):
+        raise ProvenanceRejectedError("git-anchored artifact must be a JSON object")
+    required_keys = {"provenance_kind", "row_content_digest", "schema_identity"}
+    if set(document) != required_keys:
+        raise ProvenanceRejectedError(
+            f"git-anchored artifact fields {sorted(set(document) ^ required_keys)} are missing or unexpected"
+        )
+    if document["provenance_kind"] != PROVENANCE_KIND_GIT_ANCHORED:
+        raise ProvenanceRejectedError(
+            f"git-anchored artifact provenance kind is {document['provenance_kind']!r}"
+        )
+    if document["schema_identity"] != GIT_ANCHORED_BUNDLE_SCHEMA_IDENTITY:
+        raise ProvenanceRejectedError(
+            f"git-anchored artifact schema identity is {document['schema_identity']!r}, "
+            f"expected {GIT_ANCHORED_BUNDLE_SCHEMA_IDENTITY!r}"
+        )
+    inner_digest = document["row_content_digest"]
+    if not isinstance(inner_digest, str) or not inner_digest.startswith("sha256:") or not _is_hex64(
+        inner_digest[len("sha256:"):]
+    ):
+        raise ProvenanceRejectedError("git-anchored artifact row_content_digest is not a sha256 digest string")
+    return inner_digest
 
 
 def make_git_anchored_receipt(
@@ -387,11 +693,15 @@ def make_git_anchored_receipt(
 
     Reads the artifact bytes at ``pinned_commit`` via local ``git`` commands
     inside ``repository_root`` and records their SHA-256.  Construction fails
-    closed if git is unavailable, the commit or path is absent, or the bytes
-    do not hash to ``expected_blob_sha256``.  The receipt is then verifiable
-    offline by any fresh process repeating the same check
-    (:func:`verify_git_anchored_receipt`); rows are bound by their canonical
-    content digest exactly as in the synthetic fixture receipt.
+    closed if git is unavailable, the commit or path is absent, the bytes do
+    not hash to ``expected_blob_sha256``, or the authenticated artifact does
+    not parse as a canonical bundle whose INNER ``row_content_digest`` binds
+    exactly the presented rows.  The receipt is then verifiable offline by any
+    fresh process repeating the same check
+    (:func:`verify_git_anchored_receipt`).  The row binding is one-directional
+    and structural: authenticated artifact -> rows.  Unrelated rows can never
+    borrow a blob's identity, and a blob can never provenance rows it does not
+    itself digest.
     """
     if not isinstance(batch_identity, str) or not batch_identity:
         raise ProvenanceRejectedError("batch_identity must be a non-empty string")
@@ -405,17 +715,26 @@ def make_git_anchored_receipt(
             f"git artifact digest mismatch at pinned commit {pinned_commit!r}: "
             f"expected {expected_blob_sha256}, got {actual_blob_sha256}"
         )
+    content_digest = _rows_content_digest(materialized)
+    authenticated_row_digest = _parse_git_anchored_bundle(blob_bytes)
+    if authenticated_row_digest != content_digest:
+        raise ProvenanceRejectedError(
+            "authenticated git artifact does not bind the presented rows: the artifact's inner "
+            f"row_content_digest is {authenticated_row_digest}, but the presented rows hash to "
+            f"{content_digest}; unrelated rows cannot be provenanced by a foreign blob"
+        )
     anchor = {
         "artifact_relative_path": artifact_relative_path,
         "blob_sha256": actual_blob_sha256,
         "pinned_commit": pinned_commit,
         "repository_root": str(Path(repository_root).resolve()),
         "repository_root_sha256": _path_identity_digest(repository_root),
+        "row_content_digest": authenticated_row_digest,
     }
     payload = {
         "provenance_kind": PROVENANCE_KIND_GIT_ANCHORED,
         "factory_identity": f"git_anchored_factory_v1/{pinned_commit}/{artifact_relative_path}",
-        "content_digest": _rows_content_digest(materialized),
+        "content_digest": content_digest,
         "schema_identity": _SCHEMA_IDENTITY_GIT_ANCHORED,
         "batch_identity": batch_identity,
         "anchor": anchor,
@@ -431,10 +750,13 @@ def verify_git_anchored_receipt(
 ) -> tuple[ForecastRow, ...]:
     """Fail closed unless ``receipt`` re-verifies offline against ``rows``.
 
-    Re-reads the artifact at the receipt's pinned commit with local ``git``
-    and re-compares its SHA-256 against the receipt anchor (git unavailable,
-    missing artifact, or digest mismatch all fail closed), then re-verifies
-    the row content digest and the receipt self-digest.  ``repository_root``
+    Re-reads the artifact at the receipt's pinned commit with local ``git``,
+    re-compares its SHA-256 against the receipt anchor (git unavailable,
+    missing artifact, or digest mismatch all fail closed), re-parses the
+    authenticated artifact bundle, and requires the INNER ``row_content_digest``
+    (the digest authenticated inside the artifact bytes) to equal BOTH the
+    receipt's row content digest AND the digest recomputed from the presented
+    rows; then re-verifies the receipt self-digest.  ``repository_root``
     defaults to the root recorded in the receipt anchor and may be overridden
     explicitly (portable re-verification on a fresh checkout of the same
     repository identity).
@@ -457,7 +779,13 @@ def verify_git_anchored_receipt(
     blob_bytes = _git_show_blob(root, str(anchor["pinned_commit"]), str(anchor["artifact_relative_path"]))
     if sha256_hex(blob_bytes) != anchor["blob_sha256"]:
         raise ProvenanceRejectedError("git artifact digest no longer matches the receipt anchor")
+    authenticated_row_digest = _parse_git_anchored_bundle(blob_bytes)
     actual_content = _rows_content_digest(materialized)
+    if authenticated_row_digest != receipt.content_digest:
+        raise ProvenanceRejectedError(
+            "authenticated git artifact row_content_digest no longer matches the receipt's "
+            f"bound digest {receipt.content_digest}"
+        )
     if receipt.content_digest != actual_content:
         raise ProvenanceRejectedError(
             f"row content digest mismatch: receipt claims {receipt.content_digest}, "
@@ -563,23 +891,32 @@ def admit_verified_batch(
 
 
 # ==========================================================================
-# SECTION 4 -- offline authorization token (ordering proof only)
+# SECTION 4 -- canonical authorization authentication (H1/H2 repair)
 # ==========================================================================
+#
+# A token is a DESCRIPTIVE RECEIPT, never authority.  Constructing the Python
+# object proves nothing: authority is established ONLY by the boundary's own
+# independent re-authentication of the canonical authorization binding against
+# canonical Git immediately before a claim, row, or core activity.  The former
+# caller-selected check (caller-supplied repository/commit/path/expected
+# digest) is REMOVED: the requester must never choose the trust root.
 
 
 @dataclass(frozen=True, slots=True)
 class OfflineAuthorizationToken:
-    """Immutable proof object produced by a successful offline grant check.
+    """Immutable DESCRIPTIVE RECEIPT of one successful canonical grant check.
 
-    This token proves ORDERING only: it demonstrates that the boundary cannot
-    proceed past the authorization stage without an offline-verifiable grant
-    check having succeeded first.  It deliberately does NOT consume any real
-    authorization claim and grants no real-evidence authority; the frozen
-    entrypoint's own execution-mode guard remains the authoritative
-    science-side control.
+    This token carries NO authority by itself: it can be constructed freely by
+    any caller with plausible fields, so :meth:`HardenedEvaluationBoundary.run_evaluation`
+    treats it as a receipt only and requires its binding to equal the binding
+    the boundary itself freshly re-authenticates from canonical Git at
+    admission time.  A forged or stale receipt -- including one describing a
+    throwaway repository -- is rejected because it cannot match the freshly
+    authenticated canonical binding.
 
-    Its fields are digests only.  A mode string, a constructor name, a
-    boolean, or a caller statement is structurally not this token.
+    It deliberately does NOT consume any real authorization claim and grants
+    no real-evidence authority; the frozen entrypoint's own execution-mode
+    guard remains the authoritative science-side control.
     """
 
     grant_identity: str
@@ -601,46 +938,252 @@ class OfflineAuthorizationToken:
         )
 
 
-def offline_authorization_check(
-    *,
-    repository_root: Path,
-    pinned_commit: str,
-    authorization_relative_path: str,
-    expected_authorization_sha256: str,
-    grant_identity: str,
-) -> OfflineAuthorizationToken:
-    """Offline-verifiable grant check (CI-3/CI-4 pattern, independently derived).
+def _authority_repository_root() -> Path:
+    """The repository the boundary authenticates against: ALWAYS this module's own.
 
-    Fails closed with :class:`AuthorityRejectedError` unless the authorization
-    artifact bytes at the caller-pinned commit, read via local ``git`` inside
-    ``repository_root``, hash exactly to ``expected_authorization_sha256``.
-    On success returns the immutable token.  On any absence, unavailability or
-    digest mismatch it raises, and NOTHING downstream (no rows, no claim, no
-    core invocation) is touched by this call.
-
-    This check proves ordering only; it consumes no real authorization claim.
+    The trust root is fixed by construction; no caller can redirect the
+    boundary's authority resolution at another repository.
     """
-    if not isinstance(grant_identity, str) or not grant_identity:
-        raise AuthorityRejectedError("grant_identity must be a non-empty string")
-    if not _is_hex64(expected_authorization_sha256):
-        raise AuthorityRejectedError("expected_authorization_sha256 must be a 64-char hex digest")
-    blob_bytes = _git_show_blob(repository_root, pinned_commit, authorization_relative_path)
-    actual = sha256_hex(blob_bytes)
-    if actual != expected_authorization_sha256:
-        raise AuthorityRejectedError(
-            f"pinned authorization bytes mismatch: expected {expected_authorization_sha256}, got {actual}"
+    return Path(__file__).resolve().parents[1]
+
+
+def _authority_git(root: Path, *args: str, check: bool = True) -> bytes:
+    """Read-only Git plumbing for authority authentication; fails closed.
+
+    An inherited ``GIT_DIR``/``GIT_WORK_TREE`` would silently redirect the
+    read at another repository, so every ``GIT_*`` variable is dropped and
+    ``-C`` is the only thing selecting the repository.  ``--no-optional-locks``
+    keeps a read from rewriting ``.git/index``.  Only local object-database
+    reads are ever issued (no network, no remote refs, no token use).
+    """
+    environment = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    try:
+        completed = subprocess.run(
+            ["git", "--no-optional-locks", "-C", str(root), *args],
+            check=False,
+            capture_output=True,
+            timeout=30,
+            env=environment,
         )
+    except (OSError, subprocess.TimeoutExpired) as error:
+        raise AuthorityRejectedError(
+            f"git plumbing is unavailable while authenticating the canonical grant ({args!r}): {error}"
+        ) from error
+    if check and completed.returncode:
+        detail = completed.stderr.decode("utf-8", "replace").strip() or "git command failed"
+        raise AuthorityRejectedError(
+            f"canonical grant could not be authenticated ({args!r}): {detail}"
+        )
+    return completed.stdout
+
+
+def _authority_git_text(root: Path, *args: str, check: bool = True) -> str:
+    return _authority_git(root, *args, check=check).decode("utf-8", "replace").strip()
+
+
+def _authority_git_ok(root: Path, *args: str) -> bool:
+    environment = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    try:
+        completed = subprocess.run(
+            ["git", "--no-optional-locks", "-C", str(root), *args],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=False,
+            timeout=30,
+            env=environment,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return completed.returncode == 0
+
+
+def _canonical_remote_locator(raw: str) -> str | None:
+    value = raw.strip()
+    for prefix in ("https://github.com/", "git@github.com:", "ssh://git@github.com/"):
+        if value.startswith(prefix):
+            value = value[len(prefix):]
+            break
+    else:
+        return None
+    if value.endswith("/"):
+        value = value[:-1]
+    if value.endswith(".git"):
+        value = value[:-4]
+    parts = value.split("/")
+    if len(parts) != 2 or not all(parts):
+        return None
+    return f"github.com/{parts[0]}/{parts[1]}"
+
+
+def _require_canonical_repository_context(root: Path) -> None:
+    """Contextual repository-identity check (NOT the root of trust).
+
+    The pinned commit below is the root of trust; this check additionally
+    refuses repositories whose ``origin`` is not canonical QntyLab.
+    """
+    if not (root / ".git").exists():
+        raise AuthorityRejectedError(
+            f"no usable Git metadata at {root}: canonical grant authentication fails closed"
+        )
+    configured = _authority_git_text(root, "config", "--get", "remote.origin.url", check=False)
+    lines = [line for line in configured.splitlines() if line.strip()]
+    if len(lines) != 1:
+        raise AuthorityRejectedError(
+            "canonical repository identity is unverifiable: remote.origin.url is absent or ambiguous"
+        )
+    if _canonical_remote_locator(lines[0]) != CANONICAL_REPOSITORY_LOCATOR:
+        raise AuthorityRejectedError(
+            f"wrong repository identity: remote.origin.url does not resolve to "
+            f"{CANONICAL_REPOSITORY_LOCATOR!r}; a throwaway or foreign repository can never "
+            "authenticate the canonical grant"
+        )
+
+
+def _resolve_pinned_canonical_authorization_commit(root: Path) -> None:
+    """Resolve and fully validate the source-pinned canonical commit.
+
+    Fails closed when the pinned object is absent, is not a commit, does not
+    verify to an immutable object id, is neither the current checkout nor an
+    ancestor of it, or when a canonical anchor is not an ancestor of the
+    pinned commit (wrong repository lineage).
+    """
+    pinned = EXPECTED_CANONICAL_AUTHORIZATION_COMMIT
+    if _authority_git_text(root, "cat-file", "-t", pinned, check=False) != "commit":
+        raise AuthorityRejectedError(
+            "pinned canonical authorization commit is not present or resolvable in this repository"
+        )
+    verified = _authority_git_text(root, "rev-parse", "--verify", "--quiet", f"{pinned}^{{commit}}", check=False)
+    if verified != pinned:
+        raise AuthorityRejectedError(
+            "pinned canonical authorization commit did not verify to an immutable commit object"
+        )
+    head = _authority_git_text(root, "rev-parse", "--verify", "--quiet", "HEAD^{commit}", check=False)
+    if not re.fullmatch(r"[0-9a-f]{40}", head):
+        raise AuthorityRejectedError("HEAD does not resolve to a commit object")
+    if head != pinned and not _authority_git_ok(root, "merge-base", "--is-ancestor", pinned, head):
+        raise AuthorityRejectedError(
+            "pinned canonical authorization commit is neither the current checkout nor an "
+            "ancestor of it; an unpinned, divergent, or forged commit is refused"
+        )
+    for anchor in CANONICAL_ANCHOR_COMMITS:
+        if _authority_git_text(root, "cat-file", "-t", anchor, check=False) != "commit":
+            raise AuthorityRejectedError(
+                f"wrong repository identity: canonical anchor {anchor} is not a commit in this repository"
+            )
+        if not _authority_git_ok(root, "merge-base", "--is-ancestor", anchor, pinned):
+            raise AuthorityRejectedError(
+                f"wrong repository identity: canonical anchor {anchor} is not an ancestor of the "
+                "pinned canonical authorization commit"
+            )
+
+
+def _canonical_authorization_blob(root: Path) -> bytes:
+    """The canonical authorization blob bytes at ``PINNED_COMMIT:<fixed path>``.
+
+    The tree entry is read from the pinned commit itself (``git ls-tree``), not
+    from the worktree index or ``HEAD``, so a worktree-local file, a different
+    branch, or a later tree cannot supply or hide the artifact.
+    """
+    entry = _authority_git_text(
+        root,
+        "ls-tree",
+        "--full-tree",
+        EXPECTED_CANONICAL_AUTHORIZATION_COMMIT,
+        "--",
+        CANONICAL_AUTHORIZATION_ARTIFACT_RELATIVE_PATH,
+        check=False,
+    )
+    if not entry:
+        raise AuthorityRejectedError(
+            "no canonical authorization artifact exists at the pinned canonical commit "
+            f"({CANONICAL_AUTHORIZATION_ARTIFACT_RELATIVE_PATH} at "
+            f"{EXPECTED_CANONICAL_AUTHORIZATION_COMMIT}); execution fails closed"
+        )
+    meta = entry.partition("\t")[0].split()
+    if len(meta) != 3:
+        raise AuthorityRejectedError("canonical authorization artifact tree entry is unreadable")
+    mode, kind, blob_oid = meta
+    if kind != "blob" or not re.fullmatch(r"[0-9a-f]{40}", blob_oid):
+        raise AuthorityRejectedError(
+            "canonical authorization artifact path does not resolve to a Git blob at the pinned commit"
+        )
+    if mode == "120000":
+        raise AuthorityRejectedError(
+            "canonical authorization artifact path is a symlink in the pinned tree; a regular blob is required"
+        )
+    return _authority_git(root, "cat-file", "blob", blob_oid, check=True)
+
+
+def _require_canonical_authorization_bindings(blob_bytes: bytes) -> None:
+    """The authenticated artifact must BE the governing decision for this phase."""
+    try:
+        document = json.loads(blob_bytes.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise AuthorityRejectedError(f"canonical authorization artifact is malformed: {error}") from error
+    if not isinstance(document, dict):
+        raise AuthorityRejectedError("canonical authorization artifact must be a JSON object")
+    expected_fields = {
+        "artifact_type": REQUIRED_AUTHORIZATION_ARTIFACT_TYPE,
+        "state": REQUIRED_AUTHORIZATION_STATE,
+        "authorized_later_implementation_phase": REQUIRED_AUTHORIZED_LATER_IMPLEMENTATION_PHASE,
+        "selected_architecture": REQUIRED_SELECTED_ARCHITECTURE,
+        "scientific_execution_authorized": False,
+        "real_data_access_authorized": False,
+        "outcome_access_authorized": False,
+        "provider_access_authorized": False,
+    }
+    for field, want in expected_fields.items():
+        if document.get(field) != want:
+            raise AuthorityRejectedError(
+                f"canonical authorization artifact field {field!r} mismatch: expected {want!r}, "
+                f"got {document.get(field)!r}"
+            )
+
+
+def authenticate_canonical_hardening_authorization(
+    *, root: Path | None = None
+) -> OfflineAuthorizationToken:
+    """Authenticate the canonical authorization binding (CI-3 model).
+
+    The trust root is entirely source-pinned: canonical repository locator,
+    fixed artifact path, pinned immutable commit, pinned bytes digest, anchor
+    lineage, and governing-decision field bindings.  The caller supplies NO
+    repository identity, commit, path, or digest; ``root`` can only *point at*
+    a checkout and every canonical constraint still fails closed in a wrong
+    one.  Reads are local Git object-database reads only: NO network, NO
+    GitHub API, NO token use, NO remote refs.
+
+    Fails closed with :class:`AuthorityRejectedError` on: a wrong or unusable
+    repository, an absent/forged/divergent pinned commit, a broken anchor
+    lineage, an absent artifact at the pinned commit, modified artifact bytes,
+    or governing-decision field mismatches.  On success returns the descriptive
+    receipt token whose binding :meth:`HardenedEvaluationBoundary.run_evaluation`
+    independently re-derives at admission time.
+    """
+    resolved_root = (root or _authority_repository_root()).resolve()
+    _require_canonical_repository_context(resolved_root)
+    _resolve_pinned_canonical_authorization_commit(resolved_root)
+    blob_bytes = _canonical_authorization_blob(resolved_root)
+    blob_sha256 = sha256_hex(blob_bytes)
+    if blob_sha256 != EXPECTED_CANONICAL_AUTHORIZATION_SHA256:
+        raise AuthorityRejectedError(
+            "canonical authorization artifact bytes do not match the pinned content digest; "
+            "modified authorization bytes are refused"
+        )
+    _require_canonical_authorization_bindings(blob_bytes)
     return OfflineAuthorizationToken(
-        grant_identity=grant_identity,
-        pinned_authorization_sha256=expected_authorization_sha256,
-        verification_commit=pinned_commit,
+        grant_identity=CANONICAL_GRANT_IDENTITY,
+        pinned_authorization_sha256=blob_sha256,
+        verification_commit=EXPECTED_CANONICAL_AUTHORIZATION_COMMIT,
         verified_at_commit_binding="sha256:"
         + sha256_hex(
             canonical_json_bytes(
                 {
-                    "authorization_relative_path": authorization_relative_path,
-                    "authorization_sha256": actual,
-                    "pinned_commit": pinned_commit,
+                    "anchors": list(CANONICAL_ANCHOR_COMMITS),
+                    "artifact_path": CANONICAL_AUTHORIZATION_ARTIFACT_RELATIVE_PATH,
+                    "artifact_sha256": blob_sha256,
+                    "pinned_commit": EXPECTED_CANONICAL_AUTHORIZATION_COMMIT,
+                    "repository": CANONICAL_REPOSITORY_LOCATOR,
                 }
             )
         ),
@@ -1079,14 +1622,28 @@ class HardenedEvaluationBoundary:
         ``outcome.record`` is the original RECORDED record.
         """
         self.instrumentation = BoundaryInstrumentation()
-        # 1. AUTHORIZATION VERIFIED -- the token must be a real token object
-        #    from offline_authorization_check.  A mode string, constructor
-        #    name, boolean or caller statement is structurally not one.
+        # 1. AUTHORIZATION VERIFIED -- authority is INDEPENDENTLY AUTHENTICATED
+        #    at admission time, never attested.  The boundary re-runs the full
+        #    canonical Git authentication itself (canonical repository locator,
+        #    pinned commit, pinned artifact digest, anchor lineage, governing
+        #    decision bindings) and only then requires the presented token to
+        #    be the receipt OF THAT FRESHLY AUTHENTICATED GRANT.  A directly
+        #    constructed OfflineAuthorizationToken with plausible fields is a
+        #    worthless receipt: it cannot match the fresh canonical binding
+        #    unless the canonical authentication has genuinely just passed.
         if not isinstance(authorization_token, OfflineAuthorizationToken):
             raise AuthorityRejectedError(
-                "authorization must be an OfflineAuthorizationToken from offline_authorization_check"
+                "authorization must be an OfflineAuthorizationToken receipt from "
+                "authenticate_canonical_hardening_authorization"
             )
-        binding = authorization_token.binding_digest()
+        canonical_grant = authenticate_canonical_hardening_authorization()
+        if authorization_token != canonical_grant:
+            raise AuthorityRejectedError(
+                "presented authorization token does not match the freshly authenticated canonical "
+                "grant; the receipt is forged, stale, or describes a non-canonical repository "
+                "(self-attestation is never authority)"
+            )
+        binding = canonical_grant.binding_digest()
         self.instrumentation = self.instrumentation.with_event("AUTHORIZATION_VERIFIED")
         # 2. IRREVERSIBLE CLAIM -- durable, atomic, exactly once.  The claim
         #    digest is semantic: canonical JSON over identity, authorization
@@ -1188,6 +1745,11 @@ __all__ = [
     "AlreadyClaimedError",
     "AuthorityRejectedError",
     "BoundaryInstrumentation",
+    "CANONICAL_ANCHOR_COMMITS",
+    "CANONICAL_AUTHORIZATION_ARTIFACT_RELATIVE_PATH",
+    "CANONICAL_GRANT_IDENTITY",
+    "CANONICAL_REPOSITORY_LOCATOR",
+    "CANONICAL_SYNTHETIC_FIXTURE_CONTRACT",
     "CONFLICTING_REPLAY_FAILS_CLOSED",
     "ConflictingReplayError",
     "DURABLE_OUTCOME_STATES",
@@ -1219,12 +1781,22 @@ __all__ = [
     "RESULT_RECORD_IS_DURABLE",
     "VerifiedInputProvenance",
     "admit_verified_batch",
+    "authenticate_canonical_hardening_authorization",
     "canonical_json_bytes",
+    "decode_synthetic_fixture_rows",
+    "EXPECTED_CANONICAL_AUTHORIZATION_COMMIT",
+    "EXPECTED_CANONICAL_AUTHORIZATION_SHA256",
+    "EXPECTED_SYNTHETIC_FIXTURE_ROW_CONTENT_DIGEST",
+    "EXPECTED_SYNTHETIC_FIXTURE_SHA256",
+    "git_anchored_artifact_bytes",
+    "GIT_ANCHORED_BUNDLE_SCHEMA_IDENTITY",
     "make_git_anchored_receipt",
-    "make_offline_synthetic_fixture_receipt",
-    "offline_authorization_check",
+    "make_offline_synthetic_fixture_receipt_from_authenticated_fixture",
     "run_incremental_forecast_evaluation",
     "sha256_hex",
+    "SYNTHETIC_FIXTURE_IDENTITY",
+    "SYNTHETIC_FIXTURE_SCHEMA_IDENTITY",
+    "SyntheticFixtureContract",
     "verify_git_anchored_receipt",
     "verify_offline_synthetic_fixture_receipt",
 ]

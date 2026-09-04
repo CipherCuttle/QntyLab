@@ -138,11 +138,53 @@ def mutated_copy(rows: tuple[executor.ForecastRow, ...]) -> tuple[executor.Forec
     ) + tuple(rows[1:])
 
 
-def admit(rows, *, batch_identity: str):
-    """Factory receipt + admitted batch over ``rows`` (the only honest path)."""
-    receipt = boundary.make_offline_synthetic_fixture_receipt(
-        rows, fixture_identity="invariant-suite-v0", batch_identity=batch_identity
+def _test_row_payload(row: executor.ForecastRow) -> dict[str, object]:
+    """Canonical JSON payload of one row (same encoding as the boundary)."""
+    return {
+        "origin": row.origin,
+        "target_completion": row.target_completion,
+        "funding_percentile": row.funding_percentile,
+        "rv24_target": row.rv24_target,
+        "rv24_lags": list(row.rv24_lags),
+    }
+
+
+def synthetic_fixture_bytes() -> bytes:
+    """The exact canonical fixture bytes of the pinned boundary fixture contract.
+
+    Deterministically derived from the frozen synthetic row grid; must hash to
+    ``boundary.EXPECTED_SYNTHETIC_FIXTURE_SHA256`` (asserted in the H3 tests).
+    """
+    return boundary.canonical_json_bytes(
+        {
+            "fixture_identity": boundary.SYNTHETIC_FIXTURE_IDENTITY,
+            "schema_identity": boundary.SYNTHETIC_FIXTURE_SCHEMA_IDENTITY,
+            "rows": [_test_row_payload(row) for row in build_frozen_rows()],
+        }
     )
+
+
+def decoded_fixture_rows() -> tuple[executor.ForecastRow, ...]:
+    """Rows deterministically decoded from the authenticated fixture bytes."""
+    return boundary.decode_synthetic_fixture_rows(synthetic_fixture_bytes())
+
+
+@pytest.fixture(scope="session")
+def verified_fixture_rows() -> tuple[executor.ForecastRow, ...]:
+    """The only rows that can hold OFFLINE_SYNTHETIC_FIXTURE provenance."""
+    return decoded_fixture_rows()
+
+
+def fixture_receipt(*, batch_identity: str) -> boundary.VerifiedInputProvenance:
+    """The only honest synthetic-factory path: authenticated fixture bytes."""
+    return boundary.make_offline_synthetic_fixture_receipt_from_authenticated_fixture(
+        synthetic_fixture_bytes(), batch_identity=batch_identity
+    )
+
+
+def admit(rows, *, batch_identity: str):
+    """Factory receipt + admitted batch over the authenticated fixture rows."""
+    receipt = fixture_receipt(batch_identity=batch_identity)
     return receipt, boundary.admit_verified_batch(receipt, rows)
 
 
@@ -267,7 +309,7 @@ def git(root: Path, *args: str) -> str:
 def make_synthetic_repo(root: Path, relative: str, payload: bytes) -> tuple[Path, str]:
     """A throwaway offline git repo carrying exactly one synthetic blob."""
     repo = root / "synthetic-repo"
-    repo.mkdir()
+    repo.mkdir(parents=True, exist_ok=True)
     target = repo / relative
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_bytes(payload)
@@ -293,15 +335,10 @@ AUTHORIZATION_BYTES = b"OFFLINE_SYNTHETIC_AUTHORIZATION_GRANT_V0\n"
 
 
 @pytest.fixture()
-def authorization_token(tmp_path: Path) -> boundary.OfflineAuthorizationToken:
-    repo, commit = make_synthetic_repo(tmp_path, AUTHORIZATION_RELATIVE, AUTHORIZATION_BYTES)
-    return boundary.offline_authorization_check(
-        repository_root=repo,
-        pinned_commit=commit,
-        authorization_relative_path=AUTHORIZATION_RELATIVE,
-        expected_authorization_sha256=hashlib.sha256(AUTHORIZATION_BYTES).hexdigest(),
-        grant_identity="INVARIANT_SUITE_OFFLINE_GRANT_V0",
-    )
+def authorization_token() -> boundary.OfflineAuthorizationToken:
+    """The canonical grant receipt, freshly authenticated offline from local
+    Git (no network, no token use, no remote refs)."""
+    return boundary.authenticate_canonical_hardening_authorization()
 
 
 @pytest.fixture()
@@ -310,8 +347,9 @@ def claim_store(tmp_path: Path) -> boundary.HardenedDurableClaimStore:
 
 
 def make_git_anchored_receipt_for(rows, tmp_path: Path) -> tuple[Path, boundary.VerifiedInputProvenance]:
-    payload = b"HOSTILE_SYNTHETIC_BLOB_V0\n"
-    relative = "hostile/bundle_v0.bin"
+    """Commit the canonical GIT_ANCHORED artifact bundle binding ``rows``."""
+    payload = boundary.git_anchored_artifact_bytes(rows)
+    relative = "hostile/bundle_v0.json"
     repo, commit = make_synthetic_repo(tmp_path, relative, payload)
     receipt = boundary.make_git_anchored_receipt(
         rows,
@@ -325,25 +363,13 @@ def make_git_anchored_receipt_for(rows, tmp_path: Path) -> tuple[Path, boundary.
 
 
 @pytest.fixture(scope="session")
-def recorded_run(tmp_path_factory: pytest.TempPathFactory, frozen_rows) -> dict[str, object]:
+def recorded_run(tmp_path_factory: pytest.TempPathFactory, verified_fixture_rows) -> dict[str, object]:
     """One full hardened run over the frozen panel: claim -> core -> RECORDED."""
-    auth_root = tmp_path_factory.mktemp("recorded-auth")
-    repo, commit = make_synthetic_repo(auth_root, AUTHORIZATION_RELATIVE, AUTHORIZATION_BYTES)
-    token = boundary.offline_authorization_check(
-        repository_root=repo,
-        pinned_commit=commit,
-        authorization_relative_path=AUTHORIZATION_RELATIVE,
-        expected_authorization_sha256=hashlib.sha256(AUTHORIZATION_BYTES).hexdigest(),
-        grant_identity="GOVERNED_RECORDED_RUN_V0",
-    )
+    token = boundary.authenticate_canonical_hardening_authorization()
     store = boundary.HardenedDurableClaimStore(tmp_path_factory.mktemp("recorded-store") / "claims")
     hardened = boundary.HardenedEvaluationBoundary(store)
-    receipt = boundary.make_offline_synthetic_fixture_receipt(
-        frozen_rows,
-        fixture_identity="invariant-suite-frozen-fixture-v0",
-        batch_identity="recorded-run-batch-v0",
-    )
-    batch = hardened.admit_batch(receipt, frozen_rows)
+    receipt = fixture_receipt(batch_identity="recorded-run-batch-v0")
+    batch = hardened.admit_batch(receipt, verified_fixture_rows)
     claim_identity = "recorded-run-identity-v0"
     outcome = hardened.run_evaluation(
         authorization_token=token,
@@ -383,31 +409,67 @@ def test_PROVENANCE_CONSTRUCTOR_HONESTY_forged_receipts_fail_closed_everywhere(
     assert claim_store.read_records() == ()
 
 
-def test_PROVENANCE_CONSTRUCTOR_HONESTY_arbitrary_rows_never_gain_verified_provenance() -> None:
-    rows_a = hostile_rows(target="0.25")
-    rows_b = mutated_copy(rows_a)
-    receipt_a, _ = admit(rows_a, batch_identity="mismatch-probe-a")
+def test_PROVENANCE_CONSTRUCTOR_HONESTY_arbitrary_rows_never_gain_verified_provenance(
+    verified_fixture_rows: tuple[executor.ForecastRow, ...],
+) -> None:
+    """Arbitrary/unverified rows can NEVER gain verified synthetic provenance:
+    the genuine pinned-fixture receipt refuses any other row content."""
+    rows_b = mutated_copy(verified_fixture_rows)
+    receipt_a = fixture_receipt(batch_identity="mismatch-probe-a")
     with pytest.raises(boundary.ProvenanceRejectedError):
         boundary.verify_offline_synthetic_fixture_receipt(receipt_a, rows_b)
     with pytest.raises(boundary.ProvenanceRejectedError):
         boundary.admit_verified_batch(receipt_a, rows_b)
+    # And no constructor accepting arbitrary rows + a fixture identity exists.
+    assert not hasattr(boundary, "make_offline_synthetic_fixture_receipt")
 
 
-def test_PROVENANCE_CONSTRUCTOR_HONESTY_receipt_substitution_between_batches_fails() -> None:
-    rows_a = hostile_rows(count=2, target="0.25")
-    rows_b = hostile_rows(count=3, target="0.50")
-    receipt_a, _ = admit(rows_a, batch_identity="swap-a")
-    receipt_b, _ = admit(rows_b, batch_identity="swap-b")
+def test_PROVENANCE_CONSTRUCTOR_HONESTY_invented_fixture_identity_cannot_provenance_arbitrary_rows(
+    tmp_path: Path,
+) -> None:
+    """The OLD laundering API is gone: arbitrary rows plus an invented (or even
+    genuine) fixture identity cannot be elevated to verified provenance."""
+    assert not hasattr(boundary, "offline_authorization_check")
+    rows = hostile_rows(target="0.25")
+    bundle = boundary.git_anchored_artifact_bytes(rows)
+    repo, commit = make_synthetic_repo(tmp_path, "hostile/laundry_v0.json", bundle)
+    receipt = boundary.make_git_anchored_receipt(
+        rows,
+        batch_identity="laundry-batch-v0",
+        repository_root=repo,
+        pinned_commit=commit,
+        artifact_relative_path="hostile/laundry_v0.json",
+        expected_blob_sha256=hashlib.sha256(bundle).hexdigest(),
+    )
+    # The git-anchored receipt binds ITS OWN rows; presenting it for the pinned
+    # fixture rows (or any unrelated rows) fails closed.
+    verified_fixture = decoded_fixture_rows()
     with pytest.raises(boundary.ProvenanceRejectedError):
-        boundary.verify_offline_synthetic_fixture_receipt(receipt_a, rows_b)
+        boundary.verify_offline_synthetic_fixture_receipt(receipt, verified_fixture)
     with pytest.raises(boundary.ProvenanceRejectedError):
-        boundary.verify_offline_synthetic_fixture_receipt(receipt_b, rows_a)
-    with pytest.raises(boundary.ProvenanceRejectedError):
-        boundary.admit_verified_batch(receipt_a, rows_b)
+        boundary.verify_git_anchored_receipt(receipt, mutated_copy(rows))
 
 
-def test_PROVENANCE_CONSTRUCTOR_HONESTY_tampered_receipt_fields_fail_self_digest() -> None:
-    rows = hostile_rows()
+def test_PROVENANCE_CONSTRUCTOR_HONESTY_receipt_substitution_between_batches_fails(
+    tmp_path: Path,
+) -> None:
+    rows_git = hostile_rows(count=2, target="0.50")
+    repo, receipt_git = make_git_anchored_receipt_for(rows_git, tmp_path)
+    receipt_fixture = fixture_receipt(batch_identity="swap-fixture")
+    verified_fixture = decoded_fixture_rows()
+    with pytest.raises(boundary.ProvenanceRejectedError):
+        boundary.verify_offline_synthetic_fixture_receipt(receipt_fixture, rows_git)
+    with pytest.raises(boundary.ProvenanceRejectedError):
+        boundary.verify_git_anchored_receipt(receipt_git, verified_fixture)
+    with pytest.raises(boundary.ProvenanceRejectedError):
+        boundary.admit_verified_batch(receipt_fixture, rows_git)
+    assert repo.is_dir()
+
+
+def test_PROVENANCE_CONSTRUCTOR_HONESTY_tampered_receipt_fields_fail_self_digest(
+    verified_fixture_rows: tuple[executor.ForecastRow, ...],
+) -> None:
+    rows = verified_fixture_rows
     good_receipt, _ = admit(rows, batch_identity="tamper-probe")
     for field, value in (
         ("receipt_digest", "sha256:" + "00" * 32),
@@ -422,8 +484,10 @@ def test_PROVENANCE_CONSTRUCTOR_HONESTY_tampered_receipt_fields_fail_self_digest
             boundary.verify_offline_synthetic_fixture_receipt(tampered, rows)
 
 
-def test_PROVENANCE_CONSTRUCTOR_HONESTY_content_mutation_after_binding_fails_reverify() -> None:
-    rows = hostile_rows()
+def test_PROVENANCE_CONSTRUCTOR_HONESTY_content_mutation_after_binding_fails_reverify(
+    verified_fixture_rows: tuple[executor.ForecastRow, ...],
+) -> None:
+    rows = verified_fixture_rows
     _, batch = admit(rows, batch_identity="mutation-probe")
     assert batch.reverify() == rows
     mutated = mutated_copy(rows)
@@ -435,9 +499,9 @@ def test_PROVENANCE_CONSTRUCTOR_HONESTY_content_mutation_after_binding_fails_rev
 
 
 def test_PROVENANCE_CONSTRUCTOR_HONESTY_copy_equivalent_rows_bind_by_content() -> None:
-    rows = hostile_rows()
+    rows = decoded_fixture_rows()
     receipt, _ = admit(rows, batch_identity="copy-probe")
-    fresh_copy = hostile_rows()
+    fresh_copy = decoded_fixture_rows()
     assert fresh_copy == rows  # equal content, distinct objects
     verified = boundary.verify_offline_synthetic_fixture_receipt(receipt, fresh_copy)
     assert verified == fresh_copy
@@ -452,14 +516,14 @@ def test_PROVENANCE_CONSTRUCTOR_HONESTY_git_anchored_factory_verifies_and_fails_
     repo, receipt = make_git_anchored_receipt_for(rows, tmp_path)
     assert boundary.verify_git_anchored_receipt(receipt, rows) == rows
 
-    payload = b"HOSTILE_SYNTHETIC_BLOB_V0\n"
+    payload = boundary.git_anchored_artifact_bytes(rows)
     with pytest.raises(boundary.ProvenanceRejectedError):
         boundary.make_git_anchored_receipt(
             rows,
             batch_identity="hostile-bundle-v0",
             repository_root=repo,
             pinned_commit=git(repo, "rev-parse", "HEAD"),
-            artifact_relative_path="hostile/bundle_v0.bin",
+            artifact_relative_path="hostile/bundle_v0.json",
             expected_blob_sha256="9" * 64,
         )
     with pytest.raises(boundary.ProvenanceRejectedError):
@@ -468,8 +532,19 @@ def test_PROVENANCE_CONSTRUCTOR_HONESTY_git_anchored_factory_verifies_and_fails_
             batch_identity="hostile-bundle-v0",
             repository_root=repo,
             pinned_commit=git(repo, "rev-parse", "HEAD"),
-            artifact_relative_path="hostile/absent_v0.bin",
+            artifact_relative_path="hostile/absent_v0.json",
             expected_blob_sha256=hashlib.sha256(payload).hexdigest(),
+        )
+    # A blob that is NOT a canonical row-binding bundle cannot provenance rows.
+    raw_repo, raw_commit = make_synthetic_repo(tmp_path, "hostile/raw_v0.bin", b"HOSTILE_SYNTHETIC_BLOB_V0\n")
+    with pytest.raises(boundary.ProvenanceRejectedError):
+        boundary.make_git_anchored_receipt(
+            rows,
+            batch_identity="raw-blob-v0",
+            repository_root=raw_repo,
+            pinned_commit=raw_commit,
+            artifact_relative_path="hostile/raw_v0.bin",
+            expected_blob_sha256=hashlib.sha256(b"HOSTILE_SYNTHETIC_BLOB_V0\n").hexdigest(),
         )
     foreign = tmp_path / "not-a-repo"
     foreign.mkdir()
@@ -484,8 +559,10 @@ def test_PROVENANCE_CONSTRUCTOR_HONESTY_git_anchored_factory_verifies_and_fails_
 # ==========================================================================
 
 
-def test_EXECUTION_MODE_IS_NOT_PROVENANCE_receipt_identity_is_mode_invariant() -> None:
-    rows = hostile_rows()
+def test_EXECUTION_MODE_IS_NOT_PROVENANCE_receipt_identity_is_mode_invariant(
+    verified_fixture_rows: tuple[executor.ForecastRow, ...],
+) -> None:
+    rows = verified_fixture_rows
     receipt_a, batch_a = admit(rows, batch_identity="mode-invariance-probe")
     receipt_b, batch_b = admit(rows, batch_identity="mode-invariance-probe")
     assert receipt_a == receipt_b
@@ -591,7 +668,7 @@ def assert_zero_observable_science(
 def test_AUTHORITY_FAILURE_PRECEDES_ROWS_forged_tokens_fail_closed(
     claim_store: boundary.HardenedDurableClaimStore, forged_token: object
 ) -> None:
-    rows = hostile_rows()
+    rows = decoded_fixture_rows()
     _, batch = admit(rows, batch_identity="authority-forged-probe")
     hardened = boundary.HardenedEvaluationBoundary(claim_store)
     with pytest.raises(boundary.AuthorityRejectedError):
@@ -607,7 +684,7 @@ def test_AUTHORITY_FAILURE_PRECEDES_ROWS_forged_tokens_fail_closed(
 def test_AUTHORITY_FAILURE_ZERO_OBSERVABLE_SCIENCE_counters_and_no_claim_persisted(
     claim_store: boundary.HardenedDurableClaimStore, authorization_token
 ) -> None:
-    rows = hostile_rows()
+    rows = decoded_fixture_rows()
     _, batch = admit(rows, batch_identity="zero-science-probe")
     hardened = boundary.HardenedEvaluationBoundary(claim_store)
     for bad_token in (None, "SYNTHETIC_VALIDATION", 3.14):
@@ -635,38 +712,26 @@ def test_AUTHORITY_FAILURE_ZERO_OBSERVABLE_SCIENCE_counters_and_no_claim_persist
     assert record.outcome_state == boundary.OUTCOME_CLAIMED_WITHOUT_OUTCOME
 
 
-def test_AUTHORITY_FAILURE_PRECEDES_ROWS_failed_offline_check_no_side_effects(
+def test_AUTHORITY_FAILURE_PRECEDES_ROWS_failed_canonical_authentication_no_side_effects(
     tmp_path: Path, claim_store: boundary.HardenedDurableClaimStore
 ) -> None:
+    """Every wrong-repository scenario fails closed with
+    AuthorityRejectedError and touches no durable state.  The attacker's
+    throwaway repo is self-consistent (its own commit, its own blob digest,
+    even a canonical-looking origin URL) yet can never authenticate."""
     repo, commit = make_synthetic_repo(tmp_path, AUTHORIZATION_RELATIVE, AUTHORIZATION_BYTES)
-    digest = hashlib.sha256(AUTHORIZATION_BYTES).hexdigest()
     with pytest.raises(boundary.AuthorityRejectedError):
-        boundary.offline_authorization_check(
-            repository_root=repo,
-            pinned_commit=commit,
-            authorization_relative_path=AUTHORIZATION_RELATIVE,
-            expected_authorization_sha256="0" * 64,
-            grant_identity="INVARIANT_SUITE_OFFLINE_GRANT_V0",
-        )
-    # The shared git reader fails closed on an ABSENT artifact with its own
-    # HardeningBoundaryError subclass (ProvenanceRejectedError); the digest
-    # mismatch and empty-identity scenarios above raise AuthorityRejectedError.
-    with pytest.raises(boundary.HardeningBoundaryError):
-        boundary.offline_authorization_check(
-            repository_root=repo,
-            pinned_commit=commit,
-            authorization_relative_path="authorization/absent_v0.txt",
-            expected_authorization_sha256=digest,
-            grant_identity="INVARIANT_SUITE_OFFLINE_GRANT_V0",
-        )
+        boundary.authenticate_canonical_hardening_authorization(root=repo)
+    # A canonical-looking origin URL does not help the throwaway repo either.
+    git(repo, "remote", "add", "origin", "https://github.com/CipherCuttle/QntyLab.git")
     with pytest.raises(boundary.AuthorityRejectedError):
-        boundary.offline_authorization_check(
-            repository_root=repo,
-            pinned_commit=commit,
-            authorization_relative_path=AUTHORIZATION_RELATIVE,
-            expected_authorization_sha256=digest,
-            grant_identity="",
-        )
+        boundary.authenticate_canonical_hardening_authorization(root=repo)
+    # An unrelated non-repository directory fails closed too.
+    foreign = tmp_path / "not-a-repo"
+    foreign.mkdir()
+    with pytest.raises(boundary.AuthorityRejectedError):
+        boundary.authenticate_canonical_hardening_authorization(root=foreign)
+    assert not hasattr(boundary, "offline_authorization_check")
     assert claim_store.read_records() == ()
 
 
@@ -678,7 +743,7 @@ def test_AUTHORITY_FAILURE_PRECEDES_ROWS_failed_offline_check_no_side_effects(
 def test_CRASH_WINDOW_BEFORE_CLAIM_authority_failure_no_side_effects_rerun_allowed(
     claim_store: boundary.HardenedDurableClaimStore,
 ) -> None:
-    rows = hostile_rows()
+    rows = decoded_fixture_rows()
     _, batch = admit(rows, batch_identity="before-claim-probe")
     hardened = boundary.HardenedEvaluationBoundary(claim_store)
     with pytest.raises(boundary.AuthorityRejectedError):
@@ -701,7 +766,7 @@ def test_CRASH_WINDOW_BEFORE_CLAIM_authority_failure_no_side_effects_rerun_allow
 def test_CRASH_WINDOW_AFTER_CLAIM_BEFORE_EVALUATION_duplicate_fails_fresh_observer_no_retry(
     claim_store: boundary.HardenedDurableClaimStore, authorization_token
 ) -> None:
-    rows = hostile_rows()
+    rows = decoded_fixture_rows()
     _, batch = admit(rows, batch_identity="after-claim-probe")
     claim_digest = boundary.HardenedEvaluationBoundary._claim_digest(
         claim_identity="after-claim-identity",
@@ -738,7 +803,7 @@ def test_CRASH_WINDOW_AFTER_CLAIM_BEFORE_EVALUATION_duplicate_fails_fresh_observ
 def test_CRASH_WINDOW_AFTER_EVALUATION_BEFORE_RECORD_no_silent_reexecution_reconcile_represents_only(
     claim_store: boundary.HardenedDurableClaimStore, authorization_token
 ) -> None:
-    rows = hostile_rows()
+    rows = decoded_fixture_rows()
     _, batch = admit(rows, batch_identity="after-eval-probe")
     claim_digest = boundary.HardenedEvaluationBoundary._claim_digest(
         claim_identity="after-eval-identity",
@@ -1032,7 +1097,7 @@ def test_RESULT_RECORD_IS_DURABLE_producer_exit_fresh_reader_exact_fields(tmp_pa
 def test_ADVERSARIAL_mode_substitution_claim_persisted_core_refuses_no_record(
     claim_store: boundary.HardenedDurableClaimStore, authorization_token
 ) -> None:
-    rows = hostile_rows()
+    rows = decoded_fixture_rows()
     _, batch = admit(rows, batch_identity="mode-substitution-probe")
     hardened = boundary.HardenedEvaluationBoundary(claim_store)
     with pytest.raises(executor.UnauthorizedExecutionError):
@@ -1052,13 +1117,11 @@ def test_ADVERSARIAL_mode_substitution_claim_persisted_core_refuses_no_record(
 
 
 def test_ADVERSARIAL_same_identity_different_content_conflicting_replay(
-    recorded_run: dict[str, object],
+    recorded_run: dict[str, object], tmp_path: Path
 ) -> None:
     run = recorded_run
     rows = hostile_rows(target="0.75")
-    receipt = boundary.make_offline_synthetic_fixture_receipt(
-        rows, fixture_identity="invariant-suite-v0", batch_identity="different-content-batch"
-    )
+    _, receipt = make_git_anchored_receipt_for(rows, tmp_path)
     different_batch = boundary.admit_verified_batch(receipt, rows)
     with pytest.raises(boundary.ConflictingReplayError):
         run["boundary"].run_evaluation(
@@ -1087,7 +1150,7 @@ def test_ADVERSARIAL_same_identity_different_content_conflicting_replay(
 def test_ADVERSARIAL_malformed_receipt_matrix_fails_closed(
     scenario: str, overrides: dict[str, object], resign: bool
 ) -> None:
-    rows = hostile_rows()
+    rows = decoded_fixture_rows()
     good_receipt, _ = admit(rows, batch_identity="matrix-probe")
     payload = good_receipt.to_receipt_payload()
     payload.update(overrides)
@@ -1158,3 +1221,208 @@ def test_DURABLE_RECORD_recorded_at_utc_is_not_semantic_identity(
     replay = claim_store.claim_once(identity, digest, binding)
     assert replay == recovered
     assert replay.outcome_state == boundary.OUTCOME_RECORDED
+
+
+# ==========================================================================
+# targeted hostile-review regressions (H1-H4, PR #245 review PRR_kwDOTo27Xs8AAAABMQI3yw)
+# ==========================================================================
+
+
+def test_H1_FORGED_AUTHORIZATION_TOKEN_REJECTED(
+    claim_store: boundary.HardenedDurableClaimStore,
+) -> None:
+    """A directly constructed OfflineAuthorizationToken with plausible fields
+    is a descriptive receipt only: admission independently re-authenticates the
+    canonical grant from Git, the forged binding cannot match it, and the
+    forged token yields ZERO rows, ZERO core invocations, and no persisted
+    claim or result."""
+    rows = decoded_fixture_rows()
+    _, batch = admit(rows, batch_identity="h1-forged-probe")
+    forged = boundary.OfflineAuthorizationToken(
+        grant_identity="INVARIANT_SUITE_OFFLINE_GRANT_V0",
+        pinned_authorization_sha256=hashlib.sha256(AUTHORIZATION_BYTES).hexdigest(),
+        verification_commit="deadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
+        verified_at_commit_binding="sha256:" + "ab" * 32,
+    )
+    hardened = boundary.HardenedEvaluationBoundary(claim_store)
+    with pytest.raises(boundary.AuthorityRejectedError):
+        hardened.run_evaluation(
+            authorization_token=forged,
+            batch=batch,
+            claim_identity="h1-forged-identity",
+            execution_mode=EXECUTION_MODE,
+        )
+    assert hardened.instrumentation.rows_constructed == 0
+    assert hardened.instrumentation.core_invocations == 0
+    assert claim_store.lookup("h1-forged-identity") is None
+    assert claim_store.read_records() == ()
+    assert not claim_store.shard_path("h1-forged-identity").exists()
+
+
+def test_H2_CALLER_SELECTED_GIT_AUTHORITY_REJECTED(
+    tmp_path: Path, claim_store: boundary.HardenedDurableClaimStore
+) -> None:
+    """A throwaway git repository with a self-consistent authorization blob
+    (matching SHA/path/commit chosen by the attacker) can never authenticate
+    the canonical grant: the trust root is source-pinned and the caller cannot
+    select it.  The canonical offline positive control still works with no
+    network access, no GitHub API, no token use and no remote refs."""
+    # Attacker: fully self-consistent throwaway repo, canonical-looking origin.
+    repo, commit = make_synthetic_repo(tmp_path, AUTHORIZATION_RELATIVE, AUTHORIZATION_BYTES)
+    digest = hashlib.sha256(AUTHORIZATION_BYTES).hexdigest()
+    git(repo, "remote", "add", "origin", "https://github.com/CipherCuttle/QntyLab.git")
+    # The old caller-selected verification API no longer exists at all.
+    assert not hasattr(boundary, "offline_authorization_check")
+    with pytest.raises(boundary.AuthorityRejectedError):
+        boundary.authenticate_canonical_hardening_authorization(root=repo)
+    # Even a forged receipt built from the attacker's repo is refused at
+    # admission, with zero observable science and no durable claim.
+    rows = decoded_fixture_rows()
+    _, batch = admit(rows, batch_identity="h2-throwaway-probe")
+    forged = boundary.OfflineAuthorizationToken(
+        grant_identity=boundary.CANONICAL_GRANT_IDENTITY,
+        pinned_authorization_sha256=digest,
+        verification_commit=commit,
+        verified_at_commit_binding="sha256:" + "cd" * 32,
+    )
+    hardened = boundary.HardenedEvaluationBoundary(claim_store)
+    with pytest.raises(boundary.AuthorityRejectedError):
+        hardened.run_evaluation(
+            authorization_token=forged,
+            batch=batch,
+            claim_identity="h2-throwaway-identity",
+            execution_mode=EXECUTION_MODE,
+        )
+    assert hardened.instrumentation.rows_constructed == 0
+    assert hardened.instrumentation.core_invocations == 0
+    assert claim_store.lookup("h2-throwaway-identity") is None
+    assert claim_store.read_records() == ()
+    # Positive control: canonical offline authentication succeeds from local
+    # Git only, and every git invocation stays a local read-only command.
+    commands: list[list[str]] = []
+    real_run = subprocess.run
+
+    def recording_run(args, **kwargs):  # type: ignore[no-untyped-def]
+        commands.append(list(args))
+        return real_run(args, **kwargs)
+
+    subprocess.run = recording_run  # type: ignore[assignment]
+    try:
+        token = boundary.authenticate_canonical_hardening_authorization()
+    finally:
+        subprocess.run = real_run  # type: ignore[assignment]
+    assert token.verification_commit == boundary.EXPECTED_CANONICAL_AUTHORIZATION_COMMIT
+    assert token.pinned_authorization_sha256 == boundary.EXPECTED_CANONICAL_AUTHORIZATION_SHA256
+    local_read_only = {"cat-file", "rev-parse", "merge-base", "ls-tree", "config"}
+    for argv in commands:
+        if argv[:1] == ["git"]:
+            subcommands = {arg for arg in argv[2:] if not arg.startswith("-") and arg != "origin"} \
+                & local_read_only
+            assert subcommands, f"unexpected non-local git invocation: {argv}"
+        assert not any(arg in {"ls-remote", "fetch", "clone", "push", "pull"} for arg in argv)
+
+
+def test_H3_ARBITRARY_ROWS_CANNOT_GAIN_SYNTHETIC_PROVENANCE(
+    verified_fixture_rows: tuple[executor.ForecastRow, ...],
+) -> None:
+    """Arbitrary ForecastRows can never be promoted to VERIFIED synthetic
+    provenance: (1) no constructor accepts rows + a fixture identity; (2)
+    untrusted rows with an invented fixture identity fail; (3) arbitrary rows
+    presented with the GENUINE fixture identity fail; (4) fixture bytes changed
+    after the receipt fail; (5) a self-consistent receipt whose content digest
+    does not match the pinned row digest fails; (6) exact authenticated fixture
+    bytes decode, verify, and admit; (7) copy-equivalent rows verify by
+    deterministic derivation from the same authenticated fixture contract."""
+    genuine_rows = verified_fixture_rows
+    genuine_receipt = fixture_receipt(batch_identity="h3-genuine")
+    # (2) untrusted arbitrary rows + invented fixture identity: no such API.
+    assert not hasattr(boundary, "make_offline_synthetic_fixture_receipt")
+    arbitrary = hostile_rows(target="0.31")
+    # (3) arbitrary rows + the genuine fixture identity (the genuine receipt):
+    with pytest.raises(boundary.ProvenanceRejectedError):
+        boundary.verify_offline_synthetic_fixture_receipt(genuine_receipt, arbitrary)
+    with pytest.raises(boundary.ProvenanceRejectedError):
+        boundary.admit_verified_batch(genuine_receipt, arbitrary)
+    # (4) fixture bytes changed after the receipt: re-authentication refuses.
+    tampered = synthetic_fixture_bytes()[:-1] + b" "
+    with pytest.raises(boundary.ProvenanceRejectedError):
+        boundary.decode_synthetic_fixture_rows(tampered)
+    with pytest.raises(boundary.ProvenanceRejectedError):
+        boundary.make_offline_synthetic_fixture_receipt_from_authenticated_fixture(
+            tampered, batch_identity="h3-tampered"
+        )
+    # (5) a receipt whose row content digest is valid-looking but does not
+    # match the pinned fixture row digest (even fully re-signed) is refused.
+    forged_payload = genuine_receipt.to_receipt_payload()
+    forged_payload["content_digest"] = "sha256:" + boundary.sha256_hex(
+        boundary.canonical_json_bytes([{"origin": "forged"}])
+    )
+    forged = boundary.VerifiedInputProvenance(
+        **forged_payload,  # type: ignore[arg-type]
+        receipt_digest="sha256:" + boundary.sha256_hex(boundary.canonical_json_bytes(forged_payload)),
+    )
+    with pytest.raises(boundary.ProvenanceRejectedError):
+        boundary.verify_offline_synthetic_fixture_receipt(forged, genuine_rows)
+    # (6) the exact authenticated fixture is accepted end to end.
+    receipt = fixture_receipt(batch_identity="h3-exact")
+    batch = boundary.admit_verified_batch(receipt, decoded_fixture_rows())
+    assert batch.reverify() == genuine_rows
+    # (7) copy-equivalent rows (equal content, distinct objects) verify.
+    fresh = decoded_fixture_rows()
+    assert fresh == genuine_rows
+    assert boundary.verify_offline_synthetic_fixture_receipt(receipt, fresh) == fresh
+    with pytest.raises(boundary.ProvenanceRejectedError):
+        boundary.verify_offline_synthetic_fixture_receipt(receipt, mutated_copy(genuine_rows))
+
+
+def test_H4_UNRELATED_GIT_BLOB_CANNOT_PROVENANCE_ARBITRARY_ROWS(tmp_path: Path) -> None:
+    """The authenticated Git artifact must bind the exact rows: a valid
+    committed bundle for rows A cannot provenance unrelated arbitrary rows B
+    (the digest authenticated INSIDE the artifact bytes must equal the digest
+    of the presented rows), while the exact rows bound by the bundle are
+    accepted."""
+    rows_a = hostile_rows(count=3, target="0.41")
+    bundle = boundary.git_anchored_artifact_bytes(rows_a)
+    repo, commit = make_synthetic_repo(tmp_path, "hostile/h4_bundle_v0.json", bundle)
+    blob_digest = hashlib.sha256(bundle).hexdigest()
+    rows_b = hostile_rows(count=3, target="0.67")
+    # The factory refuses to pair blob A with unrelated rows B.
+    with pytest.raises(boundary.ProvenanceRejectedError):
+        boundary.make_git_anchored_receipt(
+            rows_b,
+            batch_identity="h4-unrelated",
+            repository_root=repo,
+            pinned_commit=commit,
+            artifact_relative_path="hostile/h4_bundle_v0.json",
+            expected_blob_sha256=blob_digest,
+        )
+    # A receipt for A cannot be verified against B either.
+    receipt_a = boundary.make_git_anchored_receipt(
+        rows_a,
+        batch_identity="h4-exact",
+        repository_root=repo,
+        pinned_commit=commit,
+        artifact_relative_path="hostile/h4_bundle_v0.json",
+        expected_blob_sha256=blob_digest,
+    )
+    with pytest.raises(boundary.ProvenanceRejectedError):
+        boundary.verify_git_anchored_receipt(receipt_a, rows_b)
+    with pytest.raises(boundary.ProvenanceRejectedError):
+        boundary.admit_verified_batch(receipt_a, rows_b)
+    # The exact rows bound by the authenticated artifact are accepted.
+    assert boundary.verify_git_anchored_receipt(receipt_a, rows_a) == rows_a
+    batch = boundary.admit_verified_batch(receipt_a, rows_a)
+    assert batch.reverify() == rows_a
+    # A byte-modified artifact (digest no longer matching the pin) fails.
+    tampered = bundle[:-1] + b" "
+    repo2, commit2 = make_synthetic_repo(tmp_path, "hostile/h4_tampered_v0.json", tampered)
+    with pytest.raises(boundary.ProvenanceRejectedError):
+        boundary.make_git_anchored_receipt(
+            rows_a,
+            batch_identity="h4-tampered",
+            repository_root=repo2,
+            pinned_commit=commit2,
+            artifact_relative_path="hostile/h4_tampered_v0.json",
+            expected_blob_sha256=blob_digest,
+        )
+    assert repo.is_dir() and repo2.is_dir()

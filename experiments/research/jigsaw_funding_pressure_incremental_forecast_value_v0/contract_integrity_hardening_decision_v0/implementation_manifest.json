@@ -8,7 +8,7 @@
   "governing_decision_sha256": "712cda5d4e82414ab095deecabaa7d2af054bc7b97ab5cbd394c9fdbeda32a23",
   "selected_architecture": "OPTION_B_PRESERVE_FROZEN_V0_ORACLE_VERSIONED_HARDENED_SUCCESSOR",
   "implementation_module_path": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_hardened_evaluation_boundary_v1.py",
-  "implementation_source_sha256": "0d1c566cf656c14636692c42705137ebbabde809fc556b63b3be6f753655bef5",
+  "implementation_source_sha256": "f57dd5b72fc7fd78acc559ea692067bfd6ff80ed366a0d999544964bba469447",
   "test_paths": ["tests/test_funding_incremental_contract_integrity_hardening_invariants_v0.py"],
   "frozen_executor_sha256": "1ffcfeb959cfc547fcda96384c1c8f58b3f5cbc174c5d535324480ede312e8c6",
   "frozen_real_capable_wrapper_sha256": "b0d30af9f6def297c23981c554d6c2224ff1736a491db009a9d8ce7fcc9a9b2e",
@@ -25,7 +25,15 @@
   "trading_authority": "NONE",
   "capital_authority": "NONE",
   "pr241_wholesale_reuse": false,
-  "hostile_review_count": 0,
+  "hostile_review_count": 1,
+  "first_hostile_review_commit": "a6200d3e3d1ae2cffc44cca1d1db5d626239452c",
+  "first_hostile_review_github_review_id": "PRR_kwDOTo27Xs8AAAABMQI3yw",
+  "first_hostile_review_high_count": 4,
+  "first_hostile_review_critical_count": 0,
+  "first_hostile_review_verdict": "REPAIR_REQUIRED",
+  "hostile_review_record": "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/contract_integrity_hardening_decision_v0/implementation_hostile_review.md",
+  "bounded_repair_commit_base": "a6200d3e3d1ae2cffc44cca1d1db5d626239452c",
+  "targeted_rereview_required": true,
   "targeted_rereview_used": false,
-  "next_action": "READY_FOR_ONE_INDEPENDENT_HOSTILE_REVIEW"
+  "next_action": "READY_FOR_ONE_TARGETED_CRITICAL_HIGH_REREVIEW"
 }

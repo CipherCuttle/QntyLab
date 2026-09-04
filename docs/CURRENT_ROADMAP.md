@@ -9,6 +9,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 ## Queued — not authorized
 
 - `DSH Stage-A V1R3R2 fresh one-episode live execution authorization V0R7` — `PLANNED_NOT_AUTHORIZED`. AFTER EXACT CANONICAL MERGE ONLY: construct a separate V0R7 activation bound to the exact authorization bytes and repaired claim implementation. Do not activate, execute, read the secret, create a claim, invoke DSH, call a provider, spend, merge, replay V0R5/V0R6, or grant Stage B, Qnty, scientific, trading, capital, promotion, or broader production authority.
+- `Funding-pressure incremental contract-integrity hardening implementation V0` — `PLANNED_NOT_AUTHORIZED`. READY_FOR_ONE_INDEPENDENT_HOSTILE_REVIEW: the hardened evaluation boundary candidate is frozen for exactly one independent hostile review. No hostile review has occurred yet, no targeted rereview has been used, and no closure receipt exists. No scientific execution, real data, outcome, provider, claim consumption, real-capable wrapper activation, Router, Qnty, QntySpot, trading, or capital authority exists under this phase.
 - `PROSPECTIVE_SHADOW` — `PLANNED_NOT_AUTHORIZED`. No implementation is authorized; require separate Git-backed authorization.
 - `QNTY_HANDOFF` — `PLANNED_NOT_AUTHORIZED`. No implementation is authorized unless downstream evidence separately earns it.
 - `REACTIVE_JIGSAW_V0` — `PLANNED_NOT_AUTHORIZED`. No implementation is authorized; require separate Git-backed authorization.

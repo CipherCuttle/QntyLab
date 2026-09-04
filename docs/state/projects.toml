@@ -9992,3 +9992,67 @@ hostile_governance_medium_total = 0
 hostile_governance_low_total = 0
 targeted_rereview_used = false
 next_action = "CLOSED_PASS: canonical boundary repair merged in b2b24ef59a09a5aa039e7afeb0afa6f0610e8f87 after one independent hostile review with zero Critical/High findings. The former QntySpot DEV-acquisition row is archived with all historical receipts preserved and all remaining QntyLab implementation and market-data authority revoked. No QntySpot repository mutation, scientific execution, data access, backtest, ledger mutation, trading, promotion, or capital authority is created. Any future QntyLab evaluation of QntySpot requires a new separately Git-backed bounded research authorization."
+
+[[project]]
+project_id = "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_IMPLEMENTATION_V0"
+phase_id = "FUNDING_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_IMPLEMENTATION_V0"
+display_name = "Funding-pressure incremental contract-integrity hardening implementation V0"
+# Registry `state` is schema-validated by qntylab/project_context.py PROJECT_STATES
+# and has no IMPLEMENTATION_IN_REVIEW member; PLANNED_NOT_AUTHORIZED is the only
+# non-terminal value that marks nothing reviewed, closed, or activated. The
+# governing lifecycle state is recorded verbatim below.
+state = "PLANNED_NOT_AUTHORIZED"
+decision_state = "IMPLEMENTATION_IN_REVIEW"
+implementation_state = "IMPLEMENTATION_IN_REVIEW"
+review_lifecycle_state = "IMPLEMENTATION_IN_REVIEW"
+authority_level = "ONE_BOUNDED_NON_SCIENTIFIC_IMPLEMENTATION_ONLY"
+phase_type = "IMPLEMENTATION"
+governance_only = false
+implementation_authorized = false
+implementation_completed = false
+implementation_reviewed = false
+implementation_canonicalized = false
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/contract_integrity_hardening_decision_v0/decision.json",
+  "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/contract_integrity_hardening_decision_v0/implementation_manifest.json",
+  "qntylab/jigsaw_funding_pressure_incremental_forecast_value_hardened_evaluation_boundary_v1.py",
+  "tests/test_funding_incremental_contract_integrity_hardening_invariants_v0.py",
+]
+governing_decision_project_id = "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_DECISION_V0"
+governing_decision_artifact = "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/contract_integrity_hardening_decision_v0/decision.json"
+governing_decision_artifact_sha256 = "712cda5d4e82414ab095deecabaa7d2af054bc7b97ab5cbd394c9fdbeda32a23"
+governing_decision_state = "CLOSED_PASS"
+canonical_parent = "12202259845ada4f9876288426fed91aba5b6861"
+implementation_manifest = "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/contract_integrity_hardening_decision_v0/implementation_manifest.json"
+implementation_manifest_sha256 = "b070ddc95b2ceab78abd73c7e466c301abf9276aa5260be3b2a7ff05f1e1c65a"
+implementation_source_path = "qntylab/jigsaw_funding_pressure_incremental_forecast_value_hardened_evaluation_boundary_v1.py"
+implementation_source_sha256 = "0d1c566cf656c14636692c42705137ebbabde809fc556b63b3be6f753655bef5"
+test_paths = ["tests/test_funding_incremental_contract_integrity_hardening_invariants_v0.py"]
+selected_architecture = "OPTION_B_PRESERVE_FROZEN_V0_ORACLE_VERSIONED_HARDENED_SUCCESSOR"
+durability_class = "DURABLE_CROSS_PROCESS_LOCAL_OFFLINE"
+frozen_executor_v0_mutable = false
+frozen_executor_v0_sha256 = "1ffcfeb959cfc547fcda96384c1c8f58b3f5cbc174c5d535324480ede312e8c6"
+frozen_real_capable_wrapper_v1_mutable = false
+frozen_real_capable_wrapper_v1_sha256 = "b0d30af9f6def297c23981c554d6c2224ff1736a491db009a9d8ce7fcc9a9b2e"
+scientific_execution_authorized = false
+scientific_evaluation_authorized = false
+real_data_access_authorized = false
+outcome_access_authorized = false
+provider_access_authorized = false
+claim_access_authorized = false
+claim_consumption_authorized = false
+router_authority = "NONE"
+qnty_authority = "NONE"
+qntyspot_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+downstream_authority = "NONE"
+pr241_wholesale_reuse = false
+pr241_merged = false
+hostile_review_count = 0
+targeted_rereview_used = false
+implementation_candidate_status = "FROZEN_FOR_SINGLE_HOSTILE_REVIEW"
+active_project_after_review = "NONE"
+next_action = "READY_FOR_ONE_INDEPENDENT_HOSTILE_REVIEW: the hardened evaluation boundary candidate is frozen for exactly one independent hostile review. No hostile review has occurred yet, no targeted rereview has been used, and no closure receipt exists. No scientific execution, real data, outcome, provider, claim consumption, real-capable wrapper activation, Router, Qnty, QntySpot, trading, or capital authority exists under this phase."

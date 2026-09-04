@@ -10081,3 +10081,53 @@ hostile_governance_medium_total = 0
 hostile_governance_low_total = 0
 targeted_rereview_used = false
 next_action = "CLOSED_PASS: canonical boundary repair merged in b2b24ef59a09a5aa039e7afeb0afa6f0610e8f87 after one independent hostile review with zero Critical/High findings. The former QntySpot DEV-acquisition row is archived with all historical receipts preserved and all remaining QntyLab implementation and market-data authority revoked. No QntySpot repository mutation, scientific execution, data access, backtest, ledger mutation, trading, promotion, or capital authority is created. Any future QntyLab evaluation of QntySpot requires a new separately Git-backed bounded research authorization."
+
+[[project]]
+project_id = "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0"
+phase_id = "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_DECISION_V0"
+display_name = "QntyLab repository ergonomics and modularity cleanup decision V0"
+state = "PLANNED_NOT_AUTHORIZED"
+decision_state = "OPEN_INDEPENDENT_HOSTILE_REVIEW"
+candidate_state = "CANONICAL_GOVERNANCE_DECISION"
+canonicalization_status = "NOT_CANONICALIZED"
+authority_level = "GOVERNANCE_AUTHORIZATION_FOR_SIX_BOUNDED_ERGONOMIC_IMPLEMENTATION_INCREMENTS_ONLY"
+phase_type = "GOVERNANCE_ONLY"
+governance_only = true
+authoritative_artifacts = [
+  "AGENTS.md",
+  "qntylab.toml",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/decision.json",
+  "tests/test_qntylab_repository_ergonomics_and_modularity_cleanup_decision_v0.py",
+]
+decision_artifact = "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/decision.json"
+decision_artifact_sha256 = "cfdc32a8ad364fd161c7f99d327d24356cb4d2163401864264ef4dce30bfaf5f"
+canonical_parent = "7b1f00d7ae975aa26029e70fab190ea2b16effdc"
+forensic_audit_identity = "QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0"
+forensic_audit_commit = "be291300abb70f3ffc6ba0dd8b1bea570daf5377"
+predecessor_project_id = "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_DECISION_V0"
+predecessor_state = "CLOSED_PASS"
+authorized_implementation_increment_count = 6
+first_implementation_increment = "QNTYLAB_AGENT_CONTEXT_PACKET_V0"
+scientific_evaluation_phases_authorized = 0
+scientific_evaluation_authorized = false
+scientific_execution_authorized = false
+implementation_authorized = false
+implementation_completed = false
+real_data_access_authorized = false
+outcome_access_authorized = false
+provider_access_authorized = false
+claim_access_authorized = false
+claim_consumption_authorized = false
+router_authority = "NONE"
+qnty_authority = "NONE"
+qntyspot_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+downstream_authority = "NONE"
+active_project_after_closure = "NONE"
+review_lifecycle_policy = "NORMAL_BOUNDED_COMPLETION_NOT_TERMINAL_ONE_REVIEW"
+review_lifecycle_current_stage = "ONE_INDEPENDENT_HOSTILE_REVIEW"
+critical_high_rereviews_used = 0
+next_action = "OPEN_INDEPENDENT_HOSTILE_REVIEW: this governance-only decision authorizes exactly six bounded non-scientific ergonomics increments (C1 packet, C2 project_context modularization, C3 CI split, C4 tooling normalization, C5 proven-safe slimming, C6 fitness functions) with zero scientific, real-data, provider, claim, trading, capital, Qnty, QntySpot, or router authority. After merge, execute FIRST QNTYLAB_AGENT_CONTEXT_PACKET_V0 as a separate governance-compliant implementation task; C2-C6 must not start during the governance PR."

@@ -1,0 +1,442 @@
+{
+  "artifact_type": "FUNDING_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_DECISION",
+  "schema_version": "funding-incremental-contract-integrity-hardening-decision-v0",
+  "created_from_branch": "governance/funding-incremental-contract-integrity-hardening-decision-v0",
+  "phase": "FUNDING_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_DECISION_V0",
+  "phase_id": "FUNDING_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_DECISION_V0",
+  "project_id": "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_DECISION_V0",
+  "phase_type": "GOVERNANCE_ONLY",
+  "state": "CLOSED_PASS",
+  "decision_state": "CLOSED_PASS",
+  "authority": "CANONICAL_QNTYLAB_GIT_IDENTITY_GOVERNANCE_ONLY",
+  "governance_only": true,
+  "canonical_parent": "74e6edd0bbb51b98f92eb0c5ece881599e0f7d05",
+  "forensic_audit_identity": "QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0",
+  "forensic_audit_commit": "74e6edd0bbb51b98f92eb0c5ece881599e0f7d05",
+  "verdict": "ONE_FROZEN_ORACLE_PRESERVING_VERSIONED_HARDENED_SUCCESSOR_BOUNDARY_IS_AUTHORIZED_FOR_EXACTLY_ONE_NON_SCIENTIFIC_IMPLEMENTATION_PHASE",
+  "selected_architecture": "OPTION_B_PRESERVE_FROZEN_V0_ORACLE_VERSIONED_HARDENED_SUCCESSOR",
+  "authorization_count": {
+    "later_implementation_phases_authorized": 1,
+    "scientific_evaluation_phases_authorized": 0
+  },
+  "later_implementation_phase_count": 1,
+  "scientific_evaluation_phase_count": 0,
+  "real_data_access_authorized": false,
+  "outcome_access_authorized": false,
+  "provider_access_authorized": false,
+  "claim_consumption_authorized": false,
+  "scientific_execution_authorized": false,
+  "router_authority": "NONE",
+  "qnty_authority": "NONE",
+  "qntyspot_authority": "NONE",
+  "trading_authority": "NONE",
+  "capital_authority": "NONE",
+  "authorized_later_implementation_phase": "FUNDING_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_IMPLEMENTATION_V0",
+  "forensic_finding_ids": ["CI-1", "CI-2", "CI-7", "CI-10", "CI-11", "CI-23"],
+  "forensic_positive_control_ids": ["CI-3", "CI-4", "CI-6", "CI-8"],
+  "forensic_test_gap_classes": [
+    "MISSING_ADVERSARIAL_PROVENANCE_TEST",
+    "FIXTURE_ASSUMES_CONTRACT",
+    "ASSERTION_TOO_WEAK",
+    "OVERFIT_TO_IMPLEMENTATION",
+    "MISSING_RESTART_TEST",
+    "MISSING_MULTIPROCESS_TEST",
+    "MISSING_NEGATIVE_AUTHORITY_TEST",
+    "MISSING_CROSS_BOUNDARY_TEST"
+  ],
+  "forensic_evidence": {
+    "CI-1": {
+      "finding_id": "CI-1",
+      "severity": "HIGH",
+      "classification": "CALLER_ASSERTED_PROVENANCE",
+      "reachability": "LATENT_ON_MASTER",
+      "reachability_note": "LATENT_ON_MASTER, not branch-only: the unguarded private assembly exists on master at canonical parent 74e6edd0bbb51b98f92eb0c5ece881599e0f7d05 but is unreachable through the guarded public entrypoint today; it manifests only via a private-entrypoint bypass by a future caller.",
+      "file": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py",
+      "line_evidence": "private _assemble_incremental_forecast_evaluation at lines 565-712 has NO execution-mode guard; require_authorized_execution_mode is called only at line 723 inside public run_incremental_forecast_evaluation (lines 715-724); static NO_REAL_EXECUTION_ATTESTATION map (line 135) is embedded at lines 684 and 750; _result_digest (line 559) binds that static map rather than row provenance; ForecastRow (line 304) has no provenance field.",
+      "mechanism": "Any caller routing arbitrary rows through the unguarded private assembly obtains a digest-bearing result attesting synthetic-only provenance regardless of actual row origin, because the attestation is a static constant baked into the payload and digest rather than derived from verified row provenance."
+    },
+    "CI-2": {
+      "finding_id": "CI-2",
+      "severity": "MEDIUM",
+      "classification": "CALLER_ASSERTED_PROVENANCE",
+      "reachability": "ON_MASTER",
+      "file": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_synthetic_wrapper_v1.py",
+      "line_evidence": "lines 64-84 verify only the execution-mode string, never row provenance.",
+      "mechanism": "The synthetic wrapper authenticates a mode string, not the inputs; any row content is accepted as long as the caller declares SYNTHETIC_VALIDATION, so provenance is caller-asserted rather than structurally established."
+    },
+    "CI-7": {
+      "finding_id": "CI-7",
+      "severity": "MEDIUM",
+      "classification": "DECLARED_BUT_NOT_IMPLEMENTED",
+      "reachability": "ON_MASTER",
+      "file": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_real_capable_wrapper_v1.py",
+      "line_evidence": "_record_exactly_one_result (lines 208-217) computes a claim digest and then discards it, recording nothing; the module attests SCIENTIFIC_RESULT_RECORDED=False at line 87.",
+      "mechanism": "A function named and documented as recording exactly one result performs no durable write, so prose and behavior diverge; any downstream consumer trusting the name would believe a durable record exists when none does."
+    },
+    "CI-10": {
+      "finding_id": "CI-10",
+      "severity": "MEDIUM",
+      "classification": "PROCESS_LOCAL_ONLY",
+      "reachability": "BRANCH_ONLY",
+      "reachability_note": "BRANCH_ONLY on unmerged PR #241; not present on master and not canonicalized.",
+      "file": "PR #241 candidate d181d12096e19c1dbe2f89585e73b8f8f7b6b21f",
+      "line_evidence": "module-local _RECORDS dict plus lock implements exactly-once record/replay purely in process memory.",
+      "mechanism": "Exactly-once semantics backed only by a module-global dict and lock cannot survive restart, a new process, or a second independent worker, so any exactly-once claim made on that basis is false across process boundaries."
+    },
+    "CI-11": {
+      "finding_id": "CI-11",
+      "severity": "MEDIUM",
+      "classification": "SEMANTIC_BYPASS",
+      "reachability": "ON_MASTER_LATENT",
+      "file": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_real_capable_wrapper_v1.py",
+      "line_evidence": "lines 196-205 import the private _assemble_incremental_forecast_evaluation from the frozen executor module, bypassing the guarded public entrypoint run_incremental_forecast_evaluation.",
+      "mechanism": "Importing the private assembly turns the unguarded CI-1 seam into a live integration path for any future caller of the wrapper, which is why the private-import policy and the wrapper's frozen fail-closed disposition are load-bearing in this decision."
+    },
+    "CI-23": {
+      "finding_id": "CI-23",
+      "severity": "HIGH",
+      "classification": "CALLER_ASSERTED_PROVENANCE",
+      "reachability": "BRANCH_ONLY",
+      "reachability_note": "BRANCH_ONLY on unmerged PR #241; NOT present on master and not canonicalized.",
+      "file": "PR #241 candidate d181d12096e19c1dbe2f89585e73b8f8f7b6b21f (ForecastRowBatch.from_offline_synthetic_rows)",
+      "line_evidence": "ForecastRowBatch.from_offline_synthetic_rows classifies rows as synthetic unconditionally, independent of actual row origin.",
+      "mechanism": "Unconditional synthetic classification is provenance laundering: a batch constructor stamp outranks row reality, so real rows entering through that constructor are relabeled synthetic and pass the mode gate."
+    }
+  },
+  "reuse_preflight": {
+    "REUSE_PREFLIGHT": "REQUIRED",
+    "PROJECT_CODE_REFERENCE_MATCHES": [
+      {"project_id": "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_EXECUTION_IMPLEMENTATION_V0", "project_state": "CLOSED_PASS"},
+      {"project_id": "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_ONE_SHOT_SCIENTIFIC_EXECUTION_AUTHORIZATION_V0", "project_state": "CLOSED_BLOCKED"},
+      {"project_id": "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_PREREGISTRATION_V0", "project_state": "CLOSED_PASS"},
+      {"project_id": "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_PRE_EXECUTION_INTEGRITY_V0", "project_state": "CLOSED_PASS"},
+      {"project_id": "JIGSAW_FUNDING_PRESSURE_INCREMENTAL_FORECAST_VALUE_REAL_EXECUTION_CONSUMER_SEAM_IMPLEMENTATION_AUTHORIZATION_V0", "project_state": "CLOSED_BLOCKED"},
+      {"project_id": "FUNDING_INCREMENTAL_REAL_EXECUTION_CONSUMER_SEAM_SUCCESSOR_IMPLEMENTATION_V0", "project_state": "CLOSED_BLOCKED"}
+    ],
+    "PROJECT_CODE_REFERENCE_NOTE": "These are evidence that project state references paths, not recommendations or capability claims; the projection is partial and absence from it does not imply absence from the repository.",
+    "PROJECTION_TRUNCATED": "YES",
+    "PROJECTION_NOTE": "brief reported CONTEXT_PARTIAL; the full spine projection (python -m qntylab.project_context spine, 149 projects in project_code_reference projection) was used instead.",
+    "BOUNDED_SEARCH": [
+      "python -m qntylab.project_context spine",
+      "git ls-files | grep -iE 'funding_incremental|incremental_forecast_value'",
+      "grep -rn 'contract_integrity_hardening' qntylab/ tests/  # exit 1, zero matches: no existing hardening implementation to reuse"
+    ],
+    "CANDIDATES_INSPECTED": [
+      "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/real_execution_consumer_seam_successor_decision_v0/decision.json",
+      "docs/state/projects.toml (successor decision entry, lines 4785-4861)",
+      "tests/test_funding_incremental_real_execution_consumer_seam_successor_decision_v0.py",
+      "qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py",
+      "qntylab/jigsaw_funding_pressure_incremental_forecast_value_real_capable_wrapper_v1.py",
+      "qntylab/jigsaw_funding_pressure_incremental_forecast_value_synthetic_wrapper_v1.py",
+      "qntylab/jigsaw_funding_pressure_incremental_forecast_value_evaluation_authorization_provenance_v1.py",
+      "qntylab/jigsaw_funding_pressure_execution_foundation_v0.py",
+      "qntylab/research_ledger.py",
+      "qntylab/project_context.py",
+      "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/report.md",
+      "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/raw/contract_findings.json"
+    ],
+    "DISPOSITION": "REUSE"
+  },
+  "positive_controls_reuse": {
+    "CI-3": {
+      "finding_id": "CI-3",
+      "reuse": "YES",
+      "source": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_evaluation_authorization_provenance_v1.py",
+      "what_is_reused": "The authorization authentication model: canonical Git-backed authorization provenance where canonical_authorization_exists() returns False today and the path fails closed; the successor reuses this authentication pattern for execution authority.",
+      "what_is_not_reused": "No claim that a canonical authorization artifact exists; none does today, and authority stays fail-closed."
+    },
+    "CI-4": {
+      "finding_id": "CI-4",
+      "reuse": "YES",
+      "source": "qntylab/jigsaw_funding_pressure_execution_foundation_v0.py (verified-evidence baseline, lines 272-303)",
+      "what_is_reused": "The verified-evidence digest reconciliation pattern: provenance established by reconciling digests against authenticated canonical receipts or Git-authenticated authorization, never by caller declaration.",
+      "what_is_not_reused": "Any live scientific evidence production; the pattern is reused structurally only."
+    },
+    "CI-6": {
+      "finding_id": "CI-6",
+      "reuse": "YES",
+      "source": "qntylab/jigsaw_funding_pressure_execution_foundation_v0.py (claim_authorization_once at lines 873-888, AtMostOnceClaimTransport at line 852, GitHubRestRemoteClaimTransport at line 967)",
+      "what_is_reused": "AtMostOnceClaimTransport semantics and durable git-ref claim machinery as the durability pattern for any exactly-once claim in the successor.",
+      "transport_restriction": "P0 hardening tests use local durable stores plus subprocesses only: NO network, NO GitHub transport calls, NO token use, NO remote git-ref writes.",
+      "what_is_not_reused": "The concrete GitHub REST transport is not exercised in this governance-only phase."
+    },
+    "CI-8": {
+      "finding_id": "CI-8",
+      "reuse": "NO",
+      "source": "qntylab/research_ledger.py",
+      "non_reuse_rationale": "The append-only research ledger implements candidate-lifecycle semantics only (CANDIDATE_PROPOSED, CANDIDATE_REOPENED, DECISION_RECORDED). It has NO scientific-result-recording claim semantics, so it must NOT be auto-reused for scientific result persistence. If the later implementation phase needs durable result recording, it must build the record semantics required by successor_contract_requirements.RESULT_RECORDING_MUST_RECORD on the CI-6 durability pattern, not by overloading ledger candidate lifecycle."
+    }
+  },
+  "options": [
+    {
+      "option_id": "OPTION_A_FREEZE_BREAKING_IN_PLACE_MUTATION",
+      "disposition": "REJECT",
+      "reason": "Mutating frozen V0 in place breaks the byte/hash-bound historical oracle: the executor's digest embeds governing_preregistration_digest and the static NO_REAL_EXECUTION_ATTESTATION map, so any byte change silently rewrites what historical results mean. The forensic audit marks V0 semantics frozen, and frozen_v0_policy.executor_v0_mutable=false forbids it."
+    },
+    {
+      "option_id": "OPTION_B_PRESERVE_FROZEN_V0_ORACLE_VERSIONED_HARDENED_SUCCESSOR",
+      "disposition": "SELECT",
+      "reason": "A new versioned hardened evaluation boundary preserves frozen V0 bytes as the immutable scientific oracle while adding structural provenance, authority-vs-provenance-vs-mode separation, and honest durability semantics at a separately governed boundary. OPTION_C's wrapper disposition is folded in: the real-capable wrapper v1 becomes HISTORICAL_FAIL_CLOSED_FROZEN and its future-facing responsibilities transfer to the successor."
+    },
+    {
+      "option_id": "OPTION_C_REAL_CAPABLE_WRAPPER_RETIREMENT_ONLY",
+      "disposition": "REJECT_AS_SOLE_ARCHITECTURE",
+      "reason": "Retiring the real-capable wrapper alone leaves the CI-1 latent private seam on master unaddressed and closes neither CI-2 (string-only provenance) nor CI-7 (recording that records nothing); there is no hardened boundary left standing. The wrapper disposition (HISTORICAL_FAIL_CLOSED_FROZEN) is adopted, but only as a component of OPTION_B, never as the whole architecture."
+    }
+  ],
+  "rejected_architectures": [
+    {
+      "architecture_id": "OPTION_A_FREEZE_BREAKING_IN_PLACE_MUTATION",
+      "rejection": "Violates frozen_v0_policy; a mutated oracle invalidates every digest bound to historical V0 evidence."
+    },
+    {
+      "architecture_id": "OPTION_C_REAL_CAPABLE_WRAPPER_RETIREMENT_ONLY",
+      "rejection": "As sole architecture it leaves CI-1 (latent private seam), CI-2 (caller-asserted mode-string provenance), and CI-7 (no-op result recording) unaddressed with no hardened boundary."
+    },
+    {
+      "architecture_id": "PR241_RESURRECTION",
+      "rejection": "PR #241 is a failed historical candidate with two blocking hostile-review findings (SYNTHETIC_PROVENANCE_LAUNDERING = CI-23, EXACTLY_ONCE_IS_PROCESS_LOCAL = CI-10), never merged and not an ancestor of master; see pr241_policy."
+    }
+  ],
+  "frozen_v0_policy": {
+    "executor_v0_mutable": false,
+    "path": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py",
+    "sha256": "1ffcfeb959cfc547fcda96384c1c8f58b3f5cbc174c5d535324480ede312e8c6",
+    "classification": "HISTORICAL_FROZEN_SCIENTIFIC_ORACLE",
+    "byte_identity_test_required": true,
+    "private_import_policy": "NO new runtime imports of _assemble_incremental_forecast_evaluation; permitted ONLY inside the defining frozen V0 module, inside hash-pinned frozen exception modules, inside tests/, and inside docs/forensics/ audit artifacts",
+    "frozen_exception_modules": [
+      {
+        "path": "qntylab/jigsaw_funding_pressure_incremental_forecast_value_real_capable_wrapper_v1.py",
+        "sha256": "b0d30af9f6def297c23981c554d6c2224ff1736a491db009a9d8ce7fcc9a9b2e",
+        "disposition": "HISTORICAL_FAIL_CLOSED_FROZEN",
+        "activation_condition": "NONE under this decision; any future activation requires a separate governance phase that removes the private-assembly import"
+      }
+    ],
+    "binding_evidence": "V0 bytes bind the historical scientific oracle: executor V0 digest embeds governing_preregistration_digest + NO_REAL_EXECUTION_ATTESTATION; existing test suite tests/test_jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py exercises current bytes",
+    "distinction": "private function existing in frozen history does NOT authorize it as a future integration seam"
+  },
+  "authorized_implementation_surfaces": {
+    "allowed_add": [
+      "qntylab/jigsaw_funding_pressure_incremental_forecast_value_hardened_evaluation_boundary_v1.py",
+      "tests/test_funding_incremental_contract_integrity_hardening_invariants_v0.py (invariant suite; may be split into multiple tests/ files with the same name prefix)",
+      "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/contract_integrity_hardening_decision_v0/ artifacts"
+    ],
+    "allowed_modify": [
+      "docs/state/projects.toml (registration only)",
+      "docs/CURRENT_ROADMAP.md (via python -m qntylab.project_context render)"
+    ],
+    "forbidden": "ALL other qntylab/ runtime modules including executor_v0, synthetic_wrapper_v1, real_capable_wrapper_v1, evaluation_authorization_provenance_v1, execution_foundation_v0; all existing test files; docs/forensics/**; pyproject.toml; .github/** CI workflows; experiments/results/**"
+  },
+  "successor_contract_requirements": {
+    "PROVENANCE_IS_STRUCTURAL": "Synthetic/real/evidence classification is established ONLY by verified/provenanced row types produced by authenticated factories backed by canonical receipts or Git-authenticated authorization (CI-4 digest-reconciliation pattern, CI-3 authentication pattern). A consumer must be able to independently validate why rows have the declared provenance. A constructor name, boolean, enum, string, mode value, or caller statement alone can never establish provenance.",
+    "NO_PRIVATE_EXECUTION_BYPASS": "The hardened boundary MUST NOT import _assemble_incremental_forecast_evaluation. It reuses V0's pure scientific semantics ONLY through V0's guarded public entrypoint run_incremental_forecast_evaluation, called only after the boundary's own authority verification and structural-provenance verification succeed. The invariant scan enforces the private-import policy of frozen_v0_policy.",
+    "AUTHORITY_VS_PROVENANCE_VS_MODE_SEPARATION": "Three independent axes: (1) execution authority - require_authorized_execution_mode plus CI-3 authenticated canonical authorization; canonical_authorization_exists() is False today, so the path fails closed; (2) input provenance - verified row types from authenticated factories; (3) semantic evaluation mode - the mode string selects evaluation semantics only. execution_mode = SYNTHETIC_VALIDATION never proves input provenance. Result classification is derived from verified input provenance, never from the static NO_REAL_EXECUTION_ATTESTATION map; that map is a frozen-V0 historical attestation, never a live classification proof.",
+    "EXACTLY_ONCE_DURABILITY": "If the successor claims exactly-once, the identity/record mechanism must survive restart, a new process, and an independent second worker (durable store per the CI-6 pattern: remote git-ref claim or durable local append-only claim store). Process-local memory must NEVER be described as exactly-once; an honest weaker term is required (e.g. PROCESS_LOCAL_AT_MOST_ONCE). P0 may implement and test durable semantics with local durable stores and subprocesses only.",
+    "RESULT_RECORDING_MUST_RECORD": "Any function named or documented as recording a result must perform a durable observable write/claim. A durable record is an append-only record containing at minimum {claim_identity, claim_digest, result_digest, authorization_binding (canonical git identity), recorded_at_utc, outcome_state}, independently readable after the producing process exits. If durable recording is not implemented, the recording claim must be renamed or removed and no irreversible claim consumption may be exposed.",
+    "CLAIM_BEFORE_OUTCOME": "The sequence AUTHORIZATION VERIFIED -> IRREVERSIBLE CLAIM -> EVIDENCE AUTHENTICATED -> ROWS CONSTRUCTED -> SCIENTIFIC CORE -> RESULT RECORDED is preserved; no outcomes and no real rows may occur before a successful claim.",
+    "NO_REAL_EXECUTION_AUTHORITY": "Hardening is offline and non-scientific: synthetic fixtures and mocks only; real outcomes and the real-capable path stay deactivated."
+  },
+  "crash_contract": {
+    "BEFORE_CLAIM": {
+      "behavior": "No side effects; rerun is allowed; 0 rows constructed and 0 scientific core invocations.",
+      "observable": "REAL_ROWS_CONSTRUCTED=0, SCIENTIFIC_CORE_INVOCATIONS=0."
+    },
+    "AFTER_CLAIM_BEFORE_EVALUATION": {
+      "behavior": "Claim is durable; a rerun with the same identity fails closed (ALREADY_CLAIMED, no outcome produced); state is observable as CLAIMED_WITHOUT_OUTCOME; resumption requires explicit governance/operational reconciliation; NO automatic retry authority is ever invented.",
+      "observable": "claim store shows CLAIMED_WITHOUT_OUTCOME; no outcome record exists."
+    },
+    "AFTER_EVALUATION_BEFORE_RECORD": {
+      "behavior": "A rerun fails closed on the duplicate claim (no silent re-execution); recovery is manual reconciliation appending outcome evidence under the same identity together with a reconciliation record.",
+      "observable": "duplicate-identity rerun returns ALREADY_CLAIMED fail-closed; recovery path is explicit and auditable, never automatic."
+    },
+    "AFTER_RECORD_BEFORE_RETURN": {
+      "behavior": "The record is durable and independently observable; return-path failure is safe; duplicate identity observation is deterministic (RECORDED).",
+      "observable": "independent reader observes RECORDED with the original record fields."
+    },
+    "replay_rules": {
+      "same_identity_different_content": "deterministic CONFLICT, fail-closed; no record and no outcome.",
+      "same_identity_identical_content": "idempotent RECORDED; the original record identity is returned without a second record."
+    }
+  },
+  "required_invariants": {
+    "PROVENANCE_CONSTRUCTOR_HONESTY": {
+      "required": true,
+      "construction_rule": "Row provenance is established only by verified/provenanced row types from authenticated factories (CI-4 digest reconciliation, CI-3 authentication); constructors, names, booleans, enums, strings, modes, and caller statements cannot elevate unverified rows; adversarial tests feed arbitrary/unverified rows and prove refusal or non-elevation.",
+      "closes_test_gap_classes": ["MISSING_ADVERSARIAL_PROVENANCE_TEST", "FIXTURE_ASSUMES_CONTRACT", "OVERFIT_TO_IMPLEMENTATION"]
+    },
+    "EXECUTION_MODE_IS_NOT_PROVENANCE": {
+      "required": true,
+      "construction_rule": "execution_mode selects evaluation semantics only; mode strings, including SYNTHETIC_VALIDATION, never prove input provenance; result classification derives from verified input provenance, never from the static NO_REAL_EXECUTION_ATTESTATION map (frozen-V0 historical attestation only).",
+      "closes_test_gap_classes": ["MISSING_ADVERSARIAL_PROVENANCE_TEST"]
+    },
+    "PRIVATE_EXECUTION_SEAM_FORBIDDEN": {
+      "required": true,
+      "construction_rule": "The hardened boundary must not import _assemble_incremental_forecast_evaluation; reuse of V0 semantics goes only through the guarded public entrypoint run_incremental_forecast_evaluation; the invariant scan enforces frozen_v0_policy.private_import_policy with tests/ and docs/forensics/ exempt.",
+      "closes_test_gap_classes": ["MISSING_CROSS_BOUNDARY_TEST"]
+    },
+    "AUTHORITY_FAILURE_PRECEDES_ROWS": {
+      "required": true,
+      "construction_rule": "Execution authority is verified (require_authorized_execution_mode plus CI-3 authenticated canonical authorization; canonical_authorization_exists() False today means fail closed) before any row is constructed or any core computation runs; failed/missing authorization yields zero observable science.",
+      "closes_test_gap_classes": ["MISSING_NEGATIVE_AUTHORITY_TEST"]
+    },
+    "EXACTLY_ONCE_PROCESS_BOUNDARY": {
+      "required": true,
+      "construction_rule": "If exactly-once is claimed, the claim mechanism must survive restart and a new process, proven with real subprocess restart tests against a durable store (CI-6 pattern); process-local memory may only be described with an honest weaker term such as PROCESS_LOCAL_AT_MOST_ONCE.",
+      "closes_test_gap_classes": ["MISSING_RESTART_TEST", "MISSING_CROSS_BOUNDARY_TEST"]
+    },
+    "EXACTLY_ONCE_SECOND_WORKER": {
+      "required": true,
+      "construction_rule": "An independent second worker (real multiprocessing) observing the same claim identity must fail closed rather than double-record, proven against a durable store (CI-6 pattern).",
+      "closes_test_gap_classes": ["MISSING_MULTIPROCESS_TEST", "MISSING_CROSS_BOUNDARY_TEST"]
+    },
+    "CONFLICTING_REPLAY_FAILS_CLOSED": {
+      "required": true,
+      "construction_rule": "Same claim identity with different content yields deterministic CONFLICT and no record; same identity with identical content is idempotent RECORDED; no ambiguous partial states.",
+      "closes_test_gap_classes": ["MISSING_CROSS_BOUNDARY_TEST"]
+    },
+    "RESULT_RECORD_IS_DURABLE": {
+      "required": true,
+      "construction_rule": "Result recording performs a durable observable append-only write with at minimum {claim_identity, claim_digest, result_digest, authorization_binding, recorded_at_utc, outcome_state}, independently readable after the producing process exits; otherwise the recording claim is renamed/removed and no irreversible claim consumption is exposed (CI-7 lesson).",
+      "closes_test_gap_classes": ["MISSING_CROSS_BOUNDARY_TEST", "MISSING_RESTART_TEST"]
+    },
+    "FROZEN_V0_BYTES_UNCHANGED": {
+      "required": true,
+      "construction_rule": "sha256(qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py) == 1ffcfeb959cfc547fcda96384c1c8f58b3f5cbc174c5d535324480ede312e8c6 and sha256(qntylab/jigsaw_funding_pressure_incremental_forecast_value_real_capable_wrapper_v1.py) == b0d30af9f6def297c23981c554d6c2224ff1736a491db009a9d8ce7fcc9a9b2e are asserted in the invariant suite.",
+      "closes_test_gap_classes": ["ASSERTION_TOO_WEAK"]
+    },
+    "NO_PROCESS_LOCAL_PERSISTENCE_STATE": {
+      "required": true,
+      "construction_rule": "No module-global dict/lock may back claimed-durable persistence (CI-10 lesson); any persistence described as durable must live in a durable store that survives process boundaries.",
+      "closes_test_gap_classes": ["MISSING_RESTART_TEST", "MISSING_MULTIPROCESS_TEST"]
+    },
+    "RESULT_RECORDING_PROSE_MATCHES_BEHAVIOR": {
+      "required": true,
+      "construction_rule": "Docstrings and step claims must match implemented behavior: a function claiming to record must record durably, and one that does not must not claim to (CI-7 lesson: _record_exactly_one_result computed a digest and discarded it).",
+      "closes_test_gap_classes": ["ASSERTION_TOO_WEAK", "MISSING_ADVERSARIAL_PROVENANCE_TEST"]
+    },
+    "AUTHORITY_FAILURE_ZERO_OBSERVABLE_SCIENCE": {
+      "required": true,
+      "construction_rule": "Failed or missing authorization yields REAL_ROWS_CONSTRUCTED=0 and SCIENTIFIC_CORE_INVOCATIONS=0; authority-failure tests must count rows constructed and core invocations, not merely assert an exception type (HAPPY_PATH_ONLY_TEST_SMELL guard).",
+      "closes_test_gap_classes": ["MISSING_NEGATIVE_AUTHORITY_TEST", "ASSERTION_TOO_WEAK"]
+    }
+  },
+  "required_tests": {
+    "suite": "tests/test_funding_incremental_contract_integrity_hardening_invariants_v0.py (or same-prefix split files) added by the LATER implementation phase FUNDING_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_IMPLEMENTATION_V0",
+    "coverage_rule": "Every invariant in required_invariants must be covered at invariant level, not by happy-path phase tests; a HAPPY_PATH_ONLY_TEST_SMELL guard requires negative paths for the adversarial, weak-assertion, and overfit gap classes.",
+    "frozen_byte_tests": "A FROZEN_V0_BYTES_UNCHANGED test asserts sha256(executor_v0) == 1ffcfeb959cfc547fcda96384c1c8f58b3f5cbc174c5d535324480ede312e8c6 and sha256(real_capable_wrapper_v1) == b0d30af9f6def297c23981c554d6c2224ff1736a491db009a9d8ce7fcc9a9b2e, computed live via hashlib.",
+    "boundary_tests": "Boundary/durability tests must use real subprocesses and multiprocessing against durable local stores; NO network, NO GitHub transport calls, NO token use (CI-6 pattern, local-durable variant only).",
+    "adversarial_provenance_tests": "Adversarial provenance tests feed arbitrary/unverified rows to constructors and prove refusal or non-elevation; they must not rely on fixture assumptions the production path does not enforce (FIXTURE_ASSUMES_CONTRACT guard).",
+    "authority_failure_tests": "Authority-failure tests must count rows constructed and scientific core invocations and assert both are zero.",
+    "scan_exemptions": "tests/ and docs/forensics/ are exempt from the private-import scan per frozen_v0_policy.private_import_policy."
+  },
+  "acceptance_criteria": {
+    "1_frozen_v0_mutable": "NO. frozen_v0_policy.executor_v0_mutable=false; byte identity is hash-pinned and tested.",
+    "2_authorized_surfaces": "Exactly authorized_implementation_surfaces.allowed_add/allowed_modify; everything in forbidden is off-limits.",
+    "3_provenance": "Structural verified row types produced by authenticated factories backed by canonical receipts or Git-authenticated authorization (CI-4 digest reconciliation, CI-3 authentication); constructor names/booleans/enums/strings/modes/caller statements never establish provenance.",
+    "4_axis_separation": "Execution authority, input provenance, and semantic evaluation mode are three independent axes per successor_contract_requirements.AUTHORITY_VS_PROVENANCE_VS_MODE_SEPARATION; mode never proves provenance; classification never derives from the static NO_REAL_EXECUTION_ATTESTATION map.",
+    "5_private_reuse": "Prohibited via the invariant scan enforcing frozen_v0_policy.private_import_policy plus the frozen hash pins; the boundary calls only run_incremental_forecast_evaluation.",
+    "6_exactly_once_durability": "Either process-boundary-surviving durable claims (CI-6 pattern: remote git-ref or durable local append-only store) or an honest weaker term (e.g. PROCESS_LOCAL_AT_MOST_ONCE); process-local state is never described as durable exactly-once.",
+    "7_durable_record": "The minimum-field append-only record {claim_identity, claim_digest, result_digest, authorization_binding, recorded_at_utc, outcome_state}, independently observable after producer exit; otherwise the recording claim is renamed/removed.",
+    "8_crash_behavior": "Exactly crash_contract: four windows with the stated fail-closed/reconciliation semantics plus the two replay rules (CONFLICT fail-closed; identical replay idempotent RECORDED).",
+    "9_mandatory_invariants": "All invariants in required_invariants (the 9 mandated plus NO_PROCESS_LOCAL_PERSISTENCE_STATE, RESULT_RECORDING_PROSE_MATCHES_BEHAVIOR, AUTHORITY_FAILURE_ZERO_OBSERVABLE_SCIENCE), each with required=true and tested at invariant level.",
+    "10_unauthorized_scope": "Everything in explicit_non_authorizations is not authorized by this decision.",
+    "11_pr241": "PR #241 is a failed historical candidate, never merged, not an ancestor of master (verified exit 1); all four pr241_policy authorities are NONE; see pr241_policy.",
+    "12_phase_counts": "Exactly 1 later implementation phase (FUNDING_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_IMPLEMENTATION_V0) and 0 scientific evaluation phases are authorized."
+  },
+  "acceptance_gates": [
+    "python -m qntylab.project_context doctor --strict passes.",
+    "python -m qntylab.project_context render --check passes (CURRENT_ROADMAP.md is the deterministic projection).",
+    "Focused governance tests (this decision test plus tests/test_project_context_v0.py) are green.",
+    "sha256(qntylab/jigsaw_funding_pressure_incremental_forecast_value_executor_v0.py) == 1ffcfeb959cfc547fcda96384c1c8f58b3f5cbc174c5d535324480ede312e8c6 (V0 hash unchanged).",
+    "PR #241 candidate d181d12096e19c1dbe2f89585e73b8f8f7b6b21f remains unmerged and not an ancestor of master.",
+    "The diff is limited to authorized surfaces: this decision directory, its test file, one projects.toml registration entry, and the generated docs/CURRENT_ROADMAP.md."
+  ],
+  "kill_criteria": [
+    "Silently modifying frozen V0 without full binding analysis.",
+    "Treating mode strings as provenance.",
+    "Describing process-local state as durable exactly-once.",
+    "Caller-created synthetic classification (provenance laundering, CI-23 lesson).",
+    "Continued active use of private executor assembly as a supported seam (CI-1/CI-11 lesson).",
+    "Irreversible claim consumption without a defined result-recording/crash contract.",
+    "Repairing or merging PR #241 as the implementation.",
+    "Real data, outcome, or provider access.",
+    "Scientific evaluation.",
+    "Router, Qnty, QntySpot, trading, or capital authority.",
+    "Context, CI, or deletion scope creep (projects.toml split, CI modularization, pyproject.toml changes, P3 deletions, Git LFS/artifact storage, repo renaming)."
+  ],
+  "explicit_non_authorizations": [
+    "P1 context packet implementation.",
+    "docs/state/projects.toml split.",
+    "P2 CI modularization.",
+    "pyproject.toml changes.",
+    "P3 deletions.",
+    "Wrapper-family cleanup unrelated to the P0 hardening boundary.",
+    "P4 data migration.",
+    "Git LFS or artifact storage changes.",
+    "General repository renaming.",
+    "Scientific strategy work.",
+    "Real-data, outcome, or provider access.",
+    "Claim consumption.",
+    "Real-capable path activation.",
+    "Router, Qnty, QntySpot, trading, capital, deployment, or live execution authority."
+  ],
+  "pr241_policy": {
+    "merge_authority": "NONE",
+    "repair_authority": "NONE",
+    "rereview_authority": "NONE",
+    "cherrypick_whole_commit_authority": "NONE",
+    "status": "HISTORICAL_FAILED_CANDIDATE_EVIDENCE",
+    "candidate_commit": "d181d12096e19c1dbe2f89585e73b8f8f7b6b21f",
+    "ancestor_of_master": false,
+    "reuse_rule": "individual ideas may be independently re-derived only if they satisfy this decision; no reuse authorized merely because code exists on PR #241"
+  },
+  "review_lifecycle": {
+    "policy": "NORMAL_BOUNDED_COMPLETION_NOT_TERMINAL_ONE_REVIEW",
+    "stages": [
+      "IMPLEMENT_GOVERNANCE_DECISION",
+      "TEST_GOVERNANCE_ARTIFACTS",
+      "ONE_INDEPENDENT_HOSTILE_REVIEW",
+      "OPTIONAL_BOUNDED_REPAIR_PLUS_ONE_TARGETED_REREVIEW_FOR_CRITICAL_HIGH",
+      "CLOSED_PASS_OR_CLOSED_BLOCKED"
+    ],
+    "current_stage": "CLOSED_PASS_OR_CLOSED_BLOCKED",
+    "critical_high_rereviews_used": 0,
+    "hostile_review_verdict": "NO_CRITICAL_OR_HIGH_DEFECTS",
+    "hostile_review_record": "The independent hostile review and its verdict are recorded in this conversation's Phase 7 attempt_completion.",
+    "findings_summary": "F-001 Medium mechanical state-flip; F-002/F-003/F-004 Low advisories, none blocking"
+  },
+  "one_review_lifecycle": {
+    "review_count": 1,
+    "review_type": "single independent hostile review of this governance decision",
+    "allowed_states": ["OPEN_INDEPENDENT_HOSTILE_REVIEW", "CLOSED_PASS", "CLOSED_BLOCKED"],
+    "terminal_rule": "One independent hostile review decides CLOSED_PASS or CLOSED_BLOCKED; only critical/high findings permit the optional bounded repair plus one targeted rereview recorded in review_lifecycle.critical_high_rereviews_used.",
+    "new_work_rule": "Any change to identity, scope, authority, or a killed gate requires a new separately governed decision."
+  },
+  "canonical_predecessor": {
+    "decision_path": "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/real_execution_consumer_seam_successor_decision_v0/decision.json",
+    "decision_state": "CLOSED_PASS",
+    "note": "The canonical predecessor decision (real-execution consumer seam successor decision V0) closed CLOSED_PASS and authorized the successor implementation that failed its single hostile review (PR #241, CLOSED_BLOCKED). This decision cites it as precedent; it does not reopen, amend, or replace it.",
+    "research_candidate": {
+      "candidate_id": "CANDIDATE_FUNDING_PRESSURE_INCREMENTAL_RV_FORECAST_VALUE_V0",
+      "state": "BLOCKED",
+      "revisit_condition_unchanged": true,
+      "revisit_condition": "Only a separate Git-backed evaluation authorization may assess the frozen A protocol. Do not convert the prior-exposed 610 observations into sealed or confirmatory evidence, change the primary predictor/baseline/horizon/loss/HAC/materiality rule, access the JH01 operation ledger, reopen Order Flow, or create Router/Qnty/trading authority."
+    }
+  },
+  "next_action": "CLOSED_PASS: one later bounded implementation phase FUNDING_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_IMPLEMENTATION_V0 is authorized; execute it as a separate governance-compliant implementation task within authorized_implementation_surfaces after this decision PR merges; do not begin it inside this decision task.",
+  "verify_receipts": {
+    "canonical_head_sha256_verified": "74e6edd0bbb51b98f92eb0c5ece881599e0f7d05",
+    "git_rev_parse_head": "74e6edd0bbb51b98f92eb0c5ece881599e0f7d05",
+    "branch": "governance/funding-incremental-contract-integrity-hardening-decision-v0",
+    "pr241_ancestor_check": {
+      "command": "git merge-base --is-ancestor d181d12096e19c1dbe2f89585e73b8f8f7b6b21f master",
+      "exit_code": 1,
+      "interpretation": "PR #241 candidate commit is NOT an ancestor of master"
+    },
+    "executor_v0_sha256": "1ffcfeb959cfc547fcda96384c1c8f58b3f5cbc174c5d535324480ede312e8c6",
+    "real_capable_wrapper_v1_sha256": "b0d30af9f6def297c23981c554d6c2224ff1736a491db009a9d8ce7fcc9a9b2e",
+    "doctor_strict": "ok (verified in Phase 0 of the parent governance task at canonical parent 74e6edd0bbb51b98f92eb0c5ece881599e0f7d05)",
+    "research_ledger_context": "CANDIDATE_FUNDING_PRESSURE_INCREMENTAL_RV_FORECAST_VALUE_V0 listed under blocked variants with revisit condition unchanged"
+  }
+}

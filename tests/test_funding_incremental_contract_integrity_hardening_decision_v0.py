@@ -147,6 +147,45 @@ def test_kill_criteria_and_non_authorizations_scope() -> None:
     assert "executor_v0" in decision["authorized_implementation_surfaces"]["forbidden"]
 
 
+HOSTILE_REVIEW_RECORD_PATH = (
+    "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/"
+    "contract_integrity_hardening_decision_v0/hostile_review.md"
+)
+FORBIDDEN_EPHEMERAL_SUBSTRINGS = ("conversation", "attempt_completion", "this chat", "chat history")
+
+
+def test_hostile_review_evidence_is_durable_and_ephemeral_refs_absent() -> None:
+    decision = _decision()
+    review_lifecycle = decision["review_lifecycle"]
+
+    # Durable receipt: the record points at the in-repo hostile review file, which exists.
+    assert review_lifecycle["hostile_review_record"] == HOSTILE_REVIEW_RECORD_PATH
+    assert (ROOT / HOSTILE_REVIEW_RECORD_PATH).is_file()
+
+    # Durability flag recorded adjacent to the review record.
+    assert review_lifecycle["hostile_review_evidence_durable"] is True
+
+    # No ephemeral conversation references anywhere in the serialized decision artifact.
+    serialized = DECISION_PATH.read_bytes().decode("utf-8").lower()
+    for forbidden in FORBIDDEN_EPHEMERAL_SUBSTRINGS:
+        assert forbidden not in serialized
+
+    # Review lifecycle closure with no Critical/High rereview consumed.
+    assert review_lifecycle["critical_high_rereviews_used"] == 0
+    assert review_lifecycle["hostile_review_verdict"] == "NO_CRITICAL_OR_HIGH_DEFECTS"
+
+
+def test_frozen_and_authority_invariance() -> None:
+    decision = _decision()
+
+    assert decision["frozen_v0_policy"]["executor_v0_mutable"] is False
+    pr241 = decision["pr241_policy"]
+    assert pr241["merge_authority"] == "NONE"
+    assert pr241["repair_authority"] == "NONE"
+    assert pr241["rereview_authority"] == "NONE"
+    assert pr241["cherrypick_whole_commit_authority"] == "NONE"
+
+
 def test_registry_record_mirrors_decision_and_roadmap_renders() -> None:
     decision = _decision()
     record = _record(PROJECT_ID)

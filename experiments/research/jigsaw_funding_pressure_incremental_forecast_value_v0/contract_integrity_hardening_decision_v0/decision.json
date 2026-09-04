@@ -403,7 +403,8 @@
     "current_stage": "CLOSED_PASS_OR_CLOSED_BLOCKED",
     "critical_high_rereviews_used": 0,
     "hostile_review_verdict": "NO_CRITICAL_OR_HIGH_DEFECTS",
-    "hostile_review_record": "The independent hostile review and its verdict are recorded in this conversation's Phase 7 attempt_completion.",
+    "hostile_review_record": "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/contract_integrity_hardening_decision_v0/hostile_review.md",
+    "hostile_review_evidence_durable": true,
     "findings_summary": "F-001 Medium mechanical state-flip; F-002/F-003/F-004 Low advisories, none blocking"
   },
   "one_review_lifecycle": {

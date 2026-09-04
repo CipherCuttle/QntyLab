@@ -4950,7 +4950,7 @@ authoritative_artifacts = [
   "tests/test_funding_incremental_contract_integrity_hardening_decision_v0.py",
 ]
 decision_artifact = "experiments/research/jigsaw_funding_pressure_incremental_forecast_value_v0/contract_integrity_hardening_decision_v0/decision.json"
-decision_artifact_sha256 = "1c3af2775718180b140c1c25881723bedbd994cd6f33fd7c9f4f3dbf2a735b4f"
+decision_artifact_sha256 = "712cda5d4e82414ab095deecabaa7d2af054bc7b97ab5cbd394c9fdbeda32a23"
 canonical_parent = "74e6edd0bbb51b98f92eb0c5ece881599e0f7d05"
 forensic_audit_identity = "QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0"
 forensic_audit_commit = "74e6edd0bbb51b98f92eb0c5ece881599e0f7d05"

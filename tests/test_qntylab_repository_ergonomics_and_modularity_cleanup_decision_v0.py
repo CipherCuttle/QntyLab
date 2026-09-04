@@ -71,17 +71,9 @@ def test_decision_identity_and_open_review_state() -> None:
     assert record["phase_type"] == decision["phase_type"] == "GOVERNANCE_ONLY"
     assert record["governance_only"] is True
     assert decision["governance_only"] is True
-    # Registry `state` uses the canonical validator vocabulary (qntylab/project_context.py
-    # PROJECT_STATES); the review lifecycle vocabulary lives in decision_state, which the
-    # registry validator does not constrain.
-    assert record["state"] == "PLANNED_NOT_AUTHORIZED"
-    assert (
-        record["decision_state"]
-        == decision["decision_state"]
-        == "READY_FOR_TARGETED_CRITICAL_HIGH_REREVIEW"
-    )
-    assert decision["decision_state"] == decision["state"] == "READY_FOR_TARGETED_CRITICAL_HIGH_REREVIEW"
-    assert decision["state"] != "CLOSED_PASS"
+    assert record["state"] == "CLOSED_PASS"
+    assert record["decision_state"] == decision["decision_state"] == "CLOSED_PASS"
+    assert decision["decision_state"] == decision["state"] == "CLOSED_PASS"
     assert decision["authority"] == "CANONICAL_QNTYLAB_GIT_IDENTITY_GOVERNANCE_ONLY"
     assert decision["canonical_parent"] == CANONICAL_PARENT
     assert decision["forensic_audit_identity"] == FORENSIC_AUDIT_IDENTITY
@@ -277,10 +269,15 @@ def test_registry_entry_consistency() -> None:
         "downstream_authority",
     ):
         assert record[field] == "NONE"
-    assert record["review_lifecycle_current_stage"] == "READY_FOR_TARGETED_CRITICAL_HIGH_REREVIEW"
+    assert record["review_lifecycle_current_stage"] == "CLOSED"
+    assert record["hostile_review_count"] == 1
+    assert record["bounded_repair_used"] is True
     assert record["targeted_rereview_required"] is True
-    assert record["critical_high_rereviews_used"] == 0
-    assert record["next_action"] == "ONE_TARGETED_REREVIEW_OF_P1_A_AND_P1_B"
+    assert record["targeted_rereview_used"] is True
+    assert record["critical_high_rereviews_used"] == 1
+    assert record["unresolved_critical"] == 0
+    assert record["unresolved_high"] == 0
+    assert record["next_action"] == "IMPLEMENT_QNTYLAB_AGENT_CONTEXT_PACKET_V0"
     assert record["canonical_parent"] == decision["canonical_parent"] == CANONICAL_PARENT
 
 
@@ -339,8 +336,29 @@ EXPECTED_HOSTILE_REVIEW = {
     "P1_B_THREAD": "PRRT_kwDOTo27Xs6fdZ16",
     "BOUNDED_REPAIR_USED": True,
     "TARGETED_REREVIEW_REQUIRED": True,
-    "TARGETED_REREVIEW_USED": False,
-    "STATE": "REPAIR_COMPLETE_AWAITING_TARGETED_REREVIEW",
+    "TARGETED_REREVIEW_USED": True,
+    "TARGETED_REREVIEW": {
+        "TARGETED_REREVIEW_EVIDENCE_TYPE": "CODEX_NO_SUGGESTIONS_PR_REACTION",
+        "TARGETED_REREVIEW_CANDIDATE": "11fec95f128fb77474ec5dfc1db4741db1d8f9af",
+        "TARGETED_REREVIEW_REQUEST_COMMENT_ID": 5547555705,
+        "TARGETED_REREVIEW_REQUESTED_AT": "2026-09-04T23:19:12Z",
+        "TARGETED_REREVIEW_TYPE": "CODEX_NO_SUGGESTIONS_PR_REACTION",
+        "CODEX_REACTION": "+1",
+        "CODEX_REACTION_ID": 489574661,
+        "CODEX_REACTION_AT": "2026-09-04T23:21:24Z",
+        "CODEX_REACTION_ACTOR": "chatgpt-codex-connector[bot]",
+        "FORMAL_REVIEW_OBJECT_INVENTED": False,
+        "FORMAL_REREVIEW_ID": None,
+        "NEW_CRITICAL": 0,
+        "NEW_HIGH": 0,
+        "P1_A_CLEARED": True,
+        "P1_B_CLEARED": True,
+        "TARGETED_REREVIEW_PASS": True,
+    },
+    "UNRESOLVED_CRITICAL": 0,
+    "UNRESOLVED_HIGH": 0,
+    "FINAL_REVIEW_DISPOSITION": "CLOSED_PASS",
+    "STATE": "CLOSED_PASS",
 }
 
 
@@ -417,32 +435,134 @@ def test_hostile_review_receipt() -> None:
     assert receipt == EXPECTED_HOSTILE_REVIEW
 
 
-def test_decision_state_awaiting_rereview() -> None:
+def test_decision_state_closed_pass() -> None:
     decision = _decision()
     review_lifecycle = decision["review_lifecycle"]
 
-    assert review_lifecycle["current_stage"] == "READY_FOR_TARGETED_CRITICAL_HIGH_REREVIEW"
-    assert review_lifecycle["targeted_rereview_used"] is False
-    assert review_lifecycle["bounded_repair_used"] is True
+    # DECISION_STATE_CLOSED_PASS = YES
+    assert decision["state"] == "CLOSED_PASS"
+    assert decision["decision_state"] == "CLOSED_PASS"
+    # GOVERNANCE_REVIEW_CLOSED = YES
+    assert review_lifecycle["current_stage"] == "CLOSED"
+    # HOSTILE_REVIEW_COUNT = 1
     assert review_lifecycle["hostile_review_count"] == 1
+    # BOUNDED_REPAIR_USED = YES
+    assert review_lifecycle["bounded_repair_used"] is True
+    # TARGETED_REREVIEW_USED = YES
+    assert review_lifecycle["targeted_rereview_used"] is True
+    assert review_lifecycle["critical_high_rereviews_used"] == 1
     assert review_lifecycle["original_critical_count"] == 0
     assert review_lifecycle["original_high_count"] == 2
-    assert decision["next_action"] == "ONE_TARGETED_REREVIEW_OF_P1_A_AND_P1_B"
-    assert decision["state"] != "CLOSED_PASS"
-    assert decision["decision_state"] != "CLOSED_PASS"
-    # No finding is marked fully resolved before the targeted rereview.
+    # TARGETED_REREVIEW_FORMAL_REVIEW_ID_INVENTED = NO
+    evidence = review_lifecycle["targeted_rereview_evidence"]
+    assert evidence["formal_review_object_invented"] is False
+    assert evidence["formal_rereview_id"] is None
+    # TARGETED_REACTION_ID = 489574661
+    assert evidence["reaction_id"] == 489574661
+    assert evidence["reaction"] == "+1"
+    assert evidence["reaction_actor"] == "chatgpt-codex-connector[bot]"
+    assert evidence["evidence_type"] == "CODEX_NO_SUGGESTIONS_PR_REACTION"
+    assert evidence["candidate_commit"] == "11fec95f128fb77474ec5dfc1db4741db1d8f9af"
+    assert evidence["request_comment_id"] == 5547555705
+    assert evidence["new_critical_count"] == 0
+    assert evidence["new_high_count"] == 0
+    # P1_A_CLEARED = YES, P1_B_CLEARED = YES
+    assert evidence["p1_a_cleared"] is True
+    assert evidence["p1_b_cleared"] is True
+    assert evidence["targeted_rereview_pass"] is True
+    # UNRESOLVED_CRITICAL = 0, UNRESOLVED_HIGH = 0
+    assert decision["unresolved_critical"] == 0
+    assert decision["unresolved_high"] == 0
+    assert decision["final_review_disposition"] == "CLOSED_PASS"
+    # NEXT_ACTION = C1
+    assert decision["next_action"] == "IMPLEMENT_QNTYLAB_AGENT_CONTEXT_PACKET_V0"
+    assert decision["first_implementation_after_governance"] == "QNTYLAB_AGENT_CONTEXT_PACKET_V0"
+    # C1 authorized; C2/C3/C6 not authorized to start now.
+    assert decision["c1_authorized"] is True
+    assert decision["c2_start_authorized_now"] is False
+    assert decision["c3_start_authorized_now"] is False
+    assert decision["c6_start_authorized"] is False
+    # Repair history is terminal: both repairs cleared by the targeted rereview.
     for entry in review_lifecycle["repair_history"]:
-        assert entry["status"] == "RESOLVED_PENDING_REREVIEW"
+        assert entry["status"] == "RESOLVED_CLEARED_BY_TARGETED_REREVIEW"
 
 
 def test_registry_lifecycle_consistency() -> None:
     decision = _decision()
     record = _record(PROJECT_ID)
 
-    assert record["review_lifecycle_current_stage"] == "READY_FOR_TARGETED_CRITICAL_HIGH_REREVIEW"
+    assert record["review_lifecycle_current_stage"] == "CLOSED"
+    assert record["hostile_review_count"] == 1
+    assert record["bounded_repair_used"] is True
     assert record["targeted_rereview_required"] is True
-    assert record["critical_high_rereviews_used"] == 0
-    assert record["next_action"] == "ONE_TARGETED_REREVIEW_OF_P1_A_AND_P1_B"
-    assert record["state"] == "PLANNED_NOT_AUTHORIZED"
+    assert record["targeted_rereview_used"] is True
+    assert record["critical_high_rereviews_used"] == 1
+    assert record["unresolved_critical"] == 0
+    assert record["unresolved_high"] == 0
+    assert record["next_action"] == "IMPLEMENT_QNTYLAB_AGENT_CONTEXT_PACKET_V0"
+    assert record["state"] == "CLOSED_PASS"
+    assert record["decision_state"] == "CLOSED_PASS"
     live_sha256 = hashlib.sha256(DECISION_PATH.read_bytes()).hexdigest()
     assert live_sha256 == record["decision_artifact_sha256"]
+
+
+def test_authorized_increment_count_is_six() -> None:
+    decision = _decision()
+
+    # AUTHORIZED_INCREMENT_COUNT = 6
+    assert decision["authorized_implementation_increment_count"] == 6
+    increments = decision["authorized_implementation_increments"]
+    assert len(increments) == 6
+    assert {inc["increment_id"] for inc in increments} == EXPECTED_INCREMENT_IDS
+    assert {inc["phase_id"] for inc in increments} == EXPECTED_INCREMENT_PHASE_IDS
+
+
+def test_c1_not_started() -> None:
+    # C1_IMPLEMENTATION_PRESENT = NO: no C1 implementation artifacts exist.
+    assert not (ROOT / "qntylab/agent_context_packet_v0.py").exists()
+    assert not (ROOT / "tests/test_qntylab_agent_context_packet_v0.py").exists()
+    decision = _decision()
+    assert decision["next_action"] == "IMPLEMENT_QNTYLAB_AGENT_CONTEXT_PACKET_V0"
+    assert decision["c1_authorized"] is True
+
+
+def test_scientific_authority_remains_none() -> None:
+    decision = _decision()
+    record = _record(PROJECT_ID)
+    out_of_scope = decision["out_of_scope"]
+
+    # SCIENTIFIC_AUTHORITY = NONE across decision and registry.
+    assert out_of_scope["SCIENTIFIC_EVALUATION_PHASES_AUTHORIZED"] == 0
+    for field in (
+        "REAL_DATA_AUTHORITY",
+        "PROVIDER_AUTHORITY",
+        "CLAIM_AUTHORITY",
+        "TRADING_AUTHORITY",
+        "CAPITAL_AUTHORITY",
+        "QNTY_AUTHORITY",
+        "QNTYSPOT_AUTHORITY",
+        "ROUTER_AUTHORITY",
+    ):
+        assert out_of_scope[field] == "NONE"
+    for field in (
+        "real_data_access_authorized",
+        "outcome_access_authorized",
+        "provider_access_authorized",
+        "claim_access_authorized",
+        "claim_consumption_authorized",
+        "scientific_evaluation_authorized",
+        "scientific_execution_authorized",
+        "implementation_completed",
+    ):
+        assert record[field] is False
+    for field in (
+        "router_authority",
+        "qnty_authority",
+        "qntyspot_authority",
+        "trading_authority",
+        "capital_authority",
+        "downstream_authority",
+    ):
+        assert record[field] == "NONE"
+    assert record["scientific_evaluation_phases_authorized"] == 0
+    assert record["implementation_authorized"] is False

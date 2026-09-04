@@ -6,8 +6,8 @@
   "phase_id": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_DECISION_V0",
   "project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0",
   "phase_type": "GOVERNANCE_ONLY",
-  "state": "READY_FOR_TARGETED_CRITICAL_HIGH_REREVIEW",
-  "decision_state": "READY_FOR_TARGETED_CRITICAL_HIGH_REREVIEW",
+  "state": "CLOSED_PASS",
+  "decision_state": "CLOSED_PASS",
   "authority": "CANONICAL_QNTYLAB_GIT_IDENTITY_GOVERNANCE_ONLY",
   "governance_only": true,
   "canonical_parent": "7b1f00d7ae975aa26029e70fab190ea2b16effdc",
@@ -177,7 +177,7 @@
   },
   "state_lifecycle": {
     "closed_pass_rule": "GOVERNANCE_DECISION_CLOSED_PASS_RULE: The umbrella governance decision reaches CLOSED_PASS after its own governance review lifecycle closes with no unresolved Critical/High findings. C1-C6 completion states are implementation-program progress and do not gate governance-decision closure. CLOSED_PASS authorizes exactly the six enumerated increments and nothing else.",
-    "governance_pr_state": "READY_FOR_TARGETED_CRITICAL_HIGH_REREVIEW",
+    "governance_pr_state": "CLOSED_PASS",
     "governance_pr_rule": "In this governance PR the registry row's validator-constrained `state` uses the canonical PROJECT_STATES vocabulary (PLANNED_NOT_AUTHORIZED) because the fail-closed validator does not accept review-stage states, and the registry `state` remains PLANNED_NOT_AUTHORIZED until final closure, while the lifecycle truth is carried by `decision_state` = READY_FOR_TARGETED_CRITICAL_HIGH_REREVIEW and `review_lifecycle_current_stage` = READY_FOR_TARGETED_CRITICAL_HIGH_REREVIEW in both decision.json and the registry row; these flip mechanically to CLOSED_PASS/CLOSED only at closure."
   },
   "lifecycle_separation": {
@@ -188,7 +188,7 @@
   "review_lifecycle": {
     "policy": "NORMAL_BOUNDED_COMPLETION_NOT_TERMINAL_ONE_REVIEW",
     "stages": ["IMPLEMENT_GOVERNANCE_DECISION", "TEST_GOVERNANCE_ARTIFACTS", "ONE_INDEPENDENT_HOSTILE_REVIEW", "OPTIONAL_BOUNDED_REPAIR_PLUS_ONE_TARGETED_REREVIEW_FOR_CRITICAL_HIGH", "CLOSED_PASS_OR_CLOSED_BLOCKED"],
-    "current_stage": "READY_FOR_TARGETED_CRITICAL_HIGH_REREVIEW",
+    "current_stage": "CLOSED",
     "hostile_review_count": 1,
     "hostile_review_id": "PRR_kwDOTo27Xs8AAAABMRPxcA",
     "hostile_reviewed_commit": "f1e7821b11fb87574771694c322ffb8442ebfccc",
@@ -200,11 +200,28 @@
     ],
     "bounded_repair_used": true,
     "targeted_rereview_required": true,
-    "targeted_rereview_used": false,
-    "critical_high_rereviews_used": 0,
+    "targeted_rereview_used": true,
+    "critical_high_rereviews_used": 1,
+    "targeted_rereview_evidence": {
+      "evidence_type": "CODEX_NO_SUGGESTIONS_PR_REACTION",
+      "candidate_commit": "11fec95f128fb77474ec5dfc1db4741db1d8f9af",
+      "request_comment_id": 5547555705,
+      "requested_at": "2026-09-04T23:19:12Z",
+      "reaction_id": 489574661,
+      "reaction": "+1",
+      "reaction_created_at": "2026-09-04T23:21:24Z",
+      "reaction_actor": "chatgpt-codex-connector[bot]",
+      "formal_review_object_invented": false,
+      "formal_rereview_id": null,
+      "new_critical_count": 0,
+      "new_high_count": 0,
+      "p1_a_cleared": true,
+      "p1_b_cleared": true,
+      "targeted_rereview_pass": true
+    },
     "repair_history": [
-      {"repair": 1, "commit": "3c91278cd6b6471bab2bb65d0782aa92203f075e", "scope": "C5 pre-deletion reference-reproof gate (PRE_DELETION_REFERENCE_REPROOF_GATE) added to the C5 objective and acceptance criteria; finding from the local review pass", "status": "RESOLVED_PENDING_REREVIEW"},
-      {"repair": 2, "commit": "THIS_COMMIT", "scope": "P1-A (thread PRRT_kwDOTo27Xs6fdZ14): governance-decision lifecycle separated from cleanup-program increment lifecycles via lifecycle_separation and the rewritten closed_pass_rule; P1-B (thread PRRT_kwDOTo27Xs6fdZ16): C1 global byte-identity criterion replaced with the SAME_INPUT -> SAME_OLD_RENDERER_OUTPUT renderer-semantics contract", "status": "RESOLVED_PENDING_REREVIEW"}
+      {"repair": 1, "commit": "3c91278cd6b6471bab2bb65d0782aa92203f075e", "scope": "C5 pre-deletion reference-reproof gate (PRE_DELETION_REFERENCE_REPROOF_GATE) added to the C5 objective and acceptance criteria; finding from the local review pass", "status": "RESOLVED_CLEARED_BY_TARGETED_REREVIEW"},
+      {"repair": 2, "commit": "11fec95f128fb77474ec5dfc1db4741db1d8f9af", "scope": "P1-A (thread PRRT_kwDOTo27Xs6fdZ14): governance-decision lifecycle separated from cleanup-program increment lifecycles via lifecycle_separation and the rewritten closed_pass_rule; P1-B (thread PRRT_kwDOTo27Xs6fdZ16): C1 global byte-identity criterion replaced with the SAME_INPUT -> SAME_OLD_RENDERER_OUTPUT renderer-semantics contract", "status": "RESOLVED_CLEARED_BY_TARGETED_REREVIEW"}
     ],
     "hostile_review_scope": "ONE bounded independent hostile review focused on exactly these seven risk axes: (1) FROZEN_ORACLE_MUTATION_RISK, (2) SCIENTIFIC_AUTHORITY_LEAKAGE_RISK, (3) OPEN_PR_CONTAMINATION_RISK, (4) CONTEXT_SEMANTICS_REGRESSION_RISK (silent truncation, brief/spine/render drift), (5) LOAD_BEARING_DELETION_RISK, (6) CI_DEV_LOOP_BREAKAGE_RISK, (7) SCOPE_CREEP_RISK.",
     "repair_rule": "Critical/High findings get ONE bounded repair plus AT MOST ONE targeted rereview; then the review closes regardless of outcome."
@@ -239,7 +256,15 @@
     "decision_state": "CLOSED_PASS",
     "note": "The hardening decision V0 closed CLOSED_PASS and its implementation phase FUNDING_INCREMENTAL_CONTRACT_INTEGRITY_HARDENING_IMPLEMENTATION_V0 closed CLOSED_BLOCKED at canonical parent 7b1f00d7ae975aa26029e70fab190ea2b16effdc. This decision cites it as naming/lifecycle precedent only; it does not reopen, amend, replace, or succeed it."
   },
-  "next_action": "ONE_TARGETED_REREVIEW_OF_P1_A_AND_P1_B",
+  "next_action": "IMPLEMENT_QNTYLAB_AGENT_CONTEXT_PACKET_V0",
+  "unresolved_critical": 0,
+  "unresolved_high": 0,
+  "final_review_disposition": "CLOSED_PASS",
+  "c1_authorized": true,
+  "c2_start_authorized_now": false,
+  "c3_start_authorized_now": false,
+  "c6_start_authorized": false,
+  "c4_c5_parallelism_rule": "C4 and C5 have no dependencies and may proceed in parallel with C2/C3 only while their diffs stay within their own allowed_paths and never conflict on shared files, per increment_graph.independence.",
   "verify_receipts": {
     "canonical_head_sha256_verified": "7b1f00d7ae975aa26029e70fab190ea2b16effdc",
     "git_rev_parse_head": "7b1f00d7ae975aa26029e70fab190ea2b16effdc",

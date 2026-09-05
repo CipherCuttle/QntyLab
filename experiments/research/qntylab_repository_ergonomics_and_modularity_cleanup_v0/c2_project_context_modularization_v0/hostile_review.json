@@ -1,0 +1,66 @@
+{
+  "artifact_type": "C2_HOSTILE_REVIEW_CONSOLIDATION",
+  "increment_id": "C2",
+  "phase_id": "QNTYLAB_PROJECT_CONTEXT_MODULARIZATION_V0",
+  "reviewed_candidate": "c2-project-context-modularization-v0 uncommitted changeset at canonical parent 78f3ca1b3566e9ea3d138796b7ce50e224c9e45a",
+  "VERDICT": "PASS_NO_CRITICAL_HIGH",
+  "CRITICAL": 0,
+  "HIGH": 0,
+  "LOW": 6,
+  "repair_usage": "NONE",
+  "repair_lifecycle": "repair is authorized for Critical/High findings only; Low findings are documented and explicitly NOT repaired under the bounded lifecycle",
+  "targeted_rereview_required": false,
+  "targeted_rereview_result": "NOT_REQUIRED",
+  "targeted_rereview_note": "no Critical/High fixes were made, so no targeted rereview is required",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "LOW",
+      "summary": "EXECUTION_CANONICAL_REF is a domain-owned constant living in the generic module qntylab/project_context_core.py",
+      "location": "qntylab/project_context_core.py:127",
+      "evidence": "constant referencing the execution-authority seam is defined outside the domain module",
+      "disposition": "DOCUMENTED_NOT_REPAIRED"
+    },
+    {
+      "id": "F2",
+      "severity": "LOW",
+      "summary": "execution-authority internals are no longer reachable through the qntylab.project_context namespace, with zero external usage found; the compat test could additionally parse direct-import statements (`from qntylab.project_context import ...`) to broaden coverage",
+      "location": "qntylab/project_context.py (composition root re-export surface)",
+      "evidence": "no repo-wide consumer of the dropped names; compat gate currently token-based rather than import-statement-based",
+      "disposition": "DOCUMENTED_NOT_REPAIRED"
+    },
+    {
+      "id": "F3",
+      "severity": "LOW",
+      "summary": "the brief-digest gate in tests misses `qntylab.toml` as a docs/compiled input, and the gate docstring slightly misstates the captured basis",
+      "location": "tests/test_project_context_modularization_c2.py (brief digest gate)",
+      "evidence": "compiled_inputs in spine output include qntylab.toml; the gate's input list does not",
+      "disposition": "DOCUMENTED_NOT_REPAIRED"
+    },
+    {
+      "id": "F4",
+      "severity": "LOW",
+      "summary": "the zero-DSH confinement test is token-count-based only; an AST-level check would be stricter",
+      "location": "tests/test_project_context_modularization_c2.py (DSH confinement test)",
+      "evidence": "gate greps token set rather than resolving symbol bindings",
+      "disposition": "DOCUMENTED_NOT_REPAIRED"
+    },
+    {
+      "id": "F5",
+      "severity": "LOW",
+      "summary": "pre-existing QNTY repository-ID coupling in the registry/spine modules; this coupling pre-dates C2 and is inherited, not introduced",
+      "location": "qntylab/project_context_registry.py, qntylab/project_context_spine.py",
+      "evidence": "repository-id literals pre-exist in the monolith at the canonical parent",
+      "disposition": "DOCUMENTED_NOT_REPAIRED_PRE_DATES_C2"
+    },
+    {
+      "id": "F6",
+      "severity": "LOW",
+      "summary": "__module__ identity of re-exported objects reflects the defining sibling module rather than qntylab.project_context; no consumer inspected depends on __module__",
+      "location": "qntylab/project_context.py (re-export surface)",
+      "evidence": "repr/identity notes only; zero external usage found",
+      "disposition": "DOCUMENTED_NOT_REPAIRED"
+    }
+  ],
+  "review_scope_note": "consolidated hostile review of the C2 changeset; behavior-preserving decomposition evidence (parity digests, DSH confinement counts) is recorded in metrics.json and referenced here rather than duplicated"
+}

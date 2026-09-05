@@ -66,14 +66,24 @@ Pointer grammar (forensic section 4.3): ``<repo-relative-path>[:<line>][#<sha12>
   ``POINTER `` and point at the selected row's line in the projects registry;
   the packet field name identifies which row field the pointer references.
 
-Phase selection (fail closed, canonical only):
+Phase selection (fail closed, canonical only; no independent interpretation):
 
-* ``--phase-id X`` selects the unique row with ``project_id == X`` in the
-  canonical projects registry (parsed read-only with tomllib).  A selector
-  only chooses which canonical record to describe; it NEVER grants authority.
-* Without a selector, automatic selection requires exactly one ACTIVE row.
-  Zero or multiple ACTIVE rows fail closed with a concise ambiguity error
-  (no bulk row dumps).
+* Canonical project-context sources are loaded and the FULL projects registry
+  is validated by reusing ``qntylab.project_context`` read-only functions
+  (``load_context_sources`` and ``validate_projects_registry``) before any
+  selection.  The packet is a derived view of canonically validated project
+  state; a malformed registry fails closed even when the requested row itself
+  looks structurally plausible (no selective-row bypass).
+* ``--phase-id X`` selects the unique validated canonical record with
+  ``project_id == X`` (record uniqueness is enforced by canonical
+  validation).  A selector only chooses which canonical record to describe;
+  it NEVER grants authority.
+* Without a selector, default selection reuses the canonical operative-active
+  projection (``execution_authority_projection`` -- the same semantics
+  ``qntylab.project_context`` renders as ``Active project``), including its
+  exclusion of ``ACTIVE_CANDIDATE``/unauthorized branch-local candidate rows.
+  Exactly one operative ACTIVE canonical row is required; zero or multiple
+  fail closed with a concise error (no bulk row dumps).
 * Selection never derives from chat text, environment variables, branch
   names, caller assertions, or model memory.
 
@@ -148,7 +158,6 @@ import os
 import re
 import subprocess
 import sys
-import tomllib
 from pathlib import Path
 from typing import Any
 
@@ -231,9 +240,10 @@ MAX_RELEVANT_TESTS_ITEMS = 4
 # deterministic order their anchors are emitted.
 PROJECT_CONTEXT_SYMBOLS: tuple[str, ...] = (
     "PROJECT_STATES",
-    "RepositorySnapshot",
-    "_load_toml",
     "_git_state",
+    "load_context_sources",
+    "validate_projects_registry",
+    "execution_authority_projection",
 )
 
 
@@ -314,32 +324,54 @@ def _bounded_str(value: Any, label: str) -> str:
 # ---------------------------------------------------------------------------
 
 
-def _select_row(root: Path, registry_relative: str, phase_id: str | None) -> tuple[dict[str, Any], int | None]:
-    registry_path = root / registry_relative
+def _canonical_projects(
+    root: Path,
+) -> tuple[dict[str, Any], dict[str, dict[str, Any]], project_context.RepositorySnapshot]:
+    """Load and validate canonical project state via qntylab.project_context.
+
+    This is the ONLY interpretation of registry validity on the packet path:
+    canonical loaders/validators run first and the FULL registry must pass
+    validation before any row can be selected (no selective-row bypass).
+    """
     try:
-        with registry_path.open("rb") as stream:
-            data = tomllib.load(stream)
-    except (OSError, tomllib.TOMLDecodeError) as exc:
-        raise AgentContextPacketError(f"cannot read projects registry: {exc}") from exc
-    rows = data.get("project")
-    if not isinstance(rows, list):
-        raise AgentContextPacketError("projects registry missing 'project' array-of-tables")
+        snapshot = project_context.RepositorySnapshot.acquire(root)
+        config, _adr_registry, projects_registry = project_context.load_context_sources(root, snapshot=snapshot)
+        projects = project_context.validate_projects_registry(root, projects_registry, snapshot=snapshot)
+    except project_context.ProjectContextError as exc:
+        raise AgentContextPacketError(f"canonical project context: {exc}") from exc
+    return config, projects, snapshot
+
+
+def _select_row(
+    root: Path,
+    projects: dict[str, dict[str, Any]],
+    phase_id: str | None,
+    snapshot: project_context.RepositorySnapshot,
+) -> dict[str, Any]:
+    """Select one record from the already-validated canonical registry.
+
+    Explicit selection: the unique validated canonical record with
+    ``project_id == phase_id``; the selector grants no authority.  Default
+    selection reuses the canonical operative-active projection (the same
+    semantics qntylab.project_context renders as ``Active project``), so a
+    branch-local ``ACTIVE_CANDIDATE`` row is never selected merely because
+    its top-level state is ``ACTIVE``.
+    """
     if phase_id is not None:
-        matches = [row for row in rows if isinstance(row, dict) and row.get("project_id") == phase_id]
-        if not matches:
+        row = projects.get(phase_id)
+        if row is None:
             raise AgentContextPacketError(f"unknown phase: no canonical row with project_id {phase_id!r}")
-        if len(matches) > 1:
-            raise AgentContextPacketError("ambiguous phase selection: duplicate project_id rows")
-        row = matches[0]
-    else:
-        candidates = [row for row in rows if isinstance(row, dict) and row.get("state") == "ACTIVE"]
-        if len(candidates) == 0:
-            raise AgentContextPacketError("ambiguous default phase selection: 0 ACTIVE canonical rows")
-        if len(candidates) > 1:
-            raise AgentContextPacketError("ambiguous default phase selection: multiple ACTIVE canonical rows")
-        row = candidates[0]
-    line = _row_line(registry_path.read_text(encoding="utf-8"), _bounded_str(row.get("project_id"), "project_id"))
-    return row, line
+        return row
+    try:
+        projection = project_context.execution_authority_projection(root, projects, snapshot=snapshot)
+    except project_context.ProjectContextError as exc:
+        raise AgentContextPacketError(f"canonical project context: {exc}") from exc
+    if projection["issues"]:
+        raise AgentContextPacketError("canonical execution authority projection conflict")
+    active = projection["active_project"]
+    if active is None:
+        raise AgentContextPacketError("ambiguous default phase selection: 0 operative ACTIVE canonical rows")
+    return active
 
 
 # ---------------------------------------------------------------------------
@@ -436,23 +468,21 @@ def _relevant_tests(root: Path) -> list[str]:
 def build_packet(root: Path, *, phase_id: str | None = None) -> str:
     """Build the deterministic packet text for ``root`` (read-only)."""
     root = Path(root).resolve()
-    config = project_context._load_toml(root / "qntylab.toml")
+    config, projects, snapshot = _canonical_projects(root)
     repository_id = _bounded_str(config.get("repository_id"), "qntylab.toml repository_id")
-    authority = config.get("authority")
-    if not isinstance(authority, dict):
-        raise AgentContextPacketError("qntylab.toml missing [authority] table")
-    registry_relative = _bounded_str(authority.get("project_registry"), "project_registry")
+    registry_relative = _bounded_str(config["authority"].get("project_registry"), "project_registry")
 
     git_state = project_context._git_state(root)
     clean, untracked_count = _git_status(root)
 
-    row, row_line = _select_row(root, registry_relative, phase_id)
+    row = _select_row(root, projects, phase_id, snapshot)
     project_id = _bounded_str(row.get("project_id"), "project_id")
     state = _bounded_str(row.get("state"), "state")
     if state not in project_context.PROJECT_STATES:
         raise AgentContextPacketError(f"selected row state is not a canonical project state: {state!r}")
     next_action = _bounded_str(row.get("next_action"), "next_action")
 
+    row_line = _row_line((root / registry_relative).read_text(encoding="utf-8"), project_id)
     row_pointer = _file_pointer(root, registry_relative, line=row_line)
     worktree_value = f"{'CLEAN' if clean else 'DIRTY'} untracked={untracked_count}"
 

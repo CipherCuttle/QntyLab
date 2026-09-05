@@ -18,6 +18,7 @@ from typing import Any
 import pytest
 
 from qntylab import agent_context_packet_v0 as packet_module
+from qntylab import project_context
 from qntylab.agent_context_packet_v0 import (
     FIELD_ORDER,
     AgentContextPacketError,
@@ -35,6 +36,28 @@ project_registry = "docs/state/projects.toml"
 current_roadmap = "docs/CURRENT_ROADMAP.md"
 research_ledger_root = "experiments/research"
 global_architecture_registry = "docs/ADR/registry.toml"
+ecosystem_catalog = "docs/state/ecosystem_catalog.toml"
+"""
+
+# Minimal canonical authority sources required by
+# qntylab.project_context.load_context_sources on the packet path.
+ADR_REGISTRY_TOML = """schema_version = 1
+
+[[adr]]
+adr_id = "ADR-0001"
+status = "CURRENT_GLOBAL"
+authority_scope = "GLOBAL_ARCHITECTURE"
+path = "docs/ADR/0001-architecture.md"
+
+[[supersession]]
+"""
+
+ECOSYSTEM_CATALOG_TOML = """schema_version = 1
+
+[[repository]]
+repository_id = "FIXTURE_REPO"
+durable_role = "IMPLEMENTATION"
+default_branch = "master"
 """
 
 
@@ -93,6 +116,25 @@ def _write(root: Path, relative: str, payload: bytes | str) -> None:
     target.write_bytes(payload)
 
 
+# Activation artifact of a prior (non-DSH) candidate schema: canonical
+# qntylab.project_context.execution_authority_projection treats an ACTIVE row
+# carrying such an artifact as a branch-local candidate that is observable but
+# NOT operative (the same ACTIVE_CANDIDATE exclusion Project Context applies).
+CANDIDATE_ACTIVATION_JSON = '{"schema_version": "prior-candidate-activation-legacy-v0"}\n'
+
+
+def _candidate_row(project_id: str, **overrides: Any) -> dict[str, Any]:
+    """Registry row mirroring canonical ACTIVE_CANDIDATE semantics: top-level
+    state ACTIVE, but gated out of the operative-active set by its activation
+    artifact."""
+    return _row(
+        project_id,
+        candidate_state="ACTIVE_CANDIDATE",
+        authoritative_artifacts=["artifact.md", "activation.json"],
+        **overrides,
+    )
+
+
 def _fixture_root(
     tmp_path: Path,
     rows: list[dict[str, Any]],
@@ -107,8 +149,14 @@ def _fixture_root(
     _write(
         root,
         "docs/state/projects.toml",
-        "".join(_toml_row(row) for row in rows),
+        "schema_version = 1\n\n" + "".join(_toml_row(row) for row in rows),
     )
+    _write(root, "docs/ADR/registry.toml", ADR_REGISTRY_TOML)
+    _write(root, "docs/ADR/0001-architecture.md", "# canonical architecture\n")
+    _write(root, "docs/state/ecosystem_catalog.toml", ECOSYSTEM_CATALOG_TOML)
+    if not (extra_files or {}).get("docs/CURRENT_ROADMAP.md"):
+        _write(root, "docs/CURRENT_ROADMAP.md", "# canonical roadmap\n")
+    _write(root, "experiments/research/.gitkeep", "")
     if decision is not None:
         import json
 
@@ -312,7 +360,7 @@ def test_AMBIGUOUS_DEFAULT_PHASE_SELECTION_REJECTED(tmp_path: Path) -> None:
     completed = _run_cli(zero_active)
     assert completed.returncode != 0
     assert completed.stdout == b""
-    assert b"0 ACTIVE" in completed.stderr
+    assert b"0 operative ACTIVE" in completed.stderr
 
     tmp_path_two = tmp_path / "two"
     tmp_path_two.mkdir()
@@ -324,7 +372,9 @@ def test_AMBIGUOUS_DEFAULT_PHASE_SELECTION_REJECTED(tmp_path: Path) -> None:
     assert completed.returncode != 0
     assert completed.stdout == b""
     stderr = completed.stderr.decode("utf-8", "replace")
-    assert "multiple ACTIVE" in stderr
+    # canonical registry validation forbids more than one ACTIVE row before
+    # any packet-owned selection can run
+    assert "at most one ACTIVE project is permitted" in stderr
     assert "ACTIVE_A" not in stderr and "ACTIVE_B" not in stderr  # no bulk row dumps
     assert len(stderr) < 400
 
@@ -434,11 +484,13 @@ def test_RELEVANT_CODE_MAX_6(tmp_path: Path) -> None:
     stub_symbols = "\n".join(
         [
             "PROJECT_STATES = frozenset({'ACTIVE'})",
-            "class RepositorySnapshot:",
-            "    pass",
-            "def _load_toml(path):",
-            "    raise NotImplementedError",
             "def _git_state(root):",
+            "    raise NotImplementedError",
+            "def load_context_sources(root):",
+            "    raise NotImplementedError",
+            "def validate_projects_registry(root, registry):",
+            "    raise NotImplementedError",
+            "def execution_authority_projection(root, projects):",
             "    raise NotImplementedError",
         ]
     )
@@ -637,3 +689,112 @@ def test_EXPLICIT_SELECTOR_CLOSED_PASS_ROW_RENDERS_TRUE_STATE(tmp_path: Path) ->
     assert items["STATE"] == ["CLOSED_PASS"]
     assert items["OBJECTIVE"] == ["CLOSED_PASS: completed."]
     assert items["ALLOWED_OPERATIONS"] == ["NONE"]
+
+
+# ---------------------------------------------------------------------------
+# canonical-reuse adversarial tests (registry interpretation parity)
+# ---------------------------------------------------------------------------
+
+
+def _canonical_operative_active(root: Path) -> dict[str, Any] | None:
+    """Derive the canonical Project Context operative-active record."""
+    snapshot = project_context.RepositorySnapshot.acquire(root)
+    _, _adr_registry, projects_registry = project_context.load_context_sources(root, snapshot=snapshot)
+    projects = project_context.validate_projects_registry(root, projects_registry, snapshot=snapshot)
+    projection = project_context.execution_authority_projection(root, projects, snapshot=snapshot)
+    assert projection["issues"] == []
+    return projection["active_project"]
+
+
+def test_FULL_REGISTRY_VALIDATION_REQUIRED_NO_SELECTIVE_ROW_BYPASS(tmp_path: Path) -> None:
+    # the requested row is structurally plausible, but ANOTHER registry row
+    # violates canonical project-context validation => fail closed
+    malformed = _row("BAD_PHASE", state="NOT_A_CANONICAL_STATE", implementation_authorized=False)
+    root = _fixture_root(tmp_path, [_row("GOOD_PHASE"), malformed])
+    completed = _run_cli(root, "--phase-id", "GOOD_PHASE")
+    assert completed.returncode != 0
+    assert completed.stdout == b""
+    assert b"canonical project context" in completed.stderr
+    assert b"unknown project state" in completed.stderr
+
+
+def test_DUPLICATE_UNRELATED_PROJECT_ID_REJECTED(tmp_path: Path) -> None:
+    # confirmed in qntylab/project_context.py: canonical validation rejects
+    # duplicate project IDs anywhere in the registry
+    root = _fixture_root(
+        tmp_path,
+        [_row("PHASE_ONE"), _row("PHASE_ONE", state="CLOSED_PASS", implementation_authorized=False)],
+    )
+    completed = _run_cli(root, "--phase-id", "PHASE_ONE")
+    assert completed.returncode != 0
+    assert completed.stdout == b""
+    assert b"canonical project context" in completed.stderr
+    assert b"duplicate project ID" in completed.stderr
+
+
+def test_ACTIVE_CANDIDATE_EXCLUDED_FROM_DEFAULT_SELECTION(tmp_path: Path) -> None:
+    # ACTIVE_CANDIDATE (branch-local candidate, activation-gated out of the
+    # operative-active set) must never be selected merely because its
+    # top-level state is ACTIVE; canonical operative-active count is 0
+    root = _fixture_root(tmp_path, [_candidate_row("CANDIDATE_PHASE")], extra_files={"activation.json": CANDIDATE_ACTIVATION_JSON})
+    assert _canonical_operative_active(root) is None  # canonical parity premise
+    completed = _run_cli(root)
+    assert completed.returncode != 0
+    assert completed.stdout == b""
+    stderr = completed.stderr.decode("utf-8", "replace")
+    assert "0 operative ACTIVE" in stderr
+    assert "CANDIDATE_PHASE" not in stderr
+
+
+def test_GENUINE_ACTIVE_SELECTED_OVER_ACTIVE_CANDIDATE(tmp_path: Path) -> None:
+    # canonical ACTIVE_CANDIDATE registry spelling (V0R7 precedent):
+    # state PLANNED_NOT_AUTHORIZED + candidate_state ACTIVE_CANDIDATE
+    root = _fixture_root(
+        tmp_path,
+        [
+            _candidate_row("CANDIDATE_PHASE", state="PLANNED_NOT_AUTHORIZED"),
+            _row("GENUINE_ACTIVE_PHASE"),
+        ],
+        extra_files={"activation.json": CANDIDATE_ACTIVATION_JSON},
+    )
+    packet = _run_cli_ok(root)  # default selection
+    _, items = _parse_packet(packet)
+    assert items["PHASE_ID"] == ["GENUINE_ACTIVE_PHASE"]
+    assert items["STATE"] == ["ACTIVE"]
+
+
+def test_PACKET_SELECTION_PARITY_WITH_PROJECT_CONTEXT(tmp_path: Path) -> None:
+    # PACKET_DEFAULT_SELECTED_PHASE == PROJECT_CONTEXT_OPERATIVE_ACTIVE_PHASE
+    root = _fixture_root(
+        tmp_path,
+        [
+            _candidate_row("CANDIDATE_PHASE", state="PLANNED_NOT_AUTHORIZED"),
+            _row("GENUINE_ACTIVE_PHASE"),
+        ],
+        extra_files={"activation.json": CANDIDATE_ACTIVATION_JSON},
+    )
+    canonical_active = _canonical_operative_active(root)
+    assert canonical_active is not None
+    packet = _run_cli_ok(root)
+    _, items = _parse_packet(packet)
+    assert items["PHASE_ID"] == [canonical_active["project_id"]]
+    assert items["STATE"] == [canonical_active["state"]]
+
+
+def test_EXPLICIT_SELECTOR_CANONICAL_PLANNED_ROW_IS_DESCRIPTIVE_ONLY(tmp_path: Path) -> None:
+    root = _fixture_root(
+        tmp_path,
+        [
+            _row(
+                "PLANNED_PHASE",
+                state="PLANNED_NOT_AUTHORIZED",
+                implementation_authorized=False,
+                next_action="Planned but not authorized.",
+            ),
+            _row("ACTIVE_PHASE"),
+        ],
+    )
+    packet = _run_cli_ok(root, "--phase-id", "PLANNED_PHASE")
+    _, items = _parse_packet(packet)
+    assert items["STATE"] == ["PLANNED_NOT_AUTHORIZED"]  # verbatim, never relabeled
+    assert items["ALLOWED_OPERATIONS"] == ["NONE"]  # describing grants no authority

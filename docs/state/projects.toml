@@ -10183,3 +10183,54 @@ trading_authority = "NONE"
 capital_authority = "NONE"
 downstream_authority = "NONE"
 next_action = "PERFORM_SINGLE_BOUNDED_C1_REPAIR_FOR_ORIGINAL_THREE_P1_FINDINGS"
+
+[[project]]
+project_id = "QNTYLAB_AGENT_CONTEXT_PACKET_V0"
+display_name = "QntyLab agent context packet V0"
+state = "CLOSED_PASS"
+candidate_state = "TERMINAL_CLOSURE_RECORDED"
+canonicalization_status = "PENDING_EXPLICIT_PR_MERGE"
+authority_level = "BOUNDED_QNTYLAB_REPOSITORY_ERGONOMICS_C1_IMPLEMENTATION_ONLY"
+phase_type = "BOUNDED_REPOSITORY_ERGONOMICS_IMPLEMENTATION"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c1_agent_context_packet_v0/implementation_manifest.json",
+  "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c1_agent_context_packet_v0/original_hostile_review_receipt.json",
+  "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c1_agent_context_packet_v0/targeted_rereview_closure_receipt.json",
+  "qntylab/agent_context_packet_v0.py",
+  "tests/test_qntylab_agent_context_packet_v0.py",
+]
+umbrella_project_id = "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0"
+phase = "C1"
+implementation_authorized = false
+implementation_completed = true
+hostile_review_count = 1
+hostile_review_verdict = "THREE_HIGH_REPAIRED_TARGETED_REREVIEW_PASS"
+hostile_review_critical_total = 0
+hostile_review_high_total = 3
+repair_budget_used = true
+repair_budget_count = 1
+targeted_rereview_required = true
+targeted_rereview_used = true
+targeted_rereview_count = 1
+targeted_rereview_scope = "THREE_ORIGINAL_P1_REPAIR_SURFACES_PLUS_NEW_CRITICAL_HIGH_ONLY"
+targeted_rereview_verdict = "PASS_NO_CRITICAL_HIGH"
+targeted_rereview_new_critical_total = 0
+targeted_rereview_new_high_total = 0
+unresolved_critical_total = 0
+unresolved_high_total = 0
+evaluator_applicability = "NO_MATCH"
+evaluator_run_required = false
+evaluator_created = false
+runtime_authorized = false
+scientific_execution_authorized = false
+qnty_mutation_authorized = false
+qnty_agent_eval_mutation_authorized = false
+qntyspot_mutation_authorized = false
+trading_authority = "NONE"
+capital_authority = "NONE"
+signing_authority = "NONE"
+promotion_authority = "NONE"
+terminal_outcome = "C1_CLOSED_PASS_READY_FOR_MERGE_WITH_EXPLICIT_AUTHORITY"
+next_action = "CLOSED_PASS: C1 closure gates passed. Merge PR #248 only with explicit merge authority; do not start C2-C6 automatically."

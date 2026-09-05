@@ -12,14 +12,23 @@ state (qntylab.toml, docs/state/projects.toml, git, and files pointed to by the
 selected registry row).  There is no LLM summarization and no semantic
 invention.
 
-Schema discrepancy record (governing contract): the forensic document
-docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/agent_context_target.md
-claims a "20-field schema" in its section 4.1, but its section 3 field table
-enumerates exactly 19 fields (the 20th table row is the ~1000 B ``envelope``
-row, which is a byte budget, not a field).  The governing contract for V0 is
-the 19 enumerated field names, in the exact order given by ``FIELD_ORDER``
-below.  This discrepancy must also be recorded in the C1 manifest entry in a
-later phase.
+Schema contract (canonical binding, not local interpretation): the packet
+schema is exactly the 19 named fields in ``FIELD_ORDER`` below, as authorized
+by the canonical clarification project
+QNTYLAB_AGENT_CONTEXT_PACKET_SCHEMA_CLARIFICATION_V0 (integrated via canonical
+master; decision artifact
+experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c1_agent_context_packet_v0/schema_clarification.json,
+sha256 269bf4ee0d19ccc07df60c1e7eac4fa25fa91e626c3cc5f8f202d0af2afa1f02).
+The implementation does not adjudicate the historical forensic 19-vs-20
+discrepancy itself: at generation time the packet mechanically re-validates
+the canonical clarification row from the canonical validated projects
+registry (state and decision state CLOSED_PASS, full decision-artifact
+SHA-256 verified before the artifact is trusted) and its resolution record
+(``schema_field_count == 19``, ``field_order == FIELD_ORDER``,
+``envelope_is_schema_field is false``, ``no_twentieth_field_invented is
+true``, ``byte_cap_unchanged == 8192``); any disagreement fails closed.
+The envelope is byte-budget accounting, not a field; no twentieth field is
+invented under any name.
 
 Field order and per-field VALUE byte caps (UTF-8, fail closed):
 
@@ -109,7 +118,12 @@ Field semantics (all canonical, no invention):
 * INPUT_CONTRACTS: pointers to canonical artifacts the phase consumes
   (qntylab.toml, the selected registry row, the row's decision artifact).
 * OUTPUT_CONTRACTS: pointers to the row's ``authoritative_artifacts``
-  (canonical implementation surfaces), in row order, at most 4 items.
+  (canonical implementation surfaces), in canonical row order.  EVERY
+  canonical entry is considered; if the complete pointer list fits the
+  300-byte field cap, all pointers are emitted; if it exceeds the cap, the
+  packet fails closed.  There is no slicing, no first-N selection, no
+  ``...`` elision, and no silent omission.  A canonical authoritative
+  artifact that cannot be read or pointer-bound fails closed.
 * LOAD_BEARING_INVARIANTS: at most 7 fixed canonical invariant statements
   (constants below, single-sourced from the governing decision, the forensic
   binding document sections 3-4, and qntylab/project_context.py validation
@@ -232,7 +246,12 @@ VERIFY_COMMAND_V0 = "python -m pytest -q tests/test_qntylab_agent_context_packet
 
 FORENSIC_BINDING_DOC_TEMPLATE = "docs/forensics/{identity}/agent_context_target.md"
 
-MAX_OUTPUT_CONTRACT_ITEMS = 4
+# Canonical clarification project that authorizes the 19-field schema
+# contract (P1-A binding; see module docstring).  The row is located in the
+# canonical validated projects registry; the implementation never re-adjudicates
+# the historical forensic 19-vs-20 discrepancy itself.
+CANONICAL_SCHEMA_CLARIFICATION_PROJECT_ID = "QNTYLAB_AGENT_CONTEXT_PACKET_SCHEMA_CLARIFICATION_V0"
+
 MAX_RELEVANT_CODE_ITEMS = 6
 MAX_RELEVANT_TESTS_ITEMS = 4
 
@@ -375,6 +394,93 @@ def _select_row(
 
 
 # ---------------------------------------------------------------------------
+# canonical decision-artifact verification (shared, fail closed)
+# ---------------------------------------------------------------------------
+
+
+def _verified_decision_artifact(root: Path, row: dict[str, Any]) -> tuple[str, dict[str, Any]] | None:
+    """Verify a canonical row's decision artifact binding, fail closed.
+
+    Accepts one canonical validated project row.  When the row carries both
+    ``decision_artifact`` and ``decision_artifact_sha256``, the full SHA-256
+    of the actual artifact bytes is computed and compared against the row's
+    declared 64-hex digest BEFORE the artifact is trusted for any purpose
+    (pointer emission, JSON parsing, verification-command consumption, or any
+    other packet value derived from it).  Returns ``(relative_path,
+    parsed_decision)`` on success, or ``None`` when the row carries no
+    decision artifact.  Failures (artifact missing, digest malformed, digest
+    mismatch, artifact unreadable, artifact not valid JSON) fail closed; a
+    new hash is never recomputed and accepted, modified worktree bytes are
+    never treated as canonical, and no command is ever consumed from
+    unverified bytes.
+    """
+    artifact = row.get("decision_artifact")
+    if not (isinstance(artifact, str) and artifact):
+        return None
+    digest = row.get("decision_artifact_sha256")
+    payload = _read_bytes(root, artifact)
+    if isinstance(digest, str) and digest:
+        # digest binding declared: full verification is mandatory before any use
+        if re.fullmatch(r"[0-9a-f]{64}", digest) is None:
+            raise AgentContextPacketError(f"decision artifact digest malformed for {artifact}")
+        if hashlib.sha256(payload).hexdigest() != digest:
+            raise AgentContextPacketError(f"decision artifact digest mismatch for {artifact}")
+    try:
+        decision = json.loads(payload.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        if isinstance(digest, str) and digest:
+            raise AgentContextPacketError(f"decision artifact is not valid JSON: {artifact}") from exc
+        return artifact, None  # no digest binding declared: pointer-only legacy path
+    if not isinstance(decision, dict):
+        if isinstance(digest, str) and digest:
+            raise AgentContextPacketError(f"decision artifact is not a JSON object: {artifact}")
+        return artifact, None
+    return artifact, decision
+
+
+# ---------------------------------------------------------------------------
+# canonical schema contract binding (P1-A)
+# ---------------------------------------------------------------------------
+
+
+def _validate_canonical_schema_contract(root: Path, projects: dict[str, dict[str, Any]]) -> None:
+    """Bind FIELD_ORDER to the canonical schema clarification, fail closed.
+
+    Locates the canonical clarification row in the already-validated projects
+    registry, requires CLOSED_PASS state and decision state, verifies the
+    full SHA-256 of the decision artifact bytes BEFORE trusting the artifact,
+    then requires the resolution record to match the frozen 19-field contract
+    exactly.  Any disagreement fails closed.  This is a mechanical binding to
+    QNTYLAB_AGENT_CONTEXT_PACKET_SCHEMA_CLARIFICATION_V0, not a local
+    interpretation of the historical forensic discrepancy.
+    """
+    row = projects.get(CANONICAL_SCHEMA_CLARIFICATION_PROJECT_ID)
+    if row is None:
+        raise AgentContextPacketError(
+            f"canonical schema clarification row absent: {CANONICAL_SCHEMA_CLARIFICATION_PROJECT_ID}"
+        )
+    if row.get("state") != "CLOSED_PASS" or row.get("decision_state") != "CLOSED_PASS":
+        raise AgentContextPacketError("canonical schema clarification row is not CLOSED_PASS")
+    verified = _verified_decision_artifact(root, row)
+    if verified is None or not isinstance(verified[1], dict):
+        raise AgentContextPacketError("canonical schema clarification decision artifact is unavailable")
+    _artifact_relative, decision = verified
+    resolution = decision.get("resolution")
+    if not isinstance(resolution, dict):
+        raise AgentContextPacketError("canonical schema clarification resolution record missing")
+    if resolution.get("schema_field_count") != 19:
+        raise AgentContextPacketError("canonical schema clarification schema_field_count != 19")
+    if resolution.get("field_order") != list(FIELD_ORDER):
+        raise AgentContextPacketError("canonical schema clarification field_order != FIELD_ORDER")
+    if resolution.get("envelope_is_schema_field") is not False:
+        raise AgentContextPacketError("canonical schema clarification envelope_is_schema_field is not false")
+    if resolution.get("no_twentieth_field_invented") is not True:
+        raise AgentContextPacketError("canonical schema clarification no_twentieth_field_invented is not true")
+    if resolution.get("byte_cap_unchanged") != TOTAL_HARD_CAP:
+        raise AgentContextPacketError("canonical schema clarification byte_cap_unchanged != 8192")
+
+
+# ---------------------------------------------------------------------------
 # field value construction
 # ---------------------------------------------------------------------------
 
@@ -423,14 +529,14 @@ def _forbidden_operations(row: dict[str, Any]) -> list[str]:
     return prohibitions[:5]
 
 
-def _verify_command(root: Path, row: dict[str, Any]) -> str:
-    artifact = row.get("decision_artifact")
-    if isinstance(artifact, str) and artifact:
-        try:
-            with (root / artifact).open("rb") as stream:
-                decision = json.load(stream)
-        except (OSError, json.JSONDecodeError):
-            decision = None
+def _verify_command(verified_decision: tuple[str, dict[str, Any] | None] | None) -> str:
+    """Derive VERIFY_COMMAND from ALREADY-VERIFIED decision data.
+
+    The decision artifact is never reopened or re-parsed here: verification
+    happens exactly once, before any packet value is derived from it.
+    """
+    if verified_decision is not None:
+        _artifact_relative, decision = verified_decision
         if isinstance(decision, dict):
             commands = decision.get("verification_commands")
             if isinstance(commands, list) and commands and isinstance(commands[0], str):
@@ -472,6 +578,10 @@ def build_packet(root: Path, *, phase_id: str | None = None) -> str:
     repository_id = _bounded_str(config.get("repository_id"), "qntylab.toml repository_id")
     registry_relative = _bounded_str(config["authority"].get("project_registry"), "project_registry")
 
+    # P1-A: bind the 19-field schema contract to the canonical clarification
+    # BEFORE any packet value is constructed.
+    _validate_canonical_schema_contract(root, projects)
+
     git_state = project_context._git_state(root)
     clean, untracked_count = _git_status(root)
 
@@ -489,18 +599,22 @@ def build_packet(root: Path, *, phase_id: str | None = None) -> str:
     objective = _text_or_pointer(next_action, 500, row_pointer)
     next_action_value = _text_or_pointer(next_action, 120, row_pointer)
 
-    input_items = [_file_pointer(root, "qntylab.toml"), row_pointer]
-    decision_artifact = row.get("decision_artifact")
+    # P1-C: the decision binding is verified exactly ONCE, before the
+    # decision pointer may be emitted, the decision JSON may be parsed, or
+    # any verification command may be consumed.
+    verified_decision = _verified_decision_artifact(root, row)
     decision_pointer: str | None = None
-    if isinstance(decision_artifact, str) and decision_artifact and (root / decision_artifact).exists():
-        decision_pointer = _file_pointer(root, decision_artifact)
+    input_items = [_file_pointer(root, "qntylab.toml"), row_pointer]
+    if verified_decision is not None:
+        decision_pointer = _file_pointer(root, verified_decision[0])
         input_items.append(decision_pointer)
 
-    output_items = [
-        _file_pointer(root, artifact)
-        for artifact in row.get("authoritative_artifacts", [])
-        if isinstance(artifact, str) and artifact and (root / artifact).exists()
-    ][:MAX_OUTPUT_CONTRACT_ITEMS]
+    # P1-B: EVERY canonical authoritative artifact is considered, in
+    # canonical row order.  The complete pointer list is emitted when it fits
+    # the field cap; otherwise the packet fails closed.  No slicing, no
+    # first-N, no elision, no silent omission; a canonical authoritative
+    # artifact that cannot be read or pointer-bound fails closed.
+    output_items = [_file_pointer(root, artifact) for artifact in row.get("authoritative_artifacts", [])]
 
     immutable_items: list[str] = []
     if decision_pointer is not None:
@@ -546,7 +660,7 @@ def build_packet(root: Path, *, phase_id: str | None = None) -> str:
         "OPEN_BLOCKERS": blockers_value,
         "REVIEW_LIFECYCLE": review_value,
         "NEXT_ACTION": next_action_value,
-        "VERIFY_COMMAND": _verify_command(root, row),
+        "VERIFY_COMMAND": _verify_command(verified_decision),
     }
     return render_packet(values)
 

@@ -8,6 +8,7 @@ guarantees, and legacy renderer stability, plus positive happy-path controls.
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import re
 import subprocess
@@ -27,6 +28,18 @@ from qntylab.agent_context_packet_v0 import (
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 UMBRELLA_PROJECT_ID = "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0"
+# Mechanical positive-control row: the FIRST canonical row (projects.toml
+# order) whose COMPLETE pointer representation fits every frozen field cap
+# after the P1-B fail-closed repair.  The old positive control (the umbrella
+# row, six long artifact pointers) legitimately fails closed now.
+POSITIVE_CONTROL_PROJECT_ID = "QNTYLAB_PROJECT_CONTEXT_AND_AUTHORITY_REGISTRY_V0"
+CANONICAL_SCHEMA_CLARIFICATION_PROJECT_ID = "QNTYLAB_AGENT_CONTEXT_PACKET_SCHEMA_CLARIFICATION_V0"
+CANONICAL_SCHEMA_CLARIFICATION_SHA256 = "269bf4ee0d19ccc07df60c1e7eac4fa25fa91e626c3cc5f8f202d0af2afa1f02"
+CANONICAL_SCHEMA_CLARIFICATION_RELATIVE = (
+    "experiments/research/"
+    "qntylab_repository_ergonomics_and_modularity_cleanup_v0/"
+    "c1_agent_context_packet_v0/schema_clarification.json"
+)
 
 QNTYLAB_TOML = """schema_version = 1
 repository_id = "FIXTURE_REPO"
@@ -135,6 +148,58 @@ def _candidate_row(project_id: str, **overrides: Any) -> dict[str, Any]:
     )
 
 
+def _clarification_row(digest: str) -> dict[str, Any]:
+    """Canonical clarification registry row (mirrors the canonical master row).
+
+    The declared digest is the full SHA-256 of the fixture artifact bytes, so
+    the positive-control binding verifies; digest-mismatch tests corrupt the
+    bytes or the declared digest explicitly.
+    """
+    return {
+        "project_id": CANONICAL_SCHEMA_CLARIFICATION_PROJECT_ID,
+        "state": "CLOSED_PASS",
+        "decision_state": "CLOSED_PASS",
+        "authority_level": "CANONICAL_QNTYLAB_GIT_IDENTITY_GOVERNANCE_ONLY",
+        "authoritative_artifacts": [
+            "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/"
+            "c1_agent_context_packet_v0/schema_clarification.json",
+        ],
+        "decision_artifact": (
+            "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/"
+            "c1_agent_context_packet_v0/schema_clarification.json"
+        ),
+        "decision_artifact_sha256": digest,
+        "next_action": "PERFORM_SINGLE_BOUNDED_C1_REPAIR_FOR_ORIGINAL_THREE_P1_FINDINGS",
+        "implementation_authorized": False,
+    }
+
+
+def _clarification_artifact(
+    *,
+    field_count: int = 19,
+    field_order: list[str] | None = None,
+    envelope_is_field: bool = False,
+) -> str:
+    """Canonical clarification decision artifact bytes (frozen content)."""
+    import json
+
+    return json.dumps(
+        {
+            "artifact_type": "QNTYLAB_AGENT_CONTEXT_PACKET_SCHEMA_CLARIFICATION",
+            "clarification_id": CANONICAL_SCHEMA_CLARIFICATION_PROJECT_ID,
+            "state": "CLOSED_PASS",
+            "decision_state": "CLOSED_PASS",
+            "resolution": {
+                "schema_field_count": field_count,
+                "field_order": field_order if field_order is not None else list(FIELD_ORDER),
+                "envelope_is_schema_field": envelope_is_field,
+                "no_twentieth_field_invented": True,
+                "byte_cap_unchanged": 8192,
+            },
+        }
+    )
+
+
 def _fixture_root(
     tmp_path: Path,
     rows: list[dict[str, Any]],
@@ -142,10 +207,23 @@ def _fixture_root(
     decision: dict[str, Any] | None = None,
     extra_files: dict[str, str] | None = None,
     commit: bool = True,
+    include_clarification: bool = True,
+    clarification_field_count: int = 19,
+    clarification_field_order: list[str] | None = None,
+    clarification_envelope_field: bool = False,
+    clarification_digest: str | None = None,
 ) -> Path:
     root = tmp_path / "repo"
     _write(root, "qntylab.toml", QNTYLAB_TOML)
     _write(root, "artifact.md", "tracked artifact\n")
+    if include_clarification:
+        artifact_bytes = _clarification_artifact(
+            field_count=clarification_field_count,
+            field_order=clarification_field_order,
+            envelope_is_field=clarification_envelope_field,
+        )
+        digest = clarification_digest or hashlib.sha256(artifact_bytes.encode("utf-8")).hexdigest()
+        rows = [_clarification_row(digest), *rows]
     _write(
         root,
         "docs/state/projects.toml",
@@ -157,10 +235,18 @@ def _fixture_root(
     if not (extra_files or {}).get("docs/CURRENT_ROADMAP.md"):
         _write(root, "docs/CURRENT_ROADMAP.md", "# canonical roadmap\n")
     _write(root, "experiments/research/.gitkeep", "")
+    if include_clarification:
+        _write(root, CANONICAL_SCHEMA_CLARIFICATION_RELATIVE, artifact_bytes)
     if decision is not None:
         import json
 
-        _write(root, rows[0].get("decision_artifact", "decision.json"), json.dumps(decision))
+        # the decision artifact belongs to the first NON-clarification row
+        # (the clarification row's artifact is written separately above)
+        target_row = next(
+            (row for row in rows if row.get("project_id") != CANONICAL_SCHEMA_CLARIFICATION_PROJECT_ID),
+            rows[0],
+        )
+        _write(root, target_row.get("decision_artifact", "decision.json"), json.dumps(decision))
     for relative, content in (extra_files or {}).items():
         _write(root, relative, content)
     if commit:
@@ -632,8 +718,10 @@ def test_LEGACY_PROJECT_CONTEXT_SOURCE_UNCHANGED(tmp_path: Path) -> None:
 
     spine_before, brief_before = _legacy_renders()
     # packet generation against the live repository must not disturb the
-    # legacy context renderers or their source module
-    _run_cli_ok(REPO_ROOT, "--phase-id", UMBRELLA_PROJECT_ID)
+    # legacy context renderers or their source module; the mechanical
+    # positive-control row is used because the umbrella row legitimately
+    # fails closed under the complete-pointer-list rule
+    _run_cli_ok(REPO_ROOT, "--phase-id", POSITIVE_CONTROL_PROJECT_ID)
     spine_after, brief_after = _legacy_renders()
     assert spine_before == spine_after  # SAME_INPUT -> SAME_OLD_RENDERER_OUTPUT
     assert brief_before == brief_after
@@ -798,3 +886,243 @@ def test_EXPLICIT_SELECTOR_CANONICAL_PLANNED_ROW_IS_DESCRIPTIVE_ONLY(tmp_path: P
     _, items = _parse_packet(packet)
     assert items["STATE"] == ["PLANNED_NOT_AUTHORIZED"]  # verbatim, never relabeled
     assert items["ALLOWED_OPERATIONS"] == ["NONE"]  # describing grants no authority
+
+
+# ---------------------------------------------------------------------------
+# bounded C1 repair: P1-A canonical schema clarification binding
+# ---------------------------------------------------------------------------
+
+
+def test_CANONICAL_SCHEMA_CLARIFICATION_REQUIRED(tmp_path: Path) -> None:
+    root = _fixture_root(tmp_path, [_row("PHASE_ONE")], include_clarification=False)
+    completed = _run_cli(root)
+    assert completed.returncode != 0
+    assert completed.stdout == b""
+    stderr = completed.stderr.decode("utf-8", "replace")
+    assert "canonical schema clarification row absent" in stderr
+    assert len(stderr) < 400
+
+
+def test_CANONICAL_SCHEMA_FIELD_COUNT_19(tmp_path: Path) -> None:
+    root = _fixture_root(tmp_path, [_row("PHASE_ONE")], clarification_field_count=20)
+    completed = _run_cli(root)
+    assert completed.returncode != 0
+    assert completed.stdout == b""
+    assert b"schema_field_count != 19" in completed.stderr
+
+
+def test_CANONICAL_SCHEMA_ORDER_EXACT(tmp_path: Path) -> None:
+    reordered = list(FIELD_ORDER)
+    reordered[0], reordered[1] = reordered[1], reordered[0]
+    root = _fixture_root(tmp_path, [_row("PHASE_ONE")], clarification_field_order=reordered)
+    completed = _run_cli(root)
+    assert completed.returncode != 0
+    assert completed.stdout == b""
+    assert b"field_order != FIELD_ORDER" in completed.stderr
+
+
+def test_ENVELOPE_NOT_FIELD(tmp_path: Path) -> None:
+    root = _fixture_root(tmp_path, [_row("PHASE_ONE")], clarification_envelope_field=True)
+    completed = _run_cli(root)
+    assert completed.returncode != 0
+    assert completed.stdout == b""
+    assert b"envelope_is_schema_field is not false" in completed.stderr
+    # the rendered schema has exactly 19 named fields; no ENVELOPE field exists
+    ok_root = _fixture_root(tmp_path / "ok", [_row("PHASE_ONE")])
+    order, _ = _parse_packet(_run_cli_ok(ok_root))
+    assert order == list(FIELD_ORDER)
+    assert len(order) == 19
+    assert "ENVELOPE" not in order
+
+
+def test_SCHEMA_CLARIFICATION_DIGEST_MISMATCH_FAILS_CLOSED(tmp_path: Path) -> None:
+    root = _fixture_root(tmp_path, [_row("PHASE_ONE")], clarification_digest="f" * 64)
+    completed = _run_cli(root)
+    assert completed.returncode != 0
+    assert completed.stdout == b""
+    assert b"decision artifact digest mismatch" in completed.stderr
+
+
+# ---------------------------------------------------------------------------
+# bounded C1 repair: P1-B OUTPUT_CONTRACTS complete-pointer-list semantics
+# ---------------------------------------------------------------------------
+
+
+def test_OUTPUT_CONTRACTS_MORE_THAN_FOUR_ALL_EMITTED_WHEN_THEY_FIT(tmp_path: Path) -> None:
+    names = [f"a{i}.md" for i in range(6)]
+    extra = {name: f"tracked {name}\n" for name in names}
+    root = _fixture_root(
+        tmp_path,
+        [_row("PHASE_ONE", authoritative_artifacts=names)],
+        extra_files=extra,
+    )
+    packet = _run_cli_ok(root)
+    _, items = _parse_packet(packet)
+    pointers = items["OUTPUT_CONTRACTS"]
+    assert len(pointers) == 6  # more than four, ALL emitted
+    assert [pointer.split("#", 1)[0] for pointer in pointers] == names  # canonical row order
+
+
+def test_OUTPUT_CONTRACTS_COMPLETE_LIST_OVER_CAP_FAILS_CLOSED(tmp_path: Path) -> None:
+    names = [f"experiments/research/very_long_artifact_name_number_{i:02d}.json" for i in range(6)]
+    extra = {name: "tracked\n" for name in names}
+    root = _fixture_root(
+        tmp_path,
+        [_row("PHASE_ONE", authoritative_artifacts=names)],
+        extra_files=extra,
+    )
+    completed = _run_cli(root)
+    assert completed.returncode != 0
+    assert completed.stdout == b""  # no partial field, no partial packet
+    stderr = completed.stderr.decode("utf-8", "replace")
+    assert "pointer list exceeds field cap (300 B)" in stderr
+    assert len(stderr) < 400
+
+
+def test_OUTPUT_CONTRACTS_NO_SILENT_SLICE(tmp_path: Path) -> None:
+    names = [f"s{i}.md" for i in range(7)]
+    extra = {name: "tracked\n" for name in names}
+    root = _fixture_root(
+        tmp_path,
+        [_row("PHASE_ONE", authoritative_artifacts=names)],
+        extra_files=extra,
+    )
+    packet = _run_cli_ok(root)
+    _, items = _parse_packet(packet)
+    pointers = items["OUTPUT_CONTRACTS"]
+    assert len(pointers) == 7  # no [:4] slice, no drop-last
+    assert "..." not in packet
+    assert "OMITTED" not in packet.upper()
+    assert [pointer.split("#", 1)[0] for pointer in pointers] == names
+
+
+def test_MISSING_AUTHORITATIVE_ARTIFACT_FAILS_CLOSED(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    root = _fixture_root(tmp_path, [_row("PHASE_ONE")], extra_files={"gone.md": "tracked\n"})
+    (root / "gone.md").unlink()  # referenced canonical artifact no longer readable
+    _config, projects, _snapshot = packet_module._canonical_projects(root)
+    projects["PHASE_ONE"]["authoritative_artifacts"] = ["gone.md"]
+    monkeypatch.setattr(packet_module, "_canonical_projects", lambda _root: (_config, projects, _snapshot))
+    with pytest.raises(AgentContextPacketError, match="cannot read canonical file gone.md"):
+        packet_module.build_packet(root)
+
+
+# ---------------------------------------------------------------------------
+# bounded C1 repair: P1-C verified decision binding
+# ---------------------------------------------------------------------------
+
+
+def test_DECISION_ARTIFACT_DIGEST_MATCH_ACCEPTED(tmp_path: Path) -> None:
+    decision = {"verification_commands": ["python -m pytest -q tests/test_verified.py"]}
+    payload = json.dumps(decision).encode("utf-8")
+    digest = hashlib.sha256(payload).hexdigest()
+    root = _fixture_root(
+        tmp_path,
+        [_row("PHASE_ONE", decision_artifact="decision.json", decision_artifact_sha256=digest)],
+        extra_files={"decision.json": payload.decode("utf-8")},
+    )
+    packet = _run_cli_ok(root)
+    _, items = _parse_packet(packet)
+    assert items["VERIFY_COMMAND"] == ["python -m pytest -q tests/test_verified.py"]
+    assert f"decision.json#{digest[:12]}" in items["INPUT_CONTRACTS"]
+
+
+def test_DECISION_ARTIFACT_DIGEST_MISMATCH_REJECTED(tmp_path: Path) -> None:
+    decision = {"verification_commands": ["python -m pytest -q tests/test_tampered.py"]}
+    payload = json.dumps(decision).encode("utf-8")
+    root = _fixture_root(
+        tmp_path,
+        [_row("PHASE_ONE", decision_artifact="decision.json", decision_artifact_sha256="0" * 64)],
+        extra_files={"decision.json": payload.decode("utf-8")},
+    )
+    completed = _run_cli(root)
+    assert completed.returncode != 0
+    assert completed.stdout == b""
+    assert b"decision artifact digest mismatch" in completed.stderr
+
+
+def test_DECISION_DIGEST_MISMATCH_EMPTY_STDOUT(tmp_path: Path) -> None:
+    decision = {"verification_commands": ["python -m pytest -q tests/test_tampered.py"]}
+    payload = json.dumps(decision).encode("utf-8")
+    root = _fixture_root(
+        tmp_path,
+        [_row("PHASE_ONE", decision_artifact="decision.json", decision_artifact_sha256="0" * 64)],
+        extra_files={"decision.json": payload.decode("utf-8")},
+    )
+    completed = _run_cli(root)
+    assert completed.returncode != 0
+    assert completed.stdout == b""  # strictly empty stdout
+    assert 0 < len(completed.stderr) < 400  # bounded deterministic stderr
+
+
+def test_UNVERIFIED_DECISION_COMMAND_NOT_CONSUMED(tmp_path: Path) -> None:
+    marker = "tests/test_evil_unverified_command_marker.py"
+    decision = {"verification_commands": [f"python -m pytest -q {marker}"]}
+    payload = json.dumps(decision).encode("utf-8")
+    root = _fixture_root(
+        tmp_path,
+        [_row("PHASE_ONE", decision_artifact="decision.json", decision_artifact_sha256="0" * 64)],
+        extra_files={"decision.json": payload.decode("utf-8")},
+    )
+    completed = _run_cli(root)
+    assert completed.returncode != 0
+    # the command from UNVERIFIED bytes is never consumed anywhere
+    assert marker.encode() not in completed.stdout
+    assert marker.encode() not in completed.stderr
+
+
+# ---------------------------------------------------------------------------
+# bounded C1 repair: all three original P1s bound to the single repair
+# ---------------------------------------------------------------------------
+
+
+def test_ORIGINAL_THREE_P1S_BOUND_TO_SINGLE_REPAIR(tmp_path: Path) -> None:
+    # P1-C positive: verified decision binding drives pointer AND command
+    decision = {"verification_commands": ["python -m pytest -q tests/test_bound.py"]}
+    payload = json.dumps(decision).encode("utf-8")
+    digest = hashlib.sha256(payload).hexdigest()
+    # P1-B positive: six artifacts whose complete pointer list fits the cap
+    names = [f"b{i}.md" for i in range(6)]
+    extra: dict[str, str] = {name: "tracked\n" for name in names}
+    extra["decision.json"] = payload.decode("utf-8")
+    root = _fixture_root(
+        tmp_path,
+        [
+            _row(
+                "BOUND_PHASE",
+                authoritative_artifacts=names,
+                decision_artifact="decision.json",
+                decision_artifact_sha256=digest,
+            )
+        ],
+        extra_files=extra,
+    )
+    packet = _run_cli_ok(root)
+    order, items = _parse_packet(packet)
+    assert order == list(FIELD_ORDER) and len(order) == 19  # P1-A: exact 19-field schema
+    assert len(items["OUTPUT_CONTRACTS"]) == 6  # P1-B: no [:4] slice
+    assert items["VERIFY_COMMAND"] == ["python -m pytest -q tests/test_bound.py"]  # P1-C
+    assert f"decision.json#{digest[:12]}" in items["INPUT_CONTRACTS"]  # P1-C pointer
+    # P1-A module-level frozen facts
+    assert packet_module.CANONICAL_SCHEMA_CLARIFICATION_PROJECT_ID == CANONICAL_SCHEMA_CLARIFICATION_PROJECT_ID
+    assert not hasattr(packet_module, "MAX_OUTPUT_CONTRACT_ITEMS")  # P1-B semantic limit removed
+    # P1-A negative: clarification digest mismatch fails closed
+    _config, projects, _snapshot = packet_module._canonical_projects(root)
+    bad_row = dict(projects[CANONICAL_SCHEMA_CLARIFICATION_PROJECT_ID])
+    bad_row["decision_artifact_sha256"] = "0" * 64
+    with pytest.raises(AgentContextPacketError, match="digest mismatch"):
+        packet_module._validate_canonical_schema_contract(
+            root, {**projects, CANONICAL_SCHEMA_CLARIFICATION_PROJECT_ID: bad_row}
+        )
+
+
+def test_UMBRELLA_ROW_COMPLETE_LIST_OR_FAIL_CLOSED_NEVER_SUBSET() -> None:
+    # Live canonical umbrella row: six authoritative artifacts.  The packet
+    # must either emit ALL six pointers (if they genuinely fit) or fail
+    # closed — never a sliced subset.
+    try:
+        packet = packet_module.build_packet(REPO_ROOT, phase_id=UMBRELLA_PROJECT_ID)
+    except AgentContextPacketError as exc:
+        assert "pointer list exceeds field cap" in str(exc)  # legitimate fail-closed
+        return
+    _order, items = _parse_packet(packet)
+    assert len(items["OUTPUT_CONTRACTS"]) == 6  # complete list only

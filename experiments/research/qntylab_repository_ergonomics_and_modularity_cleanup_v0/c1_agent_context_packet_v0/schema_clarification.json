@@ -1,0 +1,200 @@
+{
+  "artifact_type": "QNTYLAB_AGENT_CONTEXT_PACKET_SCHEMA_CLARIFICATION",
+  "schema_version": "qntylab-agent-context-packet-schema-clarification-v0",
+  "clarification_id": "QNTYLAB_AGENT_CONTEXT_PACKET_SCHEMA_CLARIFICATION_V0",
+  "project_id": "QNTYLAB_AGENT_CONTEXT_PACKET_SCHEMA_CLARIFICATION_V0",
+  "phase_id": "QNTYLAB_AGENT_CONTEXT_PACKET_SCHEMA_CLARIFICATION_V0",
+  "state": "CLOSED_PASS",
+  "decision_state": "CLOSED_PASS",
+  "review_lifecycle_current_stage": "CLOSED",
+  "unresolved_critical": 0,
+  "unresolved_high": 0,
+  "project_type": "GOVERNANCE_ONLY",
+  "phase_type": "GOVERNANCE_ONLY",
+  "authority": "CANONICAL_QNTYLAB_GIT_IDENTITY_GOVERNANCE_ONLY",
+  "governance_only": true,
+  "clarifies_not_redesigns": true,
+  "purpose": "Resolve the SOURCE_CONFLICT inside the canonical forensic design artifact for phase QNTYLAB_AGENT_CONTEXT_PACKET_V0 (increment C1 of the CLOSED_PASS umbrella QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0): forensic section 3 enumerates exactly 19 named packet fields while forensic section 4 line 89 states 'Fixed 20-field schema'. The extra table row '| *(envelope: keys, newlines, escaping)* | | | ~1,000 |' is byte-budget accounting for serialization overhead, not a packet field. This clarification resolves the conflict at the governance layer only; it changes no runtime code, no forensic artifact, no scientific authority, and no umbrella state.",
+  "source_conflict": {
+    "conflict_class": "SOURCE_CONFLICT",
+    "resolved_by": "QNTYLAB_AGENT_CONTEXT_PACKET_SCHEMA_CLARIFICATION_V0",
+    "file": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/agent_context_target.md",
+    "description": "The forensic design artifact contradicts itself on the packet field count. Section 3 (Packet field contract, line 45) says the packet has 'exactly these fields, in this order' and then enumerates exactly 19 named field rows. Section 4 (Sizing rules, line 89) says 'Fixed 20-field schema; renderer rejects unknown/missing fields.' The 20th item is the table row '| *(envelope: keys, newlines, escaping)* | | | ~1,000 |' (line 69), which has no field identifier, no content semantics, and no source semantics; it only accounts for ~1,000 bytes of serialization overhead (keys, newlines, escaping) already included in the total sizing. Counting it as a field is a counting error, not a design intent to add a twentieth semantic field.",
+    "exact_quotes": [
+      "exactly these fields, in this order",
+      "Fixed 20-field schema; renderer rejects unknown/missing fields.",
+      "| *(envelope: keys, newlines, escaping)* | | | ~1,000 |"
+    ],
+    "conflict_lines": {"section_3_field_contract": 45, "envelope_table_row": 69, "section_4_sizing_rule": 89}
+  },
+  "resolution": {
+    "schema_field_count": 19,
+    "field_order": [
+      "REPOSITORY",
+      "HEAD",
+      "WORKTREE",
+      "PHASE_ID",
+      "STATE",
+      "OBJECTIVE",
+      "AUTHORITY_SOURCE",
+      "ALLOWED_OPERATIONS",
+      "FORBIDDEN_OPERATIONS",
+      "INPUT_CONTRACTS",
+      "OUTPUT_CONTRACTS",
+      "LOAD_BEARING_INVARIANTS",
+      "RELEVANT_CODE",
+      "RELEVANT_TESTS",
+      "IMMUTABLE_PATHS",
+      "OPEN_BLOCKERS",
+      "REVIEW_LIFECYCLE",
+      "NEXT_ACTION",
+      "VERIFY_COMMAND"
+    ],
+    "envelope_is_schema_field": false,
+    "envelope_disposition": "BYTE_BUDGET_ACCOUNTING_ONLY",
+    "forbidden_field_names": ["ENVELOPE", "SCHEMA", "SCHEMA_VERSION", "PACKET_VERSION", "METADATA"],
+    "forbidden_field_names_note": "No twentieth field is invented under any other name either: the authorized field set is exactly the 19 enumerated named fields and nothing else.",
+    "no_twentieth_field_invented": true,
+    "forensic_fixed_20_field_text_disposition": "COUNTING_ERROR_SUPERSEDED_FOR_C1_IMPLEMENTATION_BY_THIS_CLARIFICATION",
+    "forensic_artifact_disposition": "IMMUTABLE_HISTORICAL_DESIGN_EVIDENCE",
+    "byte_cap_unchanged": 8192
+  },
+  "mechanical_reasoning": [
+    "1. Forensic section 3 says the packet has 'exactly these fields, in this order' and then enumerates a fixed ordered list of named field rows.",
+    "2. That enumeration contains exactly 19 named identifiers: REPOSITORY, HEAD, WORKTREE, PHASE_ID, STATE, OBJECTIVE, AUTHORITY_SOURCE, ALLOWED_OPERATIONS, FORBIDDEN_OPERATIONS, INPUT_CONTRACTS, OUTPUT_CONTRACTS, LOAD_BEARING_INVARIANTS, RELEVANT_CODE, RELEVANT_TESTS, IMMUTABLE_PATHS, OPEN_BLOCKERS, REVIEW_LIFECYCLE, NEXT_ACTION, VERIFY_COMMAND.",
+    "3. Every one of the 19 named rows carries both content semantics (what the field holds) and source semantics (where the value is derived from), so each is a genuine packet field.",
+    "4. The envelope row '| *(envelope: keys, newlines, escaping)* |' has neither a field identifier nor content/source semantics; it is typographically distinct (italicized, parenthesized, unnamed).",
+    "5. The envelope row describes serialization mechanics only: keys, newlines, and escaping.",
+    "6. The ~1,000-byte envelope amount is already included in the total sizing ('~ 5,090 B typical, <= 8,192 B hard cap'), i.e. it is overhead accounting, not packet state.",
+    "7. Therefore the envelope is formatting/byte overhead, not a packet field.",
+    "8. A twentieth semantic field would require new content and source semantics that are absent from the design target; inventing them would exceed the forensic design.",
+    "9. Choosing the enumerated named-field contract (19 fields) minimizes invention and preserves the section 3 guarantee of 'exactly these fields'."
+  ],
+  "umbrella_relation": {
+    "governing_umbrella": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0",
+    "umbrella_state_unchanged": "CLOSED_PASS",
+    "affected_increment": "C1",
+    "affected_phase": "QNTYLAB_AGENT_CONTEXT_PACKET_V0",
+    "new_increment_authorized": false,
+    "authorized_implementation_increment_count_change": 0,
+    "c2_changed": false,
+    "c3_changed": false,
+    "c4_changed": false,
+    "c5_changed": false,
+    "c6_changed": false,
+    "c1_same_increment_and_review_lifecycle": true,
+    "note": "This clarification binds C1 from the governance side only. It does not reopen the umbrella, does not add a seventh increment, and does not alter C2-C6."
+  },
+  "c1_review_lifecycle": {
+    "independent_hostile_review_count": 1,
+    "reviewed_candidate": "a3a22df3604d58671ec7c4b2fd4e90b4c5b7b67a",
+    "original_critical": 0,
+    "original_high": 3,
+    "bounded_repair_used": false,
+    "targeted_rereview_used": false,
+    "post_clarification_repair_authorization": "EXACTLY_ONE_BOUNDED_REPAIR_COVERING_ALL_THREE_P1S",
+    "post_repair_rereview": "AT_MOST_ONE_TARGETED_REREVIEW",
+    "no_second_unrestricted_review": true,
+    "no_review_loop_reset": true,
+    "does_not_consume_bounded_repair": true,
+    "note": "This clarification preserves the C1 review lifecycle exactly as it stands after the one completed independent hostile review: one review, zero bounded repairs consumed, zero targeted rereviews consumed. The single remaining bounded repair, when consumed after this clarification merges, must cover all three P1 findings together; it is followed by at most one targeted rereview. No second unrestricted review and no review-loop reset is authorized."
+  },
+  "review_findings": {
+    "review_id": "PRR_kwDOTo27Xs8AAAABMR-dXw",
+    "numeric_review_id": 5119122783,
+    "result": {"critical": 0, "high": 3},
+    "findings": [
+      {
+        "finding_id": "P1_SCHEMA_CONFLICT",
+        "thread_id": "PRRT_kwDOTo27Xs6fe8He",
+        "severity": "HIGH",
+        "disposition": "RESOLVED_BY_CANONICAL_SCHEMA_CLARIFICATION"
+      },
+      {
+        "finding_id": "P1_OUTPUT_CONTRACT_TRUNCATION",
+        "thread_id": "PRRT_kwDOTo27Xs6fe8Hh",
+        "severity": "HIGH",
+        "disposition": "OPEN_IMPLEMENTATION_HIGH"
+      },
+      {
+        "finding_id": "P1_DECISION_DIGEST_MISMATCH",
+        "thread_id": "PRRT_kwDOTo27Xs6fe8Hj",
+        "severity": "HIGH",
+        "disposition": "OPEN_IMPLEMENTATION_HIGH"
+      }
+    ],
+    "open_findings_repair_binding": "P1_OUTPUT_CONTRACT_TRUNCATION and P1_DECISION_DIGEST_MISMATCH are mandatory members of the single bounded C1 repair that follows this clarification; they are not resolved by this clarification and remain OPEN_IMPLEMENTATION_HIGH until that repair."
+  },
+  "expected_repair_semantics_informational_not_implemented": {
+    "status": "NOT_IMPLEMENTED_IN_THIS_CLARIFICATION_TASK",
+    "implementation_note": "Both repair semantics below are recorded informationally for the future bounded C1 repair. This clarification task implements neither of them; no runtime file is modified here.",
+    "P1_OUTPUT_CONTRACT_TRUNCATION": "OUTPUT_CONTRACTS must not silently drop entries via an authoritative_artifacts[:4]-style truncation. If the complete canonical pointer representation cannot fit its frozen field cap, the packet generation must FAIL CLOSED unless the governing schema explicitly provides a canonical aggregate pointer representation. No hidden omission is permitted.",
+    "P1_DECISION_DIGEST_MISMATCH": "If a selected canonical row contains decision_artifact / decision_artifact_sha256, packet generation must verify sha256(actual bytes) == decision_artifact_sha256 before emitting the artifact pointer, consuming verification commands, or deriving packet content. On mismatch the packet generation must FAIL CLOSED with empty stdout and a non-zero exit code."
+  },
+  "authority_firewall": {
+    "scientific_evaluation_authority": "NONE",
+    "scientific_execution_authority": "NONE",
+    "real_data_authority": "NONE",
+    "provider_authority": "NONE",
+    "claim_authority": "NONE",
+    "router_authority": "NONE",
+    "qnty_authority": "NONE",
+    "qntyspot_authority": "NONE",
+    "trading_authority": "NONE",
+    "capital_authority": "NONE",
+    "downstream_authority": "NONE",
+    "scientific_evaluation_authorized": false,
+    "scientific_execution_authorized": false,
+    "real_data_access_authorized": false,
+    "provider_access_authorized": false,
+    "claim_access_authorized": false,
+    "claim_consumption_authorized": false,
+    "scientific_question_answered": false,
+    "historical_result_changed": false,
+    "frozen_evidence_deleted": false
+  },
+  "operative_effect": [
+    "C1 V0 schema = exactly the 19 enumerated named fields",
+    "envelope = formatting/byte overhead, not a field"
+  ],
+  "self_review_lifecycle": {
+    "independent_hostile_governance_review_count": 1,
+    "required_independent_hostile_governance_reviews": 1,
+    "bounded_clarification_repair_used": false,
+    "targeted_rereview_required": false,
+    "targeted_rereview_used": false,
+    "review_evidence": {
+      "evidence_type": "CODEX_NO_SUGGESTIONS_PR_REACTION",
+      "reviewed_candidate": "63d588b31da9c5a409c2ecf0f2ae765cfd88b908",
+      "request_comment_id": 5548485113,
+      "formal_review_id": null,
+      "reaction_id": 489707669,
+      "reaction": "+1",
+      "reaction_created_at": "2026-09-05T01:42:41Z",
+      "reaction_actor": "chatgpt-codex-connector[bot]",
+      "critical": 0,
+      "high": 0
+    },
+    "review_focus": [
+      "The 19-field resolution is mechanically justified by the historical forensic design (section 3 enumerates exactly 19 named fields; the envelope row is byte-budget accounting).",
+      "No twentieth-field semantics are invented; the authorized field set is exactly the 19 enumerated names and nothing else.",
+      "No seventh cleanup increment is created; the umbrella's authorized increment count change is 0 and the umbrella remains CLOSED_PASS.",
+      "No reset of the C1 consumed review lifecycle: one review stands, zero bounded repairs and zero targeted rereviews are consumed by this clarification, and the single remaining bounded repair must cover all three P1s.",
+      "No change to scientific or downstream authority: all authority axes remain NONE and no frozen evidence is touched."
+    ],
+    "state": "CLOSED_PASS",
+    "decision_state": "CLOSED_PASS",
+    "closure_representation_note": "state/decision_state CLOSED_PASS reflects the completed independent hostile governance review (Codex no-suggestions +1 reaction evidence, formal_review_id null); the review receipt is recorded in schema_clarification_review_receipt.json alongside this artifact.",
+    "target_state_after_review_success": "CLOSED_PASS",
+    "target_decision_state_after_review_success": "CLOSED_PASS",
+    "next_action": "PERFORM_SINGLE_BOUNDED_C1_REPAIR_FOR_ORIGINAL_THREE_P1_FINDINGS"
+  },
+  "out_of_scope": {
+    "runtime_code_changes": 0,
+    "forensic_artifact_changes": 0,
+    "umbrella_row_edits": 0,
+    "c1_pr_edits": 0,
+    "new_cleanup_increments": 0,
+    "note": "This clarification modifies no file under qntylab/, no file under docs/forensics/**, no .github/** file, no AGENTS.md/README.md, and neither the C1 branch/PR #248 nor the umbrella registry row. It does not implement the P1-B/P1-C repair rules in runtime; they are recorded informationally only."
+  }
+}

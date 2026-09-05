@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "artifact_type": "C1_TARGETED_REREVIEW_CLOSURE_RECEIPT",
+  "project_id": "QNTYLAB_AGENT_CONTEXT_PACKET_V0",
+  "umbrella_project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0",
+  "phase": "C1",
+  "terminal_state": "CLOSED_PASS",
+  "terminal_disposition": "READY_FOR_MERGE_WITH_EXPLICIT_AUTHORITY",
+  "canonical_master_at_repair": "697a5361a18988fd314a42ca786ea0277c0c283f",
+  "original_review": {
+    "review_id": "PRR_kwDOTo27Xs8AAAABMR-dXw",
+    "review_id_numeric": 5119122783,
+    "reviewed_candidate_sha": "a3a22df3604d58671ec7c4b2fd4e90b4c5b7b67a",
+    "critical_total": 0,
+    "high_total": 3
+  },
+  "bounded_repair": {
+    "repair_sha": "8e8ed6afa3dc32cb3226a598179b2577755168b0",
+    "budget_used": true,
+    "budget_count": 1,
+    "budget_limit": 1
+  },
+  "targeted_rereview": {
+    "required": true,
+    "used": true,
+    "count": 1,
+    "limit": 1,
+    "request_issue_comment_id": 5551643439,
+    "result_issue_comment_id": 5551675229,
+    "reviewed_candidate_sha": "8e8ed6afa3dc32cb3226a598179b2577755168b0",
+    "result_text": "Codex Review: Didn't find any major issues. Hooray!",
+    "verdict": "PASS_NO_CRITICAL_HIGH",
+    "new_critical_total": 0,
+    "new_high_total": 0,
+    "finding_dispositions": {
+      "P1_SCHEMA_CONFLICT": "CLEARED",
+      "P1_OUTPUT_CONTRACT_TRUNCATION": "CLEARED",
+      "P1_DECISION_DIGEST_MISMATCH": "CLEARED"
+    }
+  },
+  "qnty_agent_eval_applicability": {
+    "repository": "CipherCuttle/QntyAgentEval",
+    "main_tree_sha": "4a1078aa40639d7b78c2db4a4d6b968da8217ca8",
+    "lookup_count": 1,
+    "observed_concrete_task_scope": "tasks/qnty/",
+    "observed_target_repository": "CipherCuttle/Qnty",
+    "disposition": "NO_MATCH",
+    "evaluator_run_required": false,
+    "evaluator_created": false
+  },
+  "budgets": {
+    "broad_hostile_review_used": 1,
+    "broad_hostile_review_limit": 1,
+    "bounded_repair_used": 1,
+    "bounded_repair_limit": 1,
+    "targeted_rereview_used": 1,
+    "targeted_rereview_limit": 1
+  },
+  "authority": {
+    "runtime_authorized": false,
+    "scientific_execution_authorized": false,
+    "qnty_mutation_authorized": false,
+    "qnty_agent_eval_mutation_authorized": false,
+    "qntyspot_mutation_authorized": false,
+    "trading_authority": "NONE",
+    "capital_authority": "NONE",
+    "signing_authority": "NONE",
+    "promotion_authority": "NONE"
+  },
+  "next_action": "Merge PR #248 only with explicit merge authority; do not start C2-C6 automatically."
+}

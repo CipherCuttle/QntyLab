@@ -18,6 +18,11 @@ FORENSIC_PATH = ROOT / (
     "agent_context_target.md"
 )
 PROJECTS_PATH = ROOT / "docs/state/projects.toml"
+RECEIPT_PATH = ROOT / (
+    "experiments/research/"
+    "qntylab_repository_ergonomics_and_modularity_cleanup_v0/"
+    "c1_agent_context_packet_v0/schema_clarification_review_receipt.json"
+)
 
 CLARIFICATION_ID = "QNTYLAB_AGENT_CONTEXT_PACKET_SCHEMA_CLARIFICATION_V0"
 UMBRELLA_ID = "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0"
@@ -178,7 +183,7 @@ def test_11_p1_dispositions_and_repair_semantics_not_implemented() -> None:
     by_id = {finding["finding_id"]: finding for finding in findings}
 
     assert by_id["P1_SCHEMA_CONFLICT"]["thread_id"] == "PRRT_kwDOTo27Xs6fe8He"
-    assert by_id["P1_SCHEMA_CONFLICT"]["disposition"] == "RESOLVED_BY_THIS_CLARIFICATION"
+    assert by_id["P1_SCHEMA_CONFLICT"]["disposition"] == "RESOLVED_BY_CANONICAL_SCHEMA_CLARIFICATION"
     assert by_id["P1_OUTPUT_CONTRACT_TRUNCATION"]["thread_id"] == "PRRT_kwDOTo27Xs6fe8Hh"
     assert by_id["P1_OUTPUT_CONTRACT_TRUNCATION"]["disposition"] == "OPEN_IMPLEMENTATION_HIGH"
     assert by_id["P1_DECISION_DIGEST_MISMATCH"]["thread_id"] == "PRRT_kwDOTo27Xs6fe8Hj"
@@ -206,22 +211,84 @@ def test_12_binding_to_c1_phase_and_umbrella() -> None:
     assert clarification["resolution"]["byte_cap_unchanged"] == 8192
 
 
-def test_13_preclosure_self_lifecycle() -> None:
+def test_13_closed_pass_self_lifecycle() -> None:
     clarification = _clarification()
     self_lifecycle = clarification["self_review_lifecycle"]
 
-    assert clarification["state"] == "PLANNED_NOT_AUTHORIZED"
-    assert clarification["decision_state"] == "PLANNED_NOT_AUTHORIZED"
-    assert self_lifecycle["state"] == "PLANNED_NOT_AUTHORIZED"
-    assert self_lifecycle["decision_state"] == "PLANNED_NOT_AUTHORIZED"
-    assert self_lifecycle["independent_hostile_governance_review_count"] == 0
+    assert clarification["state"] == "CLOSED_PASS"
+    assert clarification["decision_state"] == "CLOSED_PASS"
+    assert clarification["review_lifecycle_current_stage"] == "CLOSED"
+    assert clarification["unresolved_critical"] == 0
+    assert clarification["unresolved_high"] == 0
+    assert self_lifecycle["state"] == "CLOSED_PASS"
+    assert self_lifecycle["decision_state"] == "CLOSED_PASS"
+    assert self_lifecycle["independent_hostile_governance_review_count"] == 1
     assert self_lifecycle["required_independent_hostile_governance_reviews"] == 1
     assert self_lifecycle["bounded_clarification_repair_used"] is False
+    assert self_lifecycle["targeted_rereview_required"] is False
     assert self_lifecycle["targeted_rereview_used"] is False
-    assert self_lifecycle["next_action"] == "AWAIT_INDEPENDENT_HOSTILE_GOVERNANCE_REVIEW"
+    assert (
+        self_lifecycle["next_action"]
+        == "PERFORM_SINGLE_BOUNDED_C1_REPAIR_FOR_ORIGINAL_THREE_P1_FINDINGS"
+    )
     assert self_lifecycle["target_state_after_review_success"] == "CLOSED_PASS"
     assert self_lifecycle["target_decision_state_after_review_success"] == "CLOSED_PASS"
     assert len(self_lifecycle["review_focus"]) == 5
+
+    review_evidence = self_lifecycle["review_evidence"]
+    assert review_evidence["evidence_type"] == "CODEX_NO_SUGGESTIONS_PR_REACTION"
+    assert review_evidence["reviewed_candidate"] == "63d588b31da9c5a409c2ecf0f2ae765cfd88b908"
+    assert review_evidence["request_comment_id"] == 5548485113
+    assert review_evidence["formal_review_id"] is None
+    assert review_evidence["reaction_id"] == 489707669
+    assert review_evidence["reaction"] == "+1"
+    assert review_evidence["reaction_created_at"] == "2026-09-05T01:42:41Z"
+    assert review_evidence["reaction_actor"] == "chatgpt-codex-connector[bot]"
+    assert review_evidence["critical"] == 0
+    assert review_evidence["high"] == 0
+
+
+def test_13b_review_receipt_file_matches_truthful_receipt() -> None:
+    receipt = json.loads(RECEIPT_PATH.read_text(encoding="utf-8"))
+    assert receipt["REVIEW_TYPE"] == "INDEPENDENT_HOSTILE_GOVERNANCE_REVIEW"
+    assert receipt["REVIEWED_CANDIDATE"] == "63d588b31da9c5a409c2ecf0f2ae765cfd88b908"
+    assert receipt["REQUEST_COMMENT_ID"] == 5548485113
+    assert receipt["EVIDENCE_TYPE"] == "CODEX_NO_SUGGESTIONS_PR_REACTION"
+    assert receipt["FORMAL_REVIEW_ID"] is None
+    assert receipt["REACTION_ID"] == 489707669
+    assert receipt["REACTION"] == "+1"
+    assert receipt["REACTION_CREATED_AT"] == "2026-09-05T01:42:41Z"
+    assert receipt["REACTION_ACTOR"] == "chatgpt-codex-connector[bot]"
+    assert receipt["CRITICAL"] == 0
+    assert receipt["HIGH"] == 0
+    assert receipt["BOUNDED_REPAIR_USED"] is False
+    assert receipt["TARGETED_REREVIEW_REQUIRED"] is False
+    assert receipt["TARGETED_REREVIEW_USED"] is False
+    assert receipt["FINAL_DISPOSITION"] == "CLOSED_PASS"
+
+
+def test_13c_registry_row_closed_pass_state() -> None:
+    record = _record(CLARIFICATION_ID)
+    assert record["state"] == "CLOSED_PASS"
+    assert record["decision_state"] == "CLOSED_PASS"
+    assert record["review_lifecycle_current_stage"] == "CLOSED"
+    assert record["hostile_review_count"] == 1
+    assert record["bounded_repair_used"] is False
+    assert record["targeted_rereview_required"] is False
+    assert record["targeted_rereview_used"] is False
+    assert record["unresolved_critical"] == 0
+    assert record["unresolved_high"] == 0
+    assert (
+        record["next_action"]
+        == "PERFORM_SINGLE_BOUNDED_C1_REPAIR_FOR_ORIGINAL_THREE_P1_FINDINGS"
+    )
+    assert record["authorized_implementation_increment_count_change"] == 0
+    receipt_relpath = (
+        "experiments/research/"
+        "qntylab_repository_ergonomics_and_modularity_cleanup_v0/"
+        "c1_agent_context_packet_v0/schema_clarification_review_receipt.json"
+    )
+    assert receipt_relpath in record["authoritative_artifacts"]
 
 
 def test_14_registry_row_sha256_binding() -> None:

@@ -10137,3 +10137,41 @@ critical_high_rereviews_used = 1
 unresolved_critical = 0
 unresolved_high = 0
 next_action = "IMPLEMENT_QNTYLAB_AGENT_CONTEXT_PACKET_V0"
+
+[[project]]
+project_id = "QNTYLAB_AGENT_CONTEXT_PACKET_SCHEMA_CLARIFICATION_V0"
+phase_id = "QNTYLAB_AGENT_CONTEXT_PACKET_SCHEMA_CLARIFICATION_V0"
+display_name = "QntyLab agent context packet schema clarification V0"
+state = "PLANNED_NOT_AUTHORIZED"
+decision_state = "PLANNED_NOT_AUTHORIZED"
+authority_level = "CANONICAL_QNTYLAB_GIT_IDENTITY_GOVERNANCE_ONLY"
+phase_type = "GOVERNANCE_ONLY"
+governance_only = true
+description = "Governance-only clarification resolving the 19-vs-20 SOURCE_CONFLICT in the C1 forensic design target (docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/agent_context_target.md): the QNTYLAB_AGENT_CONTEXT_PACKET_V0 schema is exactly the 19 enumerated named fields and the envelope row is byte-budget accounting, not a field. Binds increment C1 of the CLOSED_PASS umbrella QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0 from the governance side without changing the authorized increment count (change = 0), without reopening the umbrella, and without touching the C1 branch/PR #248."
+authoritative_artifacts = [
+  "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c1_agent_context_packet_v0/schema_clarification.json",
+  "tests/test_qntylab_agent_context_packet_schema_clarification_v0.py",
+]
+decision_artifact = "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c1_agent_context_packet_v0/schema_clarification.json"
+decision_artifact_sha256 = "4a798d0405eb9d34659a165787075de71f18d49c566103e615b669b37ae96793"
+governing_decision_project_id = "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0"
+affected_increment = "C1"
+affected_phase = "QNTYLAB_AGENT_CONTEXT_PACKET_V0"
+authorized_implementation_increment_count_change = 0
+scientific_evaluation_phases_authorized = 0
+scientific_evaluation_authorized = false
+scientific_execution_authorized = false
+implementation_authorized = false
+implementation_completed = false
+real_data_access_authorized = false
+outcome_access_authorized = false
+provider_access_authorized = false
+claim_access_authorized = false
+claim_consumption_authorized = false
+router_authority = "NONE"
+qnty_authority = "NONE"
+qntyspot_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+downstream_authority = "NONE"
+next_action = "AWAIT_INDEPENDENT_HOSTILE_GOVERNANCE_REVIEW"

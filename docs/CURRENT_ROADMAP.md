@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- None.
+- `QntyLab agent context packet V0` — `ACTIVE`. OPEN_DRAFT_PR_AND_UNDERGO_ONE_INDEPENDENT_GITHUB_HOSTILE_REVIEW
 
 ## Queued — not authorized
 

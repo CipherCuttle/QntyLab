@@ -1,0 +1,80 @@
+{
+  "artifact_type": "C2_VERIFICATION_REPAIR_RECEIPT",
+  "increment_id": "C2",
+  "phase_id": "PROJECT_CONTEXT_MODULARIZATION_V0",
+  "project_id": "QNTYLAB_PROJECT_CONTEXT_MODULARIZATION_V0",
+  "governing_umbrella_project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0",
+  "canonical_parent": "78f3ca1b3566e9ea3d138796b7ce50e224c9e45a",
+  "original_c2_implementation_sha": "d37c6d3930aefe8eaa327bc01097dc56017186bc",
+  "repair_commit": {
+    "parent": "d37c6d3930aefe8eaa327bc01097dc56017186bc",
+    "message": "fix: make C2 closure verification exact-head safe",
+    "sha_note": "the repair commit SHA is self-referential and therefore recorded externally in Git history; this receipt is committed inside that commit as its child of d37c6d3930aefe8eaa327bc01097dc56017186bc"
+  },
+  "findings_repaired": [
+    {
+      "id": "H1",
+      "severity": "HIGH",
+      "summary": "committed-candidate test defect in tests/test_project_context_modularization_c2.py: the baseline fixture asserted current HEAD == canonical parent 78f3ca1b3566e9ea3d138796b7ce50e224c9e45a, so tests using the baseline fixture could not run against the immutable committed candidate d37c6d3930aefe8eaa327bc01097dc56017186bc (the 15 passed / 2 skipped result was obtained as worktree changes over the parent, not at committed head)",
+      "repair_applied": "removed ONLY the false requirement that candidate HEAD equals the canonical parent; the old-source ORACLE remains pinned to 78f3ca1b3566e9ea3d138796b7ce50e224c9e45a:qntylab/project_context.py via git show against the pinned parent (NOT current HEAD); unconditional same-state semantic parity (brief, spine, doctor, render, registry validation) executes first and unchanged; frozen parent-only digest checks still skip on candidate HEAD only AFTER that unconditional parity has executed"
+    },
+    {
+      "id": "H2",
+      "severity": "HIGH",
+      "summary": "bookkeeping/evaluator evidence defect: C2 artifacts used the project ID as phase_id and recorded weak local-grep QntyAgentEval evidence",
+      "repair_applied": "phase_id corrected to PROJECT_CONTEXT_MODULARIZATION_V0 in implementation_manifest.json, metrics.json and hostile_review.json (project ID QNTYLAB_PROJECT_CONTEXT_MODULARIZATION_V0 remains distinct; umbrella decision NOT altered); weak local-grep evidence replaced with the real read-only QntyAgentEval inventory recorded verbatim"
+    }
+  ],
+  "qnty_agent_eval_inventory": {
+    "repository": "CipherCuttle/QntyAgentEval",
+    "inspected_tree": "4a1078aa40639d7b78c2db4a4d6b968da8217ca8",
+    "inspected_ref": "main",
+    "task_root": "tasks/qnty",
+    "tasks_present": ["QNTY_ADMIN_STALE_CONTEXT_001", "QNTY_PROTOCOL_FAIL_CLOSED_001"],
+    "conclusion": "No QntyLab C2 evaluator exists.",
+    "qntyagenteval_mutation": "NONE (read-only inspection only; QntyAgentEval was not re-mutated)"
+  },
+  "evaluator": {
+    "evaluator_applicability": "NO_MATCH",
+    "evaluator_run": "NOT_REQUIRED",
+    "evaluator_creation": "FORBIDDEN",
+    "evaluator_created": false
+  },
+  "repair_budget": {
+    "used": true,
+    "count": 1,
+    "limit": 1,
+    "remaining": 0
+  },
+  "targeted_rereview": {
+    "required": true,
+    "used": true,
+    "count": 1,
+    "status": "EXECUTED_AND_PASSED",
+    "scope": "ONLY H1/H2: (H1) oracle source pinned to canonical parent; test suite runs on the immutable repaired exact-head candidate; unconditional parity assertions actually execute; digest skips cannot bypass parity. (H2) phase ID corrected; project ID remains distinct; real QntyAgentEval inventory recorded; NO_MATCH truthful; repair budget 1/1 recorded; original hostile review not misrepresented as reviewing the repair commit. Plus new Critical/High defects introduced by the repair only.",
+    "reviewed_sha": "bd033ca36436ad3ea72b79874047747d46fcc602",
+    "exact_head_ci": {
+      "workflow": "Project Context",
+      "run_id": 34004922781,
+      "head_sha": "bd033ca36436ad3ea72b79874047747d46fcc602",
+      "result": "success",
+      "note": "exact-head CI ran on the repaired candidate (not on d37c6d3930aefe8eaa327bc01097dc56017186bc)"
+    },
+    "verdict": {
+      "NEW_CRITICAL": 0,
+      "NEW_HIGH": 0,
+      "H1": "CLEARED",
+      "H2": "CLEARED"
+    },
+    "h1_evidence": "tests/test_project_context_modularization_c2.py baseline fixture loads the oracle exclusively via git show CANONICAL_PARENT:qntylab/project_context.py with no HEAD-equals-parent requirement; exact-head run at bd033ca produced 15 passed / 2 skipped where both skips (brief/spine frozen digests) executed their unconditional same-state parity assertions first; doctor/render/registry parity tests passed unconditionally",
+    "h2_evidence": "phase_id corrected to PROJECT_CONTEXT_MODULARIZATION_V0 in implementation_manifest.json, metrics.json, hostile_review.json; project ID QNTYLAB_PROJECT_CONTEXT_MODULARIZATION_V0 remains distinct; real QntyAgentEval inventory (tree 4a1078aa40639d7b78c2db4a4d6b968da8217ca8, tasks/qnty root, tasks QNTY_ADMIN_STALE_CONTEXT_001 and QNTY_PROTOCOL_FAIL_CLOSED_001) recorded; evaluator NO_MATCH/NOT_REQUIRED/FORBIDDEN truthful; repair budget 1/1 recorded; original hostile review scope boundary added"
+  },
+  "governance": {
+    "merge_authority": "NOT_GRANTED",
+    "c3_c6_authorized": false,
+    "c3_c6_started": false,
+    "umbrella_decision_untouched": true,
+    "original_hostile_review_status": "PRESERVED_UNCHANGED_AS_REVIEW_OF_PRE_COMMIT_CHANGESET (phase_id corrected only; scope boundary added)"
+  },
+  "repair_timestamp_note": "recorded pre-commit; see the repair commit's own SHA via git log for the exact-head identifier"
+}

@@ -1,0 +1,120 @@
+{
+  "artifact_type": "C2_IMPLEMENTATION_MANIFEST",
+  "increment_id": "C2",
+  "phase_id": "PROJECT_CONTEXT_MODULARIZATION_V0",
+  "governing_umbrella_project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0",
+  "canonical_parent": "78f3ca1b3566e9ea3d138796b7ce50e224c9e45a",
+  "canonical_parent_note": "C1 merge commit (PR #248); origin/master unchanged at this SHA at implementation time",
+  "branch": "c2-project-context-modularization-v0",
+  "behavior_preserving": true,
+  "changeset": [
+    {
+      "path": "qntylab/project_context.py",
+      "disposition": "MODIFIED",
+      "responsibility": "composition root: retains the public module surface (imports/re-exports from sibling modules, CLI entrypoint dispatch); no DSH identities",
+      "bytes_post": 24561,
+      "loc_post": 562,
+      "dsh_token_count_post": 0
+    },
+    {
+      "path": "qntylab/project_context_core.py",
+      "disposition": "ADDED",
+      "responsibility": "generic core: context-source loading, canonical git identity, shared types/helpers",
+      "bytes_post": 13867,
+      "loc_post": 328,
+      "dsh_token_count_post": 0
+    },
+    {
+      "path": "qntylab/project_context_registry.py",
+      "disposition": "ADDED",
+      "responsibility": "generic registry: projects.toml loading/validation and project row projection",
+      "bytes_post": 11754,
+      "loc_post": 228,
+      "dsh_token_count_post": 0
+    },
+    {
+      "path": "qntylab/project_context_spine.py",
+      "disposition": "ADDED",
+      "responsibility": "generic spine: context-spine compiled projection generation and check mode",
+      "bytes_post": 14141,
+      "loc_post": 308,
+      "dsh_token_count_post": 0
+    },
+    {
+      "path": "qntylab/project_context_brief.py",
+      "disposition": "ADDED",
+      "responsibility": "generic brief: bounded orientation brief generation",
+      "bytes_post": 13503,
+      "loc_post": 301,
+      "dsh_token_count_post": 0
+    },
+    {
+      "path": "qntylab/project_context_execution_authority.py",
+      "disposition": "ADDED",
+      "responsibility": "domain seam: execution-authority projection; the ONLY module containing DSH identities (DSH, DSH_STAGE, STAGE_A, dsh, pinned_dsh, stage-a, Stage-A)",
+      "bytes_post": 40936,
+      "loc_post": 702,
+      "dsh_token_count_post": 49
+    },
+    {
+      "path": "tests/test_project_context_modularization_c2.py",
+      "disposition": "ADDED",
+      "responsibility": "C2 test gate: 17 tests covering namespace parity, CLI parity, DSH confinement, brief/spine/doctor/render gates",
+      "bytes_post": 18035,
+      "loc_post": 403,
+      "dsh_token_count_post": 21,
+      "note": "test-file DSH tokens are gate assertions, not production identity leakage"
+    }
+  ],
+  "module_boundaries_and_seams": {
+    "composition_root": "qntylab/project_context.py imports and re-exports from the five sibling modules; external import surface `qntylab.project_context` is preserved (single-module namespace contract)",
+    "generic_vs_domain_split": "five generic modules (composition root, core, registry, spine, brief) contain ZERO occurrences of DSH/DSH_STAGE/STAGE_A/dsh/pinned_dsh/stage-a/Stage-A; exactly one domain module (project_context_execution_authority.py) owns all DSH identities",
+    "domain_seam": "qntylab/project_context_execution_authority.py",
+    "no_new_public_apis": true,
+    "no_second_registry_interpretation": true
+  },
+  "parity_evidence_pointers": {
+    "pre_registration_captures": "digests recorded in metrics.json parity_captures; brief/doctor/render digests re-verified equal to canonical parent receipts at artifact-write time",
+    "spine_parity_note": "spine output from the canonical parent worktree (78f3ca1b) is 7dcf6c03f4d872c49581721d9ffb24b4051cdb601d19924688986cd62f604ecd (51328 B); refactored dirty worktree spine differs ONLY in generated_from.canonical_git_identity.worktree_status CLEAN->DIRTY; module_inventory and all other top-level keys are identical; CLEAN-state equality is asserted by the C2 test gate",
+    "full_suite_note": "full-suite chunk results and pre-existing-failure equivalence recorded in metrics.json verification"
+  },
+  "reuse_preflight": {
+    "disposition": "EXTEND",
+    "note": "C2 extends the existing qntylab.project_context capability by decomposing the monolith in place; no new capability, no second entrypoint"
+  },
+  "qnty_agent_eval_applicability_lookup": {
+    "lookup_method": "real read-only inventory inspection of the QntyAgentEval repository (not a local grep)",
+    "lookup_result": "Repository CipherCuttle/QntyAgentEval, inspected main tree 4a1078aa40639d7b78c2db4a4d6b968da8217ca8, task root tasks/qnty, tasks QNTY_ADMIN_STALE_CONTEXT_001 and QNTY_PROTOCOL_FAIL_CLOSED_001. No QntyLab C2 evaluator exists.",
+    "evaluator_applicability": "NO_MATCH",
+    "evaluator_run": "NOT_REQUIRED",
+    "evaluator_creation": "FORBIDDEN",
+    "evaluator_created": false
+  },
+  "repair": {
+    "repair_budget": "1/1",
+    "repair_commit_parent": "d37c6d3930aefe8eaa327bc01097dc56017186bc",
+    "findings_repaired": ["H1_HIGH", "H2_HIGH"],
+    "phase_id_correction": "the originally committed C2 artifacts wrongly used the project ID as phase_id; corrected to the governed phase ID PROJECT_CONTEXT_MODULARIZATION_V0 (project ID QNTYLAB_PROJECT_CONTEXT_MODULARIZATION_V0 remains distinct)",
+    "artifact_note": "changeset bytes_post/loc_post values are pre-repair measurements; the C2 test file was modified by the H1 repair",
+    "receipt": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c2_project_context_modularization_v0/verification_repair_receipt.json"
+  },
+  "scientific_execution": false,
+  "real_data_accessed": false,
+  "provider_accessed": false,
+  "claims_consumed": false,
+  "downstream_authority": "NONE",
+  "merge_authority": "NOT_GRANTED",
+  "forbidden_surfaces_untouched": [
+    ".github/**",
+    "docs/forensics/**",
+    "qntylab/agent_context_packet_v0.py",
+    "tests/test_qntylab_agent_context_packet_v0.py",
+    "frozen modules",
+    "scientific code",
+    "research execution state",
+    "market data",
+    "backtests",
+    "claims",
+    "trading authority"
+  ]
+}

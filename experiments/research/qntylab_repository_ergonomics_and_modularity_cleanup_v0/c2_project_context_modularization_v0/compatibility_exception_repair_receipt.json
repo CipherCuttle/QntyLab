@@ -1,0 +1,129 @@
+{
+  "artifact_type": "C2_COMPATIBILITY_EXCEPTION_REPAIR_RECEIPT",
+  "project_id": "QNTYLAB_PROJECT_CONTEXT_MODULARIZATION_V0",
+  "phase_id": "PROJECT_CONTEXT_MODULARIZATION_V0",
+  "umbrella_project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0",
+  "authority_basis": {
+    "grant": "C2_COMPATIBILITY_EXCEPTION_REPAIR",
+    "limit": 1,
+    "used": 1,
+    "exhausted_after_this_pass": true,
+    "note": "Single explicitly authorized compatibility-exception source repair. NOT a reuse of the exhausted H1/H2 repair budget (repair_budget_count=1) or the targeted Critical/High rereview budget (targeted_rereview_count=1); both historical budgets remain recorded and unchanged in docs/state/projects.toml."
+  },
+  "pr_250_review_evidence": {
+    "pr_number": 250,
+    "repository": "CipherCuttle/QntyLab",
+    "review_comment_id": 3942654729,
+    "reviewer": "chatgpt-codex-connector[bot]",
+    "severity": "P2",
+    "commented_file": "qntylab/project_context.py",
+    "commented_line": 135,
+    "original_commit_id": "bd033ca36436ad3ea72b79874047747d46fcc602",
+    "finding": "from qntylab.project_context import DSH_STAGE_A_V1R3R2_EXECUTION_ID raises ImportError after the C2 modularization; the composition root re-exports only execution_authority_projection while the public DSH identity constants moved into project_context_execution_authority."
+  },
+  "repro_evidence": {
+    "at_c2_closure_head_b6a7fade": {
+      "head": "b6a7fadec869f114e387b833558f6d65b9501a05",
+      "command": "python -c \"from qntylab.project_context import DSH_STAGE_A_V1R3R2_EXECUTION_ID\"",
+      "result": "ImportError: cannot import name 'DSH_STAGE_A_V1R3R2_EXECUTION_ID' from 'qntylab.project_context'",
+      "exit_code": 1
+    },
+    "at_canonical_parent_78f3ca1": {
+      "sha": "78f3ca1b3566e9ea3d138796b7ce50e224c9e45a",
+      "method": "detached git worktree at the canonical parent",
+      "command": "python -c \"from qntylab.project_context import DSH_STAGE_A_V1R3R2_EXECUTION_ID\"",
+      "result": "PARENT_IMPORT_OK DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R2R1",
+      "exit_code": 0
+    }
+  },
+  "derived_compatibility_export_set": {
+    "derivation_method": "Intersection of the public (non-underscore) top-level names defined in the canonical-parent monolith qntylab/project_context.py (git show 78f3ca1b:qntylab/project_context.py, AST) with the public top-level names defined in the current qntylab/project_context_execution_authority.py (AST). Private _-prefixed internals excluded. Names already re-exported from project_context_core (e.g. EXECUTION_CANONICAL_REF) are not in the domain module and are not part of this set.",
+    "public_execution_authority_exports": [
+      "DSH_STAGE_A_V1R3R2_ACTIVATION_SCHEMA",
+      "DSH_STAGE_A_V1R3R2_V0R1_AUTHORIZATION_ID",
+      "DSH_STAGE_A_V1R3R2_V0R1_EXECUTION_ID",
+      "DSH_STAGE_A_V1R3R2_AUTHORIZATION_ID",
+      "DSH_STAGE_A_V1R3R2_EXECUTION_ID",
+      "DSH_STAGE_A_V1R3R2_V0R3_AUTHORIZATION_ID",
+      "DSH_STAGE_A_V1R3R2_V0R3_EXECUTION_ID",
+      "DSH_STAGE_A_V1R3R2_V0R4_AUTHORIZATION_ID",
+      "DSH_STAGE_A_V1R3R2_V0R4_EXECUTION_ID",
+      "DSH_STAGE_A_V1R3R2_V0R6_EXECUTION_ID",
+      "execution_authority_projection"
+    ]
+  },
+  "repair_implementation": {
+    "design_invariant": "DSH-specific identities in the generic qntylab/project_context.py == 0; the composition root binds only names declared by the domain module's explicit export contract and names no DSH identity itself.",
+    "changes": [
+      "qntylab/project_context_execution_authority.py: added an explicit domain-owned __all__ public export contract (the seam function plus the 10 historically public execution-authority identity constants).",
+      "qntylab/project_context.py: replaced the single explicit seam binding with a generic loop over the extension's declared __all__ (globals()[name] = getattr(module, name)), binding the historical surface without naming any DSH identity.",
+      "tests/test_project_context_modularization_c2.py: added test_public_execution_authority_surface_is_derived_and_exposed — mechanically derives the required surface from the canonical-parent source intersected with the domain module's defined public names (independent of __all__, so emptying the export contract cannot make it vacuous), asserts non-vacuous derivation (seam function + DSH_STAGE_A_V1R3R2_EXECUTION_ID + size > 2), asserts the domain __all__ equals the derived set, asserts every required name resolves through qntylab.project_context with object identity to the domain module, and asserts no DSH identity literal appears in the generic composition root."
+    ],
+    "no_authority_semantics_change": true,
+    "namespace_compatibility_only": true
+  },
+  "budget_history": {
+    "historical_repair_budget": {
+      "repair_budget_count": 1,
+      "repair_budget_limit": 1,
+      "repair_commit": "bd033ca36436ad3ea72b79874047747d46fcc602",
+      "findings_repaired": ["H1_HIGH", "H2_HIGH"],
+      "receipt": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c2_project_context_modularization_v0/verification_repair_receipt.json"
+    },
+    "historical_targeted_rereview_budget": {
+      "targeted_rereview_count": 1,
+      "verdict": "PASS_NO_CRITICAL_HIGH (H1/H2 CLEARED; exact-head CI run 34004922781 success)"
+    },
+    "compatibility_exception_repair": {
+      "compatibility_exception_authorized": true,
+      "compatibility_exception_repair_limit": 1,
+      "compatibility_exception_repair_count": 1,
+      "compatibility_exception_finding": "PR250_P2_PUBLIC_NAMESPACE_REGRESSION",
+      "repair_commit_parent": "b6a7fadec869f114e387b833558f6d65b9501a05"
+    }
+  },
+  "verification": {
+    "compat_import_surface_verified_at_head": "5eaa74a44c12b9d604fdab5e905f062aa6553120",
+    "compat_repair_sha": "74f424143c1487c99f5c155b1c760bcbb1565ecb",
+    "compat_repair_sha_parent": "b6a7fadec869f114e387b833558f6d65b9501a05",
+    "dsh_identities_in_generic_core": 0,
+    "dsh_identity_evidence": "token scan of qntylab/project_context.py for {DSH, DSH_STAGE, STAGE_A, dsh, pinned_dsh, stage-a, Stage-A}: zero occurrences; C2 gate tests test_generic_core_source_is_free_of_dsh_identities (all generic modules) and test_dsh_identities_live_only_behind_the_bounded_domain_seam pass",
+    "direct_import_probes": "all 11 derived exports (seam function + 10 identity constants) imported via both qntylab.project_context and qntylab.project_context_execution_authority with object identity equal; PROBE_OK, exit 0",
+    "focused_suites_at_exact_head": {
+      "tests/test_project_context_modularization_c2.py": "16 passed, 2 skipped (pre-existing frozen-digest gate skips)",
+      "tests/test_project_context_v0.py + context spine suites": "165 passed",
+      "tests/test_qntylab_agent_context_packet_v0.py (C1 regression)": "48 passed",
+      "doctor_strict": "exit 0 (project context ok)",
+      "render_check": "exit 0 (roadmap current)"
+    },
+    "full_suite": {
+      "result": "NO_NEW_FAILURES_VS_PREVIOUS_C2_HEAD",
+      "command": "python -m pytest -q --continue-on-collection-errors",
+      "at_head_5eaa74a": "85 failed, 3576 passed, 2 skipped, 15 errors",
+      "at_b6a7fade_previous_c2_closure_head": "116 failed, 3523 passed, 2 skipped, 36 errors (detached worktree, identical environment)",
+      "failure_set_diff": "0 failures/errors present at head that are absent at b6a7fade (LC_ALL=C comm -13 comparison of sorted FAILED/ERROR lists); head has 52 FEWER failures/errors than b6a7fade",
+      "pre_existing_causes": "missing optional deps (polars, retry fixture module) and state/drift-dependent suites, all present in the b6a7fade run as well"
+    },
+    "ci": {
+      "run_on_compat_repair_sha_74f4241": { "run_id": 34008001160, "conclusion": "failure", "failed_step": "python -m qntylab.project_context render --check", "cause": "mechanical generated-view staleness: the repair commit changed docs/state/projects.toml (state BLOCKED) but omitted the canonically regenerated docs/CURRENT_ROADMAP.md (the renderer omits BLOCKED rows); no source or test failure" },
+      "mechanical_roadmap_commit": { "sha": "5eaa74a44c12b9d604fdab5e905f062aa6553120", "parent": "74f424143c1487c99f5c155b1c760bcbb1565ecb", "change": "docs/CURRENT_ROADMAP.md regenerated via the canonical renderer only (python -m qntylab.project_context render); 1 file, 1 line removed; disclosed as a mechanical generated-view commit completing the authorized bookkeeping changeset, NOT a second source repair" },
+      "run_on_5eaa74a": { "run_id": 34008123633, "conclusion": "success", "url": "https://github.com/CipherCuttle/QntyLab/actions/runs/34008123633" }
+    }
+  },
+  "rereview": {
+    "scope": "exactly one compatibility-focused targeted rereview; does NOT reopen H1/H2; no broad PR review; no Medium/Low findings",
+    "c2_compat_1_all_historical_public_execution_authority_constants_exposed": "PASS — all 11 derived names resolve through qntylab.project_context with object identity to qntylab.project_context_execution_authority (probe exit 0; regression test test_public_execution_authority_surface_is_derived_and_exposed passes)",
+    "c2_compat_2_dsh_identities_in_generic_core_zero": "PASS — zero DSH tokens in qntylab/project_context.py and all generic modules (C2 source-inspection gates pass); the composition root binds names only via the domain module's __all__",
+    "c2_compat_3_no_semantics_change_beyond_namespace": "PASS — committed repair diff is declaration-only: __all__ export contract added to the domain module; generic globals() binding loop replacing the single explicit seam binding in the composition root; no authority, CLI, projection, or domain logic touched; same-state brief/spine/doctor/render parity tests vs the canonical-parent monolith pass; module graph acyclic; seam direction PASS; C1 regression 48 passed",
+    "c2_compat_4_regression_test_prevents_recurrence": "PASS — test derives the required surface from the canonical-parent monolith source (git show 78f3ca1b) intersected with the domain module's defined public names, so it is independent of __all__ and cannot become vacuous if the export contract is emptied; asserts domain __all__ equals the derived set, per-name object identity, zero DSH literals in the composition root, and the exact PR-cited constant",
+    "new_critical_total": 0,
+    "new_high_total": 0,
+    "compatibility_finding": "CLEARED"
+  },
+  "pr_250_thread_disposition": {
+    "thread_id": "PRRT_kwDOTo27Xs6foa3w",
+    "review_comment_id": 3942654729,
+    "state_after_repair_push": { "isOutdated": true, "isResolved": false },
+    "disposition": "OUTDATED_FIXED_BY_REPAIR — the reviewed code region changed via the repair push, so the Codex P2 thread became outdated; the thread was demonstrably fixed (repro shows the historical import now succeeds; regression test + CI green on the terminal head). Thread resolution is not itself proof: tests, exact-head CI, and the targeted rereview are the recorded proof. The thread is left for the reviewer to resolve."
+  }
+}

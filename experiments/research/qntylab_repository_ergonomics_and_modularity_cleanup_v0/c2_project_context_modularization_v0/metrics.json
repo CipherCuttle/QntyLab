@@ -1,0 +1,149 @@
+{
+  "artifact_type": "C2_METRICS",
+  "increment_id": "C2",
+  "phase_id": "PROJECT_CONTEXT_MODULARIZATION_V0",
+  "canonical_parent": "78f3ca1b3566e9ea3d138796b7ce50e224c9e45a",
+  "size_metrics": {
+    "pre": {
+      "monolith_qntylab_project_context_py": { "bytes": 110441, "loc": 2178 }
+    },
+    "post": {
+      "composition_root_qntylab_project_context_py": { "bytes": 24561, "loc": 562 },
+      "qntylab_project_context_core_py": { "bytes": 13867, "loc": 328 },
+      "qntylab_project_context_registry_py": { "bytes": 11754, "loc": 228 },
+      "qntylab_project_context_spine_py": { "bytes": 14141, "loc": 308 },
+      "qntylab_project_context_brief_py": { "bytes": 13503, "loc": 301 },
+      "qntylab_project_context_execution_authority_py": { "bytes": 40936, "loc": 702 },
+      "tests_test_project_context_modularization_c2_py": { "bytes": 18035, "loc": 403, "role": "test_gate_not_production" }
+    },
+    "totals": {
+      "generic_total_parent_receipt": { "bytes": 78336, "loc": 1727, "note": "total recorded by the implementation phase for composition root + core + registry + spine + brief" },
+      "generic_total_remeasured_at_artifact_write": { "bytes": 77826, "loc": 1727, "note": "sum of the five per-module post values measured at artifact-write time; 510 B below the parent-receipt total with identical LOC, consistent with bounded doc/comment-only reconciliation between the phase receipt and the terminal changeset; LOC identical" },
+      "domain_total": { "bytes": 40936, "loc": 702 },
+      "total_parent_receipt": { "bytes": 119272, "loc": 2429 },
+      "total_remeasured_at_artifact_write": { "bytes": 118762, "loc": 2429 },
+      "composition_root_reduction_vs_monolith": { "bytes_from": 110441, "bytes_to": 24561, "loc_from": 2178, "loc_to": 562 }
+    }
+  },
+  "dsh_token_counts": {
+    "token_set": ["DSH", "DSH_STAGE", "STAGE_A", "dsh", "pinned_dsh", "stage-a", "Stage-A"],
+    "counting_method": "grep -oE 'DSH|DSH_STAGE|STAGE_A|dsh|pinned_dsh|stage-a|Stage-A' FILE | wc -l, measured at artifact-write time on the terminal changeset",
+    "qntylab_project_context_py": 0,
+    "qntylab_project_context_core_py": 0,
+    "qntylab_project_context_registry_py": 0,
+    "qntylab_project_context_spine_py": 0,
+    "qntylab_project_context_brief_py": 0,
+    "qntylab_project_context_execution_authority_py": 49,
+    "tests_test_project_context_modularization_c2_py": 21,
+    "note": "all DSH identities in production code are confined to the single domain seam module; the test-file count is gate assertions"
+  },
+  "parity_captures": {
+    "pre_registration_determinism_basis": "captures taken at the canonical parent state (docs inputs unchanged); docs-input-sensitive gates are designed to deactivate once docs change at the new commit",
+    "brief_stdout": {
+      "bytes": 14588,
+      "sha256": "6ddfa1779b180e700e154b28124750fc5f47c1cc07fce69035d4bd7655b44abf",
+      "verified_equal_to_canonical_parent_receipt": true
+    },
+    "doctor_strict_stdout": {
+      "bytes": 19,
+      "sha256": "6ae2bf9f6a49f2c25796068862831fd4b5f22fb00444b3fc868359ecb7d01169",
+      "exit_code": 0,
+      "verified_equal_to_canonical_parent_receipt": true
+    },
+    "render_check_stdout": {
+      "bytes": 16,
+      "sha256": "8d3812e8e4b37a923f2ddc5126595bcaa95c858493c20e8e97b584f08c7e5297",
+      "exit_code": 0,
+      "verified_equal_to_canonical_parent_receipt": true
+    },
+    "spine_stdout": {
+      "canonical_parent_bytes": 51328,
+      "canonical_parent_sha256": "7dcf6c03f4d872c49581721d9ffb24b4051cdb601d19924688986cd62f604ecd",
+      "refactored_dirty_worktree_sha256": "0a55e0b788787d992972de64033c4eea1ab10f8f7c0e09380003e6a47dc12a88",
+      "dirty_worktree_difference": "ONLY generated_from.canonical_git_identity.worktree_status CLEAN->DIRTY; module_inventory and all other top-level projection keys identical (verified by JSON key-diff at artifact-write time)",
+      "clean_state_parity_claim": "clean-state refactored spine asserted byte-identical to 7dcf6c03... by the C2 test gate; parent-side capture re-verified at 7dcf6c03... (51328 B) via detached worktree at 78f3ca1b"
+    },
+    "module_file_sha256_post": {
+      "qntylab/project_context.py": "2580c630f2b4534890695afe1f946bc61f87b0078e8dd18768dea0756207dccf",
+      "qntylab/project_context_core.py": "40a10bd5f5cbd3201435695f1184f3a4548b2b8cf027f2d95a82c2bc95a1e0b9",
+      "qntylab/project_context_registry.py": "fe69dddd8a551c8f54351b4aa956d824155d9ac06ff76cfe8e06772f91eea97c",
+      "qntylab/project_context_spine.py": "6220bfad23b4003ca3cbe6f380a8b36ddfe841a2f33668608f31db1063c98575",
+      "qntylab/project_context_brief.py": "0ed688d63e858467fd182497630984af2f769baef7e616c9e44b1fcb816e755a",
+      "qntylab/project_context_execution_authority.py": "e51dbb6cfb5c99abac376a34262d584707f9c66fcadad54f3c2cdfa4b2c4b725",
+      "tests/test_project_context_modularization_c2.py": "2f3e8a81b8c6b21498dda4525db9dceef185e03149b10071e6141c6ef08d306d"
+    }
+  },
+  "verification": {
+    "c1_regression_tests": {
+      "command": "python -m pytest -q tests/test_qntylab_agent_context_packet_v0.py",
+      "result": "48 passed",
+      "source": "implementation-phase receipt; re-verified post-bookkeeping (see post_bookkeeping)"
+    },
+    "c2_test_gate": {
+      "command": "python -m pytest -q tests/test_project_context_modularization_c2.py",
+      "result": "15 passed / 2 skipped at implementation time",
+      "implementation_time_state": "obtained as worktree changes over canonical parent HEAD 78f3ca1b3566e9ea3d138796b7ce50e224c9e45a, NOT at the committed candidate head",
+      "note": "brief/spine digest gates may legitimately deactivate once docs inputs change at the new commit; they are gated for exactly this. The H2 finding showed the committed-candidate test defect (H1) in the original implementation: the baseline fixture required HEAD == canonical parent, which made the suite unrunnable at the committed candidate."
+    },
+    "repair": {
+      "repair_budget": "1/1",
+      "repair_commit_parent": "d37c6d3930aefe8eaa327bc01097dc56017186bc",
+      "findings_repaired": ["H1_HIGH", "H2_HIGH"],
+      "phase_id_correction": "corrected to the governed phase ID PROJECT_CONTEXT_MODULARIZATION_V0; project ID QNTYLAB_PROJECT_CONTEXT_MODULARIZATION_V0 remains distinct",
+      "module_file_sha256_post_note": "module_file_sha256_post above are pre-repair digests; tests/test_project_context_modularization_c2.py changed in the H1 repair",
+      "receipt": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c2_project_context_modularization_v0/verification_repair_receipt.json"
+    },
+    "doctor_strict": { "exit_code": 0 },
+    "render_check": { "exit_code": 0 },
+    "full_suite_note": "full-suite chunk results: failures all proven pre-existing at the canonical parent (state/deps drift), byte-identical failure sets with the original monolith; recorded by the implementation-phase receipts, not re-run at artifact-write time",
+    "post_bookkeeping": {
+      "recorded_in": "hostile_review and the C2 registry record next_action; post-bookkeeping receipts are terminal-commit context, not duplicated here"
+    }
+  },
+  "compatibility_exception": {
+    "authority_basis": "C2_COMPATIBILITY_EXCEPTION_REPAIR = 1/1 (exhausted after this pass); distinct from and NOT a reuse of the exhausted H1/H2 repair budget (repair_budget_count=1) or targeted_rereview budget (targeted_rereview_count=1), both preserved historical and unchanged",
+    "authorized": true,
+    "repair_limit": 1,
+    "repair_count": 1,
+    "finding": "PR250_P2_PUBLIC_NAMESPACE_REGRESSION",
+    "review_evidence": {
+      "pr_number": 250,
+      "review_comment_id": 3942654729,
+      "reviewer": "chatgpt-codex-connector[bot]",
+      "severity": "P2",
+      "original_commit_id": "bd033ca36436ad3ea72b79874047747d46fcc602",
+      "summary": "from qntylab.project_context import DSH_STAGE_A_V1R3R2_EXECUTION_ID raises ImportError after C2; the composition root re-exports only execution_authority_projection."
+    },
+    "derived_public_execution_authority_exports": [
+      "DSH_STAGE_A_V1R3R2_ACTIVATION_SCHEMA",
+      "DSH_STAGE_A_V1R3R2_V0R1_AUTHORIZATION_ID",
+      "DSH_STAGE_A_V1R3R2_V0R1_EXECUTION_ID",
+      "DSH_STAGE_A_V1R3R2_AUTHORIZATION_ID",
+      "DSH_STAGE_A_V1R3R2_EXECUTION_ID",
+      "DSH_STAGE_A_V1R3R2_V0R3_AUTHORIZATION_ID",
+      "DSH_STAGE_A_V1R3R2_V0R3_EXECUTION_ID",
+      "DSH_STAGE_A_V1R3R2_V0R4_AUTHORIZATION_ID",
+      "DSH_STAGE_A_V1R3R2_V0R4_EXECUTION_ID",
+      "DSH_STAGE_A_V1R3R2_V0R6_EXECUTION_ID",
+      "execution_authority_projection"
+    ],
+    "repair_commit_parent": "b6a7fadec869f114e387b833558f6d65b9501a05",
+    "repair_commit": "74f424143c1487c99f5c155b1c760bcbb1565ecb",
+    "mechanical_roadmap_commit": "5eaa74a44c12b9d604fdab5e905f062aa6553120",
+    "receipt": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c2_project_context_modularization_v0/compatibility_exception_repair_receipt.json",
+    "note": "size_metrics/post module digests above reflect the pre-compatibility-repair terminal changeset; qntylab/project_context.py, qntylab/project_context_execution_authority.py and tests/test_project_context_modularization_c2.py changed in the compatibility-exception repair.",
+    "rereview": {
+      "compatibility_exception_rereview_count": 1,
+      "c2_compat_1_public_surface_restored": "PASS",
+      "c2_compat_2_dsh_identities_in_generic_core_zero": "PASS",
+      "c2_compat_3_namespace_compatibility_only": "PASS",
+      "c2_compat_4_mechanical_regression_prevention": "PASS",
+      "compatibility_exception_new_critical_total": 0,
+      "compatibility_exception_new_high_total": 0,
+      "compatibility_exception_finding_cleared": true,
+      "compatibility_finding": "CLEARED"
+    },
+    "full_suite": "NO_NEW_FAILURES_VS_PREVIOUS_C2_HEAD (0 new failures at 5eaa74a vs b6a7fade; head run has 52 fewer failures/errors: 85 failed/15 errors vs 116 failed/36 errors, missing-deps and state drift pre-existing)",
+    "pr_250_codex_thread": "PRRT_kwDOTo27Xs6foa3w (comment 3942654729, P2) became outdated after the repair push; fixed by repair, not reviewer-resolved; proof = regression test + exact-head CI + targeted rereview"
+  }
+}

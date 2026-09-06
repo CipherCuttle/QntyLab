@@ -10234,3 +10234,68 @@ signing_authority = "NONE"
 promotion_authority = "NONE"
 terminal_outcome = "C1_CLOSED_PASS_READY_FOR_MERGE_WITH_EXPLICIT_AUTHORITY"
 next_action = "CLOSED_PASS: C1 closure gates passed. Merge PR #248 only with explicit merge authority; do not start C2-C6 automatically."
+
+[[project]]
+project_id = "QNTYLAB_PROJECT_CONTEXT_MODULARIZATION_V0"
+display_name = "QntyLab project context modularization V0"
+state = "CLOSED_PASS"
+candidate_state = "TERMINAL_CLOSURE_RECORDED"
+canonicalization_status = "PENDING_EXPLICIT_PR_MERGE"
+authority_level = "BOUNDED_QNTYLAB_REPOSITORY_ERGONOMICS_C2_IMPLEMENTATION_ONLY"
+phase_type = "BOUNDED_REPOSITORY_ERGONOMICS_IMPLEMENTATION"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c2_project_context_modularization_v0/verification_repair_receipt.json",
+  "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c2_project_context_modularization_v0/compatibility_exception_repair_receipt.json",
+  "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c2_project_context_modularization_v0/implementation_manifest.json",
+  "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c2_project_context_modularization_v0/metrics.json",
+  "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c2_project_context_modularization_v0/hostile_review.json",
+  "qntylab/project_context.py",
+  "qntylab/project_context_core.py",
+  "qntylab/project_context_registry.py",
+  "qntylab/project_context_spine.py",
+  "qntylab/project_context_brief.py",
+  "qntylab/project_context_execution_authority.py",
+  "tests/test_project_context_modularization_c2.py",
+]
+umbrella_project_id = "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0"
+phase = "C2"
+implementation_authorized = false
+implementation_completed = true
+hostile_review_count = 1
+hostile_review_verdict = "PASS_NO_CRITICAL_HIGH"
+hostile_review_critical_total = 0
+hostile_review_high_total = 0
+repair_budget_used = true
+repair_budget_count = 1
+repair_budget_limit = 1
+targeted_rereview_required = true
+targeted_rereview_used = true
+targeted_rereview_count = 1
+targeted_rereview_new_critical_total = 0
+targeted_rereview_new_high_total = 0
+unresolved_critical_total = 0
+unresolved_high_total = 0
+compatibility_exception_authorized = true
+compatibility_exception_repair_limit = 1
+compatibility_exception_repair_count = 1
+compatibility_exception_finding = "PR250_P2_PUBLIC_NAMESPACE_REGRESSION"
+compatibility_exception_rereview_count = 1
+compatibility_exception_new_critical_total = 0
+compatibility_exception_new_high_total = 0
+compatibility_exception_finding_cleared = true
+evaluator_applicability = "NO_MATCH"
+evaluator_run_required = false
+evaluator_created = false
+runtime_authorized = false
+scientific_execution_authorized = false
+qnty_mutation_authorized = false
+qnty_agent_eval_mutation_authorized = false
+qntyspot_mutation_authorized = false
+trading_authority = "NONE"
+capital_authority = "NONE"
+signing_authority = "NONE"
+promotion_authority = "NONE"
+terminal_outcome = "C2_CLOSED_PASS_READY_FOR_MERGE_WITH_EXPLICIT_AUTHORITY"
+next_action = "C2 closed pass after the single authorized compatibility exception repair (repair commit 74f424143c1487c99f5c155b1c760bcbb1565ecb; one compatibility-focused targeted rereview: C2-COMPAT-1..4 CLEARED, no new Critical/High; post-repair exact-head CI run 34008123633 success). Merge PR #250 only with explicit merge authority and a green Project Context CI run on the terminal PR head; do not start C3-C6."

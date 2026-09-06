@@ -1,7 +1,7 @@
 {
   "artifact_type": "C2_IMPLEMENTATION_MANIFEST",
   "increment_id": "C2",
-  "phase_id": "QNTYLAB_PROJECT_CONTEXT_MODULARIZATION_V0",
+  "phase_id": "PROJECT_CONTEXT_MODULARIZATION_V0",
   "governing_umbrella_project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0",
   "canonical_parent": "78f3ca1b3566e9ea3d138796b7ce50e224c9e45a",
   "canonical_parent_note": "C1 merge commit (PR #248); origin/master unchanged at this SHA at implementation time",
@@ -83,11 +83,20 @@
     "note": "C2 extends the existing qntylab.project_context capability by decomposing the monolith in place; no new capability, no second entrypoint"
   },
   "qnty_agent_eval_applicability_lookup": {
-    "lookup_command": "grep -ril \"agenteval|agent_eval|qntyagenteval\" qntylab/ docs/ tests/ --include='*.py' --include='*.toml' --include='*.md' (+ qntylab evaluator-registry check)",
-    "lookup_result": "no QntyAgentEval task/evaluator inventory or evaluator registry exists in qntylab/; matches are spine/ecosystem role prose (docs/state/ecosystem.toml, docs/ADR/0007, docs/ADR/0008) and DSH test prose",
+    "lookup_method": "real read-only inventory inspection of the QntyAgentEval repository (not a local grep)",
+    "lookup_result": "Repository CipherCuttle/QntyAgentEval, inspected main tree 4a1078aa40639d7b78c2db4a4d6b968da8217ca8, task root tasks/qnty, tasks QNTY_ADMIN_STALE_CONTEXT_001 and QNTY_PROTOCOL_FAIL_CLOSED_001. No QntyLab C2 evaluator exists.",
     "evaluator_applicability": "NO_MATCH",
     "evaluator_run": "NOT_REQUIRED",
+    "evaluator_creation": "FORBIDDEN",
     "evaluator_created": false
+  },
+  "repair": {
+    "repair_budget": "1/1",
+    "repair_commit_parent": "d37c6d3930aefe8eaa327bc01097dc56017186bc",
+    "findings_repaired": ["H1_HIGH", "H2_HIGH"],
+    "phase_id_correction": "the originally committed C2 artifacts wrongly used the project ID as phase_id; corrected to the governed phase ID PROJECT_CONTEXT_MODULARIZATION_V0 (project ID QNTYLAB_PROJECT_CONTEXT_MODULARIZATION_V0 remains distinct)",
+    "artifact_note": "changeset bytes_post/loc_post values are pre-repair measurements; the C2 test file was modified by the H1 repair",
+    "receipt": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c2_project_context_modularization_v0/verification_repair_receipt.json"
   },
   "scientific_execution": false,
   "real_data_accessed": false,

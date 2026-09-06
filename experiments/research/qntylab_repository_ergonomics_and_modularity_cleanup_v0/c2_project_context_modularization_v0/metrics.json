@@ -1,7 +1,7 @@
 {
   "artifact_type": "C2_METRICS",
   "increment_id": "C2",
-  "phase_id": "QNTYLAB_PROJECT_CONTEXT_MODULARIZATION_V0",
+  "phase_id": "PROJECT_CONTEXT_MODULARIZATION_V0",
   "canonical_parent": "78f3ca1b3566e9ea3d138796b7ce50e224c9e45a",
   "size_metrics": {
     "pre": {
@@ -81,8 +81,17 @@
     },
     "c2_test_gate": {
       "command": "python -m pytest -q tests/test_project_context_modularization_c2.py",
-      "result": "17 passed at implementation time",
-      "note": "brief/spine digest gates may legitimately deactivate once docs inputs change at the new commit; they are gated for exactly this"
+      "result": "15 passed / 2 skipped at implementation time",
+      "implementation_time_state": "obtained as worktree changes over canonical parent HEAD 78f3ca1b3566e9ea3d138796b7ce50e224c9e45a, NOT at the committed candidate head",
+      "note": "brief/spine digest gates may legitimately deactivate once docs inputs change at the new commit; they are gated for exactly this. The H2 finding showed the committed-candidate test defect (H1) in the original implementation: the baseline fixture required HEAD == canonical parent, which made the suite unrunnable at the committed candidate."
+    },
+    "repair": {
+      "repair_budget": "1/1",
+      "repair_commit_parent": "d37c6d3930aefe8eaa327bc01097dc56017186bc",
+      "findings_repaired": ["H1_HIGH", "H2_HIGH"],
+      "phase_id_correction": "corrected to the governed phase ID PROJECT_CONTEXT_MODULARIZATION_V0; project ID QNTYLAB_PROJECT_CONTEXT_MODULARIZATION_V0 remains distinct",
+      "module_file_sha256_post_note": "module_file_sha256_post above are pre-repair digests; tests/test_project_context_modularization_c2.py changed in the H1 repair",
+      "receipt": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c2_project_context_modularization_v0/verification_repair_receipt.json"
     },
     "doctor_strict": { "exit_code": 0 },
     "render_check": { "exit_code": 0 },

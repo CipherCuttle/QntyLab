@@ -10238,14 +10238,15 @@ next_action = "CLOSED_PASS: C1 closure gates passed. Merge PR #248 only with exp
 [[project]]
 project_id = "QNTYLAB_PROJECT_CONTEXT_MODULARIZATION_V0"
 display_name = "QntyLab project context modularization V0"
-state = "CLOSED_PASS"
-candidate_state = "TERMINAL_CLOSURE_RECORDED"
-canonicalization_status = "PENDING_EXPLICIT_MERGE_AUTHORITY"
+state = "BLOCKED"
+candidate_state = "READY_FOR_TARGETED_CRITICAL_HIGH_REREVIEW"
+canonicalization_status = "REPAIR_APPLIED_TARGETED_REREVIEW_PENDING"
 authority_level = "BOUNDED_QNTYLAB_REPOSITORY_ERGONOMICS_C2_IMPLEMENTATION_ONLY"
 phase_type = "BOUNDED_REPOSITORY_ERGONOMICS_IMPLEMENTATION"
 authoritative_artifacts = [
   "docs/state/projects.toml",
   "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c2_project_context_modularization_v0/verification_repair_receipt.json",
   "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c2_project_context_modularization_v0/implementation_manifest.json",
   "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c2_project_context_modularization_v0/metrics.json",
   "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c2_project_context_modularization_v0/hostile_review.json",
@@ -10265,9 +10266,10 @@ hostile_review_count = 1
 hostile_review_verdict = "PASS_NO_CRITICAL_HIGH"
 hostile_review_critical_total = 0
 hostile_review_high_total = 0
-repair_budget_used = false
-repair_budget_count = 0
-targeted_rereview_required = false
+repair_budget_used = true
+repair_budget_count = 1
+repair_budget_limit = 1
+targeted_rereview_required = true
 targeted_rereview_used = false
 targeted_rereview_count = 0
 unresolved_critical_total = 0
@@ -10284,5 +10286,5 @@ trading_authority = "NONE"
 capital_authority = "NONE"
 signing_authority = "NONE"
 promotion_authority = "NONE"
-terminal_outcome = "C2_CLOSED_PASS_COMMITTED_AND_PUSHED_READY_FOR_MERGE_WITH_EXPLICIT_AUTHORITY"
-next_action = "CLOSED_PASS: C2 closure gates passed. Merge c2-project-context-modularization-v0 only with explicit merge authority; do not start C3-C6 automatically."
+terminal_outcome = "C2_REPAIR_APPLIED_AWAITING_TARGETED_CRITICAL_HIGH_REREVIEW"
+next_action = "Run exactly one targeted Critical/High rereview on the repaired exact-head candidate after exact-head CI; do not merge or start C3-C6."

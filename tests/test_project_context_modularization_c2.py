@@ -98,11 +98,14 @@ def _canonical_state_holds() -> bool:
 def baseline(tmp_path_factory) -> object:
     """The pre-refactor monolith loaded from Git at the canonical parent.
 
-    Loaded as a private module (never registered under the canonical name, so
-    the production ``qntylab.project_context`` stays untouched) purely as the
-    parity oracle for same-state comparisons.
+    The oracle source is pinned to the canonical parent via
+    ``git show CANONICAL_PARENT:qntylab/project_context.py`` — NOT to the
+    current HEAD — so the parity tests run unchanged at any later commit
+    (including the committed C2 candidate).  Loaded as a private module (never
+    registered under the canonical name, so the production
+    ``qntylab.project_context`` stays untouched) purely as the parity oracle
+    for same-state comparisons.
     """
-    assert _head_is_canonical_parent(), "C2 parity oracle requires HEAD at the canonical parent"
     source = subprocess.run(
         ["git", "-C", str(ROOT), "show", f"{CANONICAL_PARENT}:qntylab/project_context.py"],
         check=True,

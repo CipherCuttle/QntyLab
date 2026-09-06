@@ -1,0 +1,154 @@
+{
+  "project_id": "QNTYLAB_DEV_LOOP_CI_SPLIT_V0",
+  "phase_id": "DEV_LOOP_CI_SPLIT_V0",
+  "umbrella_project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0",
+  "canonical_parent": "fba39dfac8affe0078d1362dd5bf52ed7f073ca6",
+  "measurement_policy": "Observed measurements only. No percentage reduction targets are frozen by C3. Reduction values below are OBSERVED metrics, not governance targets.",
+  "measurement_method": {
+    "lines_bytes": "wc -l -c <file> (newline-terminated line counts)",
+    "jobs_steps": "yaml.safe_load of the workflow files; jobs = top-level jobs keys; steps = operational steps under the single job (GitHub-visible 'Set up job'/'Complete job' and 'Post Run *' entries excluded)",
+    "wall_times": "gh run view / gh api repos/CipherCuttle/QntyLab/actions/runs/<id>/jobs for run-level and job timestamps; per-step section timing derived from gh run view <id> --log '##[group]Run <step>' start markers (inter-step gaps, approximate)",
+    "monolith_bytes_for_baseline": "git show fba39dfac8affe0078d1362dd5bf52ed7f073ca6:.github/workflows/project-context.yml"
+  },
+  "baseline_monolith": {
+    "file": ".github/workflows/project-context.yml @ fba39dfac8affe0078d1362dd5bf52ed7f073ca6",
+    "lines": 322,
+    "bytes": 21201,
+    "jobs": 1,
+    "operational_steps": 19,
+    "triggers": ["pull_request", "push(master)", "workflow_dispatch(identity_mode, pull_request_number)"],
+    "permissions": {"contents": "read"}
+  },
+  "post_split_core": {
+    "file": ".github/workflows/project-context.yml",
+    "lines": 90,
+    "bytes": 4603,
+    "jobs": 1,
+    "job_name": "project-context",
+    "operational_steps": 11,
+    "triggers": ["pull_request", "push(master)", "workflow_dispatch(identity_mode, pull_request_number)"],
+    "permissions": {"contents": "read"}
+  },
+  "post_split_heavy_replay": {
+    "file": ".github/workflows/project-context-heavy-replay.yml",
+    "lines": 333,
+    "bytes": 21852,
+    "jobs": 1,
+    "job_name": "project-context-heavy-replay",
+    "operational_steps": 13,
+    "triggers": ["pull_request", "push(master)", "workflow_dispatch(identity_mode, pull_request_number)"],
+    "permissions": {"contents": "read"}
+  },
+  "total_post_split": {
+    "lines": 423,
+    "bytes": 26455,
+    "jobs": 2,
+    "operational_steps_core_plus_heavy": 24,
+    "note": "24 = 19 original operational steps + 5 mechanically duplicated identity/bootstrap steps (resolve identity, checkout, record identity, setup-python, pip install) required to preserve identity/environment semantics of the heavy execution."
+  },
+  "observed_reduction": {
+    "core_lines_vs_monolith_lines_observed": "90/322",
+    "core_bytes_vs_monolith_bytes_observed": "4603/21201",
+    "label": "OBSERVED_METRIC_NOT_GOVERNANCE_TARGET"
+  },
+  "wall_time_evidence": {
+    "method": "gh run view <id> (run/job timestamps) + gh run view <id> --log '##[group]Run <step>' start markers (per-step section gaps, approximate)",
+    "primary_canonical_master_run": {
+      "run_id": 34010570657,
+      "head_sha": "fba39dfac8affe0078d1362dd5bf52ed7f073ca6",
+      "conclusion": "success",
+      "run_created_at": "2026-09-06T04:04:25Z",
+      "run_updated_at": "2026-09-06T04:09:07Z",
+      "job": "project-context",
+      "job_started_at": "2026-09-06T04:04:29Z",
+      "job_completed_at": "2026-09-06T04:09:06Z",
+      "total_job_wall_time_seconds": 277,
+      "core_section_approx_seconds": 155,
+      "core_section_breakdown_seconds": {
+        "identity_bootstrap_plus_setup_python_pip": 11,
+        "doctor_strict": 3,
+        "render_check": 0.3,
+        "spine": 0.6,
+        "brief": 0.6,
+        "research_ledger_doctor": 0.2,
+        "core_pytest_selection": 141
+      },
+      "heavy_section_approx_seconds": 122,
+      "heavy_section_breakdown_seconds": {
+        "A_repository_deterministic_reconciliation": 1.1,
+        "setup_node": 5.3,
+        "CI_fixture_pinned_DSH_runtime_plus_qualified_DSH_HOME": 108,
+        "A_claim_production_owner_integration": 3.8,
+        "CI_fixture_removal": 0.6,
+        "CI_provenance_receipt": 0.05,
+        "B_host_qualified_runtime_preflight": 0.3
+      }
+    },
+    "comparable_recent_master_runs": [
+      {"run_id": 34010570657, "head_sha": "fba39dfac8affe0078d1362dd5bf52ed7f073ca6", "created": "2026-09-06T04:04:25Z", "updated": "2026-09-06T04:09:07Z", "conclusion": "success"},
+      {"run_id": 33984056159, "head_sha": "78f3ca1b3566e9ea3d138796b7ce50e224c9e45a", "created": "2026-09-05T18:26:15Z", "updated": "2026-09-05T18:31:22Z", "conclusion": "success"},
+      {"run_id": 33937982698, "head_sha": "697a5361a18988fd314a42ca786ea0277c0c283f", "created": "2026-09-05T02:03:33Z", "updated": "2026-09-05T02:09:20Z", "conclusion": "success"},
+      {"run_id": 33930275023, "head_sha": "b89f04296979e12e24f74e8dbff2f1cbf80e9bba", "created": "2026-09-04T23:38:39Z", "updated": "2026-09-04T23:42:22Z", "conclusion": "success"},
+      {"run_id": 33924623696, "head_sha": "7b1f00d7ae975aa26029e70fab190ea2b16effdc", "created": "2026-09-04T22:14:00Z", "updated": "2026-09-04T22:19:33Z", "conclusion": "success"}
+    ],
+    "candidate_run_wall_times": {
+      "head_sha": "2d0d02ea6b11f1d1e71a783c8906a7889757377f",
+      "core_run": {
+        "run_id": 34048154017,
+        "workflow": "Project Context",
+        "event": "pull_request",
+        "conclusion": "success",
+        "run_created_at": "2026-09-06T17:17:43Z",
+        "run_updated_at": "2026-09-06T17:21:00Z",
+        "run_level_wall_time_seconds": 197,
+        "job": "project-context",
+        "job_started_at": "2026-09-06T17:17:46Z",
+        "job_completed_at": "2026-09-06T17:20:59Z",
+        "total_job_wall_time_seconds": 193
+      },
+      "heavy_run": {
+        "run_id": 34048154056,
+        "workflow": "Project Context Heavy Replay",
+        "event": "pull_request",
+        "conclusion": "success",
+        "run_created_at": "2026-09-06T17:17:43Z",
+        "run_updated_at": "2026-09-06T17:20:13Z",
+        "run_level_wall_time_seconds": 150,
+        "job": "project-context-heavy-replay",
+        "job_started_at": "2026-09-06T17:17:46Z",
+        "job_completed_at": "2026-09-06T17:20:12Z",
+        "total_job_wall_time_seconds": 146
+      }
+    },
+    "terminal_bookkeeping_run_ids": {
+      "note": "Recorded in a second mechanical bookkeeping commit per the C3 terminal bookkeeping policy: exact-head CI run IDs observed for the first bookkeeping commit head at the time of recording. Final closure head CI is verified separately on the newest head and reported in the closure record.",
+      "head_sha": "677ebfc6bf8a970867226f5c19760c91f19130a8",
+      "core_run": {
+        "run_id": 34052135837,
+        "workflow": "Project Context",
+        "event": "pull_request",
+        "conclusion": "success",
+        "run_created_at": "2026-09-06T18:34:11Z",
+        "run_updated_at": "2026-09-06T18:35:53Z",
+        "run_level_wall_time_seconds": 102,
+        "job": "project-context",
+        "job_started_at": "2026-09-06T18:34:14Z",
+        "job_completed_at": "2026-09-06T18:35:52Z",
+        "total_job_wall_time_seconds": 98
+      },
+      "heavy_run": {
+        "run_id": 34052135854,
+        "workflow": "Project Context Heavy Replay",
+        "event": "pull_request",
+        "conclusion": "success",
+        "run_created_at": "2026-09-06T18:34:11Z",
+        "run_updated_at": "2026-09-06T18:36:51Z",
+        "run_level_wall_time_seconds": 160,
+        "job": "project-context-heavy-replay",
+        "job_started_at": "2026-09-06T18:34:15Z",
+        "job_completed_at": "2026-09-06T18:36:50Z",
+        "total_job_wall_time_seconds": 155
+      }
+    }
+  }
+}

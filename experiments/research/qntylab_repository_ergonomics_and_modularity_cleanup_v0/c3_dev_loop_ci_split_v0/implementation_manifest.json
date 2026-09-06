@@ -1,0 +1,96 @@
+{
+  "project_id": "QNTYLAB_DEV_LOOP_CI_SPLIT_V0",
+  "phase_id": "DEV_LOOP_CI_SPLIT_V0",
+  "umbrella_project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0",
+  "canonical_phase": "DEV_LOOP_CI_SPLIT_V0",
+  "canonical_parent": "fba39dfac8affe0078d1362dd5bf52ed7f073ca6",
+  "branch": "c3-dev-loop-ci-split-v0",
+  "allowed_paths": [
+    ".github/workflows/**",
+    "tests/** (C3 structure tests only)",
+    "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c3_dev_loop_ci_split_v0/**",
+    "docs/state/projects.toml (C3 lifecycle row only)",
+    "docs/CURRENT_ROADMAP.md (canonical renderer only)"
+  ],
+  "forbidden_and_respected": {
+    "doctor_strict_removed": false,
+    "render_check_removed": false,
+    "research_ledger_doctor_removed": false,
+    "test_selection_semantics_changed": false,
+    "permissions_escalated": false,
+    "secrets_added": false,
+    "triggers_escalated": false,
+    "qntylab_runtime_modules_changed": false,
+    "docs_forensics_changed": false,
+    "pyproject_toml_created": false,
+    "c5_files_deleted": false,
+    "c6_fitness_function_tests_created": false
+  },
+  "workflows": {
+    "core": {
+      "path": ".github/workflows/project-context.yml",
+      "name": "Project Context",
+      "job": "project-context",
+      "contains": [
+        "python -m qntylab.project_context doctor --strict",
+        "python -m qntylab.project_context render --check",
+        "python -m qntylab.project_context spine > /dev/null",
+        "python -m qntylab.project_context brief > /dev/null",
+        "python -m qntylab.research_ledger doctor",
+        "python -m pytest -q tests/test_project_context_v0.py tests/test_context_spine_foundation_v0.py tests/test_context_spine_brief_v0.py tests/test_context_spine_orientation_completeness_v0.py"
+      ]
+    },
+    "heavy_replay": {
+      "path": ".github/workflows/project-context-heavy-replay.yml",
+      "name": "Project Context Heavy Replay",
+      "job": "project-context-heavy-replay",
+      "contains": [
+        "A. Repository-deterministic reconciliation checks (repository-deterministic.test.mjs)",
+        "Node 22.22.0 setup (actions/setup-node@v4)",
+        "CI fixture: provision pinned DSH runtime at the frozen manifest path (materializePinnedSource/applyCanonicalPatches/pnpm fetch --frozen-lockfile/installPinnedOffline/buildPinnedRuntime + frozen digest verification)",
+        "CI fixture: materialize qualified Stage-A DSH_HOME (materializeStageADshHome + qualified profile/package-tree digests + production @qntylab packages)",
+        "A-claim. Production-owner claim-binding integration (prelive-enforcement.test.mjs with QNTYLAB_QUALIFIED_DSH_HOME binding)",
+        "CI fixture removal before step B",
+        "CI provenance receipt (deterministic, non-claim, non-secret)",
+        "B. Host-qualified runtime preflight (reports GitHub vs host scope)"
+      ]
+    }
+  },
+  "step_mapping_source": "coverage_manifest.json (ORIGINAL_OPERATIONAL_CI_STEP_COVERAGE = 100%, 19/19 operational steps mapped; 0 silently dropped)",
+  "identity_preservation": {
+    "model": "tri-state: CANDIDATE_HEAD | SYNTHETIC_PR_MERGE_RESULT | CANONICAL_MASTER",
+    "mechanism": "option (A) bounded mechanical duplication of the frozen identity bootstrap (resolve identity mode / explicit checkout with ref / record identity mode) into BOTH workflows",
+    "composition_framework_created": false,
+    "reusable_workflow_call_created": false,
+    "candidate_head_not_mislabeled_as_canonical_master": true,
+    "workflow_dispatch_identity_inputs_preserved": true,
+    "synthetic_pr_merge_result_capability_preserved": true
+  },
+  "trigger_preservation": {
+    "pull_request": "preserved in both workflows",
+    "push_master": "preserved in both workflows",
+    "workflow_dispatch": "preserved in both workflows with identical identity inputs",
+    "new_trigger_classes_added": []
+  },
+  "permission_preservation": {
+    "permissions": {"contents": "read"},
+    "escalated": false
+  },
+  "provenance_receipt_preservation": {
+    "receipt_location": "HEAVY_REPLAY workflow only",
+    "schema_broadened": false,
+    "fields_derived_at_runtime_from_committed_frozen_evidence": true,
+    "identity_mode_explicit": true,
+    "cross_workflow_atomicity_fabricated": false,
+    "new_authority_source_created": false
+  },
+  "runtime_authority_change": "NONE — C3 changes workflow topology and developer-feedback ergonomics only; zero research/evaluation/execution/claim/trading authority",
+  "test_selection_change": "NONE — core pytest selection byte-identical to monolith",
+  "structure_test_file": "tests/test_qntylab_dev_loop_ci_split_v0.py",
+  "verification_commands": [
+    "python -m pytest -q tests/test_qntylab_dev_loop_ci_split_v0.py",
+    "python -m qntylab.project_context doctor --strict",
+    "python -m qntylab.project_context render --check",
+    "python -m pytest -q"
+  ]
+}

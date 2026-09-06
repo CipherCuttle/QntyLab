@@ -128,7 +128,22 @@
       "execution_authority_projection"
     ],
     "repair_commit_parent": "b6a7fadec869f114e387b833558f6d65b9501a05",
+    "repair_commit": "74f424143c1487c99f5c155b1c760bcbb1565ecb",
+    "mechanical_roadmap_commit": "5eaa74a44c12b9d604fdab5e905f062aa6553120",
     "receipt": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c2_project_context_modularization_v0/compatibility_exception_repair_receipt.json",
-    "note": "size_metrics/post module digests above reflect the pre-compatibility-repair terminal changeset; qntylab/project_context.py, qntylab/project_context_execution_authority.py and tests/test_project_context_modularization_c2.py changed in the compatibility-exception repair."
+    "note": "size_metrics/post module digests above reflect the pre-compatibility-repair terminal changeset; qntylab/project_context.py, qntylab/project_context_execution_authority.py and tests/test_project_context_modularization_c2.py changed in the compatibility-exception repair.",
+    "rereview": {
+      "compatibility_exception_rereview_count": 1,
+      "c2_compat_1_public_surface_restored": "PASS",
+      "c2_compat_2_dsh_identities_in_generic_core_zero": "PASS",
+      "c2_compat_3_namespace_compatibility_only": "PASS",
+      "c2_compat_4_mechanical_regression_prevention": "PASS",
+      "compatibility_exception_new_critical_total": 0,
+      "compatibility_exception_new_high_total": 0,
+      "compatibility_exception_finding_cleared": true,
+      "compatibility_finding": "CLEARED"
+    },
+    "full_suite": "NO_NEW_FAILURES_VS_PREVIOUS_C2_HEAD (0 new failures at 5eaa74a vs b6a7fade; head run has 52 fewer failures/errors: 85 failed/15 errors vs 116 failed/36 errors, missing-deps and state drift pre-existing)",
+    "pr_250_codex_thread": "PRRT_kwDOTo27Xs6foa3w (comment 3942654729, P2) became outdated after the repair push; fixed by repair, not reviewer-resolved; proof = regression test + exact-head CI + targeted rereview"
   }
 }

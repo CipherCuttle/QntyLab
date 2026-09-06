@@ -132,7 +132,11 @@ _git_state = _core._git_state
 # generic machinery below consumes only this one seam function.
 from qntylab import project_context_execution_authority as _execution_authority_extension
 
-execution_authority_projection = _execution_authority_extension.execution_authority_projection
+# Namespace compatibility: bind every name the domain extension declares
+# public in its own explicit export contract.  The composition root names no
+# domain identity itself — domain identities stay owned by the extension.
+for _execution_authority_export in _execution_authority_extension.__all__:
+    globals()[_execution_authority_export] = getattr(_execution_authority_extension, _execution_authority_export)
 
 
 def load_context_sources(

@@ -63,6 +63,24 @@ _FRESH_EXECUTION_IDS_WITH_V0R2R1_BINDING_RULES = frozenset(
     }
 )
 
+# Explicit public export contract: the seam function plus the identity
+# constants that were historically public on ``qntylab.project_context``.
+# The composition root binds exactly these declared names generically, so the
+# historical import surface survives while every identity stays owned here.
+__all__ = (
+    "execution_authority_projection",
+    "DSH_STAGE_A_V1R3R2_ACTIVATION_SCHEMA",
+    "DSH_STAGE_A_V1R3R2_V0R1_AUTHORIZATION_ID",
+    "DSH_STAGE_A_V1R3R2_V0R1_EXECUTION_ID",
+    "DSH_STAGE_A_V1R3R2_AUTHORIZATION_ID",
+    "DSH_STAGE_A_V1R3R2_EXECUTION_ID",
+    "DSH_STAGE_A_V1R3R2_V0R3_AUTHORIZATION_ID",
+    "DSH_STAGE_A_V1R3R2_V0R3_EXECUTION_ID",
+    "DSH_STAGE_A_V1R3R2_V0R4_AUTHORIZATION_ID",
+    "DSH_STAGE_A_V1R3R2_V0R4_EXECUTION_ID",
+    "DSH_STAGE_A_V1R3R2_V0R6_EXECUTION_ID",
+)
+
 # These are the fields that form one execution-authority view.  The activation
 # artifact uses a nested representation while the project registry is flat;
 # keeping the mapping explicit prevents either source from silently growing a

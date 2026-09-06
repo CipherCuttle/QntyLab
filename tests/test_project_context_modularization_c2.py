@@ -409,3 +409,82 @@ def test_projects_registry_validation_error_semantics_match_baseline(baseline, t
     with pytest.raises(baseline.ProjectContextError) as baseline_error:
         baseline.validate_projects_registry(root, unauthorized)
     assert str(refactored_error.value) == str(baseline_error.value)
+
+
+# ---------------------------------------------------------------------------
+# (8) compatibility regression: historical public execution-authority exports
+# ---------------------------------------------------------------------------
+
+def _top_level_public_names(source: str) -> set[str]:
+    """Public (non-underscore) names defined at a module's top level."""
+    tree = ast.parse(source)
+    names: set[str] = set()
+    for node in tree.body:
+        if isinstance(node, ast.Assign):
+            for target in node.targets:
+                if isinstance(target, ast.Name):
+                    names.add(target.id)
+        elif isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
+            names.add(node.target.id)
+        elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            names.add(node.name)
+    return {name for name in names if not name.startswith("_")}
+
+
+def test_public_execution_authority_surface_is_derived_and_exposed(baseline) -> None:
+    """Compatibility regression for the PR #250 P2 namespace regression.
+
+    The repair context: ``from qntylab.project_context import
+    DSH_STAGE_A_V1R3R2_EXECUTION_ID`` worked at the canonical parent and broke
+    after the C2 modularization moved the execution-authority identities into
+    the bounded domain extension without exposing them through the
+    composition root.
+
+    The required surface is derived mechanically — the intersection of the
+    canonical parent's public top-level names with the names actually defined
+    in the domain extension module — and is therefore independent of the
+    extension's ``__all__``: accidentally emptying the export contract cannot
+    make this test vacuous.
+    """
+    # The cited historical import must work again through the composition
+    # root, as part of the broader derived surface (not as a lone constant).
+    from qntylab.project_context import DSH_STAGE_A_V1R3R2_EXECUTION_ID  # noqa: F401
+
+    import qntylab.project_context_execution_authority as domain
+
+    historical_public = _top_level_public_names(
+        subprocess.run(
+            ["git", "-C", str(ROOT), "show", f"{CANONICAL_PARENT}:qntylab/project_context.py"],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout
+    )
+    domain_owned = _top_level_public_names((ROOT / DOMAIN_MODULE).read_text(encoding="utf-8"))
+    required = sorted(historical_public & domain_owned)
+
+    # Non-vacuous derivation: the surface must contain the seam function and
+    # the historically public identity constants, including the exact constant
+    # cited by the PR #250 review finding.
+    assert "execution_authority_projection" in required
+    assert "DSH_STAGE_A_V1R3R2_EXECUTION_ID" in required
+    assert len(required) > 2
+
+    # The domain-owned export contract must cover exactly the derived
+    # historical surface — nothing declared that is not domain-owned public,
+    # and nothing domain-owned public left undeclared.
+    assert set(domain.__all__) == set(required)
+
+    composition_source = (ROOT / "qntylab/project_context.py").read_text(encoding="utf-8")
+    for name in required:
+        assert hasattr(project_context, name), f"missing historical export: {name}"
+        assert getattr(project_context, name) is getattr(domain, name), (
+            f"{name} must be object-identical between qntylab.project_context "
+            "and qntylab.project_context_execution_authority"
+        )
+        if name.startswith("DSH"):
+            assert name not in composition_source, (
+                "the generic composition root must not embed the domain "
+                f"identity literal {name!r}"
+            )
+    assert DSH_STAGE_A_V1R3R2_EXECUTION_ID == "DSH_STAGE_A_V1R3R2_ONE_EPISODE_LIVE_EXECUTION_V0R2R1"

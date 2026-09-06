@@ -40,9 +40,7 @@ today and steps 2-6 are unreachable.
 """
 from __future__ import annotations
 
-import hashlib
-import json
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping
 from pathlib import Path
 from types import MappingProxyType
 
@@ -58,6 +56,9 @@ from qntylab.jigsaw_funding_pressure_incremental_forecast_value_executor_v0 impo
 )
 from qntylab import (
     jigsaw_funding_pressure_incremental_forecast_value_evaluation_authorization_provenance_v1 as _provenance,
+)
+from qntylab import (
+    jigsaw_funding_pressure_incremental_forecast_value_real_row_consumer_v0 as _real_row_consumer,
 )
 
 PROJECT_ID = _provenance.REAL_CAPABLE_WRAPPER_PROJECT_ID
@@ -167,15 +168,30 @@ def _authenticate_frozen_evidence(
 def _construct_real_forecast_rows(
     authorization: Mapping[str, object], frozen_evidence: object
 ) -> tuple[ForecastRow, ...]:
-    """Step 4 -- construct the real ForecastRows from authenticated evidence."""
+    """Step 4 -- construct the real ForecastRows from authenticated evidence.
+
+    Preferred path: the authenticated evidence exposes ``real_forecast_row_inputs``,
+    an explicit typed input the repository-native consumer seam
+    (:func:`_real_row_consumer.construct_forecast_rows`) converts
+    deterministically into real ``ForecastRow`` instances and validates
+    against the executor's own frozen 609-origin schedule / temporal /
+    integrity contract -- no hidden IO, no provider access, strict
+    fail-closed.  Legacy path: a bound ``build_real_forecast_rows`` factory,
+    kept for the future authorization's own row builder.  Either way, no
+    factory / input seam means no rows and no core invocation.
+    """
+    typed = getattr(frozen_evidence, "real_forecast_row_inputs", None)
+    if callable(typed):
+        return _real_row_consumer.construct_forecast_rows(typed(authorization=authorization))
+
     build = getattr(frozen_evidence, "build_real_forecast_rows", None)
     if not callable(build):
         # The evidence receipt is a plain mapping in the minimal contract; a
-        # real row factory must be supplied by the future authorization.  No
-        # factory means no rows and no core invocation.
+        # real row factory or typed-input seam must be supplied by the future
+        # authorization.  No seam means no rows and no core invocation.
         raise UnauthorizedExecutionError(
-            "no real ForecastRow factory is bound to the authenticated evidence; "
-            "real execution fails closed"
+            "no real ForecastRow factory or typed-input seam is bound to the authenticated "
+            "evidence; real execution fails closed"
         )
     rows = build(authorization=authorization)
     if not isinstance(rows, tuple) or not rows or not all(isinstance(row, ForecastRow) for row in rows):
@@ -208,12 +224,24 @@ def _invoke_successor_shared_core(
 def _record_exactly_one_result(
     result: IncrementalForecastEvaluation, claim: Mapping[str, object]
 ) -> IncrementalForecastEvaluation:
-    """Step 6 -- record exactly one result against the consumed claim."""
-    claim_digest = hashlib.sha256(
-        json.dumps(dict(claim), sort_keys=True, separators=(",", ":")).encode("utf-8")
-    ).hexdigest()
-    result.result_digest  # the frozen result carries its own digest binding
-    _ = claim_digest  # recorded with the result by the future persistence seam
+    """Step 6 -- durably record exactly one result against the consumed claim.
+
+    Delegates to the repository-native exactly-once recorder
+    (:func:`_real_row_consumer.record_exactly_one_result`): a stable
+    idempotency key bound to the consumed one-shot claim names one
+    self-digesting JSON receipt, written atomically; an identical replay
+    returns the existing receipt with no second write, a conflicting replay
+    (a different result or provenance under the same claim) is rejected, and
+    a tampered stored receipt fails closed.  Reached only after steps 1-5
+    (authorization, one-shot claim,
+    frozen-evidence authentication, real-row construction, shared-core
+    invocation) have all passed.  The evaluation itself is returned unchanged.
+    """
+    _real_row_consumer.record_exactly_one_result(
+        result=result,
+        claim=claim,
+        ledger_root=_repository_root() / _real_row_consumer.CANONICAL_RESULT_LEDGER_RELATIVE_PATH,
+    )
     return result
 
 

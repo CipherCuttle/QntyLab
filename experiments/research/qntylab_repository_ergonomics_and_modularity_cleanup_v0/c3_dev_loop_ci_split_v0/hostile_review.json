@@ -1,11 +1,159 @@
 {
-  "project_id": "QNTYLAB_DEV_LOOP_CI_SPLIT_V0",
-  "phase_id": "DEV_LOOP_CI_SPLIT_V0",
-  "status": "PENDING_DELEGATED_INDEPENDENT_HOSTILE_REVIEW",
-  "note": "Per the frozen C3 bounded completion policy, exactly ONE independent hostile review is delegated by the orchestrator AFTER implementation verification and exact-head CI. This file is a placeholder and MUST NOT be fabricated by the implementation subtask. The reviewer subtask replaces this structure with the real review result. Medium/Low findings do not reopen implementation unless they undermine the C3 objective, invalidate verification evidence, violate a frozen invariant, drop CI coverage, or weaken fail-closed behavior.",
-  "reviewed_candidate_sha": null,
-  "verdict": null,
-  "unresolved_critical_total": null,
-  "unresolved_high_total": null,
-  "findings": []
+  "review_identity": {
+    "role": "SINGLE_INDEPENDENT_HOSTILE_REVIEWER",
+    "reviewer": "Zoo (independent hostile reviewer, debug mode)",
+    "review_date_utc": "2026-09-06",
+    "project_id": "QNTYLAB_DEV_LOOP_CI_SPLIT_V0",
+    "phase_id": "DEV_LOOP_CI_SPLIT_V0",
+    "umbrella_project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0",
+    "canonical_parent": "fba39dfac8affe0078d1362dd5bf52ed7f073ca6",
+    "candidate_sha": "2d0d02ea6b11f1d1e71a783c8906a7889757377f",
+    "pr": "https://github.com/CipherCuttle/QntyLab/pull/251",
+    "pr_state": "OPEN (head c3-dev-loop-ci-split-v0 @ 2d0d02ea6b11f1d1e71a783c8906a7889757377f, base master; verified via gh pr view)",
+    "scope": "READ-ONLY review; the only artifact written by this reviewer is this file (placeholder replaced). No repairs, no merges, no implementation reopening.",
+    "method": "All claims independently re-derived from git history, workflow file contents, gh CLI run records, wc/pyYAML measurements, and local pytest execution. Manifests were NOT trusted; every number was re-measured."
+  },
+  "attack_surfaces": [
+    {
+      "id": 1,
+      "name": "silent_test_deletion",
+      "verdict": "PASS",
+      "evidence": "Baseline monolith re-extracted via `git show fba39dfa:.github/workflows/project-context.yml` (322 lines / 21201 B) and parsed with PyYAML: exactly 19 operational steps under 1 job (9 named + 10 unnamed run/uses steps), independently matching the coverage manifest count. Mechanical section diff: baseline lines 39-90 vs core lines 48-99 and baseline lines 88-333 vs heavy lines 96-334 show ZERO operational-command differences; only comment relocation (heavy-region comments moved out of core) and one comment wording change plus a trailing-newline difference appear. Every one of the 19 baseline operational commands (doctor --strict, render --check, spine, brief, research_ledger doctor, frozen core pytest selection, A repository-deterministic reconciliation, setup-node 22.22.0, pinned DSH runtime provisioning, qualified Stage-A DSH_HOME materialization, A-claim prelive-enforcement integration, fixture removal, provenance receipt, B host-qualified preflight, and the 5 bootstrap steps) is present verbatim in exactly one destination (core lines 48-90; heavy lines 54-333). No silent drop."
+    },
+    {
+      "id": 2,
+      "name": "trigger_weakening",
+      "verdict": "PASS",
+      "evidence": "Trigger blocks diffed mechanically against baseline lines 1-23: core is byte-identical; heavy differs only in the workflow display name ('Project Context Heavy Replay'). Both workflows carry pull_request (unfiltered), push.branches [master], and workflow_dispatch with the identical identity_mode/pull_request_number inputs. Heavy ran automatically: gh run view 34048154056 = event 'pull_request', conclusion 'success', headSha 2d0d02ea6b11f1d1e71a783c8906a7889757377f. No manual-only gating introduced."
+    },
+    {
+      "id": 3,
+      "name": "trigger_escalation",
+      "verdict": "PASS",
+      "evidence": "Trigger blocks are byte-identical to the baseline monolith (diff of lines 1-23: no differences beyond the heavy workflow 'name:' line). No schedule/cron, no repository_dispatch, no workflow_call, no release trigger, no new branches (structure test tests/test_qntylab_dev_loop_ci_split_v0.py:341-354 also enforces this and 13/13 tests pass locally: `python3 -m pytest -q tests/test_qntylab_dev_loop_ci_split_v0.py` -> '13 passed')."
+    },
+    {
+      "id": 4,
+      "name": "permission_escalation",
+      "verdict": "PASS",
+      "evidence": "Both workflows: `permissions: contents: read` and nothing more (core line 22-23, heavy line 22-23; byte-identical to baseline lines 22-23). No write-all, no id-token, no packages/contents write (grep across both files: no matches for secrets./GITHUB_TOKEN/token:)."
+    },
+    {
+      "id": 5,
+      "name": "secret_escalation",
+      "verdict": "PASS",
+      "evidence": "`grep -n \"secrets\\.|GITHUB_TOKEN|token:\"` over both new workflows returned no matches (grep exit 1). No new secret or token requirement relative to the baseline monolith."
+    },
+    {
+      "id": 6,
+      "name": "identity_confusion",
+      "verdict": "PASS",
+      "evidence": "Tri-state resolver is byte-identical to baseline lines 39-59 in BOTH workflows (core lines 48-68, heavy lines 54-74, verified by mechanical diff with no hunks in the identity region). SYNTHETIC_PR_MERGE_RESULT mode, its workflow_dispatch input, the refs/pull/<n>/merge resolver branch, and the reachability echo are all preserved verbatim. Checkout in both workflows uses explicit `ref: ${{ steps.identity.outputs.checkout_ref }}` with fetch-depth 0. The `github.event.pull_request.head.sha || github.sha` fallback appears only inside the forced-dispatch CANDIDATE_HEAD branch exactly as in the baseline monolith (line 46 vs core line 55 / heavy line 61) — faithful duplication, not a new ambient-ref weakening. PR runs (event pull_request) resolve CANDIDATE_HEAD to the exact PR head SHA in both workflows, identical to baseline."
+    },
+    {
+      "id": 7,
+      "name": "provenance_corruption",
+      "verdict": "PASS",
+      "evidence": "The provenance receipt step (heavy lines 280-311) is byte-identical to baseline lines 270-301: all digest values derived at runtime from committed frozen evidence (runtime_manifest.json + current_contract.json), receipt printed as heavy-run stdout only, bound to no other workflow, and explicitly reporting HOST_QUALIFIED_CLAIMED_BY_GITHUB=FALSE. No run-level identity overreach and no cross-workflow atomicity claim anywhere in the workflow; the coverage manifest entry for step 16 states 'receipt belongs to the heavy execution only (single-workflow atomicity preserved; no cross-workflow atomicity fabricated)'."
+    },
+    {
+      "id": 8,
+      "name": "fake_split",
+      "verdict": "PASS",
+      "evidence": "Core workflow (.github/workflows/project-context.yml, 90 lines) contains zero references to the heavy workflow: no workflow_call trigger, no `uses: ./`, no reusable-workflow call, no local composite action, no shared-artifact upload/download, no shell hop into the heavy path (only actions/checkout@v4 and actions/setup-python@v5, both first-party). Heavy symmetrically has no reference to core. The 13 local structure tests — including test_core_does_not_call_heavy_inline (tests/test_qntylab_dev_loop_ci_split_v0.py:398-417) and test_heavy_does_not_call_core_inline (:420-430) — pass. The split is real: the heavy DSH/runtime/claim path is fully separable from the developer-feedback core path."
+    },
+    {
+      "id": 9,
+      "name": "environment_coupling",
+      "verdict": "PASS",
+      "evidence": "Heavy is self-contained: it duplicates its own identity bootstrap + explicit checkout, runs its own setup-python 3.12 / pip install pytest requests (needed by the Python claim CLI, verbatim from baseline), its own setup-node 22.22.0, and derives all fixture env (CI_DSH_RUNTIME_ROOT, CI_DSH_HOME, QNTYLAB_QUALIFIED_DSH_HOME) from its own steps with the same GITHUB_RUN_ID/GITHUB_RUN_ATTEMPT scoping as baseline. No dependency on any artifact, cache, or env produced by the core workflow."
+    },
+    {
+      "id": 10,
+      "name": "fixture_leakage",
+      "verdict": "PASS",
+      "evidence": "Fixture-removal-before-B semantics preserved verbatim (heavy lines 268-279 = baseline lines 258-269): removes /var/tmp/qntylab-dsh-runtime-v0-final, the run-scoped DSH_HOME, and the path file, and FAILS (exit 1, CI_FIXTURE_REMOVED_BEFORE_B=false) if the built CLI bin.js still exists — the same fail-closed cleanup ordering as the monolith, so host-qualified check B can never see GitHub-materialized fixture bytes as host evidence."
+    },
+    {
+      "id": 11,
+      "name": "historical_repair_coverage_loss",
+      "verdict": "PASS",
+      "evidence": "All historical reconciliation/regression steps present in heavy, verbatim: A. repository-deterministic execution-contract reconciliation (repository-deterministic.test.mjs), canonical patch application (codex-executable-binding.patch + claude-hard-read-only.patch), frozen digest verification (BLOCK_RUNTIME_IDENTITY guards over lockfile/patch/chunk/built-CLI digests), A-claim production-owner integration (prelive-enforcement.test.mjs with QNTYLAB_QUALIFIED_DSH_HOME binding), and the B. host-qualified runtime preflight including the conditional host-qualified-runtime.test.mjs execution when pinned runtime bytes are present. Nothing from the monolith's heavy half is omitted."
+    },
+    {
+      "id": 12,
+      "name": "runtime_contamination",
+      "verdict": "PASS",
+      "evidence": "`git diff fba39dfa..2d0d02e --stat`: exactly 9 files — .github/workflows/project-context.yml, .github/workflows/project-context-heavy-replay.yml, docs/state/projects.toml, 5 files under experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c3_dev_loop_ci_split_v0/, and tests/test_qntylab_dev_loop_ci_split_v0.py. Zero paths under qntylab/**; execution semantics untouched. No pyproject.toml or setup.py exists at repo root (ls: No such file or directory). C5-era files intact (tests/test_project_context_modularization_c2.py present, untouched by the diff). No new test file beyond the C3 structure tests (no C6 fitness tests). Forbidden items absent: doctor --strict, render --check, research-ledger doctor and the byte-identical frozen core pytest selection are all present in core (lines 82-90)."
+    },
+    {
+      "id": 13,
+      "name": "manifest_veracity",
+      "verdict": "PASS_WITH_FINDINGS",
+      "evidence": "metrics.json matches reality exactly: baseline 322 L / 21201 B (`wc -l -c` on git show output), core 90 L / 4603 B / 1 job / 11 operational steps, heavy 333 L / 21852 B / 1 job / 13 steps (PyYAML job/step parse re-derived: 11 and 13, 1 job each; baseline 19). 24 = 19 + 5 duplicated bootstrap steps (resolve identity, checkout, record identity, setup-python, pip install) — arithmetic verified. implementation_manifest.json 'contains' lists match actual file contents. FINDING F1 (MEDIUM): coverage_manifest.json `original_order` sequence is [1,2,3,4,5,5,6,7,8,9,9,10..17] — duplicated 5 and 9, max 17 for 19 entries (verified programmatically). The mapping CONTENT (all 19 steps, correct commands, correct destinations, 0 silently dropped) was independently re-derived and is correct; the misnumbering is a field-level veracity defect in an evidence artifact, not a coverage defect."
+    },
+    {
+      "id": 14,
+      "name": "ci_evidence_truthfulness",
+      "verdict": "PASS",
+      "evidence": "`gh run view 34048154017` = {conclusion: success, event: pull_request, headSha: 2d0d02ea6b11f1d1e71a783c8906a7889757377f, workflowName: 'Project Context', createdAt 2026-09-06T17:17:43Z}; `gh run view 34048154056` = {conclusion: success, event: pull_request, headSha: 2d0d02ea6b11f1d1e71a783c8906a7889757377f, workflowName: 'Project Context Heavy Replay'}. Both run IDs, names, head SHA, success, and automatic pull_request trigger path check out exactly as claimed."
+    },
+    {
+      "id": 15,
+      "name": "bookkeeping_truthfulness",
+      "verdict": "PASS",
+      "evidence": "`git diff fba39dfa..2d0d02e -- docs/state/projects.toml` is a PURE ADDITION of one [[project]] row appended after the C2 terminal row (no existing line modified or deleted; unrelated rows untouched). project_id = QNTYLAB_DEV_LOOP_CI_SPLIT_V0 and phase_id = DEV_LOOP_CI_SPLIT_V0 are correctly distinct (not conflated). Pre-closure state truthful: state RESULT_PENDING_RECORDING, candidate_state IMPLEMENTATION_CANDIDATE_AWAITING_HOSTILE_REVIEW, canonicalization_status PENDING_EXPLICIT_PR_MERGE, implementation_authorized false, hostile_review pending, no fabricated exact-head-CI or merge claim in the row, authority fields all NONE. canonical_parent matches fba39dfa."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "MEDIUM",
+      "title": "coverage_manifest.json original_order field misnumbered (duplicate 5 and 9; sequence tops out at 17 for 19 entries)",
+      "surface": 13,
+      "evidence": "Programmatic read: orders = [1,2,3,4,5,5,6,7,8,9,9,10,11,12,13,14,15,16,17]; len=19, unique=17, not equal to 1..19. The step mappings themselves (names, commands, destinations, preserved_exactly flags) were independently re-derived from the baseline monolith and both workflows and are CORRECT: 19/19 mapped, 11 CORE + 8 HEAVY_REPLAY, 0 silently dropped.",
+      "impact": "A field-level veracity defect in a machine-readable coverage evidence artifact. It does not drop any step and does not invalidate the 19/19 coverage claim (independently confirmed), but any downstream consumer keying on original_order for the doctor--strict..pytest core block would see corrupted ordering.",
+      "does_not_reopen_because": "Per the frozen policy, Medium findings do not reopen implementation unless they drop CI coverage, break a frozen invariant, or fabricate evidence. Coverage was independently re-proven complete; this is an artifact metadata defect only."
+    },
+    {
+      "id": "F2",
+      "title": "full_suite_verification_receipt.json binds head full-suite evidence to SHA 5682f6eea5f6f8c226fc1e845a127059a60b47a7, an unreachable (dangling) pre-amend sibling of candidate 2d0d02e",
+      "severity": "LOW",
+      "surface": 14,
+      "evidence": "git cat-file -t 5682f6ee = commit; 5682f6ee is NOT reachable from any ref (not in git rev-list --all, not on any branch). It has the same parent fba39dfa and same commit message as 2d0d02e; `git diff 2d0d02e..5682f6ee --stat` = exactly 1 file, full_suite_verification_receipt.json, 47 deletions — i.e. the ONLY delta is the absence of the receipt file itself. The receipt truthfully records the SHA it used (head_worktree field), so this is honest disclosure, not fabrication. No test references the receipt file (grep over tests/test_qntylab_dev_loop_ci_split_v0.py: no match), so the full-suite result (117F/3536P/36E, HEAD_NEW_FAILURES=0) transfers exactly to candidate 2d0d02e.",
+      "does_not_reopen_because": "The tree delta between the measured SHA and the candidate is the receipt file itself, which is not on any test surface; evidence is not invalidated, and the binding is disclosed rather than fabricated. Exact-head CI evidence exists separately and verifiably (runs 34048154017 / 34048154056 on 2d0d02e)."
+    },
+    {
+      "id": "F3",
+      "title": "metrics.json candidate_run_wall_times still reads 'TO_BE_RECORDED_AFTER_EXACT_HEAD_CI' although exact-head CI runs already exist",
+      "severity": "LOW",
+      "surface": 13,
+      "evidence": "metrics.json wall_time_evidence.candidate_run_wall_times = \"TO_BE_RECORDED_AFTER_EXACT_HEAD_CI\"; gh confirms runs 34048154017 (Project Context) and 34048154056 (Project Context Heavy Replay) completed successfully on 2d0d02e. The field is an honest unrecorded placeholder rather than a fabricated wall-time, and the exact-head evidence is independently available from the run records themselves; it only makes the metrics artifact slightly stale.",
+      "does_not_reopen_because": "No fabricated value; no claim made; the authoritative evidence (CI runs) exists and was verified."
+    }
+  ],
+  "totals": {
+    "critical": 0,
+    "high": 0,
+    "medium": 1,
+    "low": 2
+  },
+  "verdict": "PASS",
+  "verdict_rationale": "All 15 attack surfaces re-verified against primary repo/CI evidence: the split is a genuine verbatim topology movement with 19/19 operational-step coverage (independently re-derived, not trusted from the manifest), byte-identical trigger/permission/identity semantics in both workflows, automatic pull_request and push(master) triggering preserved (heavy run 34048154056 ran as a pull_request event), contents: read only, no secrets, no ambient-ref identity weakening beyond the baseline's own dispatch fallback, no cross-workflow coupling or fabricated atomicity, fail-closed fixture cleanup preserved, runtime paths untouched, exact-head CI evidence truthful (both runs success on 2d0d02e), and bookkeeping truthfully pre-closure. Zero Critical/High findings; one Medium artifact-metadata defect (F1) and two Low provenance-hygiene defects (F2, F3), none of which drop CI coverage, break a frozen invariant, weaken fail-closed behavior, or fabricate evidence.",
+  "decisive_command_receipts": [
+    "git rev-parse HEAD -> 2d0d02ea6b11f1d1e71a783c8906a7889757377f (candidate HEAD confirmed)",
+    "git diff fba39dfac8affe0078d1362dd5bf52ed7f073ca6..2d0d02ea6b11f1d1e71a783c8906a7889757377f --stat -> 9 files, allowed scope only, no qntylab/**",
+    "git show fba39dfa:.github/workflows/project-context.yml | wc -l -c -> 322 21201 (baseline metrics match)",
+    "wc -l -c .github/workflows/project-context.yml .github/workflows/project-context-heavy-replay.yml -> 90 4603 / 333 21852 (post-split metrics match)",
+    "PyYAML job/step parse -> core: 1 job / 11 steps; heavy: 1 job / 13 steps; baseline: 1 job / 19 steps",
+    "bash diff of baseline identity/core/heavy sections vs new workflows -> zero operational-command differences (comments and trailing newline only)",
+    "coverage_manifest original_order programmatically read -> [1,2,3,4,5,5,6,7,8,9,9,10..17] (F1)",
+    "git cat-file -t 5682f6ee -> commit; unreachable from all refs; diff vs 2d0d02e = full_suite_verification_receipt.json only (F2)",
+    "gh run view 34048154017 -> success / pull_request / headSha 2d0d02e / 'Project Context'",
+    "gh run view 34048154056 -> success / pull_request / headSha 2d0d02e / 'Project Context Heavy Replay'",
+    "gh pr view 251 -> OPEN / c3-dev-loop-ci-split-v0 @ 2d0d02e / base master",
+    "python3 -m pytest -q tests/test_qntylab_dev_loop_ci_split_v0.py -> 13 passed",
+    "git diff fba39dfa..2d0d02e -- docs/state/projects.toml -> pure addition of the C3 row (project_id and phase_id distinct)",
+    "grep secrets./GITHUB_TOKEN/token: in both workflows -> no matches (exit 1)"
+  ]
 }

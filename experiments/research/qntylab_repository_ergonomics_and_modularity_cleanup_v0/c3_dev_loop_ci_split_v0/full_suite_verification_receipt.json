@@ -1,0 +1,47 @@
+{
+  "project_id": "QNTYLAB_DEV_LOOP_CI_SPLIT_V0",
+  "phase_id": "DEV_LOOP_CI_SPLIT_V0",
+  "purpose": "Durable evidence for the C3 full-suite verification requirement: the canonical environment has PRE-EXISTING local collection errors/failures, so C3 verification uses exact base/head failure-set equivalence under equivalent conditions with HEAD_NEW_FAILURES = 0.",
+  "conditions": {
+    "method": "Two identical fresh git worktrees on the same machine, same pytest flags: python -m pytest -q --continue-on-collection-errors -rf --tb=no",
+    "base_worktree": "/tmp/qntylab-baseline @ fba39dfac8affe0078d1362dd5bf52ed7f073ca6",
+    "head_worktree": "/tmp/qntylab-c3head @ 5682f6eea5f6f8c226fc1e845a127059a60b47a7",
+    "raw_outputs": "/tmp/baseline_full.txt and /tmp/c3head_full.txt (session artifacts; counts excerpted below)"
+  },
+  "baseline_full_suite": {
+    "failed": 121,
+    "passed": 3519,
+    "skipped": 2,
+    "errors": 36,
+    "wall_time_seconds": 1577,
+    "note": "4 collection errors are pre-existing local-environment limitations (e.g. ModuleNotFoundError: polars in tests/test_jfp_v2_pr_c.py and 3 sibling files); they exist identically on canonical master fba39dfa."
+  },
+  "head_full_suite": {
+    "failed": 117,
+    "passed": 3536,
+    "skipped": 2,
+    "errors": 36,
+    "wall_time_seconds": 1651,
+    "note": "Includes the 13 new C3 structure tests, all passing."
+  },
+  "equivalence": {
+    "HEAD_NEW_FAILURES": 0,
+    "HEAD_NEW_ERRORS": 0,
+    "failure_set_relation": "head_failed_set is a strict subset of baseline_failed_set (4 baseline-only failures were re-run at baseline and reproduce there, and PASSED at head under identical fresh-worktree conditions: environment/ordering-dependent flaky tests around DSH Stage-A one-episode activation registry projections, not C3 surfaces)",
+    "baseline_only_failures_that_did_not_reproduce_at_head": [
+      "tests/test_dsh_stage_a_v1r3r2_one_episode_live_execution_activation_v0r3.py::test_project_context_registry_projection_is_fail_closed_for_v0r3",
+      "tests/test_dsh_stage_a_v1r3r2_one_episode_live_execution_activation_v0r4.py::test_closed_v0r4_activation_is_not_effective_and_claim_is_untouched",
+      "tests/test_dsh_stage_a_v1r3r2_one_episode_live_execution_activation_v0r5.py::test_registry_preserves_closed_v0r5_and_current_authorization_candidate",
+      "tests/test_dsh_stage_a_v1r3r2_one_episode_live_execution_activation_v0r6.py::test_registry_records_terminal_closure_and_projection_is_clean"
+    ],
+    "baseline_flakiness_confirmation": "Targeted rerun of the four affected v0r3-v0r6 activation test files at baseline (fresh worktree, same conditions) produced 9 failed / 46 passed in 404.9s, confirming these tests are environment/state-flaky at the baseline itself."
+  },
+  "focused_c3_structure_tests": {
+    "command": "python -m pytest -q tests/test_qntylab_dev_loop_ci_split_v0.py",
+    "result": "13 passed",
+    "verified_at_both_main_worktree_and_head_worktree": true
+  },
+  "doctor_strict": "PASS (project context ok)",
+  "render_check": "PASS (roadmap current)",
+  "pre_existing_collection_errors_confirmed_on_canonical_master": true
+}

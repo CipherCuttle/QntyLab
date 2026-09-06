@@ -1,0 +1,11 @@
+{
+  "project_id": "QNTYLAB_DEV_LOOP_CI_SPLIT_V0",
+  "phase_id": "DEV_LOOP_CI_SPLIT_V0",
+  "status": "PENDING_DELEGATED_INDEPENDENT_HOSTILE_REVIEW",
+  "note": "Per the frozen C3 bounded completion policy, exactly ONE independent hostile review is delegated by the orchestrator AFTER implementation verification and exact-head CI. This file is a placeholder and MUST NOT be fabricated by the implementation subtask. The reviewer subtask replaces this structure with the real review result. Medium/Low findings do not reopen implementation unless they undermine the C3 objective, invalidate verification evidence, violate a frozen invariant, drop CI coverage, or weaken fail-closed behavior.",
+  "reviewed_candidate_sha": null,
+  "verdict": null,
+  "unresolved_critical_total": null,
+  "unresolved_high_total": null,
+  "findings": []
+}

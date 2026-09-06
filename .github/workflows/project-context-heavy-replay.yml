@@ -1,0 +1,333 @@
+name: Project Context Heavy Replay
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      identity_mode:
+        description: "Explicit identity mode: CANDIDATE_HEAD | SYNTHETIC_PR_MERGE_RESULT | CANONICAL_MASTER"
+        required: false
+        type: choice
+        options:
+          - CANDIDATE_HEAD
+          - SYNTHETIC_PR_MERGE_RESULT
+          - CANONICAL_MASTER
+      pull_request_number:
+        description: "PR number to synthesize a merge ref for (SYNTHETIC_PR_MERGE_RESULT only)"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+# C3 (QNTYLAB_DEV_LOOP_CI_SPLIT_V0): heavy replay workflow.
+# This workflow holds the DSH Stage-A reconciliation, pinned DSH runtime
+# materialization, qualified Stage-A DSH_HOME fixture construction, the
+# production-owner claim-binding integration, the deterministic provenance
+# receipt, the host-qualified runtime preflight reporting, and the fixture
+# cleanup responsibilities that previously lived in the single
+# .github/workflows/project-context.yml monolith. The steps were moved
+# VERBATIM (topology movement, not semantic rewrite); triggers, permissions,
+# identity semantics, and provenance-receipt semantics are unchanged. The
+# tri-state identity bootstrap below is mechanically duplicated from the core
+# workflow (bounded duplication, not a generic CI framework) so this execution
+# also records exactly one explicit identity mode (CI_MODEL). The fast core
+# dev-loop checks live in .github/workflows/project-context.yml.
+jobs:
+  project-context-heavy-replay:
+    runs-on: ubuntu-latest
+    steps:
+      # Tri-state identity model (CI_MODEL). The same workflow can run against
+      # three distinct repository identities, and each is checked out EXPLICITLY
+      # so the commands below never silently test an ambient ref:
+      #   - CANDIDATE_HEAD            : exact PR head SHA (github.event.pull_request.head.sha)
+      #   - SYNTHETIC_PR_MERGE_RESULT : the synthetic merge ref (refs/pull/<n>/merge),
+      #                                 i.e. head merged into the current base
+      #   - CANONICAL_MASTER           : refs/heads/master on push
+      # We do NOT claim all three are identical or that every invocation tests
+      # all three; each run records exactly one identity mode, and the explicit
+      # identity_mode input forces a specific mode on workflow_dispatch.
+      # C3 note: duplicated verbatim from project-context.yml (bounded
+      # mechanical duplication); the two workflows are independent executions.
+      - name: Resolve identity mode
+        id: identity
+        run: |
+          if [ -n "${{ github.event.inputs.identity_mode }}" ]; then
+            echo "mode=${{ github.event.inputs.identity_mode }}" >> "$GITHUB_OUTPUT"
+            case "${{ github.event.inputs.identity_mode }}" in
+              CANDIDATE_HEAD)
+                echo "checkout_ref=${{ github.event.pull_request.head.sha || github.sha }}" >> "$GITHUB_OUTPUT";;
+              SYNTHETIC_PR_MERGE_RESULT)
+                echo "checkout_ref=refs/pull/${{ github.event.inputs.pull_request_number }}/merge" >> "$GITHUB_OUTPUT";;
+              CANONICAL_MASTER)
+                echo "checkout_ref=refs/heads/master" >> "$GITHUB_OUTPUT";;
+            esac
+          elif [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "mode=CANDIDATE_HEAD" >> "$GITHUB_OUTPUT"
+            echo "checkout_ref=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "mode=CANONICAL_MASTER" >> "$GITHUB_OUTPUT"
+            echo "checkout_ref=refs/heads/master" >> "$GITHUB_OUTPUT"
+          fi
+          echo "SYNTHETIC_PR_MERGE_RESULT is reachable via workflow_dispatch with identity_mode=SYNTHETIC_PR_MERGE_RESULT and pull_request_number."
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ steps.identity.outputs.checkout_ref }}
+      - name: Record identity mode
+        run: |
+          echo "IDENTITY_MODE=${{ steps.identity.outputs.mode }}" >> "$GITHUB_ENV"
+          echo "CHECKED_OUT_REF=${{ steps.identity.outputs.checkout_ref }}"
+          echo "HEAD_SHA=$(git rev-parse HEAD)"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # C3 note: retained verbatim from the monolith ordering so the A-claim
+      # step can execute the actual Python claim CLI exactly as before.
+      - run: python -m pip install pytest requests
+      # DSH Stage-A V1R3R2 execution-contract reconciliation — H2 split.
+      # A. REPOSITORY_DETERMINISTIC_CHECK: green on a CLEAN runner with NO
+      #    pre-existing /var/tmp DSH runtime. Proves historical evidence
+      #    immutability, DAG structure, current-generation artifact locations,
+      #    CI identity modes, and the implemented exact-commit claim-source seam
+      #    from declared, reproducible inputs only.
+      - name: A. Repository-deterministic reconciliation checks
+        run: node --test experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_execution_contract_reconciliation_v0/test/repository-deterministic.test.mjs
+      # A-claim. PRODUCTION-OWNER CLAIM-BINDING INTEGRATION (REPOSITORY-DETERMINISTIC).
+      # Runs the ACTUAL production-owner chain on candidate-head CI: resolved
+      # production identity -> launcher transport -> index.js Config semantics ->
+      # guard.mjs -> actual Python claim CLI against a SCRATCH claim namespace.
+      # This test catches the exact HIGH defect this repair fixes: if guard.mjs
+      # fails to transport the required H1 fields, candidate CI is NOT green.
+      # Repository-deterministic: scratch git repos only, no DSH runtime, no
+      # secret, no provider, no live DSH episode, non-production claim refs only.
+      # ------------------------------------------------------------------------
+      # CI_EVIDENCE_ENVIRONMENT_PROVISIONING_ONLY (authorized: canonical #219
+      #   ADD_REAL_PRODUCTION_OWNER_TEST_TO_CI targeting the Project Context
+      #   workflow ONLY; C3 moved this verbatim into the heavy replay workflow
+      #   without changing its semantics or authorization).
+      # The A-claim step runs the UNCHANGED production-owner integration test.
+      # On a clean GitHub-hosted runner the UNCHANGED production computeDigests()
+      # cannot resolve a runtime identity: the frozen runtime manifest hard-pins
+      # /var/tmp/qntylab-dsh-runtime-v0-final/source (built CLI + bundled chunks)
+      # and a qualified DSH_HOME, none of which exist on the runner. The steps
+      # below construct a deterministic temporary CI fixture for the UNCHANGED
+      # computeDigests() path ONLY, reusing the existing canonical materializers:
+      #   (1) materialize the pinned DSH runtime at the frozen manifest path via
+      #       materializePinnedSource / applyCanonicalPatches /
+      #       installPinnedOffline / buildPinnedRuntime, with
+      #       `corepack pnpm@11.7.0 fetch --frozen-lockfile` first so the governed
+      #       offline install can run on a fresh runner (no store);
+      #   (2) materialize a fresh disposable production Stage-A DSH_HOME via
+      #       materializeStageADshHome from the exact CI runtime source + the
+      #       production @qntylab Stage-A packages, then export
+      #       QNTYLAB_QUALIFIED_DSH_HOME for the A-claim process only.
+      # No new algorithm, no weakening of computeDigests, no production-derived
+      # identity replaced with test constants, no secret read, no provider call,
+      # no live DSH episode, no live boundary. After the A-claim the fixture is
+      # deleted before step B so GitHub never reports HOST_QUALIFIED_RUNTIME_CHECK.
+      # ------------------------------------------------------------------------
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.22.0"
+      - name: "CI fixture: provision pinned DSH runtime at the frozen manifest path"
+        run: |
+          set -euo pipefail
+          export CI_DSH_RUNTIME_ROOT="/var/tmp/qntylab-dsh-runtime-v0-final"
+          rm -rf "$CI_DSH_RUNTIME_ROOT"
+          corepack enable
+          node --input-type=module <<'NODE'
+          import { createHash } from 'node:crypto'
+          import { existsSync, readFileSync } from 'node:fs'
+          import { join } from 'node:path'
+          import { spawnSync } from 'node:child_process'
+          import {
+            materializePinnedSource,
+            applyCanonicalPatches,
+            installPinnedOffline,
+            buildPinnedRuntime,
+            SOURCE_COMMIT,
+            SOURCE_TREE,
+            SOURCE_TAG,
+          } from './experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_runtime_materialization_and_launch_v0/materializer/qntylab-materialize-dsh-runtime.mjs'
+          const REPO = process.cwd()
+          const RUNTIME_ROOT = process.env.CI_DSH_RUNTIME_ROOT
+          const sha = (p) => createHash('sha256').update(readFileSync(p)).digest('hex')
+          const receipt = materializePinnedSource({ runtimeRoot: RUNTIME_ROOT })
+          if (receipt.sourceCommit !== SOURCE_COMMIT || receipt.sourceTree !== SOURCE_TREE || receipt.sourceTag !== SOURCE_TAG) {
+            throw new Error('BLOCK_RUNTIME_IDENTITY: CI fixture did not reproduce the pinned DSH source')
+          }
+          const patchDigests = applyCanonicalPatches(receipt.sourceRoot, [
+            join(REPO, 'experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r1_real_runtime_qualification_v0/repairs/codex-executable-binding.patch'),
+            join(REPO, 'experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_claude_hard_read_only_repair_and_requalification_v0/repairs/claude-hard-read-only.patch'),
+          ])
+          const sourceRoot = receipt.sourceRoot
+          // Populate the pnpm store from the exact pinned lockfile so the governed
+          // offline install can run on a fresh runner (cache is an optimization only).
+          const fetchResult = spawnSync('corepack', ['pnpm@11.7.0', 'fetch', '--frozen-lockfile'], {
+            cwd: sourceRoot,
+            encoding: 'utf8',
+            env: { ...process.env, COREPACK_ENABLE_DOWNLOAD_PROMPT: '0' },
+          })
+          if (fetchResult.status !== 0) {
+            throw new Error('BLOCK_DEPENDENCY_STORE: pnpm fetch failed:\n' + (fetchResult.stderr || fetchResult.stdout))
+          }
+          installPinnedOffline(sourceRoot, { corepackExecutable: 'corepack' })
+          buildPinnedRuntime(sourceRoot, { corepackExecutable: 'corepack', buildScript: 'build:lib' })
+          // Verify the fixture byte-for-byte against the frozen runtime identity.
+          const manifestFrozen = JSON.parse(readFileSync(join(REPO, 'experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_runtime_materialization_and_launch_v0/evidence/runtime_manifest.json'), 'utf8'))
+          const contractFrozen = JSON.parse(readFileSync(join(REPO, 'experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_execution_contract_reconciliation_v0/evidence/current_contract.json'), 'utf8'))
+          const lockfileDigest = sha(join(sourceRoot, 'pnpm-lock.yaml'))
+          if (lockfileDigest !== manifestFrozen.lockfileDigest) throw new Error('BLOCK_RUNTIME_IDENTITY: lockfile digest mismatch')
+          if (patchDigests.map((d) => d.digest).join('|') !== (contractFrozen.components.runtimeIdentity.patchDigests || []).join('|')) {
+            throw new Error('BLOCK_RUNTIME_IDENTITY: governed patch digests mismatch')
+          }
+          const expectedChunks = contractFrozen.components.runtimeIdentity.workspaceBundledChunkDigests
+          for (const [rel, digest] of Object.entries(manifestFrozen.workspaceBundledChunks || {})) {
+            const abs = join(sourceRoot, rel)
+            if (!existsSync(abs) || sha(abs) !== expectedChunks[rel]) throw new Error('BLOCK_RUNTIME_IDENTITY: bundled chunk mismatch ' + rel)
+          }
+          const builtCli = join(sourceRoot, 'apps/cli/lib/bin.js')
+          if (!existsSync(builtCli) || sha(builtCli) !== manifestFrozen.builtCliDigest) {
+            throw new Error('BLOCK_RUNTIME_IDENTITY: built CLI digest mismatch')
+          }
+          console.log('CI_MATERIALIZED_SOURCE_COMMIT=' + receipt.sourceCommit)
+          console.log('CI_MATERIALIZED_SOURCE_TREE=' + receipt.sourceTree)
+          console.log('CI_MATERIALIZED_SOURCE_TAG=' + receipt.sourceTag)
+          console.log('CI_LOCK_DIGEST_VERIFIED=' + lockfileDigest)
+          console.log('CI_BUILT_CLI_DIGEST_VERIFIED=' + sha(builtCli))
+          NODE
+          echo "CI_DSH_RUNTIME_ROOT=$CI_DSH_RUNTIME_ROOT" >> "$GITHUB_ENV"
+        shell: bash
+      - name: "CI fixture: materialize qualified Stage-A DSH_HOME"
+        id: ci-dsh-home
+        run: |
+          set -euo pipefail
+          export CI_DSH_HOME="/var/tmp/qntylab-ci-stage-a-dsh-home-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          echo "$CI_DSH_HOME" > /tmp/qntylab-ci-dsh-home-path.txt
+          node --input-type=module <<'NODE'
+          import { createHash } from 'node:crypto'
+          import { existsSync, readFileSync } from 'node:fs'
+          import { join } from 'node:path'
+          import { materializeStageADshHome, packageTreeDigest } from './experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_production_dsh_home_materialization_and_requalification_v0/materializer/qntylab-materialize-stage-a-dsh-home.mjs'
+          const REPO = process.cwd()
+          const home = process.env.CI_DSH_HOME
+          const runtimeRoot = '/var/tmp/qntylab-dsh-runtime-v0-final/source'
+          const contractFrozen = JSON.parse(readFileSync(join(REPO, 'experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_execution_contract_reconciliation_v0/evidence/current_contract.json'), 'utf8'))
+          const sha = (p) => createHash('sha256').update(readFileSync(p)).digest('hex')
+          const stagePolicy = contractFrozen.components.compositeLaunchPolicy.stageAPolicy
+          const result = materializeStageADshHome({ destination: home, runtimeManifestPath: join(REPO, 'experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_runtime_materialization_and_launch_v0/evidence/runtime_manifest.json') })
+          const homeManifest = JSON.parse(readFileSync(join(home, 'dsh-home-manifest.json'), 'utf8'))
+          // Prove the qualified profile files match the frozen production profile identity.
+          const frozenProfile = stagePolicy.qualifiedDshHomeProfileDigests || {}
+          for (const [file, digest] of Object.entries(frozenProfile)) {
+            const abs = join(home, 'profiles/headless', file)
+            if (!existsSync(abs) || sha(abs) !== digest) throw new Error('BLOCK_RUNTIME_IDENTITY: qualified profile mismatch ' + file)
+          }
+          // Prove the runtime package graph matches (tree digests over the same dirs).
+          const frozenTree = stagePolicy.qualifiedRuntimePackageTreeDigests || {}
+          const runtimePaths = {
+            'dsh-llm': 'packages/llm/llm',
+            'dsh-llm-pi-ai': 'packages/llm/llm-pi-ai',
+            'dsh-subagent-claude-code': 'packages/subagent/subagent-claude-code',
+            'dsh-subagent-codex': 'packages/subagent/subagent-codex',
+            'dsh-subprocess': 'packages/subprocess/subprocess',
+            'dsh-tool-subagent': 'packages/subagent/tool-subagent',
+          }
+          for (const [name, rel] of Object.entries(runtimePaths)) {
+            const tree = packageTreeDigest(join(runtimeRoot, rel))
+            if (tree !== frozenTree[name]) throw new Error('BLOCK_RUNTIME_IDENTITY: runtime package tree mismatch ' + name)
+          }
+          // Prove the production @qntylab packages exist in the qualified home.
+          for (const pkg of ['dsh-stage-a-gated-provider', 'dsh-stage-a-parent-enforcement']) {
+            if (!existsSync(join(home, 'profiles/node_modules/@qntylab', pkg))) {
+              throw new Error('BLOCK_RUNTIME_IDENTITY: production @qntylab package missing ' + pkg)
+            }
+          }
+          console.log('CI_QUALIFIED_HOME_DIGEST=' + homeManifest.homeManifestDigest)
+          NODE
+          echo "CI_DSH_HOME=$CI_DSH_HOME" >> "$GITHUB_ENV"
+          echo "qualified_dsh_home=$CI_DSH_HOME" >> "$GITHUB_OUTPUT"
+          echo "QNTYLAB_QUALIFIED_DSH_HOME=$CI_DSH_HOME" >> "$GITHUB_ENV"
+        shell: bash
+      # A-claim. PRODUCTION-OWNER CLAIM-BINDING INTEGRATION (REPOSITORY-DETERMINISTIC).
+      # Runs the ACTUAL production-owner chain on candidate-head CI: resolved
+      # production identity -> launcher transport -> index.js Config semantics ->
+      # guard.mjs -> actual Python claim CLI against a SCRATCH claim namespace.
+      # This test catches the exact HIGH defect this repair fixes: if guard.mjs
+      # fails to transport the required H1 fields, candidate CI is NOT green.
+      # Repository-deterministic: scratch git repos only; the fixture above exists
+      # solely so the UNCHANGED production computeDigests() path can consume the
+      # frozen production identity receipt; it is removed before step B.
+      - name: A-claim. Production-owner claim-binding integration (repository-deterministic)
+        run: node --test experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_prelive_execution_enforcement_gap_closure_v0/test/prelive-enforcement.test.mjs
+        env:
+          QNTYLAB_QUALIFIED_DSH_HOME: ${{ steps.ci-dsh-home.outputs.qualified_dsh_home }}
+      - name: "CI fixture removal before step B"
+        run: |
+          set -euo pipefail
+          rm -rf "/var/tmp/qntylab-dsh-runtime-v0-final"
+          rm -rf "/var/tmp/qntylab-ci-stage-a-dsh-home-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          rm -f /tmp/qntylab-ci-dsh-home-path.txt
+          if [ -e /var/tmp/qntylab-dsh-runtime-v0-final/source/apps/cli/lib/bin.js ]; then
+            echo "CI_FIXTURE_REMOVED_BEFORE_B=false"
+            exit 1
+          fi
+          echo "CI_FIXTURE_REMOVED_BEFORE_B=true"
+        shell: bash
+      - name: CI provenance receipt (deterministic, non-claim, non-secret)
+        run: |
+          echo "CI_FIXTURE_PURPOSE=REPOSITORY_DETERMINISTIC_A_CLAIM_INPUT_ONLY"
+          # Every digest value is DERIVED at runtime from the committed frozen
+          # evidence artifacts (never transcribed), so the receipt cannot drift
+          # from, or misquote, the governed inputs.
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs'
+          import { join } from 'node:path'
+          const REPO = process.cwd()
+          const manifest = JSON.parse(readFileSync(join(REPO, 'experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_runtime_materialization_and_launch_v0/evidence/runtime_manifest.json'), 'utf8'))
+          const contract = JSON.parse(readFileSync(join(REPO, 'experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_execution_contract_reconciliation_v0/evidence/current_contract.json'), 'utf8'))
+          const rt = contract.components.runtimeIdentity
+          const lines = [
+            'DSH_SOURCE_COMMIT=' + rt.sourceIdentity.commit,
+            'DSH_SOURCE_TREE=' + rt.sourceIdentity.tree,
+            'DSH_SOURCE_TAG=' + rt.sourceIdentity.tag,
+            'PNPM_VERSION=' + manifest.packageManagerFingerprint.actualVersion,
+            'NODE_VERSION=22.22.0',
+            'LOCK_DIGEST=' + rt.lockfileDigest,
+            'PATCH_1_DIGEST=' + rt.patchDigests[0],
+            'PATCH_2_DIGEST=' + rt.patchDigests[1],
+            'BUILT_CLI_DIGEST=' + rt.builtCliDigest,
+            'QUALIFIED_HOME_DERIVED_FROM_PINNED_SOURCE=TRUE',
+            'A_CLAIM_EXECUTED=TRUE',
+            'A_CLAIM_PASS=TRUE',
+            'CI_FIXTURE_REMOVED_BEFORE_B=TRUE',
+            'HOST_QUALIFIED_CLAIMED_BY_GITHUB=FALSE',
+          ]
+          for (const line of lines) console.log(line)
+          NODE
+        shell: bash
+      # B. HOST_QUALIFIED_RUNTIME_CHECK: the production-equivalent host preflight
+      #    that recomputes the current root and current-generation successor from
+      #    the RESOLVED pinned runtime bytes. A clean GitHub runner does NOT have
+      #    those bytes, so this job REPORTS the split explicitly instead of
+      #    claiming full runtime qualification here. The committed
+      #    determinism_reconciliation_v0.json receipt is the host-executed proof
+      #    (derived twice identically). This step FAILS if the runtime bytes are
+      #    present but the recomputation disagrees — it never silently skips B
+      #    while claiming green.
+      - name: B. Host-qualified runtime preflight (reports GitHub vs host scope)
+        run: |
+          echo "CI_REPRODUCIBILITY_SPLIT=REPOSITORY_DETERMINISTIC_CHECK_ON_GITHUB"
+          echo "HOST_QUALIFIED_RUNTIME_CHECK=SCOPE: production-equivalent host with pinned DSH runtime at manifest builtCliAbsolutePath"
+          echo "GITHUB_PROVES=repository bytes: historical immutability, DAG, current-generation artifact locations, claim-source seam, CI identity modes"
+          echo "HOST_PROVES=current root re-derivation, successor re-derivation, executable fingerprint identity (committed determinism_reconciliation_v0.json)"
+          if [ -f /var/tmp/qntylab-dsh-runtime-v0-final/source/apps/cli/lib/bin.js ]; then
+            echo "RUNTIME_PRESENT=true"
+            node --test experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_stage_a_v1r3r2_execution_contract_reconciliation_v0/test/host-qualified-runtime.test.mjs
+          else
+            echo "RUNTIME_PRESENT=false"
+            echo "Host-qualified runtime check NOT executed on this runner; candidate CI is green on repository-deterministic checks only."
+          fi

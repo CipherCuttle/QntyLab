@@ -10299,3 +10299,59 @@ signing_authority = "NONE"
 promotion_authority = "NONE"
 terminal_outcome = "C2_CLOSED_PASS_READY_FOR_MERGE_WITH_EXPLICIT_AUTHORITY"
 next_action = "C2 closed pass after the single authorized compatibility exception repair (repair commit 74f424143c1487c99f5c155b1c760bcbb1565ecb; one compatibility-focused targeted rereview: C2-COMPAT-1..4 CLEARED, no new Critical/High; post-repair exact-head CI run 34008123633 success). Merge PR #250 only with explicit merge authority and a green Project Context CI run on the terminal PR head; do not start C3-C6."
+
+[[project]]
+project_id = "QNTYLAB_DEV_LOOP_CI_SPLIT_V0"
+phase_id = "DEV_LOOP_CI_SPLIT_V0"
+display_name = "QntyLab dev loop CI split V0"
+state = "RESULT_PENDING_RECORDING"
+candidate_state = "IMPLEMENTATION_CANDIDATE_AWAITING_HOSTILE_REVIEW"
+canonicalization_status = "PENDING_EXPLICIT_PR_MERGE"
+authority_level = "BOUNDED_QNTYLAB_REPOSITORY_ERGONOMICS_C3_IMPLEMENTATION_ONLY"
+phase_type = "BOUNDED_REPOSITORY_ERGONOMICS_IMPLEMENTATION"
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  ".github/workflows/project-context.yml",
+  ".github/workflows/project-context-heavy-replay.yml",
+  "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c3_dev_loop_ci_split_v0/implementation_manifest.json",
+  "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c3_dev_loop_ci_split_v0/metrics.json",
+  "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c3_dev_loop_ci_split_v0/coverage_manifest.json",
+  "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c3_dev_loop_ci_split_v0/hostile_review.json",
+  "tests/test_qntylab_dev_loop_ci_split_v0.py",
+]
+umbrella_project_id = "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0"
+phase = "C3"
+canonical_parent = "fba39dfac8affe0078d1362dd5bf52ed7f073ca6"
+predecessor_project_id = "QNTYLAB_PROJECT_CONTEXT_MODULARIZATION_V0"
+predecessor_state = "CLOSED_PASS"
+implementation_authorized = false
+implementation_completed = true
+hostile_review_count = 0
+hostile_review_verdict = "PENDING_DELEGATED_INDEPENDENT_HOSTILE_REVIEW"
+hostile_review_critical_total = 0
+hostile_review_high_total = 0
+repair_budget_used = false
+repair_budget_count = 0
+repair_budget_limit = 1
+targeted_rereview_required = false
+targeted_rereview_used = false
+targeted_rereview_count = 0
+targeted_rereview_new_critical_total = 0
+targeted_rereview_new_high_total = 0
+unresolved_critical_total = 0
+unresolved_high_total = 0
+evaluator_applicability = "NO_MATCH"
+evaluator_run_required = false
+evaluator_created = false
+runtime_authorized = false
+scientific_execution_authorized = false
+qnty_mutation_authorized = false
+qnty_agent_eval_mutation_authorized = false
+qntyspot_mutation_authorized = false
+trading_authority = "NONE"
+capital_authority = "NONE"
+signing_authority = "NONE"
+promotion_authority = "NONE"
+terminal_outcome = "C3_IMPLEMENTATION_COMPLETE_AWAITING_HOSTILE_REVIEW"
+next_action = "C3 implementation candidate complete on branch c3-dev-loop-ci-split-v0 (canonical parent fba39dfac8affe0078d1362dd5bf52ed7f073ca6): single 322-line Project Context workflow split into a fast core dev-loop workflow (doctor --strict, render --check, spine, brief, research ledger doctor, frozen core pytest selection) and a heavy replay workflow (DSH Stage-A reconciliation, pinned DSH runtime + qualified Stage-A DSH_HOME fixtures, production-owner claim-binding integration, provenance receipt, host-qualified preflight reporting) with ORIGINAL_OPERATIONAL_CI_STEP_COVERAGE = 100% and 0 silently dropped steps; tri-state identity bootstrap mechanically duplicated (no generic CI framework); triggers/permissions unchanged (contents: read); no runtime module change; no merge authority. Next: exactly ONE independent hostile review by the orchestrator, then terminal C3 bookkeeping only if 0 unresolved Critical/High. Merge only with explicit merge authority after both exact-head CI workflows pass; do not start C4-C6."

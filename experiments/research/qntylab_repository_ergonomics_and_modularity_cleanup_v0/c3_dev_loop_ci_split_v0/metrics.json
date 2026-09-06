@@ -119,6 +119,36 @@
         "job_completed_at": "2026-09-06T17:20:12Z",
         "total_job_wall_time_seconds": 146
       }
+    },
+    "terminal_bookkeeping_run_ids": {
+      "note": "Recorded in a second mechanical bookkeeping commit per the C3 terminal bookkeeping policy: exact-head CI run IDs observed for the first bookkeeping commit head at the time of recording. Final closure head CI is verified separately on the newest head and reported in the closure record.",
+      "head_sha": "677ebfc6bf8a970867226f5c19760c91f19130a8",
+      "core_run": {
+        "run_id": 34052135837,
+        "workflow": "Project Context",
+        "event": "pull_request",
+        "conclusion": "success",
+        "run_created_at": "2026-09-06T18:34:11Z",
+        "run_updated_at": "2026-09-06T18:35:53Z",
+        "run_level_wall_time_seconds": 102,
+        "job": "project-context",
+        "job_started_at": "2026-09-06T18:34:14Z",
+        "job_completed_at": "2026-09-06T18:35:52Z",
+        "total_job_wall_time_seconds": 98
+      },
+      "heavy_run": {
+        "run_id": 34052135854,
+        "workflow": "Project Context Heavy Replay",
+        "event": "pull_request",
+        "conclusion": "success",
+        "run_created_at": "2026-09-06T18:34:11Z",
+        "run_updated_at": "2026-09-06T18:36:51Z",
+        "run_level_wall_time_seconds": 160,
+        "job": "project-context-heavy-replay",
+        "job_started_at": "2026-09-06T18:34:15Z",
+        "job_completed_at": "2026-09-06T18:36:50Z",
+        "total_job_wall_time_seconds": 155
+      }
     }
   }
 }

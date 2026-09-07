@@ -1,0 +1,184 @@
+{
+  "review_identity": {
+    "role": "SINGLE_INDEPENDENT_HOSTILE_REVIEWER",
+    "reviewer": "Zoo (independent hostile reviewer, code mode)",
+    "review_date_utc": "2026-09-07",
+    "project_id": "QNTYLAB_PYTHON_TOOLING_NORMALIZATION_V0",
+    "phase_id": "PYTHON_TOOLING_NORMALIZATION_V0",
+    "umbrella_project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0",
+    "canonical_parent": "789e199b373ccd1b7a4e3c6df1fc55989f1c466d",
+    "candidate_sha": null,
+    "candidate_sha_note": "Candidate is STAGED (index) and UNCOMMITTED: branch c4-python-tooling-normalization-v0, HEAD == canonical parent 789e199b373ccd1b7a4e3c6df1fc55989f1c466d, `git diff --cached --stat` = exactly 7 files / 307 insertions. There is no candidate commit SHA yet; reviewed_candidate_sha is honestly null, matching the C3 placeholder convention.",
+    "reviewed_surface": "git index (staged content), not the worktree alone: pyproject.toml (new), docs/state/projects.toml (C4 row appended), 4 artifacts under experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c4_python_tooling_normalization_v0/, tests/test_qntylab_python_tooling_normalization_v0.py (new, 5 tests)",
+    "scope": "READ-ONLY review; the only artifact written by this reviewer is this file (placeholder replaced) and it is the only file staged by the reviewer. No repairs, no refactors, no C5/C6 work, no commits.",
+    "method": "All claims independently re-derived: full byte-level read of pyproject.toml and all 4 artifacts, fresh baseline worktree at 789e199b (git worktree add /tmp/c4_baseline_wt), local A/B pytest collection runs, raw-vs-sorted collection-ID forensics with PYTHONHASHSEED control, pip dry-run A/B in isolated /tmp copies (never in the real worktree), git diff over every forbidden path, and project_context doctor/render/plain execution. Artifact numbers were NOT trusted; every load-bearing number was re-measured or independently corroborated from the raw pytest outputs referenced by the receipt.",
+    "known_accepted_context_not_counted": [
+      "Pre-existing failure tests/test_qntylab_repository_ergonomics_and_modularity_cleanup_decision_v0.py::test_c1_not_started (stale C1 pre-start assertion)",
+      "4 pre-existing local-environment collection errors (3x ModuleNotFoundError polars, 1x ModuleNotFoundError retry)",
+      "6 fail-closed DSH worktree-cleanliness tests that pass on dirty trees (disclosed in full_suite_verification_receipt.json with controlled evidence)",
+      "configfile line change none -> pyproject.toml in the pytest session header (this IS the intended C4 normalization)"
+    ]
+  },
+  "attack_surfaces": [
+    {
+      "id": 1,
+      "name": "accidental_installable_package_conversion",
+      "verdict": "PASS_WITH_FINDINGS",
+      "evidence": "Empirical A/B in isolated /tmp copies (never in the real worktree). Canonical (no pyproject.toml): `python -m pip install --dry-run --no-deps --no-build-isolation --break-system-packages .` -> \"ERROR: Directory '.' is not installable. Neither 'setup.py' nor 'pyproject.toml' found.\" With the C4 pyproject.toml: pip now invokes the setuptools legacy PEP 517 backend and fails at metadata generation with \"Multiple top-level packages discovered in a flat-layout: ['ops', 'data', 'qntylab', 'experiments', 'qualifications']\" -> metadata-generation-failed. So `pip install .` FAILS CLOSED both before and after C4; no install path succeeds. Operational risk is negligible: grep over README.md and .github/workflows/ finds zero `pip install .` or `pip install -e .` invocations (only `python -m pip install pytest requests`, which does not touch the local directory), and the local environment is PEP 668 externally-managed (pip install refuses before project resolution even without --break-system-packages). FINDING F4 (LOW) records the undisclosed error-mode delta."
+    },
+    {
+      "id": 2,
+      "name": "hidden_project_or_build_system_authority_creep",
+      "verdict": "PASS",
+      "evidence": "pyproject.toml read byte-for-byte (21 lines / 1027 bytes; staged copy identical: `git show :pyproject.toml | wc -c` = 1027). It contains exactly one table, [tool.pytest.ini_options], with exactly one key, addopts = \"\"; the file-level comments explicitly disclaim packaging and match the actual content (no [project], no [build-system], no name/version/dependencies/entry-points/build-backend anywhere). Programmatic grep over the entire staged diff for name=/version=/requires=/install_requires/entry.point/console_scripts/build-backend/wheel/twine/publish found only negations (\"packaging_publishing_metadata_added\": false, doc-comment 'packaging/publishing metadata (name/version/entry points/build backend)') and an unrelated display_name string. The C4 test file and all 4 artifacts assert NON-packaging; no packaging claim is smuggled anywhere in the diff. The C4 contract test enforces this structurally (test_c4_pyproject_has_no_packaging_tables, test_c4_tool_surface_is_bounded)."
+    },
+    {
+      "id": 3,
+      "name": "import_resolution_change",
+      "verdict": "PASS",
+      "evidence": "`python -c \"import qntylab, sys; print(qntylab.__file__)\"` from repo root -> /home/swirky/DevHub/repos/QntyLab/qntylab/__init__.py (exit 0), i.e. import resolution still relies on cwd/repository root on sys.path. `git diff --cached qntylab/` is empty (0 bytes, exit 0), so no import hooks or runtime modules changed. pyproject.toml contains no [project] or [build-system] table, so no packaging/import mechanism is introduced; the isolated pip A/B (surface 1) confirms no install path succeeds that could shadow imports."
+    },
+    {
+      "id": 4,
+      "name": "pytest_rootdir_config_discovery_change",
+      "verdict": "PASS",
+      "evidence": "Candidate header (staged tree): rootdir /home/swirky/DevHub/repos/QntyLab, configfile: pyproject.toml, plugins: typeguard-4.4.4. Baseline header (fresh worktree at 789e199b, /tmp/c4_baseline_wt): rootdir /tmp/c4_baseline_wt, NO configfile line, plugins: typeguard-4.4.4. The only header delta is the intended configfile line (known-accepted). addopts = \"\" contributes zero command-line tokens. Plugin autoload behavior is unchanged (identical plugin list; no -p options, no [tool.pytest] keys beyond addopts). Warning filters unchanged: the ini_options table contains only addopts=\"\" (asserted programmatically by test_c4_pytest_table_is_explicit_noop) and the focused A/B runs (tests/test_lab.py: baseline 2 failed/28 passed vs candidate 30 passed -- outcome-set differences traceable to pre-existing run-to-run nondeterminism of those tests, see surface 5 note; the governed decision file is identical A/B: 1 failed/21 passed in both trees). Collection ordering forensics: pytest parametrize order is decorator-literal-deterministic (verified at source, tests/test_binance_um_archive.py:90-93 literal list; raw A/B parametrize order for test_normalized_funding_signs verified identical). Apparent ID-level A/B diffs were traced to two PRE-EXISTING, tree-independent causes: (a) wall-clock-encoded DOS timestamps inside zip-fixture bytes in test IDs (2-second granularity; seeded double-runs differ by 14 lines in BOTH trees), and (b) GNU sort collation-tie emission order (sort not comm-stable) which manufactured apparent adjacent swaps in SORTED comparisons. No pytest behavior option changed."
+    },
+    {
+      "id": 5,
+      "name": "test_collection_delta",
+      "verdict": "PASS",
+      "evidence": "Candidate: `python -m pytest --co -q` -> 3692 tests collected, 4 errors, exit-0 header configfile: pyproject.toml; the 4 error modules are byte-identical to the documented baseline (experiments/.../fixture/tests/test_retry.py retry; tests/test_jfp_v2_pr_c.py, tests/test_jigsaw_harvest_execution_v0.py, tests/test_research_data_spine_v0.py polars). Baseline (fresh worktree at 789e199b): 3687 collected, same 4 errors, no configfile. Delta = exactly +5; `python -m pytest --co -q tests/test_qntylab_python_tooling_normalization_v0.py` -> exactly the 5 new C4 tests collected. The 5 new tests are the ONLY lines unique to the candidate in the normalized collection multiset comparison (byte-normalized sed 's/\\\\x[0-9a-f][0-9a-f]//g' comparison; residual diffs are the tree-independent wall-clock zip-byte variants and sort-collation artifacts explained on surface 4). No existing test file is modified (`git diff --cached tests/` adds only the new C4 file)."
+    },
+    {
+      "id": 6,
+      "name": "hidden_dependency_or_version_changes",
+      "verdict": "PASS",
+      "evidence": "`git diff --cached requirements-*` is empty (exit 0 for all requirement files). The full staged diff (307 insertions over 7 files) contains no version pins, no dependency keys, no requirements edits; grep for name=/version=/requires=/install_requires over the staged diff returns only negation statements in artifacts (surface 2). CI dependency install commands (`python -m pip install pytest requests`, both workflows) are untouched (`git diff --cached .github/` empty)."
+    },
+    {
+      "id": 7,
+      "name": "pip_install_editable_requirement_introduced",
+      "verdict": "PASS",
+      "evidence": "grep -nE 'pip install' README.md -> no matches (exit 1); grep over .github/workflows/ finds exactly two pre-existing lines, both `python -m pip install pytest requests` (project-context.yml:81, project-context-heavy-replay.yml:89) — unchanged and none reference the repository directory, so pip never attempts to build the root pyproject.toml in CI. The candidate introduces no requirement for `pip install -e .`: import resolution is cwd-based (surface 3) and the C4 test suite passes without any install step (surface 5 / post-artifact check)."
+    },
+    {
+      "id": 8,
+      "name": "readme_verification_command_drift",
+      "verdict": "PASS",
+      "evidence": "`git diff --cached README.md` is empty (exit 0). README.md:65 still reads `python -m pytest -q` (sed -n '60,70p' output confirms the fenced block: cli fetch/run lines then `python -m pytest -q`)."
+    },
+    {
+      "id": 9,
+      "name": "ci_behavior_changed_indirectly",
+      "verdict": "PASS",
+      "evidence": "`git diff --cached .github/` is empty. Reasoning verified empirically: (a) pytest 9.0.2 config discovery picks up pyproject.toml as configfile when run from the repo root — observed in this session's header — but with only addopts=\"\" the session header and focused A/B results are otherwise byte-identical to baseline (surfaces 4-5), so CI's `python -m pytest -q` semantics are unchanged; (b) `python -m pip install pytest requests` resolves two PyPI names and never inspects the local pyproject.toml (pip builds local pyproject.toml only for directory/local-path installs, none exist in either workflow). No CI surface can newly attempt to build QntyLab."
+    },
+    {
+      "id": 10,
+      "name": "qntylab_toml_consumer_orphaned",
+      "verdict": "PASS",
+      "evidence": "`git diff --cached qntylab.toml` is empty. grep -l 'qntylab.toml' confirms all three consumers still reference it unchanged: qntylab/project_context_core.py, qntylab/agent_context_packet_v0.py, qntylab/project_context_spine.py (exit 0). pyproject.toml's own comment block explicitly declares qntylab.toml independent of pytest, and `python -m qntylab.project_context doctor --strict` + `render --check` + plain render all exit 0 with \"Warnings: - None.\""
+    },
+    {
+      "id": 11,
+      "name": "unrelated_tooling_introduced",
+      "verdict": "PASS",
+      "evidence": "Byte-level read of pyproject.toml: the ONLY tool table is [tool.pytest.ini_options] (addopts=\"\"). No [tool.ruff], [tool.black], [tool.mypy], [tool.tox], [tool.nox], [tool.uv], [tool.poetry], [tool.hatch], no [build-system], no .pre-commit-config.yaml/tox.ini/setup.cfg/setup.py introduced (staged surface is exactly the 7 declared files). test_c4_tool_surface_is_bounded enforces set(tool) == {\"pytest\"}."
+    },
+    {
+      "id": 12,
+      "name": "c5_c6_scope_leakage",
+      "verdict": "PASS",
+      "evidence": "The staged surface is exactly 7 files (git status --short + git diff --cached --stat): no C5 deletion-matrix files, no fitness-forensics artifacts, no DELETE_SAFE processing, no docs/forensics changes (`git diff --cached docs/forensics/` empty), no docs/CURRENT_ROADMAP.md change (`git diff --cached docs/CURRENT_ROADMAP.md` empty), no C6 fitness tests (only the 5-test C4 contract file), and tests/test_qntylab_repository_ergonomics_and_modularity_cleanup_decision_v0.py is NOT in the staged diff (unchanged, A/B verified: 1 failed test_c1_not_started / 21 passed in BOTH trees)."
+    },
+    {
+      "id": 13,
+      "name": "runtime_source_modification",
+      "verdict": "PASS",
+      "evidence": "`git diff --cached qntylab/` is empty (exit 0). Zero runtime surface added (metrics.json file_metrics.new_runtime_files = 0 independently confirmed by the staged file list)."
+    },
+    {
+      "id": 14,
+      "name": "governance_project_state_self_authorization",
+      "verdict": "PASS",
+      "evidence": "Mechanical field-set comparison: the staged C4 row in docs/state/projects.toml has exactly 44 fields, byte-identical field-name set to the C3 pre-closure row recovered from git history (commit 2d0d02e, `git show 2d0d02e:docs/state/projects.toml`), with identical pre-closure values modulo identity: state RESULT_PENDING_RECORDING, candidate_state IMPLEMENTATION_CANDIDATE_AWAITING_HOSTILE_REVIEW, canonicalization_status PENDING_EXPLICIT_PR_MERGE, implementation_authorized false, implementation_completed true, hostile_review_count 0, hostile_review_verdict PENDING_DELEGATED_INDEPENDENT_HOSTILE_REVIEW, hostile_review_critical_total/high_total 0, terminal_outcome C4_IMPLEMENTATION_COMPLETE_AWAITING_HOSTILE_REVIEW (C3 analogue verbatim). canonical_parent = 789e199b373ccd1b7a4e3c6df1fc55989f1c466d (matches git rev-parse HEAD); authority_level is bounded to BOUNDED_QNTYLAB_REPOSITORY_ERGONOMICS_C4_IMPLEMENTATION_ONLY; all trading/capital/signing/promotion authorities NONE; next_action explicitly says do-not-start C5-C6 and merge-only-with-explicit-authority — no authority beyond the frozen C4 umbrella scope is claimed anywhere in the row or the 4 artifacts (manifest forbids_and_respected list matches observed staged reality except as noted in F1/F3). Registry acceptance re-verified: `python -m qntylab.project_context doctor --strict` -> \"project context ok\" exit 0; `render --check` -> \"roadmap current\" exit 0; plain render exit 0, \"## Warnings - None.\", zero SOURCE_CONFLICT occurrences."
+    },
+    {
+      "id": 15,
+      "name": "equivalence_evidence_without_baseline",
+      "verdict": "PASS_WITH_FINDINGS",
+      "evidence": "metrics.json and full_suite_verification_receipt.json contain actual A/B command evidence: identical-machine/venv/flags runs (`python -m pytest -q --continue-on-collection-errors`) on a baseline tree at exactly 789e199b versus the candidate tree, with the 6-failure worktree-cleanliness accounting (named test list + controlled untracked-probe evidence) and the disclosed discarded intermediate run (204F/3477P/0 skipped). Numbers independently corroborated by this reviewer against the raw pytest outputs: /tmp/qntylab_c4_baseline_full.txt tail = \"89 failed, 3585 passed, 2 skipped, 15 errors in 1133.17s\" (matches receipt baseline 89/3585/2/15, wall 1133); the ACTUAL final candidate output /tmp/qntylab_c4_candidate_full2.txt tail = \"83 failed, 3596 passed, 2 skipped, 15 errors in 1158.02s\" (matches receipt candidate 83/3596/2/15, wall 1158). Arithmetic: 89+3585+2+15 = 3691 = 3687+4 and 83+3596+2+15 = 3696 = 3692+4; failed delta -6 with passed delta +11 = +5 new C4 tests + 6 resolved — internally consistent. Independent FAILED-list diff (grep '^FAILED', sorted) baseline vs candidate-final resolves EXACTLY the 6 DSH worktree-cleanliness tests named in the receipt, 0 new: verified line-for-line. FINDINGS F1-F3 below record three artifact-field/pointer veracity defects; the underlying equivalence claim itself was independently corroborated and holds."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "MEDIUM",
+      "title": "metrics.json file_metrics.pyproject_toml_bytes_created = 914 but the created pyproject.toml measures 1027 bytes",
+      "surface": 15,
+      "evidence": "metrics.json states \"pyproject_toml_bytes_created\": 914. Measured: `wc -c -l pyproject.toml` -> 21 lines, 1027 bytes; staged copy identical (`git show :pyproject.toml | wc -c` -> 1027). No intermediate pyproject.toml of 914 bytes is referenced anywhere; the field is simply wrong.",
+      "impact": "Machine-readable artifact veracity defect (same class as C3 finding F1). All load-bearing structural claims (tables, keys, no-op semantics) were independently re-verified and are correct; only the byte-count field is wrong.",
+      "does_not_reopen_because": "Per the frozen C4 placeholder policy, Medium findings do not reopen implementation unless they undermine the C4 objective, invalidate verification evidence, violate a frozen invariant, change pytest semantics, or introduce packaging/install metadata. The byte-count is a metadata field; the pyproject.toml content itself was independently verified conformant."
+    },
+    {
+      "id": "F2",
+      "severity": "MEDIUM",
+      "title": "full_suite_verification_receipt.json conditions.raw_outputs binds the candidate evidence to /tmp/qntylab_c4_candidate_full.txt, which actually contains the DISCLOSED discarded intermediate run; the real final candidate output lives in an unreferenced sibling file",
+      "surface": 15,
+      "evidence": "Receipt raw_outputs names /tmp/qntylab_c4_baseline_full.txt and /tmp/qntylab_c4_candidate_full.txt. Measured: the candidate-named file's tail = \"204 failed, 3477 passed, 15 errors in 1129.00s\" with 0 skipped — exactly the receipt's own disclosed DISCARDED intermediate run — while the claimed final candidate run (\"83 failed, 3596 passed, 2 skipped, 15 errors in 1158.02s\") exists only in /tmp/qntylab_c4_candidate_full2.txt (Sep 7 03:16), which the receipt does not reference. The baseline file matches the receipt exactly (89/3585/2/15, 1133.17s).",
+      "impact": "An independent auditor following the receipt's raw_outputs pointer for the candidate would find a file that CONTRADICTS the recorded candidate numbers (204F/3477P/0S vs 83F/3596P/2S). The equivalence evidence chain is non-corroborable from the receipt as written, even though the numbers themselves are true and were independently verified by this reviewer from full2 + baseline raw outputs (FAILED-list diff = exactly the 6 named DSH tests resolved, 0 new).",
+      "does_not_reopen_because": "The final-run numbers, the 6-failure worktree-cleanliness accounting, and the 0-new-failure claim were all independently corroborated against the actual raw outputs during this review; the defect is a wrong file pointer in the durable artifact, not fabricated or falsified evidence. The intermediate run was honestly disclosed in the receipt notes. Per the frozen policy this Medium does not reopen implementation."
+    },
+    {
+      "id": "F3",
+      "severity": "MEDIUM",
+      "title": "implementation_manifest.json verification.candidate_collection says '3687 tests collected ... configfile: pyproject.toml' although the final candidate tree (with the C4 test file) collects 3692",
+      "surface": 15,
+      "evidence": "implementation_manifest.json verification.candidate_collection = \"3687 tests collected, identical 4 collection errors, identical rootdir, configfile: pyproject.toml (only delta)\". Measured on the staged candidate: `python -m pytest --co -q` -> \"3692 tests collected, 4 errors\". metrics.json records the correct 3692 with the +5 pre-test-file accounting note; the manifest does not.",
+      "impact": "The manifest's candidate-collection field describes the pre-test-file intermediate state as if it were the final candidate state; a reader keying on the manifest alone would under-count by 5 and might flag the +5 delta as unexplained.",
+      "does_not_reopen_because": "The correct final count and the +5 delta are recorded and explained in metrics.json and were independently re-measured (surface 5); the defect is a stale field in a secondary evidence artifact."
+    },
+    {
+      "id": "F4",
+      "severity": "LOW",
+      "title": "`pip install .` observable failure mode changes (canonical 'not installable' vs candidate setuptools flat-layout discovery failure), undisclosed in the artifacts",
+      "surface": 1,
+      "evidence": "Isolated A/B: canonical tree -> \"ERROR: Directory '.' is not installable. Neither 'setup.py' nor 'pyproject.toml' found.\"; candidate tree -> pip engages the setuptools legacy backend and fails with \"Multiple top-level packages discovered in a flat-layout: ['ops', 'data', 'qntylab', 'experiments', 'qualifications']\" -> metadata-generation-failed. Both fail closed; zero CI/README usages of `pip install .` / `pip install -e .`; the local environment additionally refuses at the PEP 668 gate.",
+      "impact": "A user (or accidental script) running `pip install .` would see a different (still failing) error path. The implementation_manifest field \"install_behavior_changed\": false is true in substance for any successful-install path, but the failure-mode delta is real and undocumented.",
+      "does_not_reopen_because": "No install path is created or succeeds; the frozen 'not an installable package' invariant is preserved and empirically fail-closed in both directions."
+    }
+  ],
+  "totals": {
+    "critical": 0,
+    "high": 0,
+    "medium": 3,
+    "low": 1
+  },
+  "verdict": "PASS_WITH_MEDIUM_LOW_FINDINGS",
+  "verdict_rationale": "All 15 attack surfaces were independently re-verified against primary evidence (git index state, byte-level pyproject.toml/artifact reads, fresh baseline worktree at 789e199b, local A/B pytest runs, pip dry-run A/B in isolated /tmp copies, and the raw full-suite outputs): the staged surface is exactly the 7 declared files; pyproject.toml is tool-configuration-only with a structurally and empirically verified no-op [tool.pytest.ini_options] (addopts=\"\"); collection delta is exactly +5 C4 tests with identical error set, rootdir, plugin autoload, and (after forensics) identical collection ordering; import resolution, README command, CI install path, qntylab.toml consumers, runtime sources, requirements, C5/C6 boundaries, and the governance row are all untouched and conformant, with doctor --strict/render --check/plain render all clean. Zero Critical/High findings. The three Medium findings (F1 wrong byte-count field, F2 receipt raw_outputs pointer binds the disclosed discarded intermediate instead of the real final candidate run, F3 stale manifest candidate-collection count) and one Low finding (F4 pip-install error-mode delta) are artifact-veracity/pointer defects; every load-bearing number in the evidence was independently re-measured and holds, so no verification evidence is invalidated and per the frozen C4 placeholder policy and C3 precedent these do not reopen implementation. Terminal C4 bookkeeping may proceed per the frozen policy (0 unresolved Critical/High), with F1-F3 repairable during terminal bookkeeping if the orchestrator chooses.",
+  "decisive_command_receipts": [
+    "git branch --show-current -> c4-python-tooling-normalization-v0; git rev-parse HEAD -> 789e199b373ccd1b7a4e3c6df1fc55989f1c466d (== canonical parent)",
+    "git status --short && git diff --cached --stat -> exactly 7 files / 307 insertions (pyproject.toml, projects.toml, 4 C4 artifacts, 1 new test file)",
+    "git diff --cached README.md | .github/ | qntylab/ | qntylab.toml | requirements-* | docs/forensics/ | docs/CURRENT_ROADMAP.md -> all empty (exit 0)",
+    "cat pyproject.toml -> single [tool.pytest.ini_options] table, addopts = \"\" only; wc -c -> 1027 bytes (F1: metrics claims 914)",
+    "git show :pyproject.toml | wc -c -> 1027 (staged == worktree)",
+    "python -c 'import qntylab; print(qntylab.__file__)' -> /home/swirky/DevHub/repos/QntyLab/qntylab/__init__.py",
+    "git worktree add /tmp/c4_baseline_wt 789e199b; python -m pytest --co in both trees -> baseline 3687/4 errors/no configfile; candidate 3692/4 errors/configfile: pyproject.toml; same 4 error modules; plugins typeguard-4.4.4 only",
+    "python -m pytest --co -q tests/test_qntylab_python_tooling_normalization_v0.py -> exactly the 5 C4 tests",
+    "PYTHONHASHSEED=0 A/B collection + byte-normalized multiset comparison -> delta is the +5 C4 tests only; raw decorator-literal parametrize order verified identical (e.g. test_normalized_funding_signs order identical across trees); apparent ID diffs traced to wall-clock zip-fixture bytes (2s DOS granularity, both trees) and GNU-sort collation-tie artifacts",
+    "pip A/B in /tmp copies: canonical 'not installable' vs candidate setuptools 'Multiple top-level packages discovered in a flat-layout: [ops, data, qntylab, experiments, qualifications]' (both fail closed) (F4)",
+    "grep -nE 'pip install' README.md -> exit 1; .github/workflows pip usage -> only 'python -m pip install pytest requests' (x2), unchanged",
+    "sed -n '60,70p' README.md -> README.md:65 = 'python -m pytest -q'",
+    "grep -l qntylab.toml qntylab/project_context_core.py qntylab/agent_context_packet_v0.py qntylab/project_context_spine.py -> all three match",
+    "tail of /tmp/qntylab_c4_baseline_full.txt -> '89 failed, 3585 passed, 2 skipped, 15 errors in 1133.17s' (matches receipt)",
+    "tail of /tmp/qntylab_c4_candidate_full2.txt -> '83 failed, 3596 passed, 2 skipped, 15 errors in 1158.02s' (matches receipt; the receipt-named /tmp/qntylab_c4_candidate_full.txt instead holds the disclosed discarded intermediate 204/3477/0 skipped) (F2)",
+    "sorted FAILED-list diff baseline vs candidate-final -> exactly the 6 receipt-named DSH worktree-cleanliness tests resolved, 0 new (line-for-line)",
+    "field-set diff C3 pre-closure row (git show 2d0d02e:docs/state/projects.toml) vs staged C4 row -> 44/44 identical field names; state values match C3 pre-closure pattern",
+    "python -m qntylab.project_context doctor --strict -> 'project context ok', exit 0",
+    "python -m qntylab.project_context render --check -> 'roadmap current', exit 0",
+    "python -m qntylab.project_context (plain) -> exit 0, '## Warnings - None.', zero SOURCE_CONFLICT matches",
+    "python -m pytest -q tests/test_qntylab_repository_ergonomics_and_modularity_cleanup_decision_v0.py -> baseline 1 failed test_c1_not_started / 21 passed AND candidate 1 failed / 21 passed (identical A/B)"
+  ],
+  "post_artifact_validation_note": "After replacing this placeholder, the reviewer re-ran: python -m qntylab.project_context doctor --strict (exit 0), python -m pytest -q tests/test_qntylab_python_tooling_normalization_v0.py (5 passed), python -m pytest -q tests/test_qntylab_repository_ergonomics_and_modularity_cleanup_decision_v0.py (1 failed test_c1_not_started pre-existing / 21 passed). Receipts recorded in the review delivery report."
+}

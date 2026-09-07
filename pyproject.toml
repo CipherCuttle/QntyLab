@@ -1,0 +1,21 @@
+# QntyLab root Python tool configuration.
+#
+# Established by C4 — PYTHON_TOOLING_NORMALIZATION_V0 (umbrella:
+# QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0).
+#
+# Scope: tool configuration ONLY. This file deliberately contains NO
+# [project] table, NO [build-system] table, and no packaging metadata:
+# QntyLab is not an installable Python package. Import resolution relies
+# on the repository root being on sys.path via cwd; there is no install
+# step. Canonical verification command: python -m pytest -q
+#
+# qntylab.toml is the Context Spine configuration source
+# (qntylab/project_context_core.py) and remains independent of pytest.
+
+[tool.pytest.ini_options]
+# Explicit no-op: pytest currently runs with default settings and no
+# config file. Declaring this table registers pyproject.toml as the
+# canonical pytest configuration location without changing any default
+# (empty addopts == pytest default). Collection, rootdir, and
+# `python -m pytest -q` semantics must remain identical to baseline.
+addopts = ""

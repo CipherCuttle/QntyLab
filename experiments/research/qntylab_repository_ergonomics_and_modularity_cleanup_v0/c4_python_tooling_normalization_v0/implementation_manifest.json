@@ -1,0 +1,59 @@
+{
+  "project_id": "QNTYLAB_PYTHON_TOOLING_NORMALIZATION_V0",
+  "phase_id": "PYTHON_TOOLING_NORMALIZATION_V0",
+  "umbrella_project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0",
+  "canonical_phase": "PYTHON_TOOLING_NORMALIZATION_V0",
+  "canonical_parent": "789e199b373ccd1b7a4e3c6df1fc55989f1c466d",
+  "branch": "c4-python-tooling-normalization-v0",
+  "allowed_paths": [
+    "pyproject.toml (new; tool configuration only)",
+    "requirements-*.txt (normalization comments only)",
+    "tests/** (C4 contract test only, if needed)",
+    "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c4_python_tooling_normalization_v0/**",
+    "docs/state/projects.toml (C4 lifecycle row only)",
+    "docs/CURRENT_ROADMAP.md (canonical renderer only)"
+  ],
+  "forbidden_and_respected": {
+    "dependency_version_changes_in_any_requirements_file": false,
+    "packaging_publishing_metadata_added": false,
+    "install_behavior_changed": false,
+    "github_changed": false,
+    "qntylab_runtime_modules_changed": false,
+    "docs_forensics_changed": false,
+    "qntylab_toml_changed": false,
+    "readme_changed": false,
+    "c5_files_deleted": false,
+    "c6_fitness_function_tests_created": false,
+    "existing_test_files_modified": false
+  },
+  "pyproject_toml": {
+    "path": "pyproject.toml",
+    "created": true,
+    "scope": "TOOL_CONFIGURATION_ONLY",
+    "tables": ["[tool.pytest.ini_options]"],
+    "keys": {"addopts": ""},
+    "project_table_present": false,
+    "build_system_table_present": false,
+    "packaging_metadata_present": false,
+    "dependencies_present": false,
+    "no_op_evidence": "pyproject.toml registers pytest configuration without changing any pytest default: addopts = \"\" equals the pytest default; collection count, rootdir, and python -m pytest -q semantics are identical to baseline; the only session-header delta is the addition of 'configfile: pyproject.toml'."
+  },
+  "import_semantics": {
+    "unchanged": true,
+    "mechanism": "Import resolution continues to rely on the repository root being on sys.path via cwd; QntyLab remains a non-installable repository, not a Python package. pyproject.toml contains no [project] or [build-system] table and therefore introduces no install path."
+  },
+  "verification": {
+    "canonical_commands": [
+      "python -m pytest -q",
+      "python -m qntylab.project_context doctor --strict"
+    ],
+    "baseline_collection": "3687 tests collected, 4 pre-existing local-environment collection errors, rootdir /home/swirky/DevHub/repos/QntyLab, no configfile",
+    "candidate_collection": "3692 tests collected (3687 baseline + 5 C4 contract tests), identical 4 collection errors, identical rootdir, configfile: pyproject.toml (only config delta)",
+    "focused_cluster": "tests/test_qntylab_repository_ergonomics_and_modularity_cleanup_decision_v0.py + governance/render/doctor cluster: identical before/after (1 pre-existing failure test_c1_not_started, 96 passed, 2 skipped)",
+    "full_suite_method": "python -m pytest -q --continue-on-collection-errors with exact failure-set equivalence; see full_suite_verification_receipt.json"
+  },
+  "notes": "C4 is bounded Python tooling normalization only; grants no research, evaluation, execution, claim, or trading authority. qntylab.toml remains the independent Context Spine configuration source (qntylab/project_context_core.py) and is untouched.",
+  "changelog": [
+    "post-review veracity corrections F1-F3 per hostile review authorization (medium findings, no rereview required): candidate_collection 3687 -> 3692 (3687 baseline + 5 C4 contract tests), matching metrics.json"
+  ]
+}

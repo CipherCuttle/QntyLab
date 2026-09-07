@@ -1,0 +1,56 @@
+{
+  "project_id": "QNTYLAB_PYTHON_TOOLING_NORMALIZATION_V0",
+  "phase_id": "PYTHON_TOOLING_NORMALIZATION_V0",
+  "umbrella_project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0",
+  "canonical_parent": "789e199b373ccd1b7a4e3c6df1fc55989f1c466d",
+  "measurement_policy": "Observed measurements only, all re-measured on the implementation branch worktree against the canonical parent tree. No optimization targets are frozen by C4.",
+  "measurement_method": {
+    "collection": "python -m pytest --co -q and python -m pytest --co (header) run from the repository root",
+    "toml": "python -c tomllib load; grep for forbidden packaging keys",
+    "doctor": "python -m qntylab.project_context doctor --strict (exit code)",
+    "focused_cluster": "python -m pytest <fixed governance/render/doctor file selection> -q",
+    "full_suite": "python -m pytest -q --continue-on-collection-errors (see full_suite_verification_receipt.json)"
+  },
+  "baseline": {
+    "canonical_parent": "789e199b373ccd1b7a4e3c6df1fc55989f1c466d",
+    "python": "3.14.4 local (CI pins 3.12)",
+    "pytest": "9.0.2 (plugin typeguard 4.4.4)",
+    "configfile": null,
+    "collection": {"collected": 3687, "collection_errors": 4},
+    "collection_error_modules": [
+      "experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_authorization_v0/fixture/tests/test_retry.py (ModuleNotFoundError: retry)",
+      "tests/test_jfp_v2_pr_c.py (ModuleNotFoundError: polars)",
+      "tests/test_jigsaw_harvest_execution_v0.py (ModuleNotFoundError: polars)",
+      "tests/test_research_data_spine_v0.py (ModuleNotFoundError: polars)"
+    ],
+    "rootdir": "/home/swirky/DevHub/repos/QntyLab",
+    "pyproject_toml_exists": false,
+    "doctor_strict_exit": 0
+  },
+  "candidate": {
+    "collection": {"collected": 3692, "collection_errors": 4},
+    "collection_count_note": "3687 baseline tests + 5 new C4 contract tests in tests/test_qntylab_python_tooling_normalization_v0.py; collection equality 3687/4-errors/rootdir was verified directly BEFORE the C4 test file was added, then re-checked with the +5 delta after.",
+    "collection_error_modules": "identical to baseline (same 4 modules, same error causes)",
+    "rootdir": "/home/swirky/DevHub/repos/QntyLab",
+    "configfile": "pyproject.toml",
+    "header_delta": "only 'configfile: pyproject.toml' added to the pytest session header",
+    "doctor_strict_exit": 0,
+    "focused_cluster": {"failed": 1, "passed": 96, "skipped": 2, "pre_existing_failure": "tests/test_qntylab_repository_ergonomics_and_modularity_cleanup_decision_v0.py::test_c1_not_started"}
+  },
+  "equivalence": {
+    "COLLECTION_COUNT_DELTA": "+5 = exactly the 5 new C4 contract tests (pre-test-file check: 0 delta)",
+    "COLLECTION_ERROR_DELTA": 0,
+    "ROOTDIR_DELTA": "none",
+    "PASS_FAIL_BEHAVIOR_DELTA": "focused cluster identical before/after; full suite HEAD_NEW_FAILURES = 0 (6 pre-existing failures resolved purely by worktree cleanliness, see full_suite_verification_receipt.json)",
+    "HEADER_DELTA": "configfile: pyproject.toml added only"
+  },
+  "file_metrics": {
+    "pyproject_toml_bytes_created": 1027,
+    "new_runtime_files": 0,
+    "deleted_files": 0
+  },
+  "notes": "Counts and error lists were compared directly between the canonical parent and the candidate tree on the same machine and venv. C4 introduces zero runtime surface.",
+  "changelog": [
+    "post-review veracity corrections F1-F3 per hostile review authorization (medium findings, no rereview required): pyproject_toml_bytes_created 914 -> 1027 (measured with wc -c pyproject.toml)"
+  ]
+}

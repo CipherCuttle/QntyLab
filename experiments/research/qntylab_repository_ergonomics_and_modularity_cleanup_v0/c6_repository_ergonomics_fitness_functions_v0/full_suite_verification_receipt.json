@@ -1,0 +1,37 @@
+{
+  "artifact_type": "C6_FULL_SUITE_VERIFICATION_RECEIPT",
+  "project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_FITNESS_FUNCTIONS_V0",
+  "phase": "C6",
+  "canonical_parent": "afe55150da1947b78f8e41dd7c08fdbea2c4cee9",
+  "branch": "c6-repository-ergonomics-fitness-functions-v0",
+  "status": "FINAL",
+  "c6_fitness_suite": {
+    "command": "python -m pytest -q tests/test_qntylab_repository_ergonomics_fitness_functions_v0.py",
+    "result": "36 passed",
+    "contains_negative_controls": true,
+    "NEGATIVE_CONTROL_FAMILIES_TESTED": 7
+  },
+  "contract_cluster": {
+    "command": "python -m pytest -q tests/test_qntylab_repository_ergonomics_and_modularity_cleanup_decision_v0.py tests/test_qntylab_agent_context_packet_v0.py tests/test_qntylab_agent_context_packet_schema_clarification_v0.py tests/test_project_context_modularization_c2.py tests/test_qntylab_dev_loop_ci_split_v0.py tests/test_qntylab_python_tooling_normalization_v0.py tests/test_qntylab_repository_ergonomics_cleanup_c5_proven_delete_safe_slimming_v0.py",
+    "result": "1 failed, 129 passed, 2 skipped",
+    "failed": "tests/test_qntylab_repository_ergonomics_and_modularity_cleanup_decision_v0.py::test_c1_not_started (DOCUMENTED pre-existing stale decision-era assertion recorded in C4 metrics.json; not fixed — forbidden)",
+    "HEAD_NEW_FAILURES": 0,
+    "adjudication": "The C1-C5 contract-suite gate compares against the documented baseline (1 known-stale failure); HEAD_NEW_FAILURES = 0. An interim run performed while the C6 registration was incomplete showed additional failures caused solely by the Git-backed authority layer rejecting then-untracked C6 evidence artifacts; they disappeared once the complete changeset was in place and are implementation-sequence artifacts, not contract regressions."
+  },
+  "safety_commands": [
+    {"command": "python -m qntylab.project_context doctor --strict", "exit_code": 0, "marker": "project context ok", "non_mutation": "git status --porcelain dirty-set unchanged"},
+    {"command": "python -m qntylab.project_context render --check", "exit_code": 0, "marker": "roadmap current", "non_mutation": "git status --porcelain dirty-set unchanged"},
+    {"command": "python -m qntylab.research_ledger doctor", "exit_code": 0, "marker": "ledger ok", "non_mutation": "git status --porcelain dirty-set unchanged"}
+  ],
+  "full_suite_comparison": {
+    "method": "BASE measured via throwaway git worktree /tmp/qntylab-c6-base at canonical parent afe55150da1947b78f8e41dd7c08fdbea2c4cee9 (throwaway measurement only, removed after); HEAD measured in the C6 worktree; exact FAILED/ERROR line sets compared; both runs with --continue-on-collection-errors because the 4 documented pre-existing environment-bound collection errors (3x polars, 1x retry) otherwise interrupt collection",
+    "base_summary": "120 failed, 3547 passed, 2 skipped, 36 errors (156 FAILED/ERROR lines)",
+    "head_summary": "83 failed, 3641 passed, 2 skipped, 15 errors (98 FAILED/ERROR lines)",
+    "set_comparison": "head FAILED/ERROR set is a strict subset of the base set (98 = 156 - 58 base-only entries)",
+    "HEAD_NEW_FULL_SUITE_FAILURES": 0,
+    "HEAD_NEW_ERRORS": 0,
+    "base_only_entries_note": "58 base-only FAILED/ERROR entries did not recur at head. C6 touches no runtime code, no CI, no dependencies; these are the documented pre-existing environment/state-dependent drift class at the canonical parent and are not 'fixed' by C6 in any authority sense.",
+    "head_delta_note": "head collected 94 more tests than base: exactly the 36 C6 fitness/negative-control tests plus the C6 registration-driven deltas of registry-validation-driven collections; zero new failures among them"
+  },
+  "non_mutation": "git status --porcelain dirty-set compared before/after each safety command and each packet generation; unchanged in all cases (pre-existing staging of the C6 changeset itself was captured in the before-set and tolerated per the mandated dirty-set-equality semantics)"
+}

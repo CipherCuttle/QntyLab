@@ -1,0 +1,398 @@
+{
+  "artifact_type": "C6_FITNESS_MANIFEST",
+  "project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_FITNESS_FUNCTIONS_V0",
+  "phase": "C6",
+  "matrix_basis": "Reconstructed metric matrix over the frozen decision.json acceptance_metrics families (packet, DEFAULT_AGENT_CONTEXT_REDUCTION_PERCENT, project_context_modularity, ci, slimming, safety_invariants) plus the task-mandated families. M1-M23 follow the reconstructed matrix; M24 is the task-mandated repository-health safety-command family appended in sequence.",
+  "items": [
+    {
+      "id": "M1",
+      "originating_increment": "C1",
+      "decision_family": "packet",
+      "authoritative_source": {
+        "path": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/decision.json",
+        "field": "acceptance_metrics.packet.hard_cap_bytes"
+      },
+      "metric_type": "HARD_THRESHOLD",
+      "assertion": "packet bytes <= 8192",
+      "enforcing_tests": [
+        "test_c1_packet_bytes_within_hard_cap_and_reduction"
+      ],
+      "canonical_parent_observation": "recorded in c6 metrics.json (independent current observation at implementation time)",
+      "failure_mode": "FitnessFailure raised; missing evidence fails closed (no skip, no pass-on-missing)"
+    },
+    {
+      "id": "M2",
+      "originating_increment": "C1",
+      "decision_family": "packet",
+      "authoritative_source": {
+        "path": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/decision.json",
+        "field": "acceptance_metrics.DEFAULT_AGENT_CONTEXT_REDUCTION_PERCENT.minimum+basis"
+      },
+      "metric_type": "HARD_THRESHOLD",
+      "assertion": "reduction >= 95% over 586444-byte basis",
+      "enforcing_tests": [
+        "test_c1_packet_bytes_within_hard_cap_and_reduction"
+      ],
+      "canonical_parent_observation": "recorded in c6 metrics.json (independent current observation at implementation time)",
+      "failure_mode": "FitnessFailure raised; missing evidence fails closed (no skip, no pass-on-missing)"
+    },
+    {
+      "id": "M3",
+      "originating_increment": "C1",
+      "decision_family": "packet",
+      "authoritative_source": {
+        "path": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/decision.json",
+        "field": "acceptance_metrics.packet (determinism semantics of C1 contract)"
+      },
+      "metric_type": "STRUCTURAL_POSTCONDITION",
+      "assertion": "packet generation determinism (byte-identical)",
+      "enforcing_tests": [
+        "test_c1_packet_determinism"
+      ],
+      "canonical_parent_observation": "recorded in c6 metrics.json (independent current observation at implementation time)",
+      "failure_mode": "FitnessFailure raised; missing evidence fails closed (no skip, no pass-on-missing)"
+    },
+    {
+      "id": "M4",
+      "originating_increment": "C1",
+      "decision_family": "packet",
+      "authoritative_source": {
+        "path": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/decision.json",
+        "field": "acceptance_metrics.packet.fail_closed_on_overflow"
+      },
+      "metric_type": "SAFETY_INVARIANT",
+      "assertion": "packet fail-closed overflow",
+      "enforcing_tests": [
+        "test_c1_packet_fail_closed_on_oversized_field"
+      ],
+      "canonical_parent_observation": "recorded in c6 metrics.json (independent current observation at implementation time)",
+      "failure_mode": "FitnessFailure raised; missing evidence fails closed (no skip, no pass-on-missing)"
+    },
+    {
+      "id": "M5",
+      "originating_increment": "C1",
+      "decision_family": "packet",
+      "authoritative_source": {
+        "path": "tests/test_qntylab_repository_ergonomics_fitness_functions_v0.py",
+        "field": "C6-mandated non-mutation safety family (git dirty-set comparison)"
+      },
+      "metric_type": "SAFETY_INVARIANT",
+      "assertion": "packet generation non-mutation",
+      "enforcing_tests": [
+        "test_c1_packet_generation_non_mutating"
+      ],
+      "canonical_parent_observation": "recorded in c6 metrics.json (independent current observation at implementation time)",
+      "failure_mode": "FitnessFailure raised; missing evidence fails closed (no skip, no pass-on-missing)"
+    },
+    {
+      "id": "M6",
+      "originating_increment": "C2",
+      "decision_family": "project_context_modularity",
+      "authoritative_source": {
+        "path": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c2_project_context_modularization_v0/metrics.json",
+        "field": "dsh_token_counts.*==0 + frozen token set"
+      },
+      "metric_type": "HARD_THRESHOLD",
+      "assertion": "DSH token count == 0 in five generic modules",
+      "enforcing_tests": [
+        "test_c2_dsh_tokens_absent_from_generic_modules"
+      ],
+      "canonical_parent_observation": "recorded in c6 metrics.json (independent current observation at implementation time)",
+      "failure_mode": "FitnessFailure raised; missing evidence fails closed (no skip, no pass-on-missing)"
+    },
+    {
+      "id": "M7",
+      "originating_increment": "C2",
+      "decision_family": "project_context_modularity",
+      "authoritative_source": {
+        "path": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c2_project_context_modularization_v0/metrics.json",
+        "field": "dsh_token_counts.qntylab_project_context_execution_authority_py > 0 + module inventory"
+      },
+      "metric_type": "STRUCTURAL_POSTCONDITION",
+      "assertion": "execution-authority seam sole DSH confinement + six siblings exist",
+      "enforcing_tests": [
+        "test_c2_execution_authority_seam_sole_dsh_confinement"
+      ],
+      "canonical_parent_observation": "recorded in c6 metrics.json (independent current observation at implementation time)",
+      "failure_mode": "FitnessFailure raised; missing evidence fails closed (no skip, no pass-on-missing)"
+    },
+    {
+      "id": "M8",
+      "originating_increment": "C2",
+      "decision_family": "project_context_modularity",
+      "authoritative_source": {
+        "path": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c2_project_context_modularization_v0/metrics.json",
+        "field": "size_metrics.pre.monolith_qntylab_project_context_py.bytes=110441 (half bound)"
+      },
+      "metric_type": "STRUCTURAL_POSTCONDITION",
+      "assertion": "composition root < 55220 B (half of C2 monolith 110441 B)",
+      "enforcing_tests": [
+        "test_c2_composition_root_structural_bound"
+      ],
+      "canonical_parent_observation": "recorded in c6 metrics.json (independent current observation at implementation time)",
+      "failure_mode": "FitnessFailure raised; missing evidence fails closed (no skip, no pass-on-missing)"
+    },
+    {
+      "id": "M9",
+      "originating_increment": "C2",
+      "decision_family": "project_context_modularity",
+      "authoritative_source": {
+        "path": "qntylab/project_context.py",
+        "field": "re-export block lines 37-139 incl. PR250_P2 repair symbol"
+      },
+      "metric_type": "STRUCTURAL_POSTCONDITION",
+      "assertion": "composition-root compatibility surface symbols resolve",
+      "enforcing_tests": [
+        "test_c2_compatibility_surface_symbols_resolve"
+      ],
+      "canonical_parent_observation": "recorded in c6 metrics.json (independent current observation at implementation time)",
+      "failure_mode": "FitnessFailure raised; missing evidence fails closed (no skip, no pass-on-missing)"
+    },
+    {
+      "id": "M10",
+      "originating_increment": "C2",
+      "decision_family": "project_context_modularity",
+      "authoritative_source": {
+        "path": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c2_project_context_modularization_v0/metrics.json",
+        "field": "parity_captures.module_file_sha256_post (still-valid subset)"
+      },
+      "metric_type": "STRUCTURAL_POSTCONDITION",
+      "assertion": "4 still-valid C2 module digests match frozen manifest",
+      "enforcing_tests": [
+        "test_c2_still_valid_module_digests_match_frozen_manifest"
+      ],
+      "canonical_parent_observation": "recorded in c6 metrics.json (independent current observation at implementation time)",
+      "failure_mode": "FitnessFailure raised; missing evidence fails closed (no skip, no pass-on-missing)"
+    },
+    {
+      "id": "M11",
+      "originating_increment": "C3",
+      "decision_family": "ci",
+      "authoritative_source": {
+        "path": ".github/workflows/project-context.yml",
+        "field": "current shape measured at canonical parent"
+      },
+      "metric_type": "STRUCTURAL_POSTCONDITION",
+      "assertion": "core workflow 90 lines / 1 job / 11 operational steps",
+      "enforcing_tests": [
+        "test_c3_core_workflow_shape"
+      ],
+      "canonical_parent_observation": "recorded in c6 metrics.json (independent current observation at implementation time)",
+      "failure_mode": "FitnessFailure raised; missing evidence fails closed (no skip, no pass-on-missing)"
+    },
+    {
+      "id": "M12",
+      "originating_increment": "C3",
+      "decision_family": "ci",
+      "authoritative_source": {
+        "path": ".github/workflows/project-context-heavy-replay.yml",
+        "field": "current shape measured at canonical parent"
+      },
+      "metric_type": "STRUCTURAL_POSTCONDITION",
+      "assertion": "heavy workflow 333 lines / 1 job / 13 operational steps",
+      "enforcing_tests": [
+        "test_c3_heavy_workflow_shape"
+      ],
+      "canonical_parent_observation": "recorded in c6 metrics.json (independent current observation at implementation time)",
+      "failure_mode": "FitnessFailure raised; missing evidence fails closed (no skip, no pass-on-missing)"
+    },
+    {
+      "id": "M13",
+      "originating_increment": "C3",
+      "decision_family": "ci",
+      "authoritative_source": {
+        "path": ".github/workflows/project-context-heavy-replay.yml",
+        "field": "heavy-replay-only commands vs core workflow"
+      },
+      "metric_type": "STRUCTURAL_POSTCONDITION",
+      "assertion": "heavy-not-collapsed (heavy-only markers in heavy, absent from core)",
+      "enforcing_tests": [
+        "test_c3_heavy_not_collapsed_into_core"
+      ],
+      "canonical_parent_observation": "recorded in c6 metrics.json (independent current observation at implementation time)",
+      "failure_mode": "FitnessFailure raised; missing evidence fails closed (no skip, no pass-on-missing)"
+    },
+    {
+      "id": "M14",
+      "originating_increment": "C3",
+      "decision_family": "ci",
+      "authoritative_source": {
+        "path": ".github/workflows/project-context.yml",
+        "field": "canonical dev-loop command set"
+      },
+      "metric_type": "STRUCTURAL_POSTCONDITION",
+      "assertion": "core required command coverage",
+      "enforcing_tests": [
+        "test_c3_core_required_command_coverage"
+      ],
+      "canonical_parent_observation": "recorded in c6 metrics.json (independent current observation at implementation time)",
+      "failure_mode": "FitnessFailure raised; missing evidence fails closed (no skip, no pass-on-missing)"
+    },
+    {
+      "id": "M15",
+      "originating_increment": "C3",
+      "decision_family": "ci",
+      "authoritative_source": {
+        "path": ".github/workflows/project-context.yml + heavy",
+        "field": "triggers + permissions blocks"
+      },
+      "metric_type": "STRUCTURAL_POSTCONDITION",
+      "assertion": "triggers pull_request+push(master)+workflow_dispatch; permissions contents: read on both",
+      "enforcing_tests": [
+        "test_c3_triggers_and_permissions_unchanged"
+      ],
+      "canonical_parent_observation": "recorded in c6 metrics.json (independent current observation at implementation time)",
+      "failure_mode": "FitnessFailure raised; missing evidence fails closed (no skip, no pass-on-missing)"
+    },
+    {
+      "id": "M16",
+      "originating_increment": "C4",
+      "decision_family": "safety_invariants (tooling postcondition)",
+      "authoritative_source": {
+        "path": "pyproject.toml",
+        "field": "C4 authorized surface"
+      },
+      "metric_type": "STRUCTURAL_POSTCONDITION",
+      "assertion": "pyproject.toml tool-only (no [project]/[build-system]/dependency keys; addopts '')",
+      "enforcing_tests": [
+        "test_c4_pyproject_is_tool_only"
+      ],
+      "canonical_parent_observation": "recorded in c6 metrics.json (independent current observation at implementation time)",
+      "failure_mode": "FitnessFailure raised; missing evidence fails closed (no skip, no pass-on-missing)"
+    },
+    {
+      "id": "M17",
+      "originating_increment": "C4",
+      "decision_family": "safety_invariants (tooling postcondition)",
+      "authoritative_source": {
+        "path": "tests/test_qntylab_python_tooling_normalization_v0.py",
+        "field": "C4 gate existence"
+      },
+      "metric_type": "STRUCTURAL_POSTCONDITION",
+      "assertion": "C4 contract gate file present",
+      "enforcing_tests": [
+        "test_c4_contract_test_gate_present"
+      ],
+      "canonical_parent_observation": "recorded in c6 metrics.json (independent current observation at implementation time)",
+      "failure_mode": "FitnessFailure raised; missing evidence fails closed (no skip, no pass-on-missing)"
+    },
+    {
+      "id": "M18",
+      "originating_increment": "C5",
+      "decision_family": "slimming",
+      "authoritative_source": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification=DELETE_SAFE"
+      },
+      "metric_type": "STRUCTURAL_POSTCONDITION",
+      "assertion": "six DELETE_SAFE paths absent from filesystem and git ls-files",
+      "enforcing_tests": [
+        "test_c5_deleted_paths_absent"
+      ],
+      "canonical_parent_observation": "recorded in c6 metrics.json (independent current observation at implementation time)",
+      "failure_mode": "FitnessFailure raised; missing evidence fails closed (no skip, no pass-on-missing)"
+    },
+    {
+      "id": "M19",
+      "originating_increment": "C5",
+      "decision_family": "slimming",
+      "authoritative_source": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification=DELETE_BLOCKED_*"
+      },
+      "metric_type": "STRUCTURAL_POSTCONDITION",
+      "assertion": "blocked-36 (28 frozen-binding + 8 active-use) present",
+      "enforcing_tests": [
+        "test_c5_blocked_candidates_present"
+      ],
+      "canonical_parent_observation": "recorded in c6 metrics.json (independent current observation at implementation time)",
+      "failure_mode": "FitnessFailure raised; missing evidence fails closed (no skip, no pass-on-missing)"
+    },
+    {
+      "id": "M20",
+      "originating_increment": "C5",
+      "decision_family": "slimming",
+      "authoritative_source": {
+        "path": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c5_proven_delete_safe_slimming_v0/metrics.json",
+        "field": "post.qntylab_python_modules=135"
+      },
+      "metric_type": "STRUCTURAL_POSTCONDITION",
+      "assertion": "qntylab module count == 135",
+      "enforcing_tests": [
+        "test_c5_module_count_is_current_governance_count"
+      ],
+      "canonical_parent_observation": "recorded in c6 metrics.json (independent current observation at implementation time)",
+      "failure_mode": "FitnessFailure raised; missing evidence fails closed (no skip, no pass-on-missing)"
+    },
+    {
+      "id": "M21",
+      "originating_increment": "C5",
+      "decision_family": "slimming",
+      "authoritative_source": {
+        "path": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c5_proven_delete_safe_slimming_v0/metrics.json",
+        "field": "pre/post/deltas fields"
+      },
+      "metric_type": "HISTORICAL_OBSERVATION",
+      "assertion": "C5 metrics arithmetic integrity (86329-20250=66079; 91074=86329+3360+1385; 139-4=135)",
+      "enforcing_tests": [
+        "test_c5_metrics_artifact_arithmetic_integrity"
+      ],
+      "canonical_parent_observation": "recorded in c6 metrics.json (independent current observation at implementation time)",
+      "failure_mode": "FitnessFailure raised; missing evidence fails closed (no skip, no pass-on-missing)"
+    },
+    {
+      "id": "M22",
+      "originating_increment": "C6",
+      "decision_family": "safety_invariants",
+      "authoritative_source": {
+        "path": "docs/state/projects.toml + qntylab/project_context_execution_authority.py",
+        "field": "authority fields rows + expected_firewall defaults"
+      },
+      "metric_type": "SAFETY_INVARIANT",
+      "assertion": "authority non-escalation across umbrella + C1-C6 rows; firewall defaults hold",
+      "enforcing_tests": [
+        "test_authority_fields_closed_for_umbrella_and_all_increments",
+        "test_implementation_authorized_false_for_non_active_rows",
+        "test_execution_authority_firewall_defaults_hold"
+      ],
+      "canonical_parent_observation": "recorded in c6 metrics.json (independent current observation at implementation time)",
+      "failure_mode": "FitnessFailure raised; missing evidence fails closed (no skip, no pass-on-missing)"
+    },
+    {
+      "id": "M23",
+      "originating_increment": "C6",
+      "decision_family": "safety_invariants",
+      "authoritative_source": {
+        "path": "c6_repository_ergonomics_fitness_functions_v0/frozen_hash_manifest.json",
+        "field": "entries[].sha256 + declaring_authority"
+      },
+      "metric_type": "SAFETY_INVARIANT",
+      "assertion": "frozen hash bindings (28 frozen paths + decision.json + deletion_matrix + 4 C2 digests)",
+      "enforcing_tests": [
+        "test_frozen_hash_manifest_entries_all_match",
+        "test_frozen_hash_manifest_binds_decision_and_matrix"
+      ],
+      "canonical_parent_observation": "recorded in c6 metrics.json (independent current observation at implementation time)",
+      "failure_mode": "FitnessFailure raised; missing evidence fails closed (no skip, no pass-on-missing)"
+    },
+    {
+      "id": "M24",
+      "originating_increment": "C6",
+      "decision_family": "safety_invariants",
+      "authoritative_source": {
+        "path": "AGENTS.md SAFETY / decision.json safety_invariants",
+        "field": "three canonical safety commands"
+      },
+      "metric_type": "SAFETY_INVARIANT",
+      "assertion": "repository health safety commands pass with markers and non-mutation",
+      "enforcing_tests": [
+        "test_safety_command_passes_and_is_non_mutating[*]"
+      ],
+      "canonical_parent_observation": "recorded in c6 metrics.json (independent current observation at implementation time)",
+      "failure_mode": "FitnessFailure raised; missing evidence fails closed (no skip, no pass-on-missing)"
+    }
+  ],
+  "UNMAPPED_C6_ACCEPTANCE_METRICS": 0,
+  "unmapped_note": "Every decision.json acceptance_metrics family (packet, reduction, modularity, ci, slimming, safety_invariants) and every task-mandated family (frozen-hash bindings, negative controls, repository health commands) maps to at least one item above.",
+  "no_percentage_or_wall_time_targets": true
+}

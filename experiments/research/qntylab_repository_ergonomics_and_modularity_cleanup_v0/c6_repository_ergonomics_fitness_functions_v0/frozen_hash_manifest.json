@@ -1,0 +1,351 @@
+{
+  "artifact_type": "C6_FROZEN_HASH_MANIFEST",
+  "project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_FITNESS_FUNCTIONS_V0",
+  "phase": "C6",
+  "umbrella_project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0",
+  "canonical_parent": "afe55150da1947b78f8e41dd7c08fdbea2c4cee9",
+  "binding_semantics": "POINTERS_OVER_COPIES: each entry records an authoritative sha256 observed at implementation time plus the authority that declares the frozen status; the enforcing test re-hashes current bytes and fails closed on MISSING/UNREADABLE/MISMATCH. No file copies are made.",
+  "excluded_and_why": ".github workflow files are not declared hash-bound by any authoritative pointer and are therefore excluded; their shape is enforced structurally by test_c3_ci_shape_fitness_* instead.",
+  "entries": [
+    {
+      "path": "data/derived/focused_trend_validation_v1/BTCUSDT-spot-1h-2023-halt-normalized.csv",
+      "sha256": "08d5649e86743e9485fb55a3978b96f7b0b5483b33223534d52d4fe0a745d10e",
+      "bytes": 4642245,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    },
+    {
+      "path": "data/derived/focused_trend_validation_v1/ETHUSDT-spot-1h-2023-halt-normalized.csv",
+      "sha256": "a3cfb7733aad701b43fd383ac32f52252d229d2275147698449b2007bdff0d40",
+      "bytes": 4477484,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    },
+    {
+      "path": "data/derived/focused_trend_validation_v1/SOLUSDT-spot-1h-2023-halt-normalized.csv",
+      "sha256": "62cee85e0a0f7b903fadc77a8f275e774f0ff3ecfff9fba9ea51a535376f70f1",
+      "bytes": 4215272,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    },
+    {
+      "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+      "sha256": "1cb2e30dd1ba3d83f3dafbee19b43e09b2a15c0a25dd9ab342e539d8a741ca6b",
+      "bytes": 71386,
+      "declaring_authority": {
+        "path": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c5_proven_delete_safe_slimming_v0/metrics.json",
+        "field": "forensic_audit_commit",
+        "value": "be291300abb70f3ffc6ba0dd8b1bea570daf5377"
+      }
+    },
+    {
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/API3USDT-perp-1h.csv",
+      "sha256": "804135c91ec4e8be2521a119ae2f5ec53009dcf854c3d2f2b53c0f7a9dc06400",
+      "bytes": 850866,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    },
+    {
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/APTUSDT-perp-1h.csv",
+      "sha256": "3b1d35032d87f607e13a0a75c81a08665be9fafd50ab1d8e5f3908f5e8a3809a",
+      "bytes": 921564,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    },
+    {
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/BCHUSDT-perp-1h.csv",
+      "sha256": "1ea4cc042115d7d8264b4ec950076e0960e6128d75a663aa1d468f3b1f2540ec",
+      "bytes": 859355,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    },
+    {
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/CHZUSDT-perp-1h.csv",
+      "sha256": "2a39efbc7bab60e50f90ae254e04cf8ea4ab2b306032a15f3d272af1e4e009c0",
+      "bytes": 903257,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    },
+    {
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/ETCUSDT-perp-1h.csv",
+      "sha256": "bf2c7ca39beaedb407210c65dd92bdbb4a79628c7c3a1c2658121a8b7fbfb6ed",
+      "bytes": 860816,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    },
+    {
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/GMTUSDT-perp-1h.csv",
+      "sha256": "da724db34ccf6d513645ea275b91744c2451371c4f3b2a49919ae2b75bf7e7d8",
+      "bytes": 902188,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    },
+    {
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/INJUSDT-perp-1h.csv",
+      "sha256": "a7b27d3917e5851294f4193e31ec2112d04e0e0f8530cbb85f857bdf682afb73",
+      "bytes": 1018028,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    },
+    {
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/LDOUSDT-perp-1h.csv",
+      "sha256": "291166ce93714f6ad5bc2c5c2ca3420b6ca5f0dd515cdf999d06cdc71e69dbbf",
+      "bytes": 948076,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    },
+    {
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/LINKUSDT-perp-1h.csv",
+      "sha256": "1c0ab7f0535a625108ec09c6d9bef912e5e6b0111b969eeb9ed16a7f9be5034e",
+      "bytes": 867244,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    },
+    {
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/ONEUSDT-perp-1h.csv",
+      "sha256": "384b173c0fbd333e52ebee1f8a47c16dbf006d7e89611824024b7cdb1a5f2061",
+      "bytes": 906482,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    },
+    {
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/OPUSDT-perp-1h.csv",
+      "sha256": "45b272a192425c0c6025badd520b752ed06e0aa22fc4ce78785179ef56754a1a",
+      "bytes": 1039771,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    },
+    {
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/REEFUSDT-perp-1h.csv",
+      "sha256": "a7aecf5e6156b9a04fe16b6d0923addd20736016776dd17e2398f37682605d9b",
+      "bytes": 953373,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    },
+    {
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/SANDUSDT-perp-1h.csv",
+      "sha256": "343a482bcad1dd98b4a7dedb10d05f3081216507bb38b66eebbecc2c1e80d07c",
+      "bytes": 895976,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    },
+    {
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/TRXUSDT-perp-1h.csv",
+      "sha256": "ffc0a23278e0605573ff3a1e331ecc221b0d9398df3e9a7341a4d7c2a1a522ca",
+      "bytes": 905472,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    },
+    {
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/XLMUSDT-perp-1h.csv",
+      "sha256": "fc33f7cd1161d7469c7a51d87bdee6e08fe3a63730d9b4a6a1b654ff320d4845",
+      "bytes": 901142,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    },
+    {
+      "path": "experiments/research/jigsaw_funding_pressure_volatility_v0/pit_coverage_evidence_v0/raw/XRPUSDT-perp-1h.csv",
+      "sha256": "af85dde5036bcc00f06f81d9e8e0c60caaf3c0f6aa26cef56459f8bea28b36d4",
+      "bytes": 878858,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    },
+    {
+      "path": "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/coverage_census.json",
+      "sha256": "341dc27351b7a2aba13cee50f1fe37764661baa5bbb06bcf4d15a103b6689a63",
+      "bytes": 2334260,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    },
+    {
+      "path": "experiments/research/qnty_edge_discovery_order_flow_v0/materialization/v0/source_manifest.json",
+      "sha256": "45dbfd9d0819f7733abb1b1a22bc53cb6a122f54b6db0fa7cd61b46dd1e4517a",
+      "bytes": 1345605,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    },
+    {
+      "path": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/decision.json",
+      "sha256": "d2c27eda957ae9f1a650ccc886b391b3a9f5a06f4dbd25a53d1b711355e4e652",
+      "bytes": 32997,
+      "declaring_authority": {
+        "path": "docs/state/projects.toml",
+        "field": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0.decision_artifact_sha256",
+        "value": "d2c27eda957ae9f1a650ccc886b391b3a9f5a06f4dbd25a53d1b711355e4e652"
+      }
+    },
+    {
+      "path": "experiments/research/trials/2026.jsonl",
+      "sha256": "4ce78ba18cb9bfac3cfd18e9238a45c63b11cfdf70185eab367586497ad321bc",
+      "bytes": 4099903,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    },
+    {
+      "path": "experiments/results/breadth_v2_development_v0/BREADTH_V2_DEVELOPMENT_DECISION_V0.json",
+      "sha256": "c2fe0f50a15b8064bc0cc07383912c9584b737409ec10db249fdd8baf95f9df6",
+      "bytes": 15655624,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    },
+    {
+      "path": "qntylab/dsh_stage_a_v1r1_cli.py",
+      "sha256": "23bc241adfbfbdfc7b56d13fcea0f9c4ceb2118894629e373e761f7aa5cb0aed",
+      "bytes": 1466,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    },
+    {
+      "path": "qntylab/jigsaw_fast_prospective_signal_discovery_input_materialization_v0.py",
+      "sha256": "4727dbbaeabc121afda68610529a1a8de969838bec2a6de5b7b985564fb3e2e5",
+      "bytes": 14414,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    },
+    {
+      "path": "qntylab/jigsaw_fast_prospective_signal_discovery_v2.py",
+      "sha256": "b57733d5b24e612c05affe08a623f975a12aa30dfe5dc86b19386554b626a3d5",
+      "bytes": 4584,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    },
+    {
+      "path": "qntylab/pinned_dsh_codex_permission_policy_canary_controller_gate_repair_and_continuation_v0.py",
+      "sha256": "831146ad9074c2db91a1d210f20656aae8ba31ab0fab74bff2a27b02f29089f1",
+      "bytes": 2040,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    },
+    {
+      "path": "qntylab/project_context_brief.py",
+      "sha256": "0ed688d63e858467fd182497630984af2f769baef7e616c9e44b1fcb816e755a",
+      "bytes": 13503,
+      "declaring_authority": {
+        "path": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c2_project_context_modularization_v0/metrics.json",
+        "field": "parity_captures.module_file_sha256_post",
+        "note": "still-valid C2 digests; composition-root/execution-authority/test-file digests in the same field are PRE-compatibility-repair STALE and are deliberately NOT bound here"
+      }
+    },
+    {
+      "path": "qntylab/project_context_core.py",
+      "sha256": "40a10bd5f5cbd3201435695f1184f3a4548b2b8cf027f2d95a82c2bc95a1e0b9",
+      "bytes": 13867,
+      "declaring_authority": {
+        "path": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c2_project_context_modularization_v0/metrics.json",
+        "field": "parity_captures.module_file_sha256_post",
+        "note": "still-valid C2 digests; composition-root/execution-authority/test-file digests in the same field are PRE-compatibility-repair STALE and are deliberately NOT bound here"
+      }
+    },
+    {
+      "path": "qntylab/project_context_registry.py",
+      "sha256": "fe69dddd8a551c8f54351b4aa956d824155d9ac06ff76cfe8e06772f91eea97c",
+      "bytes": 11754,
+      "declaring_authority": {
+        "path": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c2_project_context_modularization_v0/metrics.json",
+        "field": "parity_captures.module_file_sha256_post",
+        "note": "still-valid C2 digests; composition-root/execution-authority/test-file digests in the same field are PRE-compatibility-repair STALE and are deliberately NOT bound here"
+      }
+    },
+    {
+      "path": "qntylab/project_context_spine.py",
+      "sha256": "6220bfad23b4003ca3cbe6f380a8b36ddfe841a2f33668608f31db1063c98575",
+      "bytes": 14141,
+      "declaring_authority": {
+        "path": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c2_project_context_modularization_v0/metrics.json",
+        "field": "parity_captures.module_file_sha256_post",
+        "note": "still-valid C2 digests; composition-root/execution-authority/test-file digests in the same field are PRE-compatibility-repair STALE and are deliberately NOT bound here"
+      }
+    },
+    {
+      "path": "qntylab/qnty_edge_order_flow_v0_input_materialization.py",
+      "sha256": "0210d0298cfc143a6963e0928754928e3fd46135caf0855fbad87b5c1d2353ad",
+      "bytes": 23511,
+      "declaring_authority": {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "field": "rows[].classification",
+        "value": "DELETE_BLOCKED_BY_FROZEN_BINDING"
+      }
+    }
+  ]
+}

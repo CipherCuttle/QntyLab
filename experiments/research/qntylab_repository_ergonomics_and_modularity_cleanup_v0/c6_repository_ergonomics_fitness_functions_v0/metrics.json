@@ -1,0 +1,324 @@
+{
+  "artifact_type": "C6_METRICS",
+  "project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_FITNESS_FUNCTIONS_V0",
+  "phase_id": "REPOSITORY_ERGONOMICS_FITNESS_FUNCTIONS_V0",
+  "increment_id": "C6",
+  "umbrella_project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0",
+  "canonical_parent": "afe55150da1947b78f8e41dd7c08fdbea2c4cee9",
+  "measurement_policy": "Independent current observations compared against authoritative sources; fail-closed on missing evidence. No CI change, no runtime change, no refactor. Reduction percentages and wall-times are OBSERVED_METRIC_NOT_GOVERNANCE_TARGET and no percentage/wall-time target is asserted.",
+  "c1_packet": {
+    "positive_control_phase_id": "QNTYLAB_PROJECT_CONTEXT_AND_AUTHORITY_REGISTRY_V0",
+    "note_positive_control": "The old umbrella-id positive control QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0 now legitimately fails closed under the C1 artifact-pointer cap; the registry positive control is used instead.",
+    "hard_cap_bytes": 8192,
+    "reduction_basis_bytes": 586444,
+    "reduction_minimum_percent": 95,
+    "observed_packet_bytes": 1675,
+    "observed_reduction_percent": 99.71,
+    "observed_deterministic": true,
+    "authoritative_source": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/decision.json acceptance_metrics.packet + DEFAULT_AGENT_CONTEXT_REDUCTION_PERCENT",
+    "enforcing_tests": [
+      "test_c1_packet_bytes_within_hard_cap_and_reduction",
+      "test_c1_packet_determinism",
+      "test_c1_packet_fail_closed_on_oversized_field",
+      "test_c1_packet_generation_non_mutating"
+    ]
+  },
+  "c2_modularity": {
+    "token_set": [
+      "DSH",
+      "DSH_STAGE",
+      "STAGE_A",
+      "dsh",
+      "pinned_dsh",
+      "stage-a",
+      "Stage-A"
+    ],
+    "counting_method": "grep -oE 'DSH|DSH_STAGE|STAGE_A|dsh|pinned_dsh|stage-a|Stage-A' FILE | wc -l (longest-first alternation reproduces POSIX leftmost-longest counts)",
+    "modules_observed": {
+      "qntylab/project_context.py": {
+        "bytes": 24881,
+        "loc": 566,
+        "sha256": "ef299e0d5482dcfacd3b0317c305c652410c4649faf91c560c8150bb010a0e6a",
+        "dsh_token_count": 0
+      },
+      "qntylab/project_context_core.py": {
+        "bytes": 13867,
+        "loc": 328,
+        "sha256": "40a10bd5f5cbd3201435695f1184f3a4548b2b8cf027f2d95a82c2bc95a1e0b9",
+        "dsh_token_count": 0
+      },
+      "qntylab/project_context_registry.py": {
+        "bytes": 11754,
+        "loc": 228,
+        "sha256": "fe69dddd8a551c8f54351b4aa956d824155d9ac06ff76cfe8e06772f91eea97c",
+        "dsh_token_count": 0
+      },
+      "qntylab/project_context_spine.py": {
+        "bytes": 14141,
+        "loc": 308,
+        "sha256": "6220bfad23b4003ca3cbe6f380a8b36ddfe841a2f33668608f31db1063c98575",
+        "dsh_token_count": 0
+      },
+      "qntylab/project_context_brief.py": {
+        "bytes": 13503,
+        "loc": 301,
+        "sha256": "0ed688d63e858467fd182497630984af2f769baef7e616c9e44b1fcb816e755a",
+        "dsh_token_count": 0
+      },
+      "qntylab/project_context_execution_authority.py": {
+        "bytes": 41734,
+        "loc": 720,
+        "sha256": "fc28bbe734079881c5894f03a8f587be002dcdcab5f0b7358f9e1e0d55bf0949",
+        "dsh_token_count": 59
+      }
+    },
+    "still_valid_digests_bound": [
+      "qntylab/project_context_core.py",
+      "qntylab/project_context_registry.py",
+      "qntylab/project_context_spine.py",
+      "qntylab/project_context_brief.py"
+    ],
+    "stale_digests_not_asserted": {
+      "paths": [
+        "qntylab/project_context.py",
+        "qntylab/project_context_execution_authority.py",
+        "tests/test_project_context_modularization_c2.py"
+      ],
+      "reason": "C2 metrics.json module_file_sha256_post values for these three paths are PRE-compatibility-repair (PR250_P2, commit 74f42414) STALE; not used as fitness assertions"
+    },
+    "composition_root_structural_bound": {
+      "max_bytes": 55220,
+      "basis": "half of C2 pre monolith 110441 B; STRUCTURAL_POSTCONDITION derived from C2 closure so monolith regrowth trips it"
+    },
+    "compatibility_surface_symbols": [
+      "validate_adr_registry",
+      "validate_projects_registry",
+      "validate_ecosystem_catalog",
+      "load_context_sources",
+      "context_text",
+      "brief_text",
+      "PROJECT_STATES",
+      "execution_authority_projection",
+      "DSH_STAGE_A_V1R3R2_EXECUTION_ID"
+    ],
+    "enforcing_tests": [
+      "test_c2_dsh_tokens_absent_from_generic_modules",
+      "test_c2_execution_authority_seam_sole_dsh_confinement",
+      "test_c2_composition_root_structural_bound",
+      "test_c2_compatibility_surface_symbols_resolve",
+      "test_c2_still_valid_module_digests_match_frozen_manifest"
+    ]
+  },
+  "c3_ci_shape": {
+    "core_workflow": {
+      "path": ".github/workflows/project-context.yml",
+      "lines": 90,
+      "jobs": 1,
+      "operational_steps": 11
+    },
+    "heavy_workflow": {
+      "path": ".github/workflows/project-context-heavy-replay.yml",
+      "lines": 333,
+      "jobs": 1,
+      "operational_steps": 13
+    },
+    "trigger_and_permissions": {
+      "pull_request": true,
+      "push_branches": [
+        "master"
+      ],
+      "workflow_dispatch": true,
+      "permissions": "contents: read",
+      "workflows": [
+        "core",
+        "heavy"
+      ]
+    },
+    "core_required_commands": [
+      "doctor --strict",
+      "render --check",
+      "project_context spine",
+      "project_context brief",
+      "research_ledger doctor",
+      "pytest tests/test_project_context_v0.py + 3 context-spine test files"
+    ],
+    "heavy_only_markers": [
+      "repository-deterministic.test.mjs",
+      "prelive-enforcement.test.mjs",
+      "host-qualified-runtime.test.mjs",
+      "materialize-dsh-runtime",
+      "materialize-stage-a-dsh-home"
+    ],
+    "reductions_and_wall_times": "OBSERVED_METRIC_NOT_GOVERNANCE_TARGET \u2014 no percentage or wall-time target is asserted by C6",
+    "enforcing_tests": [
+      "test_c3_core_workflow_shape",
+      "test_c3_heavy_workflow_shape",
+      "test_c3_triggers_and_permissions_unchanged",
+      "test_c3_core_required_command_coverage",
+      "test_c3_heavy_not_collapsed_into_core"
+    ]
+  },
+  "c4_tooling": {
+    "pyproject_tables": [
+      "[tool.pytest.ini_options]"
+    ],
+    "forbidden_tables_absent": [
+      "[project]",
+      "[build-system]"
+    ],
+    "forbidden_dependency_keys_absent": [
+      "install_requires",
+      "dependencies"
+    ],
+    "addopts": "",
+    "c4_not_modified_by_c6": true,
+    "enforcing_tests": [
+      "test_c4_pyproject_is_tool_only",
+      "test_c4_contract_test_gate_present"
+    ]
+  },
+  "c5_slimming": {
+    "deleted_six_absent_filesystem": true,
+    "deleted_six_absent_git_ls_files": true,
+    "blocked_36_present": true,
+    "blocked_classification": {
+      "DELETE_BLOCKED_BY_FROZEN_BINDING": 28,
+      "DELETE_BLOCKED_BY_ACTIVE_USE": 8
+    },
+    "module_count_observed": 135,
+    "module_count_note": "governance-era 133 is HISTORICAL and never asserted; 133/129 must never reappear as a current assertion",
+    "metrics_arithmetic_integrity": {
+      "86329_minus_20250_eq_66079": true,
+      "91074_eq_86329_plus_3360_plus_1385": true,
+      "139_minus_4_eq_135": true,
+      "5473578_minus_5407499_eq_66079": true,
+      "semantics": "HISTORICAL_OBSERVATION integrity only; no global byte cap asserted"
+    },
+    "authoritative_source": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json (audit be291300abb70f3ffc6ba0dd8b1bea570daf5377) + c5_proven_delete_safe_slimming_v0/metrics.json",
+    "enforcing_tests": [
+      "test_c5_deleted_paths_absent",
+      "test_c5_blocked_candidates_present",
+      "test_c5_module_count_is_current_governance_count",
+      "test_c5_metrics_artifact_arithmetic_integrity"
+    ]
+  },
+  "authority_non_escalation": {
+    "rows_checked": [
+      "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0",
+      "QNTYLAB_AGENT_CONTEXT_PACKET_V0",
+      "QNTYLAB_PROJECT_CONTEXT_MODULARIZATION_V0",
+      "QNTYLAB_DEV_LOOP_CI_SPLIT_V0",
+      "QNTYLAB_PYTHON_TOOLING_NORMALIZATION_V0",
+      "QNTYLAB_PROVEN_DELETE_SAFE_SLIMMING_V0",
+      "QNTYLAB_REPOSITORY_ERGONOMICS_FITNESS_FUNCTIONS_V0"
+    ],
+    "canonical_fields_checked": [
+      "scientific_execution_authorized",
+      "real_data_access_authorized",
+      "outcome_access_authorized",
+      "provider_access_authorized",
+      "claim_access_authorized",
+      "claim_consumption_authorized",
+      "router_authority",
+      "qnty_authority",
+      "qntyspot_authority",
+      "trading_authority",
+      "capital_authority",
+      "downstream_authority",
+      "signing_authority",
+      "promotion_authority",
+      "runtime_authorized",
+      "qnty_mutation_authorized",
+      "qnty_agent_eval_mutation_authorized",
+      "qntyspot_mutation_authorized",
+      "evaluator_applicability",
+      "evaluator_run_required",
+      "evaluator_created"
+    ],
+    "violations": 0,
+    "firewall_defaults_hold": true,
+    "canonical_loader_reused": "qntylab.project_context.load_context_sources + qntylab.project_context_registry.validate_projects_registry (reuse, not a new parser)",
+    "enforcing_tests": [
+      "test_authority_fields_closed_for_umbrella_and_all_increments",
+      "test_implementation_authorized_false_for_non_active_rows",
+      "test_execution_authority_firewall_defaults_hold"
+    ]
+  },
+  "frozen_hash_bindings": {
+    "manifest": "frozen_hash_manifest.json",
+    "entry_count": 34,
+    "frozen_binding_paths": 28,
+    "decision_json_binding": "d2c27eda957ae9f1a650ccc886b391b3a9f5a06f4dbd25a53d1b711355e4e652",
+    "deletion_matrix_binding": true,
+    "c2_valid_digest_bindings": 4,
+    "workflows_excluded_reason": "no authoritative pointer declares CI workflows hash-bound; enforced structurally instead",
+    "enforcing_tests": [
+      "test_frozen_hash_manifest_entries_all_match",
+      "test_frozen_hash_manifest_binds_decision_and_matrix"
+    ]
+  },
+  "repository_health_commands": {
+    "commands": [
+      "python -m qntylab.project_context doctor --strict",
+      "python -m qntylab.project_context render --check",
+      "python -m qntylab.research_ledger doctor"
+    ],
+    "expected_markers": [
+      "project context ok",
+      "roadmap current",
+      "ledger ok"
+    ],
+    "timeout_seconds": 120,
+    "non_mutation": "git status --porcelain dirty-set unchanged before/after each command; pre-existing dirt tolerated and reported",
+    "enforcing_tests": [
+      "test_safety_command_passes_and_is_non_mutating[doctor --strict]",
+      "test_safety_command_passes_and_is_non_mutating[render --check]",
+      "test_safety_command_passes_and_is_non_mutating[research_ledger doctor]"
+    ]
+  },
+  "negative_controls": {
+    "NEGATIVE_CONTROL_FAMILIES_TESTED": 7,
+    "families": [
+      {
+        "id": 1,
+        "name": "packet exceeds cap / reduction below threshold",
+        "observed": "FitnessFailure raised on synthetic oversized packet and on below-floor synthetic reduction; render_packet raises AgentContextPacketError on oversized field"
+      },
+      {
+        "id": 2,
+        "name": "DSH token injected into generic core module",
+        "observed": "token-count helper detects injected token on tmp copy; enforcement violation reported"
+      },
+      {
+        "id": 3,
+        "name": "heavy workflow deleted / required command removed",
+        "observed": "missing workflow fails closed; tmp copy minus prelive-enforcement line detected as missing required marker"
+      },
+      {
+        "id": 4,
+        "name": "one C5 deleted path reappears",
+        "observed": "absence helper flags reappearance in tmp tree"
+      },
+      {
+        "id": 5,
+        "name": "one blocked path disappears",
+        "observed": "presence helper flags empty tmp tree against all 36 blocked paths"
+      },
+      {
+        "id": 6,
+        "name": "authority flipped NONE->GRANTED",
+        "observed": "authority checker reports trading_authority violation; missing required field also fails closed"
+      },
+      {
+        "id": 7,
+        "name": "frozen digest mismatch",
+        "observed": "pristine tmp copy verifies; altered bytes raise FROZEN_MISMATCH"
+      }
+    ],
+    "worktree_impact": "none; all controls run in pytest tmp_path or on synthetic data"
+  },
+  "head_adjudication": {
+    "pre_existing_failure": "tests/test_qntylab_repository_ergonomics_and_modularity_cleanup_decision_v0.py::test_c1_not_started (documented pre-existing, C4 metrics.json, stale decision-era assertion; NOT fixed \u2014 forbidden)",
+    "contract_suite_gate": "C1-C5 contract-suite gate compares against the documented baseline (1 known-stale failure); HEAD_NEW_FAILURES = 0"
+  }
+}

@@ -1,15 +1,26 @@
+== measurement basis ==
+candidate commit tree 5ab39cc29f2f852862071e95e773c2759f8ed4c6 (worktree == HEAD, clean)
 == git rev-parse HEAD ==
-e826dcb9cc264d1280c91c0bec01e23488fbb9e1
+5ab39cc29f2f852862071e95e773c2759f8ed4c6
 == qntylab module count post ==
 135
-== tracked python bytes post ==
-5387249 total
-== total tracked bytes/files post ==
-6089113 total
-4169
+== tracked python bytes post (git ls-files -z + os.path.getsize) ==
+5407499 total
+== total tracked bytes/files post (git ls-files -z + os.path.getsize) ==
+101810659 total
+4189
 == pytest collect post ==
 !!!!!!!!!!!!!!!!!!! Interrupted: 4 errors during collection !!!!!!!!!!!!!!!!!!!!
-3692 tests collected, 4 errors in 1.12s
+3701 tests collected, 4 errors in 0.99s
 == pytest collect error kinds post ==
       3 E   ModuleNotFoundError: No module named 'polars'
       1 E   ModuleNotFoundError: No module named 'retry'
+== correction note ==
+This receipt replaces the original post_metrics_raw.txt, which was captured in a
+worktree where the six deletions were still uncommitted on top of the canonical
+parent (its 'git rev-parse HEAD' section showed e826dcb9cc264d1280c91c0bec01e23488fbb9e1,
+i.e. the synthetic parent-minus-deletions tree, with a stale contradictory total
+of 6089113/4169). The figures above were independently re-measured at the actual
+candidate commit tree using the same space-safe method (git ls-files -z +
+os.path.getsize), correcting hostile review finding F1 (MEDIUM). The original
+receipt is preserved verbatim as post_metrics_raw.synthetic_tree.txt for provenance.

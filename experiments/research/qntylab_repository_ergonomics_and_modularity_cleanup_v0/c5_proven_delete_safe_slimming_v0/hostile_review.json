@@ -1,0 +1,264 @@
+{
+  "review_identity": {
+    "role": "SINGLE_INDEPENDENT_HOSTILE_REVIEWER",
+    "reviewer": "Zoo (independent hostile reviewer, debug mode)",
+    "review_date_utc": "2026-09-07",
+    "project_id": "QNTYLAB_PROVEN_DELETE_SAFE_SLIMMING_V0",
+    "phase_id": "PROVEN_DELETE_SAFE_SLIMMING_V0",
+    "increment_id": "C5",
+    "umbrella_project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0",
+    "canonical_parent": "e826dcb9cc264d1280c91c0bec01e23488fbb9e1",
+    "candidate_sha": "5ab39cc29f2f852862071e95e773c2759f8ed4c6",
+    "candidate_sha_note": "Candidate is COMMITTED on branch c5-proven-delete-safe-slimming-v0; git rev-parse HEAD == 5ab39cc29f2f852862071e95e773c2759f8ed4c6 and git rev-parse HEAD^ == e826dcb9cc264d1280c91c0bec01e23488fbb9e1 (canonical parent). Working tree clean at review start.",
+    "forensic_anchor": "be291300abb70f3ffc6ba0dd8b1bea570daf5377",
+    "reviewed_surface": "Candidate commit 5ab39cc (worktree == HEAD, clean). Diff vs parent audited file-by-file.",
+    "scope": "READ-ONLY hostile review; the ONLY artifact written by this reviewer is this file. No repairs, no C6 work, no push/merge/PR, no commits.",
+    "method": "All claims independently re-derived from primary evidence: git diff --name-status over the whole candidate, per-path git diff --quiet over all 36 blocked candidates, independent sha256 recompute of the six deleted blobs at parent, git grep reference sweeps (case-sensitive and uppercase variants) across the whole tree, importlib/__import__/import_module dynamic-import scan, CI/ops/pyproject/qntylab.toml sweeps, independent git ls-tree -r -l and git ls-files + os.path.getsize byte measurements at BOTH commits, canonical gate re-runs, and the focused pytest cluster. Candidate artifact numbers were NOT trusted.",
+    "known_accepted_context_not_counted": [
+      "Pre-existing failure tests/test_qntylab_repository_ergonomics_and_modularity_cleanup_decision_v0.py::test_c1_not_started (stale C1 pre-start assertion; present at parent, documented baseline in C4 row and candidate C5 row)",
+      "4 pre-existing local-environment collection errors (3x ModuleNotFoundError polars, 1x ModuleNotFoundError retry), identical at parent and candidate"
+    ]
+  },
+  "attack_surfaces": [
+    {
+      "id": 1,
+      "name": "one_of_six_files_actually_load_bearing",
+      "verdict": "PASS",
+      "commands": [
+        "git grep -n -e '<each of 6 paths/4 stems>' (whole tree, C5 artifacts excluded)",
+        "git grep -n -e '<4 stems>' -- qntylab tests ops .github pyproject.toml qntylab.toml ':!tests/test_qntylab_repository_ergonomics_cleanup_c5*'",
+        "independent python check: git cat-file -e at both commits for all 6 paths"
+      ],
+      "key_output": "Case-sensitive stem/path sweep outside docs/forensics/ + C5 evidence: exactly ONE hit, experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/decision.json:101 allowed_paths (governance record). Zero hits in qntylab/, tests/ (except the authorized new C5 test), ops/, .github/, pyproject.toml, qntylab.toml. All six paths absent at candidate (cat-file rc=128), present at parent (rc=0).",
+      "result": "No load-bearing consumer found; candidate reference_reproof.json independently corroborated, not falsified."
+    },
+    {
+      "id": 2,
+      "name": "textual_references_misclassified_non_load_bearing",
+      "verdict": "PASS",
+      "commands": [
+        "git grep -n 'docs/status' -- qntylab tests ops .github pyproject.toml qntylab.toml",
+        "git grep -n -e 'JIGSAW_EXTERNAL_REPLICATION_EXECUTION_V0' -e 'JFP03_V0R1_INPUT_MATERIALIZATION' -e 'JIGSAW_CROSS_SECTIONAL_DISPERSION_EXECUTION_V0' (uppercase variants, forensics+C5 excluded)",
+        "git grep -n 'research/dvol-v0-phase1b-live-smoke' -- qntylab tests",
+        "git grep -n -e 'docs/status' -e 'jigsaw_external' -e 'jfp03_v0r1_input' -- docs/ADR/"
+      ],
+      "key_output": "docs/status refs in code/config: ZERO (rc=1). Uppercase phase-name strings survive only in historical experiment artifacts (execution_report.md/result.json etc.), docs/CURRENT_ROADMAP.md:93 (project_id prose), docs/state/projects.toml:826 (historical row) — none consumed at runtime. qntylab/jigsaw_cross_sectional_dispersion_v0.py:11 mentions the deleted execution phase in a DOCSTRING only; its imports (lines 26-36) do not import any deleted module (dependency was one-way deleted->retained). Branch-name string qntylab/prospective_deribit_dvol_live_smoke.py:32 PHASE1B_BRANCH='research/dvol-v0-phase1b-live-smoke' + its test are a git-branch-name literal, not a path to a deleted file. ADR-0004 title mentions 'evidence-retention repair' prose only; docs/ADR registry refs to deleted paths: ZERO (rc=1).",
+      "result": "All remaining textual hits are historical/governance records, correctly non-load-bearing."
+    },
+    {
+      "id": 3,
+      "name": "import_by_string_or_dynamic_import_consumers_missed",
+      "verdict": "PASS",
+      "commands": [
+        "git grep -n -e importlib -e __import__ -e import_module -- qntylab tests ops .github pyproject.toml (test files filtered)",
+        "git grep -n -e '<4 stems>' -- qntylab tests ops .github pyproject.toml qntylab.toml"
+      ],
+      "key_output": "All dynamic-import hits are stdlib/library __import__ literals: __import__('sys'), __import__('re'), __import__('math'), __import__('datetime'), __import__('polars'). No importlib/import_module usage in non-test runtime code. No stem substring appears in any dynamic-import context or scanner script (docs/forensics synthesize.py/raw/scan_*.py are one-shot audit generators, unchanged, not executed at runtime/CI).",
+      "result": "No missed dynamic-import consumer."
+    },
+    {
+      "id": 4,
+      "name": "ci_shell_script_references_missed",
+      "verdict": "PASS",
+      "commands": [
+        "git grep -n -e '<stems/paths>' -- .github ops pyproject.toml qntylab.toml requirements-data-spine-v0.txt requirements-dvol-v0-live-smoke.txt",
+        "ls .github/workflows/ ; grep -A5 scripts pyproject.toml"
+      ],
+      "key_output": "git grep rc=1 (zero hits) across .github/workflows/project-context.yml, project-context-heavy-replay.yml, ops/systemd/**, pyproject.toml (no [project.scripts] table at all), qntylab.toml, requirements files.",
+      "result": "No CI/shell/script dependency on any deleted path."
+    },
+    {
+      "id": 5,
+      "name": "registry_or_generated_view_depends_on_deleted_path",
+      "verdict": "PASS",
+      "commands": [
+        "git diff e826dcb..5ab39cc -- docs/state/projects.toml (full read)",
+        "python -m qntylab.project_context doctor --strict ; python -m qntylab.project_context render --check"
+      ],
+      "key_output": "projects.toml diff = exactly ONE appended [[project]] row QNTYLAB_PROVEN_DELETE_SAFE_SLIMMING_V0 (53 lines, no modification of prior rows; no reference to any deleted path in the row). doctor --strict -> 'project context ok' EXIT:0; render --check -> 'roadmap current' EXIT:0 (docs/CURRENT_ROADMAP.md unchanged and still canonical).",
+      "result": "Registry and generated view consistent; no deleted-path dependency."
+    },
+    {
+      "id": 6,
+      "name": "preregistration_or_closure_evidence_binds_deleted_path",
+      "verdict": "PASS",
+      "commands": [
+        "whole-tree git grep for the 6 paths/4 stems with C5 artifacts excluded (full artifact reviewed)",
+        "git diff e826dcb..5ab39cc -- experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/decision.json (empty)"
+      ],
+      "key_output": "Prereg/closure artifacts under experiments/research/ reference only uppercase project_id strings (historical receipts); no preregistration or closure artifact binds a deleted module path or docs/status file. Umbrella decision.json unchanged vs parent; its allowed_paths strings are governance prose, and decision['state']=='CLOSED_PASS'.",
+      "result": "No binding of a deleted path in prereg/closure evidence."
+    },
+    {
+      "id": 7,
+      "name": "overlooked_hash_binding",
+      "verdict": "PASS",
+      "commands": [
+        "python: git show <parent>:<path> | sha256 for each of the 6 deleted files",
+        "git grep -l -F <hash> at parent tree and candidate tree for each hash"
+      ],
+      "key_output": "Recomputed sha256: docs/status EVIDENCE_RETENTION_REPAIR 6176c286..., docs/status LIVE_SOURCE_SMOKE e423c21d..., jfp03_v0r1_input_materialization 0ec76dc0..., jigsaw_cross_sectional_dispersion_execution_v0 58f39c16..., jigsaw_external_replication_execution_v0 05242138..., jigsaw_external_replication_input_materialization_v0 576551c8... Hash-string occurrences in tracked trees at parent AND candidate: NONE.",
+      "result": "No file in either tree embeds any of the six content hashes."
+    },
+    {
+      "id": 8,
+      "name": "one_of_36_blocked_candidates_accidentally_deleted_or_modified",
+      "verdict": "PASS",
+      "commands": [
+        "python: read deletion_matrix.json rows independently; for each blocked path run git diff --quiet e826dcb..5ab39cc -- <path> and git cat-file -e 5ab39cc:<path>"
+      ],
+      "key_output": "blocked checked: 36 (28 DELETE_BLOCKED_BY_FROZEN_BINDING + 8 DELETE_BLOCKED_BY_ACTIVE_USE); violations: 0. All 36 byte-identical and present at candidate.",
+      "result": "Blocked-36 fully retained."
+    },
+    {
+      "id": 9,
+      "name": "seventh_file_in_deletion_set",
+      "verdict": "PASS",
+      "commands": [
+        "git diff --name-status e826dcb9cc264d1280c91c0bec01e23488fbb9e1 5ab39cc29f2f852862071e95e773c2759f8ed4c6"
+      ],
+      "key_output": "Full diff: D x6 (exactly the six DELETE_SAFE paths), M x1 (docs/state/projects.toml), A x20 (19 C5 artifact files under c5_proven_delete_safe_slimming_v0/ incl. verification/ + 1 new C5 structural test). Every entry within the decision.json allowed_paths surface. 27 files changed, 1864 insertions, 1631 deletions.",
+      "result": "Deletion set is exactly the authorized six."
+    },
+    {
+      "id": 10,
+      "name": "authorized_file_retained_stubbed_or_shimmed",
+      "verdict": "PASS",
+      "commands": [
+        "git diff --name-status e826dcb..5ab39cc -- qntylab/ tests/ docs/ ; find . -type d -name archive (excluding .git/data) ; git diff e826dcb..5ab39cc -- qntylab/__init__.py"
+      ],
+      "key_output": "qntylab/ diff = exactly 4 D entries, nothing added/modified. No archive/ directory anywhere outside data/. qntylab/__init__.py diff EMPTY (no re-export of deleted stems). No stub/redirect/shim files created anywhere.",
+      "result": "True deletion, no retention/stub/shim/archive copy."
+    },
+    {
+      "id": 11,
+      "name": "forensic_evidence_modified_to_make_c5_pass",
+      "verdict": "PASS",
+      "commands": [
+        "git diff --name-status e826dcb..5ab39cc -- docs/forensics/ ; git diff e826dcb..5ab39cc -- docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json"
+      ],
+      "key_output": "docs/forensics/ diff EMPTY; deletion_matrix.json blob unchanged (no diff output). matrix audit anchor be291300abb70f3ffc6ba0dd8b1bea570daf5377, distribution {FROZEN_BINDING:28, ACTIVE_USE:8, SAFE:6} re-read directly.",
+      "result": "Forensic evidence untouched."
+    },
+    {
+      "id": 12,
+      "name": "test_changed_to_hide_broken_consumer",
+      "verdict": "PASS",
+      "commands": [
+        "git diff --name-status e826dcb..5ab39cc -- tests/",
+        "python -m pytest <focused cluster> -q"
+      ],
+      "key_output": "tests/ diff = exactly ONE A entry (tests/test_qntylab_repository_ergonomics_cleanup_c5_proven_delete_safe_slimming_v0.py, 9 structural tests; asserts zero deleted-stem substring in qntylab/*.py and tests/*.py, blocked-36 presence, 135 module count, forensics/.github/pyproject unchanged, decision.json unchanged). No existing test file modified.",
+      "result": "No test tampering; focused cluster = 1 failed (test_c1_not_started, pre-existing baseline) / 30 passed."
+    },
+    {
+      "id": 13,
+      "name": "compatibility_shim_recreated_removed_surface",
+      "verdict": "PASS",
+      "commands": [
+        "git diff e826dcb..5ab39cc -- qntylab/__init__.py (empty); git grep stems across qntylab/ (rc=1)",
+        "implementation_manifest.json deletion_discipline block read"
+      ],
+      "key_output": "No shim, no re-export, no lazy-import hook; the four stems have zero occurrences in any retained qntylab module. Manifest deletion_discipline: stubs/redirects/shims/archive_moves/content_edits/seventh_deletion/substitution all false — independently corroborated by the diff audit.",
+      "result": "Removed surface not recreated."
+    },
+    {
+      "id": 14,
+      "name": "pre_post_byte_module_metrics_false_or_mismatched_trees",
+      "verdict": "FINDING",
+      "commands": [
+        "git ls-tree -r -l at BOTH commits (independent size/count recompute)",
+        "git ls-files -z + os.path.getsize in candidate worktree (candidate's own stated method)",
+        "python -m pytest --collect-only -q | tail (actual candidate collection)",
+        "cat verification/post_metrics_raw.txt"
+      ],
+      "key_output": "VERIFIED EXACT (parent): 4,175 files / 101,786,820 bytes / 139 qntylab modules / 5,473,578 repo-wide .py bytes; deleted six-file byte sum exactly 91,074 (3360+1385+11973+15790+41433+17133); four deleted .py sum exactly 86,329. VERIFIED EXACT (candidate): 135 qntylab modules. FINDING: metrics.json 'post' section (total_tracked_bytes 101,695,746, total_tracked_files 4,169, tracked_python_bytes 5,387,249, pytest_collection.collected 3692) and the deltas strings ('4175 -> 4169 (delta exactly -6)') describe the PARENT-MINUS-SIX-DELETIONS tree, not the candidate commit. Actual candidate tree: 4,189 files / 101,810,659 bytes / 5,407,499 .py bytes / 3,701 collected. Root cause captured in evidence: verification/post_metrics_raw.txt records 'git rev-parse HEAD' = e826dcb (PARENT) during the post measurement — deletions were applied uncommitted in a parent worktree before the 20 evidence files existed. Partially disclosed in full_suite_comparison_receipt.txt ('collection: identical 3692 + 9 new'; 'delta passed: head-base = 9 = exactly the 9 new C5 structural tests'). See finding F1.",
+      "result": "Module-count and deletion-delta invariants verified exact; post byte/file/collection totals mislabeled (MEDIUM F1)."
+    },
+    {
+      "id": 15,
+      "name": "c6_fitness_function_work_leaked_into_c5",
+      "verdict": "PASS",
+      "commands": [
+        "git diff --name-status e826dcb..5ab39cc (whole commit, reviewed entry-by-entry)"
+      ],
+      "key_output": "No C6 fitness-function files, no new measurement scripts outside the C5 artifact dir (reference_reproof_scan.py is the C5-spec-mandated reproof scanner), no tooling/config changes. All 20 additions are inside experiments/research/.../c5_proven_delete_safe_slimming_v0/ plus the single authorized C5 test file.",
+      "result": "No C6 leakage."
+    },
+    {
+      "id": 16,
+      "name": "frozen_scientific_or_execution_semantics_changed_indirectly",
+      "verdict": "PASS",
+      "commands": [
+        "git diff e826dcb..5ab39cc -- qntylab/ (exactly 4 D, nothing else); git diff e826dcb..5ab39cc -- experiments/ (only C5 artifact dir additions)"
+      ],
+      "key_output": "No retained qntylab module byte changed; no experiment artifact under experiments/ modified or deleted (blocked-36 byte-identical per vector 8); no pyproject/requirements/qntylab.toml change. Zero semantic surface touched beyond the six deletions.",
+      "result": "Frozen semantics untouched."
+    },
+    {
+      "id": 17,
+      "name": "evidence_receipts_point_at_wrong_sha_or_raw_output",
+      "verdict": "FINDING",
+      "commands": [
+        "grep -rno '[0-9a-f]{40}' verification/ ; head pre_baseline_metrics.txt post_metrics_raw.txt ; cat full_suite_comparison_receipt.txt doctor_render_ledger_receipts.txt focused_cluster_tail.txt head_new_failures.txt"
+      ],
+      "key_output": "pre_baseline_metrics.txt correctly pins HEAD=e826dcb for pre measurement; full_suite_comparison_receipt.txt correctly pins the base worktree to e826dcb and honestly discloses 'delta passed = 9 = exactly the 9 new C5 structural tests' and 'identical 3692 + 9 new'. base/head failure-set comparison is a strict-subset relationship (HEAD_NEW_FAILURES=0, HEAD_NEW_ERRORS=0) with full-suite tails recorded (HEAD: 83 failed/3605 passed/2 skipped/15 errors; BASE: 120 failed/3538 passed/2 skipped/36 errors). FINDING (LOW F2): verification/post_metrics_raw.txt records HEAD=e826dcb (parent) for the 'post' measurement — no verification receipt pins the candidate commit SHA 5ab39cc itself, and post_metrics_raw.txt still carries the stale undercounted total-byte figure 6,089,113/4,169 that contradicts metrics.json's own post total (101,695,746) and that metrics.json's transcription_correction_note already declares the pre-counterpart (6,175,732) unreliable. See finding F2.",
+      "result": "Load-bearing receipts valid; post receipt lacks candidate-SHA pinning and retains a contradictory stale byte figure (LOW)."
+    },
+    {
+      "id": 18,
+      "name": "unrelated_cleanup_in_git_diff",
+      "verdict": "PASS",
+      "commands": [
+        "git diff --stat e826dcb..5ab39cc ; per-file review of all 27 changed entries"
+      ],
+      "key_output": "Every changed entry is inside the decision.json allowed_paths: 6 deletions (authorized), docs/state/projects.toml (one appended C5 registration row only), 19 C5 artifact files, 1 new C5 test. No whitespace sweeps, no formatting churn, no drive-by edits.",
+      "result": "Zero unrelated cleanup."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "MEDIUM",
+      "title": "metrics.json 'post' section (and deltas strings) describe the parent-minus-six-deletions synthetic tree, not the candidate commit 5ab39cc; actual candidate tree differs by the candidate's own 20 added evidence files",
+      "surface": 14,
+      "evidence": "Independent recompute via git ls-tree -r -l at 5ab39cc and via the candidate's own stated method (git ls-files -z + os.path.getsize) in the clean candidate worktree: 4,189 tracked files / 101,810,659 total bytes / 5,407,499 repo-wide .py bytes / pytest --collect-only -q -> 3,701 collected + 4 pre-existing errors. metrics.json post claims 4,169 files / 101,695,746 bytes / 5,387,249 .py bytes / 3,692 collected, and deltas claim '4175 -> 4169 (delta exactly -6)'. The recorded post values equal pre minus exactly the six deleted files (101,786,820-91,074; 5,473,578-86,329; 4,175-6) and exclude the 20 added files (19 C5 artifacts + 1 test, incl. the new test's 9 collected tests). Root cause: verification/post_metrics_raw.txt shows 'git rev-parse HEAD' = e826dcb (PARENT) during the post measurement, i.e. deletions were uncommitted in a parent worktree when measured. Mitigating disclosure: full_suite_comparison_receipt.txt explicitly records 'collection: identical 3692 + 9 new' and 'delta passed: head-base = 9 = exactly the 9 new C5 structural tests'.",
+      "impact": "Machine-readable artifact veracity defect (same class as C4 F1/F3). The metrics as labeled would fail an independent audit reconciling metrics.json against the candidate commit. All load-bearing claims were independently re-verified and hold exactly: 139->135 modules (four deleted), deleted byte sum exactly 91,074, deleted .py sum exactly 86,329, pre totals 4,175/101,786,820/5,473,578 exact, blocked-36 retained, zero new test failures. No delete-safety conclusion depends on the post byte/file/collection totals.",
+      "does_not_reopen_because": "Per C4 placeholder policy precedent, Medium findings do not reopen implementation unless they undermine the increment objective, invalidate verification evidence, violate a frozen invariant, or change semantics. The post-metrics defect is a labeling/scope error in non-load-bearing bookkeeping fields; every load-bearing number was independently re-measured and holds."
+    },
+    {
+      "id": "F2",
+      "severity": "LOW",
+      "title": "No verification receipt pins the candidate commit SHA 5ab39cc, and verification/post_metrics_raw.txt retains a stale, internally contradictory total-byte figure",
+      "surface": 17,
+      "evidence": "grep of verification/ for 40-hex strings finds only the parent SHA e826dcb (pre baseline, base worktree, comparison receipt) and test-fixture dummy hashes; post_metrics_raw.txt records HEAD=e826dcb for the post measurement and states 'total tracked bytes/files post: 6089113 / 4169', which contradicts metrics.json post total_tracked_bytes 101,695,746 and which metrics.json's own transcription_correction_note classifies the pre-counterpart figure (6,175,732) as unreliable ('Reliable space-safe measurement proves the true canonical-parent total is 101,786,820'). The stale raw receipt was retained without a space-safe re-measurement of the post tree.",
+      "impact": "Receipt-provenance gap: an auditor following post_metrics_raw.txt finds a figure contradicting metrics.json and a HEAD that is not the candidate. Corrected figures are recoverable and the load-bearing invariants hold; cosmetic-to-minor provenance defect only.",
+      "does_not_reopen_because": "LOW severity convention/class deviation; no verification evidence invalidated; repairable during terminal C5 bookkeeping."
+    }
+  ],
+  "totals": {
+    "critical": 0,
+    "high": 0,
+    "medium": 1,
+    "low": 1
+  },
+  "verdict": "NO_CRITICAL_OR_HIGH_FINDINGS",
+  "verdict_rationale": "All 18 attack vectors were executed with real commands against the frozen candidate commit 5ab39cc and independently re-derived from primary evidence: the deletion set is exactly the six DELETE_SAFE paths from deletion_matrix.json (audit anchor be291300) with a full name-status audit showing nothing else touched except the one authorized projects.toml C5 row, 19 C5 artifact files, and the one new C5 test; all 36 blocked candidates are byte-identical and present; docs/forensics/, .github/, pyproject.toml, qntylab.toml, requirements, decision.json, existing tests, and docs/CURRENT_ROADMAP.md are all unchanged vs parent; independent sha256 recompute of the six deleted blobs finds zero hash bindings anywhere in either tree; whole-repo reference sweeps (including uppercase phase strings, docs/status refs, the branch-name literal, ADR-0004 prose, dynamic-import stems, CI/ops surfaces) find zero load-bearing consumers, corroborating the candidate's reference_reproof.json GATE_PASS rather than falsifying it; no shim/stub/archive/re-export recreates the removed surface; canonical gates re-run clean (doctor --strict exit 0, render --check 'roadmap current', research_ledger doctor clean); the focused cluster shows only the documented pre-existing test_c1_not_started failure (1 failed / 30 passed); and the full-suite base/head comparison receipt shows HEAD_NEW_FAILURES=0 with a strict-subset failure relationship. Two non-blocking artifact-veracity findings were recorded (F1 MEDIUM: metrics.json post section measures a parent-minus-deletions worktree, not the candidate commit — actual candidate tree 4,189 files/101,810,659 B/5,407,499 py B/3,701 collected; F2 LOW: no receipt pins the candidate SHA and a stale contradictory byte figure remains in post_metrics_raw.txt). Every load-bearing number was independently re-measured and holds, so per the frozen placeholder policy and C3/C4 precedent these do not reopen implementation. Terminal C5 bookkeeping may proceed with 0 unresolved Critical/High; F1-F2 repairable during terminal bookkeeping if the orchestrator chooses.",
+  "decisive_command_receipts": [
+    "git rev-parse HEAD -> 5ab39cc29f2f852862071e95e773c2759f8ed4c6; git rev-parse HEAD^ -> e826dcb9cc264d1280c91c0bec01e23488fbb9e1; git branch --show-current -> c5-proven-delete-safe-slimming-v0; git status --porcelain -> clean",
+    "git diff --name-status e826dcb..5ab39cc -> D x6 (exactly the six DELETE_SAFE paths), M docs/state/projects.toml, A x20 (C5 artifacts + C5 test); 27 files, 1864 insertions, 1631 deletions",
+    "git diff e826dcb..5ab39cc -- docs/state/projects.toml -> exactly one appended [[project]] QNTYLAB_PROVEN_DELETE_SAFE_SLIMMING_V0 row",
+    "python (deletion_matrix.json rows) + git diff --quiet per blocked path + git cat-file -e -> 'blocked checked: 36; violations: 0'; six deleted paths absent at candidate (rc=128), present at parent (rc=0)",
+    "sha256 recompute of six parent blobs: 6176c286..., e423c21d..., 0ec76dc0..., 58f39c16..., 05242138..., 576551c8...; git grep -F per hash at both trees -> NONE",
+    "git grep stems/paths -- qntylab tests ops .github pyproject.toml qntylab.toml (C5 test excluded) -> rc=1 (zero hits); git grep docs/status -- qntylab tests ops .github pyproject.toml qntylab.toml -> rc=1",
+    "git grep importlib|__import__|import_module (non-test) -> only stdlib __import__ literals (sys/re/math/datetime/polars)",
+    "git grep uppercase stems (forensics+C5 excluded) -> historical experiment artifacts + CURRENT_ROADMAP.md:93 + projects.toml:826 + docstring qntylab/jigsaw_cross_sectional_dispersion_v0.py:11 (no import; imports at lines 26-36 verified)",
+    "git ls-tree -r -l: parent 4,175 files/101,786,820 B/139 mods/5,473,578 py B; candidate 4,189 files/101,810,659 B/135 mods/5,407,499 py B; deleted sum 91,074 B (py subset 86,329 B); worktree getsize method confirms candidate figures",
+    "python -m pytest --collect-only -q -> 3,701 collected, 4 errors (3x polars, 1x retry; pre-existing)",
+    "python -m pytest tests/test_qntylab_repository_ergonomics_cleanup_c5_proven_delete_safe_slimming_v0.py tests/test_qntylab_repository_ergonomics_and_modularity_cleanup_decision_v0.py -q -> 1 failed test_c1_not_started (pre-existing baseline) / 30 passed",
+    "python -m qntylab.project_context doctor --strict -> 'project context ok' EXIT:0; python -m qntylab.project_context render --check -> 'roadmap current' EXIT:0; python -m qntylab.research_ledger doctor -> 'ledger ok' EXIT:0",
+    "cat verification/post_metrics_raw.txt -> HEAD=e826dcb during post measurement; 6089113/4169 stale figure (F2); cat full_suite_comparison_receipt.txt -> 'HEAD_NEW_FAILURES=0 HEAD_NEW_ERRORS=0', 'delta passed: head-base = 9 = exactly the 9 new C5 structural tests', 'collection: identical 3692 + 9 new'",
+    "git diff e826dcb..5ab39cc -- docs/forensics/ -> EMPTY; -- qntylab/__init__.py -> EMPTY; -- tests/ -> single A entry; -- .github/ ops/ pyproject.toml qntylab.toml -> EMPTY"
+  ],
+  "post_artifact_validation_note": "After writing this file the reviewer re-ran: python3 -c json.load (artifact parses), git status --porcelain (only this untracked/modified C5 artifact file; no other tree change; nothing committed)."
+}

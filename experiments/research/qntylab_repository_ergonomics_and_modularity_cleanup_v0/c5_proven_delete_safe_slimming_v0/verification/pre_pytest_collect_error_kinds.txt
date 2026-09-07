@@ -1,0 +1,2 @@
+      3 E   ModuleNotFoundError: No module named 'polars'
+      1 E   ModuleNotFoundError: No module named 'retry'

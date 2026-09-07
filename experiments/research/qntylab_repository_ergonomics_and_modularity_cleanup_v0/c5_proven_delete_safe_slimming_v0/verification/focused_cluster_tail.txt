@@ -1,0 +1,9 @@
+E       AssertionError: assert not True
+E        +  where True = exists()
+E        +    where exists = (PosixPath('/home/swirky/DevHub/repos/QntyLab') / 'qntylab/agent_context_packet_v0.py').exists
+
+tests/test_qntylab_repository_ergonomics_and_modularity_cleanup_decision_v0.py:522: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_qntylab_repository_ergonomics_and_modularity_cleanup_decision_v0.py::test_c1_not_started
+1 failed, 46 passed, 2 skipped in 2.06s
+/bin/sh: 1: Bad substitution

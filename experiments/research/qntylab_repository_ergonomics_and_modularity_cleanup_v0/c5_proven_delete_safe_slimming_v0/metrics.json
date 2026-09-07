@@ -1,0 +1,79 @@
+{
+  "project_id": "QNTYLAB_PROVEN_DELETE_SAFE_SLIMMING_V0",
+  "phase_id": "PROVEN_DELETE_SAFE_SLIMMING_V0",
+  "increment_id": "C5",
+  "umbrella_project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0",
+  "canonical_parent": "e826dcb9cc264d1280c91c0bec01e23488fbb9e1",
+  "forensic_audit_commit": "be291300abb70f3ffc6ba0dd8b1bea570daf5377",
+  "measurement_policy": "Observed measurements only, all re-measured on the C5 implementation branch worktree and a throwaway base worktree at the canonical parent (git worktree add /tmp/qntylab-c5-base e826dcb9cc264d1280c91c0bec01e23488fbb9e1). No optimization targets are frozen by C5.",
+  "measurement_basis": {
+    "synthetic_parent_minus_deletions_tree": "Intermediate measurement taken while the six deletions were still uncommitted in a worktree on top of the canonical parent e826dcb9cc264d1280c91c0bec01e23488fbb9e1 (receipt preserved as verification/post_metrics_raw.synthetic_tree.txt): 4169 files / 101695746 B total / 5387249 py B / 3692 collected.",
+    "candidate_commit_tree_5ab39cc29f2f852862071e95e773c2759f8ed4c6": "Authoritative measurement of the actual candidate commit tree, independently re-measured with the same space-safe method after hostile review finding F1 (see changelog): 4189 files / 101810659 B total / 5407499 py B / 3701 collected.",
+    "authoritative": "candidate_commit_tree_5ab39cc29f2f852862071e95e773c2759f8ed4c6",
+    "note": "The post and deltas sections below describe the authoritative candidate commit tree. The synthetic parent-minus-deletions tree values are retained here only as provenance of the intermediate measurement."
+  },
+  "measurement_method": {
+    "module_count": "ls qntylab/*.py | wc -l",
+    "python_bytes_and_repo_bytes": "python3: git ls-files -z (NUL-delimited, spaces-safe) + os.path.getsize over each tracked file; base values measured inside the throwaway base worktree at the canonical parent",
+    "collection": "python -m pytest --collect-only -q (error kinds via grep of E-lines)",
+    "blocked_presence": "deletion_matrix.json blocked rows checked against the filesystem",
+    "deletion_matrix": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+    "transcription_correction_note": "The subtask prose transcription stated total tracked bytes 6,175,732 over 4,175 files and post python bytes 5,461,605. Reliable space-safe measurement proves the true canonical-parent total is 101,786,820 bytes over 4,175 files and the true post python-bytes figure is 5,387,249 (5,473,578 minus 86,329 = the four deleted .py files). The transcribed 5,461,605 corresponds to removing only jfp03_v0r1_input_materialization.py and is arithmetically inconsistent with the same transcription's own module-count delta (139->135) and total delta (-91,074). Measured values are authoritative; the invariants the transcription intended (module count 139->135, python bytes 5,473,578 pre, total delta exactly -91,074) all hold exactly."
+  },
+  "pre": {
+    "canonical_parent": "e826dcb9cc264d1280c91c0bec01e23488fbb9e1",
+    "qntylab_python_modules": 139,
+    "frozen_umbrella_governance_baseline_module_count": 133,
+    "frozen_baseline_note": "The umbrella decision.json governance-era baseline of 133 qntylab modules is recorded as a frozen historical value; it is NOT expected to equal the observed count and no reconciliation is attempted. Observed count at canonical parent is 139.",
+    "tracked_python_bytes": 5473578,
+    "total_tracked_bytes": 101786820,
+    "total_tracked_files": 4175,
+    "pytest_collection": {"collected": 3692, "collection_errors": 4},
+    "collection_error_kinds": {
+      "ModuleNotFoundError: No module named 'polars'": 3,
+      "ModuleNotFoundError: No module named 'retry'": 1
+    },
+    "collection_error_note": "Pre-existing, environment-bound at canonical parent; proven identical at base worktree and head; not fixed and not hidden by C5.",
+    "deleted_candidate_files": [
+      {"path": "docs/status/QNTYLAB_DVOL_V0_PHASE1B_EVIDENCE_RETENTION_REPAIR.md", "bytes": 3360},
+      {"path": "docs/status/QNTYLAB_DVOL_V0_PHASE1B_LIVE_SOURCE_SMOKE.md", "bytes": 1385},
+      {"path": "qntylab/jfp03_v0r1_input_materialization.py", "bytes": 11973},
+      {"path": "qntylab/jigsaw_cross_sectional_dispersion_execution_v0.py", "bytes": 15790},
+      {"path": "qntylab/jigsaw_external_replication_execution_v0.py", "bytes": 41433},
+      {"path": "qntylab/jigsaw_external_replication_input_materialization_v0.py", "bytes": 17133}
+    ],
+    "deleted_candidate_total_bytes": 91074,
+    "blocked_candidates": {"total": 36, "DELETE_BLOCKED_BY_FROZEN_BINDING": 28, "DELETE_BLOCKED_BY_ACTIVE_USE": 8, "all_present_on_filesystem": true},
+    "pre_deletion_reference_reproof_gate": "GATE_PASS (72/72 cells zero load-bearing; see reference_reproof.json)"
+  },
+  "post": {
+    "measured_at_commit": "5ab39cc29f2f852862071e95e773c2759f8ed4c6",
+    "qntylab_python_modules": 135,
+    "tracked_python_bytes": 5407499,
+    "total_tracked_bytes": 101810659,
+    "total_tracked_files": 4189,
+    "pytest_collection": {"collected": 3701, "collection_errors": 4},
+    "collection_error_kinds": {
+      "ModuleNotFoundError: No module named 'polars'": 3,
+      "ModuleNotFoundError: No module named 'retry'": 1
+    },
+    "collection_error_note": "Same 4 pre-existing, environment-bound errors as at canonical parent; identical kinds, zero new.",
+    "blocked_candidates": {"total": 36, "all_present_on_filesystem": true}
+  },
+  "deltas": {
+    "basis": "canonical parent e826dcb9cc264d1280c91c0bec01e23488fbb9e1 -> candidate commit 5ab39cc29f2f852862071e95e773c2759f8ed4c6",
+    "qntylab_python_modules": "139 -> 135 (exactly the 4 deleted qntylab modules)",
+    "tracked_python_bytes": "5473578 -> 5407499 (delta -66079 = -86329 exactly the four deleted .py files (11973+15790+41433+17133) + 20250 py bytes in the two added C5 python files: reference_reproof_scan.py 14465 + tests/test_qntylab_repository_ergonomics_cleanup_c5_proven_delete_safe_slimming_v0.py 5785)",
+    "total_tracked_bytes": "101786820 -> 101810659 (deleted bytes exactly 91074 = the six deleted files; added/modified C5 evidence bytes offset this, net +23839)",
+    "total_tracked_files": "4175 -> 4189 (deleted files exactly 6; 20 added C5 evidence files, net +14)",
+    "pytest_collection": "3692 collected / 4 errors at canonical parent -> 3701 collected / 4 errors at candidate commit (identical 4 pre-existing errors; +9 = exactly the 9 new C5 structural tests)"
+  },
+  "changelog": [
+    {
+      "date_utc": "2026-09-07",
+      "source": "hostile_review.json finding F1 (MEDIUM): metrics.json post/deltas described the synthetic parent-minus-deletions tree instead of the actual candidate commit tree",
+      "change": "post and deltas corrected to describe the actual candidate commit tree 5ab39cc29f2f852862071e95e773c2759f8ed4c6, independently re-measured with the same space-safe method (git ls-files -z + os.path.getsize): 4189 tracked files / 101810659 total bytes / 5407499 tracked python bytes / 3701 collected / 4 pre-existing collection errors. Root cause: verification/post_metrics_raw.txt had been captured while the six deletions were uncommitted in a parent worktree (its 'git rev-parse HEAD' showed e826dcb9cc264d1280c91c0bec01e23488fbb9e1) and contained a stale contradictory total of 6089113/4169; the original receipt is preserved as verification/post_metrics_raw.synthetic_tree.txt and post_metrics_raw.txt now carries the re-measured candidate-commit values. A measurement_basis field was added distinguishing the synthetic tree from the authoritative candidate commit tree.",
+      "invariants_unchanged": "All load-bearing invariants hold exactly and were not altered: 139->135 qntylab modules, deleted files sum exactly 91074 B, deleted .py sum exactly 86329 B, blocked-36 retained on filesystem, zero new test failures, frozen umbrella governance baseline 133 unchanged."
+    }
+  ]
+}

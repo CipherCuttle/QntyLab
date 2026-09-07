@@ -1,0 +1,3 @@
+blocked count: 36
+present: 36 missing: []
+Counter({'DELETE_BLOCKED_BY_FROZEN_BINDING': 28, 'DELETE_BLOCKED_BY_ACTIVE_USE': 8, 'DELETE_SAFE': 6})

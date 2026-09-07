@@ -1,0 +1,7 @@
+== full-suite base/head comparison ==
+base worktree: git worktree add /tmp/qntylab-c5-base e826dcb9cc264d1280c91c0bec01e23488fbb9e1
+HEAD: 83 failed, 3605 passed, 2 skipped, 15 errors (exit 1)
+BASE: 120 failed, 3538 passed, 2 skipped, 36 errors (exit 1)
+HEAD_NEW_FAILURES=0 HEAD_NEW_ERRORS=0 (comm -23 of LC_ALL=C-sorted FAILED/ERROR lines; head set is a strict subset of base set; base-only extra failures are worktree-location/environment-bound and shrink, not grow, at head)
+delta passed: head-base = 9 = exactly the 9 new C5 structural tests
+collection: identical 3692 + 9 new; identical 4 pre-existing collection errors (3x polars, 1x retry)

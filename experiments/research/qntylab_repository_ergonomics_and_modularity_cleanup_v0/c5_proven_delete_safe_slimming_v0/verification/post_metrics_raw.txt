@@ -1,0 +1,15 @@
+== git rev-parse HEAD ==
+e826dcb9cc264d1280c91c0bec01e23488fbb9e1
+== qntylab module count post ==
+135
+== tracked python bytes post ==
+5387249 total
+== total tracked bytes/files post ==
+6089113 total
+4169
+== pytest collect post ==
+!!!!!!!!!!!!!!!!!!! Interrupted: 4 errors during collection !!!!!!!!!!!!!!!!!!!!
+3692 tests collected, 4 errors in 1.12s
+== pytest collect error kinds post ==
+      3 E   ModuleNotFoundError: No module named 'polars'
+      1 E   ModuleNotFoundError: No module named 'retry'

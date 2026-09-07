@@ -1,0 +1,17 @@
+== git rev-parse HEAD ==
+e826dcb9cc264d1280c91c0bec01e23488fbb9e1
+== six file sizes ==
+ 3360 docs/status/QNTYLAB_DVOL_V0_PHASE1B_EVIDENCE_RETENTION_REPAIR.md
+ 1385 docs/status/QNTYLAB_DVOL_V0_PHASE1B_LIVE_SOURCE_SMOKE.md
+11973 qntylab/jfp03_v0r1_input_materialization.py
+15790 qntylab/jigsaw_cross_sectional_dispersion_execution_v0.py
+41433 qntylab/jigsaw_external_replication_execution_v0.py
+17133 qntylab/jigsaw_external_replication_input_materialization_v0.py
+91074 total
+== qntylab module count ==
+139
+== tracked python bytes ==
+5473578 total
+== total tracked bytes/files ==
+6175732 total
+4175

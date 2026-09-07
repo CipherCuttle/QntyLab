@@ -1,0 +1,93 @@
+{
+  "project_id": "QNTYLAB_PROVEN_DELETE_SAFE_SLIMMING_V0",
+  "phase_id": "PROVEN_DELETE_SAFE_SLIMMING_V0",
+  "increment_id": "C5",
+  "umbrella_project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0",
+  "canonical_phase": "PROVEN_DELETE_SAFE_SLIMMING_V0",
+  "canonical_parent": "e826dcb9cc264d1280c91c0bec01e23488fbb9e1",
+  "branch": "c5-proven-delete-safe-slimming-v0",
+  "forensic_audit_commit": "be291300abb70f3ffc6ba0dd8b1bea570daf5377",
+  "deletion_matrix": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+  "allowed_paths": [
+    "docs/status/QNTYLAB_DVOL_V0_PHASE1B_EVIDENCE_RETENTION_REPAIR.md (deletion only)",
+    "docs/status/QNTYLAB_DVOL_V0_PHASE1B_LIVE_SOURCE_SMOKE.md (deletion only)",
+    "qntylab/jfp03_v0r1_input_materialization.py (deletion only)",
+    "qntylab/jigsaw_cross_sectional_dispersion_execution_v0.py (deletion only)",
+    "qntylab/jigsaw_external_replication_execution_v0.py (deletion only)",
+    "qntylab/jigsaw_external_replication_input_materialization_v0.py (deletion only)",
+    "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c5_proven_delete_safe_slimming_v0/**",
+    "docs/state/projects.toml (C5 registration row only)",
+    "docs/CURRENT_ROADMAP.md (canonical renderer only)",
+    "tests/test_qntylab_repository_ergonomics_cleanup_c5_proven_delete_safe_slimming_v0.py (new C5 structural test only)"
+  ],
+  "deleted_paths": [
+    "docs/status/QNTYLAB_DVOL_V0_PHASE1B_EVIDENCE_RETENTION_REPAIR.md",
+    "docs/status/QNTYLAB_DVOL_V0_PHASE1B_LIVE_SOURCE_SMOKE.md",
+    "qntylab/jfp03_v0r1_input_materialization.py",
+    "qntylab/jigsaw_cross_sectional_dispersion_execution_v0.py",
+    "qntylab/jigsaw_external_replication_execution_v0.py",
+    "qntylab/jigsaw_external_replication_input_materialization_v0.py"
+  ],
+  "deleted_set_count": 6,
+  "deleted_bytes_total": 91074,
+  "deletion_discipline": {
+    "stubs_created": false,
+    "redirects_created": false,
+    "shims_created": false,
+    "archive_moves_created": false,
+    "content_edits_before_deletion": false,
+    "seventh_deletion": false,
+    "substitution": false
+  },
+  "blocked_retained": 36,
+  "blocked_retained_split": {
+    "DELETE_BLOCKED_BY_FROZEN_BINDING": 28,
+    "DELETE_BLOCKED_BY_ACTIVE_USE": 8,
+    "source": "deletion_matrix.json classification_distribution"
+  },
+  "load_blocking_reference_count": 0,
+  "pre_deletion_reference_reproof": {
+    "artifact": "reference_reproof.json",
+    "scanner": "reference_reproof_scan.py",
+    "gate": "GATE_PASS",
+    "cells_checked": 72,
+    "cells_with_load_bearing_hits": 0,
+    "whole_repo_sweep_hit_classification": {
+      "HISTORICAL_FORENSICS_RECORD_NOT_LOAD_BEARING": 18,
+      "GOVERNANCE_AUTHORIZATION_RECORD_NOT_LOAD_BEARING": 6,
+      "SELF_REFERENCE_NOT_LOAD_BEARING": 1
+    },
+    "note": "All textual hits are the forensic matrix/report/raw records, the umbrella decision.json allowed_paths governance record, and one self-reference inside a deleted candidate itself. All must remain untouched; none were touched."
+  },
+  "verification_commands": [
+    "python -m pytest tests/test_qntylab_repository_ergonomics_cleanup_c5_proven_delete_safe_slimming_v0.py tests/test_qntylab_repository_ergonomics_and_modularity_cleanup_decision_v0.py tests/test_project_context_modularization_c2.py -q",
+    "python -m qntylab.project_context doctor --strict",
+    "python -m qntylab.project_context render --check",
+    "python -m qntylab.research_ledger doctor",
+    "python -m pytest -q (full suite; base/head failure-set equivalence via throwaway worktree /tmp/qntylab-c5-base at e826dcb9cc264d1280c91c0bec01e23488fbb9e1)"
+  ],
+  "forbidden_and_respected": {
+    "blocked_36_candidates_touched": false,
+    "docs_forensics_changed": false,
+    "github_changed": false,
+    "pyproject_toml_changed": false,
+    "qntylab_modules_changed_beyond_the_four_deletions": false,
+    "c2_c3_c4_surfaces_modified": false,
+    "existing_tests_modified": false,
+    "research_ledger_semantics_changed": false,
+    "hash_or_reference_checks_weakened": false,
+    "dependency_changes": false
+  },
+  "verification": {
+    "canonical_commands": [
+      "python -m pytest -q",
+      "python -m qntylab.project_context doctor --strict",
+      "python -m qntylab.project_context render --check"
+    ],
+    "raw_receipts_dir": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c5_proven_delete_safe_slimming_v0/verification/"
+  },
+  "notes": "C5 is a proven delete-safe slimming of exactly the six DELETE_SAFE candidates certified by the QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0 deletion matrix, re-proved at the canonical master HEAD immediately before deletion. C5 grants no research, evaluation, execution, claim, or trading authority. The frozen umbrella governance-era module baseline of 133 is recorded in metrics.json as a historical value and is not reconciled against the observed 139->135 counts.",
+  "changelog": [
+    "metrics transcription correction: subtask prose figures 'python bytes 5,473,578 -> 5,461,605' and 'total tracked bytes 6,175,732 over 4,175 files' were corrected by space-safe re-measurement (git ls-files -z + os.path.getsize): pre total 101,786,820 over 4,175 files; post python bytes 5,387,249; total delta exactly -91,074 and module delta exactly 139 -> 135. The intended invariants hold exactly; see metrics.json measurement_method.transcription_correction_note."
+  ]
+}

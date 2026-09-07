@@ -1,0 +1,12 @@
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_research_data_spine_v0.py:7: in <module>
+    import polars as pl
+E   ModuleNotFoundError: No module named 'polars'
+=========================== short test summary info ============================
+ERROR experiments/research/qnty_agent_orchestration_control_contract_v0/dsh_multi_agent_orchestration_stage_a_authorization_v0/fixture/tests/test_retry.py
+ERROR tests/test_jfp_v2_pr_c.py
+ERROR tests/test_jigsaw_harvest_execution_v0.py
+ERROR tests/test_research_data_spine_v0.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 4 errors during collection !!!!!!!!!!!!!!!!!!!!
+3692 tests collected, 4 errors in 1.11s

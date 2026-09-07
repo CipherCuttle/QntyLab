@@ -1,0 +1,9 @@
+== doctor --strict ==
+project context ok
+EXIT:0
+== render --check ==
+roadmap current
+EXIT:0
+== research_ledger doctor ==
+ledger ok
+EXIT:0

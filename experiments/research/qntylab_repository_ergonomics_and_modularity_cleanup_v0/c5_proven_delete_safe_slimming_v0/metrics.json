@@ -1,0 +1,62 @@
+{
+  "project_id": "QNTYLAB_PROVEN_DELETE_SAFE_SLIMMING_V0",
+  "phase_id": "PROVEN_DELETE_SAFE_SLIMMING_V0",
+  "increment_id": "C5",
+  "umbrella_project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0",
+  "canonical_parent": "e826dcb9cc264d1280c91c0bec01e23488fbb9e1",
+  "forensic_audit_commit": "be291300abb70f3ffc6ba0dd8b1bea570daf5377",
+  "measurement_policy": "Observed measurements only, all re-measured on the C5 implementation branch worktree and a throwaway base worktree at the canonical parent (git worktree add /tmp/qntylab-c5-base e826dcb9cc264d1280c91c0bec01e23488fbb9e1). No optimization targets are frozen by C5.",
+  "measurement_method": {
+    "module_count": "ls qntylab/*.py | wc -l",
+    "python_bytes_and_repo_bytes": "python3: git ls-files -z (NUL-delimited, spaces-safe) + os.path.getsize over each tracked file; base values measured inside the throwaway base worktree at the canonical parent",
+    "collection": "python -m pytest --collect-only -q (error kinds via grep of E-lines)",
+    "blocked_presence": "deletion_matrix.json blocked rows checked against the filesystem",
+    "deletion_matrix": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+    "transcription_correction_note": "The subtask prose transcription stated total tracked bytes 6,175,732 over 4,175 files and post python bytes 5,461,605. Reliable space-safe measurement proves the true canonical-parent total is 101,786,820 bytes over 4,175 files and the true post python-bytes figure is 5,387,249 (5,473,578 minus 86,329 = the four deleted .py files). The transcribed 5,461,605 corresponds to removing only jfp03_v0r1_input_materialization.py and is arithmetically inconsistent with the same transcription's own module-count delta (139->135) and total delta (-91,074). Measured values are authoritative; the invariants the transcription intended (module count 139->135, python bytes 5,473,578 pre, total delta exactly -91,074) all hold exactly."
+  },
+  "pre": {
+    "canonical_parent": "e826dcb9cc264d1280c91c0bec01e23488fbb9e1",
+    "qntylab_python_modules": 139,
+    "frozen_umbrella_governance_baseline_module_count": 133,
+    "frozen_baseline_note": "The umbrella decision.json governance-era baseline of 133 qntylab modules is recorded as a frozen historical value; it is NOT expected to equal the observed count and no reconciliation is attempted. Observed count at canonical parent is 139.",
+    "tracked_python_bytes": 5473578,
+    "total_tracked_bytes": 101786820,
+    "total_tracked_files": 4175,
+    "pytest_collection": {"collected": 3692, "collection_errors": 4},
+    "collection_error_kinds": {
+      "ModuleNotFoundError: No module named 'polars'": 3,
+      "ModuleNotFoundError: No module named 'retry'": 1
+    },
+    "collection_error_note": "Pre-existing, environment-bound at canonical parent; proven identical at base worktree and head; not fixed and not hidden by C5.",
+    "deleted_candidate_files": [
+      {"path": "docs/status/QNTYLAB_DVOL_V0_PHASE1B_EVIDENCE_RETENTION_REPAIR.md", "bytes": 3360},
+      {"path": "docs/status/QNTYLAB_DVOL_V0_PHASE1B_LIVE_SOURCE_SMOKE.md", "bytes": 1385},
+      {"path": "qntylab/jfp03_v0r1_input_materialization.py", "bytes": 11973},
+      {"path": "qntylab/jigsaw_cross_sectional_dispersion_execution_v0.py", "bytes": 15790},
+      {"path": "qntylab/jigsaw_external_replication_execution_v0.py", "bytes": 41433},
+      {"path": "qntylab/jigsaw_external_replication_input_materialization_v0.py", "bytes": 17133}
+    ],
+    "deleted_candidate_total_bytes": 91074,
+    "blocked_candidates": {"total": 36, "DELETE_BLOCKED_BY_FROZEN_BINDING": 28, "DELETE_BLOCKED_BY_ACTIVE_USE": 8, "all_present_on_filesystem": true},
+    "pre_deletion_reference_reproof_gate": "GATE_PASS (72/72 cells zero load-bearing; see reference_reproof.json)"
+  },
+  "post": {
+    "qntylab_python_modules": 135,
+    "tracked_python_bytes": 5387249,
+    "total_tracked_bytes": 101695746,
+    "total_tracked_files": 4169,
+    "pytest_collection": {"collected": 3692, "collection_errors": 4},
+    "collection_error_kinds": {
+      "ModuleNotFoundError: No module named 'polars'": 3,
+      "ModuleNotFoundError: No module named 'retry'": 1
+    },
+    "blocked_candidates": {"total": 36, "all_present_on_filesystem": true}
+  },
+  "deltas": {
+    "qntylab_python_modules": "139 -> 135 (exactly the 4 deleted qntylab modules)",
+    "tracked_python_bytes": "5473578 -> 5387249 (delta -86329 = exactly the four deleted .py files: 11973+15790+41433+17133)",
+    "total_tracked_bytes": "101786820 -> 101695746 (delta exactly -91074 = the six deleted files)",
+    "total_tracked_files": "4175 -> 4169 (delta exactly -6)",
+    "pytest_collection": "3692 collected / 4 errors -> 3692 collected / 4 errors (identical; zero new)"
+  }
+}

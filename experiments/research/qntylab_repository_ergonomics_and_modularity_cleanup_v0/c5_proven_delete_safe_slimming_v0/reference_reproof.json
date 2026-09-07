@@ -1,0 +1,639 @@
+{
+  "scanner": "c5_reference_reproof_scan",
+  "canonical_head": "e826dcb9cc264d1280c91c0bec01e23488fbb9e1",
+  "forensic_audit_commit": "be291300abb70f3ffc6ba0dd8b1bea570daf5377",
+  "worktree_equals_head_assertion": {
+    "command": "git status --porcelain",
+    "dirty_entries": [
+      "?? experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c5_proven_delete_safe_slimming_v0/"
+    ],
+    "clean": false
+  },
+  "candidates": [
+    "docs/status/QNTYLAB_DVOL_V0_PHASE1B_EVIDENCE_RETENTION_REPAIR.md",
+    "docs/status/QNTYLAB_DVOL_V0_PHASE1B_LIVE_SOURCE_SMOKE.md",
+    "qntylab/jfp03_v0r1_input_materialization.py",
+    "qntylab/jigsaw_cross_sectional_dispersion_execution_v0.py",
+    "qntylab/jigsaw_external_replication_execution_v0.py",
+    "qntylab/jigsaw_external_replication_input_materialization_v0.py"
+  ],
+  "categories": [
+    "PYTHON_IMPORT_REFERENCES",
+    "DOCSTRING_PROSE_REFERENCES",
+    "TEST_REFERENCES",
+    "PROJECT_REGISTRY_REFERENCES",
+    "AUTHORITATIVE_ARTIFACT_REFERENCES",
+    "HASH_BINDINGS",
+    "PREREGISTRATION_BINDINGS",
+    "CLOSURE_REFERENCES",
+    "ADR_REFERENCES",
+    "RESEARCH_LEDGER_REFERENCES",
+    "CI_REFERENCES",
+    "GENERATED_VIEW_REFERENCES"
+  ],
+  "cells": {
+    "docs/status/QNTYLAB_DVOL_V0_PHASE1B_EVIDENCE_RETENTION_REPAIR.md": {
+      "PYTHON_IMPORT_REFERENCES": {
+        "command": "git grep -I -l -e 'QNTYLAB_DVOL_V0_PHASE1B_EVIDENCE_RETENTION_REPAIR.md' e826dcb9cc26 -- qntylab/ (self excluded)",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "DOCSTRING_PROSE_REFERENCES": {
+        "command": "git grep -I -l -e 'QNTYLAB_DVOL_V0_PHASE1B_EVIDENCE_RETENTION_REPAIR.md' e826dcb9cc26 -- qntylab/ (self excluded)",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "TEST_REFERENCES": {
+        "command": "git grep -I -l -e 'QNTYLAB_DVOL_V0_PHASE1B_EVIDENCE_RETENTION_REPAIR.md' e826dcb9cc26 -- tests/",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "PROJECT_REGISTRY_REFERENCES": {
+        "command": "grep stem docs/state/projects.toml docs/state/ecosystem.toml",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "AUTHORITATIVE_ARTIFACT_REFERENCES": {
+        "command": "quoted-string scan of docs/state/projects.toml + docs/state/ecosystem.toml",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "HASH_BINDINGS": {
+        "command": "64-hex hash-line binding scan across docs/state/**",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "PREREGISTRATION_BINDINGS": {
+        "command": "prereg filename/content scan over experiments/research/**",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "CLOSURE_REFERENCES": {
+        "command": "closure-filename scan over experiments/research/**",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "ADR_REFERENCES": {
+        "command": "git grep -I -l -e 'QNTYLAB_DVOL_V0_PHASE1B_EVIDENCE_RETENTION_REPAIR.md' e826dcb9cc26 -- docs/ADR/",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "RESEARCH_LEDGER_REFERENCES": {
+        "command": "grep stem experiments/research/decisions.jsonl + experiments/research/ledger/**",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "CI_REFERENCES": {
+        "command": "git grep -I -l -e 'QNTYLAB_DVOL_V0_PHASE1B_EVIDENCE_RETENTION_REPAIR.md' e826dcb9cc26 -- .github/ ops/",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "GENERATED_VIEW_REFERENCES": {
+        "command": "grep stem docs/state/** + docs/CURRENT_ROADMAP.md",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "_load_bearing_cells": [],
+      "_load_bearing_sweep_paths": []
+    },
+    "docs/status/QNTYLAB_DVOL_V0_PHASE1B_LIVE_SOURCE_SMOKE.md": {
+      "PYTHON_IMPORT_REFERENCES": {
+        "command": "git grep -I -l -e 'QNTYLAB_DVOL_V0_PHASE1B_LIVE_SOURCE_SMOKE.md' e826dcb9cc26 -- qntylab/ (self excluded)",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "DOCSTRING_PROSE_REFERENCES": {
+        "command": "git grep -I -l -e 'QNTYLAB_DVOL_V0_PHASE1B_LIVE_SOURCE_SMOKE.md' e826dcb9cc26 -- qntylab/ (self excluded)",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "TEST_REFERENCES": {
+        "command": "git grep -I -l -e 'QNTYLAB_DVOL_V0_PHASE1B_LIVE_SOURCE_SMOKE.md' e826dcb9cc26 -- tests/",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "PROJECT_REGISTRY_REFERENCES": {
+        "command": "grep stem docs/state/projects.toml docs/state/ecosystem.toml",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "AUTHORITATIVE_ARTIFACT_REFERENCES": {
+        "command": "quoted-string scan of docs/state/projects.toml + docs/state/ecosystem.toml",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "HASH_BINDINGS": {
+        "command": "64-hex hash-line binding scan across docs/state/**",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "PREREGISTRATION_BINDINGS": {
+        "command": "prereg filename/content scan over experiments/research/**",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "CLOSURE_REFERENCES": {
+        "command": "closure-filename scan over experiments/research/**",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "ADR_REFERENCES": {
+        "command": "git grep -I -l -e 'QNTYLAB_DVOL_V0_PHASE1B_LIVE_SOURCE_SMOKE.md' e826dcb9cc26 -- docs/ADR/",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "RESEARCH_LEDGER_REFERENCES": {
+        "command": "grep stem experiments/research/decisions.jsonl + experiments/research/ledger/**",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "CI_REFERENCES": {
+        "command": "git grep -I -l -e 'QNTYLAB_DVOL_V0_PHASE1B_LIVE_SOURCE_SMOKE.md' e826dcb9cc26 -- .github/ ops/",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "GENERATED_VIEW_REFERENCES": {
+        "command": "grep stem docs/state/** + docs/CURRENT_ROADMAP.md",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "_load_bearing_cells": [],
+      "_load_bearing_sweep_paths": []
+    },
+    "qntylab/jfp03_v0r1_input_materialization.py": {
+      "PYTHON_IMPORT_REFERENCES": {
+        "command": "git grep -I -l -e 'jfp03_v0r1_input_materialization' e826dcb9cc26 -- qntylab/ (self excluded)",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "DOCSTRING_PROSE_REFERENCES": {
+        "command": "git grep -I -l -e 'jfp03_v0r1_input_materialization' e826dcb9cc26 -- qntylab/ (self excluded)",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "TEST_REFERENCES": {
+        "command": "git grep -I -l -e 'jfp03_v0r1_input_materialization' e826dcb9cc26 -- tests/",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "PROJECT_REGISTRY_REFERENCES": {
+        "command": "grep stem docs/state/projects.toml docs/state/ecosystem.toml",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "AUTHORITATIVE_ARTIFACT_REFERENCES": {
+        "command": "quoted-string scan of docs/state/projects.toml + docs/state/ecosystem.toml",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "HASH_BINDINGS": {
+        "command": "64-hex hash-line binding scan across docs/state/**",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "PREREGISTRATION_BINDINGS": {
+        "command": "prereg filename/content scan over experiments/research/**",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "CLOSURE_REFERENCES": {
+        "command": "closure-filename scan over experiments/research/**",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "ADR_REFERENCES": {
+        "command": "git grep -I -l -e 'jfp03_v0r1_input_materialization' e826dcb9cc26 -- docs/ADR/",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "RESEARCH_LEDGER_REFERENCES": {
+        "command": "grep stem experiments/research/decisions.jsonl + experiments/research/ledger/**",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "CI_REFERENCES": {
+        "command": "git grep -I -l -e 'jfp03_v0r1_input_materialization' e826dcb9cc26 -- .github/ ops/",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "GENERATED_VIEW_REFERENCES": {
+        "command": "grep stem docs/state/** + docs/CURRENT_ROADMAP.md",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "_load_bearing_cells": [],
+      "_load_bearing_sweep_paths": []
+    },
+    "qntylab/jigsaw_cross_sectional_dispersion_execution_v0.py": {
+      "PYTHON_IMPORT_REFERENCES": {
+        "command": "git grep -I -l -e 'jigsaw_cross_sectional_dispersion_execution_v0' e826dcb9cc26 -- qntylab/ (self excluded)",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "DOCSTRING_PROSE_REFERENCES": {
+        "command": "git grep -I -l -e 'jigsaw_cross_sectional_dispersion_execution_v0' e826dcb9cc26 -- qntylab/ (self excluded)",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "TEST_REFERENCES": {
+        "command": "git grep -I -l -e 'jigsaw_cross_sectional_dispersion_execution_v0' e826dcb9cc26 -- tests/",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "PROJECT_REGISTRY_REFERENCES": {
+        "command": "grep stem docs/state/projects.toml docs/state/ecosystem.toml",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "AUTHORITATIVE_ARTIFACT_REFERENCES": {
+        "command": "quoted-string scan of docs/state/projects.toml + docs/state/ecosystem.toml",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "HASH_BINDINGS": {
+        "command": "64-hex hash-line binding scan across docs/state/**",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "PREREGISTRATION_BINDINGS": {
+        "command": "prereg filename/content scan over experiments/research/**",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "CLOSURE_REFERENCES": {
+        "command": "closure-filename scan over experiments/research/**",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "ADR_REFERENCES": {
+        "command": "git grep -I -l -e 'jigsaw_cross_sectional_dispersion_execution_v0' e826dcb9cc26 -- docs/ADR/",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "RESEARCH_LEDGER_REFERENCES": {
+        "command": "grep stem experiments/research/decisions.jsonl + experiments/research/ledger/**",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "CI_REFERENCES": {
+        "command": "git grep -I -l -e 'jigsaw_cross_sectional_dispersion_execution_v0' e826dcb9cc26 -- .github/ ops/",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "GENERATED_VIEW_REFERENCES": {
+        "command": "grep stem docs/state/** + docs/CURRENT_ROADMAP.md",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "_load_bearing_cells": [],
+      "_load_bearing_sweep_paths": []
+    },
+    "qntylab/jigsaw_external_replication_execution_v0.py": {
+      "PYTHON_IMPORT_REFERENCES": {
+        "command": "git grep -I -l -e 'jigsaw_external_replication_execution_v0' e826dcb9cc26 -- qntylab/ (self excluded)",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "DOCSTRING_PROSE_REFERENCES": {
+        "command": "git grep -I -l -e 'jigsaw_external_replication_execution_v0' e826dcb9cc26 -- qntylab/ (self excluded)",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "TEST_REFERENCES": {
+        "command": "git grep -I -l -e 'jigsaw_external_replication_execution_v0' e826dcb9cc26 -- tests/",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "PROJECT_REGISTRY_REFERENCES": {
+        "command": "grep stem docs/state/projects.toml docs/state/ecosystem.toml",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "AUTHORITATIVE_ARTIFACT_REFERENCES": {
+        "command": "quoted-string scan of docs/state/projects.toml + docs/state/ecosystem.toml",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "HASH_BINDINGS": {
+        "command": "64-hex hash-line binding scan across docs/state/**",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "PREREGISTRATION_BINDINGS": {
+        "command": "prereg filename/content scan over experiments/research/**",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "CLOSURE_REFERENCES": {
+        "command": "closure-filename scan over experiments/research/**",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "ADR_REFERENCES": {
+        "command": "git grep -I -l -e 'jigsaw_external_replication_execution_v0' e826dcb9cc26 -- docs/ADR/",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "RESEARCH_LEDGER_REFERENCES": {
+        "command": "grep stem experiments/research/decisions.jsonl + experiments/research/ledger/**",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "CI_REFERENCES": {
+        "command": "git grep -I -l -e 'jigsaw_external_replication_execution_v0' e826dcb9cc26 -- .github/ ops/",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "GENERATED_VIEW_REFERENCES": {
+        "command": "grep stem docs/state/** + docs/CURRENT_ROADMAP.md",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "_load_bearing_cells": [],
+      "_load_bearing_sweep_paths": []
+    },
+    "qntylab/jigsaw_external_replication_input_materialization_v0.py": {
+      "PYTHON_IMPORT_REFERENCES": {
+        "command": "git grep -I -l -e 'jigsaw_external_replication_input_materialization_v0' e826dcb9cc26 -- qntylab/ (self excluded)",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "DOCSTRING_PROSE_REFERENCES": {
+        "command": "git grep -I -l -e 'jigsaw_external_replication_input_materialization_v0' e826dcb9cc26 -- qntylab/ (self excluded)",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "TEST_REFERENCES": {
+        "command": "git grep -I -l -e 'jigsaw_external_replication_input_materialization_v0' e826dcb9cc26 -- tests/",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "PROJECT_REGISTRY_REFERENCES": {
+        "command": "grep stem docs/state/projects.toml docs/state/ecosystem.toml",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "AUTHORITATIVE_ARTIFACT_REFERENCES": {
+        "command": "quoted-string scan of docs/state/projects.toml + docs/state/ecosystem.toml",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "HASH_BINDINGS": {
+        "command": "64-hex hash-line binding scan across docs/state/**",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "PREREGISTRATION_BINDINGS": {
+        "command": "prereg filename/content scan over experiments/research/**",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "CLOSURE_REFERENCES": {
+        "command": "closure-filename scan over experiments/research/**",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "ADR_REFERENCES": {
+        "command": "git grep -I -l -e 'jigsaw_external_replication_input_materialization_v0' e826dcb9cc26 -- docs/ADR/",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "RESEARCH_LEDGER_REFERENCES": {
+        "command": "grep stem experiments/research/decisions.jsonl + experiments/research/ledger/**",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "CI_REFERENCES": {
+        "command": "git grep -I -l -e 'jigsaw_external_replication_input_materialization_v0' e826dcb9cc26 -- .github/ ops/",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "GENERATED_VIEW_REFERENCES": {
+        "command": "grep stem docs/state/** + docs/CURRENT_ROADMAP.md",
+        "count": 0,
+        "evidence_paths": []
+      },
+      "_load_bearing_cells": [],
+      "_load_bearing_sweep_paths": []
+    }
+  },
+  "whole_repo_sweep": {
+    "docs/status/QNTYLAB_DVOL_V0_PHASE1B_EVIDENCE_RETENTION_REPAIR.md": [
+      {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "terms": [
+          "QNTYLAB_DVOL_V0_PHASE1B_EVIDENCE_RETENTION_REPAIR.md"
+        ],
+        "classification": "HISTORICAL_FORENSICS_RECORD_NOT_LOAD_BEARING"
+      },
+      {
+        "path": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/decision.json",
+        "terms": [
+          "QNTYLAB_DVOL_V0_PHASE1B_EVIDENCE_RETENTION_REPAIR.md"
+        ],
+        "classification": "GOVERNANCE_AUTHORIZATION_RECORD_NOT_LOAD_BEARING"
+      }
+    ],
+    "docs/status/QNTYLAB_DVOL_V0_PHASE1B_LIVE_SOURCE_SMOKE.md": [
+      {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "terms": [
+          "QNTYLAB_DVOL_V0_PHASE1B_LIVE_SOURCE_SMOKE.md"
+        ],
+        "classification": "HISTORICAL_FORENSICS_RECORD_NOT_LOAD_BEARING"
+      },
+      {
+        "path": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/decision.json",
+        "terms": [
+          "QNTYLAB_DVOL_V0_PHASE1B_LIVE_SOURCE_SMOKE.md"
+        ],
+        "classification": "GOVERNANCE_AUTHORIZATION_RECORD_NOT_LOAD_BEARING"
+      }
+    ],
+    "qntylab/jfp03_v0r1_input_materialization.py": [
+      {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "terms": [
+          "jfp03_v0r1_input_materialization",
+          "jfp03_v0r1_input_materialization.py"
+        ],
+        "classification": "HISTORICAL_FORENSICS_RECORD_NOT_LOAD_BEARING"
+      },
+      {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/raw/module_inventory.json",
+        "terms": [
+          "jfp03_v0r1_input_materialization",
+          "jfp03_v0r1_input_materialization.py"
+        ],
+        "classification": "HISTORICAL_FORENSICS_RECORD_NOT_LOAD_BEARING"
+      },
+      {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/report.md",
+        "terms": [
+          "jfp03_v0r1_input_materialization",
+          "jfp03_v0r1_input_materialization.py"
+        ],
+        "classification": "HISTORICAL_FORENSICS_RECORD_NOT_LOAD_BEARING"
+      },
+      {
+        "path": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/decision.json",
+        "terms": [
+          "jfp03_v0r1_input_materialization",
+          "jfp03_v0r1_input_materialization.py"
+        ],
+        "classification": "GOVERNANCE_AUTHORIZATION_RECORD_NOT_LOAD_BEARING"
+      }
+    ],
+    "qntylab/jigsaw_cross_sectional_dispersion_execution_v0.py": [
+      {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "terms": [
+          "jigsaw_cross_sectional_dispersion_execution_v0",
+          "jigsaw_cross_sectional_dispersion_execution_v0.py"
+        ],
+        "classification": "HISTORICAL_FORENSICS_RECORD_NOT_LOAD_BEARING"
+      },
+      {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/raw/module_inventory.json",
+        "terms": [
+          "jigsaw_cross_sectional_dispersion_execution_v0",
+          "jigsaw_cross_sectional_dispersion_execution_v0.py"
+        ],
+        "classification": "HISTORICAL_FORENSICS_RECORD_NOT_LOAD_BEARING"
+      },
+      {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/report.md",
+        "terms": [
+          "jigsaw_cross_sectional_dispersion_execution_v0",
+          "jigsaw_cross_sectional_dispersion_execution_v0.py"
+        ],
+        "classification": "HISTORICAL_FORENSICS_RECORD_NOT_LOAD_BEARING"
+      },
+      {
+        "path": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/decision.json",
+        "terms": [
+          "jigsaw_cross_sectional_dispersion_execution_v0",
+          "jigsaw_cross_sectional_dispersion_execution_v0.py"
+        ],
+        "classification": "GOVERNANCE_AUTHORIZATION_RECORD_NOT_LOAD_BEARING"
+      }
+    ],
+    "qntylab/jigsaw_external_replication_execution_v0.py": [
+      {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "terms": [
+          "jigsaw_external_replication_execution_v0",
+          "jigsaw_external_replication_execution_v0.py"
+        ],
+        "classification": "HISTORICAL_FORENSICS_RECORD_NOT_LOAD_BEARING"
+      },
+      {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/inventory.json",
+        "terms": [
+          "jigsaw_external_replication_execution_v0"
+        ],
+        "classification": "HISTORICAL_FORENSICS_RECORD_NOT_LOAD_BEARING"
+      },
+      {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/raw/module_inventory.json",
+        "terms": [
+          "jigsaw_external_replication_execution_v0",
+          "jigsaw_external_replication_execution_v0.py"
+        ],
+        "classification": "HISTORICAL_FORENSICS_RECORD_NOT_LOAD_BEARING"
+      },
+      {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/raw/repo_byte_weight.json",
+        "terms": [
+          "jigsaw_external_replication_execution_v0"
+        ],
+        "classification": "HISTORICAL_FORENSICS_RECORD_NOT_LOAD_BEARING"
+      },
+      {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/report.md",
+        "terms": [
+          "jigsaw_external_replication_execution_v0",
+          "jigsaw_external_replication_execution_v0.py"
+        ],
+        "classification": "HISTORICAL_FORENSICS_RECORD_NOT_LOAD_BEARING"
+      },
+      {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/synthesize.py",
+        "terms": [
+          "jigsaw_external_replication_execution_v0"
+        ],
+        "classification": "HISTORICAL_FORENSICS_RECORD_NOT_LOAD_BEARING"
+      },
+      {
+        "path": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/decision.json",
+        "terms": [
+          "jigsaw_external_replication_execution_v0",
+          "jigsaw_external_replication_execution_v0.py"
+        ],
+        "classification": "GOVERNANCE_AUTHORIZATION_RECORD_NOT_LOAD_BEARING"
+      }
+    ],
+    "qntylab/jigsaw_external_replication_input_materialization_v0.py": [
+      {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/deletion_matrix.json",
+        "terms": [
+          "jigsaw_external_replication_input_materialization_v0",
+          "jigsaw_external_replication_input_materialization_v0.py"
+        ],
+        "classification": "HISTORICAL_FORENSICS_RECORD_NOT_LOAD_BEARING"
+      },
+      {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/raw/module_inventory.json",
+        "terms": [
+          "jigsaw_external_replication_input_materialization_v0",
+          "jigsaw_external_replication_input_materialization_v0.py"
+        ],
+        "classification": "HISTORICAL_FORENSICS_RECORD_NOT_LOAD_BEARING"
+      },
+      {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/raw/repo_byte_weight.json",
+        "terms": [
+          "jigsaw_external_replication_input_materialization_v0"
+        ],
+        "classification": "HISTORICAL_FORENSICS_RECORD_NOT_LOAD_BEARING"
+      },
+      {
+        "path": "docs/forensics/QNTYLAB_REPOSITORY_FITNESS_AND_UPSTREAM_CONTRACT_FORENSICS_V0/report.md",
+        "terms": [
+          "jigsaw_external_replication_input_materialization_v0",
+          "jigsaw_external_replication_input_materialization_v0.py"
+        ],
+        "classification": "HISTORICAL_FORENSICS_RECORD_NOT_LOAD_BEARING"
+      },
+      {
+        "path": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/decision.json",
+        "terms": [
+          "jigsaw_external_replication_input_materialization_v0",
+          "jigsaw_external_replication_input_materialization_v0.py"
+        ],
+        "classification": "GOVERNANCE_AUTHORIZATION_RECORD_NOT_LOAD_BEARING"
+      },
+      {
+        "path": "qntylab/jigsaw_external_replication_input_materialization_v0.py",
+        "terms": [
+          "jigsaw_external_replication_input_materialization_v0"
+        ],
+        "classification": "SELF_REFERENCE_NOT_LOAD_BEARING"
+      }
+    ]
+  },
+  "research_ledger_context_grep": {
+    "command": "python -m qntylab.research_ledger context | grep stem",
+    "exit_code": 0,
+    "hits": {
+      "docs/status/QNTYLAB_DVOL_V0_PHASE1B_EVIDENCE_RETENTION_REPAIR.md": [],
+      "docs/status/QNTYLAB_DVOL_V0_PHASE1B_LIVE_SOURCE_SMOKE.md": [],
+      "qntylab/jfp03_v0r1_input_materialization.py": [],
+      "qntylab/jigsaw_cross_sectional_dispersion_execution_v0.py": [],
+      "qntylab/jigsaw_external_replication_execution_v0.py": [],
+      "qntylab/jigsaw_external_replication_input_materialization_v0.py": []
+    }
+  },
+  "total_load_bearing": 0,
+  "verdict": "GATE_PASS"
+}

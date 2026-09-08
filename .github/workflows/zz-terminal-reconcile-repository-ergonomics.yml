@@ -36,12 +36,11 @@ jobs:
           text = REGISTRY.read_text(encoding="utf-8")
 
           def block_bounds(source: str, project_id: str) -> tuple[int, int]:
-              marker = f'project_id = "{project_id}"'
-              pos = source.find(marker)
-              if pos < 0:
-                  raise AssertionError(f"missing project row: {project_id}")
-              if source.find(marker, pos + 1) >= 0:
-                  raise AssertionError(f"duplicate project row: {project_id}")
+              pattern = re.compile(rf'(?m)^project_id = "{re.escape(project_id)}"$')
+              matches = list(pattern.finditer(source))
+              if len(matches) != 1:
+                  raise AssertionError(f"expected one exact project row for {project_id}, got {len(matches)}")
+              pos = matches[0].start()
               start = source.rfind("[[project]]", 0, pos)
               end = source.find("\n[[project]]", pos)
               if start < 0:
@@ -75,8 +74,12 @@ jobs:
               for key, (after_key, value) in add_after.items():
                   if re.search(rf"(?m)^{re.escape(key)} = ", block):
                       raise AssertionError(f"{project_id}: field already exists: {key}")
-                  anchor = re.compile(rf"(?m)^({re.escape(after_key)} = .*?)$")
-                  block, count = anchor.subn(rf"\1\n{key} = {render_value(value)}", block, count=1)
+                  anchor = re.compile(rf"(?m)^{re.escape(after_key)} = .*?$")
+                  block, count = anchor.subn(
+                      lambda match: match.group(0) + f"\n{key} = {render_value(value)}",
+                      block,
+                      count=1,
+                  )
                   if count != 1:
                       raise AssertionError(f"{project_id}: cannot insert {key} after {after_key}")
               text = text[:start] + block + text[end:]
@@ -204,7 +207,6 @@ jobs:
 
               mutate(project_id, expect=expect, set_fields=set_fields, add_after=add_after)
 
-          # Parse after mutation before touching disk.
           parsed = tomllib.loads(text)
           rows = {row["project_id"]: row for row in parsed["project"]}
           assert rows[umbrella]["completed_increment_count"] == 6
@@ -247,8 +249,6 @@ jobs:
                   raise AssertionError(f"decision test replacement count {count} for {old[:80]!r}")
               test_text = test_text.replace(old, new, 1)
 
-          insert_anchor = 'EXPECTED_INCREMENT_PHASE_IDS = {\n'
-          # Add canonical merge truth table immediately before EXPECTED_EDGES, keeping frozen decision constants separate.
           edge_anchor = 'EXPECTED_EDGES = {\n'
           merge_table = (
               'EXPECTED_CANONICAL_INCREMENT_MERGES = {\n'

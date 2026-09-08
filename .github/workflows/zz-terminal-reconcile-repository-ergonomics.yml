@@ -18,7 +18,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: python -m pip install pytest requests
+      - run: python -m pip install pytest requests pyyaml
       - name: Reconcile frozen-history projection into live canonical registry
         shell: bash
         run: |

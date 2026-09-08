@@ -24,6 +24,14 @@ EXPECTED_INCREMENT_PHASE_IDS = {
     "PROVEN_DELETE_SAFE_SLIMMING_V0",
     "REPOSITORY_ERGONOMICS_FITNESS_FUNCTIONS_V0",
 }
+EXPECTED_CANONICAL_INCREMENT_MERGES = {
+    "QNTYLAB_AGENT_CONTEXT_PACKET_V0": (248, "78f3ca1b3566e9ea3d138796b7ce50e224c9e45a"),
+    "QNTYLAB_PROJECT_CONTEXT_MODULARIZATION_V0": (250, "fba39dfac8affe0078d1362dd5bf52ed7f073ca6"),
+    "QNTYLAB_DEV_LOOP_CI_SPLIT_V0": (251, "789e199b373ccd1b7a4e3c6df1fc55989f1c466d"),
+    "QNTYLAB_PYTHON_TOOLING_NORMALIZATION_V0": (252, "e826dcb9cc264d1280c91c0bec01e23488fbb9e1"),
+    "QNTYLAB_PROVEN_DELETE_SAFE_SLIMMING_V0": (253, "afe55150da1947b78f8e41dd7c08fdbea2c4cee9"),
+    "QNTYLAB_REPOSITORY_ERGONOMICS_FITNESS_FUNCTIONS_V0": (254, "8a0d09c508144c178da358466243b83586468d9a"),
+}
 EXPECTED_EDGES = {
     ("C1", "C2"),
     ("C1", "C3"),
@@ -170,6 +178,17 @@ def test_dependency_graph() -> None:
     assert graph["terminal_increment"] == "C6"
 
 
+def test_all_six_increment_merges_are_canonicalized() -> None:
+    for project_id, (pr_number, merge_sha) in EXPECTED_CANONICAL_INCREMENT_MERGES.items():
+        record = _record(project_id)
+        assert record["state"] == "CLOSED_PASS"
+        assert record["canonicalization_status"] == "EXACT_CANONICAL_MERGE_VERIFIED"
+        assert record["canonical_merge"] == merge_sha
+        assert record["canonical_merge_pr"] == pr_number
+        assert "READY_FOR_MERGE" not in record["terminal_outcome"]
+        assert "PENDING" not in record["next_action"]
+
+
 def test_forbidden_operations_present() -> None:
     decision = _decision()
     out_of_scope = decision["out_of_scope"]
@@ -248,7 +267,7 @@ def test_registry_entry_consistency() -> None:
     live_sha256 = hashlib.sha256(DECISION_PATH.read_bytes()).hexdigest()
     assert live_sha256 == record["decision_artifact_sha256"]
     assert record["candidate_state"] == "CANONICAL_GOVERNANCE_DECISION"
-    assert record["canonicalization_status"] == "NOT_CANONICALIZED"
+    assert record["canonicalization_status"] == "EXACT_CANONICAL_MERGE_VERIFIED"
     assert record["authorized_implementation_increment_count"] == 6
     assert record["first_implementation_increment"] == FIRST_IMPLEMENTATION
     assert record["scientific_evaluation_phases_authorized"] == 0
@@ -277,7 +296,7 @@ def test_registry_entry_consistency() -> None:
     assert record["critical_high_rereviews_used"] == 1
     assert record["unresolved_critical"] == 0
     assert record["unresolved_high"] == 0
-    assert record["next_action"] == "IMPLEMENT_QNTYLAB_AGENT_CONTEXT_PACKET_V0"
+    assert "no C7" in record["next_action"]
     assert record["canonical_parent"] == decision["canonical_parent"] == CANONICAL_PARENT
 
 
@@ -499,7 +518,7 @@ def test_registry_lifecycle_consistency() -> None:
     assert record["critical_high_rereviews_used"] == 1
     assert record["unresolved_critical"] == 0
     assert record["unresolved_high"] == 0
-    assert record["next_action"] == "IMPLEMENT_QNTYLAB_AGENT_CONTEXT_PACKET_V0"
+    assert "no C7" in record["next_action"]
     assert record["state"] == "CLOSED_PASS"
     assert record["decision_state"] == "CLOSED_PASS"
     live_sha256 = hashlib.sha256(DECISION_PATH.read_bytes()).hexdigest()
@@ -517,13 +536,20 @@ def test_authorized_increment_count_is_six() -> None:
     assert {inc["phase_id"] for inc in increments} == EXPECTED_INCREMENT_PHASE_IDS
 
 
-def test_c1_not_started() -> None:
-    # C1_IMPLEMENTATION_PRESENT = NO: no C1 implementation artifacts exist.
-    assert not (ROOT / "qntylab/agent_context_packet_v0.py").exists()
-    assert not (ROOT / "tests/test_qntylab_agent_context_packet_v0.py").exists()
+def test_frozen_decision_history_is_not_live_registry_state() -> None:
+    # Frozen decision provenance retains the original C1-start instruction.
+    # Live registry state records the now-completed six-increment program.
+    assert (ROOT / "qntylab/agent_context_packet_v0.py").is_file()
+    assert (ROOT / "tests/test_qntylab_agent_context_packet_v0.py").is_file()
     decision = _decision()
     assert decision["next_action"] == "IMPLEMENT_QNTYLAB_AGENT_CONTEXT_PACKET_V0"
     assert decision["c1_authorized"] is True
+    record = _record(PROJECT_ID)
+    assert record["completed_increment_count"] == 6
+    assert record["terminal_increment_project_id"] == "QNTYLAB_REPOSITORY_ERGONOMICS_FITNESS_FUNCTIONS_V0"
+    assert record["terminal_increment_canonical_merge"] == "8a0d09c508144c178da358466243b83586468d9a"
+    assert record["terminal_increment_canonical_merge_pr"] == 254
+    assert record["terminal_outcome"] == "ALL_SIX_AUTHORIZED_INCREMENT_MERGES_CANONICAL_NO_C7"
 
 
 def test_scientific_authority_remains_none() -> None:

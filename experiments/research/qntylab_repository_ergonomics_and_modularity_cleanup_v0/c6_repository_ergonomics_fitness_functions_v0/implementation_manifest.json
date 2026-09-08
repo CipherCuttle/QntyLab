@@ -1,0 +1,43 @@
+{
+  "artifact_type": "C6_IMPLEMENTATION_MANIFEST",
+  "project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_FITNESS_FUNCTIONS_V0",
+  "phase_id": "REPOSITORY_ERGONOMICS_FITNESS_FUNCTIONS_V0",
+  "increment_id": "C6",
+  "umbrella_project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0",
+  "branch": "c6-repository-ergonomics-fitness-functions-v0",
+  "canonical_parent": "afe55150da1947b78f8e41dd7c08fdbea2c4cee9",
+  "objective": "Fail-closed executable pytest fitness functions permanently enforcing C1-C5 gains. TESTS + EVIDENCE ONLY.",
+  "allowed_surface_used": {
+    "tests": [
+      "tests/test_qntylab_repository_ergonomics_fitness_functions_v0.py"
+    ],
+    "evidence_dir": "experiments/research/qntylab_repository_ergonomics_and_modularity_cleanup_v0/c6_repository_ergonomics_fitness_functions_v0/",
+    "evidence_files": [
+      "frozen_hash_manifest.json",
+      "metrics.json",
+      "fitness_manifest.json",
+      "implementation_manifest.json",
+      "full_suite_verification_receipt.json"
+    ],
+    "registry_row": "docs/state/projects.toml (one C6 row)",
+    "roadmap": "docs/CURRENT_ROADMAP.md regenerated only via python -m qntylab.project_context render"
+  },
+  "forbidden_surface_untouched": [
+    "qntylab/**",
+    ".github/**",
+    "pyproject.toml",
+    "docs/forensics/**",
+    "decision.json",
+    "C1-C5 artifacts",
+    "existing tests",
+    "dependencies",
+    "frozen/hash-bound bytes"
+  ],
+  "design_notes": [
+    "Single coherent suite; helpers are pure functions over explicit roots/paths so negative controls run in tmp_path without touching the worktree.",
+    "POINTERS_OVER_COPIES: frozen_hash_manifest.json records authoritative sha256 values + declaring_authority pointers; no file copies.",
+    "No percentage or wall-time targets asserted; CI shape frozen as STRUCTURAL_POSTCONDITION.",
+    "Stale pre-repair C2 digests deliberately not asserted; only the four still-valid digests are bound.",
+    "Canonical loaders reused (load_context_sources/validate_projects_registry); no second projects.toml parser."
+  ]
+}

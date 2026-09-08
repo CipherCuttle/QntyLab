@@ -1,0 +1,111 @@
+{
+  "review_identity": {
+    "role": "SINGLE_INDEPENDENT_HOSTILE_REVIEWER",
+    "reviewer": "Zoo (independent hostile reviewer)",
+    "reviewer_mode": "independent-hostile-review (ask-mode subtask)",
+    "review_date_utc": "2026-09-08",
+    "project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_FITNESS_FUNCTIONS_V0",
+    "phase_id": "REPOSITORY_ERGONOMICS_FITNESS_FUNCTIONS_V0",
+    "increment_id": "C6",
+    "umbrella_project_id": "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0",
+    "candidate_sha": "390880c4c9d51e8a4183ff15a7bf669e7c28c1f7",
+    "parent_sha": "afe55150da1947b78f8e41dd7c08fdbea2c4cee9",
+    "branch": "c6-repository-ergonomics-fitness-functions-v0",
+    "reviewed_surface": "Candidate commit 390880c4 diff vs canonical parent afe55150 (tests/test_qntylab_repository_ergonomics_fitness_functions_v0.py + C6 evidence artifacts + docs/state/projects.toml C6 registration row only).",
+    "scope_note": "Static analysis + committed receipts + read-only path/digest verification. The reviewer had NO shell-execution tool, so pytest and safety-command results (C6 suite 36 passed; contract cluster 129 passed / 1 documented pre-existing failure / 2 skipped; safety commands exit 0; full-suite base/head strict-subset HEAD_NEW=0/0) were verified via the committed receipts in the C6 evidence directory, not re-executed. No files were modified by the reviewer; this artifact is the reviewer's only write."
+  },
+  "attack_vector_verdicts": {
+    "table": "1-27",
+    "verdict_convention": "HELD = the candidate survived the attack vector; no attack vector produced a Critical or High finding.",
+    "vectors": [
+      { "id": 1, "verdict": "HELD" },
+      { "id": 2, "verdict": "HELD" },
+      { "id": 3, "verdict": "HELD" },
+      { "id": 4, "verdict": "HELD" },
+      { "id": 5, "verdict": "HELD" },
+      { "id": 6, "verdict": "HELD" },
+      { "id": 7, "verdict": "HELD" },
+      { "id": 8, "verdict": "HELD" },
+      { "id": 9, "verdict": "HELD" },
+      { "id": 10, "verdict": "HELD" },
+      { "id": 11, "verdict": "HELD" },
+      { "id": 12, "verdict": "HELD" },
+      {
+        "id": 13,
+        "verdict": "HELD",
+        "correction": "Canonical authority union is 21 fields, not 22. The candidate's stated authority-union field count is corrected from 22 to 21; the correction does not weaken any enforcement (the fitness assertion is evaluated against the canonical registry's actual union) and does not constitute a Critical/High finding."
+      },
+      { "id": 14, "verdict": "HELD" },
+      { "id": 15, "verdict": "HELD" },
+      { "id": 16, "verdict": "HELD" },
+      { "id": 17, "verdict": "HELD" },
+      { "id": 18, "verdict": "HELD" },
+      { "id": 19, "verdict": "HELD" },
+      { "id": 20, "verdict": "HELD" },
+      { "id": 21, "verdict": "HELD" },
+      { "id": 22, "verdict": "HELD" },
+      { "id": 23, "verdict": "HELD" },
+      { "id": 24, "verdict": "HELD" },
+      { "id": 25, "verdict": "HELD" },
+      { "id": 26, "verdict": "HELD" },
+      { "id": 27, "verdict": "HELD" }
+    ]
+  },
+  "additional_duties_results": {
+    "note": "Additional reviewer duties were executed within the declared static/receipt-verification scope: verification of the committed receipts for the C6 pytest suite and the three safety commands, read-only path/digest verification of the frozen hash bindings and deletion-matrix frozen rows, and cross-checking candidate evidence (implementation_manifest.json, fitness_manifest.json, frozen_hash_manifest.json, metrics.json, full_suite_verification_receipt.json) against the candidate commit surface. No additional duty produced a Critical or High finding; resulting observations are recorded in findings L1-L4."
+  },
+  "findings": [
+    {
+      "id": "M1",
+      "severity": "MEDIUM",
+      "title": "Negative-control family 1 for packet cap/reduction is tautological",
+      "evidence": "The negative-control tests at tests/test_qntylab_repository_ergonomics_fitness_functions_v0.py:539 and tests/test_qntylab_repository_ergonomics_fitness_functions_v0.py:967 exercise only the literal comparison, so the negative control does not independently prove that an out-of-bounds packet would be rejected end-to-end.",
+      "impact": "No false PASS is created: real M1/M2 enforcement is covered by the positive test (test_c1_packet_bytes_within_hard_cap_and_reduction against live evidence, fail-closed). The defect is limited to negative-control strength for the packet-cap/reduction family.",
+      "does_not_reopen_because": "Medium findings do not reopen implementation unless they undermine the increment objective, invalidate verification evidence, violate a frozen invariant, or change semantics. The positive-path enforcement holds and is fail-closed; this is a negative-control-strength observation only."
+    },
+    {
+      "id": "L1",
+      "severity": "LOW",
+      "title": "No machine cross-check of frozen_hash_manifest path-set equality vs the deletion_matrix 28 frozen rows (count-only)",
+      "evidence": "The fitness layer checks the frozen-row COUNT against deletion_matrix.json but does not machine-verify path-set equality between frozen_hash_manifest.json entries and the 28 DELETE_BLOCKED_BY_FROZEN_BINDING rows.",
+      "impact": "A path-set divergence would not be caught by an automated fitness assertion.",
+      "does_not_reopen_because": "Mitigated by the matrix digest binding: frozen_hash_manifest.json binds the deletion_matrix.json digest, so any matrix change would break the binding; LOW severity class deviation with a compensating control."
+    },
+    {
+      "id": "L2",
+      "severity": "LOW",
+      "title": "acceptance_metrics.packet.no_silent_truncation has no dedicated enforcing test",
+      "evidence": "No fitness test asserts the no_silent_truncation acceptance metric directly.",
+      "impact": "That single acceptance metric is not independently enforced as a hard threshold.",
+      "does_not_reopen_because": "Partially covered by the overflow-control and byte-cap fitness assertions (packet bytes <= 8192 hard cap and >=95% reduction), which fail closed and would surface silent-truncation regressions in practice; LOW severity."
+    },
+    {
+      "id": "L3",
+      "severity": "LOW",
+      "title": "Seam module project_context_execution_authority.py deliberately unbounded/unbound",
+      "evidence": "The DSH-execution-authority seam module qntylab/project_context_execution_authority.py is intentionally excluded from the size bound and structural binding applied to the rest of the composition root.",
+      "impact": "Growth of that seam module is not bounded by the C6 fitness functions.",
+      "does_not_reopen_because": "Documented tradeoff in the candidate evidence: the seam is the authorized DSH execution-authority boundary and binding it would entangle the fitness layer with that contract; deliberate, disclosed, and LOW."
+    },
+    {
+      "id": "L4",
+      "severity": "LOW",
+      "title": "Authority checking covers the canonical 21-field union only; non-canonical authority-ish booleans exist on some rows outside the checked set",
+      "evidence": "The authority non-escalation fitness assertion evaluates the canonical registry's 21-field authority union; a small number of rows carry additional authority-ish boolean fields outside that checked set.",
+      "impact": "Non-canonical authority-flavored fields would not trip the fitness assertion directly.",
+      "does_not_reopen_because": "Canonical registry validation is the backstop: the canonical authority registry remains the machine-checked authority surface, and the extra fields are non-canonical; LOW."
+    }
+  ],
+  "totals": {
+    "critical_total": 0,
+    "high_total": 0,
+    "medium_total": 1,
+    "low_total": 4
+  },
+  "final_verdict": "PASS",
+  "verdict_rationale": "All 27 attack vectors were held against candidate 390880c4 (parent afe55150). The candidate surface is tests + evidence + registration only; the single MEDIUM finding (tautological packet-cap negative control) creates no false PASS because positive M1/M2 enforcement is fail-closed and covered by the positive test, and the four LOW findings are disclosed, mitigated, or deliberate documented tradeoffs. No Critical/High findings, therefore no repairs are required, no targeted rereview is required, and the implementation is not reopened.",
+  "repairs_required": false,
+  "targeted_rereview_required": false,
+  "reopen_required": false,
+  "post_artifact_validation_note": "This file is the faithful machine-readable record of the completed independent hostile review subtask; the reviewer performed static analysis, committed-receipt verification, and read-only path/digest verification only."
+}

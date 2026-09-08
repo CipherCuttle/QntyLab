@@ -1,0 +1,315 @@
+name: Terminal Repository Ergonomics Reconciliation
+
+on:
+  push:
+    branches:
+      - chore/reconcile-repository-ergonomics-terminal-v0
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest requests
+      - name: Reconcile frozen-history projection into live canonical registry
+        shell: bash
+        run: |
+          python - <<'PY'
+          from __future__ import annotations
+          import json
+          import re
+          import tomllib
+          from pathlib import Path
+
+          REGISTRY = Path("docs/state/projects.toml")
+          TEST = Path("tests/test_qntylab_repository_ergonomics_and_modularity_cleanup_decision_v0.py")
+          TERMINAL_MERGE = "8a0d09c508144c178da358466243b83586468d9a"
+
+          text = REGISTRY.read_text(encoding="utf-8")
+
+          def block_bounds(source: str, project_id: str) -> tuple[int, int]:
+              marker = f'project_id = "{project_id}"'
+              pos = source.find(marker)
+              if pos < 0:
+                  raise AssertionError(f"missing project row: {project_id}")
+              if source.find(marker, pos + 1) >= 0:
+                  raise AssertionError(f"duplicate project row: {project_id}")
+              start = source.rfind("[[project]]", 0, pos)
+              end = source.find("\n[[project]]", pos)
+              if start < 0:
+                  raise AssertionError(f"missing project block start: {project_id}")
+              if end < 0:
+                  end = len(source)
+              return start, end
+
+          def render_value(value: object) -> str:
+              if isinstance(value, str):
+                  return json.dumps(value)
+              if isinstance(value, bool):
+                  return "true" if value else "false"
+              return str(value)
+
+          def mutate(project_id: str, *, expect: dict[str, object], set_fields: dict[str, object], add_after: dict[str, tuple[str, object]]) -> None:
+              global text
+              start, end = block_bounds(text, project_id)
+              block = text[start:end]
+              parsed = tomllib.loads(block)["project"][0]
+              for key, expected in expect.items():
+                  actual = parsed.get(key, object())
+                  if actual != expected:
+                      raise AssertionError(f"{project_id}: expected {key}={expected!r}, got {actual!r}")
+              for key, value in set_fields.items():
+                  line_re = re.compile(rf"(?m)^{re.escape(key)} = .*?$")
+                  replacement = f"{key} = {render_value(value)}"
+                  block, count = line_re.subn(replacement, block, count=1)
+                  if count != 1:
+                      raise AssertionError(f"{project_id}: cannot set unique field {key}")
+              for key, (after_key, value) in add_after.items():
+                  if re.search(rf"(?m)^{re.escape(key)} = ", block):
+                      raise AssertionError(f"{project_id}: field already exists: {key}")
+                  anchor = re.compile(rf"(?m)^({re.escape(after_key)} = .*?)$")
+                  block, count = anchor.subn(rf"\1\n{key} = {render_value(value)}", block, count=1)
+                  if count != 1:
+                      raise AssertionError(f"{project_id}: cannot insert {key} after {after_key}")
+              text = text[:start] + block + text[end:]
+
+          umbrella = "QNTYLAB_REPOSITORY_ERGONOMICS_AND_MODULARITY_CLEANUP_V0"
+          mutate(
+              umbrella,
+              expect={
+                  "state": "CLOSED_PASS",
+                  "canonicalization_status": "NOT_CANONICALIZED",
+                  "authorized_implementation_increment_count": 6,
+                  "next_action": "IMPLEMENT_QNTYLAB_AGENT_CONTEXT_PACKET_V0",
+              },
+              set_fields={
+                  "canonicalization_status": "EXACT_CANONICAL_MERGE_VERIFIED",
+                  "next_action": (
+                      "CLOSED_PASS: all six authorized repository-ergonomics increments C1-C6 are canonically merged through PR #254 / "
+                      + TERMINAL_MERGE
+                      + ". The umbrella is terminal; no C7 or follow-on implementation authority exists. Return to the separately governed scientific roadmap. This row grants no scientific execution, real-data, provider, claim, Router, Qnty, QntySpot, trading, promotion, or capital authority."
+                  ),
+              },
+              add_after={
+                  "completed_increment_count": ("authorized_implementation_increment_count", 6),
+                  "terminal_increment_project_id": ("completed_increment_count", "QNTYLAB_REPOSITORY_ERGONOMICS_FITNESS_FUNCTIONS_V0"),
+                  "terminal_increment_canonical_merge": ("terminal_increment_project_id", TERMINAL_MERGE),
+                  "terminal_increment_canonical_merge_pr": ("terminal_increment_canonical_merge", 254),
+                  "terminal_outcome": ("terminal_increment_canonical_merge_pr", "ALL_SIX_AUTHORIZED_INCREMENT_MERGES_CANONICAL_NO_C7"),
+              },
+          )
+
+          increments = {
+              "QNTYLAB_AGENT_CONTEXT_PACKET_V0": {
+                  "pr": 248,
+                  "merge": "78f3ca1b3566e9ea3d138796b7ce50e224c9e45a",
+                  "expect_state": "CLOSED_PASS",
+                  "expect_candidate": "TERMINAL_CLOSURE_RECORDED",
+                  "outcome": "C1_CLOSED_PASS_CANONICAL_MERGED",
+              },
+              "QNTYLAB_PROJECT_CONTEXT_MODULARIZATION_V0": {
+                  "pr": 250,
+                  "merge": "fba39dfac8affe0078d1362dd5bf52ed7f073ca6",
+                  "expect_state": "CLOSED_PASS",
+                  "expect_candidate": "TERMINAL_CLOSURE_RECORDED",
+                  "outcome": "C2_CLOSED_PASS_CANONICAL_MERGED",
+              },
+              "QNTYLAB_DEV_LOOP_CI_SPLIT_V0": {
+                  "pr": 251,
+                  "merge": "789e199b373ccd1b7a4e3c6df1fc55989f1c466d",
+                  "expect_state": "CLOSED_PASS",
+                  "expect_candidate": "TERMINAL_CLOSURE_RECORDED",
+                  "outcome": "C3_CLOSED_PASS_CANONICAL_MERGED",
+              },
+              "QNTYLAB_PYTHON_TOOLING_NORMALIZATION_V0": {
+                  "pr": 252,
+                  "merge": "e826dcb9cc264d1280c91c0bec01e23488fbb9e1",
+                  "expect_state": "RESULT_PENDING_RECORDING",
+                  "expect_candidate": "IMPLEMENTATION_CANDIDATE_AWAITING_HOSTILE_REVIEW",
+                  "outcome": "C4_CLOSED_PASS_CANONICAL_MERGED",
+              },
+              "QNTYLAB_PROVEN_DELETE_SAFE_SLIMMING_V0": {
+                  "pr": 253,
+                  "merge": "afe55150da1947b78f8e41dd7c08fdbea2c4cee9",
+                  "expect_state": "RESULT_PENDING_RECORDING",
+                  "expect_candidate": "IMPLEMENTATION_CANDIDATE_AWAITING_HOSTILE_REVIEW",
+                  "outcome": "C5_CLOSED_PASS_CANONICAL_MERGED",
+              },
+              "QNTYLAB_REPOSITORY_ERGONOMICS_FITNESS_FUNCTIONS_V0": {
+                  "pr": 254,
+                  "merge": TERMINAL_MERGE,
+                  "expect_state": "CLOSED_PASS",
+                  "expect_candidate": "TERMINAL_CLOSURE_RECORDED",
+                  "outcome": "C6_CLOSED_PASS_CANONICAL_MERGED",
+              },
+          }
+
+          for index, (project_id, meta) in enumerate(increments.items(), start=1):
+              set_fields = {
+                  "canonicalization_status": "EXACT_CANONICAL_MERGE_VERIFIED",
+                  "terminal_outcome": meta["outcome"],
+                  "next_action": (
+                      f"CLOSED_PASS: C{index} canonical merge verified at PR #{meta['pr']} / {meta['merge']}. "
+                      + ("This is the terminal increment; no C7 or follow-on authority is created by this row." if index == 6 else "This increment is historical and terminal; no standalone follow-on authority is created by this row.")
+                  ),
+              }
+              expect = {
+                  "state": meta["expect_state"],
+                  "candidate_state": meta["expect_candidate"],
+                  "canonicalization_status": "PENDING_EXPLICIT_PR_MERGE",
+              }
+              add_after = {
+                  "canonical_merge": ("canonicalization_status", meta["merge"]),
+                  "canonical_merge_pr": ("canonical_merge", meta["pr"]),
+              }
+
+              if index == 4:
+                  set_fields.update({
+                      "state": "CLOSED_PASS",
+                      "candidate_state": "TERMINAL_CLOSURE_RECORDED",
+                      "hostile_review_count": 1,
+                      "hostile_review_verdict": "PASS_WITH_MEDIUM_LOW_FINDINGS",
+                  })
+                  expect.update({
+                      "hostile_review_count": 0,
+                      "hostile_review_verdict": "PENDING_DELEGATED_INDEPENDENT_HOSTILE_REVIEW",
+                  })
+                  add_after.update({
+                      "hostile_review_medium_total": ("hostile_review_high_total", 3),
+                      "hostile_review_low_total": ("hostile_review_medium_total", 1),
+                  })
+              elif index == 5:
+                  set_fields.update({
+                      "state": "CLOSED_PASS",
+                      "candidate_state": "TERMINAL_CLOSURE_RECORDED",
+                      "hostile_review_count": 1,
+                      "hostile_review_verdict": "NO_CRITICAL_OR_HIGH_FINDINGS",
+                  })
+                  expect.update({
+                      "hostile_review_count": 0,
+                      "hostile_review_verdict": "PENDING_DELEGATED_INDEPENDENT_HOSTILE_REVIEW",
+                  })
+                  add_after.update({
+                      "hostile_review_medium_total": ("hostile_review_high_total", 1),
+                      "hostile_review_low_total": ("hostile_review_medium_total", 1),
+                  })
+
+              mutate(project_id, expect=expect, set_fields=set_fields, add_after=add_after)
+
+          # Parse after mutation before touching disk.
+          parsed = tomllib.loads(text)
+          rows = {row["project_id"]: row for row in parsed["project"]}
+          assert rows[umbrella]["completed_increment_count"] == 6
+          assert rows[umbrella]["terminal_increment_canonical_merge"] == TERMINAL_MERGE
+          for project_id, meta in increments.items():
+              row = rows[project_id]
+              assert row["state"] == "CLOSED_PASS"
+              assert row["canonicalization_status"] == "EXACT_CANONICAL_MERGE_VERIFIED"
+              assert row["canonical_merge"] == meta["merge"]
+              assert row["canonical_merge_pr"] == meta["pr"]
+          REGISTRY.write_text(text, encoding="utf-8")
+
+          test_text = TEST.read_text(encoding="utf-8")
+          replacements = {
+              '    assert record["canonicalization_status"] == "NOT_CANONICALIZED"\n': '    assert record["canonicalization_status"] == "EXACT_CANONICAL_MERGE_VERIFIED"\n',
+              '    assert record["next_action"] == "IMPLEMENT_QNTYLAB_AGENT_CONTEXT_PACKET_V0"\n': (
+                  '    assert record["completed_increment_count"] == 6\n'
+                  '    assert record["terminal_increment_project_id"] == "QNTYLAB_REPOSITORY_ERGONOMICS_FITNESS_FUNCTIONS_V0"\n'
+                  f'    assert record["terminal_increment_canonical_merge"] == "{TERMINAL_MERGE}"\n'
+                  '    assert record["terminal_increment_canonical_merge_pr"] == 254\n'
+                  '    assert record["terminal_outcome"] == "ALL_SIX_AUTHORIZED_INCREMENT_MERGES_CANONICAL_NO_C7"\n'
+                  '    assert "no C7" in record["next_action"]\n'
+              ),
+              'def test_c1_not_started() -> None:\n    # C1_IMPLEMENTATION_PRESENT = NO: no C1 implementation artifacts exist.\n    assert not (ROOT / "qntylab/agent_context_packet_v0.py").exists()\n    assert not (ROOT / "tests/test_qntylab_agent_context_packet_v0.py").exists()\n    decision = _decision()\n    assert decision["next_action"] == "IMPLEMENT_QNTYLAB_AGENT_CONTEXT_PACKET_V0"\n': (
+                  'def test_frozen_decision_history_is_not_live_registry_state() -> None:\n'
+                  '    # The hash-bound decision keeps its original C1 starting instruction as historical provenance.\n'
+                  '    # The live registry is the current-state projection and now records all six canonical merges.\n'
+                  '    assert (ROOT / "qntylab/agent_context_packet_v0.py").is_file()\n'
+                  '    assert (ROOT / "tests/test_qntylab_agent_context_packet_v0.py").is_file()\n'
+                  '    decision = _decision()\n'
+                  '    assert decision["next_action"] == "IMPLEMENT_QNTYLAB_AGENT_CONTEXT_PACKET_V0"\n'
+                  '    record = _record(PROJECT_ID)\n'
+                  '    assert record["completed_increment_count"] == 6\n'
+                  '    assert record["terminal_outcome"] == "ALL_SIX_AUTHORIZED_INCREMENT_MERGES_CANONICAL_NO_C7"\n'
+              ),
+          }
+          for old, new in replacements.items():
+              count = test_text.count(old)
+              if count != 1:
+                  raise AssertionError(f"decision test replacement count {count} for {old[:80]!r}")
+              test_text = test_text.replace(old, new, 1)
+
+          insert_anchor = 'EXPECTED_INCREMENT_PHASE_IDS = {\n'
+          # Add canonical merge truth table immediately before EXPECTED_EDGES, keeping frozen decision constants separate.
+          edge_anchor = 'EXPECTED_EDGES = {\n'
+          merge_table = (
+              'EXPECTED_CANONICAL_INCREMENT_MERGES = {\n'
+              '    "QNTYLAB_AGENT_CONTEXT_PACKET_V0": (248, "78f3ca1b3566e9ea3d138796b7ce50e224c9e45a"),\n'
+              '    "QNTYLAB_PROJECT_CONTEXT_MODULARIZATION_V0": (250, "fba39dfac8affe0078d1362dd5bf52ed7f073ca6"),\n'
+              '    "QNTYLAB_DEV_LOOP_CI_SPLIT_V0": (251, "789e199b373ccd1b7a4e3c6df1fc55989f1c466d"),\n'
+              '    "QNTYLAB_PYTHON_TOOLING_NORMALIZATION_V0": (252, "e826dcb9cc264d1280c91c0bec01e23488fbb9e1"),\n'
+              '    "QNTYLAB_PROVEN_DELETE_SAFE_SLIMMING_V0": (253, "afe55150da1947b78f8e41dd7c08fdbea2c4cee9"),\n'
+              f'    "QNTYLAB_REPOSITORY_ERGONOMICS_FITNESS_FUNCTIONS_V0": (254, "{TERMINAL_MERGE}"),\n'
+              '}\n'
+          )
+          if merge_table.strip() in test_text:
+              raise AssertionError("canonical merge table already present")
+          if test_text.count(edge_anchor) != 1:
+              raise AssertionError("EXPECTED_EDGES anchor not unique")
+          test_text = test_text.replace(edge_anchor, merge_table + edge_anchor, 1)
+
+          test_anchor = '\ndef test_forbidden_operations_present() -> None:\n'
+          canonical_test = (
+              '\ndef test_all_six_increment_merges_are_canonicalized() -> None:\n'
+              '    for project_id, (pr_number, merge_sha) in EXPECTED_CANONICAL_INCREMENT_MERGES.items():\n'
+              '        record = _record(project_id)\n'
+              '        assert record["state"] == "CLOSED_PASS"\n'
+              '        assert record["canonicalization_status"] == "EXACT_CANONICAL_MERGE_VERIFIED"\n'
+              '        assert record["canonical_merge"] == merge_sha\n'
+              '        assert record["canonical_merge_pr"] == pr_number\n'
+              '        assert "READY_FOR_MERGE" not in record["terminal_outcome"]\n'
+              '        assert "PENDING" not in record["next_action"]\n'
+              '\n'
+          )
+          if test_text.count(test_anchor) != 1:
+              raise AssertionError("test insertion anchor not unique")
+          test_text = test_text.replace(test_anchor, canonical_test + test_anchor, 1)
+          TEST.write_text(test_text, encoding="utf-8")
+          PY
+
+          python -m qntylab.project_context render
+
+          mapfile -t changed < <(git diff --name-only | sort)
+          expected=(
+            docs/CURRENT_ROADMAP.md
+            docs/state/projects.toml
+            tests/test_qntylab_repository_ergonomics_and_modularity_cleanup_decision_v0.py
+          )
+          printf '%s\n' "${changed[@]}" > /tmp/changed.txt
+          printf '%s\n' "${expected[@]}" | sort > /tmp/expected.txt
+          diff -u /tmp/expected.txt /tmp/changed.txt
+          git diff --check
+      - name: Verify terminal reconciliation
+        run: |
+          python -m qntylab.project_context doctor --strict
+          python -m qntylab.project_context render --check
+          python -m qntylab.research_ledger doctor
+          python -m pytest -q tests/test_qntylab_repository_ergonomics_and_modularity_cleanup_decision_v0.py tests/test_qntylab_repository_ergonomics_fitness_functions_v0.py
+      - name: Commit verified result and remove bootstrap workflow
+        shell: bash
+        run: |
+          rm .github/workflows/zz-terminal-reconcile-repository-ergonomics.yml
+          git diff --check
+          git config user.name "qntylab-terminal-reconciler"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/state/projects.toml docs/CURRENT_ROADMAP.md tests/test_qntylab_repository_ergonomics_and_modularity_cleanup_decision_v0.py .github/workflows/zz-terminal-reconcile-repository-ergonomics.yml
+          git commit -m "chore(governance): reconcile terminal repository ergonomics state"
+          git push origin HEAD:chore/reconcile-repository-ergonomics-terminal-v0

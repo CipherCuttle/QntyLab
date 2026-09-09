@@ -30,7 +30,8 @@ exists here or is created by this script.
 
 Usage (from the QntyLab repo/worktree root):
     python3 experiments/h003_bridge_v0/compute_signal_intent.py \
-        --out-dir /path/to/QntySpot-worktree/qualifications/h003_bridge_v0
+        --out-dir /path/to/QntySpot-worktree/qualifications/h003_bridge_v0 \
+        --source-commit <canonical-QntyLab-commit>
 """
 
 from __future__ import annotations
@@ -38,11 +39,18 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import sys
 from fractions import Fraction
 from pathlib import Path
 
 import numpy as np
+
+# The documented invocation runs this file directly from the repository root;
+# make the checked-out package importable without requiring installation.
+REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 from qntylab.data import load
 from qntylab.strategies import positions
@@ -55,7 +63,8 @@ VARIANT_ID = "variant_00eb140f03a5f6ab40600160"
 STRATEGY_VERSION = "existing-qntylab-strategies-v1"
 PARAMS = {"fast": 48, "slow": 192, "mode": "long_flat"}
 SOURCE_SEMANTIC = "BINANCE_SPOT_SOLUSDT_1H"
-QNTYLAB_HEAD = "ae5471e8d614bc0429b85daa53826f628d0de6ff"
+SOURCE_REPOSITORY = "CipherCuttle/QntyLab"
+FULL_GIT_SHA_RE = re.compile(r"\A[0-9a-f]{40}\Z")
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -86,7 +95,15 @@ def main() -> int:
     parser.add_argument("--csv", default="data/raw/SOLUSDT-1h.csv")
     parser.add_argument("--manifest", default="data/manifests/SOLUSDT-1h.json")
     parser.add_argument("--out-dir", required=True, help="artifact output directory")
+    parser.add_argument(
+        "--source-commit",
+        required=True,
+        help="canonical QntyLab commit to bind into the handoff provenance",
+    )
     args = parser.parse_args()
+
+    if not FULL_GIT_SHA_RE.fullmatch(args.source_commit):
+        parser.error("--source-commit must be a 40-character lowercase git SHA")
 
     csv_path = Path(args.csv)
     manifest_path = Path(args.manifest)
@@ -141,6 +158,8 @@ def main() -> int:
     # long_flat clamps via max(raw, 0).
     causal_target_num = max(raw_exact, 0)
     causal_target = "LONG" if causal_target_num == 1 else "FLAT"
+    previous_target = "LONG" if float(pos[t]) > 0 else "FLAT"
+    transition_action = "NO_ACTION" if previous_target == causal_target else "TARGET_CHANGE"
 
     first_open = rows[0]["timestamp"]
     last_open = rows[t]["timestamp"]
@@ -182,11 +201,19 @@ def main() -> int:
             "ma48": {"denominator": ma48.denominator, "numerator": ma48.numerator},
             "ma192": {"denominator": ma192.denominator, "numerator": ma192.numerator},
             "raw_signal_at_t": raw_exact,
+            "source_bar_timestamp": last_open,
+        },
+        "transition": {
+            "action": transition_action,
+            "current_target": causal_target,
+            "previous_target": previous_target,
         },
         "upstream": {
             "candidate_id": CANDIDATE_ID,
             "parameters": dict(PARAMS),
-            "qntylab_head": QNTYLAB_HEAD,
+            "qntylab_head": args.source_commit,
+            "source_commit": args.source_commit,
+            "source_repository": SOURCE_REPOSITORY,
             "source_semantic": SOURCE_SEMANTIC,
             "strategy_id": STRATEGY_ID,
             "strategy_version": STRATEGY_VERSION,

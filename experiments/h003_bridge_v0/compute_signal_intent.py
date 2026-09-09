@@ -108,6 +108,10 @@ def main() -> int:
     csv_path = Path(args.csv)
     manifest_path = Path(args.manifest)
     out_dir = Path(args.out_dir)
+    expected_csv = REPO_ROOT / "data" / "raw" / "SOLUSDT-1h.csv"
+    expected_manifest = REPO_ROOT / "data" / "manifests" / "SOLUSDT-1h.json"
+    if csv_path.resolve() != expected_csv.resolve() or manifest_path.resolve() != expected_manifest.resolve():
+        parser.error("--csv and --manifest must identify the frozen SOLUSDT-1h inputs")
 
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
 

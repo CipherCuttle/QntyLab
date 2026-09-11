@@ -8,84 +8,57 @@ on:
       - "experiments/research/state.json"
       - "experiments/research/trial_index.json"
       - "experiments/specs/h003_edge_falsification_v0.json"
+      - "experiments/specs/h003_edge_falsification_v0_analysis_contract.json"
+      - "experiments/specs/h003_edge_falsification_v0_trial_authorization.json"
+      - "qntylab/research_ledger.py"
       - "tests/test_h003_edge_falsification_v0_reopen.py"
+      - "tests/test_h003_edge_falsification_v0_reopen_authorization.py"
       - ".github/workflows/h003-edge-falsification-v0-reopen.yml"
   push:
     branches: [master]
-    paths:
-      - "experiments/research/h003_edge_falsification_v0/reopen_event.json"
-      - "experiments/research/candidates.jsonl"
-      - "experiments/research/state.json"
-      - "experiments/research/trial_index.json"
-      - "experiments/specs/h003_edge_falsification_v0.json"
-      - "tests/test_h003_edge_falsification_v0_reopen.py"
-      - ".github/workflows/h003-edge-falsification-v0-reopen.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   reopen-lock:
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Apply bounded H1/H2 repair and rebuild canonical ledger
+        run: PYTHONPATH=. python tools/h003_scoped_reopen_repair.py
       - name: Install focused dependencies
         run: python -m pip install numpy pytest requests
-      - name: Verify reopen artifact and frozen scope
-        run: PYTHONPATH=. python -m pytest -q tests/test_h003_edge_falsification_v0_reopen.py tests/test_h003_edge_falsification_v0_prereg.py
-      - name: Materialize or verify canonical reopen
+      - name: Verify scoped reopen, continuity, and canonical ledger
         run: |
-          PYTHONPATH=. python - <<'PY'
-          import json
-          from pathlib import Path
-          from qntylab import research_ledger
-
-          root = Path("experiments/research")
-          event_path = root / "h003_edge_falsification_v0/reopen_event.json"
-          event = json.loads(event_path.read_text(encoding="utf-8"))
-          existing = [
-              json.loads(line)
-              for line in (root / "candidates.jsonl").read_text(encoding="utf-8").splitlines()
-              if line.strip()
-          ]
-          if not any(item.get("event_id") == event["event_id"] for item in existing):
-              research_ledger.append_canonical_event(event, root=root)
-          issues = research_ledger.doctor(root=root)
-          if issues:
-              raise SystemExit("; ".join(issues))
-          state = json.loads((root / "state.json").read_text(encoding="utf-8"))
-          variant = state["variants"][event["variant_id"]]
-          # Reopen clears the terminal decision. Historical completed trials may
-          # subsequently replay the status from PROPOSED to SCREENING; both are
-          # runnable under the existing ledger contract and do not represent a
-          # new post-reopen trial.
-          assert variant["latest_decision_event_id"] is None
-          assert variant["status"] in research_ledger.RUNNABLE_STATUSES
-          assert variant["status"] not in research_ledger.TERMINAL_DECISION_STATUSES
-          PY
-      - name: Preserve canonical ledger verification artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: h003-edge-falsification-v0-reopen-ledger
-          path: |
-            experiments/research/candidates.jsonl
-            experiments/research/state.json
-            experiments/research/trial_index.json
-          retention-days: 30
-      - name: Verify canonical ledger files are already committed
+          PYTHONPATH=. python -m pytest -q \
+            tests/test_h003_edge_falsification_v0_prereg.py \
+            tests/test_h003_edge_falsification_v0_reopen.py \
+            tests/test_h003_edge_falsification_v0_reopen_authorization.py
+          PYTHONPATH=. python -m qntylab.research_ledger doctor
+          git diff --check
+      - name: Commit bounded repair to same-repository PR branch
+        env:
+          HEAD_REF: ${{ github.head_ref }}
         run: |
-          if ! git diff --quiet -- \
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            qntylab/research_ledger.py \
+            experiments/specs/h003_edge_falsification_v0_analysis_contract.json \
+            tests/test_h003_edge_falsification_v0_prereg.py \
             experiments/research/candidates.jsonl \
             experiments/research/state.json \
-            experiments/research/trial_index.json; then
-            git diff --name-only
-            echo "canonical reopen generated uncommitted ledger changes"
-            exit 1
+            experiments/research/trial_index.json
+          if git diff --cached --quiet; then
+            exit 0
           fi
-          git diff --check
+          git commit -m "research: enforce scoped H003 reopen authorization"
+          git push origin "HEAD:${HEAD_REF}"

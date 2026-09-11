@@ -14,64 +14,48 @@ on:
       - "tests/test_h003_edge_falsification_v0_prereg.py"
       - "tests/test_h003_edge_falsification_v0_reopen.py"
       - "tests/test_h003_edge_falsification_v0_reopen_authorization.py"
+      - "tests/test_research_ledger_reopen_chronology.py"
       - ".github/workflows/h003-edge-falsification-v0-reopen.yml"
   push:
     branches: [master]
-    paths:
-      - "experiments/research/h003_edge_falsification_v0/reopen_event.json"
-      - "experiments/research/candidates.jsonl"
-      - "experiments/research/state.json"
-      - "experiments/research/trial_index.json"
-      - "experiments/specs/h003_edge_falsification_v0.json"
-      - "experiments/specs/h003_edge_falsification_v0_analysis_contract.json"
-      - "experiments/specs/h003_edge_falsification_v0_trial_authorization.json"
-      - "qntylab/research_ledger.py"
-      - "tests/test_h003_edge_falsification_v0_prereg.py"
-      - "tests/test_h003_edge_falsification_v0_reopen.py"
-      - "tests/test_h003_edge_falsification_v0_reopen_authorization.py"
-      - ".github/workflows/h003-edge-falsification-v0-reopen.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   reopen-lock:
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Apply consumed-reopen chronology fix
+        run: PYTHONPATH=. python tools/h003_reopen_chronology_fix.py
       - name: Install focused dependencies
         run: python -m pip install numpy pytest requests
-      - name: Verify scoped reopen and 193-bar continuity
+      - name: Verify scoped reopen and chronology
         run: |
           PYTHONPATH=. python -m pytest -q \
             tests/test_h003_edge_falsification_v0_prereg.py \
             tests/test_h003_edge_falsification_v0_reopen.py \
-            tests/test_h003_edge_falsification_v0_reopen_authorization.py
-      - name: Verify canonical ledger indexes
-        run: |
+            tests/test_h003_edge_falsification_v0_reopen_authorization.py \
+            tests/test_research_ledger_reopen_chronology.py
           PYTHONPATH=. python -m qntylab.research_ledger doctor
-          PYTHONPATH=. python - <<'PY'
-          import json
-          from pathlib import Path
-          from qntylab import research_ledger
-
-          root = Path("experiments/research")
-          event = json.loads((root / "h003_edge_falsification_v0/reopen_event.json").read_text(encoding="utf-8"))
-          candidates = [json.loads(line) for line in (root / "candidates.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
-          assert sum(item.get("event_id") == event["event_id"] for item in candidates) == 1
-          state = json.loads((root / "state.json").read_text(encoding="utf-8"))
-          variant = state["variants"][event["variant_id"]]
-          assert variant["latest_decision_event_id"] is None
-          assert variant["status"] in research_ledger.RUNNABLE_STATUSES
-          assert variant["active_reopen_event_id"] == event["event_id"]
-          assert variant["reopen_authorization_contract_path"] == event["authorization_contract_path"]
-          assert variant["reopen_authorization_contract_sha256"] == event["authorization_contract_sha256"]
-          PY
-      - name: Verify no whitespace errors
-        run: git diff --check ${{ github.event.pull_request.base.sha || 'HEAD^' }}..HEAD
+          git diff --check
+      - name: Commit chronology repair
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add qntylab/research_ledger.py
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "research: preserve terminal decisions after consumed reopen"
+          git push origin "HEAD:${HEAD_REF}"

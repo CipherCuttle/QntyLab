@@ -23,6 +23,7 @@ AUTH_PATH = ROOT / "experiments/specs/h003_defensive_followup_v1_activation.json
 REOPEN_PATH = ROOT / "experiments/research/h003_defensive_followup_v1/activation_reopen_event.json"
 STATE_PATH = RESEARCH_ROOT / "state.json"
 REOPEN_EVENT_ID = "event_reopen_h003_defensive_followup_v1_activation"
+TIMING_RECONCILIATION_DECISION_ID = "event_decision_232206a8b9e45a253b952b3e"
 
 
 def _config(row: dict, *, research_intent: str = "FOLLOW_UP") -> dict:
@@ -92,37 +93,64 @@ def test_materialized_contract_matches_compiler_when_present() -> None:
     assert REOPEN_PATH.is_file()
 
 
-def test_active_reopen_allows_only_exact_authorized_diagnostic_ids_when_materialized() -> None:
+def test_materialized_activation_is_exact_while_later_terminal_decisions_fail_closed() -> None:
     if not AUTH_PATH.exists() or not REOPEN_PATH.exists():
         pytest.skip("activation is not materialized yet")
     state = json.loads(STATE_PATH.read_text(encoding="utf-8"))
     variant = state["variants"][VARIANT_ID]
-    assert variant["active_reopen_event_id"] == REOPEN_EVENT_ID
-    assert variant["reopen_authorization_contract_path"] == "experiments/specs/h003_defensive_followup_v1_activation.json"
-
     row = diagnostic_trial_rows()[0]
-    binding = preflight(
-        config=_config(row),
-        symbol=row["symbol"],
-        input_sha256=row["input_sha256"],
-        root=RESEARCH_ROOT,
-    )
-    assert binding["trial_id"] == row["trial_id"]
-    assert binding["reopen_authorization_id"] == AUTHORIZATION_ID
+
+    if variant.get("active_reopen_event_id") == REOPEN_EVENT_ID:
+        assert variant["reopen_authorization_contract_path"] == "experiments/specs/h003_defensive_followup_v1_activation.json"
+
+        binding = preflight(
+            config=_config(row),
+            symbol=row["symbol"],
+            input_sha256=row["input_sha256"],
+            root=RESEARCH_ROOT,
+        )
+        assert binding["trial_id"] == row["trial_id"]
+        assert binding["reopen_authorization_id"] == AUTHORIZATION_ID
+
+        unauthorized = dict(row, evaluation_start="2021-01-01T01:00:00Z")
+        with pytest.raises(LedgerError, match="trial not authorized by active reopen contract"):
+            preflight(
+                config=_config(unauthorized),
+                symbol=unauthorized["symbol"],
+                input_sha256=unauthorized["input_sha256"],
+                root=RESEARCH_ROOT,
+            )
+
+        with pytest.raises(LedgerError, match="research_intent not authorized by active reopen contract"):
+            preflight(
+                config=_config(row, research_intent="SCREEN"),
+                symbol=row["symbol"],
+                input_sha256=row["input_sha256"],
+                root=RESEARCH_ROOT,
+            )
+        return
+
+    # A later terminal decision legitimately consumes/supersedes the reopen.
+    # The activation contract remains immutable historical evidence, but no
+    # historical diagnostic trial may run until a new explicit reopen exists.
+    assert variant["status"] == "BLOCKED"
+    assert variant["latest_decision_event_id"] == TIMING_RECONCILIATION_DECISION_ID
+    assert "active_reopen_event_id" not in variant
+    assert "reopen_authorization_contract_path" not in variant
+
+    with pytest.raises(LedgerError, match="latest variant state BLOCKED"):
+        preflight(
+            config=_config(row),
+            symbol=row["symbol"],
+            input_sha256=row["input_sha256"],
+            root=RESEARCH_ROOT,
+        )
 
     unauthorized = dict(row, evaluation_start="2021-01-01T01:00:00Z")
-    with pytest.raises(LedgerError, match="trial not authorized by active reopen contract"):
+    with pytest.raises(LedgerError, match="latest variant state BLOCKED"):
         preflight(
             config=_config(unauthorized),
             symbol=unauthorized["symbol"],
             input_sha256=unauthorized["input_sha256"],
-            root=RESEARCH_ROOT,
-        )
-
-    with pytest.raises(LedgerError, match="research_intent not authorized by active reopen contract"):
-        preflight(
-            config=_config(row, research_intent="SCREEN"),
-            symbol=row["symbol"],
-            input_sha256=row["input_sha256"],
             root=RESEARCH_ROOT,
         )

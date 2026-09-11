@@ -1,0 +1,119 @@
+{
+  "schema_version": "1.0.0",
+  "contract_id": "H003_EDGE_FALSIFICATION_V0_ANALYSIS_CONTRACT",
+  "parent_preregistration_id": "H003_EDGE_FALSIFICATION_V0",
+  "status": "NORMATIVE_RESULT_BLIND_SUPPLEMENT",
+  "created_before_v0_execution": true,
+  "purpose": "Remove metric, control-generation, and known-gap degrees of freedom before any H003 Edge Falsification V0 result is produced.",
+  "precedence": "This file narrows ambiguous implementation details in the parent preregistration. It may not weaken any parent failure gate, add a strategy variant, change H003 parameters, or reinterpret prior negative evidence.",
+  "return_accounting": {
+    "annual_bars": 8760,
+    "risk_free_rate": 0,
+    "strategy_bar_return": "r_t = close[t+1] / close[t] - 1; held_t = position[t]; change_t = abs(position[t+1] - position[t]); net_t = held_t * r_t - change_t * (fee_bps + slippage_bps) / 10000",
+    "must_match_qntylab_backtest_evaluate": true,
+    "net_cumulative_return": "prod(1 + net_t) - 1",
+    "annualized_return": "expm1(log1p(net_cumulative_return) / years), where years = number_of_net_returns / 8760; undefined if terminal equity <= 0",
+    "annualized_sharpe": "mean(net_t) / population_stddev(net_t, ddof=0) * sqrt(8760), risk-free rate zero; undefined if stddev is zero",
+    "maximum_drawdown": "minimum over equity_t / running_peak_t - 1, with starting equity 1.0 and equity_t = cumulative product of 1 + net_t",
+    "calmar_ratio": "annualized_return / abs(maximum_drawdown); undefined if annualized_return is undefined or maximum_drawdown equals zero",
+    "analysis_exposure_fraction": "mean(abs(held_t)) over evaluated return intervals",
+    "turnover": "sum(abs(position[t+1] - position[t]))",
+    "trade_count": "count of nonzero abs(position[t+1] - position[t]))",
+    "undefined_primary_metric_policy": "Any undefined H003 Sharpe or Calmar required by a decision gate causes BLOCKED_BY_INPUT_OR_INTEGRITY, never favorable imputation."
+  },
+  "benchmark_accounting": {
+    "SOL_BUY_AND_HOLD": {
+      "held_position": 1,
+      "fees_and_slippage": "ZERO for the primary historical benchmark, matching the existing QntyLab buy_and_hold_return convention; this intentionally makes the benchmark harder to beat.",
+      "return_path": "close[t+1] / close[t] - 1 on exactly the same admitted return intervals as H003",
+      "metric_formulas": "same Sharpe, drawdown, annualized-return and Calmar formulas as H003"
+    },
+    "CASH": {
+      "return_path": "all zero returns",
+      "role": "reference only; undefined Sharpe/Calmar are not success evidence"
+    }
+  },
+  "control_generation": {
+    "rng": "numpy.random.Generator(numpy.random.PCG64(seed))",
+    "seeds": [17011, 17029, 17041, 17053, 17077, 17093, 17107, 17123, 17137, 17159],
+    "EXPOSURE_MATCHED_RANDOM_TIMING": {
+      "algorithm": [
+        "Use the exact binary H003 held-position sequence on admitted return intervals within one historical decision block.",
+        "Run-length encode the sequence into maximal alternating state runs (state in {0,1}, positive integer length).",
+        "Separate run lengths by state while preserving the block's original starting state and number of runs of each state.",
+        "For each seed, independently permute the state-0 run-length list and state-1 run-length list with the declared PCG64 generator.",
+        "Reconstruct an alternating state sequence beginning with the original starting state by consuming the corresponding permuted run lengths.",
+        "The reconstructed sequence must have exactly the original length, exactly the original number of long intervals, exactly the original number of flat intervals, and the same multiset of long-run and flat-run lengths; otherwise fail closed.",
+        "Apply the same cost mode to transitions in the reconstructed sequence."
+      ],
+      "comparison_statistic": "median metric across the 10 frozen seeds",
+      "post_result_seed_changes_forbidden": true
+    },
+    "BLOCK_SHUFFLED_H003_SIGNAL": {
+      "algorithm": [
+        "Use fixed non-overlapping 168-hour blocks of the H003 held-position sequence, starting at the first admitted return interval of the evaluated decision block.",
+        "Leave a final partial block, if any, fixed at the end.",
+        "For each seed, permute only the full 168-hour blocks with the declared PCG64 generator and then append the unchanged partial tail.",
+        "No return series is shuffled; only the timing-position blocks are permuted.",
+        "Apply the same cost mode after reconstruction."
+      ],
+      "comparison_statistic": "median metric across the 10 frozen seeds"
+    },
+    "H003_SIGNAL_DELAYED_24H": {
+      "algorithm": "Set held_control[t] = 0 for the first 24 admitted return intervals and held_control[t] = h003_held[t-24] thereafter; apply the same cost mode.",
+      "parameter_search": "NONE"
+    }
+  },
+  "gap_and_input_semantics": {
+    "global_rule": "Never create an ordinary missing candle and never compute a return across a timestamp gap.",
+    "known_manifest_gaps": [
+      "2021-02-11T03:00:00+00:00 -> 2021-02-11T05:00:00+00:00",
+      "2021-03-06T01:00:00+00:00 -> 2021-03-06T03:00:00+00:00",
+      "2021-04-20T01:00:00+00:00 -> 2021-04-20T04:00:00+00:00",
+      "2021-04-25T04:00:00+00:00 -> 2021-04-25T08:00:00+00:00",
+      "2021-08-13T01:00:00+00:00 -> 2021-08-13T06:00:00+00:00",
+      "2021-09-29T06:00:00+00:00 -> 2021-09-29T09:00:00+00:00",
+      "2023-03-24T12:00:00+00:00 -> 2023-03-24T14:00:00+00:00"
+    ],
+    "BLOCK_2021": {
+      "policy": "SEGMENT_FAIL_CLOSED_NO_SYNTHETIC_BARS",
+      "procedure": "Split 2021 at every manifest-declared gap into maximal contiguous hourly segments. Each segment is an independent qntylab.strategy_test run under the exact H003 variant and cost mode. The strategy state resets at each segment boundary; no pre-gap state is carried across missing time. Concatenate only the admitted per-segment net-return paths in chronological order for block-level risk metrics. Do not charge or infer a transition across a gap.",
+      "interpretation": "Conservative diagnostic of 2021 under official gap-reject semantics; no ordinary gap normalization is authorized.",
+      "minimum_segment_rule": "A segment with fewer than 193 close observations contributes no H003 decision metric and is excluded symmetrically from H003 and benchmark return-path aggregation; exclusion count must be reported."
+    },
+    "BLOCK_2023_KNOWN_HOLDOUT": {
+      "policy": "USE_EXISTING_AUTHORIZED_HALT_NORMALIZATION",
+      "input_path": "data/derived/focused_trend_validation_v1/SOLUSDT-spot-1h-2023-halt-normalized.csv",
+      "input_sha256": "62cee85e0a0f7b903fadc77a8f275e774f0ff3ecfff9fba9ea51a535376f70f1",
+      "manifest_path": "data/derived/focused_trend_validation_v1/SOLUSDT-spot-1h-2023-halt-normalized.manifest.json",
+      "normalization_version": "BINANCE_SPOT_HALT_NORMALIZATION_V1",
+      "normalized_timestamp": "2023-03-24T13:00:00Z",
+      "ordinary_gap_fill_forbidden": true,
+      "role": "KNOWN_NEGATIVE_PRIOR_EVIDENCE_NOT_NEW_HOLDOUT"
+    },
+    "OTHER_BLOCKS": {
+      "policy": "Exact authoritative raw input; qntylab.strategy_test must reject any unexpected gap. Any newly discovered gap blocks that block and cannot be normalized after result inspection."
+    }
+  },
+  "aggregation": {
+    "complete_historical_sample": "Concatenate admitted chronological net-return paths from 2021 through the frozen 2026 endpoint, with no synthetic return at a gap or input-boundary join. Strategy and benchmark use exactly the same admitted market-return intervals. Position state resets to FLAT at every excluded-gap or separately materialized block boundary; no transition cost is invented across a boundary.",
+    "block_metrics": "Computed from each block's admitted net-return path with the frozen formulas above.",
+    "no_weighting_search": true,
+    "no_block_deletion_after_results": true
+  },
+  "implementation_constraints": [
+    "All H003 strategy result-producing runs must be created through qntylab.strategy_test.",
+    "A separate deterministic analysis module may derive Sharpe, Calmar and controls only from frozen input bytes plus strategy_test-bound strategy semantics; it must not call an alternative H003 evaluator.",
+    "The analysis implementation and focused tests must be committed before any V0 output is inspected.",
+    "No result may change these formulas, seeds, gap rules, controls or verdict gates."
+  ],
+  "authority": {
+    "research_only": true,
+    "qnty_acceptance": "NONE",
+    "qntyspot_policy": "NONE",
+    "execution": "FORBIDDEN",
+    "capital": "NONE",
+    "signing": "NONE",
+    "submission": "NONE"
+  }
+}

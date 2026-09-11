@@ -68,14 +68,17 @@
   },
   "recorder_authority": {
     "authority_derivation": "ACTIVE_V2_LEDGER_REOPEN_CONTRACT_AND_CANONICAL_VALID_ORIGIN_V2_ARTIFACT_REQUIRED_TOGETHER",
-    "status_after_this_artifact_is_canonical": "ACTIVE_PROSPECTIVE_SHADOW_RECORDING",
+    "status_after_this_artifact_is_canonical": "CONDITIONAL_PROSPECTIVE_SHADOW_RECORDING_REQUIRES_CANONICALIZATION_TIME_GUARD",
     "recording_may_begin_only_after_artifact_is_canonical": true,
     "origin_artifact_must_be_canonical_before_origin": true,
+    "canonicalization_time_guard_function": "validate_artifact_canonicalization_time",
+    "recording_authority_requires_canonicalization_timestamp_strictly_before_origin": true,
+    "unconditional_recording_authority": false,
     "late_artifact_behavior": "BLOCK_AND_REISSUE_FUTURE_ORIGIN_NO_BACKFILL",
     "paper_shadow_only": true,
-    "market_data_recording_authorized": true,
-    "signal_recording_authorized": true,
-    "integrity_receipt_recording_authorized": true,
+    "market_data_recording_authorized_if_guard_passes": true,
+    "signal_recording_authorized_if_guard_passes": true,
+    "integrity_receipt_recording_authorized_if_guard_passes": true,
     "economic_performance_verdict_before_maturity_forbidden": true,
     "parameter_changes_forbidden": true,
     "asset_changes_forbidden": true,
@@ -91,6 +94,7 @@
     "market_data_accessed_to_choose_origin": false,
     "strategy_result_accessed_to_choose_origin": false,
     "origin_may_not_be_moved_for_market_or_strategy_outcomes": true,
+    "canonicalization_time_proof_required_before_recording": true,
     "if_artifact_becomes_canonical_at_or_after_origin": "INVALID_BLOCK_AND_REISSUE_FUTURE_ORIGIN_NO_BACKFILL"
   }
 }

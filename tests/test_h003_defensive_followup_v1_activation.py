@@ -23,6 +23,8 @@ AUTH_PATH = ROOT / "experiments/specs/h003_defensive_followup_v1_activation.json
 REOPEN_PATH = ROOT / "experiments/research/h003_defensive_followup_v1/activation_reopen_event.json"
 STATE_PATH = RESEARCH_ROOT / "state.json"
 REOPEN_EVENT_ID = "event_reopen_h003_defensive_followup_v1_activation"
+V2_PROSPECTIVE_REOPEN_EVENT_ID = "event_reopen_h003_defensive_followup_v1_prospective_v2"
+V2_PROSPECTIVE_CONTRACT_PATH = "experiments/specs/h003_defensive_followup_v1_prospective_reopen_v2.json"
 TIMING_RECONCILIATION_DECISION_ID = "event_decision_232206a8b9e45a253b952b3e"
 
 
@@ -93,14 +95,15 @@ def test_materialized_contract_matches_compiler_when_present() -> None:
     assert REOPEN_PATH.is_file()
 
 
-def test_materialized_activation_is_exact_while_later_terminal_decisions_fail_closed() -> None:
+def test_materialized_activation_is_exact_while_later_generations_fail_closed() -> None:
     if not AUTH_PATH.exists() or not REOPEN_PATH.exists():
         pytest.skip("activation is not materialized yet")
     state = json.loads(STATE_PATH.read_text(encoding="utf-8"))
     variant = state["variants"][VARIANT_ID]
     row = diagnostic_trial_rows()[0]
+    active_reopen = variant.get("active_reopen_event_id")
 
-    if variant.get("active_reopen_event_id") == REOPEN_EVENT_ID:
+    if active_reopen == REOPEN_EVENT_ID:
         assert variant["reopen_authorization_contract_path"] == "experiments/specs/h003_defensive_followup_v1_activation.json"
 
         binding = preflight(
@@ -130,9 +133,33 @@ def test_materialized_activation_is_exact_while_later_terminal_decisions_fail_cl
             )
         return
 
-    # A later terminal decision legitimately consumes/supersedes the reopen.
-    # The activation contract remains immutable historical evidence, but no
-    # historical diagnostic trial may run until a new explicit reopen exists.
+    if active_reopen == V2_PROSPECTIVE_REOPEN_EVENT_ID:
+        # The later prospective-only generation supersedes the old 88-trial
+        # diagnostic authority. Canonical replay labels this already-tested
+        # variant SCREENING, but the exact V2 contract must deny every old
+        # activation trial and all non-FOLLOW_UP intents.
+        assert variant["status"] == "SCREENING"
+        assert variant["latest_decision_event_id"] is None
+        assert variant["reopen_authorization_contract_path"] == V2_PROSPECTIVE_CONTRACT_PATH
+        with pytest.raises(LedgerError, match="trial not authorized by active reopen contract"):
+            preflight(
+                config=_config(row),
+                symbol=row["symbol"],
+                input_sha256=row["input_sha256"],
+                root=RESEARCH_ROOT,
+            )
+        with pytest.raises(LedgerError, match="research_intent not authorized by active reopen contract"):
+            preflight(
+                config=_config(row, research_intent="SCREEN"),
+                symbol=row["symbol"],
+                input_sha256=row["input_sha256"],
+                root=RESEARCH_ROOT,
+            )
+        return
+
+    # A later terminal decision legitimately consumes/supersedes the activation
+    # reopen. The activation contract remains immutable historical evidence, but
+    # no historical diagnostic trial may run until a new explicit reopen exists.
     assert variant["status"] == "BLOCKED"
     assert variant["latest_decision_event_id"] == TIMING_RECONCILIATION_DECISION_ID
     assert "active_reopen_event_id" not in variant

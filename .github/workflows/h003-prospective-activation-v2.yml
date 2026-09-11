@@ -1,0 +1,34 @@
+name: H003 Prospective Activation V2
+
+on:
+  push:
+    branches:
+      - research/h003-prospective-activation-v2
+    paths:
+      - ".github/workflows/h003-prospective-activation-v2.yml"
+      - ".github/workflows/h003-prospective-operation-v2.yml"
+      - "experiments/research/h003_defensive_followup_v1/prospective_source_v2_activation.json"
+  pull_request:
+    paths:
+      - ".github/workflows/h003-prospective-activation-v2.yml"
+      - ".github/workflows/h003-prospective-operation-v2.yml"
+      - "experiments/research/h003_defensive_followup_v1/prospective_source_v2_activation.json"
+      - "experiments/research/h003_defensive_followup_v1/prospective_source_v2_runtime.json"
+      - "tests/test_h003_defensive_followup_v1_prospective_activation_v2.py"
+
+permissions:
+  contents: read
+
+jobs:
+  activation-v2-lock:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify source qualification ancestry and exact source identity
+        run: |
+          git merge-base --is-ancestor 1827bb3e753970aed0cfbd0adc27bba121b41d5d HEAD
+          test "$(sha256sum qntylab/h003_defensive_followup_v1_prospective_source_v2.py | awk '{print $1}')" = "74e1906f1bb54123ff77347629d5da6bafcd400b9a979d6d5526bbc6ccf08633"
+      - name: Print operational workflow SHA256 for binding
+        run: sha256sum .github/workflows/h003-prospective-operation-v2.yml

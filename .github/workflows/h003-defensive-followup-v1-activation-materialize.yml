@@ -7,6 +7,7 @@ on:
     paths:
       - "qntylab/h003_defensive_followup_v1_activation.py"
       - "tests/test_h003_defensive_followup_v1_activation.py"
+      - "tests/test_h003_edge_falsification_v0_reopen_authorization.py"
       - "tools/h003_defensive_followup_v1_activation_materialize.py"
       - ".github/workflows/h003-defensive-followup-v1-activation-materialize.yml"
 

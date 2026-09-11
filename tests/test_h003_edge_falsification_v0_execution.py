@@ -51,3 +51,24 @@ def test_execution_surface_is_frozen_but_not_invoked_by_tests() -> None:
     assert callable(execution.execute_frozen_plan)
     assert callable(execution.verify_complete_receipts)
     assert callable(execution.analyze_frozen_results)
+
+
+def test_execute_frozen_plan_binds_research_root_before_verification(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    workspace = tmp_path / "workspace"
+    (workspace / "plan").mkdir(parents=True)
+    research_root = tmp_path / "research"
+    research_root.mkdir()
+    seen: dict[str, Path] = {}
+
+    monkeypatch.setattr(execution.h003, "compile_plan", lambda: [])
+
+    def fake_verify(_workspace: Path, *, research_root: Path | None = None):
+        assert research_root is not None
+        seen["research_root"] = research_root
+        return {}
+
+    monkeypatch.setattr(execution, "verify_complete_receipts", fake_verify)
+    receipt = execution.execute_frozen_plan(workspace, research_root=research_root)
+    assert seen["research_root"] == research_root
+    assert receipt["executed_trial_ids"] == []
+    assert receipt["resumed_verified_trial_ids"] == []

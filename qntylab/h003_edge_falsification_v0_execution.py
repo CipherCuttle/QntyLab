@@ -130,6 +130,7 @@ def execute_frozen_plan(workspace: Path, *, research_root: Path | None = None) -
     if not plan_dir.exists():
         h003.write_plan(plan_dir)
     plan = h003.compile_plan()
+    ledger_root = research_root or strategy_test.RESEARCH_ROOT
     runs = workspace / "runs"
     runs.mkdir(parents=True, exist_ok=True)
     executed: list[str] = []

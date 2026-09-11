@@ -216,7 +216,7 @@ def test_reporting_slice_reconstructs_full_path_before_calendar_slice() -> None:
     full_position = reconstruct_h003_position(close, receipt)
     official = _official_metrics(close, full_position, 10.0)
     first_end = 300
-    last_end = 420
+    last_end = 500
 
     admitted = reporting_block_slice(
         timestamps,

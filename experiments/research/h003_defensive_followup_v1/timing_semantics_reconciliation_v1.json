@@ -1,0 +1,69 @@
+{
+  "artifact_id": "H003_TIMING_SEMANTICS_RECONCILIATION_V1",
+  "authority": {
+    "capital": "NONE",
+    "economic_verdict_authorized": false,
+    "integrity_receipt_recording_authorized": false,
+    "live_execution": "FORBIDDEN",
+    "market_data_recording_authorized": false,
+    "new_historical_trials_authorized": false,
+    "next_required_authority": "A separate Git-backed CANDIDATE_REOPENED reconciliation completion must bind this artifact, the intended semantics regression, and a new prospective origin that is strictly future relative to that authority becoming canonical.",
+    "qnty_acceptance": "NONE",
+    "qntyspot_policy": "NONE",
+    "signal_recording_authorized": false,
+    "signing": "NONE",
+    "status": "BLOCKED_PENDING_REOPEN_AND_NEW_FUTURE_ORIGIN",
+    "submission": "NONE"
+  },
+  "candidate_id": "CANDIDATE_H003_MA_48_192_LONG_FLAT",
+  "finding": {
+    "classification": "LEGACY_H003_ONE_EXTRA_BAR_DELAY",
+    "frozen_preregistered_semantics": "completed bar t -> evaluate sign(MA48 - MA192) -> negative means FLAT -> decision at t owns return t->t+1",
+    "historical_implementation_path": [
+      "qntylab.strategies.moving_average computes the raw MA relation at row t",
+      "qntylab.strategies._causal shifts raw[t] into position[t+1]",
+      "qntylab.h003_edge_falsification_v0.net_return_path pairs position[:-1] with close[1:]/close[:-1]-1",
+      "therefore raw[t] is applied to close[t+1]->close[t+2], one full bar later than the frozen prose"
+    ],
+    "severity": "SCIENCE_GOVERNANCE_BLOCKER",
+    "status": "CONFIRMED_IMPLEMENTATION_PREREG_DIVERGENCE",
+    "timestamp_semantics": "QntyLab stores Binance Spot kline field 0 as timestamp. That field is candle open time; the row close is only known when the one-hour candle completes."
+  },
+  "historical_evidence_treatment": {
+    "btc_eth_prior_exposure_preserved": true,
+    "existing_v0_results_preserved": true,
+    "existing_v0_results_semantics": "LEGACY_H003_ONE_EXTRA_BAR_DELAY",
+    "original_2023_failure_preserved": true,
+    "performance_based_semantics_choice_forbidden": true,
+    "rerun_to_replace_existing_results_forbidden": true,
+    "rewrite_forbidden": true
+  },
+  "origin_reconciliation": {
+    "backfill_from_2026_09_11T18_00_00Z": "FORBIDDEN",
+    "owned_prospective_observations_under_pr266_origin": "NONE_AUTHORIZED",
+    "pr266_codex_p1_left_unresolved": true,
+    "pr266_origin_artifact_treatment": "PRESERVED_AS_HISTORICAL_GIT_EVIDENCE_BUT_NOT_SUFFICIENT_RECORDING_AUTHORITY",
+    "pr266_origin_elapsed_before_origin_artifact_was_canonical": true,
+    "preauthorized_sealed_backfill_rule_present": false,
+    "research_ledger_activation_transition_present_in_pr266": false
+  },
+  "prospective_semantics": {
+    "historical_comparability_note": "Prospective intended-semantics receipts are not to be represented as exact execution-semantic replication of legacy V0 results.",
+    "implementation_guard": "The future recorder must not compose an already shifted H003 strategy position with a second evaluator shift.",
+    "rule": "After completed bar t, compute MA48 and MA192 using information through t; that decision directly owns the next close-to-close return t->t+1 exactly once.",
+    "selected_semantics": "ORIGINALLY_PREREGISTERED_INTENDED_SEMANTICS",
+    "selection_basis": "The intended t->t+1 ownership rule was frozen before prospective outcomes and is selected without comparing economic results."
+  },
+  "schema_version": "1.0.0",
+  "scope": "EXACT_VARIANT",
+  "source_state": {
+    "activation_merge_committed_at_utc": "2026-09-11T17:59:07Z",
+    "activation_merge_sha": "adee935bfa596af5e7e0ad0fe1e5aadf9f7faad5",
+    "frozen_origin_utc": "2026-09-11T18:00:00Z",
+    "origin_artifact_path": "experiments/research/h003_defensive_followup_v1/prospective_origin.json",
+    "origin_merge_sha": "c4c147d1148ef05e5407b97488ee895c44922b22",
+    "origin_merged_at_utc": "2026-09-11T18:06:41Z",
+    "origin_pr": 266
+  },
+  "variant_id": "variant_00eb140f03a5f6ab40600160"
+}

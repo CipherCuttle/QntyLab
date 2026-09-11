@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "experiments/research/h003_defensive_followup_v1/prospective_origin_v2.json"
+      - "experiments/specs/h003_defensive_followup_v1.json"
       - "experiments/specs/h003_defensive_followup_v1_prospective_reopen_v2.json"
       - "experiments/research/h003_defensive_followup_v1/timing_semantics_reconciliation_v1.json"
       - "experiments/research/state.json"
@@ -18,6 +19,7 @@ on:
       - master
     paths:
       - "experiments/research/h003_defensive_followup_v1/prospective_origin_v2.json"
+      - "experiments/specs/h003_defensive_followup_v1.json"
       - "experiments/specs/h003_defensive_followup_v1_prospective_reopen_v2.json"
       - "experiments/research/h003_defensive_followup_v1/timing_semantics_reconciliation_v1.json"
       - "experiments/research/state.json"

@@ -1,12 +1,12 @@
 """Fixture-only H003 prospective shadow recorder V2.
 
 This module deliberately binds no network transport, scheduler, publication
-surface, evaluator, Qnty authority, or QntySpot authority.  It turns already
+surface, evaluator, Qnty authority, or QntySpot authority. It turns already
 materialized Binance Spot 1h kline rows into deterministic source manifests
-and chained shadow signal receipts after re-validating the canonical H003 V2
-ledger/origin authority.
+and chained shadow signal receipts only through the authority-gated bundle
+entry point.
 
-The operational source adapter is a later, separate phase.  No economic
+The operational source adapter is a later, separate phase. No economic
 performance metric or interim verdict is computed here.
 """
 from __future__ import annotations
@@ -96,9 +96,9 @@ def _git_text(root: Path, *args: str) -> str:
 def validate_recorder_authority(root: Path = ROOT) -> dict[str, Any]:
     """Re-derive recorder authority from canonical Git and frozen artifacts.
 
-    The canonicalization timestamp is never caller supplied.  It is read from
+    The canonicalization timestamp is never caller supplied. It is read from
     the fixed PR #269 merge commit, verified against the frozen timestamp, and
-    passed through the strict-before-origin guard.  The exact origin artifact
+    passed through the strict-before-origin guard. The exact origin artifact
     bytes at that merge commit must equal the current checked-out artifact.
     """
     origin_path = root / ORIGIN_ARTIFACT_RELATIVE_PATH
@@ -194,10 +194,14 @@ def validate_bars(bars: Sequence[SpotBar], *, through_logical_close: datetime) -
     for bar in bars:
         if bar.symbol not in by_symbol:
             raise RecorderBlocked(f"non-panel symbol rejected: {bar.symbol}")
+        # Re-derive every authority-bearing field from the exact row whose hash
+        # enters the evidence chain. Direct SpotBar construction cannot create
+        # a second, contradictory price/timestamp truth.
+        reparsed = spot_bar_from_row(bar.symbol, bar.raw_row)
+        if reparsed != bar:
+            raise RecorderBlocked("SpotBar fields diverge from raw Binance row evidence")
         if bar.logical_close_utc < first or bar.logical_close_utc > through:
             raise RecorderBlocked("bar outside exact required warmup/recording window")
-        if bar.open_time_utc + timedelta(hours=1) != bar.logical_close_utc:
-            raise RecorderBlocked("bar logical-close mapping changed")
         key = (bar.symbol, bar.logical_close_utc)
         if key in seen:
             raise RecorderBlocked("duplicate symbol/logical-close row")
@@ -217,7 +221,7 @@ def validate_bars(bars: Sequence[SpotBar], *, through_logical_close: datetime) -
     return tuple(sorted(bars, key=lambda item: (item.logical_close_utc, PANEL.index(item.symbol))))
 
 
-def build_source_manifest(bars: Sequence[SpotBar], *, through_logical_close: datetime) -> dict[str, Any]:
+def _build_source_manifest(bars: Sequence[SpotBar], *, through_logical_close: datetime) -> dict[str, Any]:
     ordered = validate_bars(bars, through_logical_close=through_logical_close)
     value = {
         "source_contract": SPOT_SOURCE_ID,
@@ -239,7 +243,7 @@ def build_source_manifest(bars: Sequence[SpotBar], *, through_logical_close: dat
     return {**value, "source_manifest_sha256": digest(value)}
 
 
-def build_signal_receipts(
+def _build_signal_receipts(
     bars: Sequence[SpotBar],
     *,
     through_logical_close: datetime,
@@ -291,8 +295,7 @@ def build_signal_receipts(
             "previous_receipt_sha256": chain,
         }
         receipt_sha = digest(receipt_body)
-        receipt = {**receipt_body, "receipt_sha256": receipt_sha}
-        receipts.append(receipt)
+        receipts.append({**receipt_body, "receipt_sha256": receipt_sha})
         chain = receipt_sha
     if not receipts:
         raise RecorderBlocked("no prospective receipts emitted")
@@ -306,9 +309,10 @@ def build_fixture_bundle(
     previous_chain_sha256: str | None = None,
     root: Path = ROOT,
 ) -> dict[str, Any]:
+    """The sole public receipt-emitting path; canonical authority is mandatory."""
     authority = validate_recorder_authority(root)
-    manifest = build_source_manifest(bars, through_logical_close=through_logical_close)
-    receipts = build_signal_receipts(
+    manifest = _build_source_manifest(bars, through_logical_close=through_logical_close)
+    receipts = _build_signal_receipts(
         bars,
         through_logical_close=through_logical_close,
         previous_chain_sha256=previous_chain_sha256,
@@ -340,8 +344,6 @@ __all__ = [
     "SPOT_SOURCE_ID",
     "SpotBar",
     "build_fixture_bundle",
-    "build_signal_receipts",
-    "build_source_manifest",
     "first_required_logical_close",
     "spot_bar_from_row",
     "validate_bars",

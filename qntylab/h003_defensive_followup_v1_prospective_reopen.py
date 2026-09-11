@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+
 
 ROOT = Path(__file__).resolve().parents[1]
 RECONCILIATION_PATH = ROOT / "experiments/research/h003_defensive_followup_v1/timing_semantics_reconciliation_v1.json"
@@ -28,6 +30,40 @@ def canonical_bytes(value: Any) -> bytes:
 
 def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def prospective_h003_positions(close: np.ndarray) -> np.ndarray:
+    """Canonical prospective H003 completed-bar position path.
+
+    Unlike ``qntylab.strategies.moving_average``, this deliberately does not
+    apply ``_causal``. A relation computed from completed bar t is stored at t
+    so it can own close[t] -> close[t+1] exactly once. The prospective recorder
+    must use this helper rather than the legacy historically-tested shifted path.
+    """
+    values = np.asarray(close, dtype=float)
+    if values.ndim != 1:
+        raise ValueError("close must be one-dimensional")
+    position = np.zeros(len(values), dtype=float)
+    fast, slow = 48, 192
+    if len(values) < slow:
+        return position
+    ma_fast = np.convolve(values, np.ones(fast) / fast, "valid")
+    ma_slow = np.convolve(values, np.ones(slow) / slow, "valid")
+    raw_relation = np.sign(ma_fast[slow - fast :] - ma_slow)
+    position[slow - 1 :] = np.maximum(raw_relation, 0.0)
+    return position
+
+
+def prospective_h003_owned_return_path(close: np.ndarray) -> np.ndarray:
+    """Gross one-bar returns owned by the canonical prospective H003 state."""
+    values = np.asarray(close, dtype=float)
+    if values.ndim != 1:
+        raise ValueError("close must be one-dimensional")
+    if len(values) < 2:
+        return np.zeros(0, dtype=float)
+    position = prospective_h003_positions(values)
+    one_bar_return = values[1:] / values[:-1] - 1.0
+    return position[:-1] * one_bar_return
 
 
 def _load_json(path: Path) -> dict[str, Any]:

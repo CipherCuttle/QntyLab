@@ -10,9 +10,10 @@ from qntylab.h003_edge_falsification_v0 import net_return_path, reconstruct_h003
 
 ROOT = Path(__file__).resolve().parents[1]
 RECONCILIATION_PATH = ROOT / "experiments/research/h003_defensive_followup_v1/timing_semantics_reconciliation_v1.json"
+PROSPECTIVE_REOPEN_CONTRACT_PATH = ROOT / "experiments/specs/h003_defensive_followup_v1_prospective_reopen_v2.json"
 STATE_PATH = ROOT / "experiments/research/state.json"
 VARIANT_ID = "variant_00eb140f03a5f6ab40600160"
-DECISION_EVENT_ID = "event_decision_232206a8b9e45a253b952b3e"
+REOPEN_EVENT_ID = "event_reopen_h003_defensive_followup_v1_prospective_v2"
 
 
 def _load(path: Path) -> dict:
@@ -75,18 +76,31 @@ def test_reconciliation_selects_preregistered_intended_semantics_result_blind() 
     assert "second evaluator shift" in prospective["implementation_guard"]
 
 
-def test_research_ledger_is_fail_closed_after_reconciliation() -> None:
+def test_research_ledger_remains_fail_closed_under_explicit_prospective_reopen() -> None:
     state = _load(STATE_PATH)
     variant = state["variants"][VARIANT_ID]
 
-    assert variant["status"] == "BLOCKED"
-    assert variant["latest_decision_event_id"] == DECISION_EVENT_ID
-    assert "active_reopen_event_id" not in variant
-    assert "reopen_authorization_contract_path" not in variant
-    assert "new prospective origin strictly in the future" in variant["revisit_condition"]
+    # Historical TRIAL_COMPLETED events are replayed after the explicit reopen,
+    # so the display status is SCREENING. Authority remains fail-closed because
+    # the exact active contract grants no historical trial execution and keeps
+    # prospective recording inactive until a separately valid origin-v2.
+    assert variant["status"] == "SCREENING"
+    assert variant["latest_decision_event_id"] is None
+    assert variant["active_reopen_event_id"] == REOPEN_EVENT_ID
+    assert variant["reopen_authorization_contract_path"] == "experiments/specs/h003_defensive_followup_v1_prospective_reopen_v2.json"
+
+    contract = _load(PROSPECTIVE_REOPEN_CONTRACT_PATH)
+    assert contract["reopen_event_id"] == REOPEN_EVENT_ID
+    assert contract["metadata"]["trial_execution_authority"] == "NONE"
+    recorder = contract["metadata"]["prospective_recorder"]
+    assert recorder["status"] == "ARMED_BUT_INACTIVE_PENDING_VALID_ORIGIN_V2_ARTIFACT"
+    assert recorder["origin"] is None
+    assert recorder["market_data_recording_authorized"] is False
+    assert recorder["signal_recording_authorized"] is False
+    assert recorder["integrity_receipt_recording_authorized"] is False
+    assert recorder["economic_verdict_authorized"] is False
 
     authority = _load(RECONCILIATION_PATH)["authority"]
-    assert authority["status"] == "BLOCKED_PENDING_REOPEN_AND_NEW_FUTURE_ORIGIN"
     assert authority["market_data_recording_authorized"] is False
     assert authority["signal_recording_authorized"] is False
     assert authority["integrity_receipt_recording_authorized"] is False

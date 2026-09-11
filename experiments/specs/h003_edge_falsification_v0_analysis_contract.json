@@ -144,5 +144,10 @@
     "capital": "NONE",
     "signing": "NONE",
     "submission": "NONE"
+  },
+  "control_contract_boundary_costs": {
+    "owned_interval_transition_rule": "For controls defined on reporting-owned return intervals, charge each transition between consecutive reconstructed held states on the preceding owned return, matching QntyLab backtest alignment.",
+    "terminal_boundary_rule": "Do not invent a liquidation or exit after the final owned return solely because a reporting block, contiguous segment, or analysis slice ends. This gives controls no extra terminal cost and is conservative against H003.",
+    "genuine_gap_rule": "Never charge or infer a transition across a genuine unnormalized gap. Each admitted 2021 contiguous segment constructs controls independently before chronological return concatenation."
   }
 }

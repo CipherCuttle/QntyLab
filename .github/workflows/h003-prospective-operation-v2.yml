@@ -6,31 +6,40 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: h003-prospective-operation-v2
   cancel-in-progress: false
 
 env:
-  H003_EVIDENCE_BRANCH: h003-prospective-evidence-v2
   H003_STATE_FILE: h003_prospective_v2_events.jsonl
   H003_STATE_DIR: ${{ github.workspace }}/.h003-prospective-state-v2
+  H003_RELEASE_PREFIX: h003-v2-evidence-
+  H003_PYTHON_VERSION: "3.12.14"
+  H003_NUMPY_VERSION: "2.5.3"
 
 jobs:
   record:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     timeout-minutes: 12
+    outputs:
+      changed: ${{ steps.record.outputs.changed }}
+      release_tag: ${{ steps.record.outputs.release_tag }}
+      ledger_sha256: ${{ steps.record.outputs.ledger_sha256 }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: master
           fetch-depth: 0
-      - uses: actions/setup-python@v5
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
-          python-version: "3.12"
-      - name: Install runtime dependencies
-        run: python -m pip install numpy requests
+          python-version: "3.12.14"
+      - name: Install frozen numerical runtime
+        run: python -m pip install --disable-pip-version-check "numpy==2.5.3"
       - name: Verify activation and runtime binding before source access
         run: |
           PYTHONPATH=. python - <<'PY'
@@ -44,12 +53,23 @@ jobs:
           runtime = json.loads(runtime_path.read_text(encoding="utf-8"))
           workflow_path = root / runtime["workflow_path"]
           actual = sha256(workflow_path.read_bytes()).hexdigest()
-          if actual != runtime["workflow_sha256"]:
-              raise SystemExit("H003 operational workflow identity mismatch")
-          if runtime["evidence_branch"] != "h003-prospective-evidence-v2":
-              raise SystemExit("H003 evidence branch binding mismatch")
-          if runtime["force_push"] != "FORBIDDEN":
-              raise SystemExit("H003 force-push firewall changed")
+          expected = {
+              "workflow_sha256": actual,
+              "python_version": "3.12.14",
+              "numpy_version": "2.5.3",
+              "checkout_action_sha": "11d5960a326750d5838078e36cf38b85af677262",
+              "setup_python_action_sha": "a26af69be951a213d495a4c3e4e4022e16d87065",
+              "upload_artifact_action_sha": "ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "download_artifact_action_sha": "d3f86a106a0bac45b974a628896c90dbdf5c8093",
+              "release_prefix": "h003-v2-evidence-",
+              "release_asset": "h003_prospective_v2_events.jsonl",
+              "persistence": "GITHUB_IMMUTABLE_RELEASE_HASH_CHAIN_V1",
+              "immutable_release_required": True,
+              "write_authority": "PERSIST_JOB_ONLY",
+          }
+          for key, value in expected.items():
+              if runtime.get(key) != value:
+                  raise SystemExit(f"H003 runtime binding mismatch: {key}")
           authority = validate_activation_authority(root)
           print(json.dumps({
               "operation_mode": authority["operation_mode"],
@@ -58,19 +78,47 @@ jobs:
               "runtime_workflow_sha256": actual,
           }, sort_keys=True))
           PY
-      - name: Restore durable evidence ledger
+      - name: Restore latest immutable evidence snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           mkdir -p "$H003_STATE_DIR"
-          if git ls-remote --exit-code --heads origin "$H003_EVIDENCE_BRANCH" >/dev/null 2>&1; then
-            git fetch --no-tags origin "+refs/heads/$H003_EVIDENCE_BRANCH:refs/remotes/origin/$H003_EVIDENCE_BRANCH"
-            git show "refs/remotes/origin/$H003_EVIDENCE_BRANCH:$H003_STATE_FILE" > "$H003_STATE_DIR/$H003_STATE_FILE"
+          MATCH=""
+          for PAGE in $(seq 1 50); do
+            PAGE_JSON="$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "repos/$GITHUB_REPOSITORY/releases?per_page=100&page=$PAGE")"
+            MATCH="$(printf '%s' "$PAGE_JSON" | jq -c --arg prefix "$H003_RELEASE_PREFIX" '[.[] | select(.tag_name | startswith($prefix))][0] // empty')"
+            if [ -n "$MATCH" ]; then
+              break
+            fi
+            COUNT="$(printf '%s' "$PAGE_JSON" | jq 'length')"
+            if [ "$COUNT" -lt 100 ]; then
+              break
+            fi
+            if [ "$PAGE" -eq 50 ]; then
+              echo "H003 release scan exceeded bounded search" >&2
+              exit 1
+            fi
+          done
+
+          if [ -z "$MATCH" ]; then
+            echo "NO_PRIOR_IMMUTABLE_LEDGER"
+            exit 0
           fi
-          if [ -f "$H003_STATE_DIR/$H003_STATE_FILE" ]; then
-            sha256sum "$H003_STATE_DIR/$H003_STATE_FILE"
-          else
-            echo "NO_PRIOR_LEDGER"
-          fi
+
+          test "$(printf '%s' "$MATCH" | jq -r '.immutable')" = "true"
+          TAG="$(printf '%s' "$MATCH" | jq -r '.tag_name')"
+          ASSET_COUNT="$(printf '%s' "$MATCH" | jq --arg name "$H003_STATE_FILE" '[.assets[] | select(.name == $name)] | length')"
+          test "$ASSET_COUNT" -eq 1
+          DIGEST="$(printf '%s' "$MATCH" | jq -r --arg name "$H003_STATE_FILE" '.assets[] | select(.name == $name) | .digest')"
+          case "$DIGEST" in
+            sha256:*) ;;
+            *) echo "Immutable release asset lacks SHA-256 digest" >&2; exit 1 ;;
+          esac
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern "$H003_STATE_FILE" --dir "$H003_STATE_DIR"
+          ACTUAL="$(sha256sum "$H003_STATE_DIR/$H003_STATE_FILE" | awk '{print $1}')"
+          test "$ACTUAL" = "${DIGEST#sha256:}"
+          echo "Restored immutable H003 evidence release $TAG ($ACTUAL)"
       - name: Record at most the next due H003 hour
         id: record
         run: |
@@ -105,36 +153,81 @@ jobs:
           fi
           if [ "$BEFORE" = "$AFTER" ]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-          fi
-      - name: Persist ledger by fast-forward-only evidence commit
-        if: steps.record.outputs.changed == 'true'
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          WORKTREE="$RUNNER_TEMP/h003-evidence-worktree"
-          rm -rf "$WORKTREE"
-          if git show-ref --verify --quiet "refs/remotes/origin/$H003_EVIDENCE_BRANCH"; then
-            git worktree add -B "$H003_EVIDENCE_BRANCH" "$WORKTREE" "refs/remotes/origin/$H003_EVIDENCE_BRANCH"
-          else
-            git worktree add --detach "$WORKTREE" HEAD
-            cd "$WORKTREE"
-            git checkout --orphan "$H003_EVIDENCE_BRANCH"
-            git rm -rf .
-          fi
-          cd "$WORKTREE"
-          cp "$H003_STATE_DIR/$H003_STATE_FILE" "$H003_STATE_FILE"
-          git add "$H003_STATE_FILE"
-          if git diff --cached --quiet; then
-            echo "Evidence ledger unchanged; no commit required"
             exit 0
           fi
-          TIP="$(tail -n 1 "$H003_STATE_FILE" | sha256sum | awk '{print $1}')"
-          git commit -m "research: append H003 prospective evidence ${TIP:0:16}"
-          git push origin "HEAD:refs/heads/$H003_EVIDENCE_BRANCH"
-          REMOTE="$(git ls-remote origin "refs/heads/$H003_EVIDENCE_BRANCH" | awk '{print $1}')"
-          test -n "$REMOTE"
-          test "$REMOTE" = "$(git rev-parse HEAD)"
-          echo "Persisted evidence branch tip $REMOTE"
+
+          LAST_EVENT_DIGEST="$(python - "$H003_STATE_DIR/$H003_STATE_FILE" <<'PY'
+          import json
+          import sys
+          lines = [line for line in open(sys.argv[1], encoding="utf-8") if line.strip()]
+          if not lines:
+              raise SystemExit("changed H003 ledger is empty")
+          print(json.loads(lines[-1])["event_digest"])
+          PY
+          )"
+          test "${#LAST_EVENT_DIGEST}" -eq 64
+          RELEASE_TAG="${H003_RELEASE_PREFIX}${LAST_EVENT_DIGEST:0:24}"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          echo "release_tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
+          echo "ledger_sha256=$AFTER" >> "$GITHUB_OUTPUT"
+          mkdir -p "$RUNNER_TEMP/h003-evidence-artifact"
+          cp "$H003_STATE_DIR/$H003_STATE_FILE" "$RUNNER_TEMP/h003-evidence-artifact/$H003_STATE_FILE"
+      - name: Stage ledger for write-isolated persistence job
+        if: steps.record.outputs.changed == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: h003-v2-ledger-${{ github.run_id }}
+          path: ${{ runner.temp }}/h003-evidence-artifact/h003_prospective_v2_events.jsonl
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
+
+  persist:
+    needs: record
+    if: needs.record.outputs.changed == 'true'
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Download recorder output without repository checkout
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: h003-v2-ledger-${{ github.run_id }}
+          path: ${{ runner.temp }}/h003-persist
+      - name: Verify isolated ledger artifact
+        env:
+          EXPECTED_LEDGER_SHA256: ${{ needs.record.outputs.ledger_sha256 }}
+        run: |
+          set -euo pipefail
+          test -f "$RUNNER_TEMP/h003-persist/$H003_STATE_FILE"
+          ACTUAL="$(sha256sum "$RUNNER_TEMP/h003-persist/$H003_STATE_FILE" | awk '{print $1}')"
+          test "$ACTUAL" = "$EXPECTED_LEDGER_SHA256"
+      - name: Publish and verify immutable evidence release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.record.outputs.release_tag }}
+          EXPECTED_LEDGER_SHA256: ${{ needs.record.outputs.ledger_sha256 }}
+        run: |
+          set -euo pipefail
+          LEDGER="$RUNNER_TEMP/h003-persist/$H003_STATE_FILE"
+
+          if RELEASE_JSON="$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" 2>/dev/null)"; then
+            echo "Release already exists; verifying idempotent immutable state"
+          else
+            gh release create "$RELEASE_TAG" "$LEDGER#$H003_STATE_FILE" \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title "$RELEASE_TAG" \
+              --notes "H003 V2 cumulative paper/shadow evidence snapshot. No economic verdict or downstream authority." \
+              --prerelease
+            RELEASE_JSON="$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG")"
+          fi
+
+          test "$(printf '%s' "$RELEASE_JSON" | jq -r '.draft')" = "false"
+          test "$(printf '%s' "$RELEASE_JSON" | jq -r '.immutable')" = "true"
+          ASSET_COUNT="$(printf '%s' "$RELEASE_JSON" | jq --arg name "$H003_STATE_FILE" '[.assets[] | select(.name == $name)] | length')"
+          test "$ASSET_COUNT" -eq 1
+          DIGEST="$(printf '%s' "$RELEASE_JSON" | jq -r --arg name "$H003_STATE_FILE" '.assets[] | select(.name == $name) | .digest')"
+          test "$DIGEST" = "sha256:$EXPECTED_LEDGER_SHA256"
+          echo "Immutable H003 evidence anchored at $RELEASE_TAG"

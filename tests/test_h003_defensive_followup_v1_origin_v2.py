@@ -69,6 +69,8 @@ def test_origin_v2_canonicalization_deadline_is_executable_and_fail_closed() -> 
     before = origin - timedelta(microseconds=1)
     assert validate_artifact_canonicalization_time(before.isoformat()) == before
 
+    with pytest.raises(ValueError, match="timezone-aware timestamp required"):
+        validate_artifact_canonicalization_time("2026-09-12T01:59:59")
     with pytest.raises(RuntimeError, match="BLOCK_AND_REISSUE_FUTURE_ORIGIN_NO_BACKFILL"):
         validate_artifact_canonicalization_time(EXPECTED_ORIGIN_UTC)
     with pytest.raises(RuntimeError, match="BLOCK_AND_REISSUE_FUTURE_ORIGIN_NO_BACKFILL"):

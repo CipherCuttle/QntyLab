@@ -33,16 +33,26 @@ jobs:
         run: PYTHONPATH=. python -m pytest -q tests/test_h003_edge_falsification_v0_data_attestation.py
       - name: Reproduce and attest exact frozen SOLUSDT bytes
         run: |
+          set +e
           PYTHONPATH=. python experiments/research/h003_edge_falsification_v0/attest_canonical_data.py \
             --out /tmp/h003-input-attestation.json
-          cat /tmp/h003-input-attestation.json
+          status=$?
+          set -e
+          if [[ -f /tmp/h003-input-attestation.json ]]; then
+            cat /tmp/h003-input-attestation.json
+          else
+            echo "ERROR: attestation receipt missing"
+            status=99
+          fi
+          exit "$status"
       - name: Preserve attestation receipt
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: h003-edge-falsification-v0-input-attestation
           path: /tmp/h003-input-attestation.json
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 30
       - name: Verify no whitespace errors
+        if: always()
         run: git diff --check ${{ github.event.pull_request.base.sha || 'HEAD^' }}..HEAD

@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
+from dataclasses import replace
+from datetime import datetime, timedelta
 
 import pytest
 
+import qntylab.h003_defensive_followup_v1_prospective_recorder_v2 as recorder_module
 from qntylab.h003_defensive_followup_v1_origin_v2 import EXPECTED_ORIGIN_UTC, parse_utc
 from qntylab.h003_defensive_followup_v1_prospective_recorder_v2 import (
     NETWORK_TRANSPORT,
@@ -17,9 +19,6 @@ from qntylab.h003_defensive_followup_v1_prospective_recorder_v2 import (
     validate_bars,
     validate_recorder_authority,
 )
-
-
-HOUR_MS = 3_600_000
 
 
 def _row(logical_close: datetime, close: float) -> list[object]:
@@ -82,7 +81,7 @@ def test_spot_row_mapping_requires_exact_completed_1h_contract() -> None:
         spot_bar_from_row("DOGEUSDT", _row(logical_close, 1.0))
 
 
-def test_source_coverage_is_exact_and_fail_closed() -> None:
+def test_source_coverage_is_exact_and_raw_evidence_bound() -> None:
     origin = parse_utc(EXPECTED_ORIGIN_UTC)
     through = origin + timedelta(hours=1)
     bars = _bars(through=through)
@@ -101,6 +100,29 @@ def test_source_coverage_is_exact_and_fail_closed() -> None:
     future.append(spot_bar_from_row("SOLUSDT", _row(through + timedelta(hours=1), 2.0)))
     with pytest.raises(RecorderBlocked, match="outside exact required warmup/recording window"):
         validate_bars(future, through_logical_close=through)
+
+    # A caller cannot make the strategy consume one price while the evidence
+    # chain hashes a different raw Binance row.
+    tampered = list(bars)
+    tampered[0] = replace(tampered[0], close=tampered[0].close + 99.0)
+    with pytest.raises(RecorderBlocked, match="diverge from raw Binance row evidence"):
+        validate_bars(tampered, through_logical_close=through)
+
+
+def test_fixture_bundle_is_the_only_public_receipt_emitting_authority_path(monkeypatch: pytest.MonkeyPatch) -> None:
+    assert "build_signal_receipts" not in recorder_module.__all__
+    assert not hasattr(recorder_module, "build_signal_receipts")
+    assert "_build_signal_receipts" not in recorder_module.__all__
+
+    origin = parse_utc(EXPECTED_ORIGIN_UTC)
+    bars = _bars(through=origin)
+
+    def blocked_authority(*args, **kwargs):
+        raise RecorderBlocked("authority gate sentinel")
+
+    monkeypatch.setattr(recorder_module, "validate_recorder_authority", blocked_authority)
+    with pytest.raises(RecorderBlocked, match="authority gate sentinel"):
+        recorder_module.build_fixture_bundle(bars, through_logical_close=origin)
 
 
 def test_fixture_bundle_emits_only_chained_shadow_signal_facts() -> None:

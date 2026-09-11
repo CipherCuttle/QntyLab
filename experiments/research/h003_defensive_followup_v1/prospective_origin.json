@@ -4,6 +4,12 @@
   "candidate_id": "CANDIDATE_H003_MA_48_192_LONG_FLAT",
   "variant_id": "variant_00eb140f03a5f6ab40600160",
   "activation_authorization_id": "H003_DEFENSIVE_FOLLOWUP_V1_ACTIVATION",
+  "source_contracts": {
+    "preregistration_path": "experiments/specs/h003_defensive_followup_v1.json",
+    "preregistration_sha256": "d56da275c4339163c77cd6e5599f151964be6f61323124f9f72d98e3974f44ca",
+    "activation_contract_path": "experiments/specs/h003_defensive_followup_v1_activation.json",
+    "activation_contract_sha256": "6d11a8e748e6a28560781a0d8044d913934bd2e199891932ed2fe4df3b3d7505"
+  },
   "activation_merge_sha": "adee935bfa596af5e7e0ad0fe1e5aadf9f7faad5",
   "activation_merge_committed_at_utc": "2026-09-11T17:59:07Z",
   "origin_rule": "next whole UTC hour strictly after activation merge commit timestamp",

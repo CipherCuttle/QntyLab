@@ -4,6 +4,7 @@ from datetime import UTC, datetime, timedelta
 from hashlib import sha256
 import fcntl
 import io
+import subprocess
 import zipfile
 
 import pytest
@@ -193,9 +194,7 @@ def test_materializer_requires_completed_exact_three_asset_coverage() -> None:
         )
 
 
-def test_default_operational_entry_points_require_future_canonical_activation(
-    tmp_path,
-) -> None:
+def test_default_operational_entry_points_follow_activation_lifecycle(tmp_path) -> None:
     origin = parse_utc(EXPECTED_ORIGIN_UTC)
     fetch_count = 0
 
@@ -214,10 +213,39 @@ def test_default_operational_entry_points_require_future_canonical_activation(
         archive_provider=_no_archive,
         rest_fetcher=counting_fetcher,
     )
-    with pytest.raises(SourceBlocked, match="activation artifact required"):
-        operation.status(now=origin)
-    with pytest.raises(SourceBlocked, match="activation artifact required"):
-        operation.record_due(now=origin + timedelta(minutes=5))
+    canonical = subprocess.check_output(
+        [
+            "git",
+            "log",
+            "--first-parent",
+            "-1",
+            "--format=%H",
+            "origin/master",
+            "--",
+            source_module.ACTIVATION_ARTIFACT_RELATIVE_PATH,
+        ],
+        cwd=source_module.ROOT,
+        text=True,
+    ).strip()
+    if not canonical:
+        with pytest.raises(
+            SourceBlocked,
+            match="activation artifact required|activation lineage is incomplete",
+        ):
+            operation.status(now=origin - timedelta(minutes=1))
+        with pytest.raises(
+            SourceBlocked,
+            match="activation artifact required|activation lineage is incomplete",
+        ):
+            operation.record_due(now=origin - timedelta(minutes=1))
+    else:
+        status = operation.status(now=origin - timedelta(minutes=1))
+        assert status["state"] == "ACTIVE_PROSPECTIVE_SHADOW"
+        assert status["operation_mode"] == "CANONICAL_PROSPECTIVE_SHADOW"
+        assert status["next_due_state"] == "NOT_DUE"
+        result = operation.record_due(now=origin - timedelta(minutes=1))
+        assert result["state"] == "NOT_DUE"
+        assert result["operation_mode"] == "CANONICAL_PROSPECTIVE_SHADOW"
     assert fetch_count == 0
     assert not (tmp_path / source_module.LEDGER_FILENAME).exists()
     assert "_qualification_mode" not in source_module.OperationalRecorder.__init__.__annotations__

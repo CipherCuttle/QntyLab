@@ -98,6 +98,7 @@ def test_origin_authorizes_shadow_recording_only_and_freezes_maturity() -> None:
     assert maturity["regime_coverage_deadline_utc"] == "2027-09-11T18:00:00Z"
 
     assert authority["status_after_this_artifact_is_canonical"] == "ACTIVE_PROSPECTIVE_SHADOW_RECORDING"
+    assert authority["recording_may_begin_only_after_artifact_is_canonical"] is True
     assert authority["market_data_recording_authorized"] is True
     assert authority["signal_recording_authorized"] is True
     assert authority["integrity_receipt_recording_authorized"] is True

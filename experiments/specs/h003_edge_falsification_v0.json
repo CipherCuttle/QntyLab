@@ -1,0 +1,236 @@
+{
+  "schema_version": "1.0.0",
+  "preregistration_id": "H003_EDGE_FALSIFICATION_V0",
+  "registered_at_utc": "2026-09-11T00:10:58Z",
+  "registration_only": true,
+  "status": "REGISTERED_NOT_EXECUTED",
+  "base_commit": "d7ed51f02e2e9a0a5fde74b54f6b8b9174847c7c",
+  "purpose": "Test whether the exact graveyarded H003 MA(48,192) long-flat rule contains a defensive/risk-timing edge despite its already-recorded failure to outperform buy-and-hold on the preregistered 2023 untouched holdout.",
+  "prior_evidence_is_frozen": true,
+  "prior_evidence": {
+    "candidate_id": "CANDIDATE_H003_MA_48_192_LONG_FLAT",
+    "variant_id": "variant_00eb140f03a5f6ab40600160",
+    "strategy_id": "H003_moving_average",
+    "strategy_version": "existing-qntylab-strategies-v1",
+    "parameters": {
+      "fast": 48,
+      "slow": 192,
+      "mode": "long_flat"
+    },
+    "graveyard_decision_event_id": "event_3206c7b09c089b274ca027a5",
+    "graveyard_reason_code": "FAILED_2023_HOLDOUT_MULTIPLE_GATES",
+    "graveyard_result_must_not_be_reinterpreted": "The exact variant failed its prior excess-return-vs-buy-and-hold continuation objective. This V0 does not reverse, overwrite, or weaken that result.",
+    "known_2023_sol_baseline": {
+      "buy_and_hold_return": 9.182182182182181,
+      "h003_net_return": 4.250723395010568,
+      "h003_maximum_drawdown": -0.35105796898536945,
+      "excess_return_vs_buy_and_hold": -4.931458787171613,
+      "interpretation": "Positive absolute return with materially lower return than buy-and-hold; motivates a distinct defensive-risk question only, not a rescue of the prior objective."
+    }
+  },
+  "new_claim": {
+    "claim_id": "H003_DEFENSIVE_RISK_TIMING_EDGE_V0",
+    "type": "RETROSPECTIVE_FALSIFICATION_NOT_VALIDATION",
+    "question": "Does the exact frozen H003 48/192 long-flat timing rule improve risk-adjusted or drawdown-adjusted utility relative to passive SOL exposure and exposure-matched timing controls after realistic costs?",
+    "null": "Any apparent defensive benefit is explainable by reduced market exposure, chance timing, one-regime concentration, or cost/accounting artifacts rather than information in the H003 timing rule.",
+    "alternative": "H003 timing adds information beyond exposure reduction: risk-adjusted and drawdown-adjusted performance beats preregistered controls with consistent sign across multiple historical blocks and survives stress costs.",
+    "causal_claim_prohibited": true,
+    "alpha_claim_prohibited": true,
+    "scientific_validation_prohibited": true
+  },
+  "scope": {
+    "primary_symbol": "SOLUSDT",
+    "bar_interval": "1h",
+    "input_kind": "OHLCV_1H_CSV",
+    "source_semantic": "BINANCE_SPOT_SOLUSDT_1H",
+    "strategy_variant_count": 1,
+    "parameter_search_allowed": false,
+    "neighbor_parameter_testing_allowed": false,
+    "replacement_winner_selection_allowed": false,
+    "portfolio_optimization_allowed": false
+  },
+  "data_contract": {
+    "canonical_manifest_path": "data/manifests/SOLUSDT-1h.json",
+    "canonical_csv_path": "data/raw/SOLUSDT-1h.csv",
+    "canonical_csv_sha256": "64bdb27a31003b0de25f3802affa8b412143a50bc8a5b76a399924626b01174a",
+    "canonical_row_count": 49831,
+    "canonical_start": "2021-01-01T00:00:00Z",
+    "canonical_end": "2026-09-08T20:00:00Z",
+    "complete_candles_only": true,
+    "gap_policy": "REJECT_CROSS_GAP_RETURNS_NO_FORWARD_FILL_NO_INTERPOLATION",
+    "exact_canonical_bytes_required_for_canonical_run": true,
+    "external_reconstruction_policy": "If exact canonical CSV bytes cannot be established, label the run EXTERNAL_RECONSTRUCTION and do not combine it with canonical evidence.",
+    "post_freeze_live_continuation": {
+      "start_after": "2026-09-08T20:00:00Z",
+      "role": "SANITY_CHECK_ONLY_UNTIL_SUFFICIENT_FORWARD_SAMPLE",
+      "minimum_forward_hours_before_any_forward_evidence_claim": 2160
+    }
+  },
+  "historical_blocks": [
+    {
+      "id": "BLOCK_2021",
+      "start": "2021-01-01T00:00:00Z",
+      "end": "2021-12-31T23:00:00Z"
+    },
+    {
+      "id": "BLOCK_2022",
+      "start": "2022-01-01T00:00:00Z",
+      "end": "2022-12-31T23:00:00Z"
+    },
+    {
+      "id": "BLOCK_2023_KNOWN_HOLDOUT",
+      "start": "2023-01-01T00:00:00Z",
+      "end": "2023-12-31T23:00:00Z",
+      "role": "KNOWN_NEGATIVE_PRIOR_EVIDENCE_NOT_NEW_HOLDOUT"
+    },
+    {
+      "id": "BLOCK_2024",
+      "start": "2024-01-01T00:00:00Z",
+      "end": "2024-12-31T23:00:00Z"
+    },
+    {
+      "id": "BLOCK_2025",
+      "start": "2025-01-01T00:00:00Z",
+      "end": "2025-12-31T23:00:00Z"
+    },
+    {
+      "id": "BLOCK_2026_TO_FREEZE",
+      "start": "2026-01-01T00:00:00Z",
+      "end": "2026-09-08T20:00:00Z"
+    }
+  ],
+  "cost_modes": {
+    "zero_cost_diagnostic": {
+      "fee_bps": 0,
+      "slippage_bps": 0,
+      "decision_role": "DIAGNOSTIC_ONLY"
+    },
+    "baseline": {
+      "fee_bps": 10,
+      "slippage_bps": 0,
+      "decision_role": "PRIMARY"
+    },
+    "stress": {
+      "fee_bps": 10,
+      "slippage_bps": 10,
+      "decision_role": "PRIMARY"
+    },
+    "severe_stress": {
+      "fee_bps": 10,
+      "slippage_bps": 20,
+      "decision_role": "ROBUSTNESS"
+    }
+  },
+  "primary_metrics": [
+    "annualized_sharpe",
+    "maximum_drawdown",
+    "calmar_ratio",
+    "net_return",
+    "exposure_fraction",
+    "turnover",
+    "trade_count"
+  ],
+  "benchmarks_and_controls": [
+    "SOL_BUY_AND_HOLD",
+    "CASH",
+    "EXPOSURE_MATCHED_RANDOM_TIMING",
+    "BLOCK_SHUFFLED_H003_SIGNAL",
+    "H003_SIGNAL_DELAYED_24H"
+  ],
+  "control_contract": {
+    "random_seed_set_before_results": [17011, 17029, 17041, 17053, 17077, 17093, 17107, 17123, 17137, 17159],
+    "exposure_matched_random_timing": "Each control path must match H003's realized long exposure fraction within each evaluated block; contiguous holding-run lengths must be sampled from the empirical H003 run-length distribution for that block.",
+    "block_shuffled_signal": "Circularly permute contiguous signal blocks using preregistered seeds; do not shuffle individual hourly returns independently.",
+    "delayed_signal": "Use the same frozen H003 signal delayed exactly 24 completed hourly bars; no parameter changes.",
+    "control_paths_per_seed": 1
+  },
+  "decision_gates": {
+    "integrity": [
+      "exact H003 causal one-bar shift preserved",
+      "no look-ahead",
+      "all accounting paths use identical return timestamps",
+      "no cross-gap returns",
+      "all receipts valid",
+      "canonical input SHA matches before a canonical verdict"
+    ],
+    "defensive_edge_candidate_requires_all": [
+      "baseline annualized_sharpe > buy-and-hold annualized_sharpe on the complete historical sample",
+      "baseline calmar_ratio > buy-and-hold calmar_ratio on the complete historical sample",
+      "baseline maximum_drawdown is less severe than buy-and-hold maximum_drawdown",
+      "stress annualized_sharpe remains positive",
+      "stress calmar_ratio remains positive",
+      "at least 4 of 6 historical blocks have H003 baseline Sharpe greater than the median exposure-matched random-timing Sharpe",
+      "at least 4 of 6 historical blocks have H003 baseline Calmar greater than the median exposure-matched random-timing Calmar",
+      "the known 2023 failure remains reported as a failure on its original excess-return objective"
+    ],
+    "falsified_if_any": [
+      "integrity gate fails",
+      "baseline complete-sample Sharpe does not beat buy-and-hold",
+      "baseline complete-sample Calmar does not beat buy-and-hold",
+      "stress Sharpe <= 0",
+      "stress Calmar <= 0",
+      "H003 fails to beat exposure-matched random timing on either Sharpe or Calmar in at least 3 historical blocks"
+    ],
+    "otherwise": "FRAGILE_OR_UNPROVEN"
+  },
+  "multiple_testing": {
+    "v0_strategy_count": 1,
+    "parameter_search": "NONE",
+    "white_reality_check": "DEFERRED_NOT_NEEDED_FOR_SINGLE_STRATEGY_V0",
+    "hansen_spa": "DEFERRED_TO_MULTI_VARIANT_V1_IF_V0_SURVIVES",
+    "deflated_sharpe_ratio": "REPORT_IF_IMPLEMENTATION_EXISTS_WITHOUT_ADDING_A_PARAMETER_SEARCH",
+    "probability_of_backtest_overfitting": "DEFERRED_TO_MULTI_VARIANT_V1_IF_V0_SURVIVES"
+  },
+  "verdict_vocabulary": [
+    "DEFENSIVE_EDGE_CANDIDATE",
+    "FRAGILE_OR_UNPROVEN",
+    "FALSIFIED",
+    "BLOCKED_BY_INPUT_OR_INTEGRITY"
+  ],
+  "execution_preconditions": [
+    "Run python -m qntylab.project_context brief and obey the canonical authority map.",
+    "Run python -m qntylab.research_ledger context and doctor.",
+    "Append a CANDIDATE_REOPENED event for variant_00eb140f03a5f6ab40600160 referencing previous decision event_3206c7b09c089b274ca027a5, with the material change limited to the defensive-risk objective in this preregistration.",
+    "Do not alter or remove the prior graveyard decision.",
+    "All official strategy trials must execute via qntylab.strategy_test.",
+    "Freeze implementation and tests before inspecting V0 result outputs.",
+    "One independent hostile review is required before interpreting the final result."
+  ],
+  "authority": {
+    "qntylab_only": true,
+    "qnty_acceptance": "NONE",
+    "qntyspot_policy": "NONE",
+    "capital": "NONE",
+    "signing": "NONE",
+    "submission": "NONE",
+    "live_trading": "FORBIDDEN",
+    "paper_trading": "FORBIDDEN",
+    "execution": "FORBIDDEN"
+  },
+  "literature_basis": [
+    {
+      "citation": "White, H. (2000), A Reality Check for Data Snooping, Econometrica 68(5), 1097-1126.",
+      "doi": "10.1111/1468-0262.00152",
+      "role": "Motivates explicit control of repeated strategy search and forbids post-result replacement winners."
+    },
+    {
+      "citation": "Hansen, P. R. (2005), A Test for Superior Predictive Ability, Journal of Business & Economic Statistics 23(4), 365-380.",
+      "doi": "10.1198/073500105000000063",
+      "role": "Reserved for a later multi-variant universe if V0 survives."
+    },
+    {
+      "citation": "Bailey, D. H. and Lopez de Prado, M. (2014), The Deflated Sharpe Ratio, Journal of Portfolio Management 40(5), 94-107.",
+      "doi": "10.3905/jpm.2014.40.5.094",
+      "role": "Motivates skepticism about observed Sharpe after selection and non-normal returns."
+    },
+    {
+      "citation": "Bailey, D. H., Borwein, J. M., Lopez de Prado, M. and Zhu, Q. J. (2017), The Probability of Backtest Overfitting, Journal of Computational Finance 20(4).",
+      "role": "Reserved for later multi-variant V1 cross-validation if V0 survives."
+    },
+    {
+      "citation": "Moskowitz, T. J., Ooi, Y. H. and Pedersen, L. H. (2012), Time Series Momentum, Journal of Financial Economics 104(2), 228-250.",
+      "doi": "10.1016/j.jfineco.2011.11.003",
+      "role": "Provides a prior that trend effects are plausible without validating this exact SOL hourly MA rule."
+    }
+  ]
+}

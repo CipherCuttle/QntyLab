@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0.0",
+  "project_id": "H003_PROSPECTIVE_SOURCE_V2_ACTIVATION",
+  "state": "ACTIVE",
+  "candidate_id": "CANDIDATE_H003_MA_48_192_LONG_FLAT",
+  "variant_id": "variant_00eb140f03a5f6ab40600160",
+  "prospective_origin_utc": "2026-09-12T02:00:00Z",
+  "source_qualification_merge_sha": "1827bb3e753970aed0cfbd0adc27bba121b41d5d",
+  "source_implementation_path": "qntylab/h003_defensive_followup_v1_prospective_source_v2.py",
+  "source_implementation_sha256": "74e1906f1bb54123ff77347629d5da6bafcd400b9a979d6d5526bbc6ccf08633",
+  "collection_mode": "PAPER_SHADOW_ONLY",
+  "market_data_recording_authorized": true,
+  "signal_recording_authorized": true,
+  "scheduler_authorized": true,
+  "backfill": "FORBIDDEN",
+  "interim_economic_verdict_authorized": false,
+  "qnty_acceptance_authorized": false,
+  "qntyspot_policy_authorized": false,
+  "live_execution_authorized": false,
+  "capital_authority": "NONE",
+  "signing_authority": "NONE",
+  "submission_authority": "NONE"
+}

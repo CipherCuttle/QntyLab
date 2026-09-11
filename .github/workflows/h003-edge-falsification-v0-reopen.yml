@@ -22,7 +22,7 @@ on:
       - ".github/workflows/h003-edge-falsification-v0-reopen.yml"
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   reopen-lock:
@@ -69,7 +69,7 @@ jobs:
           assert variant["status"] in research_ledger.RUNNABLE_STATUSES
           assert variant["status"] not in research_ledger.TERMINAL_DECISION_STATUSES
           PY
-      - name: Preserve generated canonical ledger files
+      - name: Preserve canonical ledger verification artifact
         uses: actions/upload-artifact@v4
         with:
           name: h003-edge-falsification-v0-reopen-ledger
@@ -78,29 +78,14 @@ jobs:
             experiments/research/state.json
             experiments/research/trial_index.json
           retention-days: 30
-      - name: Verify only authorized ledger generation is dirty
+      - name: Verify canonical ledger files are already committed
         run: |
-          unexpected="$(git diff --name-only | grep -Ev '^(experiments/research/(candidates.jsonl|state.json|trial_index.json))$' || true)"
-          if [[ -n "$unexpected" ]]; then
-            echo "$unexpected"
+          if ! git diff --quiet -- \
+            experiments/research/candidates.jsonl \
+            experiments/research/state.json \
+            experiments/research/trial_index.json; then
+            git diff --name-only
+            echo "canonical reopen generated uncommitted ledger changes"
             exit 1
           fi
           git diff --check
-      - name: Commit generated ledger bytes to same-repository PR branch
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
-        env:
-          HEAD_REF: ${{ github.head_ref }}
-        run: |
-          paths=(
-            experiments/research/candidates.jsonl
-            experiments/research/state.json
-            experiments/research/trial_index.json
-          )
-          if git diff --quiet -- "${paths[@]}"; then
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- "${paths[@]}"
-          git commit -m "research: materialize H003 reopen ledger state"
-          git push origin "HEAD:${HEAD_REF}"

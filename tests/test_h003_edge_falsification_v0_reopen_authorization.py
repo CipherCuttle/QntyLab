@@ -13,6 +13,7 @@ RESEARCH_ROOT = ROOT / "experiments/research"
 AUTH = ROOT / "experiments/specs/h003_edge_falsification_v0_trial_authorization.json"
 REOPEN = ROOT / "experiments/research/h003_edge_falsification_v0/reopen_event.json"
 ANALYSIS = ROOT / "experiments/specs/h003_edge_falsification_v0_analysis_contract.json"
+TRIAL_INDEX = RESEARCH_ROOT / "trial_index.json"
 
 VARIANT_ID = "variant_00eb140f03a5f6ab40600160"
 CANDIDATE_ID = "CANDIDATE_H003_MA_48_192_LONG_FLAT"
@@ -90,16 +91,32 @@ def test_causal_boundary_contract_requires_193_pre_reporting_closes() -> None:
     ]
 
 
-def test_central_preflight_allows_only_authorized_reopen_trials() -> None:
+def test_central_preflight_enforces_reopen_authorization_and_duplicate_lifecycle() -> None:
     allowed = _config(
         start="2021-12-23T23:00:00Z",
         end="2022-12-31T23:00:00Z",
         fee_bps=10,
         slippage_bps=0,
     )
-    binding = preflight(config=allowed, symbol="SOLUSDT", input_sha256=CANONICAL_SHA, root=RESEARCH_ROOT)
-    assert binding["variant_id"] == VARIANT_ID
-    assert binding["reopen_authorization_id"] == "H003_EDGE_FALSIFICATION_V0"
+    allowed_trial_id = compute_trial_id(
+        variant_id=VARIANT_ID,
+        symbol="SOLUSDT",
+        input_sha256=CANONICAL_SHA,
+        evaluation_start=allowed["evaluation_start"],
+        evaluation_end=allowed["evaluation_end"],
+        fee_bps=float(allowed["fee_bps"]),
+        slippage_bps=float(allowed["slippage_bps"]),
+        gap_policy=allowed["gap_policy"],
+        expected_interval=allowed["expected_interval"],
+    )
+    trial_index = json.loads(TRIAL_INDEX.read_text(encoding="utf-8"))
+    if allowed_trial_id in trial_index["trials"]:
+        with pytest.raises(LedgerError, match="exact trial already completed"):
+            preflight(config=allowed, symbol="SOLUSDT", input_sha256=CANONICAL_SHA, root=RESEARCH_ROOT)
+    else:
+        binding = preflight(config=allowed, symbol="SOLUSDT", input_sha256=CANONICAL_SHA, root=RESEARCH_ROOT)
+        assert binding["variant_id"] == VARIANT_ID
+        assert binding["reopen_authorization_id"] == "H003_EDGE_FALSIFICATION_V0"
 
     unauthorized_window = dict(allowed, evaluation_start="2021-12-24T00:00:00Z")
     with pytest.raises(LedgerError, match="not authorized by active reopen contract"):

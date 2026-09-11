@@ -1,0 +1,65 @@
+name: H003 Prospective Recorder V2
+
+on:
+  pull_request:
+    paths:
+      - "experiments/research/h003_defensive_followup_v1/prospective_origin_v2.json"
+      - "experiments/specs/h003_defensive_followup_v1.json"
+      - "experiments/specs/h003_defensive_followup_v1_prospective_reopen_v2.json"
+      - "experiments/research/h003_defensive_followup_v1/timing_semantics_reconciliation_v1.json"
+      - "experiments/research/state.json"
+      - "qntylab/h003_defensive_followup_v1_origin_v2.py"
+      - "qntylab/h003_defensive_followup_v1_prospective_reopen.py"
+      - "qntylab/h003_defensive_followup_v1_prospective_recorder_v2.py"
+      - "tests/test_h003_defensive_followup_v1_origin_v2.py"
+      - "tests/test_h003_defensive_followup_v1_prospective_reopen_v2.py"
+      - "tests/test_h003_timing_semantics_reconciliation_v1.py"
+      - "tests/test_h003_defensive_followup_v1_prospective_recorder_v2.py"
+      - ".github/workflows/h003-prospective-origin-v2.yml"
+      - ".github/workflows/h003-prospective-recorder-v2.yml"
+  push:
+    branches:
+      - master
+    paths:
+      - "experiments/research/h003_defensive_followup_v1/prospective_origin_v2.json"
+      - "experiments/specs/h003_defensive_followup_v1.json"
+      - "experiments/specs/h003_defensive_followup_v1_prospective_reopen_v2.json"
+      - "experiments/research/h003_defensive_followup_v1/timing_semantics_reconciliation_v1.json"
+      - "experiments/research/state.json"
+      - "qntylab/h003_defensive_followup_v1_origin_v2.py"
+      - "qntylab/h003_defensive_followup_v1_prospective_reopen.py"
+      - "qntylab/h003_defensive_followup_v1_prospective_recorder_v2.py"
+      - "tests/test_h003_defensive_followup_v1_origin_v2.py"
+      - "tests/test_h003_defensive_followup_v1_prospective_reopen_v2.py"
+      - "tests/test_h003_timing_semantics_reconciliation_v1.py"
+      - "tests/test_h003_defensive_followup_v1_prospective_recorder_v2.py"
+      - ".github/workflows/h003-prospective-origin-v2.yml"
+      - ".github/workflows/h003-prospective-recorder-v2.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  recorder-v2-fixture-lock:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install focused dependencies
+        run: python -m pip install numpy pytest requests
+      - name: Verify fixture-only recorder and authority chain
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            tests/test_h003_defensive_followup_v1_prospective_recorder_v2.py \
+            tests/test_h003_defensive_followup_v1_origin_v2.py \
+            tests/test_h003_defensive_followup_v1_prospective_reopen_v2.py \
+            tests/test_h003_timing_semantics_reconciliation_v1.py
+      - name: Verify research ledger
+        run: PYTHONPATH=. python -m qntylab.research_ledger doctor
+      - name: Verify bounded diff hygiene
+        run: git diff --check

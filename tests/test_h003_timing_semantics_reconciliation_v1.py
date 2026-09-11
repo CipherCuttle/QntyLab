@@ -22,13 +22,15 @@ def _load(path: Path) -> dict:
 
 
 def test_legacy_h003_path_has_one_extra_bar_delay() -> None:
-    # 192 completed one-hour bars at 1.0 leave MA48 == MA192. At row 192,
-    # the close jumps to 2.0, making the completed-bar raw MA relation LONG.
-    # The frozen prose says that decision should own 2.0 -> 4.0 immediately.
-    close = np.ones(195, dtype=float)
-    close[192] = 2.0
-    close[193] = 4.0
-    close[194] = 8.0
+    # A falling 192-bar history makes the completed-bar relation at row 191
+    # unambiguously FLAT under long_flat. A large row-192 jump makes the raw
+    # relation at row 192 unambiguously LONG, avoiding equality/roundoff edges.
+    # The frozen prose says that row-192 decision should own 50 -> 100.
+    close = np.empty(195, dtype=float)
+    close[:192] = np.linspace(3.0, 1.0, 192)
+    close[192] = 50.0
+    close[193] = 100.0
+    close[194] = 200.0
 
     position = reconstruct_h003(close)
     net = net_return_path(close, position, total_cost_bps=0.0)
@@ -38,8 +40,8 @@ def test_legacy_h003_path_has_one_extra_bar_delay() -> None:
     assert position[193] == 1.0
 
     # net_return_path then uses position[:-1] for close[i] -> close[i+1].
-    # Therefore the immediately following 2 -> 4 return is not owned, while
-    # the later 4 -> 8 return is. This pins the historical double-alignment.
+    # Therefore the immediately following 50 -> 100 return is not owned,
+    # while the later 100 -> 200 return is. This pins the legacy extra delay.
     assert net[192] == 0.0
     assert net[193] == 1.0
 

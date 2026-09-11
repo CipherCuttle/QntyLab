@@ -57,7 +57,9 @@ def _bars(*, through: datetime):
             if symbol == "SOLUSDT":
                 close = 1.0 if index < 144 else 2.0
             elif symbol == "BTCUSDT":
-                close = 1.0
+                # Strictly falling history makes MA48 < MA192 by a wide margin;
+                # avoid floating equality deciding the synthetic FLAT fixture.
+                close = 3.0 - 0.005 * index
             else:
                 close = 2.0 if index < 144 else 1.0
             result.append(spot_bar_from_row(symbol, _row(logical_close, close)))

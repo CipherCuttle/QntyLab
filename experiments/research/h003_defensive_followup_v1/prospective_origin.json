@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0.0",
+  "artifact_id": "H003_DEFENSIVE_FOLLOWUP_V1_PROSPECTIVE_ORIGIN",
+  "candidate_id": "CANDIDATE_H003_MA_48_192_LONG_FLAT",
+  "variant_id": "variant_00eb140f03a5f6ab40600160",
+  "activation_authorization_id": "H003_DEFENSIVE_FOLLOWUP_V1_ACTIVATION",
+  "activation_merge_sha": "adee935bfa596af5e7e0ad0fe1e5aadf9f7faad5",
+  "activation_merge_committed_at_utc": "2026-09-11T17:59:07Z",
+  "origin_rule": "next whole UTC hour strictly after activation merge commit timestamp",
+  "prospective_origin_utc": "2026-09-11T18:00:00Z",
+  "assets": [
+    "SOLUSDT",
+    "BTCUSDT",
+    "ETHUSDT"
+  ],
+  "market": "Binance Spot",
+  "timeframe": "1h",
+  "strategy": {
+    "strategy_id": "H003_moving_average",
+    "strategy_version": "existing-qntylab-strategies-v1",
+    "fast": 48,
+    "slow": 192,
+    "mode": "long_flat",
+    "leverage": 1.0
+  },
+  "return_ownership": {
+    "pre_origin_closes_may_initialize_state_only": true,
+    "pre_origin_return_or_transition_cost_in_metrics": false,
+    "owned_return_requires_ending_bar_timestamp_strictly_greater_than_origin": true,
+    "first_possible_owned_return_end_utc": "2026-09-11T19:00:00Z"
+  },
+  "maturity": {
+    "minimum_calendar_days_before_economic_verdict": 180,
+    "earliest_calendar_maturity_utc": "2027-03-10T18:00:00Z",
+    "minimum_genuine_position_state_changes_per_asset": 2,
+    "maximum_calendar_days_for_regime_coverage_gate": 365,
+    "regime_coverage_deadline_utc": "2027-09-11T18:00:00Z",
+    "insufficient_regime_coverage_verdict": "INCONCLUSIVE_INSUFFICIENT_REGIME_COVERAGE"
+  },
+  "recorder_authority": {
+    "status_after_this_artifact_is_canonical": "ACTIVE_PROSPECTIVE_SHADOW_RECORDING",
+    "market_data_recording_authorized": true,
+    "signal_recording_authorized": true,
+    "integrity_receipt_recording_authorized": true,
+    "catch_up_from_frozen_origin_without_human_result_selection": true,
+    "economic_performance_verdict_before_maturity_forbidden": true,
+    "parameter_changes_forbidden": true,
+    "asset_changes_forbidden": true,
+    "qnty_acceptance": "NONE",
+    "qntyspot_policy": "NONE",
+    "live_execution": "FORBIDDEN",
+    "capital": "NONE",
+    "signing": "NONE",
+    "submission": "NONE"
+  },
+  "materialization_integrity": {
+    "derived_from_git_metadata_only": true,
+    "market_data_accessed_to_choose_origin": false,
+    "strategy_result_accessed_to_choose_origin": false,
+    "origin_may_not_be_moved_after_materialization": true
+  }
+}

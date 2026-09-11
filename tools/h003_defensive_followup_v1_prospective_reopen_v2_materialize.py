@@ -42,7 +42,7 @@ def main() -> None:
     state = json.loads((ROOT / "experiments/research/state.json").read_text(encoding="utf-8"))
     variant = state["variants"][event["variant_id"]]
     if variant.get("status") != "PROPOSED" or variant.get("active_reopen_event_id") != REOPEN_EVENT_ID:
-        raise RuntimeError("prospective reopen did not materialize as the active fail-closed generation")
+        raise RuntimeError(f"prospective reopen did not materialize as the active fail-closed generation: {variant!r}")
 
 
 if __name__ == "__main__":

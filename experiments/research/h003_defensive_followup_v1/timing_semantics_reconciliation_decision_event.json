@@ -1,0 +1,26 @@
+{
+  "candidate_id": "CANDIDATE_H003_MA_48_192_LONG_FLAT",
+  "decision_note": "Bound H003 prospective recording is blocked before any recorder implementation. The historical H003 path applies the completed-bar MA relation one extra bar later than the frozen t->t+1 prose because strategies._causal shifts once and the H003 net-return path pairs position[:-1] with the following close return. PR #266 also made its 18:00Z origin canonical only at 18:06:41Z without a preauthorized sealed-backfill rule and did not append the required research-ledger activation transition; its Codex P1 was merged unresolved. Preserve all historical evidence unchanged. Prospectively use the originally preregistered intended semantics only after a new explicit reopen and strictly future Git-backed origin. No backfill from the PR #266 origin is authorized.",
+  "event_id": "event_decision_232206a8b9e45a253b952b3e",
+  "event_type": "DECISION_RECORDED",
+  "evidence_paths": [
+    "experiments/research/h003_defensive_followup_v1/timing_semantics_reconciliation_v1.json"
+  ],
+  "evidence_sha256": {
+    "experiments/research/h003_defensive_followup_v1/timing_semantics_reconciliation_v1.json": "aff7b50c424d0ef85b9bc59aa541b8c52c5f71681370668ffbebb344a9960ca3"
+  },
+  "family_id": "moving_average_trend",
+  "reason_codes": [
+    "CONFIRMED_H003_LEGACY_ONE_EXTRA_BAR_DELAY",
+    "IMPLEMENTATION_PREREG_SEMANTICS_DIVERGENCE",
+    "PR266_ORIGIN_ELAPSED_BEFORE_CANONICAL_ARTIFACT",
+    "PR266_RESEARCH_LEDGER_ACTIVATION_MISSING",
+    "PR266_P1_MERGED_UNRESOLVED",
+    "PROSPECTIVE_RECORDING_NOT_AUTHORIZED"
+  ],
+  "recorded_at_utc": "2026-09-11T18:51:00Z",
+  "revisit_condition": "A separate Git-backed CANDIDATE_REOPENED event must explicitly bind H003_TIMING_SEMANTICS_RECONCILIATION_V1, preserve legacy V0 evidence without rerunning it to choose semantics, require a regression proving exactly one t->t+1 ownership step for the prospective recorder, and bind a new prospective origin strictly in the future after that authority becomes canonical. No PR #266-origin backfill and no Qnty/QntySpot/live authority.",
+  "scope": "EXACT_VARIANT",
+  "status": "BLOCKED",
+  "variant_id": "variant_00eb140f03a5f6ab40600160"
+}

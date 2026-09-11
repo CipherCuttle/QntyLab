@@ -1,0 +1,125 @@
+{
+  "schema_version": "1.0.0",
+  "authorization_id": "H003_DEFENSIVE_FOLLOWUP_V1",
+  "candidate_id": "CANDIDATE_H003_MA_48_192_LONG_FLAT",
+  "variant_id": "variant_00eb140f03a5f6ab40600160",
+  "strategy_id": "H003_moving_average",
+  "strategy_version": "existing-qntylab-strategies-v1",
+  "research_question": "Does the already-frozen H003 48/192 long-flat rule provide a reproducible defensive/risk-adjusted benefit outside the SOL retrospective sample that produced H003_EDGE_FALSIFICATION_V0?",
+  "claim_boundary": {
+    "allowed_claim": "defensive/risk-adjusted mechanism candidate only",
+    "forbidden_claims": [
+      "validated alpha",
+      "absolute-return superiority",
+      "causal effect",
+      "family-wide moving-average validity",
+      "Qnty acceptance",
+      "QntySpot policy admission",
+      "paper/live trading authorization",
+      "capital allocation"
+    ],
+    "prior_2023_holdout_failure_must_remain_preserved": true,
+    "same_sample_sol_reruns_cannot_promote_claim": true
+  },
+  "frozen_strategy": {
+    "fast": 48,
+    "slow": 192,
+    "mode": "long_flat",
+    "decision_rule": "completed bar t; raw sign(MA48-MA192); negative maps to FLAT; one-bar shift so position decided at t owns t->t+1 return",
+    "parameter_search_authorized": false,
+    "asset_specific_parameters_authorized": false,
+    "leverage": 1.0
+  },
+  "cost_modes": [
+    {"id": "zero_cost_diagnostic", "fee_bps": 0, "slippage_bps": 0},
+    {"id": "baseline", "fee_bps": 10, "slippage_bps": 0},
+    {"id": "stress", "fee_bps": 10, "slippage_bps": 10},
+    {"id": "severe_stress", "fee_bps": 10, "slippage_bps": 20}
+  ],
+  "cross_asset_replication": {
+    "execution_authorized_only_after_this_prereg_is_merged": true,
+    "assets": [
+      {
+        "symbol": "BTCUSDT",
+        "market": "Binance Spot",
+        "timeframe": "1h",
+        "raw_manifest_path": "data/manifests/BTCUSDT-1h.json",
+        "raw_sha256": "6dcc8c6293f24e2e91957b286a96d9b87fd646e4b57c846495bd41d1aa225b65",
+        "historical_end": "2026-07-28T18:00:00Z",
+        "normalized_2023_path": "data/derived/focused_trend_validation_v1/BTCUSDT-spot-1h-2023-halt-normalized.csv",
+        "normalized_2023_sha256": "08d5649e86743e9485fb55a3978b96f7b0b5483b33223534d52d4fe0a745d10e"
+      },
+      {
+        "symbol": "ETHUSDT",
+        "market": "Binance Spot",
+        "timeframe": "1h",
+        "raw_manifest_path": "data/manifests/ETHUSDT-1h.json",
+        "raw_sha256": "3584c161874dc3b8d8f9961901e5abaadebe32a1aaba6d321106b8ccb1f61187",
+        "historical_end": "2026-07-28T18:00:00Z",
+        "normalized_2023_path": "data/derived/focused_trend_validation_v1/ETHUSDT-spot-1h-2023-halt-normalized.csv",
+        "normalized_2023_sha256": "a3cfb7733aad701b43fd383ac32f52252d229d2275147698449b2007bdff0d40"
+      }
+    ],
+    "history_start": "2021-01-01T00:00:00Z",
+    "continuity": {
+      "reconstruct_full_path_before_reporting_slice": true,
+      "minimum_pre_reporting_closes": 193,
+      "unnormalized_exchange_gaps_are_hard_state_resets": true,
+      "the_2023_binance_spot_halt_normalization_is_not_a_reset": true,
+      "no_transition_or_cost_may_be_inferred_across_a_genuine_gap": true
+    },
+    "primary_success_gate": {
+      "both_assets_baseline_maximum_drawdown_must_be_shallower_than_buy_and_hold": true,
+      "minimum_wins_across_four_baseline_risk_adjusted_comparisons": 3,
+      "risk_adjusted_comparisons": [
+        "BTCUSDT annualized_sharpe > BTCUSDT buy_and_hold annualized_sharpe",
+        "BTCUSDT calmar_ratio > BTCUSDT buy_and_hold calmar_ratio",
+        "ETHUSDT annualized_sharpe > ETHUSDT buy_and_hold annualized_sharpe",
+        "ETHUSDT calmar_ratio > ETHUSDT buy_and_hold calmar_ratio"
+      ],
+      "both_assets_stress_annualized_sharpe_must_be_positive": true
+    },
+    "interpretation": {
+      "pass": "CROSS_ASSET_DEFENSIVE_REPLICATION_PASS",
+      "otherwise": "CROSS_ASSET_DEFENSIVE_REPLICATION_FAIL",
+      "no_post_result_parameter_changes": true
+    }
+  },
+  "prospective_sol": {
+    "mode": "paper_shadow_only",
+    "activation_rule": "After this preregistration is merged to master, create a separate activation artifact from Git metadata only. The prospective origin is the first complete UTC 1h bar whose open timestamp is greater than or equal to the next whole UTC hour strictly after the prereg merge commit timestamp.",
+    "warmup_rule": "Pre-origin closes may initialize MA48/MA192 state only; no pre-origin return may enter prospective reporting metrics.",
+    "minimum_calendar_days_before_economic_verdict": 180,
+    "minimum_genuine_position_state_changes_before_economic_verdict": 2,
+    "maximum_calendar_days_for_regime_coverage_gate": 365,
+    "if_365_days_elapse_with_fewer_than_two_state_changes": "INCONCLUSIVE_INSUFFICIENT_REGIME_COVERAGE",
+    "interim_policy": {
+      "integrity_checks_allowed": true,
+      "signal_and_receipt_recording_allowed": true,
+      "economic_performance_verdict_before_maturity_forbidden": true,
+      "parameter_changes_forbidden": true
+    },
+    "primary_success_gate_at_maturity": {
+      "baseline_maximum_drawdown_shallower_than_buy_and_hold": true,
+      "baseline_annualized_sharpe_greater_than_or_equal_to_buy_and_hold": true,
+      "baseline_calmar_ratio_greater_than_or_equal_to_buy_and_hold": true,
+      "stress_annualized_sharpe_positive": true
+    }
+  },
+  "combined_adjudication": {
+    "DEFENSIVE_REPLICATION_SUPPORTED": "cross-asset primary gate passes AND prospective SOL primary gate passes",
+    "FRAGILE_OR_UNPROVEN": "exactly one of the cross-asset or prospective primary gates passes, or prospective regime coverage is inconclusive",
+    "FALSIFIED": "both primary gates fail",
+    "BLOCKED_BY_INPUT_OR_INTEGRITY": "any frozen input, provenance, continuity, receipt, implementation, or activation identity check fails",
+    "downstream_authority_after_any_verdict": "NONE; any Qnty/QntySpot paper or live canary requires a separate explicit authorization"
+  },
+  "authority": {
+    "qntylab_research_only": true,
+    "qnty_acceptance": "NONE",
+    "qntyspot_policy": "NONE",
+    "execution": "RESEARCH_BACKTEST_AND_PAPER_SHADOW_ONLY",
+    "capital": "NONE",
+    "signing": "NONE",
+    "submission": "NONE"
+  }
+}

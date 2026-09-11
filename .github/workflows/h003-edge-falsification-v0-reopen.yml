@@ -22,7 +22,7 @@ on:
       - ".github/workflows/h003-edge-falsification-v0-reopen.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   reopen-lock:
@@ -86,3 +86,21 @@ jobs:
             exit 1
           fi
           git diff --check
+      - name: Commit generated ledger bytes to same-repository PR branch
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          paths=(
+            experiments/research/candidates.jsonl
+            experiments/research/state.json
+            experiments/research/trial_index.json
+          )
+          if git diff --quiet -- "${paths[@]}"; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- "${paths[@]}"
+          git commit -m "research: materialize H003 reopen ledger state"
+          git push origin "HEAD:${HEAD_REF}"

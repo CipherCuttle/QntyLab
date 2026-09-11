@@ -35,7 +35,18 @@
   },
   "control_generation": {
     "rng": "numpy.random.Generator(numpy.random.PCG64(seed))",
-    "seeds": [17011, 17029, 17041, 17053, 17077, 17093, 17107, 17123, 17137, 17159],
+    "seeds": [
+      17011,
+      17029,
+      17041,
+      17053,
+      17077,
+      17093,
+      17107,
+      17123,
+      17137,
+      17159
+    ],
     "EXPOSURE_MATCHED_RANDOM_TIMING": {
       "algorithm": [
         "Use the exact binary H003 held-position sequence on admitted return intervals within one historical decision block.",
@@ -47,7 +58,8 @@
         "Apply the same cost mode to transitions in the reconstructed sequence."
       ],
       "comparison_statistic": "median metric across the 10 frozen seeds",
-      "post_result_seed_changes_forbidden": true
+      "post_result_seed_changes_forbidden": true,
+      "decision_role": "PRIMARY"
     },
     "BLOCK_SHUFFLED_H003_SIGNAL": {
       "algorithm": [
@@ -57,12 +69,25 @@
         "No return series is shuffled; only the timing-position blocks are permuted.",
         "Apply the same cost mode after reconstruction."
       ],
-      "comparison_statistic": "median metric across the 10 frozen seeds"
+      "comparison_statistic": "median metric across the 10 frozen seeds",
+      "decision_role": "DIAGNOSTIC_ONLY"
     },
     "H003_SIGNAL_DELAYED_24H": {
       "algorithm": "Set held_control[t] = 0 for the first 24 admitted return intervals and held_control[t] = h003_held[t-24] thereafter; apply the same cost mode.",
-      "parameter_search": "NONE"
+      "parameter_search": "NONE",
+      "decision_role": "DIAGNOSTIC_ONLY"
     }
+  },
+  "state_continuity": {
+    "rule": "Calendar-year/reporting boundaries and file-materialization boundaries are not H003 strategy reset boundaries. Reconstruct the exact 48/192 position path before slicing reporting blocks.",
+    "minimum_pre_block_history_closes": 192,
+    "reset_allowed_only_at": [
+      "the frozen dataset start when no earlier admitted close exists",
+      "a manifest-declared timestamp gap that remains unnormalized under this contract"
+    ],
+    "authorized_2023_halt_is_not_a_reset": "The existing BINANCE_SPOT_HALT_NORMALIZATION_V1 bar at 2023-03-24T13:00:00Z is an authorized normalized observation for this V0, so it does not create a strategy reset.",
+    "reporting_block_return_ownership": "A reporting block owns each admitted net return whose ending close timestamp lies within that block. The analysis slice must therefore include the immediately preceding admitted close and inherited position so the year-boundary return/state/transition are not dropped.",
+    "official_trial_role": "An official qntylab.strategy_test path-attestation run may begin before a reporting block to provide the required contiguous prehistory. The analyzer must first match that official run on its full attested window, reconstruct H003 on the full window, and only then slice the reporting block. Passing a bare calendar-year close array directly to positions() is forbidden."
   },
   "gap_and_input_semantics": {
     "global_rule": "Never create an ordinary missing candle and never compute a return across a timestamp gap.",
@@ -77,7 +102,7 @@
     ],
     "BLOCK_2021": {
       "policy": "SEGMENT_FAIL_CLOSED_NO_SYNTHETIC_BARS",
-      "procedure": "Split 2021 at every manifest-declared gap into maximal contiguous hourly segments. Each segment is an independent qntylab.strategy_test run under the exact H003 variant and cost mode. The strategy state resets at each segment boundary; no pre-gap state is carried across missing time. Concatenate only the admitted per-segment net-return paths in chronological order for block-level risk metrics. Do not charge or infer a transition across a gap.",
+      "procedure": "Split only at manifest-declared 2021 timestamp gaps into maximal contiguous hourly segments. Each maximal segment is an independent qntylab.strategy_test path-attestation run under the exact H003 variant and cost mode. A genuine unnormalized gap resets state because no cross-gap observation is admitted. Calendar boundaries do not reset state. For reporting, reconstruct positions on each full segment first, then slice owned return intervals; concatenate admitted per-segment net-return paths chronologically. Do not charge or infer a transition across a genuine gap.",
       "interpretation": "Conservative diagnostic of 2021 under official gap-reject semantics; no ordinary gap normalization is authorized.",
       "minimum_segment_rule": "A segment with fewer than 193 close observations contributes no H003 decision metric and is excluded symmetrically from H003 and benchmark return-path aggregation; exclusion count must be reported."
     },
@@ -89,21 +114,24 @@
       "normalization_version": "BINANCE_SPOT_HALT_NORMALIZATION_V1",
       "normalized_timestamp": "2023-03-24T13:00:00Z",
       "ordinary_gap_fill_forbidden": true,
-      "role": "KNOWN_NEGATIVE_PRIOR_EVIDENCE_NOT_NEW_HOLDOUT"
+      "role": "KNOWN_NEGATIVE_PRIOR_EVIDENCE_NOT_NEW_HOLDOUT",
+      "warmup_start": "2022-12-02T00:00:00Z",
+      "procedure": "Use the existing halt-normalized derived input including its frozen pre-2023 warmup beginning 2022-12-02T00:00:00Z. The official path-attestation window must include that prehistory. Reconstruct H003 on the full attested window before slicing returns whose ending timestamps fall in 2023. Do not reset H003 at 2023-01-01T00:00:00Z."
     },
     "OTHER_BLOCKS": {
-      "policy": "Exact authoritative raw input; qntylab.strategy_test must reject any unexpected gap. Any newly discovered gap blocks that block and cannot be normalized after result inspection."
+      "policy": "Use exact authoritative raw input. For every reporting block whose start is not the frozen dataset start or immediately after a genuine unnormalized gap, the path-attestation/reconstruction window must include at least the preceding 192 contiguous hourly closes. qntylab.strategy_test must reject any unexpected gap in the attested window. Any newly discovered gap blocks the affected path and cannot be normalized after result inspection."
     }
   },
   "aggregation": {
-    "complete_historical_sample": "Concatenate admitted chronological net-return paths from 2021 through the frozen 2026 endpoint, with no synthetic return at a gap or input-boundary join. Strategy and benchmark use exactly the same admitted market-return intervals. Position state resets to FLAT at every excluded-gap or separately materialized block boundary; no transition cost is invented across a boundary.",
-    "block_metrics": "Computed from each block's admitted net-return path with the frozen formulas above.",
+    "complete_historical_sample": "Concatenate every admitted chronological net return owned by the reporting blocks from the frozen dataset start through the frozen 2026 endpoint, with no synthetic return across a genuine unnormalized gap. Strategy and benchmark use exactly the same admitted market-return intervals. Calendar-year and file-materialization boundaries never reset H003 state and never drop the return crossing that boundary; only the frozen dataset start or a genuine unnormalized gap may reset state. No transition cost is invented across a genuine gap.",
+    "block_metrics": "Computed from each block's owned admitted net-return path after H003 has been reconstructed on its full contiguous path-attestation history; never by restarting positions() at the block start.",
     "no_weighting_search": true,
     "no_block_deletion_after_results": true
   },
   "implementation_constraints": [
     "All H003 strategy result-producing runs must be created through qntylab.strategy_test.",
     "A separate deterministic analysis module may derive Sharpe, Calmar and controls only from frozen input bytes plus strategy_test-bound strategy semantics; it must not call an alternative H003 evaluator.",
+    "Calendar/reporting slices must be applied only after full-history position reconstruction. Tests must prove a block sliced from a continuous synthetic H003 path is identical to the same timestamps taken from the unsliced path, including the inherited first position and boundary return.",
     "The analysis implementation and focused tests must be committed before any V0 output is inspected.",
     "No result may change these formulas, seeds, gap rules, controls or verdict gates."
   ],

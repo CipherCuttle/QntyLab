@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import copy
-import math
+from datetime import UTC, datetime, timedelta
 
 import numpy as np
 import pytest
@@ -13,6 +13,7 @@ from experiments.research.h003_edge_falsification_v0.analysis import (
     DELAY_HOURS,
     H003FalsificationError,
     PARAMETERS,
+    RESET_FROZEN_DATASET_START,
     STRATEGY_ID,
     STRATEGY_VERSION,
     VARIANT_ID,
@@ -21,7 +22,9 @@ from experiments.research.h003_edge_falsification_v0.analysis import (
     evaluate_path,
     exposure_matched_random_position,
     reconstruct_h003_position,
+    reporting_block_slice,
     summarize_block,
+    summarize_reporting_block,
     total_cost_bps_from_receipt,
     validate_official_receipt,
     verify_official_metrics,
@@ -29,7 +32,14 @@ from experiments.research.h003_edge_falsification_v0.analysis import (
 from qntylab.backtest import evaluate
 
 
-def _receipt(*, fee_bps: float = 10.0, slippage_bps: float = 0.0) -> dict:
+def _receipt(
+    *,
+    fee_bps: float = 10.0,
+    slippage_bps: float = 0.0,
+    input_sha256: str = "a" * 64,
+    start: str = "2024-01-01T00:00:00Z",
+    end: str = "2024-12-31T23:00:00Z",
+) -> dict:
     return {
         "candidate_id": CANDIDATE_ID,
         "variant_id": VARIANT_ID,
@@ -43,11 +53,8 @@ def _receipt(*, fee_bps: float = 10.0, slippage_bps: float = 0.0) -> dict:
         "status": "completed",
         "parameters": dict(PARAMETERS),
         "exploratory_only": True,
-        "input_sha256": "a" * 64,
-        "evaluation_range": {
-            "start": "2024-01-01T00:00:00Z",
-            "end": "2024-12-31T23:00:00Z",
-        },
+        "input_sha256": input_sha256,
+        "evaluation_range": {"start": start, "end": end},
         "fee_assumption": {"fee_bps": fee_bps},
         "slippage_assumption": {"slippage_bps": slippage_bps},
     }
@@ -61,10 +68,34 @@ def _synthetic_close(n: int = 720) -> np.ndarray:
     return np.exp(log_close)
 
 
+def _monotonic_close(n: int = 520) -> np.ndarray:
+    return np.linspace(100.0, 220.0, n, dtype=float)
+
+
+def _timestamps(n: int, *, start: datetime = datetime(2024, 1, 1, tzinfo=UTC)) -> list[str]:
+    return [(start + timedelta(hours=index)).isoformat().replace("+00:00", "Z") for index in range(n)]
+
+
+def _official_metrics(close: np.ndarray, position: np.ndarray, total_cost_bps: float) -> dict:
+    evaluated = evaluate(close, position, total_cost_bps)
+    buy_hold = float(close[-1] / close[0] - 1)
+    return {
+        "observation_count": len(evaluated["net_returns"]),
+        "trade_count": evaluated["trade_count"],
+        "exposure_fraction": float(np.abs(position).mean()),
+        "gross_return": evaluated["gross_cumulative_return"],
+        "net_return": evaluated["net_cumulative_return"],
+        "buy_and_hold_return": buy_hold,
+        "excess_return_vs_buy_and_hold": evaluated["net_cumulative_return"] - buy_hold,
+        "total_cost": evaluated["fee_cost"],
+        "maximum_drawdown": evaluated["max_drawdown"],
+    }
+
+
 def _control_position() -> np.ndarray:
     # Multiple runs of both states are required so run-length permutations are
-    # meaningfully testable.  Last element is the terminal target used by the
-    # existing evaluator's final change accounting.
+    # meaningfully testable. Last element is the frozen terminal-target
+    # convention used by the V0 controls.
     held = np.array(
         [0] * 4
         + [1] * 3
@@ -136,7 +167,7 @@ def test_reconstruction_uses_existing_h003_callable_and_existing_evaluator() -> 
 
     assert len(position) == len(close)
     assert set(np.unique(position)).issubset({0.0, 1.0})
-    assert np.all(position[:192] == 0.0)  # causal signal cannot be held before slow MA is known
+    assert np.all(position[:192] == 0.0)
 
     ours = evaluate_path(close, position, total_cost_bps=20.0)
     canonical = evaluate(close, position, 20.0)
@@ -157,23 +188,16 @@ def test_reconstruction_uses_existing_h003_callable_and_existing_evaluator() -> 
         assert ours["calmar"] == pytest.approx(ours["annualized_return"] / abs(ours["max_drawdown"]), rel=0, abs=1e-15)
 
 
-def test_official_metric_crosscheck_fails_closed_on_any_accounting_mismatch() -> None:
-    close = _synthetic_close()
+def test_official_metric_crosscheck_uses_strategy_test_exposure_semantics() -> None:
+    close = _monotonic_close(n=320)
     receipt = _receipt(fee_bps=10.0, slippage_bps=0.0)
     position = reconstruct_h003_position(close, receipt)
     evaluated = evaluate(close, position, 10.0)
-    buy_hold = evaluate(close, np.ones(len(close), dtype=float), 0.0)
-    official = {
-        "observation_count": len(evaluated["net_returns"]),
-        "trade_count": evaluated["trade_count"],
-        "exposure_fraction": evaluated["average_absolute_exposure"],
-        "gross_return": evaluated["gross_cumulative_return"],
-        "net_return": evaluated["net_cumulative_return"],
-        "buy_and_hold_return": buy_hold["net_cumulative_return"],
-        "excess_return_vs_buy_and_hold": evaluated["net_cumulative_return"] - buy_hold["net_cumulative_return"],
-        "total_cost": evaluated["fee_cost"],
-        "maximum_drawdown": evaluated["max_drawdown"],
-    }
+    official = _official_metrics(close, position, 10.0)
+
+    assert position[-1] == 1.0
+    assert official["exposure_fraction"] == pytest.approx(float(np.abs(position).mean()))
+    assert official["exposure_fraction"] != pytest.approx(evaluated["average_absolute_exposure"], abs=1e-15)
 
     verified = verify_official_metrics(close, position, receipt, official)
     assert verified["net_cumulative_return"] == evaluated["net_cumulative_return"]
@@ -183,6 +207,122 @@ def test_official_metric_crosscheck_fails_closed_on_any_accounting_mismatch() ->
         corrupted[key] = corrupted[key] + 1 if key == "trade_count" else float(corrupted[key]) + 1e-6
         with pytest.raises(H003FalsificationError, match="mismatch"):
             verify_official_metrics(close, position, receipt, corrupted)
+
+
+def test_reporting_slice_reconstructs_full_path_before_calendar_slice() -> None:
+    close = _monotonic_close(n=520)
+    timestamps = _timestamps(len(close))
+    receipt = _receipt(start=timestamps[0], end=timestamps[-1])
+    full_position = reconstruct_h003_position(close, receipt)
+    official = _official_metrics(close, full_position, 10.0)
+    first_end = 300
+    last_end = 420
+
+    admitted = reporting_block_slice(
+        timestamps,
+        close,
+        receipt,
+        official,
+        expected_input_sha256="a" * 64,
+        block_start=timestamps[first_end],
+        block_end=timestamps[last_end],
+    )
+
+    assert admitted["timestamps"][0] == timestamps[first_end - 1]
+    assert admitted["timestamps"][1] == timestamps[first_end]
+    assert admitted["first_return_ending_timestamp"] == timestamps[first_end]
+    assert admitted["last_return_ending_timestamp"] == timestamps[last_end]
+    assert admitted["owned_return_count"] == last_end - first_end + 1
+    assert admitted["position"][0] == full_position[first_end - 1] == 1.0
+    assert np.array_equal(admitted["position"], full_position[first_end - 1 : last_end + 1])
+
+    expected = evaluate(
+        close[first_end - 1 : last_end + 1],
+        full_position[first_end - 1 : last_end + 1],
+        10.0,
+    )
+    observed = evaluate_path(admitted["close"], admitted["position"], total_cost_bps=10.0)
+    assert np.array_equal(observed["net_returns"], expected["net_returns"])
+
+    naive_restart = reconstruct_h003_position(admitted["close"], receipt)
+    assert naive_restart[0] == 0.0
+    assert admitted["position"][0] == 1.0
+
+    summary = summarize_reporting_block(
+        timestamps,
+        close,
+        receipt,
+        official,
+        expected_input_sha256="a" * 64,
+        block_start=timestamps[first_end],
+        block_end=timestamps[last_end],
+    )
+    assert summary["owned_return_count"] == last_end - first_end + 1
+    assert summary["diagnostics"]["h003"]["net_cumulative_return"] == observed["net_cumulative_return"]
+
+
+def test_reporting_slice_rejects_artificial_reset_insufficient_history_and_gaps() -> None:
+    close = _monotonic_close(n=260)
+    timestamps = _timestamps(len(close))
+    receipt = _receipt(start=timestamps[0], end=timestamps[-1])
+    position = reconstruct_h003_position(close, receipt)
+    official = _official_metrics(close, position, 10.0)
+
+    with pytest.raises(H003FalsificationError, match="insufficient prehistory"):
+        reporting_block_slice(
+            timestamps,
+            close,
+            receipt,
+            official,
+            expected_input_sha256="a" * 64,
+            block_start=timestamps[192],
+            block_end=timestamps[-1],
+        )
+
+    with pytest.raises(H003FalsificationError, match="authorized reset reason"):
+        reporting_block_slice(
+            timestamps,
+            close,
+            receipt,
+            official,
+            expected_input_sha256="a" * 64,
+            block_start=timestamps[0],
+            block_end=timestamps[-1],
+        )
+
+    broken = list(timestamps)
+    broken[220] = (datetime.fromisoformat(broken[220].replace("Z", "+00:00")) + timedelta(hours=1)).isoformat().replace("+00:00", "Z")
+    with pytest.raises(H003FalsificationError, match="strictly contiguous hourly"):
+        reporting_block_slice(
+            broken,
+            close,
+            receipt,
+            official,
+            expected_input_sha256="a" * 64,
+            block_start=broken[200],
+            block_end=broken[-1],
+        )
+
+
+def test_dataset_start_reset_is_explicit_and_frozen() -> None:
+    close = _monotonic_close(n=260)
+    timestamps = _timestamps(len(close), start=datetime(2021, 1, 1, tzinfo=UTC))
+    receipt = _receipt(start=timestamps[0], end=timestamps[-1])
+    position = reconstruct_h003_position(close, receipt)
+    official = _official_metrics(close, position, 10.0)
+
+    admitted = reporting_block_slice(
+        timestamps,
+        close,
+        receipt,
+        official,
+        expected_input_sha256="a" * 64,
+        block_start=timestamps[0],
+        block_end=timestamps[-1],
+        authorized_reset_reason=RESET_FROZEN_DATASET_START,
+    )
+    assert admitted["first_return_ending_timestamp"] == timestamps[1]
+    assert admitted["owned_return_count"] == len(close) - 1
 
 
 def test_exposure_matched_control_preserves_exact_held_exposure_and_run_multisets() -> None:

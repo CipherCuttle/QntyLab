@@ -46,6 +46,12 @@ HOUR_MS = 3_600_000
 RECORDING_WINDOW = timedelta(hours=1)
 LEDGER_FILENAME = "h003_prospective_v2_events.jsonl"
 LOCK_FILENAME = ".h003_prospective_v2.lock"
+SOURCE_IMPLEMENTATION_PATH = "qntylab/h003_defensive_followup_v1_prospective_source_v2.py"
+ACTIVATION_ARTIFACT_RELATIVE_PATH = (
+    "experiments/research/h003_defensive_followup_v1/"
+    "prospective_source_v2_activation.json"
+)
+ACTIVATION_PROJECT_ID = "H003_PROSPECTIVE_SOURCE_V2_ACTIVATION"
 
 
 class SourceBlocked(ValueError):
@@ -115,6 +121,128 @@ def validate_source_lineage(root: Path = ROOT) -> dict[str, str]:
         "recorder_foundation_merge_sha": RECORDER_FOUNDATION_MERGE_SHA,
         "recorder_foundation_merge_utc": RECORDER_FOUNDATION_MERGE_UTC,
         "recorder_source_sha256": sha256(current_bytes).hexdigest(),
+    }
+
+
+def validate_activation_authority(root: Path = ROOT) -> dict[str, Any]:
+    """Require the future activation artifact to be canonical on origin/master.
+
+    The source qualification PR cannot authorize itself. A successor phase
+    must add the activation artifact without modifying this source file. The
+    validator derives both source and activation canonical commits from the
+    first-parent history of ``origin/master`` and rejects local-only artifacts.
+    """
+    activation_path = root / ACTIVATION_ARTIFACT_RELATIVE_PATH
+    source_path = root / SOURCE_IMPLEMENTATION_PATH
+    if not activation_path.is_file():
+        raise SourceBlocked("canonical H003 source activation artifact required")
+    try:
+        source_merge = subprocess.check_output(
+            [
+                "git",
+                "log",
+                "--first-parent",
+                "-1",
+                "--format=%H",
+                "origin/master",
+                "--",
+                SOURCE_IMPLEMENTATION_PATH,
+            ],
+            cwd=root,
+            text=True,
+        ).strip()
+        activation_merge = subprocess.check_output(
+            [
+                "git",
+                "log",
+                "--first-parent",
+                "-1",
+                "--format=%H",
+                "origin/master",
+                "--",
+                ACTIVATION_ARTIFACT_RELATIVE_PATH,
+            ],
+            cwd=root,
+            text=True,
+        ).strip()
+        if not source_merge or not activation_merge:
+            raise SourceBlocked("canonical H003 activation lineage is incomplete")
+        source_bytes = subprocess.check_output(
+            ["git", "show", f"{source_merge}:{SOURCE_IMPLEMENTATION_PATH}"],
+            cwd=root,
+        )
+        activation_bytes = subprocess.check_output(
+            ["git", "show", f"{activation_merge}:{ACTIVATION_ARTIFACT_RELATIVE_PATH}"],
+            cwd=root,
+        )
+        activation_timestamp = subprocess.check_output(
+            ["git", "show", "-s", "--format=%cI", activation_merge],
+            cwd=root,
+            text=True,
+        ).strip()
+        subprocess.run(
+            ["git", "merge-base", "--is-ancestor", source_merge, "origin/master"],
+            cwd=root,
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        subprocess.run(
+            ["git", "merge-base", "--is-ancestor", activation_merge, "origin/master"],
+            cwd=root,
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    except SourceBlocked:
+        raise
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise SourceBlocked("canonical H003 activation Git authority unavailable") from exc
+
+    if source_bytes != source_path.read_bytes():
+        raise SourceBlocked("source implementation differs from canonical qualification merge")
+    if activation_bytes != activation_path.read_bytes():
+        raise SourceBlocked("activation artifact differs from canonical activation merge")
+    activated_at = parse_utc(activation_timestamp)
+    origin = parse_utc(EXPECTED_ORIGIN_UTC)
+    if activated_at >= origin:
+        raise SourceBlocked("activation became canonical at or after prospective origin")
+
+    try:
+        artifact = json.loads(activation_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise SourceBlocked("canonical H003 activation artifact is malformed") from exc
+    expected = {
+        "schema_version": "1.0.0",
+        "project_id": ACTIVATION_PROJECT_ID,
+        "state": "ACTIVE",
+        "candidate_id": recorder.CANDIDATE_ID,
+        "variant_id": recorder.VARIANT_ID,
+        "prospective_origin_utc": EXPECTED_ORIGIN_UTC,
+        "source_qualification_merge_sha": source_merge,
+        "source_implementation_path": SOURCE_IMPLEMENTATION_PATH,
+        "source_implementation_sha256": sha256(source_bytes).hexdigest(),
+        "collection_mode": "PAPER_SHADOW_ONLY",
+        "market_data_recording_authorized": True,
+        "signal_recording_authorized": True,
+        "scheduler_authorized": True,
+        "backfill": "FORBIDDEN",
+        "interim_economic_verdict_authorized": False,
+        "qnty_acceptance_authorized": False,
+        "qntyspot_policy_authorized": False,
+        "live_execution_authorized": False,
+        "capital_authority": "NONE",
+        "signing_authority": "NONE",
+        "submission_authority": "NONE",
+    }
+    if artifact != expected:
+        raise SourceBlocked("canonical H003 activation artifact binding mismatch")
+    return {
+        "operation_mode": "CANONICAL_PROSPECTIVE_SHADOW",
+        "activation_merge_sha": activation_merge,
+        "activation_canonicalized_at_utc": _stamp(activated_at),
+        "source_qualification_merge_sha": source_merge,
+        "source_implementation_sha256": expected["source_implementation_sha256"],
     }
 
 
@@ -477,10 +605,20 @@ class _EvidenceLedger:
             "payload": dict(payload),
         }
         event = {**body, "event_digest": digest(body)}
+        created = not self.path.exists()
         with self.path.open("ab") as handle:
             handle.write(canonical_bytes(event) + b"\n")
             handle.flush()
             os.fsync(handle.fileno())
+        if created:
+            try:
+                directory_fd = os.open(self.state_dir, os.O_RDONLY)
+                try:
+                    os.fsync(directory_fd)
+                finally:
+                    os.close(directory_fd)
+            except OSError as exc:
+                raise SourceBlocked("evidence ledger directory fsync failed") from exc
         reread = self.events()
         if not reread or reread[-1] != event:
             raise SourceBlocked("durable evidence append verification failed")
@@ -571,6 +709,7 @@ class OperationalRecorder:
         *,
         archive_provider: ArchiveProvider | None = None,
         rest_fetcher: RestFetcher | None = None,
+        _qualification_mode: bool = False,
     ):
         self.state_dir = state_dir
         self.state_dir.mkdir(parents=True, exist_ok=True)
@@ -578,6 +717,18 @@ class OperationalRecorder:
         self._lock_path = self.state_dir / LOCK_FILENAME
         self.archive_provider = archive_provider
         self.rest_fetcher = rest_fetcher
+        self._qualification_mode = bool(_qualification_mode)
+
+    def _activation_context(self) -> dict[str, Any]:
+        if self._qualification_mode:
+            return {
+                "operation_mode": "SYNTHETIC_QUALIFICATION_ONLY",
+                "activation_merge_sha": None,
+                "activation_canonicalized_at_utc": None,
+                "source_qualification_merge_sha": None,
+                "source_implementation_sha256": sha256(Path(__file__).read_bytes()).hexdigest(),
+            }
+        return validate_activation_authority()
 
     @contextmanager
     def _process_lock(self) -> Iterator[None]:
@@ -593,10 +744,12 @@ class OperationalRecorder:
                 fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
 
     def _status_unlocked(self, *, now: datetime) -> dict[str, Any]:
+        activation = self._activation_context()
         validate_source_lineage()
         if self._ledger.terminal_block() is not None:
             return {
                 "state": "BLOCKED_MISSED_RECORDING_WINDOW",
+                "operation_mode": activation["operation_mode"],
                 "next_required_close_utc": None,
                 "completed_hour_count": len(self._ledger.recorded()),
                 "economic_verdict": "FORBIDDEN",
@@ -610,7 +763,12 @@ class OperationalRecorder:
         else:
             due_state = "DUE"
         return {
-            "state": "ARMED_OPERATIONAL_IMPLEMENTATION_NOT_SCHEDULED",
+            "state": (
+                "QUALIFIED_IMPLEMENTATION_TEST_ONLY"
+                if self._qualification_mode
+                else "ACTIVE_PROSPECTIVE_SHADOW"
+            ),
+            "operation_mode": activation["operation_mode"],
             "next_required_close_utc": _stamp(due),
             "next_due_state": due_state,
             "completed_hour_count": len(self._ledger.recorded()),
@@ -644,6 +802,7 @@ class OperationalRecorder:
             return self._record_due_unlocked(now=now)
 
     def _record_due_unlocked(self, *, now: datetime) -> dict[str, Any]:
+        activation = self._activation_context()
         lineage = validate_source_lineage()
         current = _instant(now)
         if self._ledger.terminal_block() is not None:
@@ -652,11 +811,14 @@ class OperationalRecorder:
         if current < due:
             return {
                 "state": "NOT_DUE",
+                "operation_mode": activation["operation_mode"],
                 "through_logical_close_utc": _stamp(due),
                 "economic_verdict": "FORBIDDEN",
             }
         if current >= due + RECORDING_WINDOW:
             payload = {
+                "operation_mode": activation["operation_mode"],
+                "activation": activation,
                 "through_logical_close_utc": _stamp(due),
                 "detected_at_utc": _stamp(current),
                 "reason": "MISSED_ONE_HOUR_RECORDING_WINDOW",
@@ -740,6 +902,8 @@ class OperationalRecorder:
         ]
         payload = {
             "schema_version": "1.0.0",
+            "operation_mode": activation["operation_mode"],
+            "activation": activation,
             "through_logical_close_utc": _stamp(due),
             "recorded_at_utc": _stamp(current),
             "source_lineage": lineage,
@@ -760,13 +924,15 @@ class OperationalRecorder:
         }
         event = self._ledger._append("HOUR_RECORDED", payload)
         return {
-            "state": "RECORDED",
+            "state": "QUALIFICATION_RECORDED" if self._qualification_mode else "RECORDED",
             "event_digest": event["event_digest"],
             **payload,
         }
 
 
 __all__ = [
+    "ACTIVATION_ARTIFACT_RELATIVE_PATH",
+    "ACTIVATION_PROJECT_ID",
     "ARCHIVE_ZIP_URL",
     "OperationalRecorder",
     "RECORDER_FOUNDATION_MERGE_SHA",
@@ -781,5 +947,6 @@ __all__ = [
     "latest_completed_logical_close",
     "materialize_bars",
     "request_bounds",
+    "validate_activation_authority",
     "validate_source_lineage",
 ]

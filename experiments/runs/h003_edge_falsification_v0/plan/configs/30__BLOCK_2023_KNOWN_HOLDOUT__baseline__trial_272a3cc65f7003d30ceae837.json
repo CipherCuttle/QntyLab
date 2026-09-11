@@ -1,0 +1,38 @@
+{
+  "candidate_id": "CANDIDATE_H003_MA_48_192_LONG_FLAT",
+  "evaluation_end": "2023-12-31T23:00:00Z",
+  "evaluation_start": "2022-12-02T00:00:00Z",
+  "expected_interval": "1h",
+  "fee_bps": 10.0,
+  "funding_boundary_mode": "NOT_APPLICABLE",
+  "gap_policy": "REJECT",
+  "initial_capital": 10000.0,
+  "input_path": "data/derived/focused_trend_validation_v1/SOLUSDT-spot-1h-2023-halt-normalized.csv",
+  "normalization_provenance": {
+    "authoritative_raw_path": "data/raw/SOLUSDT-1h.csv",
+    "authoritative_raw_sha256": "c431aa068acbfedf3cb0c38845dfac275044a9cf83367075b47d47f06974e99d",
+    "authoritative_raw_snapshot_manifest_git_commit": "7c3c1b4a9d08625cd973bba2747a1a3de740bdf7",
+    "authoritative_raw_snapshot_manifest_path": "data/manifests/SOLUSDT-1h.json",
+    "derived_input_path": "data/derived/focused_trend_validation_v1/SOLUSDT-spot-1h-2023-halt-normalized.csv",
+    "derived_input_sha256": "62cee85e0a0f7b903fadc77a8f275e774f0ff3ecfff9fba9ea51a535376f70f1",
+    "derived_manifest_path": "data/derived/focused_trend_validation_v1/SOLUSDT-spot-1h-2023-halt-normalized.manifest.json",
+    "derived_manifest_sha256": "232b42f1d9d968faedc4fe86018cbc5767261af901391bb7e189fd1aa1a6e5af",
+    "normalization_id": "PREREGISTER_BINANCE_SPOT_HALT_NORMALIZATION_V1",
+    "normalization_version": "BINANCE_SPOT_HALT_NORMALIZATION_V1",
+    "normalized_timestamp": "2023-03-24T13:00:00Z",
+    "reason_code": "BINANCE_SPOT_AUTHORITATIVE_NO_TRADE_HALT",
+    "source_resolution_artifact_path": "experiments/research/summaries/focused_trend_validation_v1_2023_source_resolution.json",
+    "source_resolution_artifact_sha256": "a945478ce34aec6d4e44c57e407b1a14027b4e9b99b788f9fd08c435804e54b6",
+    "source_resolution_git_commit": "5a0fe6baae1d3ec9762384e192adb9b20e472263"
+  },
+  "parameters": {
+    "fast": 48,
+    "mode": "long_flat",
+    "slow": 192
+  },
+  "research_intent": "FOLLOW_UP",
+  "schema_version": 1,
+  "slippage_bps": 0.0,
+  "strategy_id": "H003_moving_average",
+  "strategy_version": "existing-qntylab-strategies-v1"
+}

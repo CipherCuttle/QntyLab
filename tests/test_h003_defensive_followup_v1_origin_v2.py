@@ -6,6 +6,7 @@ from datetime import timedelta
 from pathlib import Path
 
 import numpy as np
+import pytest
 
 from qntylab.h003_defensive_followup_v1_origin_v2 import (
     EXPECTED_ORIGIN_UTC,
@@ -19,6 +20,7 @@ from qntylab.h003_defensive_followup_v1_origin_v2 import (
     build_origin_artifact,
     derive_origin,
     parse_utc,
+    validate_artifact_canonicalization_time,
 )
 from qntylab.h003_defensive_followup_v1_prospective_reopen import (
     prospective_h003_owned_return_path,
@@ -59,6 +61,27 @@ def test_origin_v2_is_exact_git_only_derivation_from_reopen_merge() -> None:
     assert integrity["market_data_accessed_to_choose_origin"] is False
     assert integrity["strategy_result_accessed_to_choose_origin"] is False
     assert integrity["origin_may_not_be_moved_for_market_or_strategy_outcomes"] is True
+    assert integrity["canonicalization_time_proof_required_before_recording"] is True
+
+
+def test_origin_v2_canonicalization_deadline_is_executable_and_fail_closed() -> None:
+    origin = parse_utc(EXPECTED_ORIGIN_UTC)
+    before = origin - timedelta(microseconds=1)
+    assert validate_artifact_canonicalization_time(before.isoformat()) == before
+
+    with pytest.raises(RuntimeError, match="BLOCK_AND_REISSUE_FUTURE_ORIGIN_NO_BACKFILL"):
+        validate_artifact_canonicalization_time(EXPECTED_ORIGIN_UTC)
+    with pytest.raises(RuntimeError, match="BLOCK_AND_REISSUE_FUTURE_ORIGIN_NO_BACKFILL"):
+        validate_artifact_canonicalization_time((origin + timedelta(seconds=1)).isoformat())
+
+    authority = _load(ORIGIN_PATH)["recorder_authority"]
+    assert authority["status_after_this_artifact_is_canonical"] == "CONDITIONAL_PROSPECTIVE_SHADOW_RECORDING_REQUIRES_CANONICALIZATION_TIME_GUARD"
+    assert authority["canonicalization_time_guard_function"] == "validate_artifact_canonicalization_time"
+    assert authority["recording_authority_requires_canonicalization_timestamp_strictly_before_origin"] is True
+    assert authority["unconditional_recording_authority"] is False
+    assert authority["market_data_recording_authorized_if_guard_passes"] is True
+    assert authority["signal_recording_authorized_if_guard_passes"] is True
+    assert authority["integrity_receipt_recording_authorized_if_guard_passes"] is True
 
 
 def test_origin_v2_requires_active_exact_ledger_contract_not_dual_authority() -> None:
@@ -148,11 +171,11 @@ def test_origin_v2_freezes_maturity_and_shadow_only_authority() -> None:
     assert maturity["interim_economic_verdict"] == "FORBIDDEN"
 
     authority = artifact["recorder_authority"]
-    assert authority["status_after_this_artifact_is_canonical"] == "ACTIVE_PROSPECTIVE_SHADOW_RECORDING"
+    assert authority["status_after_this_artifact_is_canonical"] == "CONDITIONAL_PROSPECTIVE_SHADOW_RECORDING_REQUIRES_CANONICALIZATION_TIME_GUARD"
     assert authority["paper_shadow_only"] is True
-    assert authority["market_data_recording_authorized"] is True
-    assert authority["signal_recording_authorized"] is True
-    assert authority["integrity_receipt_recording_authorized"] is True
+    assert authority["market_data_recording_authorized_if_guard_passes"] is True
+    assert authority["signal_recording_authorized_if_guard_passes"] is True
+    assert authority["integrity_receipt_recording_authorized_if_guard_passes"] is True
     assert authority["economic_performance_verdict_before_maturity_forbidden"] is True
     assert authority["parameter_changes_forbidden"] is True
     assert authority["asset_changes_forbidden"] is True

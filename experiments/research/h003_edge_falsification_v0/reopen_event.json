@@ -1,0 +1,10 @@
+{
+  "event_type": "CANDIDATE_REOPENED",
+  "candidate_id": "CANDIDATE_H003_MA_48_192_LONG_FLAT",
+  "variant_id": "variant_00eb140f03a5f6ab40600160",
+  "previous_decision_event_id": "event_3206c7b09c089b274ca027a5",
+  "reason": "NEW_PREREGISTERED_DEFENSIVE_RISK_FALSIFICATION_QUESTION",
+  "material_change": "H003_EDGE_FALSIFICATION_V0 asks a materially different, preregistered defensive-risk and timing-control falsification question for the exact 48/192 rule after the original 2023 continuation/excess-return claim was graveyarded. The prior FAILED_2023_HOLDOUT_MULTIPLE_GATES decision remains negative evidence and is not superseded. The reopened generation permits only the already-frozen no-parameter-search H003_EDGE_FALSIFICATION_V0 matrix and controls, using the exact SOLUSDT 1h input identity independently re-attested byte-for-byte at SHA-256 64bdb27a31003b0de25f3802affa8b412143a50bc8a5b76a399924626b01174a. This creates no economic rehabilitation, family-wide claim, Qnty/QntySpot authority, capital authority, signing, submission, paper trading, or live execution authority.",
+  "recorded_at_utc": "2026-09-11T02:05:00Z",
+  "event_id": "event_reopen_h003_edge_falsification_v0"
+}

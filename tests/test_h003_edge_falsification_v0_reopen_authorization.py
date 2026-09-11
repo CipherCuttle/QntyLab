@@ -19,6 +19,8 @@ STATE = RESEARCH_ROOT / "state.json"
 VARIANT_ID = "variant_00eb140f03a5f6ab40600160"
 CANDIDATE_ID = "CANDIDATE_H003_MA_48_192_LONG_FLAT"
 CANONICAL_SHA = "64bdb27a31003b0de25f3802affa8b412143a50bc8a5b76a399924626b01174a"
+V0_REOPEN_EVENT_ID = "event_reopen_h003_edge_falsification_v0"
+V1_ACTIVATION_REOPEN_EVENT_ID = "event_reopen_h003_defensive_followup_v1_activation"
 
 
 def _config(*, start: str, end: str, fee_bps: float, slippage_bps: float, research_intent: str = "FOLLOW_UP") -> dict:
@@ -102,9 +104,7 @@ def test_central_preflight_enforces_reopen_authorization_and_duplicate_lifecycle
     state = json.loads(STATE.read_text(encoding="utf-8"))
     variant_state = state["variants"][VARIANT_ID]
 
-    # Once a later terminal governance decision blocks this exact variant,
-    # the consumed V0 reopen must not continue policing or enabling trials.
-    # The terminal state itself fails closed until a new scoped reopen exists.
+    # A later terminal decision blocks all trials until a new scoped reopen.
     if variant_state["status"] == "BLOCKED":
         assert variant_state["latest_decision_event_id"] is not None
         for config in (
@@ -117,6 +117,27 @@ def test_central_preflight_enforces_reopen_authorization_and_duplicate_lifecycle
                 preflight(config=config, symbol="SOLUSDT", input_sha256=CANONICAL_SHA, root=RESEARCH_ROOT)
         return
 
+    active_reopen = variant_state.get("active_reopen_event_id")
+    if active_reopen == V1_ACTIVATION_REOPEN_EVENT_ID:
+        # V0 SOL trials are outside the new activation generation. They must
+        # fail at the active authorization boundary even if already completed.
+        for config in (
+            allowed,
+            dict(allowed, evaluation_start="2021-12-24T00:00:00Z"),
+            dict(allowed, fee_bps=7),
+        ):
+            with pytest.raises(LedgerError, match="trial not authorized by active reopen contract"):
+                preflight(config=config, symbol="SOLUSDT", input_sha256=CANONICAL_SHA, root=RESEARCH_ROOT)
+        with pytest.raises(LedgerError, match="research_intent not authorized by active reopen contract"):
+            preflight(
+                config=dict(allowed, research_intent="SCREEN"),
+                symbol="SOLUSDT",
+                input_sha256=CANONICAL_SHA,
+                root=RESEARCH_ROOT,
+            )
+        return
+
+    assert active_reopen in {None, V0_REOPEN_EVENT_ID}
     allowed_trial_id = compute_trial_id(
         variant_id=VARIANT_ID,
         symbol="SOLUSDT",

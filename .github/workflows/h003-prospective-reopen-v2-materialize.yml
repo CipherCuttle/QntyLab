@@ -45,3 +45,5 @@ jobs:
           git add experiments/specs/h003_defensive_followup_v1_prospective_reopen_v2.json experiments/research/h003_defensive_followup_v1/prospective_reopen_v2_event.json experiments/research/candidates.jsonl experiments/research/state.json experiments/research/trial_index.json
           git commit -m "research: materialize H003 prospective-only reopen v2"
           git push origin HEAD:research/h003-prospective-reopen-v2
+
+# diagnostic rerun 2

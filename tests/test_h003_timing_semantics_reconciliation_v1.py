@@ -5,6 +5,10 @@ from pathlib import Path
 
 import numpy as np
 
+from qntylab.h003_defensive_followup_v1_prospective_reopen import (
+    prospective_h003_owned_return_path,
+    prospective_h003_positions,
+)
 from qntylab.h003_edge_falsification_v0 import net_return_path, reconstruct_h003
 
 
@@ -45,6 +49,24 @@ def test_legacy_h003_path_has_one_extra_bar_delay() -> None:
     # while the later 100 -> 200 return is. This pins the legacy extra delay.
     assert net[192] == 0.0
     assert net[193] == 1.0
+
+
+def test_prospective_h003_completed_bar_owns_next_return_exactly_once() -> None:
+    # Build a deterministic one-bar LONG pulse: the completed row-192 MA
+    # relation is LONG, while row 193 is FLAT. This lets the fixture distinguish
+    # ownership of 192->193 from the following 193->194 return.
+    close = np.r_[np.full(144, 0.5), np.full(48, 0.4), 5.2, 0.01, 1.0]
+
+    position = prospective_h003_positions(close)
+    owned = prospective_h003_owned_return_path(close)
+
+    assert position[191] == 0.0
+    assert position[192] == 1.0
+    assert position[193] == 0.0
+
+    expected_192_to_193 = close[193] / close[192] - 1.0
+    assert np.isclose(owned[192], expected_192_to_193)
+    assert owned[193] == 0.0
 
 
 def test_reconciliation_preserves_history_and_forbids_pr266_backfill() -> None:

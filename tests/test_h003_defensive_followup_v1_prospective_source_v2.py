@@ -2,11 +2,13 @@ from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
 from hashlib import sha256
+import fcntl
 import io
 import zipfile
 
 import pytest
 
+import qntylab.h003_defensive_followup_v1_prospective_source_v2 as source_module
 from qntylab.h003_defensive_followup_v1_origin_v2 import EXPECTED_ORIGIN_UTC, parse_utc
 from qntylab.h003_defensive_followup_v1_prospective_recorder_v2 import PANEL, first_required_logical_close
 from qntylab.h003_defensive_followup_v1_prospective_source_v2 import (
@@ -23,7 +25,6 @@ from qntylab.h003_defensive_followup_v1_prospective_source_v2 import (
 
 
 HOUR_MS = 3_600_000
-HOUR_US = 3_600_000_000
 
 
 def _row(logical_close: datetime, close: float, *, unit: str = "millisecond") -> list[object]:
@@ -148,12 +149,29 @@ def test_materializer_requires_completed_exact_three_asset_coverage() -> None:
         )
 
 
-def test_operational_writer_persists_bootstrap_then_incremental_evidence_and_chain(tmp_path) -> None:
+def test_writer_is_private_and_status_surface_is_read_only(tmp_path) -> None:
+    operation = OperationalRecorder(tmp_path, archive_provider=_no_archive, rest_fetcher=_rest_fetcher)
+    assert "EvidenceLedger" not in source_module.__all__
+    assert not hasattr(source_module, "EvidenceLedger")
+    assert not hasattr(operation, "ledger")
+    snapshot = operation.verify_persistence()
+    assert snapshot["event_count"] == 0
+    assert snapshot["recorded_hour_count"] == 0
+    assert snapshot["durable_bar_count"] == 0
+
+
+def test_operational_writer_bootstraps_once_then_fetches_only_new_hour(tmp_path) -> None:
     origin = parse_utc(EXPECTED_ORIGIN_UTC)
+    calls: list[tuple[str, int, int]] = []
+
+    def counting_fetcher(*, symbol: str, start_ms: int, end_ms: int, interval: str):
+        calls.append((symbol, start_ms, end_ms))
+        return _rest_fetcher(symbol=symbol, start_ms=start_ms, end_ms=end_ms, interval=interval)
+
     operation = OperationalRecorder(
         tmp_path,
         archive_provider=_no_archive,
-        rest_fetcher=_rest_fetcher,
+        rest_fetcher=counting_fetcher,
     )
 
     first = operation.record_due(now=origin + timedelta(minutes=5))
@@ -163,13 +181,14 @@ def test_operational_writer_persists_bootstrap_then_incremental_evidence_and_cha
     assert len(first["evidence_rows"]) == 192 * 3
     assert len(first["current_receipts"]) == 3
     assert first["current_receipts"][0]["previous_receipt_sha256"] is None
-    assert first["economic_performance_metric"] == "NOT_COMPUTED"
-    assert first["interim_economic_verdict"] == "FORBIDDEN"
-    assert first["live_execution"] == "FORBIDDEN"
+    assert len(calls) == 3
+
+    bootstrap_start = int((first_required_logical_close() - timedelta(hours=1)).timestamp() * 1000)
+    assert all(start_ms == bootstrap_start for _, start_ms, _ in calls)
 
     not_due = operation.record_due(now=origin + timedelta(minutes=10))
     assert not_due["state"] == "NOT_DUE"
-    assert not_due["through_logical_close_utc"] == (origin + timedelta(hours=1)).isoformat().replace("+00:00", "Z")
+    assert len(calls) == 3
 
     second = operation.record_due(now=origin + timedelta(hours=1, minutes=5))
     assert second["state"] == "RECORDED"
@@ -177,18 +196,83 @@ def test_operational_writer_persists_bootstrap_then_incremental_evidence_and_cha
     assert len(second["evidence_rows"]) == 3
     assert len(second["current_receipts"]) == 3
     assert second["current_receipts"][0]["previous_receipt_sha256"] == first["receipt_chain_tip_sha256"]
-    assert second["receipt_chain_tip_sha256"] != first["receipt_chain_tip_sha256"]
+    assert len(calls) == 6
+
+    expected_incremental_start = int(origin.timestamp() * 1000)
+    expected_incremental_end = int((origin + timedelta(hours=1)).timestamp() * 1000) - 1
+    for symbol, start_ms, end_ms in calls[-3:]:
+        assert symbol in PANEL
+        assert start_ms == expected_incremental_start
+        assert end_ms == expected_incremental_end
+
+    persistence = operation.verify_persistence()
+    assert persistence["event_count"] == 2
+    assert persistence["recorded_hour_count"] == 2
+    assert persistence["durable_bar_count"] == 193 * 3
+    assert persistence["receipt_chain_tip_sha256"] == second["receipt_chain_tip_sha256"]
 
     status = operation.status(now=origin + timedelta(hours=1, minutes=10))
     assert status["completed_hour_count"] == 2
     assert status["next_required_close_utc"] == (origin + timedelta(hours=2)).isoformat().replace("+00:00", "Z")
     assert status["economic_verdict"] == "FORBIDDEN"
 
-    # Re-read verifies event-digest and previous-event chain integrity.
-    events = operation.ledger.events()
-    assert len(events) == 2
-    assert events[0]["previous_event_digest"] is None
-    assert events[1]["previous_event_digest"] == events[0]["event_digest"]
+
+def test_incremental_run_never_refetches_or_accepts_revised_history(tmp_path) -> None:
+    origin = parse_utc(EXPECTED_ORIGIN_UTC)
+    bootstrap_finished = False
+
+    def history_hostile_fetcher(*, symbol: str, start_ms: int, end_ms: int, interval: str):
+        nonlocal bootstrap_finished
+        origin_open_ms = int(origin.timestamp() * 1000)
+        if bootstrap_finished and start_ms < origin_open_ms:
+            raise AssertionError("historical source was refetched after durable bootstrap")
+        return _rest_fetcher(symbol=symbol, start_ms=start_ms, end_ms=end_ms, interval=interval)
+
+    operation = OperationalRecorder(
+        tmp_path,
+        archive_provider=_no_archive,
+        rest_fetcher=history_hostile_fetcher,
+    )
+    first = operation.record_due(now=origin + timedelta(minutes=5))
+    bootstrap_finished = True
+    second = operation.record_due(now=origin + timedelta(hours=1, minutes=5))
+    assert first["state"] == second["state"] == "RECORDED"
+    assert second["current_receipts"][0]["previous_receipt_sha256"] == first["receipt_chain_tip_sha256"]
+
+
+def test_overlapping_invocation_fails_closed_on_process_lock(tmp_path) -> None:
+    origin = parse_utc(EXPECTED_ORIGIN_UTC)
+    operation = OperationalRecorder(tmp_path, archive_provider=_no_archive, rest_fetcher=_rest_fetcher)
+    lock_path = tmp_path / source_module.LOCK_FILENAME
+    with lock_path.open("a+b") as handle:
+        fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        with pytest.raises(SourceBlocked, match="already holds the process lock"):
+            operation.status(now=origin)
+        with pytest.raises(SourceBlocked, match="already holds the process lock"):
+            operation.record_due(now=origin)
+        fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+
+
+def test_tampered_durable_ledger_fails_integrity_before_next_fetch(tmp_path) -> None:
+    origin = parse_utc(EXPECTED_ORIGIN_UTC)
+    fetch_count = 0
+
+    def counting_fetcher(*, symbol: str, start_ms: int, end_ms: int, interval: str):
+        nonlocal fetch_count
+        fetch_count += 1
+        return _rest_fetcher(symbol=symbol, start_ms=start_ms, end_ms=end_ms, interval=interval)
+
+    operation = OperationalRecorder(tmp_path, archive_provider=_no_archive, rest_fetcher=counting_fetcher)
+    operation.record_due(now=origin + timedelta(minutes=5))
+    assert fetch_count == 3
+
+    ledger_path = tmp_path / source_module.LEDGER_FILENAME
+    raw = ledger_path.read_text(encoding="utf-8")
+    ledger_path.write_text(raw.replace('"raw_row_sha256":"', '"raw_row_sha256":"0', 1), encoding="utf-8")
+
+    with pytest.raises(SourceBlocked, match="chain integrity failure"):
+        operation.record_due(now=origin + timedelta(hours=1, minutes=5))
+    assert fetch_count == 3
 
 
 def test_missed_first_window_blocks_without_backfill(tmp_path) -> None:

@@ -1,0 +1,177 @@
+{
+  "schema_version": "1.0.0",
+  "authorization_id": "H003_EDGE_FALSIFICATION_V0",
+  "reopen_event_id": "event_reopen_h003_edge_falsification_v0",
+  "candidate_id": "CANDIDATE_H003_MA_48_192_LONG_FLAT",
+  "variant_id": "variant_00eb140f03a5f6ab40600160",
+  "allowed_research_intents": [
+    "FOLLOW_UP"
+  ],
+  "authorized_trial_ids": [
+    "trial_b449ab7c33d3ce8b020d2ba3",
+    "trial_c7475ce0722d7e0dae5fec8a",
+    "trial_73d99bc42d69d1900a1d69ad",
+    "trial_e471e20d60ca18e034ffad62",
+    "trial_90807fb290917fbc1d19d48a",
+    "trial_26b352f95bb216c340386a6e",
+    "trial_8c17c623c4f7c86759d4aa92",
+    "trial_748cb74b8657a797b03c2fc0",
+    "trial_19f668bc50c63e460d49b20d",
+    "trial_59677f8e82d9e056507ea522",
+    "trial_48d6db8c63e374c47ce3c8d4",
+    "trial_27d0ed21457cfb34de9f175e",
+    "trial_365fb0bfe61dbd5402333963",
+    "trial_ce084e74f89065442359493f",
+    "trial_281ab1b393c17c960fafd5e2",
+    "trial_515947b3eaa1e9589c21f2ed",
+    "trial_af11ea5af956892e76fcf4bc",
+    "trial_475e622f640424f696f2c33c",
+    "trial_8c8671246932158010d75853",
+    "trial_165bfec106e6f6a488c30e10",
+    "trial_a4c86909bc85aaf7960efb68",
+    "trial_58d6a452626814d2651e8c31",
+    "trial_fb9e9d803086c9c646cb1144",
+    "trial_fc3f8dfd7099040343e0e8e2",
+    "trial_343887b7293326da1fd80820",
+    "trial_292cac5d26e82a1c087e4168",
+    "trial_67af103b7165f70c20d0d097",
+    "trial_0a283037521a79eb57b47dc6",
+    "trial_9630ec38aa148e487eda2c5c",
+    "trial_272a3cc65f7003d30ceae837",
+    "trial_e0358a27a1352e1bb6e4eb1a",
+    "trial_f8c5d08080a0c00391286a72",
+    "trial_a91af24e62a0fbfc115288e4",
+    "trial_a9b4494ad0a546e4f91674f8",
+    "trial_fd51e74e0d94b45dff4fa256",
+    "trial_8a35a96f7b28a6326a4e42c7",
+    "trial_d210f226c9b2ba124d76e596",
+    "trial_5175a55342187d253e8349f1",
+    "trial_87e8815388bd951c63934770",
+    "trial_fdaa557a2b61e846b84a1681",
+    "trial_d90b574df2232032ee6b2827",
+    "trial_94b35f582ee5b116c30adcbb",
+    "trial_eed5d8e05956d27a312f389f",
+    "trial_0ed7aceae386da5b42162779"
+  ],
+  "metadata": {
+    "preregistration_id": "H003_EDGE_FALSIFICATION_V0",
+    "strategy_id": "H003_moving_average",
+    "strategy_version": "existing-qntylab-strategies-v1",
+    "parameters": {
+      "fast": 48,
+      "slow": 192,
+      "mode": "long_flat"
+    },
+    "symbol": "SOLUSDT",
+    "expected_interval": "1h",
+    "gap_policy": "REJECT",
+    "minimum_pre_reporting_closes": 193,
+    "excluded_windows": [
+      {
+        "id": "BLOCK_2021_SEGMENT_04",
+        "evaluation_start": "2021-04-20T04:00:00Z",
+        "evaluation_end": "2021-04-25T04:00:00Z",
+        "reason": "121_CLOSES_LT_193_MINIMUM"
+      }
+    ],
+    "windows": [
+      {
+        "id": "BLOCK_2021_SEGMENT_01",
+        "evaluation_start": "2021-01-01T00:00:00Z",
+        "evaluation_end": "2021-02-11T03:00:00Z",
+        "input_sha256": "64bdb27a31003b0de25f3802affa8b412143a50bc8a5b76a399924626b01174a"
+      },
+      {
+        "id": "BLOCK_2021_SEGMENT_02",
+        "evaluation_start": "2021-02-11T05:00:00Z",
+        "evaluation_end": "2021-03-06T01:00:00Z",
+        "input_sha256": "64bdb27a31003b0de25f3802affa8b412143a50bc8a5b76a399924626b01174a"
+      },
+      {
+        "id": "BLOCK_2021_SEGMENT_03",
+        "evaluation_start": "2021-03-06T03:00:00Z",
+        "evaluation_end": "2021-04-20T01:00:00Z",
+        "input_sha256": "64bdb27a31003b0de25f3802affa8b412143a50bc8a5b76a399924626b01174a"
+      },
+      {
+        "id": "BLOCK_2021_SEGMENT_05",
+        "evaluation_start": "2021-04-25T08:00:00Z",
+        "evaluation_end": "2021-08-13T01:00:00Z",
+        "input_sha256": "64bdb27a31003b0de25f3802affa8b412143a50bc8a5b76a399924626b01174a"
+      },
+      {
+        "id": "BLOCK_2021_SEGMENT_06",
+        "evaluation_start": "2021-08-13T06:00:00Z",
+        "evaluation_end": "2021-09-29T06:00:00Z",
+        "input_sha256": "64bdb27a31003b0de25f3802affa8b412143a50bc8a5b76a399924626b01174a"
+      },
+      {
+        "id": "BLOCK_2021_SEGMENT_07",
+        "evaluation_start": "2021-09-29T09:00:00Z",
+        "evaluation_end": "2021-12-31T23:00:00Z",
+        "input_sha256": "64bdb27a31003b0de25f3802affa8b412143a50bc8a5b76a399924626b01174a"
+      },
+      {
+        "id": "BLOCK_2022",
+        "evaluation_start": "2021-12-23T23:00:00Z",
+        "evaluation_end": "2022-12-31T23:00:00Z",
+        "input_sha256": "64bdb27a31003b0de25f3802affa8b412143a50bc8a5b76a399924626b01174a"
+      },
+      {
+        "id": "BLOCK_2023_KNOWN_HOLDOUT",
+        "evaluation_start": "2022-12-02T00:00:00Z",
+        "evaluation_end": "2023-12-31T23:00:00Z",
+        "input_sha256": "62cee85e0a0f7b903fadc77a8f275e774f0ff3ecfff9fba9ea51a535376f70f1"
+      },
+      {
+        "id": "BLOCK_2024",
+        "evaluation_start": "2023-12-23T23:00:00Z",
+        "evaluation_end": "2024-12-31T23:00:00Z",
+        "input_sha256": "64bdb27a31003b0de25f3802affa8b412143a50bc8a5b76a399924626b01174a"
+      },
+      {
+        "id": "BLOCK_2025",
+        "evaluation_start": "2024-12-23T23:00:00Z",
+        "evaluation_end": "2025-12-31T23:00:00Z",
+        "input_sha256": "64bdb27a31003b0de25f3802affa8b412143a50bc8a5b76a399924626b01174a"
+      },
+      {
+        "id": "BLOCK_2026_TO_FREEZE",
+        "evaluation_start": "2025-12-23T23:00:00Z",
+        "evaluation_end": "2026-09-08T20:00:00Z",
+        "input_sha256": "64bdb27a31003b0de25f3802affa8b412143a50bc8a5b76a399924626b01174a"
+      }
+    ],
+    "cost_modes": [
+      {
+        "id": "zero_cost_diagnostic",
+        "fee_bps": 0,
+        "slippage_bps": 0
+      },
+      {
+        "id": "baseline",
+        "fee_bps": 10,
+        "slippage_bps": 0
+      },
+      {
+        "id": "stress",
+        "fee_bps": 10,
+        "slippage_bps": 10
+      },
+      {
+        "id": "severe_stress",
+        "fee_bps": 10,
+        "slippage_bps": 20
+      }
+    ],
+    "authority": {
+      "qntylab_only": true,
+      "qnty_acceptance": "NONE",
+      "qntyspot_policy": "NONE",
+      "execution": "FORBIDDEN",
+      "capital": "NONE",
+      "signing": "NONE",
+      "submission": "NONE"
+    }
+  }
+}

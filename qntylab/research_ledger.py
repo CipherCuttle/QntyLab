@@ -67,6 +67,20 @@ CANDIDATE_REOPENED_KEYS = {
     "material_change",
     "recorded_at_utc",
 }
+CANDIDATE_REOPENED_OPTIONAL_KEYS = {
+    "authorization_contract_path",
+    "authorization_contract_sha256",
+}
+REOPEN_AUTHORIZATION_CONTRACT_KEYS = {
+    "schema_version",
+    "authorization_id",
+    "reopen_event_id",
+    "candidate_id",
+    "variant_id",
+    "allowed_research_intents",
+    "authorized_trial_ids",
+    "metadata",
+}
 DECISION_KEYS = {
     "event_id",
     "event_type",
@@ -383,12 +397,26 @@ def validate_candidate_event(event: dict[str, Any]) -> None:
         if event["variant_id"] != compute_variant_id(event):
             raise LedgerError(f"variant_id mismatch: {event['event_id']}")
     elif event_type == "CANDIDATE_REOPENED":
-        _require_keys(event, CANDIDATE_REOPENED_KEYS, event_type)
+        _require_keys(event, CANDIDATE_REOPENED_KEYS, event_type, optional=CANDIDATE_REOPENED_OPTIONAL_KEYS)
         _require_non_empty_string(event, ("event_id", "candidate_id", "variant_id", "previous_decision_event_id", "recorded_at_utc"))
         if not isinstance(event["reason"], str) or len(event["reason"].strip()) < 12:
             raise LedgerError("reopen reason must be concrete and non-empty")
         if not isinstance(event["material_change"], str) or not event["material_change"].strip():
             raise LedgerError("material_change must be a non-empty string")
+        contract_path = event.get("authorization_contract_path")
+        contract_sha = event.get("authorization_contract_sha256")
+        if (contract_path is None) != (contract_sha is None):
+            raise LedgerError("reopen authorization contract path and SHA-256 must be declared together")
+        if contract_path is not None:
+            _require_non_empty_string(event, ("authorization_contract_path", "authorization_contract_sha256"))
+            if Path(contract_path).is_absolute():
+                raise LedgerError("reopen authorization contract path must be repository-relative")
+            if len(contract_sha) != 64:
+                raise LedgerError("reopen authorization contract SHA-256 must be 64 hex characters")
+            try:
+                int(contract_sha, 16)
+            except ValueError as exc:
+                raise LedgerError("reopen authorization contract SHA-256 must be hexadecimal") from exc
     else:
         raise LedgerError(f"unsupported candidate event_type: {event_type!r}")
 
@@ -730,14 +758,28 @@ def replay(history: CanonicalHistory, *, verify_evidence: bool = False, root: Pa
                 and decision["event_id"] == variant["latest_decision_event_id"]
                 for decision in history.decisions
             )
-            if not later_decision:
-                issues.append(f"reopen does not target latest decision: {event['event_id']}")
+            if later_decision:
+                # This reopen has already been consumed to authorize the later
+                # decision. Preserve that later decision on replay; an older
+                # reopen must never reactivate a subsequently terminal variant.
                 continue
+            issues.append(f"reopen does not target latest decision: {event['event_id']}")
+            continue
         if variant["status"] not in TERMINAL_DECISION_STATUSES:
             issues.append(f"reopen targets non-terminal status: {event['event_id']}")
             continue
         variant["status"] = "PROPOSED"
         variant["latest_decision_event_id"] = None
+        for key in (
+            "active_reopen_event_id",
+            "reopen_authorization_contract_path",
+            "reopen_authorization_contract_sha256",
+        ):
+            variant.pop(key, None)
+        if event.get("authorization_contract_path") is not None:
+            variant["active_reopen_event_id"] = event["event_id"]
+            variant["reopen_authorization_contract_path"] = event["authorization_contract_path"]
+            variant["reopen_authorization_contract_sha256"] = event["authorization_contract_sha256"]
 
     for event in history.trials:
         if event["event_id"] in seen_events:
@@ -820,6 +862,57 @@ def verify_indexes_current(root: Path = RESEARCH_ROOT) -> tuple[dict[str, Any], 
     return state, trial_index, ledger_sha
 
 
+
+def _load_reopen_authorization_contract(*, variant: dict[str, Any], variant_id: str, root: Path) -> dict[str, Any] | None:
+    path_value = variant.get("reopen_authorization_contract_path")
+    sha_value = variant.get("reopen_authorization_contract_sha256")
+    event_id_value = variant.get("active_reopen_event_id")
+    if path_value is None and sha_value is None and event_id_value is None:
+        return None
+    if not all(isinstance(value, str) and value.strip() for value in (path_value, sha_value, event_id_value)):
+        raise LedgerError("active reopen authorization state is incomplete")
+    if Path(path_value).is_absolute():
+        raise LedgerError("active reopen authorization contract path must be repository-relative")
+    repo_root = root.parent.parent.resolve()
+    contract_path = (repo_root / path_value).resolve()
+    try:
+        contract_path.relative_to(repo_root)
+    except ValueError as exc:
+        raise LedgerError("active reopen authorization contract escapes repository root") from exc
+    if not contract_path.is_file():
+        raise LedgerError(f"active reopen authorization contract missing: {path_value}")
+    if sha256_path(contract_path) != sha_value:
+        raise LedgerError("active reopen authorization contract SHA-256 mismatch")
+    try:
+        contract = json.loads(contract_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise LedgerError("active reopen authorization contract is malformed JSON") from exc
+    if not isinstance(contract, dict):
+        raise LedgerError("active reopen authorization contract must be a JSON object")
+    extra = set(contract) - REOPEN_AUTHORIZATION_CONTRACT_KEYS
+    missing = REOPEN_AUTHORIZATION_CONTRACT_KEYS - set(contract)
+    if extra or missing:
+        raise LedgerError(f"active reopen authorization contract keys invalid: extra={sorted(extra)} missing={sorted(missing)}")
+    if contract["schema_version"] != "1.0.0":
+        raise LedgerError("unsupported reopen authorization contract schema")
+    for key in ("authorization_id", "reopen_event_id", "candidate_id", "variant_id"):
+        if not isinstance(contract[key], str) or not contract[key].strip():
+            raise LedgerError(f"reopen authorization contract {key} must be a non-empty string")
+    if contract["reopen_event_id"] != event_id_value:
+        raise LedgerError("reopen authorization contract event identity mismatch")
+    if contract["candidate_id"] != variant["candidate_id"] or contract["variant_id"] != variant_id:
+        raise LedgerError("reopen authorization contract variant identity mismatch")
+    intents = contract["allowed_research_intents"]
+    if not isinstance(intents, list) or not intents or len(intents) != len(set(intents)) or any(intent not in RESEARCH_INTENTS for intent in intents):
+        raise LedgerError("reopen authorization contract allowed_research_intents invalid")
+    trial_ids = contract["authorized_trial_ids"]
+    if not isinstance(trial_ids, list) or not trial_ids or len(trial_ids) != len(set(trial_ids)) or not all(isinstance(item, str) and item.startswith("trial_") for item in trial_ids):
+        raise LedgerError("reopen authorization contract authorized_trial_ids invalid")
+    if not isinstance(contract["metadata"], dict):
+        raise LedgerError("reopen authorization contract metadata must be an object")
+    return contract
+
+
 def preflight(
     *,
     config: dict[str, Any],
@@ -885,6 +978,14 @@ def preflight(
             gap_policy=config["gap_policy"],
             expected_interval=config["expected_interval"],
         )
+    reopen_authorization = _load_reopen_authorization_contract(variant=variant, variant_id=variant_id, root=root)
+    reopen_authorization_id = None
+    if reopen_authorization is not None:
+        reopen_authorization_id = reopen_authorization["authorization_id"]
+        if config.get("research_intent") not in reopen_authorization["allowed_research_intents"]:
+            raise LedgerError("research_intent not authorized by active reopen contract")
+        if trial_id not in reopen_authorization["authorized_trial_ids"]:
+            raise LedgerError("trial not authorized by active reopen contract")
     if trial_id in trial_index["trials"] and config.get("research_intent") != "REPLICATION":
         raise LedgerError("exact trial already completed")
     return {
@@ -898,6 +999,7 @@ def preflight(
         "latest_decision_event_id": variant["latest_decision_event_id"],
         "ledger_sha256_before_run": ledger_sha,
         "research_intent": config.get("research_intent"),
+        "reopen_authorization_id": reopen_authorization_id,
         "status": status,
         "trial_id": trial_id,
         "variant_id": variant_id,

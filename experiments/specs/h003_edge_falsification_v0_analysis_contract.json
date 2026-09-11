@@ -80,14 +80,14 @@
   },
   "state_continuity": {
     "rule": "Calendar-year/reporting boundaries and file-materialization boundaries are not H003 strategy reset boundaries. Reconstruct the exact 48/192 position path before slicing reporting blocks.",
-    "minimum_pre_block_history_closes": 192,
+    "minimum_pre_block_history_closes": 193,
     "reset_allowed_only_at": [
       "the frozen dataset start when no earlier admitted close exists",
       "a manifest-declared timestamp gap that remains unnormalized under this contract"
     ],
     "authorized_2023_halt_is_not_a_reset": "The existing BINANCE_SPOT_HALT_NORMALIZATION_V1 bar at 2023-03-24T13:00:00Z is an authorized normalized observation for this V0, so it does not create a strategy reset.",
     "reporting_block_return_ownership": "A reporting block owns each admitted net return whose ending close timestamp lies within that block. The analysis slice must therefore include the immediately preceding admitted close and inherited position so the year-boundary return/state/transition are not dropped.",
-    "official_trial_role": "An official qntylab.strategy_test path-attestation run may begin before a reporting block to provide the required contiguous prehistory. The analyzer must first match that official run on its full attested window, reconstruct H003 on the full window, and only then slice the reporting block. Passing a bare calendar-year close array directly to positions() is forbidden."
+    "official_trial_role": "An official qntylab.strategy_test path-attestation run must use an exact window frozen in experiments/specs/h003_edge_falsification_v0_trial_authorization.json. For non-reset reporting boundaries this supplies 193 preceding closes so the one-bar-shifted predecessor position is causally reconstructible. The analyzer must first match that official run on its full attested window, reconstruct H003 on the full window, and only then slice the reporting block. Passing a bare calendar-year close array directly to positions() is forbidden."
   },
   "gap_and_input_semantics": {
     "global_rule": "Never create an ordinary missing candle and never compute a return across a timestamp gap.",
@@ -119,7 +119,7 @@
       "procedure": "Use the existing halt-normalized derived input including its frozen pre-2023 warmup beginning 2022-12-02T00:00:00Z. The official path-attestation window must include that prehistory. Reconstruct H003 on the full attested window before slicing returns whose ending timestamps fall in 2023. Do not reset H003 at 2023-01-01T00:00:00Z."
     },
     "OTHER_BLOCKS": {
-      "policy": "Use exact authoritative raw input. For every reporting block whose start is not the frozen dataset start or immediately after a genuine unnormalized gap, the path-attestation/reconstruction window must include at least the preceding 192 contiguous hourly closes. qntylab.strategy_test must reject any unexpected gap in the attested window. Any newly discovered gap blocks the affected path and cannot be normalized after result inspection."
+      "policy": "Use exact authoritative raw input. Every non-reset reporting block must use the exact 193-close prehistory window frozen in experiments/specs/h003_edge_falsification_v0_trial_authorization.json. qntylab.strategy_test must reject any unexpected gap in the attested window. Any newly discovered gap blocks the affected path and cannot be normalized after result inspection."
     }
   },
   "aggregation": {
@@ -130,6 +130,7 @@
   },
   "implementation_constraints": [
     "All H003 strategy result-producing runs must be created through qntylab.strategy_test.",
+    "Any post-graveyard H003 strategy_test trial must be admitted by the SHA-pinned active reopen authorization contract at the central research_ledger.preflight boundary; prose-only authorization or wrapper-only checks are insufficient.",
     "A separate deterministic analysis module may derive Sharpe, Calmar and controls only from frozen input bytes plus strategy_test-bound strategy semantics; it must not call an alternative H003 evaluator.",
     "Calendar/reporting slices must be applied only after full-history position reconstruction. Tests must prove a block sliced from a continuous synthetic H003 path is identical to the same timestamps taken from the unsliced path, including the inherited first position and boundary return.",
     "The analysis implementation and focused tests must be committed before any V0 output is inspected.",

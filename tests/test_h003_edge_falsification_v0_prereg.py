@@ -107,7 +107,7 @@ def test_analysis_contract_removes_metric_rng_and_gap_degrees_of_freedom() -> No
     assert controls["H003_SIGNAL_DELAYED_24H"]["decision_role"] == "DIAGNOSTIC_ONLY"
 
     continuity = analysis["state_continuity"]
-    assert continuity["minimum_pre_block_history_closes"] == 192
+    assert continuity["minimum_pre_block_history_closes"] == 193
     assert "not H003 strategy reset boundaries" in continuity["rule"]
     assert "ending close timestamp" in continuity["reporting_block_return_ownership"]
     assert "Passing a bare calendar-year close array directly to positions() is forbidden." in continuity["official_trial_role"]
@@ -121,7 +121,7 @@ def test_analysis_contract_removes_metric_rng_and_gap_degrees_of_freedom() -> No
     assert gap["BLOCK_2023_KNOWN_HOLDOUT"]["policy"] == "USE_EXISTING_AUTHORIZED_HALT_NORMALIZATION"
     assert gap["BLOCK_2023_KNOWN_HOLDOUT"]["input_sha256"] == "62cee85e0a0f7b903fadc77a8f275e774f0ff3ecfff9fba9ea51a535376f70f1"
     assert gap["BLOCK_2023_KNOWN_HOLDOUT"]["warmup_start"] == "2022-12-02T00:00:00Z"
-    assert "at least the preceding 192 contiguous hourly closes" in gap["OTHER_BLOCKS"]["policy"]
+    assert "exact 193-close prehistory" in gap["OTHER_BLOCKS"]["policy"]
 
     aggregation = analysis["aggregation"]
     assert "Calendar-year and file-materialization boundaries never reset H003 state" in aggregation["complete_historical_sample"]

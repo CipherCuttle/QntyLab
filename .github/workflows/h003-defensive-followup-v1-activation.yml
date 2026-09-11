@@ -1,0 +1,53 @@
+name: H003 Defensive Follow-up V1 Activation
+
+on:
+  pull_request:
+    paths:
+      - "experiments/specs/h003_defensive_followup_v1_activation.json"
+      - "experiments/research/h003_defensive_followup_v1/activation_reopen_event.json"
+      - "experiments/research/candidates.jsonl"
+      - "experiments/research/state.json"
+      - "experiments/research/trial_index.json"
+      - "qntylab/h003_defensive_followup_v1_activation.py"
+      - "tests/test_h003_defensive_followup_v1_activation.py"
+      - "tests/test_h003_edge_falsification_v0_reopen_authorization.py"
+      - ".github/workflows/h003-defensive-followup-v1-activation.yml"
+  push:
+    branches:
+      - master
+    paths:
+      - "experiments/specs/h003_defensive_followup_v1_activation.json"
+      - "experiments/research/h003_defensive_followup_v1/activation_reopen_event.json"
+      - "experiments/research/candidates.jsonl"
+      - "experiments/research/state.json"
+      - "experiments/research/trial_index.json"
+      - "qntylab/h003_defensive_followup_v1_activation.py"
+      - "tests/test_h003_defensive_followup_v1_activation.py"
+      - "tests/test_h003_edge_falsification_v0_reopen_authorization.py"
+      - ".github/workflows/h003-defensive-followup-v1-activation.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  activation-lock:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install focused dependencies
+        run: python -m pip install numpy pytest requests
+      - name: Verify frozen activation contract and lifecycle
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            tests/test_h003_defensive_followup_v1_activation.py \
+            tests/test_h003_edge_falsification_v0_reopen_authorization.py
+      - name: Verify research ledger
+        run: PYTHONPATH=. python -m qntylab.research_ledger doctor
+      - name: Verify bounded diff hygiene
+        run: git diff --check

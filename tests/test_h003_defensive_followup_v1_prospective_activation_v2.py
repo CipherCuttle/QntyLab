@@ -24,9 +24,16 @@ SOURCE_MERGE = "1827bb3e753970aed0cfbd0adc27bba121b41d5d"
 SOURCE_SHA256 = "74e1906f1bb54123ff77347629d5da6bafcd400b9a979d6d5526bbc6ccf08633"
 RUNTIME_RELATIVE_PATH = "experiments/research/h003_defensive_followup_v1/prospective_source_v2_runtime.json"
 WORKFLOW_RELATIVE_PATH = ".github/workflows/h003-prospective-operation-v2.yml"
-WORKFLOW_SHA256 = "33a994db1c5dae38a72cc06fdeaa79f9271fccc94d3d0fbb4cf496838acae4e9"
-EVIDENCE_BRANCH = "h003-prospective-evidence-v2"
+WORKFLOW_SHA256 = "39356c475e6328f11fde0c9499140e4a30b038c1e09fccfec3111e1bfbe0af76"
 SCHEDULE = "7,22,37,52 * * * *"
+PYTHON_VERSION = "3.12.14"
+NUMPY_VERSION = "2.5.3"
+CHECKOUT_SHA = "11d5960a326750d5838078e36cf38b85af677262"
+SETUP_PYTHON_SHA = "a26af69be951a213d495a4c3e4e4022e16d87065"
+UPLOAD_ARTIFACT_SHA = "ea165f8d65b6e75b540449e92b4886f43607fa02"
+DOWNLOAD_ARTIFACT_SHA = "d3f86a106a0bac45b974a628896c90dbdf5c8093"
+RELEASE_PREFIX = "h003-v2-evidence-"
+EVIDENCE_FILE = "h003_prospective_v2_events.jsonl"
 
 
 def _git(*args: str) -> str:
@@ -82,7 +89,7 @@ def test_activation_artifact_exactly_matches_source_authority_contract() -> None
     }
 
 
-def test_runtime_binding_freezes_schedule_workflow_and_evidence_branch() -> None:
+def test_runtime_binding_freezes_schedule_toolchain_and_immutable_evidence() -> None:
     runtime = _load(RUNTIME_RELATIVE_PATH)
     workflow = (ROOT / WORKFLOW_RELATIVE_PATH).read_bytes()
     assert sha256(workflow).hexdigest() == WORKFLOW_SHA256
@@ -96,9 +103,17 @@ def test_runtime_binding_freezes_schedule_workflow_and_evidence_branch() -> None
         "workflow_path": WORKFLOW_RELATIVE_PATH,
         "workflow_sha256": WORKFLOW_SHA256,
         "schedule_utc": SCHEDULE,
-        "evidence_branch": EVIDENCE_BRANCH,
-        "evidence_file": "h003_prospective_v2_events.jsonl",
-        "persistence": "GIT_FAST_FORWARD_HASH_CHAIN_V1",
+        "python_version": PYTHON_VERSION,
+        "numpy_version": NUMPY_VERSION,
+        "checkout_action_sha": CHECKOUT_SHA,
+        "setup_python_action_sha": SETUP_PYTHON_SHA,
+        "upload_artifact_action_sha": UPLOAD_ARTIFACT_SHA,
+        "download_artifact_action_sha": DOWNLOAD_ARTIFACT_SHA,
+        "release_prefix": RELEASE_PREFIX,
+        "release_asset": EVIDENCE_FILE,
+        "persistence": "GITHUB_IMMUTABLE_RELEASE_HASH_CHAIN_V1",
+        "immutable_release_required": True,
+        "write_authority": "PERSIST_JOB_ONLY",
         "force_push": "FORBIDDEN",
         "economic_verdict": "FORBIDDEN",
         "downstream_authority": "NONE",
@@ -107,12 +122,26 @@ def test_runtime_binding_freezes_schedule_workflow_and_evidence_branch() -> None
     text = workflow.decode("utf-8")
     assert f'cron: "{SCHEDULE}"' in text
     assert "cancel-in-progress: false" in text
-    assert "contents: write" in text
-    assert 'git push origin "HEAD:refs/heads/$H003_EVIDENCE_BRANCH"' in text
-    assert "git push --force" not in text
-    assert "git push -f" not in text
+    assert f"actions/checkout@{CHECKOUT_SHA}" in text
+    assert f"actions/setup-python@{SETUP_PYTHON_SHA}" in text
+    assert f"actions/upload-artifact@{UPLOAD_ARTIFACT_SHA}" in text
+    assert f"actions/download-artifact@{DOWNLOAD_ARTIFACT_SHA}" in text
+    assert f'python-version: "{PYTHON_VERSION}"' in text
+    assert f'"numpy=={NUMPY_VERSION}"' in text
+    assert "persist-credentials: false" in text
+    assert "GITHUB_IMMUTABLE_RELEASE_HASH_CHAIN_V1" in text
+    assert "gh release create" in text
+    assert "'.immutable'" in text
+    assert "H003_EVIDENCE_BRANCH" not in text
+    assert "git push" not in text
     assert "pull_request:" not in text
-    assert "economic" not in text.lower() or "economic" in _load(RUNTIME_RELATIVE_PATH)["economic_verdict"].lower()
+
+    record_section, persist_section = text.split("\n  persist:\n", 1)
+    assert "  record:\n    permissions:\n      contents: read" in record_section
+    assert "contents: write" not in record_section
+    assert "permissions:\n      contents: write" in persist_section
+    assert "actions/checkout@" not in persist_section
+    assert "GH_TOKEN: ${{ github.token }}" in persist_section
 
 
 def test_activation_is_not_authority_until_artifact_is_canonical_on_origin_master() -> None:

@@ -21,18 +21,24 @@ from qntylab.h003_defensive_followup_v1_prospective_recorder_v2 import (
 )
 
 
-def _row(logical_close: datetime, close: float) -> list[object]:
+def _row(logical_close: datetime, close: float, *, unit: str = "millisecond") -> list[object]:
     opened = logical_close - timedelta(hours=1)
-    open_ms = int(opened.timestamp() * 1000)
-    close_ms = int(logical_close.timestamp() * 1000) - 1
+    if unit == "millisecond":
+        scale = 1_000
+    elif unit == "microsecond":
+        scale = 1_000_000
+    else:
+        raise ValueError(unit)
+    open_stamp = int(opened.timestamp() * scale)
+    close_stamp = int(logical_close.timestamp() * scale) - 1
     return [
-        open_ms,
+        open_stamp,
         str(close),
         str(close),
         str(close),
         str(close),
         "1.0",
-        close_ms,
+        close_stamp,
         "1.0",
         1,
         "0.5",
@@ -66,16 +72,20 @@ def test_recorder_authority_is_git_derived_from_canonical_origin_merge() -> None
     assert parse_utc(ORIGIN_V2_CANONICAL_MERGE_UTC) < parse_utc(EXPECTED_ORIGIN_UTC)
 
 
-def test_spot_row_mapping_requires_exact_completed_1h_contract() -> None:
+def test_spot_row_mapping_requires_exact_completed_1h_contract_in_ms_or_us() -> None:
     logical_close = parse_utc(EXPECTED_ORIGIN_UTC)
-    bar = spot_bar_from_row("SOLUSDT", _row(logical_close, 123.45))
-    assert bar.logical_close_utc == logical_close
-    assert bar.open_time_utc == logical_close - timedelta(hours=1)
-    assert bar.close == 123.45
+    millisecond = spot_bar_from_row("SOLUSDT", _row(logical_close, 123.45, unit="millisecond"))
+    microsecond = spot_bar_from_row("SOLUSDT", _row(logical_close, 123.45, unit="microsecond"))
+    assert millisecond.logical_close_utc == microsecond.logical_close_utc == logical_close
+    assert millisecond.open_time_utc == microsecond.open_time_utc == logical_close - timedelta(hours=1)
+    assert millisecond.close == microsecond.close == 123.45
+    assert millisecond.provider_timestamp_unit == "millisecond"
+    assert microsecond.provider_timestamp_unit == "microsecond"
+    assert millisecond.raw_row != microsecond.raw_row
 
     malformed = _row(logical_close, 123.45)
     malformed[6] = int(malformed[6]) + 1
-    with pytest.raises(RecorderBlocked, match="exact 1h interval"):
+    with pytest.raises(RecorderBlocked, match="not an exact hour in supported ms/us units"):
         spot_bar_from_row("SOLUSDT", malformed)
     with pytest.raises(RecorderBlocked, match="non-panel symbol"):
         spot_bar_from_row("DOGEUSDT", _row(logical_close, 1.0))
@@ -142,6 +152,7 @@ def test_fixture_bundle_emits_only_chained_shadow_signal_facts() -> None:
     assert manifest["first_required_logical_close_utc"] == first_required_logical_close().isoformat().replace("+00:00", "Z")
     assert manifest["through_logical_close_utc"] == through.isoformat().replace("+00:00", "Z")
     assert len(manifest["rows"]) == 193 * 3
+    assert {row["provider_timestamp_unit"] for row in manifest["rows"]} == {"millisecond"}
 
     receipts = bundle["receipts"]
     assert len(receipts) == 6
@@ -156,6 +167,7 @@ def test_fixture_bundle_emits_only_chained_shadow_signal_facts() -> None:
     assert receipts[0]["state"] == "LONG"
     assert receipts[1]["state"] == "FLAT"
     assert receipts[2]["state"] == "FLAT"
+    assert all(item["provider_timestamp_unit"] == "millisecond" for item in receipts)
     assert all(item["economic_performance_metric"] == "NOT_COMPUTED" for item in receipts)
     assert all(item["interim_economic_verdict"] == "FORBIDDEN" for item in receipts)
     assert all(item["live_execution"] == "FORBIDDEN" for item in receipts)

@@ -1,7 +1,7 @@
 {
   "candidate_id": "CANDIDATE_H003_MA_48_192_LONG_FLAT",
-  "decision_note": "H003 V0 supports a narrow defensive/risk-adjusted mechanism candidate for the exact 48/192 long-flat variant. BTCUSDT and ETHUSDT are explicitly prior-exposed for this exact variant and any retrospective use is diagnostic only, not independent confirmation. The prior 2023 excess-return failure remains canonical. Genuine confirmation requires the frozen post-preregistration SOLUSDT/BTCUSDT/ETHUSDT paper-shadow panel. No Qnty, QntySpot, live-trading, capital, signing, or submission authority is granted.",
-  "event_id": "event_decision_f61c8c6345d0528e76eb385f",
+  "decision_note": "H003 V0 supports a narrow defensive/risk-adjusted mechanism candidate for the exact 48/192 long-flat variant, but the variant is BLOCKED pending a separate scoped activation. BTCUSDT and ETHUSDT are prior-exposed and may only be used as retrospective diagnostics after explicit activation; genuine confirmation requires a post-activation SOLUSDT/BTCUSDT/ETHUSDT paper-shadow panel. The prior 2023 excess-return failure remains canonical. This decision grants no generic trial, shadow, Qnty, QntySpot, live-trading, capital, signing, or submission authority.",
+  "event_id": "event_decision_663334b58c3697ef37dd2e09",
   "event_type": "DECISION_RECORDED",
   "evidence_paths": [
     "experiments/runs/h003_edge_falsification_v0/analysis.json",
@@ -17,7 +17,7 @@
     "experiments/runs/h003_edge_falsification_v0/analysis.json": "6d71be953ab29440c429ad07dab8db4f3f3c4ac63cd4d131b528e6447e9aa64f",
     "experiments/runs/h003_edge_falsification_v0/execution_receipt.json": "176dc80cce0d055e2badd2dd6253b27a0cffd22ba973e0c6575d2a99984b1dfd",
     "experiments/runs/h003_edge_falsification_v0/input_attestation.json": "efde784b358f8816817464085489b8a640a25010145399cc8ddd84f65fd9ffd6",
-    "experiments/specs/h003_defensive_followup_v1.json": "4771dd64f40fc59f1a883bcbfa63ab74f49c9b5ffcf186fe16c86e15fcc35ba1"
+    "experiments/specs/h003_defensive_followup_v1.json": "d56da275c4339163c77cd6e5599f151964be6f61323124f9f72d98e3974f44ca"
   },
   "family_id": "moving_average_trend",
   "reason_codes": [
@@ -26,11 +26,12 @@
     "ABSOLUTE_RETURN_SUPERIORITY_NOT_ESTABLISHED",
     "PRIOR_2023_HOLDOUT_FAILURE_PRESERVED",
     "PRIOR_EXPOSED_RETROSPECTIVE_DIAGNOSTIC_ONLY",
-    "PROSPECTIVE_MULTI_ASSET_CONFIRMATION_REQUIRED"
+    "FOLLOWUP_PREREGISTERED_AWAITING_ACTIVATION",
+    "NO_GENERIC_TRIAL_AUTHORITY"
   ],
-  "recorded_at_utc": "2026-09-11T17:05:00Z",
-  "revisit_condition": "After this preregistration is merged, historical BTCUSDT/ETHUSDT may be run only as the frozen prior-exposed diagnostic with exact input attestation, and SOLUSDT/BTCUSDT/ETHUSDT may enter the frozen prospective paper-shadow panel from one Git-derived post-merge origin. No same-sample promotion, parameter search, asset-specific tuning, or downstream economic authority is authorized.",
+  "recorded_at_utc": "2026-09-11T17:12:00Z",
+  "revisit_condition": "A separate Git-backed CANDIDATE_REOPENED activation must authorize the exact historical diagnostic trial matrix and prospective recorder, bind a post-activation origin, and preserve all H003_DEFENSIVE_FOLLOWUP_V1 invariants before any execution or shadow recording begins.",
   "scope": "EXACT_VARIANT",
-  "status": "FOLLOW_UP",
+  "status": "BLOCKED",
   "variant_id": "variant_00eb140f03a5f6ab40600160"
 }

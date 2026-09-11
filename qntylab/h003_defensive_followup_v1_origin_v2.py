@@ -61,6 +61,24 @@ def derive_origin(merge_timestamp_utc: str, *, lead_hours: int = ORIGIN_SAFETY_L
     return first_whole_hour_at_or_after(parse_utc(merge_timestamp_utc) + timedelta(hours=lead_hours))
 
 
+def validate_artifact_canonicalization_time(canonicalized_at_utc: str) -> datetime:
+    """Fail closed unless the origin-v2 artifact became canonical before origin.
+
+    The future recorder must supply Git-derived canonicalization time and call
+    this guard before treating the origin artifact as recording authority.
+    Equality is deliberately invalid: the artifact must already be canonical
+    strictly before the frozen origin, otherwise a new future origin is needed.
+    """
+    canonicalized = parse_utc(canonicalized_at_utc)
+    origin = parse_utc(EXPECTED_ORIGIN_UTC)
+    if canonicalized >= origin:
+        raise RuntimeError(
+            "origin-v2 artifact canonicalized at/after origin; "
+            "BLOCK_AND_REISSUE_FUTURE_ORIGIN_NO_BACKFILL"
+        )
+    return canonicalized
+
+
 def validate_authority_inputs() -> None:
     expected_hashes = {
         PREREG_PATH: PREREG_SHA256,
@@ -191,14 +209,17 @@ def build_origin_artifact() -> dict[str, Any]:
         },
         "recorder_authority": {
             "authority_derivation": "ACTIVE_V2_LEDGER_REOPEN_CONTRACT_AND_CANONICAL_VALID_ORIGIN_V2_ARTIFACT_REQUIRED_TOGETHER",
-            "status_after_this_artifact_is_canonical": "ACTIVE_PROSPECTIVE_SHADOW_RECORDING",
+            "status_after_this_artifact_is_canonical": "CONDITIONAL_PROSPECTIVE_SHADOW_RECORDING_REQUIRES_CANONICALIZATION_TIME_GUARD",
             "recording_may_begin_only_after_artifact_is_canonical": True,
             "origin_artifact_must_be_canonical_before_origin": True,
+            "canonicalization_time_guard_function": "validate_artifact_canonicalization_time",
+            "recording_authority_requires_canonicalization_timestamp_strictly_before_origin": True,
+            "unconditional_recording_authority": False,
             "late_artifact_behavior": "BLOCK_AND_REISSUE_FUTURE_ORIGIN_NO_BACKFILL",
             "paper_shadow_only": True,
-            "market_data_recording_authorized": True,
-            "signal_recording_authorized": True,
-            "integrity_receipt_recording_authorized": True,
+            "market_data_recording_authorized_if_guard_passes": True,
+            "signal_recording_authorized_if_guard_passes": True,
+            "integrity_receipt_recording_authorized_if_guard_passes": True,
             "economic_performance_verdict_before_maturity_forbidden": True,
             "parameter_changes_forbidden": True,
             "asset_changes_forbidden": True,
@@ -214,6 +235,7 @@ def build_origin_artifact() -> dict[str, Any]:
             "market_data_accessed_to_choose_origin": False,
             "strategy_result_accessed_to_choose_origin": False,
             "origin_may_not_be_moved_for_market_or_strategy_outcomes": True,
+            "canonicalization_time_proof_required_before_recording": True,
             "if_artifact_becomes_canonical_at_or_after_origin": "INVALID_BLOCK_AND_REISSUE_FUTURE_ORIGIN_NO_BACKFILL",
         },
     }

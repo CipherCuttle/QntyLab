@@ -46,7 +46,8 @@ INTERVAL = "1h"
 FAST = 48
 SLOW = 192
 HOUR_MS = 3_600_000
-SPOT_SOURCE_ID = "Binance Spot public 1h kline 12-field contract"
+HOUR_US = 3_600_000_000
+SPOT_SOURCE_ID = "Binance Spot public 1h kline 12-field contract (millisecond REST or microsecond public-data timestamps)"
 NETWORK_TRANSPORT = "UNBOUND_FIXTURE_ONLY"
 
 
@@ -61,6 +62,7 @@ class SpotBar:
     logical_close_utc: datetime
     close: float
     raw_row: tuple[Any, ...]
+    provider_timestamp_unit: str
 
 
 def canonical_bytes(value: Any) -> bytes:
@@ -157,28 +159,40 @@ def first_required_logical_close() -> datetime:
 
 
 def spot_bar_from_row(symbol: str, row: Sequence[Any]) -> SpotBar:
-    """Map one exact Binance Spot 1h 12-field row to a logical close."""
+    """Map one exact Binance Spot 1h 12-field row to a logical close.
+
+    Binance REST klines use millisecond timestamps by default, while Binance
+    public-data Spot archives use microseconds for 2025+ data. Both provider
+    encodings are admitted only when they form an exact hour; the original row
+    is retained byte-semantically for hashing rather than being rewritten.
+    """
     if symbol not in PANEL:
         raise RecorderBlocked(f"non-panel symbol rejected: {symbol}")
     if len(row) != 12:
         raise RecorderBlocked("Binance Spot kline row must contain exactly 12 fields")
     try:
-        open_ms = int(row[0])
+        open_stamp = int(row[0])
         close_value = float(row[4])
-        close_ms = int(row[6])
+        close_stamp = int(row[6])
     except (TypeError, ValueError) as exc:
         raise RecorderBlocked("malformed Binance Spot kline row") from exc
-    if open_ms % HOUR_MS:
-        raise RecorderBlocked("Spot kline open time is not hour aligned")
-    if close_ms != open_ms + HOUR_MS - 1:
-        raise RecorderBlocked("Spot kline is not an exact 1h interval")
+
+    if close_stamp - open_stamp == HOUR_MS - 1 and open_stamp % HOUR_MS == 0:
+        timestamp_scale = 1_000
+        timestamp_unit = "millisecond"
+    elif close_stamp - open_stamp == HOUR_US - 1 and open_stamp % HOUR_US == 0:
+        timestamp_scale = 1_000_000
+        timestamp_unit = "microsecond"
+    else:
+        raise RecorderBlocked("Spot kline timestamps are not an exact hour in supported ms/us units")
+
     if not math.isfinite(close_value) or close_value <= 0:
         raise RecorderBlocked("Spot kline close must be finite and positive")
-    opened = datetime.fromtimestamp(open_ms / 1000, UTC)
-    logical_close = datetime.fromtimestamp((close_ms + 1) / 1000, UTC)
+    opened = datetime.fromtimestamp(open_stamp / timestamp_scale, UTC)
+    logical_close = datetime.fromtimestamp((close_stamp + 1) / timestamp_scale, UTC)
     if logical_close != opened + timedelta(hours=1):
         raise RecorderBlocked("provider timestamps do not map to the logical close")
-    return SpotBar(symbol, opened, logical_close, close_value, tuple(row))
+    return SpotBar(symbol, opened, logical_close, close_value, tuple(row), timestamp_unit)
 
 
 def validate_bars(bars: Sequence[SpotBar], *, through_logical_close: datetime) -> tuple[SpotBar, ...]:
@@ -235,6 +249,7 @@ def _build_source_manifest(bars: Sequence[SpotBar], *, through_logical_close: da
             {
                 "symbol": bar.symbol,
                 "logical_close_utc": _stamp(bar.logical_close_utc),
+                "provider_timestamp_unit": bar.provider_timestamp_unit,
                 "raw_row_sha256": sha256(canonical_bytes(bar.raw_row)).hexdigest(),
             }
             for bar in ordered
@@ -277,6 +292,7 @@ def _build_signal_receipts(
             "symbol": bar.symbol,
             "interval": INTERVAL,
             "logical_close_utc": _stamp(bar.logical_close_utc),
+            "provider_timestamp_unit": bar.provider_timestamp_unit,
             "close_raw_row_sha256": sha256(canonical_bytes(bar.raw_row)).hexdigest(),
             "position": position,
             "state": "LONG" if position > 0 else "FLAT",

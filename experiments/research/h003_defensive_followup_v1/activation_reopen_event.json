@@ -1,0 +1,12 @@
+{
+  "authorization_contract_path": "experiments/specs/h003_defensive_followup_v1_activation.json",
+  "authorization_contract_sha256": "6d11a8e748e6a28560781a0d8044d913934bd2e199891932ed2fe4df3b3d7505",
+  "candidate_id": "CANDIDATE_H003_MA_48_192_LONG_FLAT",
+  "event_id": "event_reopen_h003_defensive_followup_v1_activation",
+  "event_type": "CANDIDATE_REOPENED",
+  "material_change": "The exact H003 48/192 defensive-edge candidate now has a merged, result-blind H003_DEFENSIVE_FOLLOWUP_V1 contract. This activation authorizes only 88 precomputed prior-exposed BTCUSDT/ETHUSDT retrospective diagnostic trial IDs under the frozen windows/costs and arms, but does not start, the future SOLUSDT/BTCUSDT/ETHUSDT paper-shadow recorder. BTC/ETH history cannot create confirmatory support. The recorder remains ARMED_BUT_INACTIVE_PENDING_ORIGIN_ARTIFACT with no market-data or signal recording authority until a separate post-merge Git-derived origin artifact is canonical. The prior 2023 excess-return failure remains negative evidence. No Qnty, QntySpot, live execution, capital, signing, or submission authority is created.",
+  "previous_decision_event_id": "event_decision_663334b58c3697ef37dd2e09",
+  "reason": "ACTIVATE_FROZEN_H003_DEFENSIVE_FOLLOWUP_V1",
+  "recorded_at_utc": "2026-09-11T17:22:00Z",
+  "variant_id": "variant_00eb140f03a5f6ab40600160"
+}

@@ -21,6 +21,8 @@ CANDIDATE_ID = "CANDIDATE_H003_MA_48_192_LONG_FLAT"
 CANONICAL_SHA = "64bdb27a31003b0de25f3802affa8b412143a50bc8a5b76a399924626b01174a"
 V0_REOPEN_EVENT_ID = "event_reopen_h003_edge_falsification_v0"
 V1_ACTIVATION_REOPEN_EVENT_ID = "event_reopen_h003_defensive_followup_v1_activation"
+V2_PROSPECTIVE_REOPEN_EVENT_ID = "event_reopen_h003_defensive_followup_v1_prospective_v2"
+V2_PROSPECTIVE_CONTRACT_PATH = "experiments/specs/h003_defensive_followup_v1_prospective_reopen_v2.json"
 
 
 def _config(*, start: str, end: str, fee_bps: float, slippage_bps: float, research_intent: str = "FOLLOW_UP") -> dict:
@@ -119,8 +121,30 @@ def test_central_preflight_enforces_reopen_authorization_and_duplicate_lifecycle
 
     active_reopen = variant_state.get("active_reopen_event_id")
     if active_reopen == V1_ACTIVATION_REOPEN_EVENT_ID:
-        # V0 SOL trials are outside the new activation generation. They must
-        # fail at the active authorization boundary even if already completed.
+        # V0 SOL trials are outside the activation generation. They must fail at
+        # the active authorization boundary even if already completed.
+        for config in (
+            allowed,
+            dict(allowed, evaluation_start="2021-12-24T00:00:00Z"),
+            dict(allowed, fee_bps=7),
+        ):
+            with pytest.raises(LedgerError, match="trial not authorized by active reopen contract"):
+                preflight(config=config, symbol="SOLUSDT", input_sha256=CANONICAL_SHA, root=RESEARCH_ROOT)
+        with pytest.raises(LedgerError, match="research_intent not authorized by active reopen contract"):
+            preflight(
+                config=dict(allowed, research_intent="SCREEN"),
+                symbol="SOLUSDT",
+                input_sha256=CANONICAL_SHA,
+                root=RESEARCH_ROOT,
+            )
+        return
+
+    if active_reopen == V2_PROSPECTIVE_REOPEN_EVENT_ID:
+        # The explicit prospective-only generation must not reactivate any V0
+        # historical SOL trial. Its active contract is exact and recorder-only.
+        assert variant_state["status"] == "SCREENING"
+        assert variant_state["latest_decision_event_id"] is None
+        assert variant_state["reopen_authorization_contract_path"] == V2_PROSPECTIVE_CONTRACT_PATH
         for config in (
             allowed,
             dict(allowed, evaluation_start="2021-12-24T00:00:00Z"),

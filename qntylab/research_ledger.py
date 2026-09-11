@@ -758,9 +758,13 @@ def replay(history: CanonicalHistory, *, verify_evidence: bool = False, root: Pa
                 and decision["event_id"] == variant["latest_decision_event_id"]
                 for decision in history.decisions
             )
-            if not later_decision:
-                issues.append(f"reopen does not target latest decision: {event['event_id']}")
+            if later_decision:
+                # This reopen has already been consumed to authorize the later
+                # decision. Preserve that later decision on replay; an older
+                # reopen must never reactivate a subsequently terminal variant.
                 continue
+            issues.append(f"reopen does not target latest decision: {event['event_id']}")
+            continue
         if variant["status"] not in TERMINAL_DECISION_STATUSES:
             issues.append(f"reopen targets non-terminal status: {event['event_id']}")
             continue

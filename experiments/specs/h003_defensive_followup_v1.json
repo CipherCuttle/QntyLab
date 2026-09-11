@@ -5,7 +5,7 @@
   "variant_id": "variant_00eb140f03a5f6ab40600160",
   "strategy_id": "H003_moving_average",
   "strategy_version": "existing-qntylab-strategies-v1",
-  "research_question": "Does the already-frozen H003 48/192 long-flat rule provide a reproducible defensive/risk-adjusted benefit outside the SOL retrospective sample that produced H003_EDGE_FALSIFICATION_V0?",
+  "research_question": "Does the already-frozen H003 48/192 long-flat rule provide a reproducible defensive/risk-adjusted benefit when prior-exposed retrospective diagnostics are separated from genuinely post-preregistration prospective evidence?",
   "claim_boundary": {
     "allowed_claim": "defensive/risk-adjusted mechanism candidate only",
     "forbidden_claims": [
@@ -13,13 +13,15 @@
       "absolute-return superiority",
       "causal effect",
       "family-wide moving-average validity",
+      "independent historical replication on BTCUSDT or ETHUSDT",
       "Qnty acceptance",
       "QntySpot policy admission",
-      "paper/live trading authorization",
+      "live trading authorization",
       "capital allocation"
     ],
     "prior_2023_holdout_failure_must_remain_preserved": true,
-    "same_sample_sol_reruns_cannot_promote_claim": true
+    "same_sample_sol_reruns_cannot_promote_claim": true,
+    "prior_exposed_btc_eth_history_cannot_create_confirmatory_support": true
   },
   "frozen_strategy": {
     "fast": 48,
@@ -36,7 +38,11 @@
     {"id": "stress", "fee_bps": 10, "slippage_bps": 10},
     {"id": "severe_stress", "fee_bps": 10, "slippage_bps": 20}
   ],
-  "cross_asset_replication": {
+  "prior_exposed_retrospective_diagnostic": {
+    "role": "supplementary robustness diagnostic and possible falsifying evidence only; it cannot create confirmatory support",
+    "prior_exposure_acknowledged": true,
+    "prior_exposure_evidence_path": "experiments/research/summaries/focused_trend_validation_v1_2023_holdout_cells.csv",
+    "exact_h003_btc_eth_were_previously_evaluated": true,
     "execution_authorized_only_after_this_prereg_is_merged": true,
     "assets": [
       {
@@ -44,9 +50,12 @@
         "market": "Binance Spot",
         "timeframe": "1h",
         "raw_manifest_path": "data/manifests/BTCUSDT-1h.json",
-        "raw_sha256": "6dcc8c6293f24e2e91957b286a96d9b87fd646e4b57c846495bd41d1aa225b65",
+        "history_start": "2021-01-01T00:00:00Z",
         "historical_end": "2026-07-28T18:00:00Z",
+        "expected_rows": 48821,
+        "raw_sha256": "6dcc8c6293f24e2e91957b286a96d9b87fd646e4b57c846495bd41d1aa225b65",
         "normalized_2023_path": "data/derived/focused_trend_validation_v1/BTCUSDT-spot-1h-2023-halt-normalized.csv",
+        "normalized_2023_manifest_path": "data/derived/focused_trend_validation_v1/BTCUSDT-spot-1h-2023-halt-normalized.manifest.json",
         "normalized_2023_sha256": "08d5649e86743e9485fb55a3978b96f7b0b5483b33223534d52d4fe0a745d10e"
       },
       {
@@ -54,13 +63,22 @@
         "market": "Binance Spot",
         "timeframe": "1h",
         "raw_manifest_path": "data/manifests/ETHUSDT-1h.json",
-        "raw_sha256": "3584c161874dc3b8d8f9961901e5abaadebe32a1aaba6d321106b8ccb1f61187",
+        "history_start": "2021-01-01T00:00:00Z",
         "historical_end": "2026-07-28T18:00:00Z",
+        "expected_rows": 48821,
+        "raw_sha256": "3584c161874dc3b8d8f9961901e5abaadebe32a1aaba6d321106b8ccb1f61187",
         "normalized_2023_path": "data/derived/focused_trend_validation_v1/ETHUSDT-spot-1h-2023-halt-normalized.csv",
+        "normalized_2023_manifest_path": "data/derived/focused_trend_validation_v1/ETHUSDT-spot-1h-2023-halt-normalized.manifest.json",
         "normalized_2023_sha256": "a3cfb7733aad701b43fd383ac32f52252d229d2275147698449b2007bdff0d40"
       }
     ],
-    "history_start": "2021-01-01T00:00:00Z",
+    "input_identity_contract": {
+      "source": "Binance Spot public market-data REST",
+      "materialization_rule": "Materialize exactly from each frozen history_start through historical_end inclusive, then require exact start, end, expected_rows, and raw_sha256 before strategy execution. If a longer append-only raw file is used as a source, hash and verify the exact first expected_rows CSV rows plus header and require the last prefix timestamp to equal historical_end and the prefix SHA256 to equal raw_sha256.",
+      "newer_full_file_may_not_replace_frozen_snapshot": true,
+      "acquisition_error_or_identity_mismatch_verdict": "BLOCKED_BY_INPUT_OR_INTEGRITY",
+      "normalized_2023_manifest_and_derived_sha_must_validate": true
+    },
     "continuity": {
       "reconstruct_full_path_before_reporting_slice": true,
       "minimum_pre_reporting_closes": 193,
@@ -68,7 +86,7 @@
       "the_2023_binance_spot_halt_normalization_is_not_a_reset": true,
       "no_transition_or_cost_may_be_inferred_across_a_genuine_gap": true
     },
-    "primary_success_gate": {
+    "diagnostic_hurdle": {
       "both_assets_baseline_maximum_drawdown_must_be_shallower_than_buy_and_hold": true,
       "minimum_wins_across_four_baseline_risk_adjusted_comparisons": 3,
       "risk_adjusted_comparisons": [
@@ -80,37 +98,50 @@
       "both_assets_stress_annualized_sharpe_must_be_positive": true
     },
     "interpretation": {
-      "pass": "CROSS_ASSET_DEFENSIVE_REPLICATION_PASS",
-      "otherwise": "CROSS_ASSET_DEFENSIVE_REPLICATION_FAIL",
+      "pass": "PRIOR_EXPOSED_DIAGNOSTIC_PASS",
+      "otherwise": "PRIOR_EXPOSED_DIAGNOSTIC_FAIL",
+      "pass_cannot_confirm_or_promote": true,
+      "failure_may_downgrade_a_later_prospective_pass_to_fragile_or_unproven": true,
       "no_post_result_parameter_changes": true
     }
   },
-  "prospective_sol": {
+  "prospective_panel": {
     "mode": "paper_shadow_only",
-    "activation_rule": "After this preregistration is merged to master, create a separate activation artifact from Git metadata only. The prospective origin is the first complete UTC 1h bar whose open timestamp is greater than or equal to the next whole UTC hour strictly after the prereg merge commit timestamp.",
-    "warmup_rule": "Pre-origin closes may initialize MA48/MA192 state only; no pre-origin return may enter prospective reporting metrics.",
+    "assets": ["SOLUSDT", "BTCUSDT", "ETHUSDT"],
+    "market": "Binance Spot",
+    "timeframe": "1h",
+    "activation_rule": "After this preregistration is merged to master, create a separate activation artifact from Git metadata only. All three assets share one prospective origin equal to the next whole UTC hour strictly after the prereg merge commit timestamp.",
+    "return_ownership_rule": "Pre-origin closes may initialize MA48/MA192 state only. No pre-origin return or transition cost may enter prospective metrics. A prospective return is owned only when its ending bar timestamp is strictly greater than the prospective origin.",
     "minimum_calendar_days_before_economic_verdict": 180,
-    "minimum_genuine_position_state_changes_before_economic_verdict": 2,
+    "minimum_genuine_position_state_changes_per_asset_before_economic_verdict": 2,
     "maximum_calendar_days_for_regime_coverage_gate": 365,
-    "if_365_days_elapse_with_fewer_than_two_state_changes": "INCONCLUSIVE_INSUFFICIENT_REGIME_COVERAGE",
+    "if_365_days_elapse_and_any_asset_has_fewer_than_two_state_changes": "INCONCLUSIVE_INSUFFICIENT_REGIME_COVERAGE",
     "interim_policy": {
       "integrity_checks_allowed": true,
       "signal_and_receipt_recording_allowed": true,
       "economic_performance_verdict_before_maturity_forbidden": true,
-      "parameter_changes_forbidden": true
+      "parameter_changes_forbidden": true,
+      "asset_changes_forbidden": true
     },
     "primary_success_gate_at_maturity": {
-      "baseline_maximum_drawdown_shallower_than_buy_and_hold": true,
-      "baseline_annualized_sharpe_greater_than_or_equal_to_buy_and_hold": true,
-      "baseline_calmar_ratio_greater_than_or_equal_to_buy_and_hold": true,
-      "stress_annualized_sharpe_positive": true
+      "all_three_assets_baseline_maximum_drawdown_must_be_shallower_than_buy_and_hold": true,
+      "minimum_wins_across_six_baseline_risk_adjusted_comparisons": 4,
+      "risk_adjusted_comparisons": [
+        "SOLUSDT annualized_sharpe >= SOLUSDT buy_and_hold annualized_sharpe",
+        "SOLUSDT calmar_ratio >= SOLUSDT buy_and_hold calmar_ratio",
+        "BTCUSDT annualized_sharpe >= BTCUSDT buy_and_hold annualized_sharpe",
+        "BTCUSDT calmar_ratio >= BTCUSDT buy_and_hold calmar_ratio",
+        "ETHUSDT annualized_sharpe >= ETHUSDT buy_and_hold annualized_sharpe",
+        "ETHUSDT calmar_ratio >= ETHUSDT buy_and_hold calmar_ratio"
+      ],
+      "minimum_assets_with_positive_stress_annualized_sharpe": 2
     }
   },
   "combined_adjudication": {
-    "DEFENSIVE_REPLICATION_SUPPORTED": "cross-asset primary gate passes AND prospective SOL primary gate passes",
-    "FRAGILE_OR_UNPROVEN": "exactly one of the cross-asset or prospective primary gates passes, or prospective regime coverage is inconclusive",
-    "FALSIFIED": "both primary gates fail",
-    "BLOCKED_BY_INPUT_OR_INTEGRITY": "any frozen input, provenance, continuity, receipt, implementation, or activation identity check fails",
+    "DEFENSIVE_REPLICATION_SUPPORTED": "prospective_panel primary gate passes AND prior_exposed_retrospective_diagnostic hurdle passes; historical diagnostic is supplementary and cannot create this verdict by itself",
+    "FRAGILE_OR_UNPROVEN": "prospective_panel passes but the prior-exposed diagnostic hurdle fails, or prospective regime coverage is inconclusive",
+    "FALSIFIED": "prospective_panel reaches maturity with sufficient regime coverage and fails its primary success gate",
+    "BLOCKED_BY_INPUT_OR_INTEGRITY": "any frozen input, provenance, continuity, receipt, implementation, acquisition, or activation identity check fails",
     "downstream_authority_after_any_verdict": "NONE; any Qnty/QntySpot paper or live canary requires a separate explicit authorization"
   },
   "authority": {

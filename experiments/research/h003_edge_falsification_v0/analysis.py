@@ -1,8 +1,8 @@
 """Result-blind diagnostics for H003_EDGE_FALSIFICATION_V0.
 
 This module deliberately has no CLI and performs no data acquisition, ledger
-mutation, strategy trial registration, or verdict publication.  Official H003
-research evidence remains owned by ``qntylab.strategy_test``.  The functions
+mutation, strategy trial registration, or verdict publication. Official H003
+research evidence remains owned by ``qntylab.strategy_test``. The functions
 below validate an official completed receipt, reconstruct the exact already-
 registered H003 position path through ``qntylab.strategies.positions``, and
 compute only the preregistered defensive-risk controls/diagnostics.
@@ -14,7 +14,8 @@ capital, signing, submission, or execution semantics live here.
 from __future__ import annotations
 
 import math
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Mapping, Sequence
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import numpy as np
@@ -35,6 +36,17 @@ RESEARCH_INTENT = "FOLLOW_UP"
 DEFAULT_SEEDS = (17011, 17029, 17041, 17053, 17077, 17093, 17107, 17123, 17137, 17159)
 BLOCK_HOURS = 168
 DELAY_HOURS = 24
+CANONICAL_DATASET_START = "2021-01-01T00:00:00Z"
+RESET_FROZEN_DATASET_START = "FROZEN_DATASET_START"
+RESET_MANIFEST_GAP = "MANIFEST_DECLARED_UNNORMALIZED_GAP"
+AUTHORIZED_GAP_SEGMENT_STARTS = (
+    "2021-02-11T05:00:00Z",
+    "2021-03-06T03:00:00Z",
+    "2021-04-20T04:00:00Z",
+    "2021-04-25T08:00:00Z",
+    "2021-08-13T06:00:00Z",
+    "2021-09-29T09:00:00Z",
+)
 
 
 class H003FalsificationError(ValueError):
@@ -44,6 +56,27 @@ class H003FalsificationError(ValueError):
 def _require(condition: bool, message: str) -> None:
     if not condition:
         raise H003FalsificationError(message)
+
+
+def _parse_utc_timestamp(value: str, *, label: str) -> datetime:
+    _require(isinstance(value, str) and bool(value), f"{label} must be a non-empty timestamp string")
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise H003FalsificationError(f"{label} is not a valid ISO-8601 timestamp") from exc
+    _require(parsed.tzinfo is not None, f"{label} must be timezone-aware")
+    _require(parsed.utcoffset() == timedelta(0), f"{label} must be UTC")
+    return parsed.astimezone(UTC)
+
+
+def _validated_timestamps(timestamps: Sequence[str] | Iterable[str], *, expected_length: int) -> tuple[tuple[str, ...], tuple[datetime, ...]]:
+    values = tuple(timestamps)
+    _require(len(values) == expected_length, "timestamp/close length mismatch")
+    _require(len(values) >= 3, "at least 3 timestamps are required")
+    parsed = tuple(_parse_utc_timestamp(value, label=f"timestamps[{index}]") for index, value in enumerate(values))
+    for previous, current in zip(parsed, parsed[1:], strict=True):
+        _require(current - previous == timedelta(hours=1), "attested timestamps must be strictly contiguous hourly UTC bars")
+    return values, parsed
 
 
 def validate_official_receipt(
@@ -58,7 +91,7 @@ def validate_official_receipt(
     """Validate the identity/accounting fields required before diagnostics.
 
     The receipt must already have been produced by the official
-    ``qntylab.strategy_test`` boundary.  This function does not create a trial
+    ``qntylab.strategy_test`` boundary. This function does not create a trial
     and intentionally does not accept alternate H003 parameters or variants.
     """
 
@@ -111,8 +144,8 @@ def reconstruct_h003_position(close: np.ndarray, receipt: Mapping[str, Any]) -> 
     """Reconstruct the exact registered position callable after receipt validation."""
 
     validate_official_receipt(receipt)
-    close = _validated_close(close)
-    return positions(STRATEGY_ID, close, dict(PARAMETERS))
+    close_values = _validated_close(close)
+    return positions(STRATEGY_ID, close_values, dict(PARAMETERS))
 
 
 def _validated_close(close: np.ndarray) -> np.ndarray:
@@ -161,19 +194,19 @@ def verify_official_metrics(
 ) -> dict[str, Any]:
     """Fail closed unless reconstructed accounting matches official metrics.
 
-    ``strategy_test`` currently publishes the compact metrics below rather than
-    Sharpe/Calmar.  Matching them proves that the reconstructed path uses the
-    same causal position and cost accounting before additional diagnostics are
-    considered.
+    ``strategy_test`` publishes ``exposure_fraction`` over the full position
+    vector, while the evaluator's ``average_absolute_exposure`` is the separate
+    held-return-interval diagnostic. The distinction is intentional here.
     """
 
     validate_official_receipt(receipt)
-    evaluated = evaluate_path(close, position, total_cost_bps=total_cost_bps_from_receipt(receipt))
+    position_values = _validated_binary_position(position, expected_length=len(close))
+    evaluated = evaluate_path(close, position_values, total_cost_bps=total_cost_bps_from_receipt(receipt))
 
     expected = {
         "observation_count": len(evaluated["net_returns"]),
         "trade_count": evaluated["trade_count"],
-        "exposure_fraction": evaluated["average_absolute_exposure"],
+        "exposure_fraction": float(np.abs(position_values).mean()),
         "gross_return": evaluated["gross_cumulative_return"],
         "net_return": evaluated["net_cumulative_return"],
         "total_cost": evaluated["fee_cost"],
@@ -190,19 +223,20 @@ def verify_official_metrics(
                 f"official metric mismatch: {key}",
             )
 
-    buy_hold = evaluate_path(close, np.ones(len(close), dtype=float), total_cost_bps=0.0)
+    close_values = _validated_close(close)
+    buy_and_hold_return = float(close_values[-1] / close_values[0] - 1)
     _require("buy_and_hold_return" in official_metrics, "official metrics missing buy_and_hold_return")
     _require(
         math.isclose(
             float(official_metrics["buy_and_hold_return"]),
-            float(buy_hold["net_cumulative_return"]),
+            buy_and_hold_return,
             rel_tol=0.0,
             abs_tol=absolute_tolerance,
         ),
         "official buy_and_hold_return mismatch",
     )
     _require("excess_return_vs_buy_and_hold" in official_metrics, "official metrics missing excess_return_vs_buy_and_hold")
-    expected_excess = float(evaluated["net_cumulative_return"]) - float(buy_hold["net_cumulative_return"])
+    expected_excess = float(evaluated["net_cumulative_return"]) - buy_and_hold_return
     _require(
         math.isclose(
             float(official_metrics["excess_return_vs_buy_and_hold"]),
@@ -213,6 +247,119 @@ def verify_official_metrics(
         "official excess_return_vs_buy_and_hold mismatch",
     )
     return evaluated
+
+
+def reporting_block_slice(
+    timestamps: Sequence[str] | Iterable[str],
+    close: np.ndarray,
+    receipt: Mapping[str, Any],
+    official_metrics: Mapping[str, Any],
+    *,
+    expected_input_sha256: str,
+    block_start: str,
+    block_end: str,
+    authorized_reset_reason: str | None = None,
+) -> dict[str, Any]:
+    """Bind an official full path, then slice returns by ending timestamp.
+
+    Calendar/reporting boundaries never restart H003. A reset is accepted only
+    at the frozen dataset start or at one of the preregistered 2021 post-gap
+    segment starts. Otherwise enough prehistory must be present for the causal
+    MA(48,192) predecessor position before the first owned reporting return.
+    """
+
+    _require(isinstance(expected_input_sha256, str) and len(expected_input_sha256) == 64, "expected_input_sha256 must be a 64-character digest")
+    close_values = _validated_close(close)
+    timestamp_values, parsed = _validated_timestamps(timestamps, expected_length=len(close_values))
+    validate_official_receipt(receipt, expected_input_sha256=expected_input_sha256)
+
+    evaluation_range = receipt["evaluation_range"]
+    receipt_start = _parse_utc_timestamp(evaluation_range.get("start"), label="receipt evaluation start")
+    receipt_end = _parse_utc_timestamp(evaluation_range.get("end"), label="receipt evaluation end")
+    _require(receipt_start == parsed[0], "receipt evaluation start must equal supplied attested path start")
+    _require(receipt_end == parsed[-1], "receipt evaluation end must equal supplied attested path end")
+
+    full_position = reconstruct_h003_position(close_values, receipt)
+    verify_official_metrics(close_values, full_position, receipt, official_metrics)
+
+    start = _parse_utc_timestamp(block_start, label="block_start")
+    end = _parse_utc_timestamp(block_end, label="block_end")
+    _require(start <= end, "block_start must be at or before block_end")
+    _require(parsed[0] <= start <= parsed[-1], "block_start is outside the attested path")
+    _require(parsed[0] <= end <= parsed[-1], "block_end is outside the attested path")
+
+    owned_end_indices = [index for index in range(1, len(parsed)) if start <= parsed[index] <= end]
+    _require(bool(owned_end_indices), "reporting block owns no evaluable returns")
+    first_end = owned_end_indices[0]
+    last_end = owned_end_indices[-1]
+    _require(owned_end_indices == list(range(first_end, last_end + 1)), "reporting return ownership must be contiguous")
+
+    if start == parsed[0]:
+        if authorized_reset_reason == RESET_FROZEN_DATASET_START:
+            _require(parsed[0] == _parse_utc_timestamp(CANONICAL_DATASET_START, label="canonical dataset start"), "dataset-start reset is only valid at the frozen dataset start")
+        elif authorized_reset_reason == RESET_MANIFEST_GAP:
+            allowed = {_parse_utc_timestamp(value, label="authorized gap segment start") for value in AUTHORIZED_GAP_SEGMENT_STARTS}
+            _require(parsed[0] in allowed, "manifest-gap reset start is not preregistered")
+        else:
+            raise H003FalsificationError("attested path begins at reporting boundary without an authorized reset reason")
+    else:
+        _require(authorized_reset_reason is None, "reset reason is only valid when reporting block starts at attested segment start")
+        _require(parsed[first_end] == start, "non-reset reporting block must include its exact block_start timestamp")
+        # The predecessor held position is causal-shifted. It must itself occur
+        # after a complete slow-MA history, hence slow + 1 closes precede the
+        # first owned ending timestamp. This is stricter than the frozen
+        # 'at least 192 closes' floor and prevents an artificial FLAT predecessor.
+        _require(first_end >= PARAMETERS["slow"] + 1, "insufficient prehistory for inherited H003 predecessor position")
+
+    slice_start = first_end - 1
+    slice_stop = last_end + 1
+    return {
+        "timestamps": timestamp_values[slice_start:slice_stop],
+        "close": close_values[slice_start:slice_stop].copy(),
+        "position": full_position[slice_start:slice_stop].copy(),
+        "first_return_ending_timestamp": timestamp_values[first_end],
+        "last_return_ending_timestamp": timestamp_values[last_end],
+        "owned_return_count": len(owned_end_indices),
+        "full_attested_position": full_position,
+    }
+
+
+def summarize_reporting_block(
+    timestamps: Sequence[str] | Iterable[str],
+    close: np.ndarray,
+    receipt: Mapping[str, Any],
+    official_metrics: Mapping[str, Any],
+    *,
+    expected_input_sha256: str,
+    block_start: str,
+    block_end: str,
+    authorized_reset_reason: str | None = None,
+    seeds: Iterable[int] = DEFAULT_SEEDS,
+) -> dict[str, Any]:
+    """Canonical V0 reporting entry point: attest full path, slice, summarize."""
+
+    admitted = reporting_block_slice(
+        timestamps,
+        close,
+        receipt,
+        official_metrics,
+        expected_input_sha256=expected_input_sha256,
+        block_start=block_start,
+        block_end=block_end,
+        authorized_reset_reason=authorized_reset_reason,
+    )
+    diagnostics = summarize_block(
+        admitted["close"],
+        admitted["position"],
+        total_cost_bps=total_cost_bps_from_receipt(receipt),
+        seeds=seeds,
+    )
+    return {
+        "first_return_ending_timestamp": admitted["first_return_ending_timestamp"],
+        "last_return_ending_timestamp": admitted["last_return_ending_timestamp"],
+        "owned_return_count": admitted["owned_return_count"],
+        "diagnostics": diagnostics,
+    }
 
 
 def _run_length_encode(binary: np.ndarray) -> tuple[list[int], list[int]]:
@@ -236,9 +383,9 @@ def exposure_matched_random_position(position: np.ndarray, *, seed: int) -> np.n
     """Permute same-state holding-run lengths while preserving exact exposure.
 
     The preregistered control operates on the *held* path ``position[:-1]``.
-    The original terminal target ``position[-1]`` is retained so the existing
-    evaluator applies its normal terminal position-change accounting without
-    inventing a new terminal target.
+    V0 freezes the original terminal target for evaluator compatibility; this
+    can affect at most one terminal transition fee and is diagnostic convention,
+    not evidence for the strategy.
     """
 
     original = _validated_binary_position(position)
@@ -325,7 +472,7 @@ def summarize_block(
     total_cost_bps: float,
     seeds: Iterable[int] = DEFAULT_SEEDS,
 ) -> dict[str, Any]:
-    """Compute preregistered diagnostics for one already-admitted contiguous block."""
+    """Low-level diagnostics for an already continuity-safe admitted slice."""
 
     close_values = _validated_close(close)
     position_values = _validated_binary_position(h003_position, expected_length=len(close_values))

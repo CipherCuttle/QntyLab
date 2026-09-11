@@ -149,8 +149,30 @@ def test_materializer_requires_completed_exact_three_asset_coverage() -> None:
         )
 
 
+def test_default_operational_entry_points_require_future_canonical_activation(tmp_path) -> None:
+    origin = parse_utc(EXPECTED_ORIGIN_UTC)
+    fetch_count = 0
+
+    def counting_fetcher(*, symbol: str, start_ms: int, end_ms: int, interval: str):
+        nonlocal fetch_count
+        fetch_count += 1
+        return _rest_fetcher(symbol=symbol, start_ms=start_ms, end_ms=end_ms, interval=interval)
+
+    operation = OperationalRecorder(
+        tmp_path,
+        archive_provider=_no_archive,
+        rest_fetcher=counting_fetcher,
+    )
+    with pytest.raises(SourceBlocked, match="activation artifact required"):
+        operation.status(now=origin)
+    with pytest.raises(SourceBlocked, match="activation artifact required"):
+        operation.record_due(now=origin + timedelta(minutes=5))
+    assert fetch_count == 0
+    assert not (tmp_path / source_module.LEDGER_FILENAME).exists()
+
+
 def test_writer_is_private_and_status_surface_is_read_only(tmp_path) -> None:
-    operation = OperationalRecorder(tmp_path, archive_provider=_no_archive, rest_fetcher=_rest_fetcher)
+    operation = OperationalRecorder(tmp_path, archive_provider=_no_archive, rest_fetcher=_rest_fetcher, _qualification_mode=True)
     assert "EvidenceLedger" not in source_module.__all__
     assert not hasattr(source_module, "EvidenceLedger")
     assert not hasattr(operation, "ledger")
@@ -172,11 +194,13 @@ def test_operational_writer_bootstraps_once_then_fetches_only_new_hour(tmp_path)
         tmp_path,
         archive_provider=_no_archive,
         rest_fetcher=counting_fetcher,
+        _qualification_mode=True,
     )
 
     first = operation.record_due(now=origin + timedelta(minutes=5))
-    assert first["state"] == "RECORDED"
+    assert first["state"] == "QUALIFICATION_RECORDED"
     assert first["through_logical_close_utc"] == EXPECTED_ORIGIN_UTC
+    assert first["operation_mode"] == "SYNTHETIC_QUALIFICATION_ONLY"
     assert first["evidence_scope"] == "BOOTSTRAP_WARMUP_PLUS_ORIGIN"
     assert len(first["evidence_rows"]) == 192 * 3
     assert len(first["current_receipts"]) == 3
@@ -191,7 +215,7 @@ def test_operational_writer_bootstraps_once_then_fetches_only_new_hour(tmp_path)
     assert len(calls) == 3
 
     second = operation.record_due(now=origin + timedelta(hours=1, minutes=5))
-    assert second["state"] == "RECORDED"
+    assert second["state"] == "QUALIFICATION_RECORDED"
     assert second["evidence_scope"] == "INCREMENTAL_HOUR_ONLY"
     assert len(second["evidence_rows"]) == 3
     assert len(second["current_receipts"]) == 3
@@ -232,17 +256,18 @@ def test_incremental_run_never_refetches_or_accepts_revised_history(tmp_path) ->
         tmp_path,
         archive_provider=_no_archive,
         rest_fetcher=history_hostile_fetcher,
+        _qualification_mode=True,
     )
     first = operation.record_due(now=origin + timedelta(minutes=5))
     bootstrap_finished = True
     second = operation.record_due(now=origin + timedelta(hours=1, minutes=5))
-    assert first["state"] == second["state"] == "RECORDED"
+    assert first["state"] == second["state"] == "QUALIFICATION_RECORDED"
     assert second["current_receipts"][0]["previous_receipt_sha256"] == first["receipt_chain_tip_sha256"]
 
 
 def test_overlapping_invocation_fails_closed_on_process_lock(tmp_path) -> None:
     origin = parse_utc(EXPECTED_ORIGIN_UTC)
-    operation = OperationalRecorder(tmp_path, archive_provider=_no_archive, rest_fetcher=_rest_fetcher)
+    operation = OperationalRecorder(tmp_path, archive_provider=_no_archive, rest_fetcher=_rest_fetcher, _qualification_mode=True)
     lock_path = tmp_path / source_module.LOCK_FILENAME
     with lock_path.open("a+b") as handle:
         fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -251,6 +276,26 @@ def test_overlapping_invocation_fails_closed_on_process_lock(tmp_path) -> None:
         with pytest.raises(SourceBlocked, match="already holds the process lock"):
             operation.record_due(now=origin)
         fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+
+
+def test_first_ledger_creation_fsyncs_file_and_parent_directory(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
+    origin = parse_utc(EXPECTED_ORIGIN_UTC)
+    calls: list[int] = []
+    real_fsync = source_module.os.fsync
+
+    def tracking_fsync(fd: int) -> None:
+        calls.append(fd)
+        real_fsync(fd)
+
+    monkeypatch.setattr(source_module.os, "fsync", tracking_fsync)
+    operation = OperationalRecorder(
+        tmp_path,
+        archive_provider=_no_archive,
+        rest_fetcher=_rest_fetcher,
+        _qualification_mode=True,
+    )
+    operation.record_due(now=origin + timedelta(minutes=5))
+    assert len(calls) >= 2
 
 
 def test_tampered_durable_ledger_fails_integrity_before_next_fetch(tmp_path) -> None:
@@ -262,7 +307,7 @@ def test_tampered_durable_ledger_fails_integrity_before_next_fetch(tmp_path) -> 
         fetch_count += 1
         return _rest_fetcher(symbol=symbol, start_ms=start_ms, end_ms=end_ms, interval=interval)
 
-    operation = OperationalRecorder(tmp_path, archive_provider=_no_archive, rest_fetcher=counting_fetcher)
+    operation = OperationalRecorder(tmp_path, archive_provider=_no_archive, rest_fetcher=counting_fetcher, _qualification_mode=True)
     operation.record_due(now=origin + timedelta(minutes=5))
     assert fetch_count == 3
 
@@ -281,6 +326,7 @@ def test_missed_first_window_blocks_without_backfill(tmp_path) -> None:
         tmp_path,
         archive_provider=_no_archive,
         rest_fetcher=_rest_fetcher,
+        _qualification_mode=True,
     )
     blocked = operation.record_due(now=origin + timedelta(hours=1))
     assert blocked["state"] == "BLOCKED_MISSED_RECORDING_WINDOW"

@@ -1,0 +1,83 @@
+name: H003 Edge Falsification V0 Reopen
+
+on:
+  pull_request:
+    paths:
+      - "experiments/research/h003_edge_falsification_v0/reopen_event.json"
+      - "experiments/research/candidates.jsonl"
+      - "experiments/research/state.json"
+      - "experiments/research/trial_index.json"
+      - "experiments/specs/h003_edge_falsification_v0.json"
+      - "tests/test_h003_edge_falsification_v0_reopen.py"
+      - ".github/workflows/h003-edge-falsification-v0-reopen.yml"
+  push:
+    branches: [master]
+    paths:
+      - "experiments/research/h003_edge_falsification_v0/reopen_event.json"
+      - "experiments/research/candidates.jsonl"
+      - "experiments/research/state.json"
+      - "experiments/research/trial_index.json"
+      - "experiments/specs/h003_edge_falsification_v0.json"
+      - "tests/test_h003_edge_falsification_v0_reopen.py"
+      - ".github/workflows/h003-edge-falsification-v0-reopen.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  reopen-lock:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install focused dependencies
+        run: python -m pip install pytest requests
+      - name: Verify reopen artifact and frozen scope
+        run: PYTHONPATH=. python -m pytest -q tests/test_h003_edge_falsification_v0_reopen.py tests/test_h003_edge_falsification_v0_prereg.py
+      - name: Materialize or verify canonical reopen
+        run: |
+          PYTHONPATH=. python - <<'PY'
+          import json
+          from pathlib import Path
+          from qntylab import research_ledger
+
+          root = Path("experiments/research")
+          event_path = root / "h003_edge_falsification_v0/reopen_event.json"
+          event = json.loads(event_path.read_text(encoding="utf-8"))
+          existing = [
+              json.loads(line)
+              for line in (root / "candidates.jsonl").read_text(encoding="utf-8").splitlines()
+              if line.strip()
+          ]
+          if not any(item.get("event_id") == event["event_id"] for item in existing):
+              research_ledger.append_canonical_event(event, root=root)
+          issues = research_ledger.doctor(root=root)
+          if issues:
+              raise SystemExit("; ".join(issues))
+          state = json.loads((root / "state.json").read_text(encoding="utf-8"))
+          variant = state["variants"][event["variant_id"]]
+          assert variant["status"] == "PROPOSED"
+          assert variant["latest_decision_event_id"] is None
+          PY
+      - name: Preserve generated canonical ledger files
+        uses: actions/upload-artifact@v4
+        with:
+          name: h003-edge-falsification-v0-reopen-ledger
+          path: |
+            experiments/research/candidates.jsonl
+            experiments/research/state.json
+            experiments/research/trial_index.json
+          retention-days: 30
+      - name: Verify only authorized ledger generation is dirty
+        run: |
+          unexpected="$(git diff --name-only | grep -Ev '^(experiments/research/(candidates.jsonl|state.json|trial_index.json))$' || true)"
+          if [[ -n "$unexpected" ]]; then
+            echo "$unexpected"
+            exit 1
+          fi
+          git diff --check

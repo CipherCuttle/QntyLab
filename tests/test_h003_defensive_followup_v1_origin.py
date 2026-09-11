@@ -5,6 +5,8 @@ import subprocess
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+from qntylab.research_ledger import sha256_path
+
 
 ROOT = Path(__file__).resolve().parents[1]
 ORIGIN_PATH = ROOT / "experiments/research/h003_defensive_followup_v1/prospective_origin.json"
@@ -51,6 +53,19 @@ def test_origin_is_derived_only_from_verified_activation_merge_metadata() -> Non
         "strategy_result_accessed_to_choose_origin": False,
         "origin_may_not_be_moved_after_materialization": True,
     }
+
+
+def test_origin_binds_exact_source_contract_hashes() -> None:
+    origin = _load(ORIGIN_PATH)
+    sources = origin["source_contracts"]
+    assert sources == {
+        "preregistration_path": "experiments/specs/h003_defensive_followup_v1.json",
+        "preregistration_sha256": "d56da275c4339163c77cd6e5599f151964be6f61323124f9f72d98e3974f44ca",
+        "activation_contract_path": "experiments/specs/h003_defensive_followup_v1_activation.json",
+        "activation_contract_sha256": "6d11a8e748e6a28560781a0d8044d913934bd2e199891932ed2fe4df3b3d7505",
+    }
+    assert sha256_path(PREREG_PATH) == sources["preregistration_sha256"]
+    assert sha256_path(ACTIVATION_PATH) == sources["activation_contract_sha256"]
 
 
 def test_origin_preserves_frozen_prospective_panel_and_return_ownership() -> None:

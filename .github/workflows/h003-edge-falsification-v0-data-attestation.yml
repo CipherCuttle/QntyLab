@@ -1,0 +1,48 @@
+name: H003 Edge Falsification V0 Data Attestation
+
+on:
+  pull_request:
+    paths:
+      - "experiments/research/h003_edge_falsification_v0/attest_canonical_data.py"
+      - "tests/test_h003_edge_falsification_v0_data_attestation.py"
+      - ".github/workflows/h003-edge-falsification-v0-data-attestation.yml"
+  push:
+    branches: [master]
+    paths:
+      - "experiments/research/h003_edge_falsification_v0/attest_canonical_data.py"
+      - "tests/test_h003_edge_falsification_v0_data_attestation.py"
+      - ".github/workflows/h003-edge-falsification-v0-data-attestation.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  canonical-input-attestation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install data-attestation dependencies
+        run: python -m pip install pytest requests
+      - name: Verify fail-closed attestation contract
+        run: PYTHONPATH=. python -m pytest -q tests/test_h003_edge_falsification_v0_data_attestation.py
+      - name: Reproduce and attest exact frozen SOLUSDT bytes
+        run: |
+          PYTHONPATH=. python experiments/research/h003_edge_falsification_v0/attest_canonical_data.py \
+            --out /tmp/h003-input-attestation.json
+          cat /tmp/h003-input-attestation.json
+      - name: Preserve attestation receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: h003-edge-falsification-v0-input-attestation
+          path: /tmp/h003-input-attestation.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Verify no whitespace errors
+        run: git diff --check ${{ github.event.pull_request.base.sha || 'HEAD^' }}..HEAD

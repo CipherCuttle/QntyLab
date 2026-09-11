@@ -40,13 +40,11 @@ jobs:
           python-version: "3.12.14"
       - name: Install focused frozen dependencies
         run: python -m pip install --disable-pip-version-check "numpy==2.5.3" "pytest==9.1.1" "requests==2.34.2"
-      - name: Verify frozen source and report runtime identity
+      - name: Verify frozen source and runtime identities
         run: |
           git merge-base --is-ancestor 1827bb3e753970aed0cfbd0adc27bba121b41d5d HEAD
           test "$(sha256sum qntylab/h003_defensive_followup_v1_prospective_source_v2.py | awk '{print $1}')" = "74e1906f1bb54123ff77347629d5da6bafcd400b9a979d6d5526bbc6ccf08633"
-          OPERATION_SHA256="$(sha256sum .github/workflows/h003-prospective-operation-v2.yml | awk '{print $1}')"
-          echo "OPERATION_SHA256=$OPERATION_SHA256"
-          test "$OPERATION_SHA256" = "39356c475e6328f11fde0c9499140e4a30b038c1e09fccfec3111e1bfbe0af76"
+          test "$(sha256sum .github/workflows/h003-prospective-operation-v2.yml | awk '{print $1}')" = "bbf881c9daec8c2cfffa8431964d26e5389f0bf1e7fbc990d3f19d39166b7d45"
       - name: Verify activation, runtime and H003 authority chain
         run: |
           PYTHONPATH=. python -m pytest -q \

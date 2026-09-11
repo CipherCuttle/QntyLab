@@ -39,10 +39,10 @@
   },
   "recorder_authority": {
     "status_after_this_artifact_is_canonical": "ACTIVE_PROSPECTIVE_SHADOW_RECORDING",
+    "recording_may_begin_only_after_artifact_is_canonical": true,
     "market_data_recording_authorized": true,
     "signal_recording_authorized": true,
     "integrity_receipt_recording_authorized": true,
-    "catch_up_from_frozen_origin_without_human_result_selection": true,
     "economic_performance_verdict_before_maturity_forbidden": true,
     "parameter_changes_forbidden": true,
     "asset_changes_forbidden": true,

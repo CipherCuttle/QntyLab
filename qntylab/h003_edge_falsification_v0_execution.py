@@ -89,13 +89,31 @@ def _verify_one_receipt(run_dir: Path, row: dict[str, Any]) -> tuple[dict[str, A
     return receipt, metrics
 
 
-def verify_complete_receipts(workspace: Path) -> dict[str, dict[str, Any]]:
+def _verify_ledger_membership(run_dir: Path, row: dict[str, Any], research_root: Path) -> None:
+    index_path = research_root / "trial_index.json"
+    if not index_path.is_file():
+        raise FileNotFoundError(f"missing canonical trial index: {index_path}")
+    index = _read_json(index_path)
+    record = index.get("trials", {}).get(row["trial_id"])
+    if not isinstance(record, dict):
+        raise RuntimeError(f"H003 trial missing from canonical ledger: {row['trial_id']}")
+    if record.get("variant_id") != "variant_00eb140f03a5f6ab40600160":
+        raise RuntimeError(f"H003 ledger variant mismatch: {row['trial_id']}")
+    receipt_path = run_dir / "run_receipt.json"
+    if record.get("receipt_sha256") != strategy_test.sha256_path(receipt_path):
+        raise RuntimeError(f"H003 ledger receipt hash mismatch: {row['trial_id']}")
+
+
+def verify_complete_receipts(workspace: Path, *, research_root: Path | None = None) -> dict[str, dict[str, Any]]:
     plan = h003.compile_plan()
+    ledger_root = research_root or strategy_test.RESEARCH_ROOT
     runs = workspace / "runs"
+    ledger_root = research_root or strategy_test.RESEARCH_ROOT
     verified: dict[str, dict[str, Any]] = {}
     for index, row in enumerate(plan, 1):
         run_dir = runs / run_name(index, row)
         receipt, metrics = _verify_one_receipt(run_dir, row)
+        _verify_ledger_membership(run_dir, row, ledger_root)
         verified[row["trial_id"]] = {"receipt": receipt, "metrics": metrics, "run_dir": str(run_dir)}
     if set(verified) != {row["trial_id"] for row in plan} or len(verified) != 44:
         raise RuntimeError("H003 V0 receipt set is not exactly the frozen 44-trial matrix")
@@ -120,6 +138,7 @@ def execute_frozen_plan(workspace: Path, *, research_root: Path | None = None) -
         run_dir = runs / run_name(index, row)
         if run_dir.exists():
             _verify_one_receipt(run_dir, row)
+            _verify_ledger_membership(run_dir, row, ledger_root)
             skipped.append(row["trial_id"])
             continue
         config_path = _config_path(plan_dir, row["trial_id"])
@@ -143,7 +162,7 @@ def execute_frozen_plan(workspace: Path, *, research_root: Path | None = None) -
         if result["receipt"].get("trial_id") != row["trial_id"]:
             raise RuntimeError("strategy_test returned a trial outside the frozen H003 authorization")
         executed.append(row["trial_id"])
-    verified = verify_complete_receipts(workspace)
+    verified = verify_complete_receipts(workspace, research_root=ledger_root)
     receipt = {
         "schema_version": "1.0.0",
         "authorization_id": "H003_EDGE_FALSIFICATION_V0",
@@ -248,6 +267,7 @@ def analyze_frozen_results(workspace: Path) -> dict[str, Any]:
     block_rows: dict[str, Any] = {}
     random_wins_sharpe = 0
     random_wins_calmar = 0
+    controls_complete = True
     for block in ("BLOCK_2021", "BLOCK_2022", "BLOCK_2023_KNOWN_HOLDOUT", "BLOCK_2024", "BLOCK_2025", "BLOCK_2026_TO_FREEZE"):
         modes = segments.get(block)
         if modes is None or any(mode not in modes for mode in complete_by_cost):
@@ -282,6 +302,8 @@ def analyze_frozen_results(workspace: Path) -> dict[str, Any]:
         random_median_calmar = _median_finite([item["calmar_ratio"] for item in random_metrics])
         shuffle_median_sharpe = _median_finite([item["annualized_sharpe"] for item in shuffle_metrics])
         shuffle_median_calmar = _median_finite([item["calmar_ratio"] for item in shuffle_metrics])
+        if random_median_sharpe is None or random_median_calmar is None:
+            controls_complete = False
         base = block_metrics["baseline"]
         if random_median_sharpe is not None and base["annualized_sharpe"] is not None and base["annualized_sharpe"] > random_median_sharpe:
             random_wins_sharpe += 1
@@ -305,11 +327,20 @@ def analyze_frozen_results(workspace: Path) -> dict[str, Any]:
         "block_random_wins_sharpe": random_wins_sharpe,
         "block_random_wins_calmar": random_wins_calmar,
         "prior_2023_failure_preserved": prior_preserved,
+        "controls_complete": controls_complete,
     }
     result = {
         "schema_version": "1.0.0",
         "authorization_id": "H003_EDGE_FALSIFICATION_V0",
         "trial_count": 44,
+        "repository_commit": strategy_test._repository_commit(),
+        "implementation_sha256": {
+            "compiler": strategy_test.sha256_path(Path(h003.__file__)),
+            "executor_analyzer": strategy_test.sha256_path(Path(__file__)),
+            "authorization": strategy_test.sha256_path(h003.AUTHORIZATION_PATH),
+            "analysis_contract": strategy_test.sha256_path(h003.ANALYSIS_CONTRACT_PATH),
+            "preregistration": strategy_test.sha256_path(h003.PREREG_PATH),
+        },
         "prior_2023_failure_preserved": prior_preserved,
         "complete_sample": {**full, "buy_and_hold": buyhold_full},
         "blocks": block_rows,

@@ -220,8 +220,10 @@ def delayed_24h(held: np.ndarray) -> np.ndarray:
 
 
 def verdict(summary: dict[str, Any]) -> str:
-    required = ("baseline", "stress", "buy_and_hold", "block_random_wins_sharpe", "block_random_wins_calmar", "prior_2023_failure_preserved")
+    required = ("baseline", "stress", "buy_and_hold", "block_random_wins_sharpe", "block_random_wins_calmar", "prior_2023_failure_preserved", "controls_complete")
     if any(key not in summary for key in required):
+        return "BLOCKED_BY_INPUT_OR_INTEGRITY"
+    if summary["prior_2023_failure_preserved"] is not True or summary["controls_complete"] is not True:
         return "BLOCKED_BY_INPUT_OR_INTEGRITY"
     baseline, stress, buyhold = summary["baseline"], summary["stress"], summary["buy_and_hold"]
     required_metrics = (

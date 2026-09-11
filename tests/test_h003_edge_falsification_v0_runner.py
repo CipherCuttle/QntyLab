@@ -112,7 +112,31 @@ def test_verdict_fail_closed_and_falsification_precedes_candidate() -> None:
         "block_random_wins_sharpe": 5,
         "block_random_wins_calmar": 5,
         "prior_2023_failure_preserved": True,
+        "controls_complete": True,
     }
     assert h003.verdict(summary) == "FALSIFIED"
     summary["baseline"]["annualized_sharpe"] = 0.9
     assert h003.verdict(summary) == "DEFENSIVE_EDGE_CANDIDATE"
+
+
+def test_verdict_blocks_on_control_or_prior_evidence_integrity() -> None:
+    summary = {
+        "baseline": {"annualized_sharpe": 1.0, "calmar_ratio": 1.0, "maximum_drawdown": -0.1},
+        "stress": {"annualized_sharpe": 0.5, "calmar_ratio": 0.5},
+        "buy_and_hold": {"annualized_sharpe": 0.2, "calmar_ratio": 0.2, "maximum_drawdown": -0.5},
+        "block_random_wins_sharpe": 6,
+        "block_random_wins_calmar": 6,
+        "prior_2023_failure_preserved": True,
+        "controls_complete": False,
+    }
+    assert h003.verdict(summary) == "BLOCKED_BY_INPUT_OR_INTEGRITY"
+    summary["controls_complete"] = True
+    summary["prior_2023_failure_preserved"] = False
+    assert h003.verdict(summary) == "BLOCKED_BY_INPUT_OR_INTEGRITY"
+
+
+def test_control_boundary_cost_contract_is_frozen() -> None:
+    contract = json.loads(h003.ANALYSIS_CONTRACT_PATH.read_text(encoding="utf-8"))
+    boundary = contract["control_contract_boundary_costs"]
+    assert "Do not invent a liquidation or exit" in boundary["terminal_boundary_rule"]
+    assert "Never charge or infer a transition across a genuine unnormalized gap" in boundary["genuine_gap_rule"]

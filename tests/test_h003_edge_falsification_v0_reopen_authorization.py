@@ -14,6 +14,7 @@ AUTH = ROOT / "experiments/specs/h003_edge_falsification_v0_trial_authorization.
 REOPEN = ROOT / "experiments/research/h003_edge_falsification_v0/reopen_event.json"
 ANALYSIS = ROOT / "experiments/specs/h003_edge_falsification_v0_analysis_contract.json"
 TRIAL_INDEX = RESEARCH_ROOT / "trial_index.json"
+STATE = RESEARCH_ROOT / "state.json"
 
 VARIANT_ID = "variant_00eb140f03a5f6ab40600160"
 CANDIDATE_ID = "CANDIDATE_H003_MA_48_192_LONG_FLAT"
@@ -98,6 +99,24 @@ def test_central_preflight_enforces_reopen_authorization_and_duplicate_lifecycle
         fee_bps=10,
         slippage_bps=0,
     )
+    state = json.loads(STATE.read_text(encoding="utf-8"))
+    variant_state = state["variants"][VARIANT_ID]
+
+    # Once a later terminal governance decision blocks this exact variant,
+    # the consumed V0 reopen must not continue policing or enabling trials.
+    # The terminal state itself fails closed until a new scoped reopen exists.
+    if variant_state["status"] == "BLOCKED":
+        assert variant_state["latest_decision_event_id"] is not None
+        for config in (
+            allowed,
+            dict(allowed, evaluation_start="2021-12-24T00:00:00Z"),
+            dict(allowed, fee_bps=7),
+            dict(allowed, research_intent="SCREEN"),
+        ):
+            with pytest.raises(LedgerError, match="latest variant state BLOCKED"):
+                preflight(config=config, symbol="SOLUSDT", input_sha256=CANONICAL_SHA, root=RESEARCH_ROOT)
+        return
+
     allowed_trial_id = compute_trial_id(
         variant_id=VARIANT_ID,
         symbol="SOLUSDT",

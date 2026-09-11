@@ -68,7 +68,14 @@ def _rest_fetcher(*, symbol: str, start_ms: int, end_ms: int, interval: str):
 
 
 def _future_rest_fetcher(*, symbol: str, start_ms: int, end_ms: int, interval: str):
-    rows = list(_rest_fetcher(symbol=symbol, start_ms=start_ms, end_ms=end_ms, interval=interval))
+    rows = list(
+        _rest_fetcher(
+            symbol=symbol,
+            start_ms=start_ms,
+            end_ms=end_ms,
+            interval=interval,
+        )
+    )
     through = datetime.fromtimestamp((end_ms + 1) / 1000, UTC)
     rows.append(_row(through + timedelta(hours=1), 1.0))
     return rows
@@ -79,12 +86,39 @@ def _no_archive(**kwargs):
 
 
 def _archive_bytes(rows: list[list[object]]) -> tuple[bytes, str]:
-    payload = "\n".join(",".join(str(cell) for cell in row) for row in rows).encode("utf-8") + b"\n"
+    payload = (
+        "\n".join(",".join(str(cell) for cell in row) for row in rows).encode("utf-8")
+        + b"\n"
+    )
     stream = io.BytesIO()
     with zipfile.ZipFile(stream, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         archive.writestr("TEST-1h-2026-09.csv", payload)
     zip_bytes = stream.getvalue()
     return zip_bytes, f"{sha256(zip_bytes).hexdigest()}  TEST.zip\n"
+
+
+@pytest.fixture
+def qualification_authority(monkeypatch: pytest.MonkeyPatch) -> dict[str, object]:
+    """Replace the production validator only inside the test process.
+
+    There is intentionally no shipped constructor flag or alternate production
+    code path that can bypass canonical activation.
+    """
+    context: dict[str, object] = {
+        "operation_mode": "SYNTHETIC_QUALIFICATION_ONLY",
+        "activation_merge_sha": None,
+        "activation_canonicalized_at_utc": None,
+        "source_qualification_merge_sha": None,
+        "source_implementation_sha256": sha256(
+            source_module.Path(source_module.__file__).read_bytes()
+        ).hexdigest(),
+    }
+    monkeypatch.setattr(
+        source_module,
+        "validate_activation_authority",
+        lambda root=source_module.ROOT: dict(context),
+    )
+    return context
 
 
 def test_source_lineage_binds_exact_canonical_recorder_foundation() -> None:
@@ -96,20 +130,30 @@ def test_source_lineage_binds_exact_canonical_recorder_foundation() -> None:
 
 def test_completed_bar_cutoff_and_rest_bounds_are_exact() -> None:
     origin = parse_utc(EXPECTED_ORIGIN_UTC)
-    assert latest_completed_logical_close(origin - timedelta(microseconds=1)) == origin - timedelta(hours=1)
+    assert latest_completed_logical_close(origin - timedelta(microseconds=1)) == (
+        origin - timedelta(hours=1)
+    )
     assert latest_completed_logical_close(origin) == origin
     start_ms, end_ms = request_bounds(
         first_logical_close=first_required_logical_close(),
         through_logical_close=origin,
     )
-    assert start_ms == int((first_required_logical_close() - timedelta(hours=1)).timestamp() * 1000)
+    assert start_ms == int(
+        (first_required_logical_close() - timedelta(hours=1)).timestamp() * 1000
+    )
     assert end_ms == int(origin.timestamp() * 1000) - 1
 
 
 def test_authenticated_archive_accepts_microseconds_and_rejects_bad_checksum() -> None:
     origin = parse_utc(EXPECTED_ORIGIN_UTC)
-    zip_bytes, checksum = _archive_bytes([_row(origin, 123.0, unit="microsecond")])
-    bars = bars_from_authenticated_archive(symbol="SOLUSDT", zip_bytes=zip_bytes, checksum_text=checksum)
+    zip_bytes, checksum = _archive_bytes(
+        [_row(origin, 123.0, unit="microsecond")]
+    )
+    bars = bars_from_authenticated_archive(
+        symbol="SOLUSDT",
+        zip_bytes=zip_bytes,
+        checksum_text=checksum,
+    )
     assert len(bars) == 1
     assert bars[0].logical_close_utc == origin
     assert bars[0].provider_timestamp_unit == "microsecond"
@@ -149,14 +193,21 @@ def test_materializer_requires_completed_exact_three_asset_coverage() -> None:
         )
 
 
-def test_default_operational_entry_points_require_future_canonical_activation(tmp_path) -> None:
+def test_default_operational_entry_points_require_future_canonical_activation(
+    tmp_path,
+) -> None:
     origin = parse_utc(EXPECTED_ORIGIN_UTC)
     fetch_count = 0
 
     def counting_fetcher(*, symbol: str, start_ms: int, end_ms: int, interval: str):
         nonlocal fetch_count
         fetch_count += 1
-        return _rest_fetcher(symbol=symbol, start_ms=start_ms, end_ms=end_ms, interval=interval)
+        return _rest_fetcher(
+            symbol=symbol,
+            start_ms=start_ms,
+            end_ms=end_ms,
+            interval=interval,
+        )
 
     operation = OperationalRecorder(
         tmp_path,
@@ -169,10 +220,18 @@ def test_default_operational_entry_points_require_future_canonical_activation(tm
         operation.record_due(now=origin + timedelta(minutes=5))
     assert fetch_count == 0
     assert not (tmp_path / source_module.LEDGER_FILENAME).exists()
+    assert "_qualification_mode" not in source_module.OperationalRecorder.__init__.__annotations__
 
 
-def test_writer_is_private_and_status_surface_is_read_only(tmp_path) -> None:
-    operation = OperationalRecorder(tmp_path, archive_provider=_no_archive, rest_fetcher=_rest_fetcher, _qualification_mode=True)
+def test_writer_is_private_and_status_surface_is_read_only(
+    tmp_path,
+    qualification_authority,
+) -> None:
+    operation = OperationalRecorder(
+        tmp_path,
+        archive_provider=_no_archive,
+        rest_fetcher=_rest_fetcher,
+    )
     assert "EvidenceLedger" not in source_module.__all__
     assert not hasattr(source_module, "EvidenceLedger")
     assert not hasattr(operation, "ledger")
@@ -182,19 +241,26 @@ def test_writer_is_private_and_status_surface_is_read_only(tmp_path) -> None:
     assert snapshot["durable_bar_count"] == 0
 
 
-def test_operational_writer_bootstraps_once_then_fetches_only_new_hour(tmp_path) -> None:
+def test_operational_writer_bootstraps_once_then_fetches_only_new_hour(
+    tmp_path,
+    qualification_authority,
+) -> None:
     origin = parse_utc(EXPECTED_ORIGIN_UTC)
     calls: list[tuple[str, int, int]] = []
 
     def counting_fetcher(*, symbol: str, start_ms: int, end_ms: int, interval: str):
         calls.append((symbol, start_ms, end_ms))
-        return _rest_fetcher(symbol=symbol, start_ms=start_ms, end_ms=end_ms, interval=interval)
+        return _rest_fetcher(
+            symbol=symbol,
+            start_ms=start_ms,
+            end_ms=end_ms,
+            interval=interval,
+        )
 
     operation = OperationalRecorder(
         tmp_path,
         archive_provider=_no_archive,
         rest_fetcher=counting_fetcher,
-        _qualification_mode=True,
     )
 
     first = operation.record_due(now=origin + timedelta(minutes=5))
@@ -207,7 +273,9 @@ def test_operational_writer_bootstraps_once_then_fetches_only_new_hour(tmp_path)
     assert first["current_receipts"][0]["previous_receipt_sha256"] is None
     assert len(calls) == 3
 
-    bootstrap_start = int((first_required_logical_close() - timedelta(hours=1)).timestamp() * 1000)
+    bootstrap_start = int(
+        (first_required_logical_close() - timedelta(hours=1)).timestamp() * 1000
+    )
     assert all(start_ms == bootstrap_start for _, start_ms, _ in calls)
 
     not_due = operation.record_due(now=origin + timedelta(minutes=10))
@@ -219,11 +287,15 @@ def test_operational_writer_bootstraps_once_then_fetches_only_new_hour(tmp_path)
     assert second["evidence_scope"] == "INCREMENTAL_HOUR_ONLY"
     assert len(second["evidence_rows"]) == 3
     assert len(second["current_receipts"]) == 3
-    assert second["current_receipts"][0]["previous_receipt_sha256"] == first["receipt_chain_tip_sha256"]
+    assert second["current_receipts"][0]["previous_receipt_sha256"] == first[
+        "receipt_chain_tip_sha256"
+    ]
     assert len(calls) == 6
 
     expected_incremental_start = int(origin.timestamp() * 1000)
-    expected_incremental_end = int((origin + timedelta(hours=1)).timestamp() * 1000) - 1
+    expected_incremental_end = int(
+        (origin + timedelta(hours=1)).timestamp() * 1000
+    ) - 1
     for symbol, start_ms, end_ms in calls[-3:]:
         assert symbol in PANEL
         assert start_ms == expected_incremental_start
@@ -233,41 +305,63 @@ def test_operational_writer_bootstraps_once_then_fetches_only_new_hour(tmp_path)
     assert persistence["event_count"] == 2
     assert persistence["recorded_hour_count"] == 2
     assert persistence["durable_bar_count"] == 193 * 3
-    assert persistence["receipt_chain_tip_sha256"] == second["receipt_chain_tip_sha256"]
+    assert persistence["receipt_chain_tip_sha256"] == second[
+        "receipt_chain_tip_sha256"
+    ]
 
     status = operation.status(now=origin + timedelta(hours=1, minutes=10))
     assert status["completed_hour_count"] == 2
-    assert status["next_required_close_utc"] == (origin + timedelta(hours=2)).isoformat().replace("+00:00", "Z")
+    assert status["next_required_close_utc"] == (
+        origin + timedelta(hours=2)
+    ).isoformat().replace("+00:00", "Z")
     assert status["economic_verdict"] == "FORBIDDEN"
 
 
-def test_incremental_run_never_refetches_or_accepts_revised_history(tmp_path) -> None:
+def test_incremental_run_never_refetches_or_accepts_revised_history(
+    tmp_path,
+    qualification_authority,
+) -> None:
     origin = parse_utc(EXPECTED_ORIGIN_UTC)
     bootstrap_finished = False
 
-    def history_hostile_fetcher(*, symbol: str, start_ms: int, end_ms: int, interval: str):
+    def history_hostile_fetcher(
+        *, symbol: str, start_ms: int, end_ms: int, interval: str
+    ):
         nonlocal bootstrap_finished
         origin_open_ms = int(origin.timestamp() * 1000)
         if bootstrap_finished and start_ms < origin_open_ms:
             raise AssertionError("historical source was refetched after durable bootstrap")
-        return _rest_fetcher(symbol=symbol, start_ms=start_ms, end_ms=end_ms, interval=interval)
+        return _rest_fetcher(
+            symbol=symbol,
+            start_ms=start_ms,
+            end_ms=end_ms,
+            interval=interval,
+        )
 
     operation = OperationalRecorder(
         tmp_path,
         archive_provider=_no_archive,
         rest_fetcher=history_hostile_fetcher,
-        _qualification_mode=True,
     )
     first = operation.record_due(now=origin + timedelta(minutes=5))
     bootstrap_finished = True
     second = operation.record_due(now=origin + timedelta(hours=1, minutes=5))
     assert first["state"] == second["state"] == "QUALIFICATION_RECORDED"
-    assert second["current_receipts"][0]["previous_receipt_sha256"] == first["receipt_chain_tip_sha256"]
+    assert second["current_receipts"][0]["previous_receipt_sha256"] == first[
+        "receipt_chain_tip_sha256"
+    ]
 
 
-def test_overlapping_invocation_fails_closed_on_process_lock(tmp_path) -> None:
+def test_overlapping_invocation_fails_closed_on_process_lock(
+    tmp_path,
+    qualification_authority,
+) -> None:
     origin = parse_utc(EXPECTED_ORIGIN_UTC)
-    operation = OperationalRecorder(tmp_path, archive_provider=_no_archive, rest_fetcher=_rest_fetcher, _qualification_mode=True)
+    operation = OperationalRecorder(
+        tmp_path,
+        archive_provider=_no_archive,
+        rest_fetcher=_rest_fetcher,
+    )
     lock_path = tmp_path / source_module.LOCK_FILENAME
     with lock_path.open("a+b") as handle:
         fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -278,7 +372,11 @@ def test_overlapping_invocation_fails_closed_on_process_lock(tmp_path) -> None:
         fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
 
 
-def test_first_ledger_creation_fsyncs_file_and_parent_directory(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_first_ledger_creation_fsyncs_file_and_parent_directory(
+    tmp_path,
+    monkeypatch: pytest.MonkeyPatch,
+    qualification_authority,
+) -> None:
     origin = parse_utc(EXPECTED_ORIGIN_UTC)
     calls: list[int] = []
     real_fsync = source_module.os.fsync
@@ -292,41 +390,57 @@ def test_first_ledger_creation_fsyncs_file_and_parent_directory(tmp_path, monkey
         tmp_path,
         archive_provider=_no_archive,
         rest_fetcher=_rest_fetcher,
-        _qualification_mode=True,
     )
     operation.record_due(now=origin + timedelta(minutes=5))
     assert len(calls) >= 2
 
 
-def test_tampered_durable_ledger_fails_integrity_before_next_fetch(tmp_path) -> None:
+def test_tampered_durable_ledger_fails_integrity_before_next_fetch(
+    tmp_path,
+    qualification_authority,
+) -> None:
     origin = parse_utc(EXPECTED_ORIGIN_UTC)
     fetch_count = 0
 
     def counting_fetcher(*, symbol: str, start_ms: int, end_ms: int, interval: str):
         nonlocal fetch_count
         fetch_count += 1
-        return _rest_fetcher(symbol=symbol, start_ms=start_ms, end_ms=end_ms, interval=interval)
+        return _rest_fetcher(
+            symbol=symbol,
+            start_ms=start_ms,
+            end_ms=end_ms,
+            interval=interval,
+        )
 
-    operation = OperationalRecorder(tmp_path, archive_provider=_no_archive, rest_fetcher=counting_fetcher, _qualification_mode=True)
+    operation = OperationalRecorder(
+        tmp_path,
+        archive_provider=_no_archive,
+        rest_fetcher=counting_fetcher,
+    )
     operation.record_due(now=origin + timedelta(minutes=5))
     assert fetch_count == 3
 
     ledger_path = tmp_path / source_module.LEDGER_FILENAME
     raw = ledger_path.read_text(encoding="utf-8")
-    ledger_path.write_text(raw.replace('"raw_row_sha256":"', '"raw_row_sha256":"0', 1), encoding="utf-8")
+    ledger_path.write_text(
+        raw.replace('"raw_row_sha256":"', '"raw_row_sha256":"0', 1),
+        encoding="utf-8",
+    )
 
     with pytest.raises(SourceBlocked, match="chain integrity failure"):
         operation.record_due(now=origin + timedelta(hours=1, minutes=5))
     assert fetch_count == 3
 
 
-def test_missed_first_window_blocks_without_backfill(tmp_path) -> None:
+def test_missed_first_window_blocks_without_backfill(
+    tmp_path,
+    qualification_authority,
+) -> None:
     origin = parse_utc(EXPECTED_ORIGIN_UTC)
     operation = OperationalRecorder(
         tmp_path,
         archive_provider=_no_archive,
         rest_fetcher=_rest_fetcher,
-        _qualification_mode=True,
     )
     blocked = operation.record_due(now=origin + timedelta(hours=1))
     assert blocked["state"] == "BLOCKED_MISSED_RECORDING_WINDOW"

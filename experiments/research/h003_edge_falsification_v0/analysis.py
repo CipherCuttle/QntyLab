@@ -74,7 +74,7 @@ def _validated_timestamps(timestamps: Sequence[str] | Iterable[str], *, expected
     _require(len(values) == expected_length, "timestamp/close length mismatch")
     _require(len(values) >= 3, "at least 3 timestamps are required")
     parsed = tuple(_parse_utc_timestamp(value, label=f"timestamps[{index}]") for index, value in enumerate(values))
-    for previous, current in zip(parsed, parsed[1:], strict=True):
+    for previous, current in zip(parsed, parsed[1:]):
         _require(current - previous == timedelta(hours=1), "attested timestamps must be strictly contiguous hourly UTC bars")
     return values, parsed
 

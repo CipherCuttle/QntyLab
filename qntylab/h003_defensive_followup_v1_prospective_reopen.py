@@ -69,6 +69,7 @@ def build_authorization_contract() -> dict[str, Any]:
         "metadata": {
             "purpose": "PROSPECTIVE_SHADOW_RECORDER_ONLY",
             "trial_execution_authority": "NONE",
+            "ledger_replay_status_note": "Canonical replay may label this generation SCREENING because historical TRIAL_COMPLETED events are replayed after CANDIDATE_REOPENED. That label does not represent new-generation execution and grants no authority beyond this active contract.",
             "schema_compatibility_anchor": {
                 "trial_id": SCHEMA_COMPATIBILITY_ANCHOR_TRIAL_ID,
                 "status": "ALREADY_COMPLETED_NON_EXECUTABLE",

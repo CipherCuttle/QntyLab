@@ -64,6 +64,10 @@ def _expected_identity() -> dict[str, Any]:
 
 
 def attest(root: Path) -> dict[str, Any]:
+    # qntylab.data.fetch creates data/raw itself but expects data/manifests to
+    # exist before writing the manifest. The attestation deliberately runs in
+    # a fresh temporary root, so provision only that required repository shape.
+    (root / "data" / "manifests").mkdir(parents=True, exist_ok=True)
     manifest = fetch(SYMBOL, START, root, interval="1h", end=FROZEN_RETRIEVAL_INSTANT)
     observed = {
         "symbol": manifest["symbol"],

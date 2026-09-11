@@ -118,6 +118,16 @@ jobs:
           gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern "$H003_STATE_FILE" --dir "$H003_STATE_DIR"
           ACTUAL="$(sha256sum "$H003_STATE_DIR/$H003_STATE_FILE" | awk '{print $1}')"
           test "$ACTUAL" = "${DIGEST#sha256:}"
+          LAST_EVENT_DIGEST="$(python - "$H003_STATE_DIR/$H003_STATE_FILE" <<'PY'
+          import json
+          import sys
+          lines = [line for line in open(sys.argv[1], encoding="utf-8") if line.strip()]
+          if not lines:
+              raise SystemExit("immutable H003 ledger is empty")
+          print(json.loads(lines[-1])["event_digest"])
+          PY
+          )"
+          test "$TAG" = "${H003_RELEASE_PREFIX}${LAST_EVENT_DIGEST:0:24}"
           echo "Restored immutable H003 evidence release $TAG ($ACTUAL)"
       - name: Record at most the next due H003 hour
         id: record
@@ -212,16 +222,57 @@ jobs:
           set -euo pipefail
           LEDGER="$RUNNER_TEMP/h003-persist/$H003_STATE_FILE"
 
-          if RELEASE_JSON="$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" 2>/dev/null)"; then
-            echo "Release already exists; verifying idempotent immutable state"
-          else
-            gh release create "$RELEASE_TAG" "$LEDGER#$H003_STATE_FILE" \
+          find_release() {
+            local match=""
+            for page in $(seq 1 50); do
+              local page_json
+              page_json="$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "repos/$GITHUB_REPOSITORY/releases?per_page=100&page=$page")"
+              match="$(printf '%s' "$page_json" | jq -c --arg tag "$RELEASE_TAG" '[.[] | select(.tag_name == $tag)][0] // empty')"
+              if [ -n "$match" ]; then
+                printf '%s' "$match"
+                return 0
+              fi
+              local count
+              count="$(printf '%s' "$page_json" | jq 'length')"
+              if [ "$count" -lt 100 ]; then
+                return 1
+              fi
+            done
+            return 1
+          }
+
+          RELEASE_JSON="$(find_release || true)"
+          if [ -z "$RELEASE_JSON" ]; then
+            gh release create "$RELEASE_TAG" \
               --repo "$GITHUB_REPOSITORY" \
               --target "$GITHUB_SHA" \
               --title "$RELEASE_TAG" \
               --notes "H003 V2 cumulative paper/shadow evidence snapshot. No economic verdict or downstream authority." \
-              --prerelease
+              --prerelease \
+              --draft
+            RELEASE_JSON="$(find_release)"
+          fi
+
+          DRAFT="$(printf '%s' "$RELEASE_JSON" | jq -r '.draft')"
+          IMMUTABLE="$(printf '%s' "$RELEASE_JSON" | jq -r '.immutable')"
+          if [ "$IMMUTABLE" = "true" ]; then
+            echo "Immutable release already exists; verifying idempotent state"
+          elif [ "$DRAFT" = "true" ]; then
+            ASSET_COUNT="$(printf '%s' "$RELEASE_JSON" | jq --arg name "$H003_STATE_FILE" '[.assets[] | select(.name == $name)] | length')"
+            if [ "$ASSET_COUNT" -eq 0 ]; then
+              gh release upload "$RELEASE_TAG" "$LEDGER#$H003_STATE_FILE" --repo "$GITHUB_REPOSITORY"
+            elif [ "$ASSET_COUNT" -ne 1 ]; then
+              echo "Draft H003 release has invalid asset cardinality" >&2
+              exit 1
+            fi
+            RELEASE_JSON="$(find_release)"
+            DRAFT_DIGEST="$(printf '%s' "$RELEASE_JSON" | jq -r --arg name "$H003_STATE_FILE" '.assets[] | select(.name == $name) | .digest')"
+            test "$DRAFT_DIGEST" = "sha256:$EXPECTED_LEDGER_SHA256"
+            gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --draft=false --prerelease
             RELEASE_JSON="$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG")"
+          else
+            echo "Existing H003 release is neither draft nor immutable" >&2
+            exit 1
           fi
 
           test "$(printf '%s' "$RELEASE_JSON" | jq -r '.draft')" = "false"

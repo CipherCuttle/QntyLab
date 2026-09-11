@@ -24,7 +24,7 @@ SOURCE_MERGE = "1827bb3e753970aed0cfbd0adc27bba121b41d5d"
 SOURCE_SHA256 = "74e1906f1bb54123ff77347629d5da6bafcd400b9a979d6d5526bbc6ccf08633"
 RUNTIME_RELATIVE_PATH = "experiments/research/h003_defensive_followup_v1/prospective_source_v2_runtime.json"
 WORKFLOW_RELATIVE_PATH = ".github/workflows/h003-prospective-operation-v2.yml"
-WORKFLOW_SHA256 = "39356c475e6328f11fde0c9499140e4a30b038c1e09fccfec3111e1bfbe0af76"
+WORKFLOW_SHA256 = "bbf881c9daec8c2cfffa8431964d26e5389f0bf1e7fbc990d3f19d39166b7d45"
 SCHEDULE = "7,22,37,52 * * * *"
 PYTHON_VERSION = "3.12.14"
 NUMPY_VERSION = "2.5.3"
@@ -131,7 +131,11 @@ def test_runtime_binding_freezes_schedule_toolchain_and_immutable_evidence() -> 
     assert "persist-credentials: false" in text
     assert "GITHUB_IMMUTABLE_RELEASE_HASH_CHAIN_V1" in text
     assert "gh release create" in text
+    assert "--draft" in text
+    assert "gh release upload" in text
+    assert "gh release edit" in text
     assert "'.immutable'" in text
+    assert 'test "$TAG" = "${H003_RELEASE_PREFIX}${LAST_EVENT_DIGEST:0:24}"' in text
     assert "H003_EVIDENCE_BRANCH" not in text
     assert "git push" not in text
     assert "pull_request:" not in text

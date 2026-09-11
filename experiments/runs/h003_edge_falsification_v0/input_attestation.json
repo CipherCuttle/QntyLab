@@ -1,0 +1,32 @@
+{
+  "authority": {
+    "capital": "NONE",
+    "execution": "RESEARCH_BACKTEST_ONLY",
+    "qnty_acceptance": "NONE",
+    "qntylab_research_only": true,
+    "qntyspot_policy": "NONE",
+    "signing": "NONE",
+    "submission": "NONE"
+  },
+  "authorization_id": "H003_EDGE_FALSIFICATION_V0",
+  "canonical_match": true,
+  "expected": {
+    "end": "2026-09-08T20:00:00Z",
+    "rows": 49831,
+    "sha256": "64bdb27a31003b0de25f3802affa8b412143a50bc8a5b76a399924626b01174a",
+    "start": "2021-01-01T00:00:00Z",
+    "symbol": "SOLUSDT",
+    "timeframe": "1h"
+  },
+  "mismatches": {},
+  "observed": {
+    "end": "2026-09-08T20:00:00Z",
+    "rows": 49831,
+    "sha256": "64bdb27a31003b0de25f3802affa8b412143a50bc8a5b76a399924626b01174a",
+    "start": "2021-01-01T00:00:00Z",
+    "symbol": "SOLUSDT",
+    "timeframe": "1h"
+  },
+  "schema_version": "1.0.0",
+  "status": "CANONICAL_MATCH"
+}

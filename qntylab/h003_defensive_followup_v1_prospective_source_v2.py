@@ -168,12 +168,10 @@ def validate_activation_authority(root: Path = ROOT) -> dict[str, Any]:
         if not source_merge or not activation_merge:
             raise SourceBlocked("canonical H003 activation lineage is incomplete")
         source_bytes = subprocess.check_output(
-            ["git", "show", f"{source_merge}:{SOURCE_IMPLEMENTATION_PATH}"],
-            cwd=root,
+            ["git", "show", f"{source_merge}:{SOURCE_IMPLEMENTATION_PATH}"], cwd=root
         )
         activation_bytes = subprocess.check_output(
-            ["git", "show", f"{activation_merge}:{ACTIVATION_ARTIFACT_RELATIVE_PATH}"],
-            cwd=root,
+            ["git", "show", f"{activation_merge}:{ACTIVATION_ARTIFACT_RELATIVE_PATH}"], cwd=root
         )
         activation_timestamp = subprocess.check_output(
             ["git", "show", "-s", "--format=%cI", activation_merge],
@@ -253,9 +251,7 @@ def latest_completed_logical_close(as_of: datetime) -> datetime:
 
 
 def request_bounds(
-    *,
-    first_logical_close: datetime,
-    through_logical_close: datetime,
+    *, first_logical_close: datetime, through_logical_close: datetime
 ) -> tuple[int, int]:
     first = _hour(first_logical_close)
     through = _hour(through_logical_close)
@@ -354,7 +350,10 @@ def default_archive_provider(
                 raise SourceBlocked(f"Spot archive rejected request: HTTP {response.status}")
             zip_bytes = response.read()
         with opener(
-            Request(url + ".CHECKSUM", headers={"User-Agent": "QntyLab-H003-Prospective-Source/2"}),
+            Request(
+                url + ".CHECKSUM",
+                headers={"User-Agent": "QntyLab-H003-Prospective-Source/2"},
+            ),
             timeout=timeout,
         ) as response:
             if response.status != 200:
@@ -381,10 +380,7 @@ def _published_checksum(checksum_text: str) -> str:
 
 
 def bars_from_authenticated_archive(
-    *,
-    symbol: str,
-    zip_bytes: bytes,
-    checksum_text: str,
+    *, symbol: str, zip_bytes: bytes, checksum_text: str
 ) -> tuple[recorder.SpotBar, ...]:
     """Verify archive bytes before parsing exact 12-field Spot kline rows."""
     published = _published_checksum(checksum_text)
@@ -419,9 +415,7 @@ def bars_from_authenticated_archive(
 
 
 def completed_archive_months(
-    *,
-    first_logical_close: datetime,
-    through_logical_close: datetime,
+    *, first_logical_close: datetime, through_logical_close: datetime
 ) -> tuple[tuple[int, int], ...]:
     """Months fully before the month containing the requested final close."""
     first_open = _hour(first_logical_close) - timedelta(hours=1)
@@ -475,8 +469,7 @@ def materialize_bars(
     archive_provider = archive_provider or default_archive_provider
     rest_fetcher = rest_fetcher or default_fetch_klines
     months = completed_archive_months(
-        first_logical_close=first,
-        through_logical_close=through,
+        first_logical_close=first, through_logical_close=through
     )
     expected_hours = int((through - first).total_seconds() // 3600) + 1
     required_closes = tuple(first + timedelta(hours=index) for index in range(expected_hours))
@@ -490,9 +483,7 @@ def materialize_bars(
                 continue
             zip_bytes, checksum_text = provided
             for bar in bars_from_authenticated_archive(
-                symbol=symbol,
-                zip_bytes=zip_bytes,
-                checksum_text=checksum_text,
+                symbol=symbol, zip_bytes=zip_bytes, checksum_text=checksum_text
             ):
                 if first <= bar.logical_close_utc <= through:
                     if bar.logical_close_utc in covered:
@@ -503,8 +494,7 @@ def materialize_bars(
         uncovered = [close for close in required_closes if close not in covered]
         if uncovered:
             start_ms, end_ms = request_bounds(
-                first_logical_close=uncovered[0],
-                through_logical_close=through,
+                first_logical_close=uncovered[0], through_logical_close=through
             )
             for raw_row in rest_fetcher(
                 symbol=symbol,
@@ -541,8 +531,7 @@ def _fetch_incremental_hour(
         raise SourceBlocked("requested incremental close is not complete at as_of")
     rest_fetcher = rest_fetcher or default_fetch_klines
     start_ms, end_ms = request_bounds(
-        first_logical_close=due,
-        through_logical_close=due,
+        first_logical_close=due, through_logical_close=due
     )
     result: list[recorder.SpotBar] = []
     for symbol in recorder.PANEL:
@@ -555,7 +544,9 @@ def _fetch_incremental_hour(
             )
         )
         if len(rows) != 1:
-            raise SourceBlocked(f"incremental Spot source must return exactly one row for {symbol}")
+            raise SourceBlocked(
+                f"incremental Spot source must return exactly one row for {symbol}"
+            )
         bar = _rest_bar_from_row(symbol, rows[0], expected_close=due)
         if bar.logical_close_utc > latest:
             raise SourceBlocked("REST returned open or future Spot bar")
@@ -590,7 +581,10 @@ class _EvidenceLedger:
             }
             if not isinstance(body["payload"], dict):
                 raise SourceBlocked("evidence ledger payload is malformed")
-            if body["previous_event_digest"] != previous or event.get("event_digest") != digest(body):
+            if (
+                body["previous_event_digest"] != previous
+                or event.get("event_digest") != digest(body)
+            ):
                 raise SourceBlocked("evidence ledger chain integrity failure")
             events.append(event)
             previous = event["event_digest"]
@@ -625,13 +619,17 @@ class _EvidenceLedger:
         return event
 
     def terminal_block(self) -> dict[str, Any] | None:
-        blocked = [event for event in self.events() if event["event_type"] == "RECORDING_BLOCKED"]
+        blocked = [
+            event for event in self.events() if event["event_type"] == "RECORDING_BLOCKED"
+        ]
         if len(blocked) > 1:
             raise SourceBlocked("multiple terminal recording blocks")
         return blocked[0] if blocked else None
 
     def recorded(self) -> tuple[dict[str, Any], ...]:
-        return tuple(event for event in self.events() if event["event_type"] == "HOUR_RECORDED")
+        return tuple(
+            event for event in self.events() if event["event_type"] == "HOUR_RECORDED"
+        )
 
     def next_required_close(self) -> datetime:
         if self.terminal_block() is not None:
@@ -640,7 +638,9 @@ class _EvidenceLedger:
         origin = parse_utc(EXPECTED_ORIGIN_UTC)
         if not recorded:
             return origin
-        closes = [_instant(event["payload"]["through_logical_close_utc"]) for event in recorded]
+        closes = [
+            _instant(event["payload"]["through_logical_close_utc"]) for event in recorded
+        ]
         expected = [origin + timedelta(hours=index) for index in range(len(closes))]
         if closes != expected:
             raise SourceBlocked("recorded close ordering/gap violation")
@@ -648,7 +648,11 @@ class _EvidenceLedger:
 
     def receipt_chain_tip(self) -> str | None:
         recorded = self.recorded()
-        return None if not recorded else str(recorded[-1]["payload"]["receipt_chain_tip_sha256"])
+        return (
+            None
+            if not recorded
+            else str(recorded[-1]["payload"]["receipt_chain_tip_sha256"])
+        )
 
     def reconstruct_bars(self) -> tuple[recorder.SpotBar, ...]:
         """Rebuild immutable historical source rows only from durable evidence."""
@@ -663,13 +667,21 @@ class _EvidenceLedger:
             through = _instant(payload.get("through_logical_close_utc"))
             if through != expected_close:
                 raise SourceBlocked("durable evidence hour ordering/gap violation")
-            expected_scope = "BOOTSTRAP_WARMUP_PLUS_ORIGIN" if index == 0 else "INCREMENTAL_HOUR_ONLY"
+            expected_scope = (
+                "BOOTSTRAP_WARMUP_PLUS_ORIGIN"
+                if index == 0
+                else "INCREMENTAL_HOUR_ONLY"
+            )
             if payload.get("evidence_scope") != expected_scope:
                 raise SourceBlocked("durable evidence scope violation")
             rows = payload.get("evidence_rows")
             if not isinstance(rows, list):
                 raise SourceBlocked("durable evidence rows are malformed")
-            expected_rows = recorder.SLOW * len(recorder.PANEL) if index == 0 else len(recorder.PANEL)
+            expected_rows = (
+                recorder.SLOW * len(recorder.PANEL)
+                if index == 0
+                else len(recorder.PANEL)
+            )
             if len(rows) != expected_rows:
                 raise SourceBlocked("durable evidence row cardinality mismatch")
             for row in rows:
@@ -679,7 +691,9 @@ class _EvidenceLedger:
                 raw_row = row.get("raw_row")
                 if symbol not in recorder.PANEL or not isinstance(raw_row, list):
                     raise SourceBlocked("durable evidence row identity is malformed")
-                if row.get("raw_row_sha256") != sha256(canonical_bytes(raw_row)).hexdigest():
+                if row.get("raw_row_sha256") != sha256(
+                    canonical_bytes(raw_row)
+                ).hexdigest():
                     raise SourceBlocked("durable raw-row digest mismatch")
                 try:
                     bar = recorder.spot_bar_from_row(symbol, raw_row)
@@ -690,7 +704,9 @@ class _EvidenceLedger:
                 if row.get("provider_timestamp_unit") != bar.provider_timestamp_unit:
                     raise SourceBlocked("durable timestamp-unit metadata mismatch")
                 if index > 0 and bar.logical_close_utc != through:
-                    raise SourceBlocked("incremental durable row does not match recorded hour")
+                    raise SourceBlocked(
+                        "incremental durable row does not match recorded hour"
+                    )
                 bars.append(bar)
             expected_close += timedelta(hours=1)
         last = _instant(recorded[-1]["payload"]["through_logical_close_utc"])
@@ -709,7 +725,6 @@ class OperationalRecorder:
         *,
         archive_provider: ArchiveProvider | None = None,
         rest_fetcher: RestFetcher | None = None,
-        _qualification_mode: bool = False,
     ):
         self.state_dir = state_dir
         self.state_dir.mkdir(parents=True, exist_ok=True)
@@ -717,17 +732,8 @@ class OperationalRecorder:
         self._lock_path = self.state_dir / LOCK_FILENAME
         self.archive_provider = archive_provider
         self.rest_fetcher = rest_fetcher
-        self._qualification_mode = bool(_qualification_mode)
 
     def _activation_context(self) -> dict[str, Any]:
-        if self._qualification_mode:
-            return {
-                "operation_mode": "SYNTHETIC_QUALIFICATION_ONLY",
-                "activation_merge_sha": None,
-                "activation_canonicalized_at_utc": None,
-                "source_qualification_merge_sha": None,
-                "source_implementation_sha256": sha256(Path(__file__).read_bytes()).hexdigest(),
-            }
         return validate_activation_authority()
 
     @contextmanager
@@ -737,7 +743,9 @@ class OperationalRecorder:
             try:
                 fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
             except BlockingIOError as exc:
-                raise SourceBlocked("another H003 recorder invocation already holds the process lock") from exc
+                raise SourceBlocked(
+                    "another H003 recorder invocation already holds the process lock"
+                ) from exc
             try:
                 yield
             finally:
@@ -765,7 +773,7 @@ class OperationalRecorder:
         return {
             "state": (
                 "QUALIFIED_IMPLEMENTATION_TEST_ONLY"
-                if self._qualification_mode
+                if activation["operation_mode"] == "SYNTHETIC_QUALIFICATION_ONLY"
                 else "ACTIVE_PROSPECTIVE_SHADOW"
             ),
             "operation_mode": activation["operation_mode"],
@@ -843,7 +851,11 @@ class OperationalRecorder:
         else:
             historical = self._ledger.reconstruct_bars()
             expected_historical_tip = due - timedelta(hours=1)
-            if not historical or max(bar.logical_close_utc for bar in historical) != expected_historical_tip:
+            if (
+                not historical
+                or max(bar.logical_close_utc for bar in historical)
+                != expected_historical_tip
+            ):
                 raise SourceBlocked("durable history does not end at prior required close")
             incremental = _fetch_incremental_hour(
                 logical_close=due,
@@ -854,13 +866,17 @@ class OperationalRecorder:
             try:
                 bars = recorder.validate_bars(bars, through_logical_close=due)
             except recorder.RecorderBlocked as exc:
-                raise SourceBlocked(f"durable-plus-incremental source rejected: {exc}") from exc
+                raise SourceBlocked(
+                    f"durable-plus-incremental source rejected: {exc}"
+                ) from exc
             evidence_bars = list(incremental)
             evidence_scope = "INCREMENTAL_HOUR_ONLY"
 
         bundle = recorder.build_fixture_bundle(bars, through_logical_close=due)
         current_receipts = [
-            item for item in bundle["receipts"] if item["logical_close_utc"] == _stamp(due)
+            item
+            for item in bundle["receipts"]
+            if item["logical_close_utc"] == _stamp(due)
         ]
         if len(current_receipts) != len(recorder.PANEL):
             raise SourceBlocked("current-hour receipt cardinality mismatch")
@@ -872,7 +888,9 @@ class OperationalRecorder:
 
         if recorded:
             historical_receipts = [
-                item for item in bundle["receipts"] if item["logical_close_utc"] < _stamp(due)
+                item
+                for item in bundle["receipts"]
+                if item["logical_close_utc"] < _stamp(due)
             ]
             persisted_receipts = [
                 receipt
@@ -880,7 +898,9 @@ class OperationalRecorder:
                 for receipt in event["payload"].get("current_receipts", [])
             ]
             if historical_receipts != persisted_receipts:
-                raise SourceBlocked("recomputed historical receipts differ from durable evidence")
+                raise SourceBlocked(
+                    "recomputed historical receipts differ from durable evidence"
+                )
 
         expected_evidence_count = (
             recorder.SLOW * len(recorder.PANEL)
@@ -907,7 +927,9 @@ class OperationalRecorder:
             "through_logical_close_utc": _stamp(due),
             "recorded_at_utc": _stamp(current),
             "source_lineage": lineage,
-            "source_manifest_sha256": bundle["source_manifest"]["source_manifest_sha256"],
+            "source_manifest_sha256": bundle["source_manifest"][
+                "source_manifest_sha256"
+            ],
             "bundle_sha256": bundle["bundle_sha256"],
             "evidence_scope": evidence_scope,
             "evidence_rows": evidence_rows,
@@ -924,7 +946,11 @@ class OperationalRecorder:
         }
         event = self._ledger._append("HOUR_RECORDED", payload)
         return {
-            "state": "QUALIFICATION_RECORDED" if self._qualification_mode else "RECORDED",
+            "state": (
+                "QUALIFICATION_RECORDED"
+                if activation["operation_mode"] == "SYNTHETIC_QUALIFICATION_ONLY"
+                else "RECORDED"
+            ),
             "event_digest": event["event_digest"],
             **payload,
         }

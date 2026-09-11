@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0.0",
+  "project_id": "H003_PROSPECTIVE_SOURCE_V2_RUNTIME_BINDING",
+  "state": "ACTIVE",
+  "activation_artifact_path": "experiments/research/h003_defensive_followup_v1/prospective_source_v2_activation.json",
+  "source_qualification_merge_sha": "1827bb3e753970aed0cfbd0adc27bba121b41d5d",
+  "source_implementation_sha256": "74e1906f1bb54123ff77347629d5da6bafcd400b9a979d6d5526bbc6ccf08633",
+  "workflow_path": ".github/workflows/h003-prospective-operation-v2.yml",
+  "workflow_sha256": "33a994db1c5dae38a72cc06fdeaa79f9271fccc94d3d0fbb4cf496838acae4e9",
+  "schedule_utc": "7,22,37,52 * * * *",
+  "evidence_branch": "h003-prospective-evidence-v2",
+  "evidence_file": "h003_prospective_v2_events.jsonl",
+  "persistence": "GIT_FAST_FORWARD_HASH_CHAIN_V1",
+  "force_push": "FORBIDDEN",
+  "economic_verdict": "FORBIDDEN",
+  "downstream_authority": "NONE"
+}

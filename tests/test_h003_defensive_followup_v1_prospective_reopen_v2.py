@@ -37,11 +37,11 @@ def test_contract_is_recorder_only_and_anchor_is_already_completed() -> None:
     assert contract["authorized_trial_ids"] == [SCHEMA_COMPATIBILITY_ANCHOR_TRIAL_ID]
     assert contract["allowed_research_intents"] == ["FOLLOW_UP"]
     assert contract["metadata"]["trial_execution_authority"] == "NONE"
+    assert "historical TRIAL_COMPLETED events" in contract["metadata"]["ledger_replay_status_note"]
 
     anchor = _load(TRIAL_INDEX_PATH)["trials"][SCHEMA_COMPATIBILITY_ANCHOR_TRIAL_ID]
     assert anchor["variant_id"] == VARIANT_ID
-    compat = contract["metadata"]["schema_compatibility_anchor"]
-    assert compat["status"] == "ALREADY_COMPLETED_NON_EXECUTABLE"
+    assert contract["metadata"]["schema_compatibility_anchor"]["status"] == "ALREADY_COMPLETED_NON_EXECUTABLE"
 
 
 def test_recorder_stays_inactive_until_valid_origin_v2() -> None:
@@ -71,13 +71,15 @@ def test_materialized_reopen_is_exact_and_all_new_trials_fail_closed() -> None:
         pytest.skip("prospective reopen v2 is materialized by the bounded workflow")
     contract = _load(CONTRACT_PATH)
     event = _load(EVENT_PATH)
-    state = _load(STATE_PATH)
-    variant = state["variants"][VARIANT_ID]
+    variant = _load(STATE_PATH)["variants"][VARIANT_ID]
 
     assert contract == build_authorization_contract()
     assert event["event_id"] == REOPEN_EVENT_ID
     assert event["authorization_contract_sha256"] == sha256_path(CONTRACT_PATH)
-    assert variant["status"] == "PROPOSED"
+    # Replay processes historical trial events after reopens, so an already-tried
+    # variant is labeled SCREENING. Authority still comes only from the active
+    # reopen contract; this does not mean a new-generation trial ran.
+    assert variant["status"] == "SCREENING"
     assert variant["latest_decision_event_id"] is None
     assert variant["active_reopen_event_id"] == REOPEN_EVENT_ID
     assert variant["reopen_authorization_contract_path"] == "experiments/specs/h003_defensive_followup_v1_prospective_reopen_v2.json"

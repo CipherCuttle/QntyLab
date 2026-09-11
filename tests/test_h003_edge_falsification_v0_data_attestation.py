@@ -32,6 +32,7 @@ def test_attestation_accepts_only_exact_frozen_manifest(monkeypatch: pytest.Monk
         assert interval == "1h"
         assert end == module.FROZEN_RETRIEVAL_INSTANT
         assert root == tmp_path
+        assert (root / "data" / "manifests").is_dir()
         return copy.deepcopy(expected)
 
     monkeypatch.setattr(module, "fetch", fake_fetch)

@@ -35,11 +35,14 @@ def test_attestation_accepts_only_exact_frozen_manifest(monkeypatch: pytest.Monk
         return copy.deepcopy(expected)
 
     monkeypatch.setattr(module, "fetch", fake_fetch)
-    result = module.attest(tmp_path)
+    result = module.attest_classified(tmp_path)
 
+    assert result["status"] == "CANONICAL_MATCH"
     assert result["canonical_match"] is True
     assert result["mismatches"] == {}
+    assert result["error"] is None
     assert result["observed"]["sha256"] == module.EXPECTED_SHA256
+    assert module._exit_code(result) == 0
 
 
 @pytest.mark.parametrize(
@@ -64,10 +67,36 @@ def test_attestation_fails_closed_on_any_material_identity_change(
     manifest[key] = replacement
     monkeypatch.setattr(module, "fetch", lambda *args, **kwargs: copy.deepcopy(manifest))
 
-    result = module.attest(tmp_path)
+    result = module.attest_classified(tmp_path)
 
+    assert result["status"] == "MISMATCH"
     assert result["canonical_match"] is False
     assert key in result["mismatches"]
+    assert result["error"] is None
+    assert module._exit_code(result) == 2
+
+
+def test_acquisition_exception_yields_classified_noncanonical_receipt(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    def failing_fetch(*args, **kwargs):
+        raise RuntimeError("public data endpoint unavailable")
+
+    monkeypatch.setattr(module, "fetch", failing_fetch)
+    result = module.attest_classified(tmp_path)
+
+    assert result["status"] == "ACQUISITION_ERROR"
+    assert result["canonical_match"] is False
+    assert result["observed"] is None
+    assert result["mismatches"] == {}
+    assert result["expected"]["sha256"] == module.EXPECTED_SHA256
+    assert result["error"] == {
+        "classification": "ACQUISITION_ERROR",
+        "exception_type": "RuntimeError",
+        "message": "public data endpoint unavailable",
+    }
+    assert module._exit_code(result) == 3
 
 
 def test_attestation_has_no_strategy_backtest_or_ledger_surface() -> None:
@@ -95,7 +124,7 @@ def test_attestation_has_no_strategy_backtest_or_ledger_surface() -> None:
 
 def test_attestation_authority_is_explicitly_zero(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     monkeypatch.setattr(module, "fetch", lambda *args, **kwargs: _expected_manifest())
-    result = module.attest(tmp_path)
+    result = module.attest_classified(tmp_path)
 
     assert result["authority"] == {
         "research_result": "NONE",

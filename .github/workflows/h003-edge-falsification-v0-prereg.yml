@@ -1,0 +1,38 @@
+name: H003 Edge Falsification V0 Preregistration
+
+on:
+  pull_request:
+    paths:
+      - "experiments/specs/h003_edge_falsification_v0.json"
+      - "experiments/specs/h003_edge_falsification_v0.md"
+      - "experiments/specs/h003_edge_falsification_v0_analysis_contract.json"
+      - "tests/test_h003_edge_falsification_v0_prereg.py"
+      - ".github/workflows/h003-edge-falsification-v0-prereg.yml"
+  push:
+    branches: [master]
+    paths:
+      - "experiments/specs/h003_edge_falsification_v0.json"
+      - "experiments/specs/h003_edge_falsification_v0.md"
+      - "experiments/specs/h003_edge_falsification_v0_analysis_contract.json"
+      - "tests/test_h003_edge_falsification_v0_prereg.py"
+      - ".github/workflows/h003-edge-falsification-v0-prereg.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  preregistration-lock:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install focused test dependencies
+        run: python -m pip install numpy pytest
+      - name: Verify frozen preregistration contract
+        run: PYTHONPATH=. python -m pytest -q tests/test_h003_edge_falsification_v0_prereg.py
+      - name: Verify no whitespace errors
+        run: git diff --check ${{ github.event.pull_request.base.sha || 'HEAD^' }}..HEAD

@@ -38,12 +38,20 @@
     {"id": "stress", "fee_bps": 10, "slippage_bps": 10},
     {"id": "severe_stress", "fee_bps": 10, "slippage_bps": 20}
   ],
+  "activation_boundary": {
+    "governance_state_after_this_preregistration": "BLOCKED",
+    "reason": "The scientific follow-up design is frozen, but this preregistration grants no generic strategy-test or paper-shadow execution authority. A separate Git-backed activation/reopen must authorize the exact historical diagnostic matrix and prospective recorder after merge.",
+    "generic_trial_execution_authorized": false,
+    "paper_shadow_recording_authorized": false,
+    "requires_separate_git_backed_activation_after_merge": true
+  },
   "prior_exposed_retrospective_diagnostic": {
     "role": "supplementary robustness diagnostic and possible falsifying evidence only; it cannot create confirmatory support",
     "prior_exposure_acknowledged": true,
     "prior_exposure_evidence_path": "experiments/research/summaries/focused_trend_validation_v1_2023_holdout_cells.csv",
     "exact_h003_btc_eth_were_previously_evaluated": true,
-    "execution_authorized_only_after_this_prereg_is_merged": true,
+    "execution_authorized_by_this_preregistration": false,
+    "requires_separate_git_backed_activation_after_merge": true,
     "assets": [
       {
         "symbol": "BTCUSDT",
@@ -107,18 +115,20 @@
   },
   "prospective_panel": {
     "mode": "paper_shadow_only",
+    "execution_authorized_by_this_preregistration": false,
+    "requires_separate_git_backed_activation_after_merge": true,
     "assets": ["SOLUSDT", "BTCUSDT", "ETHUSDT"],
     "market": "Binance Spot",
     "timeframe": "1h",
-    "activation_rule": "After this preregistration is merged to master, create a separate activation artifact from Git metadata only. All three assets share one prospective origin equal to the next whole UTC hour strictly after the prereg merge commit timestamp.",
+    "activation_rule": "After this preregistration is merged to master and a separate activation/reopen is canonical, create a prospective activation artifact from Git metadata only. All three assets share one prospective origin equal to the next whole UTC hour strictly after the activation commit timestamp; the preregistration itself may not start recording.",
     "return_ownership_rule": "Pre-origin closes may initialize MA48/MA192 state only. No pre-origin return or transition cost may enter prospective metrics. A prospective return is owned only when its ending bar timestamp is strictly greater than the prospective origin.",
     "minimum_calendar_days_before_economic_verdict": 180,
     "minimum_genuine_position_state_changes_per_asset_before_economic_verdict": 2,
     "maximum_calendar_days_for_regime_coverage_gate": 365,
     "if_365_days_elapse_and_any_asset_has_fewer_than_two_state_changes": "INCONCLUSIVE_INSUFFICIENT_REGIME_COVERAGE",
     "interim_policy": {
-      "integrity_checks_allowed": true,
-      "signal_and_receipt_recording_allowed": true,
+      "integrity_checks_allowed_after_activation": true,
+      "signal_and_receipt_recording_allowed_after_activation": true,
       "economic_performance_verdict_before_maturity_forbidden": true,
       "parameter_changes_forbidden": true,
       "asset_changes_forbidden": true
@@ -138,9 +148,9 @@
     }
   },
   "combined_adjudication": {
-    "DEFENSIVE_REPLICATION_SUPPORTED": "prospective_panel primary gate passes AND prior_exposed_retrospective_diagnostic hurdle passes; historical diagnostic is supplementary and cannot create this verdict by itself",
-    "FRAGILE_OR_UNPROVEN": "prospective_panel passes but the prior-exposed diagnostic hurdle fails, or prospective regime coverage is inconclusive",
-    "FALSIFIED": "prospective_panel reaches maturity with sufficient regime coverage and fails its primary success gate",
+    "DEFENSIVE_REPLICATION_SUPPORTED": "after separate activation, prospective_panel primary gate passes AND prior_exposed_retrospective_diagnostic hurdle passes; historical diagnostic is supplementary and cannot create this verdict by itself",
+    "FRAGILE_OR_UNPROVEN": "after separate activation, prospective_panel passes but the prior-exposed diagnostic hurdle fails, or prospective regime coverage is inconclusive",
+    "FALSIFIED": "after separate activation, prospective_panel reaches maturity with sufficient regime coverage and fails its primary success gate",
     "BLOCKED_BY_INPUT_OR_INTEGRITY": "any frozen input, provenance, continuity, receipt, implementation, acquisition, or activation identity check fails",
     "downstream_authority_after_any_verdict": "NONE; any Qnty/QntySpot paper or live canary requires a separate explicit authorization"
   },
@@ -148,7 +158,7 @@
     "qntylab_research_only": true,
     "qnty_acceptance": "NONE",
     "qntyspot_policy": "NONE",
-    "execution": "RESEARCH_BACKTEST_AND_PAPER_SHADOW_ONLY",
+    "execution": "PREREGISTRATION_ONLY_NO_TRIAL_OR_SHADOW_EXECUTION",
     "capital": "NONE",
     "signing": "NONE",
     "submission": "NONE"

@@ -61,8 +61,13 @@ jobs:
               raise SystemExit("; ".join(issues))
           state = json.loads((root / "state.json").read_text(encoding="utf-8"))
           variant = state["variants"][event["variant_id"]]
-          assert variant["status"] == "PROPOSED"
+          # Reopen clears the terminal decision. Historical completed trials may
+          # subsequently replay the status from PROPOSED to SCREENING; both are
+          # runnable under the existing ledger contract and do not represent a
+          # new post-reopen trial.
           assert variant["latest_decision_event_id"] is None
+          assert variant["status"] in research_ledger.RUNNABLE_STATUSES
+          assert variant["status"] not in research_ledger.TERMINAL_DECISION_STATUSES
           PY
       - name: Preserve generated canonical ledger files
         uses: actions/upload-artifact@v4

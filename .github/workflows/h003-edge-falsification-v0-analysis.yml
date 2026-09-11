@@ -1,0 +1,44 @@
+name: H003 Edge Falsification V0 Analysis
+
+on:
+  pull_request:
+    paths:
+      - "experiments/research/h003_edge_falsification_v0/analysis.py"
+      - "tests/test_h003_edge_falsification_v0_analysis.py"
+      - "experiments/specs/h003_edge_falsification_v0.json"
+      - "experiments/specs/h003_edge_falsification_v0_analysis_contract.json"
+      - "tests/test_h003_edge_falsification_v0_prereg.py"
+      - ".github/workflows/h003-edge-falsification-v0-analysis.yml"
+  push:
+    branches: [master]
+    paths:
+      - "experiments/research/h003_edge_falsification_v0/analysis.py"
+      - "tests/test_h003_edge_falsification_v0_analysis.py"
+      - "experiments/specs/h003_edge_falsification_v0.json"
+      - "experiments/specs/h003_edge_falsification_v0_analysis_contract.json"
+      - "tests/test_h003_edge_falsification_v0_prereg.py"
+      - ".github/workflows/h003-edge-falsification-v0-analysis.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  analysis-lock:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install focused test dependencies
+        run: python -m pip install numpy pytest
+      - name: Verify preregistration and analysis implementation
+        run: |
+          PYTHONPATH=. python -m pytest -q \
+            tests/test_h003_edge_falsification_v0_prereg.py \
+            tests/test_h003_edge_falsification_v0_analysis.py
+      - name: Verify no whitespace errors
+        run: git diff --check ${{ github.event.pull_request.base.sha || 'HEAD^' }}..HEAD

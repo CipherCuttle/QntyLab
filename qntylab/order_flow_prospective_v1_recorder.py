@@ -16,14 +16,16 @@ restores/verifies those bytes.
 """
 from __future__ import annotations
 
+from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from hashlib import sha256
+import fcntl
 import json
 import os
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any, Iterator, Mapping, Sequence
 
 
 CANDIDATE_ID = "CANDIDATE_ORDER_FLOW_SIGNED_TAKER_QUOTE_IMBALANCE_INCREMENTAL_RETURN_V1"
@@ -40,6 +42,7 @@ LAST_ORIGIN = "2027-01-13T23:00:00Z"
 TERMINAL_TAIL_CLOSE = "2027-01-14T00:00:00Z"
 
 LEDGER_FILENAME = "order_flow_prospective_v1_events.jsonl"
+LOCK_FILENAME = ".order_flow_prospective_v1.lock"
 SCHEMA_VERSION = "1.0.0"
 
 ROW_VALIDITY_RULES = (
@@ -309,12 +312,22 @@ def synthetic_batch(logical_close: str | datetime = FIRST_WARMUP_CLOSE) -> dict[
 
 
 class EvidenceLedger:
-    """Append-only local staging ledger. This is not the durable scientific pointer."""
+    """Append-only locked local staging ledger; never itself the durable scientific pointer."""
 
     def __init__(self, state_dir: Path, *, filename: str = LEDGER_FILENAME):
         self.state_dir = state_dir
         self.state_dir.mkdir(parents=True, exist_ok=True)
         self.path = self.state_dir / filename
+        self.lock_path = self.state_dir / LOCK_FILENAME
+
+    @contextmanager
+    def _exclusive_lock(self) -> Iterator[None]:
+        with self.lock_path.open("a+b") as lock_handle:
+            try:
+                fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX)
+                yield
+            finally:
+                fcntl.flock(lock_handle.fileno(), fcntl.LOCK_UN)
 
     def events(self) -> tuple[dict[str, Any], ...]:
         if not self.path.exists():
@@ -343,7 +356,7 @@ class EvidenceLedger:
             previous = event["event_digest"]
         return tuple(result)
 
-    def _append(self, event_type: str, payload: Mapping[str, Any]) -> dict[str, Any]:
+    def _append_locked(self, event_type: str, payload: Mapping[str, Any]) -> dict[str, Any]:
         events = self.events()
         previous = events[-1]["event_digest"] if events else None
         body = {"event_type": event_type, "previous_event_digest": previous, "payload": dict(payload)}
@@ -389,26 +402,37 @@ class EvidenceLedger:
         if observed >= close + RECORDING_WINDOW:
             raise RecorderBlocked("recording window missed; backfill forbidden")
         normalized = normalize_batch(logical_close=close, rows=rows, observed_at=observed)
-        payload = {
-            "schema_version": SCHEMA_VERSION,
-            "candidate_id": CANDIDATE_ID,
-            "logical_close_utc": stamp(close),
-            "phase": classify_logical_close(close),
-            "observed_at_utc": stamp(observed),
-            "recording_deadline_utc": stamp(close + RECORDING_WINDOW),
-            "backfill": "FORBIDDEN",
-            "durable_scientific_state": "OBSERVED_PENDING_ANCHOR",
-            "rows": [row.as_dict() for row in normalized],
-        }
-        payload["batch_digest"] = digest(payload["rows"])
-        existing = self._event_for_close(payload["logical_close_utc"])
-        if existing is not None:
-            if existing["event_type"] != "OBSERVATION_STAGED":
-                raise RecorderBlocked("logical close was already marked missed; backfill forbidden")
-            if existing["payload"] == payload:
-                return existing
-            raise RecorderBlocked("conflicting second observation for logical close")
-        return self._append("OBSERVATION_STAGED", payload)
+        normalized_rows = [row.as_dict() for row in normalized]
+        batch_digest = digest(normalized_rows)
+        logical_close_utc = stamp(close)
+
+        with self._exclusive_lock():
+            existing = self._event_for_close(logical_close_utc)
+            if existing is not None:
+                if existing["event_type"] != "OBSERVATION_STAGED":
+                    raise RecorderBlocked("logical close was already marked missed; backfill forbidden")
+                if (
+                    existing["payload"].get("batch_digest") == batch_digest
+                    and existing["payload"].get("rows") == normalized_rows
+                ):
+                    return existing
+                raise RecorderBlocked("conflicting second observation for logical close")
+
+            return self._append_locked(
+                "OBSERVATION_STAGED",
+                {
+                    "schema_version": SCHEMA_VERSION,
+                    "candidate_id": CANDIDATE_ID,
+                    "logical_close_utc": logical_close_utc,
+                    "phase": classify_logical_close(close),
+                    "observed_at_utc": stamp(observed),
+                    "recording_deadline_utc": stamp(close + RECORDING_WINDOW),
+                    "backfill": "FORBIDDEN",
+                    "durable_scientific_state": "OBSERVED_PENDING_ANCHOR",
+                    "rows": normalized_rows,
+                    "batch_digest": batch_digest,
+                },
+            )
 
     def mark_missed(self, *, logical_close: str | datetime, detected_at: str | datetime) -> dict[str, Any]:
         close = hour(logical_close)
@@ -417,25 +441,27 @@ class EvidenceLedger:
         if detected < close + RECORDING_WINDOW:
             raise RecorderBlocked("cannot mark recording window missed before its deadline")
         logical_close_utc = stamp(close)
-        existing = self._event_for_close(logical_close_utc)
-        if existing is not None:
-            if existing["event_type"] == "WINDOW_MISSED":
-                return existing
-            raise RecorderBlocked("observation already staged for logical close")
-        return self._append(
-            "WINDOW_MISSED",
-            {
-                "schema_version": SCHEMA_VERSION,
-                "candidate_id": CANDIDATE_ID,
-                "logical_close_utc": logical_close_utc,
-                "phase": classify_logical_close(close),
-                "detected_at_utc": stamp(detected),
-                "recording_deadline_utc": stamp(close + RECORDING_WINDOW),
-                "backfill": "FORBIDDEN",
-                "scientific_validity": "INVALID_MISSING_PROSPECTIVE_OBSERVATION",
-                "economic_verdict": "FORBIDDEN",
-            },
-        )
+
+        with self._exclusive_lock():
+            existing = self._event_for_close(logical_close_utc)
+            if existing is not None:
+                if existing["event_type"] == "WINDOW_MISSED":
+                    return existing
+                raise RecorderBlocked("observation already staged for logical close")
+            return self._append_locked(
+                "WINDOW_MISSED",
+                {
+                    "schema_version": SCHEMA_VERSION,
+                    "candidate_id": CANDIDATE_ID,
+                    "logical_close_utc": logical_close_utc,
+                    "phase": classify_logical_close(close),
+                    "detected_at_utc": stamp(detected),
+                    "recording_deadline_utc": stamp(close + RECORDING_WINDOW),
+                    "backfill": "FORBIDDEN",
+                    "scientific_validity": "INVALID_MISSING_PROSPECTIVE_OBSERVATION",
+                    "economic_verdict": "FORBIDDEN",
+                },
+            )
 
     def ledger_sha256(self) -> str | None:
         if not self.path.exists():

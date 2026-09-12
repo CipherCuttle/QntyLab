@@ -79,6 +79,21 @@ def test_order_flow_v1_warmup_is_prospective_non_evaluated_and_exact() -> None:
     assert warmup["feature_or_outcome_evaluation"] == "FORBIDDEN"
 
 
+def test_order_flow_v1_terminal_outcome_tail_is_exactly_one_non_origin_bar() -> None:
+    doc = _load()
+    tail = doc["terminal_outcome_tail"]
+    last_origin = _stamp(doc["prospective_window"]["last_origin_utc"])
+    outcome_close = _stamp(tail["outcome_logical_close_utc"])
+    assert tail["last_origin_utc"] == "2027-01-13T23:00:00Z"
+    assert tail["outcome_provider_open_time_utc"] == "2027-01-13T23:00:00Z"
+    assert tail["outcome_provider_close_time_utc"] == "2027-01-13T23:59:59.999Z"
+    assert outcome_close - last_origin == timedelta(hours=1)
+    assert tail["outcome_only_completed_bars"] == 1
+    assert tail["creates_candidate_origin"] is False
+    assert tail["extends_origin_schedule"] is False
+    assert tail["replacement_or_extra_outcomes"] == "FORBIDDEN"
+
+
 def test_order_flow_v1_source_and_feature_semantics_are_exact() -> None:
     doc = _load()
     source = doc["source_contract"]

@@ -39,6 +39,9 @@ def test_draft_assets_are_addressed_by_numeric_release_id() -> None:
     assert '"https://api.github.com/repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID"' in text
     assert "-X PATCH" in text
     assert "find_release" in text
+    assert "find_release || true" not in text
+    assert 'if [ "$FIND_STATUS" -eq 1 ]; then' in text
+    assert "Qualification release lookup failed with status" in text
 
 
 def test_qualification_proves_anchor_restore_and_immutability() -> None:

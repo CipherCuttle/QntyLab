@@ -37,6 +37,8 @@ The evaluated collection window is exactly `2026-09-16T00:00:00Z` through `2027-
 
 A source/control-only prospective warmup precedes it. The exact warmup logical-close grid is `2026-09-15T00:00:00Z` through `2026-09-15T23:00:00Z`, 24 completed bars. Warmup observations are not candidate origins, have no outcome labels, and may not be evaluated or used to alter the model. They exist only so the first frozen origin can compute `r24` and `rv24` without historical backfill.
 
+The final origin at `2027-01-13T23:00:00Z` owns exactly one outcome candle `[2027-01-13T23:00:00Z, 2027-01-14T00:00:00Z)`. Its completed outcome is therefore collected through logical close `2027-01-14T00:00:00Z`. This one-candle terminal tail is **outcome-only**: it creates no additional origin and does not extend the 2880-origin schedule.
+
 No historical V0 outcome may be used to alter this design. No backfill, replacement origins, source substitution, parameter change, symbol change, interim p-value, interim edge verdict, strategy translation, Router authority, Qnty authority, or trading authority is granted. If warmup history is missing, the origin schedule does not move: affected origins remain invalid until the exact prospectively collected 24-return history exists.
 
 ## Source semantics
@@ -75,6 +77,6 @@ The concentration guard uses Frisch-Waugh-Lovell residuals of both the feature a
 
 ## Decision rule
 
-This phase performs no market-data access and no scientific execution. After the 120-day evaluated collection is complete, a separately authorized terminal evaluator may run the frozen pooled model and diagnostic per-symbol slopes.
+This phase performs no market-data access and no scientific execution. After the 120-day evaluated collection plus the single final outcome tail are complete, a separately authorized terminal evaluator may run the frozen pooled model and diagnostic per-symbol slopes.
 
 Support requires every gate in `preregistration.json`; otherwise the candidate fails or is inconclusive for integrity reasons. A supported result establishes only incremental predictive information within the frozen prospective scope. It does not itself establish a profitable executable strategy.

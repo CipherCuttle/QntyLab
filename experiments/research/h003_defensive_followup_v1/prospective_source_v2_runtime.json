@@ -1,13 +1,16 @@
 {
   "schema_version": "1.0.0",
   "project_id": "H003_PROSPECTIVE_SOURCE_V2_RUNTIME_BINDING",
-  "state": "ACTIVE",
+  "state": "CLOSED_BLOCKED",
   "activation_artifact_path": "experiments/research/h003_defensive_followup_v1/prospective_source_v2_activation.json",
+  "closure_artifact_path": "experiments/research/h003_defensive_followup_v1/prospective_v2_closure.json",
+  "terminal_ledger_path": "experiments/research/h003_defensive_followup_v1/prospective_v2_terminal_ledger.jsonl",
   "source_qualification_merge_sha": "1827bb3e753970aed0cfbd0adc27bba121b41d5d",
   "source_implementation_sha256": "74e1906f1bb54123ff77347629d5da6bafcd400b9a979d6d5526bbc6ccf08633",
   "workflow_path": ".github/workflows/h003-prospective-operation-v2.yml",
-  "workflow_sha256": "bbf881c9daec8c2cfffa8431964d26e5389f0bf1e7fbc990d3f19d39166b7d45",
-  "schedule_utc": "7,22,37,52 * * * *",
+  "workflow_sha256": "b74bf918944f4e50278a31ed0cf2603c9424806b2d25d8f5d502df245caf6d61",
+  "schedule_utc": null,
+  "scheduler_active": false,
   "python_version": "3.12.14",
   "numpy_version": "2.5.3",
   "checkout_action_sha": "11d5960a326750d5838078e36cf38b85af677262",
@@ -18,8 +21,10 @@
   "release_asset": "h003_prospective_v2_events.jsonl",
   "persistence": "GITHUB_IMMUTABLE_RELEASE_HASH_CHAIN_V1",
   "immutable_release_required": true,
-  "write_authority": "PERSIST_JOB_ONLY",
+  "write_authority": "NONE_CLOSED",
   "force_push": "FORBIDDEN",
+  "backfill": "FORBIDDEN",
   "economic_verdict": "FORBIDDEN",
-  "downstream_authority": "NONE"
+  "downstream_authority": "NONE",
+  "successor_requires_new_future_origin": true
 }

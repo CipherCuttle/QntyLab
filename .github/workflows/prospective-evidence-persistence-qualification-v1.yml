@@ -104,7 +104,18 @@ jobs:
             return 2
           }
 
-          RELEASE_JSON="$(find_release || true)"
+          if RELEASE_JSON="$(find_release)"; then
+            :
+          else
+            FIND_STATUS=$?
+            if [ "$FIND_STATUS" -eq 1 ]; then
+              RELEASE_JSON=""
+            else
+              echo "Qualification release lookup failed with status $FIND_STATUS" >&2
+              exit "$FIND_STATUS"
+            fi
+          fi
+
           if [ -z "$RELEASE_JSON" ]; then
             CREATE_BODY="$(jq -cn \
               --arg tag "$RELEASE_TAG" \

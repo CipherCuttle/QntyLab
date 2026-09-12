@@ -1,0 +1,48 @@
+name: JFPV3 R3 Transport Repair
+
+on:
+  pull_request:
+    paths:
+      - "qntylab/jfp_v3_shadow.py"
+      - "qntylab/jfp_v3_shadow_r3.py"
+      - "tests/test_jfp_v3_shadow.py"
+      - "tests/test_jfp_v3_shadow_r3.py"
+      - "experiments/research/jigsaw_fast_prospective_signal_discovery_v3/collector_v0r3/**"
+      - ".github/workflows/jfpv3-r3-transport-repair.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-r3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.12.14"
+      - name: Install frozen test runner
+        run: python -m pip install --disable-pip-version-check "pytest==8.4.2"
+      - name: Verify R3 manifest file digests
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          root = Path.cwd()
+          manifest_path = root / "experiments/research/jigsaw_fast_prospective_signal_discovery_v3/collector_v0r3/implementation_manifest.json"
+          manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+          for relative, expected in manifest["files"].items():
+              actual = hashlib.sha256((root / relative).read_bytes()).hexdigest()
+              if actual != expected:
+                  raise SystemExit(f"R3 manifest mismatch: {relative}: {actual} != {expected}")
+          print("R3 manifest file digests: PASS")
+          PY
+      - name: Run frozen R2 and repaired R3 tests
+        run: python -m pytest -q tests/test_jfp_v3_shadow.py tests/test_jfp_v3_shadow_r3.py

@@ -56,6 +56,17 @@
     "replacement_origins": "FORBIDDEN",
     "window_extension": "FORBIDDEN"
   },
+  "terminal_outcome_tail": {
+    "purpose": "Collect the one and only outcome candle owned by the final scheduled origin; this is not an additional origin or schedule extension.",
+    "last_origin_utc": "2027-01-13T23:00:00Z",
+    "outcome_provider_open_time_utc": "2027-01-13T23:00:00Z",
+    "outcome_provider_close_time_utc": "2027-01-13T23:59:59.999Z",
+    "outcome_logical_close_utc": "2027-01-14T00:00:00Z",
+    "outcome_only_completed_bars": 1,
+    "creates_candidate_origin": false,
+    "extends_origin_schedule": false,
+    "replacement_or_extra_outcomes": "FORBIDDEN"
+  },
   "feature_contract": {
     "name": "signed_taker_quote_imbalance",
     "formula": "(2 * taker_buy_quote_asset_volume_t - quote_asset_volume_t) / quote_asset_volume_t",

@@ -132,6 +132,24 @@
     "failed_label": "ORDER_FLOW_INCREMENTAL_RETURN_INFORMATION_NOT_SUPPORTED_WITHIN_FROZEN_PROSPECTIVE_SCOPE",
     "integrity_failure_label": "INCONCLUSIVE_PROSPECTIVE_INTEGRITY_FAILURE"
   },
+  "terminal_decision_contract": {
+    "decision_order": "Evaluate integrity preconditions before any scientific support condition. Integrity failure has precedence and must not be relabeled as scientific non-support.",
+    "integrity_preconditions": [
+      "each frozen symbol has at least 2592 valid origins (90% of 2880 scheduled origins)",
+      "every row counted as valid satisfies the frozen source/timestamp/feature/control/outcome ownership contracts with no backfill, source substitution, replacement origin or window extension",
+      "all required pooled and symbol-specific model inputs and estimates are finite and the required design matrices are full column rank",
+      "the terminal outcome tail needed by every row counted as valid is complete under the frozen ownership contract"
+    ],
+    "integrity_failure_action": "If any integrity precondition fails, emit INCONCLUSIVE_PROSPECTIVE_INTEGRITY_FAILURE, do not emit the failed_label, and do not interpret the result as evidence against the scientific claim.",
+    "scientific_support_conditions_after_integrity_pass": [
+      "primary pooled beta_signed_taker_quote_imbalance > 0",
+      "two-sided frozen time-clustered HAC p-value <= 0.01",
+      "at least 4 of 5 frozen symbol-specific diagnostic imbalance slopes are > 0",
+      "maximum frozen residualized concentration share across symbols <= 0.35"
+    ],
+    "scientific_failure_action": "Only after all integrity preconditions pass: if every scientific support condition passes emit supported_label; otherwise emit failed_label.",
+    "recorder_validity_freeze_deadline": "Before the first real warmup logical close at 2026-09-15T00:00:00Z, the separate recorder qualification phase must freeze exhaustive machine-checkable row-validity rules implementing only the already-frozen source/timestamp/feature/control/outcome contracts. After that boundary those validity rules may not change and may not add discretionary magnitude-based filtering."
+  },
   "firewall": {
     "historical_candidate_v0_outcomes_may_not_be_used": true,
     "warmup_values_may_not_be_used_for_model_changes": true,

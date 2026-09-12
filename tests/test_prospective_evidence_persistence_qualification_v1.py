@@ -52,6 +52,9 @@ def test_qualification_proves_anchor_restore_and_immutability() -> None:
     assert "releases/assets/$ASSET_ID" in text
     assert "-X DELETE" in text
     assert "Immutable qualification asset was unexpectedly deletable" in text
+    assert "Cannot delete asset from an immutable release" in text
+    assert "Asset delete failed for a non-policy reason" in text
+    assert "RELEASE_JSON=\"$(api_get \"https://api.github.com/repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID\")\"" in text
     assert "cmp \"$EXPECTED\" \"$RESTORED\"" in text
     assert "Independent restore matched exact synthetic bytes" in text
 

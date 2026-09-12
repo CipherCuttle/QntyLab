@@ -23,21 +23,35 @@
       "open_time": 0,
       "open": 1,
       "close": 4,
-      "close_time": 6,
+      "provider_close_time": 6,
       "quote_asset_volume": 7,
       "taker_buy_quote_asset_volume": 10
     },
-    "bar_identity": "Provider kline open time identifies the one-hour candle; only fully completed candles are admissible.",
+    "bar_identity": "Provider kline open time identifies the one-hour candle. Scientific logical close boundary C maps to provider open_time = C - 1h and provider close_time = C - 1ms. Logical origin timestamps are derived from open_time + 1h, not copied from provider close_time.",
+    "logical_close_to_provider_query": "For an inclusive logical close range [A,B], request provider kline open times from A-1h through B-1h inclusive.",
+    "completed_bar_gate": "A bar is admissible only after its provider close_time has elapsed and the response open_time exactly matches the expected logical-close-minus-1h identity.",
     "source_substitution_authorized": false,
     "historical_archive_materialization_authorized": false,
-    "alternative_exchange_authorized": false
+    "alternative_exchange_authorized": false,
+    "alternative_taker_volume_endpoint_authorized": false
+  },
+  "warmup_contract": {
+    "purpose": "Prospective source/control warmup only; not candidate origins and not scientific outcomes.",
+    "first_warmup_logical_close_utc": "2026-09-15T00:00:00Z",
+    "last_warmup_logical_close_utc": "2026-09-15T23:00:00Z",
+    "warmup_completed_bars": 24,
+    "provider_open_time_range_utc": "2026-09-14T23:00:00Z..2026-09-15T22:00:00Z",
+    "prospective_collection_only": true,
+    "backfill": "FORBIDDEN",
+    "feature_or_outcome_evaluation": "FORBIDDEN",
+    "missing_warmup_rule": "Do not shift or replace scheduled origins. Any origin lacking the exact 24 completed control returns is invalid until sufficient prospectively collected contiguous history exists."
   },
   "prospective_window": {
     "first_origin_utc": "2026-09-16T00:00:00Z",
     "last_origin_utc": "2027-01-13T23:00:00Z",
     "scheduled_hours": 2880,
     "calendar_days": 120,
-    "origin_definition": "Each origin t is the close of a completed 1h candle. Features use information available no later than that close; the outcome is the immediately following completed-hour return.",
+    "origin_definition": "Each origin C is the logical close boundary of one completed 1h source candle whose provider open_time is C-1h. Features use information available no later than that completed candle; the outcome is the immediately following completed-hour return.",
     "backfill": "FORBIDDEN",
     "replacement_origins": "FORBIDDEN",
     "window_extension": "FORBIDDEN"
@@ -52,14 +66,16 @@
     "normalization": "NONE_BEYOND_QUOTE_VOLUME_RATIO"
   },
   "control_contract": {
-    "r1_t": "log(close_t / open_t)",
-    "r24_t": "log(close_t / close_{t-24}) using only completed bars through t",
-    "rv24_t": "sqrt(sum of squared hourly log close-to-close returns over the 24 completed returns ending at t))"
+    "r1_t": "log(close_t / open_t) on the completed source candle ending at logical origin C",
+    "r24_t": "log(close_t / close_{t-24}) using the close at C and the close exactly 24 completed hourly bars earlier",
+    "rv24_t": "sqrt(sum of squared hourly log close-to-close returns over the 24 completed returns ending at logical origin C))",
+    "first_origin_history_requirement": "The first origin at 2026-09-16T00:00:00Z requires close observations at hourly logical boundaries from 2026-09-15T00:00:00Z through 2026-09-16T00:00:00Z inclusive; the first 24 boundaries are supplied by prospective warmup plus the first evaluated source candle close."
   },
   "outcome_contract": {
     "name": "next_hour_return",
     "formula": "log(close_{t+1} / open_{t+1})",
-    "outcome_available_only_after": "close of t+1 candle",
+    "outcome_candle_identity": "For logical origin C, outcome candle provider open_time = C and logical close boundary = C+1h.",
+    "outcome_available_only_after": "provider close_time for the C..C+1h candle has elapsed",
     "overlap_policy": "Hourly outcomes may be adjacent but each origin owns exactly one next-hour candle once."
   },
   "primary_model": {
@@ -85,6 +101,7 @@
   },
   "firewall": {
     "historical_candidate_v0_outcomes_may_not_be_used": true,
+    "warmup_values_may_not_be_used_for_model_changes": true,
     "pre_origin_real_v1_feature_values_may_not_be_inspected_for_model_changes": true,
     "interim_scientific_evaluation": false,
     "interim_p_values": false,
@@ -106,5 +123,5 @@
     "trading_authorized": false,
     "capital_authority": "NONE"
   },
-  "next_action": "Independent hostile review of this outcome-blind preregistration. If canonicalized cleanly, create a separate implementation/recorder qualification phase before 2026-09-16T00:00:00Z. Do not access real prospective observations in this preregistration phase."
+  "next_action": "Independent hostile review of this outcome-blind preregistration. If canonicalized cleanly, create a separate implementation/recorder qualification phase early enough to begin the exact prospective control warmup at 2026-09-15T00:00:00Z. Do not access real prospective observations in this preregistration phase."
 }

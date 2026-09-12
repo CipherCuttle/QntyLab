@@ -1,0 +1,275 @@
+name: Prospective Evidence Persistence Qualification V1
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  QUAL_ASSET_NAME: prospective_persistence_fixture.json
+  QUAL_RELEASE_PREFIX: prospective-persistence-qualification-v1-
+
+jobs:
+  stage:
+    name: stage synthetic fixture
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    outputs:
+      fixture_sha256: ${{ steps.fixture.outputs.fixture_sha256 }}
+    steps:
+      - name: Create known non-scientific fixture
+        id: fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/qualification-artifact"
+          cat > "$RUNNER_TEMP/qualification-artifact/$QUAL_ASSET_NAME" <<'JSON'
+          {"schema":"PROSPECTIVE_EVIDENCE_PERSISTENCE_QUALIFICATION_V1","authority":"NONE","scientific_evidence":false,"payload":"synthetic-known-bytes-v1"}
+          JSON
+          FIXTURE_SHA256="$(sha256sum "$RUNNER_TEMP/qualification-artifact/$QUAL_ASSET_NAME" | awk '{print $1}')"
+          test "${#FIXTURE_SHA256}" -eq 64
+          echo "fixture_sha256=$FIXTURE_SHA256" >> "$GITHUB_OUTPUT"
+
+      - name: Stage fixture without repository write authority
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: prospective-persistence-qualification-${{ github.run_id }}
+          path: ${{ runner.temp }}/qualification-artifact/${{ env.QUAL_ASSET_NAME }}
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
+
+  persist:
+    name: anchor by numeric release id
+    needs: stage
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    outputs:
+      release_id: ${{ steps.anchor.outputs.release_id }}
+      asset_id: ${{ steps.anchor.outputs.asset_id }}
+    env:
+      EXPECTED_SHA256: ${{ needs.stage.outputs.fixture_sha256 }}
+      RELEASE_TAG: prospective-persistence-qualification-v1-${{ github.run_id }}
+    steps:
+      - name: Download staged fixture without repository checkout
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: prospective-persistence-qualification-${{ github.run_id }}
+          path: ${{ runner.temp }}/qualification-input
+
+      - name: Verify staged fixture digest
+        shell: bash
+        run: |
+          set -euo pipefail
+          FIXTURE="$RUNNER_TEMP/qualification-input/$QUAL_ASSET_NAME"
+          test -f "$FIXTURE"
+          ACTUAL_SHA256="$(sha256sum "$FIXTURE" | awk '{print $1}')"
+          test "$ACTUAL_SHA256" = "$EXPECTED_SHA256"
+
+      - name: Create or resume draft, upload by numeric id, and publish immutable release
+        id: anchor
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          FIXTURE="$RUNNER_TEMP/qualification-input/$QUAL_ASSET_NAME"
+
+          api_get() {
+            curl --fail-with-body --silent --show-error \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "$1"
+          }
+
+          find_release() {
+            local page page_json match count
+            for page in $(seq 1 50); do
+              page_json="$(api_get "https://api.github.com/repos/$GITHUB_REPOSITORY/releases?per_page=100&page=$page")"
+              match="$(printf '%s' "$page_json" | jq -c --arg tag "$RELEASE_TAG" '[.[] | select(.tag_name == $tag)][0] // empty')"
+              if [ -n "$match" ]; then
+                printf '%s' "$match"
+                return 0
+              fi
+              count="$(printf '%s' "$page_json" | jq 'length')"
+              if [ "$count" -lt 100 ]; then
+                return 1
+              fi
+            done
+            echo "Release scan exceeded bounded search" >&2
+            return 2
+          }
+
+          if RELEASE_JSON="$(find_release)"; then
+            :
+          else
+            FIND_STATUS=$?
+            if [ "$FIND_STATUS" -eq 1 ]; then
+              RELEASE_JSON=""
+            else
+              echo "Qualification release lookup failed with status $FIND_STATUS" >&2
+              exit "$FIND_STATUS"
+            fi
+          fi
+
+          if [ -z "$RELEASE_JSON" ]; then
+            CREATE_BODY="$(jq -cn \
+              --arg tag "$RELEASE_TAG" \
+              --arg target "$GITHUB_SHA" \
+              '{tag_name:$tag,target_commitish:$target,name:$tag,body:"Synthetic persistence qualification only. Not scientific evidence and grants no downstream authority.",draft:true,prerelease:true}')"
+            RELEASE_JSON="$(curl --fail-with-body --silent --show-error \
+              -X POST \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              -H "Content-Type: application/json" \
+              -d "$CREATE_BODY" \
+              "https://api.github.com/repos/$GITHUB_REPOSITORY/releases")"
+          fi
+
+          RELEASE_ID="$(printf '%s' "$RELEASE_JSON" | jq -r '.id')"
+          test "$RELEASE_ID" != "null"
+          test "$(printf '%s' "$RELEASE_JSON" | jq -r '.tag_name')" = "$RELEASE_TAG"
+
+          DRAFT="$(printf '%s' "$RELEASE_JSON" | jq -r '.draft')"
+          IMMUTABLE="$(printf '%s' "$RELEASE_JSON" | jq -r '.immutable')"
+
+          if [ "$IMMUTABLE" = "true" ]; then
+            test "$DRAFT" = "false"
+          elif [ "$DRAFT" = "true" ]; then
+            TOTAL_ASSET_COUNT="$(printf '%s' "$RELEASE_JSON" | jq '.assets | length')"
+            EXPECTED_ASSET_COUNT="$(printf '%s' "$RELEASE_JSON" | jq --arg name "$QUAL_ASSET_NAME" '[.assets[] | select(.name == $name)] | length')"
+            if [ "$TOTAL_ASSET_COUNT" -eq 0 ]; then
+              UPLOAD_JSON="$(curl --fail-with-body --silent --show-error \
+                -X POST \
+                -H "Authorization: Bearer $GH_TOKEN" \
+                -H "Accept: application/vnd.github+json" \
+                -H "X-GitHub-Api-Version: 2022-11-28" \
+                -H "Content-Type: application/octet-stream" \
+                --data-binary "@$FIXTURE" \
+                "https://uploads.github.com/repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID/assets?name=$QUAL_ASSET_NAME")"
+              test "$(printf '%s' "$UPLOAD_JSON" | jq -r '.name')" = "$QUAL_ASSET_NAME"
+              test "$(printf '%s' "$UPLOAD_JSON" | jq -r '.digest')" = "sha256:$EXPECTED_SHA256"
+            elif [ "$TOTAL_ASSET_COUNT" -eq 1 ] && [ "$EXPECTED_ASSET_COUNT" -eq 1 ]; then
+              EXISTING_DIGEST="$(printf '%s' "$RELEASE_JSON" | jq -r --arg name "$QUAL_ASSET_NAME" '.assets[] | select(.name == $name) | .digest')"
+              test "$EXISTING_DIGEST" = "sha256:$EXPECTED_SHA256"
+            else
+              echo "Draft qualification release has unexpected assets" >&2
+              exit 1
+            fi
+
+            RELEASE_JSON="$(api_get "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID")"
+            test "$(printf '%s' "$RELEASE_JSON" | jq -r --arg name "$QUAL_ASSET_NAME" '.assets[] | select(.name == $name) | .digest')" = "sha256:$EXPECTED_SHA256"
+
+            curl --fail-with-body --silent --show-error \
+              -X PATCH \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              -H "Content-Type: application/json" \
+              -d '{"draft":false,"prerelease":true}' \
+              "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" \
+              >/dev/null
+
+            for attempt in $(seq 1 10); do
+              RELEASE_JSON="$(api_get "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID")"
+              if [ "$(printf '%s' "$RELEASE_JSON" | jq -r '.draft')" = "false" ] \
+                && [ "$(printf '%s' "$RELEASE_JSON" | jq -r '.immutable')" = "true" ]; then
+                break
+              fi
+              if [ "$attempt" -eq 10 ]; then
+                echo "Published qualification release did not become immutable" >&2
+                exit 1
+              fi
+              sleep 2
+            done
+          else
+            echo "Existing qualification release is neither a draft nor immutable" >&2
+            exit 1
+          fi
+
+          test "$(printf '%s' "$RELEASE_JSON" | jq -r '.draft')" = "false"
+          test "$(printf '%s' "$RELEASE_JSON" | jq -r '.immutable')" = "true"
+          test "$(printf '%s' "$RELEASE_JSON" | jq -r '.tag_name')" = "$RELEASE_TAG"
+          test "$(printf '%s' "$RELEASE_JSON" | jq '.assets | length')" -eq 1
+          test "$(printf '%s' "$RELEASE_JSON" | jq -r --arg name "$QUAL_ASSET_NAME" '.assets[] | select(.name == $name) | .digest')" = "sha256:$EXPECTED_SHA256"
+
+          ASSET_ID="$(printf '%s' "$RELEASE_JSON" | jq -r --arg name "$QUAL_ASSET_NAME" '.assets[] | select(.name == $name) | .id')"
+          test "$ASSET_ID" != "null"
+
+          DELETE_RESPONSE="$RUNNER_TEMP/immutable-delete-response"
+          DELETE_STATUS="$(curl --silent --show-error \
+            -o "$DELETE_RESPONSE" \
+            -w '%{http_code}' \
+            -X DELETE \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/assets/$ASSET_ID")"
+          case "$DELETE_STATUS" in
+            2*)
+              echo "Immutable qualification asset was unexpectedly deletable" >&2
+              exit 1
+              ;;
+            4*)
+              ;;
+            *)
+              echo "Asset delete failed for a non-policy reason (HTTP $DELETE_STATUS)" >&2
+              cat "$DELETE_RESPONSE" >&2
+              exit 1
+              ;;
+          esac
+          test "$(jq -r '[.errors[]?.message] | any(. == "Cannot delete asset from an immutable release")' "$DELETE_RESPONSE")" = "true"
+
+          RELEASE_JSON="$(api_get "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID")"
+          test "$(printf '%s' "$RELEASE_JSON" | jq -r '.immutable')" = "true"
+          test "$(printf '%s' "$RELEASE_JSON" | jq '.assets | length')" -eq 1
+          test "$(printf '%s' "$RELEASE_JSON" | jq -r --arg name "$QUAL_ASSET_NAME" '.assets[] | select(.name == $name) | .id')" = "$ASSET_ID"
+          test "$(printf '%s' "$RELEASE_JSON" | jq -r --arg name "$QUAL_ASSET_NAME" '.assets[] | select(.name == $name) | .digest')" = "sha256:$EXPECTED_SHA256"
+
+          echo "release_id=$RELEASE_ID" >> "$GITHUB_OUTPUT"
+          echo "asset_id=$ASSET_ID" >> "$GITHUB_OUTPUT"
+          echo "Immutable synthetic fixture anchored at $RELEASE_TAG (sha256:$EXPECTED_SHA256)"
+
+  restore:
+    name: independently restore exact bytes
+    needs: [stage, persist]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    env:
+      EXPECTED_SHA256: ${{ needs.stage.outputs.fixture_sha256 }}
+      RELEASE_ID: ${{ needs.persist.outputs.release_id }}
+      ASSET_ID: ${{ needs.persist.outputs.asset_id }}
+    steps:
+      - name: Download immutable asset by numeric id and compare exact bytes
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test -n "$RELEASE_ID"
+          test -n "$ASSET_ID"
+
+          RESTORED="$RUNNER_TEMP/restored-$QUAL_ASSET_NAME"
+          EXPECTED="$RUNNER_TEMP/expected-$QUAL_ASSET_NAME"
+
+          curl --fail-with-body --silent --show-error --location \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/octet-stream" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/assets/$ASSET_ID" \
+            -o "$RESTORED"
+
+          cat > "$EXPECTED" <<'JSON'
+          {"schema":"PROSPECTIVE_EVIDENCE_PERSISTENCE_QUALIFICATION_V1","authority":"NONE","scientific_evidence":false,"payload":"synthetic-known-bytes-v1"}
+          JSON
+
+          ACTUAL_SHA256="$(sha256sum "$RESTORED" | awk '{print $1}')"
+          test "$ACTUAL_SHA256" = "$EXPECTED_SHA256"
+          cmp "$EXPECTED" "$RESTORED"
+          echo "Independent restore matched exact synthetic bytes (sha256:$ACTUAL_SHA256)"

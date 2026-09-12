@@ -8,12 +8,12 @@ Historical V0 was blocked by frozen source/lifecycle coverage and was correctly 
 
 ## Mechanism
 
-For completed one-hour candle `t`, define:
+For the completed one-hour candle ending at logical close boundary `C`, define:
 
 ```text
-signed_taker_quote_imbalance_t =
-    (2 * taker_buy_quote_asset_volume_t - quote_asset_volume_t)
-    / quote_asset_volume_t
+signed_taker_quote_imbalance_C =
+    (2 * taker_buy_quote_asset_volume_C - quote_asset_volume_C)
+    / quote_asset_volume_C
 ```
 
 The value is positive when aggressive buyer quote notional dominates and negative when aggressive seller quote notional dominates.
@@ -33,18 +33,38 @@ The feature family, horizon, and outcome are therefore structurally different fr
 
 The frozen panel is `BTCUSDT`, `ETHUSDT`, `SOLUSDT`, `BNBUSDT`, `XRPUSDT` on Binance USD-M perpetual futures.
 
-The collection window is exactly `2026-09-16T00:00:00Z` through `2027-01-13T23:00:00Z` (2880 hourly origins / 120 calendar days).
+The evaluated collection window is exactly `2026-09-16T00:00:00Z` through `2027-01-13T23:00:00Z` (2880 hourly origins / 120 calendar days).
 
-No historical V0 outcome may be used to alter this design. No backfill, replacement origins, source substitution, parameter change, symbol change, interim p-value, interim edge verdict, strategy translation, Router authority, Qnty authority, or trading authority is granted.
+A source/control-only prospective warmup precedes it. The exact warmup logical-close grid is `2026-09-15T00:00:00Z` through `2026-09-15T23:00:00Z`, 24 completed bars. Warmup observations are not candidate origins, have no outcome labels, and may not be evaluated or used to alter the model. They exist only so the first frozen origin can compute `r24` and `rv24` without historical backfill.
+
+No historical V0 outcome may be used to alter this design. No backfill, replacement origins, source substitution, parameter change, symbol change, interim p-value, interim edge verdict, strategy translation, Router authority, Qnty authority, or trading authority is granted. If warmup history is missing, the origin schedule does not move: affected origins remain invalid until the exact prospectively collected 24-return history exists.
 
 ## Source semantics
 
-The intended provider is Binance first-party USD-M Futures `GET /fapi/v1/klines`, interval `1h`. The contract consumes the provider's completed-candle fields for open time, open, close, close time, quote asset volume, and taker-buy quote asset volume.
+The intended provider is Binance first-party USD-M Futures `GET /fapi/v1/klines`, interval `1h`. The contract consumes the provider's completed-candle fields for open time, open, close, provider close time, quote asset volume, and taker-buy quote asset volume.
 
-The provider identifies klines by candle open time. Any later recorder must therefore bind logical origin/close semantics explicitly and must not repeat the close-time/open-time translation defect discovered in the unrelated JFPV3 R2 transport.
+Binance identifies a kline by **open time**. Our scientific clock is the exact hourly **logical close boundary**. Therefore:
+
+```text
+provider open_time = logical close boundary - 1 hour
+provider close_time = logical close boundary - 1 millisecond
+logical close boundary = provider open_time + 1 hour
+```
+
+For an inclusive logical close range `[A, B]`, the provider query must request kline open times `[A-1h, B-1h]`. The provider `close_time` field is a completion/integrity check; it is not copied as the scientific origin timestamp.
+
+This binding is frozen specifically so a later recorder cannot repeat the close-time/open-time translation defect discovered in the unrelated JFPV3 R2 transport.
+
+## Control timing
+
+At origin `C`, the source/feature candle is the completed hour `[C-1h, C)`. `r24` compares the close at `C` with the close exactly 24 hourly bars earlier. `rv24` uses the 24 completed close-to-close returns ending at `C`.
+
+Thus the first evaluated origin, `2026-09-16T00:00:00Z`, requires hourly logical-close observations from `2026-09-15T00:00:00Z` through `2026-09-16T00:00:00Z` inclusive: 24 warmup closes plus the first evaluated source-candle close.
+
+For origin `C`, the outcome candle is `[C, C+1h)`: provider open time `C`, logical close boundary `C+1h`. Its outcome cannot exist until that provider candle is complete.
 
 ## Decision rule
 
-This phase performs no scientific execution. After the 120-day collection is complete, a separately authorized terminal evaluator may run the frozen pooled model and diagnostic per-symbol slopes.
+This phase performs no market-data access and no scientific execution. After the 120-day evaluated collection is complete, a separately authorized terminal evaluator may run the frozen pooled model and diagnostic per-symbol slopes.
 
 Support requires every gate in `preregistration.json`; otherwise the candidate fails or is inconclusive for integrity reasons. A supported result establishes only incremental predictive information within the frozen prospective scope. It does not itself establish a profitable executable strategy.

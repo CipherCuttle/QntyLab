@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from datetime import UTC, datetime, timedelta
 
+import pytest
+
 from qntylab import jfp_v3_shadow as r2
 from qntylab import jfp_v3_shadow_r3 as r3
 
@@ -96,9 +98,31 @@ def test_r2_frozen_transport_demonstrates_the_shift_that_r3_repairs():
 
 def test_r3_manifest_binds_new_identity_without_mutating_r2():
     identity = r3.implementation_identity()
-    assert identity["implementation_digest"] == "07132f8f75596da62c237235a79b5f5492a2ba62fd1817d2e3f5a0f7ba488555"
+    assert identity["implementation_digest"] == "93002eb46171dde797a4e497e74184f028d2d0cdc40c3989df44a72886a23612"
     assert r3.R2_CANONICAL_MERGE == "bc4f3a327f23d057da1ad970e9eeb7ed2fe10c91"
     assert r3.R2_IMPLEMENTATION_DIGEST == "3f80bcd2dd60aaae6e1307883cca2e996f631f7bbc3b76037eafef8450167e2b"
+
+
+def test_r3_activation_fails_closed_without_canonical_r2_ancestry(tmp_path, monkeypatch):
+    ledger = r2.ReceiptLedger(tmp_path / "events.jsonl")
+    canonical_sha = "f" * 40
+    monkeypatch.setattr(
+        r2,
+        "resolve_runtime_canonical_state",
+        lambda *_args, **_kwargs: {
+            "canonical": True,
+            "head_sha": canonical_sha,
+            "origin_master_sha": canonical_sha,
+            "worktree_clean": True,
+            "lineage": {},
+        },
+    )
+    monkeypatch.setattr(r2, "is_ancestor", lambda *_args, **_kwargs: False)
+
+    with pytest.raises(r2.ContractError, match="canonical R2 ancestry"):
+        r3.activate_shadow_runtime(ledger, repo_root=tmp_path, now=ORIGIN)
+
+    assert not ledger.path.exists()
 
 
 def test_r3_repair_is_inert_until_explicit_activation_or_collection():

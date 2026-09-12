@@ -1,0 +1,110 @@
+{
+  "artifact_type": "QNTY_EDGE_ORDER_FLOW_PROSPECTIVE_V1_PREREGISTRATION",
+  "schema_version": "qnty-edge-order-flow-prospective-v1",
+  "project_id": "QNTY_EDGE_ORDER_FLOW_PROSPECTIVE_V1_PREREGISTRATION",
+  "candidate_id": "CANDIDATE_ORDER_FLOW_SIGNED_TAKER_QUOTE_IMBALANCE_INCREMENTAL_RETURN_V1",
+  "phase_type": "OUTCOME_BLIND_PREREGISTRATION_ONLY",
+  "parent_historical_candidate": "CANDIDATE_ORDER_FLOW_SIGNED_TAKER_NOTIONAL_V0",
+  "parent_historical_disposition": "CLOSED_BLOCKED_GRAVEYARDED_NO_RESCUE",
+  "new_candidate_identity": true,
+  "historical_v0_reopened": false,
+  "scientific_claim": "Completed-hour normalized signed aggressive taker quote imbalance contains incremental information about the next completed-hour return beyond recent return and realized-volatility controls.",
+  "claim_boundary": "Predictive association / incremental forecast information only. No causal order-flow claim, strategy edge, Router, Qnty, trading, capital, signing, or promotion authority.",
+  "mechanism": "Aggressive buyers and sellers reveal short-lived demand pressure that may persist into the immediately following hour after controlling for recent price movement and volatility state.",
+  "venue": "Binance USD-M perpetual futures",
+  "bar_interval": "1h",
+  "fixed_symbols": ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT"],
+  "source_contract": {
+    "provider": "Binance first-party USD-M Futures REST",
+    "endpoint": "/fapi/v1/klines",
+    "endpoint_base": "https://fapi.binance.com",
+    "interval": "1h",
+    "required_fields": {
+      "open_time": 0,
+      "open": 1,
+      "close": 4,
+      "close_time": 6,
+      "quote_asset_volume": 7,
+      "taker_buy_quote_asset_volume": 10
+    },
+    "bar_identity": "Provider kline open time identifies the one-hour candle; only fully completed candles are admissible.",
+    "source_substitution_authorized": false,
+    "historical_archive_materialization_authorized": false,
+    "alternative_exchange_authorized": false
+  },
+  "prospective_window": {
+    "first_origin_utc": "2026-09-16T00:00:00Z",
+    "last_origin_utc": "2027-01-13T23:00:00Z",
+    "scheduled_hours": 2880,
+    "calendar_days": 120,
+    "origin_definition": "Each origin t is the close of a completed 1h candle. Features use information available no later than that close; the outcome is the immediately following completed-hour return.",
+    "backfill": "FORBIDDEN",
+    "replacement_origins": "FORBIDDEN",
+    "window_extension": "FORBIDDEN"
+  },
+  "feature_contract": {
+    "name": "signed_taker_quote_imbalance",
+    "formula": "(2 * taker_buy_quote_asset_volume_t - quote_asset_volume_t) / quote_asset_volume_t",
+    "domain": "[-1,1] when provider fields are internally consistent",
+    "zero_quote_volume": "ORIGIN_INVALID_FAIL_CLOSED",
+    "out_of_domain": "ORIGIN_INVALID_FAIL_CLOSED",
+    "winsorization": "NONE",
+    "normalization": "NONE_BEYOND_QUOTE_VOLUME_RATIO"
+  },
+  "control_contract": {
+    "r1_t": "log(close_t / open_t)",
+    "r24_t": "log(close_t / close_{t-24}) using only completed bars through t",
+    "rv24_t": "sqrt(sum of squared hourly log close-to-close returns over the 24 completed returns ending at t))"
+  },
+  "outcome_contract": {
+    "name": "next_hour_return",
+    "formula": "log(close_{t+1} / open_{t+1})",
+    "outcome_available_only_after": "close of t+1 candle",
+    "overlap_policy": "Hourly outcomes may be adjacent but each origin owns exactly one next-hour candle once."
+  },
+  "primary_model": {
+    "formula": "next_hour_return ~ signed_taker_quote_imbalance + r1_t + r24_t + rv24_t + symbol_fixed_effects",
+    "estimator": "OLS with heteroskedasticity/autocorrelation-consistent covariance",
+    "hac_lag_hours": 24,
+    "primary_parameter": "beta_signed_taker_quote_imbalance",
+    "directional_hypothesis": "beta_signed_taker_quote_imbalance > 0",
+    "primary_alpha_two_sided": 0.01
+  },
+  "terminal_support_gate": {
+    "all_required": true,
+    "conditions": [
+      "primary pooled beta_signed_taker_quote_imbalance > 0",
+      "two-sided HAC p-value <= 0.01",
+      "at least 4 of 5 symbol-specific diagnostic slopes are > 0",
+      "each symbol has at least 90% of its 2880 scheduled origins valid",
+      "no single symbol contributes more than 35% of absolute pooled feature x outcome covariance"
+    ],
+    "supported_label": "ORDER_FLOW_INCREMENTAL_RETURN_INFORMATION_SUPPORTED_WITHIN_FROZEN_PROSPECTIVE_SCOPE",
+    "failed_label": "ORDER_FLOW_INCREMENTAL_RETURN_INFORMATION_NOT_SUPPORTED_WITHIN_FROZEN_PROSPECTIVE_SCOPE",
+    "integrity_failure_label": "INCONCLUSIVE_PROSPECTIVE_INTEGRITY_FAILURE"
+  },
+  "firewall": {
+    "historical_candidate_v0_outcomes_may_not_be_used": true,
+    "pre_origin_real_v1_feature_values_may_not_be_inspected_for_model_changes": true,
+    "interim_scientific_evaluation": false,
+    "interim_p_values": false,
+    "interim_edge_verdict": false,
+    "parameter_changes_after_canonical_freeze": false,
+    "symbol_changes_after_canonical_freeze": false,
+    "source_changes_after_canonical_freeze": false,
+    "economic_strategy_translation_authorized": false
+  },
+  "phase_authority": {
+    "market_data_access_authorized": false,
+    "collector_implementation_authorized": false,
+    "prospective_activation_authorized": false,
+    "scientific_execution_authorized": false,
+    "terminal_evaluation_authorized": false,
+    "router_authorized": false,
+    "qnty_authorized": false,
+    "qntyspot_authorized": false,
+    "trading_authorized": false,
+    "capital_authority": "NONE"
+  },
+  "next_action": "Independent hostile review of this outcome-blind preregistration. If canonicalized cleanly, create a separate implementation/recorder qualification phase before 2026-09-16T00:00:00Z. Do not access real prospective observations in this preregistration phase."
+}

@@ -21,6 +21,7 @@ from qntylab.h003_defensive_followup_v1_prospective_source_v2 import (
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_MERGE = "1827bb3e753970aed0cfbd0adc27bba121b41d5d"
+ACTIVATION_MERGE = "6612ce47fbcea02cd001bf9f7ca1447313a8abd2"
 SOURCE_SHA256 = "74e1906f1bb54123ff77347629d5da6bafcd400b9a979d6d5526bbc6ccf08633"
 RUNTIME_RELATIVE_PATH = "experiments/research/h003_defensive_followup_v1/prospective_source_v2_runtime.json"
 WORKFLOW_RELATIVE_PATH = ".github/workflows/h003-prospective-operation-v2.yml"
@@ -89,10 +90,12 @@ def test_activation_artifact_exactly_matches_source_authority_contract() -> None
     }
 
 
-def test_runtime_binding_freezes_schedule_toolchain_and_immutable_evidence() -> None:
+def test_historical_runtime_binding_freezes_schedule_toolchain_and_immutable_evidence() -> None:
     runtime = _load(RUNTIME_RELATIVE_PATH)
-    workflow = (ROOT / WORKFLOW_RELATIVE_PATH).read_bytes()
-    assert sha256(workflow).hexdigest() == WORKFLOW_SHA256
+    historical_workflow = subprocess.check_output(
+        ["git", "show", f"{ACTIVATION_MERGE}:{WORKFLOW_RELATIVE_PATH}"], cwd=ROOT
+    )
+    assert sha256(historical_workflow).hexdigest() == WORKFLOW_SHA256
     assert runtime == {
         "schema_version": "1.0.0",
         "project_id": "H003_PROSPECTIVE_SOURCE_V2_RUNTIME_BINDING",
@@ -119,7 +122,7 @@ def test_runtime_binding_freezes_schedule_toolchain_and_immutable_evidence() -> 
         "downstream_authority": "NONE",
     }
 
-    text = workflow.decode("utf-8")
+    text = historical_workflow.decode("utf-8")
     assert f'cron: "{SCHEDULE}"' in text
     assert "cancel-in-progress: false" in text
     assert f"actions/checkout@{CHECKOUT_SHA}" in text

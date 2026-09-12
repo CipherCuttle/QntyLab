@@ -1,0 +1,290 @@
+name: Order Flow Prospective V1 Recorder Qualification
+
+on:
+  pull_request:
+    paths:
+      - "qntylab/order_flow_prospective_v1_recorder.py"
+      - "experiments/research/qnty_edge_discovery_order_flow_v1/recorder_qualification.json"
+      - "tests/test_order_flow_prospective_v1_recorder.py"
+      - "tests/test_order_flow_prospective_v1_recorder_workflow.py"
+      - ".github/workflows/order-flow-prospective-v1-recorder-qualification.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  QUAL_ASSET_NAME: order_flow_prospective_v1_synthetic_ledger.jsonl
+  QUAL_RELEASE_PREFIX: order-flow-v1-recorder-qualification-
+
+jobs:
+  verify:
+    name: verify frozen recorder contract
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.12.14"
+      - name: Install frozen test runner
+        run: python -m pip install --disable-pip-version-check "pytest==8.4.2"
+      - name: Verify recorder and qualification invariants
+        run: python -m pytest -q tests/test_order_flow_prospective_v1_recorder.py tests/test_order_flow_prospective_v1_recorder_workflow.py
+
+  stage:
+    name: stage deterministic synthetic recorder ledger
+    needs: verify
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    outputs:
+      ledger_sha256: ${{ steps.build.outputs.ledger_sha256 }}
+      release_tag: ${{ steps.build.outputs.release_tag }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: master
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.12.14"
+      - name: Build synthetic recorder ledger without provider access
+        id: build
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/order-flow-recorder-qualification"
+          mkdir -p "$OUT"
+          PYTHONPATH=. python - "$OUT" <<'PY'
+          import sys
+          from pathlib import Path
+          from qntylab.order_flow_prospective_v1_recorder import build_synthetic_qualification_ledger
+
+          path = build_synthetic_qualification_ledger(Path(sys.argv[1]))
+          print(path)
+          PY
+          cp "$OUT/order_flow_prospective_v1_events.jsonl" "$OUT/$QUAL_ASSET_NAME"
+          LEDGER_SHA256="$(sha256sum "$OUT/$QUAL_ASSET_NAME" | awk '{print $1}')"
+          test "${#LEDGER_SHA256}" -eq 64
+          echo "ledger_sha256=$LEDGER_SHA256" >> "$GITHUB_OUTPUT"
+          echo "release_tag=${QUAL_RELEASE_PREFIX}${GITHUB_RUN_ID}" >> "$GITHUB_OUTPUT"
+      - name: Stage exact bytes for isolated persistence job
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: order-flow-v1-recorder-ledger-${{ github.run_id }}
+          path: ${{ runner.temp }}/order-flow-recorder-qualification/order_flow_prospective_v1_synthetic_ledger.jsonl
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
+
+  persist:
+    name: publish immutable synthetic recorder ledger
+    needs: stage
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    outputs:
+      release_id: ${{ steps.persist.outputs.release_id }}
+      asset_id: ${{ steps.persist.outputs.asset_id }}
+    steps:
+      - name: Download staged ledger without repository checkout
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: order-flow-v1-recorder-ledger-${{ github.run_id }}
+          path: ${{ runner.temp }}/order-flow-v1-persist
+      - name: Publish by numeric release id and verify immutability
+        id: persist
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_SHA256: ${{ needs.stage.outputs.ledger_sha256 }}
+          RELEASE_TAG: ${{ needs.stage.outputs.release_tag }}
+        run: |
+          set -euo pipefail
+          LEDGER="$RUNNER_TEMP/order-flow-v1-persist/$QUAL_ASSET_NAME"
+          test -f "$LEDGER"
+          test "$(sha256sum "$LEDGER" | awk '{print $1}')" = "$EXPECTED_SHA256"
+
+          api_get() {
+            curl --fail-with-body --silent --show-error \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "$1"
+          }
+
+          find_release() {
+            local page page_json match count
+            for page in $(seq 1 50); do
+              page_json="$(api_get "https://api.github.com/repos/$GITHUB_REPOSITORY/releases?per_page=100&page=$page")"
+              match="$(printf '%s' "$page_json" | jq -c --arg tag "$RELEASE_TAG" '[.[] | select(.tag_name == $tag)][0] // empty')"
+              if [ -n "$match" ]; then
+                printf '%s' "$match"
+                return 0
+              fi
+              count="$(printf '%s' "$page_json" | jq 'length')"
+              if [ "$count" -lt 100 ]; then
+                return 1
+              fi
+            done
+            echo "Release scan exceeded bounded search" >&2
+            return 2
+          }
+
+          if RELEASE_JSON="$(find_release)"; then
+            :
+          else
+            FIND_STATUS=$?
+            if [ "$FIND_STATUS" -eq 1 ]; then
+              RELEASE_JSON=""
+            else
+              echo "Qualification release lookup failed with status $FIND_STATUS" >&2
+              exit "$FIND_STATUS"
+            fi
+          fi
+
+          if [ -z "$RELEASE_JSON" ]; then
+            CREATE_BODY="$(jq -cn \
+              --arg tag "$RELEASE_TAG" \
+              --arg target "$GITHUB_SHA" \
+              '{tag_name:$tag,target_commitish:$target,name:$tag,body:"Order Flow V1 synthetic recorder qualification only. Not scientific evidence and grants no activation or downstream authority.",draft:true,prerelease:true}')"
+            RELEASE_JSON="$(curl --fail-with-body --silent --show-error \
+              -X POST \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              -H "Content-Type: application/json" \
+              -d "$CREATE_BODY" \
+              "https://api.github.com/repos/$GITHUB_REPOSITORY/releases")"
+          fi
+
+          RELEASE_ID="$(printf '%s' "$RELEASE_JSON" | jq -r '.id')"
+          test "$RELEASE_ID" != "null"
+          test "$(printf '%s' "$RELEASE_JSON" | jq -r '.tag_name')" = "$RELEASE_TAG"
+          DRAFT="$(printf '%s' "$RELEASE_JSON" | jq -r '.draft')"
+          IMMUTABLE="$(printf '%s' "$RELEASE_JSON" | jq -r '.immutable')"
+
+          if [ "$IMMUTABLE" = "true" ]; then
+            test "$DRAFT" = "false"
+          elif [ "$DRAFT" = "true" ]; then
+            TOTAL_ASSET_COUNT="$(printf '%s' "$RELEASE_JSON" | jq '.assets | length')"
+            EXPECTED_ASSET_COUNT="$(printf '%s' "$RELEASE_JSON" | jq --arg name "$QUAL_ASSET_NAME" '[.assets[] | select(.name == $name)] | length')"
+            if [ "$TOTAL_ASSET_COUNT" -eq 0 ]; then
+              UPLOAD_JSON="$(curl --fail-with-body --silent --show-error \
+                -X POST \
+                -H "Authorization: Bearer $GH_TOKEN" \
+                -H "Accept: application/vnd.github+json" \
+                -H "X-GitHub-Api-Version: 2022-11-28" \
+                -H "Content-Type: application/octet-stream" \
+                --data-binary "@$LEDGER" \
+                "https://uploads.github.com/repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID/assets?name=$QUAL_ASSET_NAME")"
+              test "$(printf '%s' "$UPLOAD_JSON" | jq -r '.name')" = "$QUAL_ASSET_NAME"
+              test "$(printf '%s' "$UPLOAD_JSON" | jq -r '.digest')" = "sha256:$EXPECTED_SHA256"
+            elif [ "$TOTAL_ASSET_COUNT" -eq 1 ] && [ "$EXPECTED_ASSET_COUNT" -eq 1 ]; then
+              test "$(printf '%s' "$RELEASE_JSON" | jq -r --arg name "$QUAL_ASSET_NAME" '.assets[] | select(.name == $name) | .digest')" = "sha256:$EXPECTED_SHA256"
+            else
+              echo "Draft qualification release has unexpected assets" >&2
+              exit 1
+            fi
+
+            RELEASE_JSON="$(api_get "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID")"
+            test "$(printf '%s' "$RELEASE_JSON" | jq -r --arg name "$QUAL_ASSET_NAME" '.assets[] | select(.name == $name) | .digest')" = "sha256:$EXPECTED_SHA256"
+
+            curl --fail-with-body --silent --show-error \
+              -X PATCH \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              -H "Content-Type: application/json" \
+              -d '{"draft":false,"prerelease":true}' \
+              "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" >/dev/null
+
+            for attempt in $(seq 1 10); do
+              RELEASE_JSON="$(api_get "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID")"
+              if [ "$(printf '%s' "$RELEASE_JSON" | jq -r '.draft')" = "false" ] \
+                && [ "$(printf '%s' "$RELEASE_JSON" | jq -r '.immutable')" = "true" ]; then
+                break
+              fi
+              if [ "$attempt" -eq 10 ]; then
+                echo "Published qualification release did not become immutable" >&2
+                exit 1
+              fi
+              sleep 2
+            done
+          else
+            echo "Existing qualification release is neither a draft nor immutable" >&2
+            exit 1
+          fi
+
+          test "$(printf '%s' "$RELEASE_JSON" | jq -r '.draft')" = "false"
+          test "$(printf '%s' "$RELEASE_JSON" | jq -r '.immutable')" = "true"
+          test "$(printf '%s' "$RELEASE_JSON" | jq '.assets | length')" -eq 1
+          test "$(printf '%s' "$RELEASE_JSON" | jq -r --arg name "$QUAL_ASSET_NAME" '.assets[] | select(.name == $name) | .digest')" = "sha256:$EXPECTED_SHA256"
+
+          ASSET_ID="$(printf '%s' "$RELEASE_JSON" | jq -r --arg name "$QUAL_ASSET_NAME" '.assets[] | select(.name == $name) | .id')"
+          test "$ASSET_ID" != "null"
+          DELETE_RESPONSE="$RUNNER_TEMP/immutable-delete-response"
+          DELETE_STATUS="$(curl --silent --show-error \
+            -o "$DELETE_RESPONSE" \
+            -w '%{http_code}' \
+            -X DELETE \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/assets/$ASSET_ID")"
+          case "$DELETE_STATUS" in
+            2*) echo "Immutable qualification asset was unexpectedly deletable" >&2; exit 1 ;;
+            4*) ;;
+            *) echo "Asset delete failed for a non-policy reason (HTTP $DELETE_STATUS)" >&2; cat "$DELETE_RESPONSE" >&2; exit 1 ;;
+          esac
+          test "$(jq -r '[.errors[]?.message] | any(. == "Cannot delete asset from an immutable release")' "$DELETE_RESPONSE")" = "true"
+
+          RELEASE_JSON="$(api_get "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID")"
+          test "$(printf '%s' "$RELEASE_JSON" | jq -r '.immutable')" = "true"
+          test "$(printf '%s' "$RELEASE_JSON" | jq '.assets | length')" -eq 1
+          test "$(printf '%s' "$RELEASE_JSON" | jq -r --arg name "$QUAL_ASSET_NAME" '.assets[] | select(.name == $name) | .id')" = "$ASSET_ID"
+          test "$(printf '%s' "$RELEASE_JSON" | jq -r --arg name "$QUAL_ASSET_NAME" '.assets[] | select(.name == $name) | .digest')" = "sha256:$EXPECTED_SHA256"
+          echo "release_id=$RELEASE_ID" >> "$GITHUB_OUTPUT"
+          echo "asset_id=$ASSET_ID" >> "$GITHUB_OUTPUT"
+
+  restore:
+    name: independently restore exact recorder ledger bytes
+    needs: [stage, persist]
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - name: Download original staged ledger
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: order-flow-v1-recorder-ledger-${{ github.run_id }}
+          path: ${{ runner.temp }}/order-flow-v1-original
+      - name: Restore immutable asset by numeric id and compare exact bytes
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_SHA256: ${{ needs.stage.outputs.ledger_sha256 }}
+          ASSET_ID: ${{ needs.persist.outputs.asset_id }}
+        run: |
+          set -euo pipefail
+          ORIGINAL="$RUNNER_TEMP/order-flow-v1-original/$QUAL_ASSET_NAME"
+          RESTORED="$RUNNER_TEMP/restored-$QUAL_ASSET_NAME"
+          test -f "$ORIGINAL"
+          test -n "$ASSET_ID"
+          curl --fail-with-body --silent --show-error --location \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/octet-stream" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/assets/$ASSET_ID" \
+            -o "$RESTORED"
+          test "$(sha256sum "$ORIGINAL" | awk '{print $1}')" = "$EXPECTED_SHA256"
+          test "$(sha256sum "$RESTORED" | awk '{print $1}')" = "$EXPECTED_SHA256"
+          cmp "$ORIGINAL" "$RESTORED"
+          echo "Order Flow V1 synthetic recorder ledger independently restored byte-for-byte"

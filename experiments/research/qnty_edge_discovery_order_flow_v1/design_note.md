@@ -59,9 +59,19 @@ This binding is frozen specifically so a later recorder cannot repeat the close-
 
 At origin `C`, the source/feature candle is the completed hour `[C-1h, C)`. `r24` compares the close at `C` with the close exactly 24 hourly bars earlier. `rv24` uses the 24 completed close-to-close returns ending at `C`.
 
-Thus the first evaluated origin, `2026-09-16T00:00:00Z`, requires hourly logical-close observations from `2026-09-15T00:00:00Z` through `2026-09-16T00:00:00Z` inclusive: 24 warmup closes plus the first evaluated source-candle close.
+Thus the first evaluated origin, `2026-09-16T00:00:00Z`, requires hourly logical-close observations from `2026-09-15T00:00:00Z` through `2026-09-16T00:00:00Z` inclusive: 24 prospectively collected warmup closes plus the first evaluated source-candle close, giving 25 closes and exactly 24 completed close-to-close returns.
 
 For origin `C`, the outcome candle is `[C, C+1h)`: provider open time `C`, logical close boundary `C+1h`. Its outcome cannot exist until that provider candle is complete.
+
+## Frozen panel inference
+
+The primary coefficient comes from pooled OLS with the three frozen controls and symbol fixed effects. BTCUSDT is the reference category.
+
+A generic row-based HAC is **not** allowed. Five symbols can share the same hourly origin and therefore share market-wide shocks. After pooled OLS, coefficient-score contributions are summed across all valid symbols at each logical origin to form exactly one score vector per clock hour. Newey-West/Bartlett long-run covariance is then computed across those hourly score vectors with lag 24 and no finite-sample correction. Thus `24` always means **24 hours**, never 24 stacked panel rows, while contemporaneous dependence among symbols is admitted within each hourly cluster.
+
+Per-symbol slopes are diagnostics only: each symbol uses the same feature and three controls, and only the slope sign is used. No hidden per-symbol significance threshold exists.
+
+The concentration guard uses Frisch-Waugh-Lovell residuals of both the feature and outcome after projecting each on the same nuisance matrix (controls + symbol fixed effects). Each symbol contributes the absolute residualized feature/outcome cross-product; no symbol may exceed 35% of the total. A zero total fails support rather than creating a divide-by-zero escape hatch.
 
 ## Decision rule
 

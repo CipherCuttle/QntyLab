@@ -201,8 +201,9 @@ jobs:
           ASSET_ID="$(printf '%s' "$RELEASE_JSON" | jq -r --arg name "$QUAL_ASSET_NAME" '.assets[] | select(.name == $name) | .id')"
           test "$ASSET_ID" != "null"
 
+          DELETE_RESPONSE="$RUNNER_TEMP/immutable-delete-response"
           DELETE_STATUS="$(curl --silent --show-error \
-            -o "$RUNNER_TEMP/immutable-delete-response" \
+            -o "$DELETE_RESPONSE" \
             -w '%{http_code}' \
             -X DELETE \
             -H "Authorization: Bearer $GH_TOKEN" \
@@ -214,7 +215,21 @@ jobs:
               echo "Immutable qualification asset was unexpectedly deletable" >&2
               exit 1
               ;;
+            4*)
+              ;;
+            *)
+              echo "Asset delete failed for a non-policy reason (HTTP $DELETE_STATUS)" >&2
+              cat "$DELETE_RESPONSE" >&2
+              exit 1
+              ;;
           esac
+          test "$(jq -r '[.errors[]?.message] | any(. == "Cannot delete asset from an immutable release")' "$DELETE_RESPONSE")" = "true"
+
+          RELEASE_JSON="$(api_get "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID")"
+          test "$(printf '%s' "$RELEASE_JSON" | jq -r '.immutable')" = "true"
+          test "$(printf '%s' "$RELEASE_JSON" | jq '.assets | length')" -eq 1
+          test "$(printf '%s' "$RELEASE_JSON" | jq -r --arg name "$QUAL_ASSET_NAME" '.assets[] | select(.name == $name) | .id')" = "$ASSET_ID"
+          test "$(printf '%s' "$RELEASE_JSON" | jq -r --arg name "$QUAL_ASSET_NAME" '.assets[] | select(.name == $name) | .digest')" = "sha256:$EXPECTED_SHA256"
 
           echo "release_id=$RELEASE_ID" >> "$GITHUB_OUTPUT"
           echo "asset_id=$ASSET_ID" >> "$GITHUB_OUTPUT"

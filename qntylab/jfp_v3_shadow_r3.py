@@ -95,6 +95,8 @@ def activate_shadow_runtime(
     state = r2.resolve_runtime_canonical_state(repo_root, refresh=True)
     if not state["canonical"]:
         raise r2.ContractError("activation requires fresh clean canonical master")
+    if not r2.is_ancestor(repo_root, R2_CANONICAL_MERGE, state["head_sha"]):
+        raise r2.ContractError("R3 activation requires canonical R2 ancestry")
     binding = r2.bind_pr_a(repo_root, current_sha=state["head_sha"])
     identity = implementation_identity(repo_root)
     activation_time = r2.ensure_utc(now or datetime.now(UTC))

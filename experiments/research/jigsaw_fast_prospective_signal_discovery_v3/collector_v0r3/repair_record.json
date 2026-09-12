@@ -1,0 +1,33 @@
+{
+  "activation_performed": false,
+  "artifact_type": "JFPV3_PR_B_R3_TRANSPORT_WINDOW_REPAIR_RECORD",
+  "candidate_id": "JFPV3_01",
+  "classification_changed": false,
+  "defect": {
+    "consequence": "requested windows are shifted one hour forward: earliest required close can be absent and an origin+1h close can be included",
+    "logical_transport_contract": "bars(start,end) denotes inclusive logical close timestamps",
+    "provider_time_basis": "Binance klines are keyed and selected by candle open time",
+    "r2_behavior": "passed logical close bounds directly as provider startTime/endTime, then labeled row open_time+1h as close_time"
+  },
+  "inference_changed": false,
+  "materiality_changed": false,
+  "old_activation_authority_disposition": "DO_NOT_ACTIVATE_R2; ISSUE_NEW_R3_BOUND_ACTIVATION_AUTHORIZATION_AFTER_CANONICAL_REPAIR",
+  "parent_r2_canonical_merge": "bc4f3a327f23d057da1ad970e9eeb7ed2fe10c91",
+  "parent_r2_implementation_digest": "3f80bcd2dd60aaae6e1307883cca2e996f631f7bbc3b76037eafef8450167e2b",
+  "parent_r2_manifest_digest": "b1ca7d2bb5025b272bfdcd871a1889f6f25842c2be83c479d19ebad16075520e",
+  "phase": "JFPV3_PR_B_R3",
+  "preregistration_changed": false,
+  "prospective_activation_authorization_v0_merge": "926c3a52b66336ca433f5b46781f114d4d7a03d4",
+  "prospective_contamination": "NONE",
+  "real_market_data_accessed": false,
+  "real_network_used": false,
+  "real_prospective_ohlcv_accessed": false,
+  "repair": "subtract exactly one hour from both provider query bounds while preserving logical close_time = open_time + 1h",
+  "root_cause": "BINANCE_KLINE_OPEN_TIME_CLOSE_WINDOW_OFF_BY_ONE_HOUR",
+  "schedule_changed": false,
+  "scientific_contract_changed": false,
+  "scientific_statistics_computed": false,
+  "shadow_activated_before_repair": false,
+  "universe_changed": false,
+  "valid_activation_count_before_repair": 0
+}

@@ -69,7 +69,7 @@
     "r1_t": "log(close_t / open_t) on the completed source candle ending at logical origin C",
     "r24_t": "log(close_t / close_{t-24}) using the close at C and the close exactly 24 completed hourly bars earlier",
     "rv24_t": "sqrt(sum of squared hourly log close-to-close returns over the 24 completed returns ending at logical origin C))",
-    "first_origin_history_requirement": "The first origin at 2026-09-16T00:00:00Z requires close observations at hourly logical boundaries from 2026-09-15T00:00:00Z through 2026-09-16T00:00:00Z inclusive; the first 24 boundaries are supplied by prospective warmup plus the first evaluated source candle close."
+    "first_origin_history_requirement": "The first origin at 2026-09-16T00:00:00Z requires close observations at hourly logical boundaries from 2026-09-15T00:00:00Z through 2026-09-16T00:00:00Z inclusive: 24 prospectively collected warmup boundary closes plus the first evaluated source-candle close, yielding 25 close points and exactly 24 completed close-to-close returns."
   },
   "outcome_contract": {
     "name": "next_hour_return",
@@ -80,20 +80,42 @@
   },
   "primary_model": {
     "formula": "next_hour_return ~ signed_taker_quote_imbalance + r1_t + r24_t + rv24_t + symbol_fixed_effects",
-    "estimator": "OLS with heteroskedasticity/autocorrelation-consistent covariance",
-    "hac_lag_hours": 24,
+    "estimator": "POOLED_OLS",
+    "symbol_fixed_effects": "Include intercept plus ETHUSDT, SOLUSDT, BNBUSDT and XRPUSDT indicators; BTCUSDT is the frozen reference category.",
+    "covariance": {
+      "type": "TIME_CLUSTERED_NEWEY_WEST_BARTLETT",
+      "cluster_key": "logical_origin_utc",
+      "lag_hours": 24,
+      "score_definition": "After pooled OLS, for each hourly logical origin C sum x_iC * residual_iC across all valid symbols i to form one coefficient-score vector g_C.",
+      "long_run_meat": "S = sum_C g_C g_C' + sum_{l=1..24} (1-l/25) * sum_C [g_C g_{C-l}' + g_{C-l} g_C']",
+      "sandwich": "cov(beta_hat) = (X'X)^-1 S (X'X)^-1",
+      "finite_sample_correction": "NONE",
+      "reason": "The lag is 24 clock-hours, not 24 stacked panel rows; summing scores within each origin admits arbitrary contemporaneous dependence across the five symbols."
+    },
     "primary_parameter": "beta_signed_taker_quote_imbalance",
     "directional_hypothesis": "beta_signed_taker_quote_imbalance > 0",
+    "primary_p_value": "two-sided normal-reference p-value from the frozen time-clustered HAC standard error",
     "primary_alpha_two_sided": 0.01
+  },
+  "diagnostic_contract": {
+    "symbol_specific_slopes": "For each symbol separately, fit next_hour_return ~ signed_taker_quote_imbalance + r1_t + r24_t + rv24_t with intercept using OLS. Only the sign of the imbalance coefficient enters the support gate; no per-symbol p-value threshold is used.",
+    "concentration": {
+      "nuisance_matrix": "intercept + frozen symbol fixed effects + r1_t + r24_t + rv24_t",
+      "residualization": "Use Frisch-Waugh-Lovell residuals x_tilde and y_tilde after separately projecting signed_taker_quote_imbalance and next_hour_return on the same nuisance matrix over all valid pooled rows.",
+      "symbol_contribution": "c_i = abs(sum over valid origins C of x_tilde_iC * y_tilde_iC)",
+      "share": "share_i = c_i / sum_j c_j",
+      "gate": "max_i share_i <= 0.35",
+      "zero_denominator": "SUPPORT_GATE_FAIL"
+    }
   },
   "terminal_support_gate": {
     "all_required": true,
     "conditions": [
       "primary pooled beta_signed_taker_quote_imbalance > 0",
-      "two-sided HAC p-value <= 0.01",
-      "at least 4 of 5 symbol-specific diagnostic slopes are > 0",
-      "each symbol has at least 90% of its 2880 scheduled origins valid",
-      "no single symbol contributes more than 35% of absolute pooled feature x outcome covariance"
+      "two-sided frozen time-clustered HAC p-value <= 0.01",
+      "at least 4 of 5 frozen symbol-specific diagnostic imbalance slopes are > 0",
+      "each symbol has at least 2592 valid origins (90% of 2880 scheduled origins)",
+      "maximum frozen residualized concentration share across symbols <= 0.35"
     ],
     "supported_label": "ORDER_FLOW_INCREMENTAL_RETURN_INFORMATION_SUPPORTED_WITHIN_FROZEN_PROSPECTIVE_SCOPE",
     "failed_label": "ORDER_FLOW_INCREMENTAL_RETURN_INFORMATION_NOT_SUPPORTED_WITHIN_FROZEN_PROSPECTIVE_SCOPE",

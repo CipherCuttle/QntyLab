@@ -22,7 +22,7 @@ def test_terminal_integrity_failure_precedes_scientific_non_support() -> None:
     assert "integrity" in decision["decision_order"].lower()
     assert "precedence" in decision["decision_order"].lower()
     assert gate["integrity_failure_label"] == "INCONCLUSIVE_PROSPECTIVE_INTEGRITY_FAILURE"
-    assert gate["failed_label"] in decision["integrity_failure_action"]
+    assert "failed_label" in decision["integrity_failure_action"]
     assert "do not emit" in decision["integrity_failure_action"]
     assert "evidence against" in decision["integrity_failure_action"]
 

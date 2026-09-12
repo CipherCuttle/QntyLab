@@ -113,9 +113,9 @@ def test_order_flow_v1_source_and_feature_semantics_are_exact() -> None:
 def test_order_flow_v1_first_origin_has_exact_control_history_contract() -> None:
     doc = _load()
     controls = doc["control_contract"]
-    assert "2026-09-15T00:00:00Z through 2026-09-16T00:00:00Z inclusive" in (
-        controls["first_origin_history_requirement"]
-    )
+    history = controls["first_origin_history_requirement"]
+    assert "2026-09-15T00:00:00Z through 2026-09-16T00:00:00Z inclusive" in history
+    assert "25 close points and exactly 24 completed close-to-close returns" in history
     outcome = doc["outcome_contract"]
     assert outcome["outcome_candle_identity"] == (
         "For logical origin C, outcome candle provider open_time = C and logical close "
@@ -123,16 +123,43 @@ def test_order_flow_v1_first_origin_has_exact_control_history_contract() -> None
     )
 
 
-def test_order_flow_v1_primary_model_and_gate_are_frozen() -> None:
+def test_order_flow_v1_primary_panel_inference_is_clock_hour_clustered() -> None:
     doc = _load()
     model = doc["primary_model"]
+    assert model["estimator"] == "POOLED_OLS"
+    assert "BTCUSDT is the frozen reference category" in model["symbol_fixed_effects"]
+    covariance = model["covariance"]
+    assert covariance["type"] == "TIME_CLUSTERED_NEWEY_WEST_BARTLETT"
+    assert covariance["cluster_key"] == "logical_origin_utc"
+    assert covariance["lag_hours"] == 24
+    assert "sum x_iC * residual_iC across all valid symbols" in covariance["score_definition"]
+    assert "(1-l/25)" in covariance["long_run_meat"]
+    assert covariance["finite_sample_correction"] == "NONE"
     assert model["primary_parameter"] == "beta_signed_taker_quote_imbalance"
     assert model["directional_hypothesis"] == "beta_signed_taker_quote_imbalance > 0"
     assert model["primary_alpha_two_sided"] == 0.01
-    assert model["hac_lag_hours"] == 24
+
+
+def test_order_flow_v1_diagnostics_and_support_gate_are_frozen() -> None:
+    doc = _load()
+    diagnostics = doc["diagnostic_contract"]
+    assert "Only the sign" in diagnostics["symbol_specific_slopes"]
+    concentration = diagnostics["concentration"]
+    assert concentration["nuisance_matrix"] == (
+        "intercept + frozen symbol fixed effects + r1_t + r24_t + rv24_t"
+    )
+    assert "Frisch-Waugh-Lovell residuals" in concentration["residualization"]
+    assert concentration["gate"] == "max_i share_i <= 0.35"
+    assert concentration["zero_denominator"] == "SUPPORT_GATE_FAIL"
+
     conditions = doc["terminal_support_gate"]["conditions"]
-    assert "at least 4 of 5 symbol-specific diagnostic slopes are > 0" in conditions
-    assert "each symbol has at least 90% of its 2880 scheduled origins valid" in conditions
+    assert "two-sided frozen time-clustered HAC p-value <= 0.01" in conditions
+    assert (
+        "at least 4 of 5 frozen symbol-specific diagnostic imbalance slopes are > 0"
+        in conditions
+    )
+    assert "each symbol has at least 2592 valid origins (90% of 2880 scheduled origins)" in conditions
+    assert "maximum frozen residualized concentration share across symbols <= 0.35" in conditions
 
 
 def test_order_flow_v1_preregistration_grants_no_execution_authority() -> None:

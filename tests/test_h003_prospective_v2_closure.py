@@ -37,17 +37,18 @@ def test_h003_v2_closure_preserves_exact_terminal_evidence() -> None:
     assert event["payload"]["economic_verdict"] == "FORBIDDEN"
 
 
-def test_h003_v2_runtime_is_closed_and_unscheduled() -> None:
+def test_h003_v2_historical_runtime_binding_is_not_rewritten() -> None:
     runtime = json.loads(RUNTIME.read_text(encoding="utf-8"))
-    workflow_bytes = WORKFLOW.read_bytes()
 
-    assert runtime["state"] == "CLOSED_BLOCKED"
-    assert runtime["schedule_utc"] is None
-    assert runtime["scheduler_active"] is False
-    assert runtime["write_authority"] == "NONE_CLOSED"
-    assert runtime["backfill"] == "FORBIDDEN"
-    assert runtime["successor_requires_new_future_origin"] is True
-    assert hashlib.sha256(workflow_bytes).hexdigest() == runtime["workflow_sha256"]
+    # This artifact records what was actually activated. Closure supersedes
+    # operation through a separate artifact; historical activation evidence is
+    # intentionally not rewritten to pretend it was never active.
+    assert runtime["state"] == "ACTIVE"
+    assert runtime["schedule_utc"] == "7,22,37,52 * * * *"
+    assert runtime["write_authority"] == "PERSIST_JOB_ONLY"
+    assert runtime["workflow_sha256"] == "bbf881c9daec8c2cfffa8431964d26e5389f0bf1e7fbc990d3f19d39166b7d45"
+    assert runtime["economic_verdict"] == "FORBIDDEN"
+    assert runtime["downstream_authority"] == "NONE"
 
 
 def test_h003_v2_workflow_is_manual_read_only_tombstone() -> None:

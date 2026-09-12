@@ -1,16 +1,14 @@
 """JFPV3 R3 transport-window repair.
 
 This successor preserves the frozen JFPV3 scientific contracts and R2 collector
-state machine while correcting the Binance USD-M kline request boundary.  The
-public `bars(start, end)` contract is expressed in logical *close* timestamps;
-Binance `startTime`/`endTime` select klines by *open* timestamp.  Therefore each
-REST bound is shifted back exactly one hour.
+state machine while correcting only the Binance USD-M kline request boundary.
 
-No activation or network access occurs on import.
+This module deliberately exposes no activation or collection runtime. A later,
+separately Git-backed authorization must provide the operational wrapper after
+R3 is canonical.
 """
 from __future__ import annotations
 
-import argparse
 import json
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -38,6 +36,9 @@ class BinanceUmTransport(r2.BinanceUmTransport):
         start, end = r2.ensure_utc(start), r2.ensure_utc(end)
         if end < start:
             raise r2.ContractError("bar window end precedes start")
+
+        # The collector contract is expressed in inclusive logical close times,
+        # while Binance /fapi/v1/klines selects rows by candle open time.
         open_start = start - timedelta(hours=1)
         open_end = end - timedelta(hours=1)
         raw = self.requester(
@@ -68,7 +69,7 @@ class BinanceUmTransport(r2.BinanceUmTransport):
 
 
 def implementation_identity(repo_root: Path = ROOT) -> dict[str, Any]:
-    """Verify the R3 successor bytes against its frozen manifest."""
+    """Verify the R3 repair bytes against their frozen manifest."""
     manifest_path = repo_root / R3_IMPLEMENTATION_MANIFEST
     manifest = r2.load_json(manifest_path)
     if manifest.get("parent_r2_canonical_merge") != R2_CANONICAL_MERGE:
@@ -88,79 +89,20 @@ def implementation_identity(repo_root: Path = ROOT) -> dict[str, Any]:
     }
 
 
-def activate_shadow_runtime(
-    ledger: r2.ReceiptLedger, *, repo_root: Path = ROOT, now: datetime | None = None
+def validate_repair_lineage(
+    repo_root: Path = ROOT, *, current_sha: str | None = None
 ) -> dict[str, Any]:
-    """Perform the existing guarded activation under the repaired R3 identity."""
-    state = r2.resolve_runtime_canonical_state(repo_root, refresh=True)
-    if not state["canonical"]:
-        raise r2.ContractError("activation requires fresh clean canonical master")
-    if not r2.is_ancestor(repo_root, R2_CANONICAL_MERGE, state["head_sha"]):
-        raise r2.ContractError("R3 activation requires canonical R2 ancestry")
-    binding = r2.bind_pr_a(repo_root, current_sha=state["head_sha"])
+    """Bind R3 to canonical R2 ancestry and unchanged PR-A scientific contracts."""
+    current_sha = current_sha or r2.git_sha(repo_root)
+    if not r2.is_ancestor(repo_root, R2_CANONICAL_MERGE, current_sha):
+        raise r2.ContractError("R3 requires canonical R2 ancestry")
+    binding = r2.bind_pr_a(repo_root, current_sha=current_sha)
     identity = implementation_identity(repo_root)
-    activation_time = r2.ensure_utc(now or datetime.now(UTC))
-    record = {
-        "activation_master_sha": state["head_sha"],
-        "collector_implementation_sha": identity["implementation_digest"],
-        "preregistration_digest": binding["artifact_digests"]["preregistration.json"],
-        "universe_contract_digest": binding["artifact_digests"]["universe_contract.json"],
-        "source_contract_digest": binding["artifact_digests"]["source_contract.json"],
-        "scientific_contract_digest": binding["artifact_digests"]["scientific_contract.json"],
-        "schedule_contract_digest": binding["artifact_digests"]["schedule_contract.json"],
-        "activation_timestamp": r2.stamp(activation_time),
-        "shadow_run_id": (
-            f"{r2.GENERATION_ID}-R3-"
-            f"{activation_time.strftime('%Y%m%dT%H%M%SZ')}-{state['head_sha'][:12]}"
-        ),
+    return {
+        "current_sha": current_sha,
+        "r2_canonical_merge": R2_CANONICAL_MERGE,
+        "r3_implementation_digest": identity["implementation_digest"],
+        "pr_a_artifact_digests": binding["artifact_digests"],
+        "activation_authority": "NONE",
+        "collection_authority": "NONE",
     }
-    return r2.activate_shadow(
-        ledger,
-        record,
-        r2.schedule(activation_time),
-        canonical_state=state,
-        binding=binding,
-        expected_implementation_sha=identity["implementation_digest"],
-    )
-
-
-def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(prog="python -m qntylab.jfp_v3_shadow_r3")
-    parser.add_argument(
-        "command",
-        choices=("verify-config", "activate-shadow", "collect-due", "status", "verify-receipts"),
-    )
-    parser.add_argument("--ledger", type=Path, default=Path("data/jfp_v3_shadow/events.jsonl"))
-    args = parser.parse_args(argv)
-
-    if args.command == "verify-config":
-        payload = {
-            "pr_a": r2.bind_pr_a(),
-            "r3": implementation_identity(),
-        }
-        print(json.dumps(payload, sort_keys=True))
-        return 0
-
-    ledger = r2.ReceiptLedger(args.ledger)
-    if args.command == "status":
-        print(json.dumps(r2.status(ledger), sort_keys=True))
-        return 0
-    if args.command == "verify-receipts":
-        print(json.dumps(ledger.verify(), sort_keys=True))
-        return 0
-    if args.command == "activate-shadow":
-        print(json.dumps(activate_shadow_runtime(ledger), sort_keys=True))
-        return 0
-    if args.command == "collect-due":
-        result = r2.collect_due(
-            r2.Collector(ledger),
-            BinanceUmTransport(r2.UrllibRequester()),
-            now=datetime.now(UTC),
-        )
-        print(json.dumps(result, sort_keys=True))
-        return 0
-    raise r2.ContractError("unsupported R3 command")
-
-
-if __name__ == "__main__":  # pragma: no cover
-    main()

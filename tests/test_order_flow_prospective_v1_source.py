@@ -151,6 +151,58 @@ def test_acquisition_crossing_deadline_marks_missed_and_stops_fetching(tmp_path:
     assert tuple(item["event_type"] for item in ledger.events()) == ("WINDOW_MISSED",)
 
 
+def test_provider_failure_crossing_deadline_marks_missed(tmp_path: Path) -> None:
+    close = _utc(recorder.FIRST_WARMUP_CLOSE)
+    observed = close + timedelta(minutes=59)
+    ledger = recorder.EvidenceLedger(tmp_path)
+    calls = []
+    ticks = iter((observed, close + timedelta(hours=1, seconds=1)))
+
+    def clock():
+        return next(ticks)
+
+    def fetcher(*, symbol, logical_close):
+        calls.append(symbol)
+        raise SourceBlocked("synthetic provider timeout")
+
+    event = stage_due_hour(
+        ledger,
+        logical_close=close,
+        observed_at=observed,
+        fetcher=fetcher,
+        clock=clock,
+    )
+
+    assert event["event_type"] == "WINDOW_MISSED"
+    assert event["payload"]["detected_at_utc"] == "2026-09-15T01:00:01Z"
+    assert calls == ["BTCUSDT"]
+    assert tuple(item["event_type"] for item in ledger.events()) == ("WINDOW_MISSED",)
+
+
+def test_provider_failure_inside_window_preserves_source_failure(tmp_path: Path) -> None:
+    close = _utc(recorder.FIRST_WARMUP_CLOSE)
+    observed = close + timedelta(minutes=4)
+    ledger = recorder.EvidenceLedger(tmp_path)
+    ticks = iter((observed, observed + timedelta(seconds=30)))
+
+    def clock():
+        return next(ticks)
+
+    def fetcher(*, symbol, logical_close):
+        raise SourceBlocked("synthetic provider failure")
+
+    with pytest.raises(SourceBlocked, match="synthetic provider failure"):
+        stage_due_hour(
+            ledger,
+            logical_close=close,
+            observed_at=observed,
+            fetcher=fetcher,
+            clock=clock,
+        )
+
+    assert ledger.events() == ()
+
+
 def test_late_hour_marks_missed_without_contacting_provider(tmp_path: Path) -> None:
     close = _utc(recorder.FIRST_WARMUP_CLOSE)
     ledger = recorder.EvidenceLedger(tmp_path)

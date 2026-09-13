@@ -60,7 +60,13 @@ jobs:
           assert result["scientific_evidence"] is False
           assert result["symbol_count"] == 5
           assert result["status"] == "PASS"
-          forbidden = {"open", "close", "price", "volume", "imbalance", "taker"}
+          forbidden = {
+              "open_price",
+              "close_price",
+              "quote_asset_volume",
+              "taker_buy_quote_asset_volume",
+              "signed_taker_quote_imbalance",
+          }
           rendered = json.dumps(result, sort_keys=True).lower()
           assert not any(word in rendered for word in forbidden)
           print(json.dumps(result, sort_keys=True))

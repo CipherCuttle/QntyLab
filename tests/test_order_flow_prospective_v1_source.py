@@ -103,14 +103,52 @@ def test_scientific_batch_requires_exact_five_provider_rows() -> None:
     def fetcher(*, symbol, logical_close):
         return [recorder.synthetic_row(symbol=symbol, logical_close=logical_close)]
 
-    rows = fetch_scientific_batch(logical_close=close, observed_at=observed, fetcher=fetcher)
+    rows = fetch_scientific_batch(
+        logical_close=close,
+        observed_at=observed,
+        fetcher=fetcher,
+        clock=lambda: observed,
+    )
     assert tuple(rows) == PANEL
 
     def empty_fetcher(*, symbol, logical_close):
         return []
 
     with pytest.raises(SourceBlocked, match="exactly one row"):
-        fetch_scientific_batch(logical_close=close, observed_at=observed, fetcher=empty_fetcher)
+        fetch_scientific_batch(
+            logical_close=close,
+            observed_at=observed,
+            fetcher=empty_fetcher,
+            clock=lambda: observed,
+        )
+
+
+def test_acquisition_crossing_deadline_marks_missed_and_stops_fetching(tmp_path: Path) -> None:
+    close = _utc(recorder.FIRST_WARMUP_CLOSE)
+    observed = close + timedelta(minutes=59)
+    ledger = recorder.EvidenceLedger(tmp_path)
+    calls = []
+    ticks = iter((observed, close + timedelta(hours=1, seconds=1)))
+
+    def clock():
+        return next(ticks)
+
+    def fetcher(*, symbol, logical_close):
+        calls.append(symbol)
+        return [recorder.synthetic_row(symbol=symbol, logical_close=logical_close)]
+
+    event = stage_due_hour(
+        ledger,
+        logical_close=close,
+        observed_at=observed,
+        fetcher=fetcher,
+        clock=clock,
+    )
+
+    assert event["event_type"] == "WINDOW_MISSED"
+    assert event["payload"]["detected_at_utc"] == "2026-09-15T01:00:01Z"
+    assert calls == ["BTCUSDT"]
+    assert tuple(item["event_type"] for item in ledger.events()) == ("WINDOW_MISSED",)
 
 
 def test_late_hour_marks_missed_without_contacting_provider(tmp_path: Path) -> None:

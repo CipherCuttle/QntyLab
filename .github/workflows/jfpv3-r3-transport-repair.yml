@@ -115,21 +115,12 @@ jobs:
           python -m qntylab.project_context render
           python -m qntylab.project_context render --check
           git diff --check
-          python - <<'PY'
-          import base64
-          import gzip
-          import json
-          from pathlib import Path
-
-          payload = json.dumps(
-              {
-                  "projects.toml": Path("docs/state/projects.toml").read_text(encoding="utf-8"),
-                  "CURRENT_ROADMAP.md": Path("docs/CURRENT_ROADMAP.md").read_text(encoding="utf-8"),
-              },
-              sort_keys=True,
-              separators=(",", ":"),
-          ).encode("utf-8")
-          encoded = base64.b64encode(gzip.compress(payload, compresslevel=9)).decode("ascii")
-          for index in range(0, len(encoded), 4000):
-              print(f"QNTY_R2_REVOCATION_B64:{index // 4000:04d}:{encoded[index:index + 4000]}")
-          PY
+      - name: Upload exact authority-revocation candidate
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: jfpv3-r2-authority-revocation-candidate
+          path: |
+            docs/state/projects.toml
+            docs/CURRENT_ROADMAP.md
+          if-no-files-found: error
+          retention-days: 1

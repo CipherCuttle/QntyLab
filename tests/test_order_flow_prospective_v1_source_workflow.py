@@ -20,6 +20,8 @@ def test_source_qualification_workflow_is_manual_probe_only() -> None:
     assert "scientific_evidence" in text
     assert "symbol_count" in text
     assert "persist-credentials: false" in text
+    assert "runs-on: [self-hosted, linux, x64, qntylab-eu-source]" in text
+    assert "if: github.event_name == 'workflow_dispatch'" in text
 
 
 def test_source_module_has_no_import_time_network_or_scheduler_authority() -> None:
@@ -28,6 +30,7 @@ def test_source_module_has_no_import_time_network_or_scheduler_authority() -> No
     assert "schedule" not in text.lower().split("class SourceBlocked", 1)[0]
     assert "subprocess.check_output" in text
     assert "scientific recording window missed; provider fetch forbidden" in text
+    assert "scientific recording window elapsed during provider acquisition" in text
     assert "NON_SCIENTIFIC_SOURCE_QUALIFICATION" in text
 
 
@@ -46,3 +49,11 @@ def test_contract_and_pass_receipt_keep_authority_separated() -> None:
     assert contract["phase_authority"]["real_prospective_collection_authorized"] is False
     assert contract["phase_authority"]["scheduler_authorized"] is False
     assert contract["phase_authority"]["prospective_activation_authorized"] is False
+    assert contract["qualification_deviation"]["source_contract_changed"] is False
+    assert contract["qualification_deviation"]["provider_payload_observed"] is False
+    assert contract["qualification_deviation"]["repair_runner_labels"] == [
+        "self-hosted",
+        "linux",
+        "x64",
+        "qntylab-eu-source",
+    ]

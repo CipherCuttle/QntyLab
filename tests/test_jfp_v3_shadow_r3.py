@@ -144,3 +144,29 @@ def test_r3_repair_exposes_no_activation_or_collection_runtime():
 
 def test_r3_repair_is_inert_on_import():
     assert not (r3.ROOT / "data/jfp_v3_shadow/events.jsonl").exists()
+
+
+def test_r2_operation_authority_is_revoked_until_fresh_r3_authorization():
+    import tomllib
+
+    registry = tomllib.loads((r3.ROOT / "docs/state/projects.toml").read_text(encoding="utf-8"))
+    rows = [
+        row
+        for row in registry["project"]
+        if row["project_id"]
+        == "JFPV3_PROSPECTIVE_SHADOW_ACTIVATION_AND_FORWARD_COLLECTION_AUTHORIZATION_V0"
+    ]
+    assert len(rows) == 1
+    row = rows[0]
+    assert row["state"] == "SUPERSEDED"
+    assert row["operation_authority_revoked"] is True
+    assert row["fresh_r3_bound_authorization_required"] is True
+    assert row["activation_authorized_after_canonicalization"] is False
+    assert row["activations_authorized"] == 0
+    assert row["committed_activation_count_allowed"] == 0
+    assert row["forward_collection_authorized_after_activation"] is False
+    assert row["real_binance_source_access_authorized_only_when_due"] is False
+    assert "activate_shadow_command" not in row
+    assert "collect_due_command" not in row
+    assert row["historical_activate_shadow_command"] == "python -m qntylab.jfp_v3_shadow activate-shadow"
+    assert row["historical_collect_due_command"] == "python -m qntylab.jfp_v3_shadow collect-due"

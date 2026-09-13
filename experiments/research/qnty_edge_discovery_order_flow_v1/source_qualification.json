@@ -27,9 +27,32 @@
     "warmup_or_origin_collection": false,
     "persistence_of_live_probe_values": false
   },
+  "qualification_deviation": {
+    "classification": "PRE_ACTIVATION_TRANSPORT_AND_DEADLINE_REPAIR",
+    "failed_master_dispatches": [
+      {
+        "run_id": 34730937111,
+        "runner_region": "eastus",
+        "failure": "HTTP_451_ON_FIRST_BINANCE_USD_M_REQUEST"
+      },
+      {
+        "run_id": 34730944734,
+        "runner_region": "westcentralus",
+        "failure": "HTTP_451_ON_FIRST_BINANCE_USD_M_REQUEST"
+      }
+    ],
+    "provider_payload_observed": false,
+    "scientific_evidence_created": false,
+    "source_contract_changed": false,
+    "post_merge_p1": "The source seam must recheck wall-clock time during and after the five-request batch so a request sequence crossing the frozen deadline cannot stage late rows.",
+    "repair_runner_labels": ["self-hosted", "linux", "x64", "qntylab-eu-source"],
+    "retry_authority": "ONE_POST_REPAIR_MANUAL_CANONICAL_MASTER_DISPATCH",
+    "activation_until_pass": "FORBIDDEN"
+  },
   "failure_semantics": {
     "network_http_json_shape_or_timestamp_mismatch": "FAIL_CLOSED",
     "scientific_hour_after_recording_deadline": "WINDOW_MISSED_WITHOUT_PROVIDER_FETCH",
+    "scientific_acquisition_crosses_recording_deadline": "WINDOW_MISSED_AND_STOP_FURTHER_PROVIDER_REQUESTS",
     "scientific_hour_before_logical_close": "FAIL_CLOSED",
     "duplicate_exact_scientific_observation": "DELEGATE_TO_QUALIFIED_RECORDER_IDEMPOTENCY",
     "conflicting_second_scientific_observation": "FAIL_CLOSED"
@@ -52,8 +75,9 @@
     "exact request bounds and symbol/interval/limit are machine tested",
     "malformed HTTP/JSON/row-count/timestamp responses fail closed",
     "late scientific hour becomes WINDOW_MISSED without any provider request",
+    "a provider request sequence that crosses the recording deadline becomes WINDOW_MISSED and stops further provider requests",
     "PR CI performs no real provider access",
-    "one manual canonical-master live probe succeeds for all five symbols without printing scientific values"
+    "one post-repair manual canonical-master live probe succeeds for all five symbols from the qualified non-US runner without printing scientific values"
   ],
-  "next_action": "After one hostile review and green exact-head CI, merge. Then dispatch exactly one manual source qualification probe from canonical master. Only PASS permits a separate activation PR before 2026-09-15T00:00:00Z."
+  "next_action": "Hostile-review this bounded pre-activation repair and require green exact-head CI. If clean, merge, register/enable the qntylab-eu-source self-hosted runner outside the blocked US regions, then dispatch exactly one post-repair manual source qualification probe from canonical master. Only PASS permits a separate activation PR before 2026-09-15T00:00:00Z."
 }

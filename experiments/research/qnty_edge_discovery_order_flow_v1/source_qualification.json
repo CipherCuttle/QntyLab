@@ -1,0 +1,59 @@
+{
+  "artifact_type": "QNTY_EDGE_ORDER_FLOW_PROSPECTIVE_V1_SOURCE_QUALIFICATION",
+  "schema_version": "1.0.0",
+  "project_id": "QNTY_EDGE_ORDER_FLOW_PROSPECTIVE_V1_SOURCE_QUALIFICATION",
+  "candidate_id": "CANDIDATE_ORDER_FLOW_SIGNED_TAKER_QUOTE_IMBALANCE_INCREMENTAL_RETURN_V1",
+  "state": "IMPLEMENTED_UNQUALIFIED",
+  "recorder_qualification_result_path": "experiments/research/qnty_edge_discovery_order_flow_v1/recorder_qualification_result.json",
+  "required_recorder_qualification_state": "PASS",
+  "source_implementation_path": "qntylab/order_flow_prospective_v1_source.py",
+  "qualification_workflow_path": ".github/workflows/order-flow-prospective-v1-source-qualification.yml",
+  "provider_contract": {
+    "provider": "Binance first-party USD-M Futures REST",
+    "endpoint_base": "https://fapi.binance.com",
+    "endpoint_path": "/fapi/v1/klines",
+    "interval": "1h",
+    "symbols": ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT"],
+    "request_identity": "For scientific logical close C, request exactly one provider kline with startTime=C-1h, endTime=C-1ms, limit=1.",
+    "response_identity": "Exactly one 12-field row must be returned and its provider open/close timestamps must match the requested hour exactly.",
+    "source_substitution": "FORBIDDEN",
+    "archive_fallback": "FORBIDDEN",
+    "alternative_exchange": "FORBIDDEN"
+  },
+  "qualification_mode": {
+    "pull_request": "synthetic/injected transport only; no real provider access",
+    "manual_master_dispatch": "one non-scientific live connectivity/shape probe using the latest fully completed hour, printing no price/volume/feature values",
+    "scientific_evidence": false,
+    "warmup_or_origin_collection": false,
+    "persistence_of_live_probe_values": false
+  },
+  "failure_semantics": {
+    "network_http_json_shape_or_timestamp_mismatch": "FAIL_CLOSED",
+    "scientific_hour_after_recording_deadline": "WINDOW_MISSED_WITHOUT_PROVIDER_FETCH",
+    "scientific_hour_before_logical_close": "FAIL_CLOSED",
+    "duplicate_exact_scientific_observation": "DELEGATE_TO_QUALIFIED_RECORDER_IDEMPOTENCY",
+    "conflicting_second_scientific_observation": "FAIL_CLOSED"
+  },
+  "phase_authority": {
+    "non_scientific_provider_probe_authorized": true,
+    "real_prospective_collection_authorized": false,
+    "scheduler_authorized": false,
+    "prospective_activation_authorized": false,
+    "scientific_execution_authorized": false,
+    "terminal_evaluation_authorized": false,
+    "router_authorized": false,
+    "qnty_authorized": false,
+    "qntyspot_authorized": false,
+    "trading_authorized": false,
+    "capital_authority": "NONE"
+  },
+  "acceptance": [
+    "recorder qualification PASS receipt is exact and recorder source is unchanged from its canonical qualification merge",
+    "exact request bounds and symbol/interval/limit are machine tested",
+    "malformed HTTP/JSON/row-count/timestamp responses fail closed",
+    "late scientific hour becomes WINDOW_MISSED without any provider request",
+    "PR CI performs no real provider access",
+    "one manual canonical-master live probe succeeds for all five symbols without printing scientific values"
+  ],
+  "next_action": "After one hostile review and green exact-head CI, merge. Then dispatch exactly one manual source qualification probe from canonical master. Only PASS permits a separate activation PR before 2026-09-15T00:00:00Z."
+}

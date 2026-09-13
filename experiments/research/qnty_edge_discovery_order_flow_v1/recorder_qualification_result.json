@@ -1,0 +1,41 @@
+{
+  "artifact_type": "QNTY_EDGE_ORDER_FLOW_PROSPECTIVE_V1_RECORDER_QUALIFICATION_RESULT",
+  "schema_version": "1.0.0",
+  "project_id": "QNTY_EDGE_ORDER_FLOW_PROSPECTIVE_V1_RECORDER_QUALIFICATION_RESULT",
+  "candidate_id": "CANDIDATE_ORDER_FLOW_SIGNED_TAKER_QUOTE_IMBALANCE_INCREMENTAL_RETURN_V1",
+  "state": "PASS",
+  "scientific_evidence": false,
+  "authority": "NONE",
+  "recorder_qualification_merge_sha": "5043c4e311980ec7b655be8f93f97b91b845c2ff",
+  "workflow_run": {
+    "id": 34730310188,
+    "event": "workflow_dispatch",
+    "head_branch": "master",
+    "head_sha": "5043c4e311980ec7b655be8f93f97b91b845c2ff",
+    "conclusion": "success",
+    "completed_at_utc": "2026-09-13T01:21:47Z"
+  },
+  "immutable_release": {
+    "id": 387757083,
+    "tag": "order-flow-v1-recorder-qualification-34730310188",
+    "target_commitish": "5043c4e311980ec7b655be8f93f97b91b845c2ff",
+    "draft": false,
+    "immutable": true,
+    "prerelease": true,
+    "asset_id": 560308361,
+    "asset_name": "order_flow_prospective_v1_synthetic_ledger.jsonl",
+    "asset_sha256": "61878def8d673e38f0417062a43d328c79805cd4883bc9b40875e1b6a41fc8bc",
+    "asset_count": 1
+  },
+  "acceptance": {
+    "frozen_recorder_contract": "PASS",
+    "deterministic_synthetic_ledger": "PASS",
+    "numeric_release_id_upload": "PASS",
+    "immutable_true": "PASS",
+    "asset_digest_matches_staged_ledger": "PASS",
+    "immutable_delete_denied_for_policy_reason": "PASS",
+    "independent_read_only_restore": "PASS",
+    "restored_bytes_equal_staged_bytes": "PASS"
+  },
+  "activation_effect": "This result permits a separate successor source/activation phase. It does not itself authorize real market-data collection, scheduling, scientific execution, Qnty/QntySpot use, trading, capital, signing, or submission."
+}

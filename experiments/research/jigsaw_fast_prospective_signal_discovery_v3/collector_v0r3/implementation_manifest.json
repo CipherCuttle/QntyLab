@@ -4,9 +4,9 @@
   "collection_performed": false,
   "files": {
     "experiments/research/jigsaw_fast_prospective_signal_discovery_v3/collector_v0r3/repair_record.json": "c6bdebe3aa3b949e9680bb57c8f6fa3a2efb6f74bdb97dec946f2128c3d8eba2",
-    "qntylab/jfp_v3_shadow_r3.py": "50d402b315e8be6b12b8bce47cea51fcc48009a0f54047cdeec481234ef2e1ca"
+    "qntylab/jfp_v3_shadow_r3.py": "a2aa54e9c8610fd21ec60977f1fbe8ce63403134a5b9af242fb2c551ef961dda"
   },
-  "implementation_digest": "50d402b315e8be6b12b8bce47cea51fcc48009a0f54047cdeec481234ef2e1ca",
+  "implementation_digest": "a2aa54e9c8610fd21ec60977f1fbe8ce63403134a5b9af242fb2c551ef961dda",
   "operational_entrypoints_exposed": false,
   "parent_r2_canonical_merge": "bc4f3a327f23d057da1ad970e9eeb7ed2fe10c91",
   "parent_r2_implementation_digest": "3f80bcd2dd60aaae6e1307883cca2e996f631f7bbc3b76037eafef8450167e2b",

@@ -69,7 +69,7 @@ class BinanceUmTransport(r2.BinanceUmTransport):
 
 
 def implementation_identity(repo_root: Path = ROOT) -> dict[str, Any]:
-    """Verify the R3 repair bytes against their frozen manifest."""
+    """Verify the R3 repair bytes and its exact frozen R2 dependency."""
     manifest_path = repo_root / R3_IMPLEMENTATION_MANIFEST
     manifest = r2.load_json(manifest_path)
     if manifest.get("parent_r2_canonical_merge") != R2_CANONICAL_MERGE:
@@ -78,6 +78,16 @@ def implementation_identity(repo_root: Path = ROOT) -> dict[str, Any]:
         raise r2.ContractError("R3 parent R2 implementation mismatch")
     if manifest.get("parent_r2_manifest_digest") != R2_MANIFEST_DIGEST:
         raise r2.ContractError("R3 parent R2 manifest mismatch")
+
+    parent = r2.implementation_identity(
+        repo_root=repo_root,
+        manifest_path=r2.R2_IMPLEMENTATION_MANIFEST,
+    )
+    if parent.get("implementation_digest") != R2_IMPLEMENTATION_DIGEST:
+        raise r2.ContractError("R3 runtime R2 implementation bytes mismatch")
+    if parent.get("manifest_digest") != R2_MANIFEST_DIGEST:
+        raise r2.ContractError("R3 runtime R2 manifest bytes mismatch")
+
     for relative, expected in manifest.get("files", {}).items():
         path = repo_root / relative
         if not path.is_file() or r2.bytes_digest(path.read_bytes()) != expected:
@@ -86,6 +96,8 @@ def implementation_identity(repo_root: Path = ROOT) -> dict[str, Any]:
         "implementation_digest": manifest.get("implementation_digest"),
         "manifest_digest": r2.bytes_digest(manifest_path.read_bytes()),
         "manifest_path": R3_IMPLEMENTATION_MANIFEST,
+        "parent_r2_implementation_digest": parent["implementation_digest"],
+        "parent_r2_manifest_digest": parent["manifest_digest"],
     }
 
 

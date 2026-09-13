@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
 from hashlib import sha256
+from http.client import HTTPException
 import json
 from pathlib import Path
 import subprocess
@@ -154,7 +155,7 @@ def default_fetch_one(*, symbol: str, logical_close: str | datetime, timeout: fl
             payload = json.loads(response.read())
     except SourceBlocked:
         raise
-    except (HTTPError, URLError, TimeoutError, OSError) as exc:
+    except (HTTPException, HTTPError, URLError, TimeoutError, OSError) as exc:
         raise SourceBlocked(f"Binance USD-M REST transport failure: {exc}") from exc
     except json.JSONDecodeError as exc:
         raise SourceBlocked("Binance USD-M REST returned malformed JSON") from exc

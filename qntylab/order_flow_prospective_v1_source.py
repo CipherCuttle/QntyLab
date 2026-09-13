@@ -211,7 +211,15 @@ def fetch_scientific_batch(
         acquisition_observed = _effective_now(acquisition_observed, clock)
         if acquisition_observed >= deadline:
             raise SourceWindowMissed(acquisition_observed)
-        payload = list(fetcher(symbol=symbol, logical_close=close))
+        try:
+            payload = list(fetcher(symbol=symbol, logical_close=close))
+        except SourceWindowMissed:
+            raise
+        except SourceBlocked as exc:
+            acquisition_observed = _effective_now(acquisition_observed, clock)
+            if acquisition_observed >= deadline:
+                raise SourceWindowMissed(acquisition_observed) from exc
+            raise
         acquisition_observed = _effective_now(acquisition_observed, clock)
         if acquisition_observed >= deadline:
             raise SourceWindowMissed(acquisition_observed)

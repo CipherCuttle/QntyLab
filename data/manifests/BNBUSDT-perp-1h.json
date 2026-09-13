@@ -1,0 +1,108 @@
+{
+  "funding_rows": 459,
+  "funding_sha256": "05ce98553c11c68e36f01c06a6145863e63cc7045e57b004d947683fab9e040e",
+  "rows": 3672,
+  "sha256": "cbf2f59d087991e3b99648576402420e983348d1b3316f39d30f57583e6ec67a",
+  "sources": [
+    {
+      "byte_count": 34847,
+      "members": [
+        "BNBUSDT-1h-2026-03.csv"
+      ],
+      "row_count": 744,
+      "sha256": "1e50c1fb04976debffed8500fc95e8418233a0a020497e813774b700b3bba6aa",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BNBUSDT/1h/BNBUSDT-1h-2026-03.zip"
+    },
+    {
+      "byte_count": 708,
+      "members": [
+        "BNBUSDT-fundingRate-2026-03.csv"
+      ],
+      "row_count": 93,
+      "sha256": "19e6e88c1a0c318fee6b8c570ed39fbfd4e3dcbcd917e0738347c3b03fad52c3",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BNBUSDT/BNBUSDT-fundingRate-2026-03.zip"
+    },
+    {
+      "byte_count": 33390,
+      "members": [
+        "BNBUSDT-1h-2026-04.csv"
+      ],
+      "row_count": 720,
+      "sha256": "197440860948507349cda7242530861f42c8879e551e2673a7bd144a286b3303",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BNBUSDT/1h/BNBUSDT-1h-2026-04.zip"
+    },
+    {
+      "byte_count": 818,
+      "members": [
+        "BNBUSDT-fundingRate-2026-04.csv"
+      ],
+      "row_count": 90,
+      "sha256": "64ad28743203161c89a5c64582ed14a599a5d47addcffc3f7e2f07063ef9bb2b",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BNBUSDT/BNBUSDT-fundingRate-2026-04.zip"
+    },
+    {
+      "byte_count": 34698,
+      "members": [
+        "BNBUSDT-1h-2026-05.csv"
+      ],
+      "row_count": 744,
+      "sha256": "61c5e4bd190326a5de1dbb69a91716b75212573a282792b260b7cced9a335709",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BNBUSDT/1h/BNBUSDT-1h-2026-05.zip"
+    },
+    {
+      "byte_count": 908,
+      "members": [
+        "BNBUSDT-fundingRate-2026-05.csv"
+      ],
+      "row_count": 93,
+      "sha256": "b62dd555a8c1ecc25644f529e4cd351a835aeabaa70258909d9f1c328f427cd8",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BNBUSDT/BNBUSDT-fundingRate-2026-05.zip"
+    },
+    {
+      "byte_count": 33955,
+      "members": [
+        "BNBUSDT-1h-2026-06.csv"
+      ],
+      "row_count": 720,
+      "sha256": "d3760589416bf315de18bb9557cb9ced5d4f92bc89d1bfcd4dbbe2733ba5d355",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BNBUSDT/1h/BNBUSDT-1h-2026-06.zip"
+    },
+    {
+      "byte_count": 777,
+      "members": [
+        "BNBUSDT-fundingRate-2026-06.csv"
+      ],
+      "row_count": 90,
+      "sha256": "fffa72378e35dd0fc6faf22e8e7b5b22794201124e4727da92d6cb2b591459be",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BNBUSDT/BNBUSDT-fundingRate-2026-06.zip"
+    },
+    {
+      "byte_count": 34025,
+      "members": [
+        "BNBUSDT-1h-2026-07.csv"
+      ],
+      "row_count": 744,
+      "sha256": "1f5f1a843bd6347c9b9ff2afd8f1d90038dfa999ae20840dc14f4561d3d48d50",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BNBUSDT/1h/BNBUSDT-1h-2026-07.zip"
+    },
+    {
+      "byte_count": 937,
+      "members": [
+        "BNBUSDT-fundingRate-2026-07.csv"
+      ],
+      "row_count": 93,
+      "sha256": "0ff2884392a6efe9a33063971dd583090124e916a3c8b59dca6949cb6ed81124",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BNBUSDT/BNBUSDT-fundingRate-2026-07.zip"
+    }
+  ]
+}

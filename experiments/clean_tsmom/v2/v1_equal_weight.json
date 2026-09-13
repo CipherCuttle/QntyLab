@@ -1,0 +1,1 @@
+{"experiment_version":"EXP_V2","identifier":"CLEAN_V1","lookback_bars":20,"universe":["BTCUSDT","ETHUSDT","XRPUSDT","LINKUSDT","DOTUSDT","BNBUSDT","ADAUSDT","SOLUSDT","AVAXUSDT"],"weight_rule":"signal / 9; no active-only renormalization","execution":"t+1"}

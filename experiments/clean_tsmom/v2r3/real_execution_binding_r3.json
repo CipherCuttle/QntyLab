@@ -1,0 +1,14 @@
+{
+  "amendment": "R3 changes execution implementation only.",
+  "contract_revision": "REAL_EXECUTION_IMPLEMENTATION_R3",
+  "experiment": "EXP_V2",
+  "r1_source_binding_sha256": "ceb79a882dee4b6bcd5bb21c9b89e5ba7388ffe44cbd543aae775a61106eafbd",
+  "referenced_contracts": [
+    {"path":"experiments/clean_tsmom/v2/","sha256":"PRESERVED_V2_DIRECTORY"},
+    {"path":"experiments/clean_tsmom/v2r1/","sha256":"PRESERVED_R1_DIRECTORY"},
+    {"path":"experiments/clean_tsmom/v2r2/","sha256":"PRESERVED_R2_DIRECTORY"}
+  ],
+  "R1_source_bytes_and_authentication_unchanged": true,
+  "R2_timeline_window_metrics_benchmark_classification_semantics_unchanged": true,
+  "no_real_corrected_metrics_observed_before_freeze": true
+}

@@ -1,30 +1,108 @@
 {
-  "complete_archive_months_only": true,
-  "data_type": [
-    "klines",
-    "premiumIndexKlines",
-    "fundingRate"
-  ],
-  "end": "2026-06-30T23:00:00Z",
-  "funding_events": 6096,
-  "funding_source": "Binance public-data fundingRate archive",
-  "gaps": [
-    "2021-06-30T23:00:00+00:00 -> 2021-07-02T00:00:00+00:00 (1 day, 1:00:00)",
-    "2021-07-23T23:00:00+00:00 -> 2021-07-28T00:00:00+00:00 (4 days, 1:00:00)",
-    "2022-02-25T23:00:00+00:00 -> 2022-03-01T00:00:00+00:00 (3 days, 1:00:00)",
-    "2022-03-31T23:00:00+00:00 -> 2022-04-03T00:00:00+00:00 (2 days, 1:00:00)",
-    "2023-04-08T23:00:00+00:00 -> 2023-04-10T00:00:00+00:00 (1 day, 1:00:00)",
-    "2026-06-28T23:00:00+00:00 -> 2026-06-30T00:00:00+00:00 (1 day, 1:00:00)"
-  ],
-  "market": "USD-M perpetual",
-  "retrieved_at": "2026-07-28T20:02:00.457773Z",
-  "rows": 47880,
-  "sha256": {
-    "funding": "138753bec9936f63ec128c9463ae003b02247d045d275167caf36532fd230c9d",
-    "perp": "b292842c2933c088cba5c2b0d508c8980d07a4ae8057c1314db452f5e200301d"
-  },
-  "source": "https://data.binance.vision/data/futures/um/monthly",
-  "start": "2021-01-01T00:00:00Z",
-  "symbol": "SOLUSDT",
-  "timeframe": "1h"
+  "funding_rows": 459,
+  "funding_sha256": "54cdfe07f692183ec5e35e13eadbbe042207c105ba3ab0c592ff8dbd8f29f3c3",
+  "rows": 3672,
+  "sha256": "5902e10bc475d9f4b8bb6932716bc3ccd642e18711bb85473905e2c7a10038b4",
+  "sources": [
+    {
+      "byte_count": 36150,
+      "members": [
+        "SOLUSDT-1h-2026-03.csv"
+      ],
+      "row_count": 744,
+      "sha256": "5e9440665d3e4209c320e2dab897b5c3cec578800e669e1c8fd3503f157e49f1",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/SOLUSDT/1h/SOLUSDT-1h-2026-03.zip"
+    },
+    {
+      "byte_count": 1010,
+      "members": [
+        "SOLUSDT-fundingRate-2026-03.csv"
+      ],
+      "row_count": 93,
+      "sha256": "75cfaea075d97779a577c3744ea63e3d83704f281806fb5f76f2d3e0f089fd2c",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/SOLUSDT/SOLUSDT-fundingRate-2026-03.zip"
+    },
+    {
+      "byte_count": 34581,
+      "members": [
+        "SOLUSDT-1h-2026-04.csv"
+      ],
+      "row_count": 720,
+      "sha256": "2f466580c7e6d2e02a67a968428c0f9b987108cc1a3d2ba73061e329aacc208d",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/SOLUSDT/1h/SOLUSDT-1h-2026-04.zip"
+    },
+    {
+      "byte_count": 944,
+      "members": [
+        "SOLUSDT-fundingRate-2026-04.csv"
+      ],
+      "row_count": 90,
+      "sha256": "951a280e98b6d20fe4be25bf2b71f3cda1c07c7583a88cb874151e2b1fe941f1",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/SOLUSDT/SOLUSDT-fundingRate-2026-04.zip"
+    },
+    {
+      "byte_count": 35689,
+      "members": [
+        "SOLUSDT-1h-2026-05.csv"
+      ],
+      "row_count": 744,
+      "sha256": "0d1aef19746005c140421825e55e482813330b19a82cbc24c792aaa0464778c2",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/SOLUSDT/1h/SOLUSDT-1h-2026-05.zip"
+    },
+    {
+      "byte_count": 979,
+      "members": [
+        "SOLUSDT-fundingRate-2026-05.csv"
+      ],
+      "row_count": 93,
+      "sha256": "c13066e5f7c5d161dbebd488cbeaab1205688c6dc7f9fafcc8f94296f2c1e47b",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/SOLUSDT/SOLUSDT-fundingRate-2026-05.zip"
+    },
+    {
+      "byte_count": 35026,
+      "members": [
+        "SOLUSDT-1h-2026-06.csv"
+      ],
+      "row_count": 720,
+      "sha256": "5b6913a64843d8fbadeb1783a2ef064291355a33e6eee84f1a03c7e8786acfc8",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/SOLUSDT/1h/SOLUSDT-1h-2026-06.zip"
+    },
+    {
+      "byte_count": 973,
+      "members": [
+        "SOLUSDT-fundingRate-2026-06.csv"
+      ],
+      "row_count": 90,
+      "sha256": "8d32fa3153d54c58667650e8b2c65e489b3a433b775052a93208bf60541a40d3",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/SOLUSDT/SOLUSDT-fundingRate-2026-06.zip"
+    },
+    {
+      "byte_count": 35322,
+      "members": [
+        "SOLUSDT-1h-2026-07.csv"
+      ],
+      "row_count": 744,
+      "sha256": "4a88a47617d14ba94ae2154732ba724497a8cad66b1d7fd0dc4f88216101e0be",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/SOLUSDT/1h/SOLUSDT-1h-2026-07.zip"
+    },
+    {
+      "byte_count": 964,
+      "members": [
+        "SOLUSDT-fundingRate-2026-07.csv"
+      ],
+      "row_count": 93,
+      "sha256": "13f655eaa29865b16acc7bd97be74e212bc4c2139fc2f9ead4d150852c2a9ebb",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/SOLUSDT/SOLUSDT-fundingRate-2026-07.zip"
+    }
+  ]
 }

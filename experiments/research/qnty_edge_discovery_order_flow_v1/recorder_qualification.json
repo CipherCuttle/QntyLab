@@ -1,0 +1,79 @@
+{
+  "artifact_type": "QNTY_EDGE_ORDER_FLOW_PROSPECTIVE_V1_RECORDER_QUALIFICATION",
+  "schema_version": "1.0.0",
+  "project_id": "QNTY_EDGE_ORDER_FLOW_PROSPECTIVE_V1_RECORDER_QUALIFICATION",
+  "candidate_id": "CANDIDATE_ORDER_FLOW_SIGNED_TAKER_QUOTE_IMBALANCE_INCREMENTAL_RETURN_V1",
+  "state": "IMPLEMENTED_UNQUALIFIED",
+  "preregistration_canonical_merge_sha": "acd1076825d79af36071422bac5b8206e38534af",
+  "implementation_path": "qntylab/order_flow_prospective_v1_recorder.py",
+  "qualification_workflow_path": ".github/workflows/order-flow-prospective-v1-recorder-qualification.yml",
+  "source_contract": {
+    "provider": "Binance first-party USD-M Futures REST",
+    "endpoint_base": "https://fapi.binance.com",
+    "endpoint_path": "/fapi/v1/klines",
+    "interval": "1h",
+    "fixed_symbols": ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT"],
+    "logical_close_mapping": "provider open_time = C-1h; provider close_time = C-1ms",
+    "recording_window": "[C,C+1h)",
+    "backfill": "FORBIDDEN",
+    "source_substitution": "FORBIDDEN"
+  },
+  "row_validity_freeze": {
+    "deadline_utc": "2026-09-15T00:00:00Z",
+    "status": "FROZEN_BY_THIS_PHASE_BEFORE_REAL_WARMUP",
+    "rules_source": "ROW_VALIDITY_RULES in implementation_path",
+    "discretionary_magnitude_filtering": "FORBIDDEN",
+    "winsorization": "NONE",
+    "replacement_rows": "FORBIDDEN"
+  },
+  "gap_semantics": {
+    "missed_hour_event": "WINDOW_MISSED",
+    "missed_hour_backfill": "FORBIDDEN",
+    "campaign_terminal_on_single_gap": false,
+    "terminal_integrity_is_decided_by_preregistered_coverage_and_integrity_gates": true
+  },
+  "durability_contract": {
+    "local_append_state": "OBSERVED_PENDING_ANCHOR",
+    "scientific_durable_state_requires": [
+      "exact ledger bytes staged as an Actions artifact",
+      "same bytes uploaded to a draft GitHub release by numeric release id",
+      "release published and reported immutable=true",
+      "asset SHA-256 equals staged ledger SHA-256",
+      "immutable asset mutation is specifically denied",
+      "separate read-only job restores asset by numeric asset id",
+      "restored bytes exactly match staged ledger bytes and SHA-256"
+    ],
+    "persistence_transport_basis_pr": 275,
+    "persistence_transport_basis_merge_sha": "08aea4880132fd0d894d9b09bbf257b22f51ffc7",
+    "persistence_transport_basis_run_id": 34719771090,
+    "persistence_transport_basis_result": "PASS"
+  },
+  "qualification_matrix": [
+    "logical-close to provider request bounds are exact",
+    "provider timestamp identity mismatch fails closed",
+    "non-finite/non-positive/malformed required fields fail closed",
+    "taker-buy quote volume outside [0,quote volume] fails closed",
+    "exact five-symbol batch requirement is enforced",
+    "staged observation is deterministic and hash chained",
+    "duplicate identical observation is idempotent",
+    "conflicting second observation fails closed",
+    "late missing hour becomes WINDOW_MISSED and cannot be backfilled",
+    "synthetic ledger anchors to immutable release by numeric release id",
+    "immutable asset digest is verified and deletion is specifically denied",
+    "separate read-only job restores exact bytes"
+  ],
+  "phase_authority": {
+    "real_market_data_access_authorized": false,
+    "scheduler_authorized": false,
+    "prospective_activation_authorized": false,
+    "scientific_execution_authorized": false,
+    "terminal_evaluation_authorized": false,
+    "router_authorized": false,
+    "qnty_authorized": false,
+    "qntyspot_authorized": false,
+    "trading_authorized": false,
+    "capital_authority": "NONE"
+  },
+  "activation_rule": "A separate successor PR may activate only after this qualification is PASS on canonical master and before the first real warmup close. If that deadline is missed, do not slide or backfill; issue a new future prospective campaign identity/schedule.",
+  "next_action": "Run read-only CI and one hostile review. If merged cleanly, dispatch exactly one synthetic persistence qualification from canonical master. Only a PASS permits a separate activation phase."
+}

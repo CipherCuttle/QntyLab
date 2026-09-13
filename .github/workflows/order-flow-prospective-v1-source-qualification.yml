@@ -37,7 +37,7 @@ jobs:
     name: one non-scientific first-party provider smoke probe
     needs: verify
     if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-24.04
+    runs-on: [self-hosted, linux, x64, qntylab-eu-source]
     permissions:
       contents: read
     steps:

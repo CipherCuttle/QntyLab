@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
+from http.client import IncompleteRead
 from io import BytesIO
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
@@ -80,6 +81,25 @@ def test_default_fetch_one_uses_exact_query_and_shape() -> None:
         "endTime": [str(int(close.timestamp() * 1000) - 1)],
         "limit": ["1"],
     }
+
+
+def test_response_read_http_exception_is_normalized_to_source_blocked() -> None:
+    close = _utc(recorder.FIRST_WARMUP_CLOSE)
+
+    class Response:
+        status = 200
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            return False
+        def read(self):
+            raise IncompleteRead(b"partial", 100)
+
+    def opener(request, timeout):
+        return Response()
+
+    with pytest.raises(SourceBlocked, match="REST transport failure"):
+        default_fetch_one(symbol="BTCUSDT", logical_close=close, opener=opener)
 
 
 def test_provider_shape_and_timestamp_mismatch_fail_closed() -> None:
@@ -179,6 +199,41 @@ def test_provider_failure_crossing_deadline_marks_missed(tmp_path: Path) -> None
     assert tuple(item["event_type"] for item in ledger.events()) == ("WINDOW_MISSED",)
 
 
+def test_response_read_failure_crossing_deadline_marks_missed(tmp_path: Path) -> None:
+    close = _utc(recorder.FIRST_WARMUP_CLOSE)
+    observed = close + timedelta(minutes=59)
+    ledger = recorder.EvidenceLedger(tmp_path)
+    ticks = iter((observed, close + timedelta(hours=1, seconds=1)))
+
+    class Response:
+        status = 200
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            return False
+        def read(self):
+            raise IncompleteRead(b"partial", 100)
+
+    def fetcher(*, symbol, logical_close):
+        return default_fetch_one(
+            symbol=symbol,
+            logical_close=logical_close,
+            opener=lambda request, timeout: Response(),
+        )
+
+    event = stage_due_hour(
+        ledger,
+        logical_close=close,
+        observed_at=observed,
+        fetcher=fetcher,
+        clock=lambda: next(ticks),
+    )
+
+    assert event["event_type"] == "WINDOW_MISSED"
+    assert event["payload"]["detected_at_utc"] == "2026-09-15T01:00:01Z"
+    assert tuple(item["event_type"] for item in ledger.events()) == ("WINDOW_MISSED",)
+
+
 def test_provider_failure_inside_window_preserves_source_failure(tmp_path: Path) -> None:
     close = _utc(recorder.FIRST_WARMUP_CLOSE)
     observed = close + timedelta(minutes=4)
@@ -198,6 +253,40 @@ def test_provider_failure_inside_window_preserves_source_failure(tmp_path: Path)
             observed_at=observed,
             fetcher=fetcher,
             clock=clock,
+        )
+
+    assert ledger.events() == ()
+
+
+def test_response_read_failure_inside_window_preserves_source_blocked(tmp_path: Path) -> None:
+    close = _utc(recorder.FIRST_WARMUP_CLOSE)
+    observed = close + timedelta(minutes=4)
+    ledger = recorder.EvidenceLedger(tmp_path)
+    ticks = iter((observed, observed + timedelta(seconds=30)))
+
+    class Response:
+        status = 200
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            return False
+        def read(self):
+            raise IncompleteRead(b"partial", 100)
+
+    def fetcher(*, symbol, logical_close):
+        return default_fetch_one(
+            symbol=symbol,
+            logical_close=logical_close,
+            opener=lambda request, timeout: Response(),
+        )
+
+    with pytest.raises(SourceBlocked, match="REST transport failure"):
+        stage_due_hour(
+            ledger,
+            logical_close=close,
+            observed_at=observed,
+            fetcher=fetcher,
+            clock=lambda: next(ticks),
         )
 
     assert ledger.events() == ()

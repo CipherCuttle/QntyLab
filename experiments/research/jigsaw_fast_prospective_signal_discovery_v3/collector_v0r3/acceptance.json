@@ -1,0 +1,18 @@
+{
+  "activation_authorized_in_this_phase": false,
+  "candidate_id": "JFPV3_01",
+  "exact_transport_repair": "subtract one hour from both Binance provider query bounds while preserving logical close timestamps",
+  "fresh_activation_authorization_required_after_canonicalization": true,
+  "frozen_r2_mutation_authorized": false,
+  "hostile_review_budget": 1,
+  "phase": "JFPV3_PR_B_R3",
+  "required_gates": [
+    "feature close grid origin-24h through origin exact",
+    "outcome close grid origin through origin+24h exact",
+    "R2 frozen transport remains unchanged",
+    "R3 manifest identity verifies",
+    "no activation or real network access",
+    "no scientific-contract change"
+  ],
+  "targeted_rereview_allowed_only_for_critical_or_high_repairs": true
+}

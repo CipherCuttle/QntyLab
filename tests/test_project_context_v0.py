@@ -921,8 +921,10 @@ def test_jfpv3_prospective_shadow_authorization_is_one_shot_and_non_scientific()
     _, _, registry = project_context.load_context_sources(ROOT)
     authorization = next(record for record in registry["project"] if record["project_id"] == PROSPECTIVE_SHADOW_AUTHORIZATION_PROJECT_ID)
     _assert_project_is_not_current_active(data, PROSPECTIVE_SHADOW_AUTHORIZATION_PROJECT_ID)
-    assert authorization["state"] == "CLOSED_PASS"
-    assert authorization["authority_level"] == "FROZEN_PROSPECTIVE_SHADOW_OPERATION_AUTHORIZATION_ONLY"
+    assert authorization["state"] == "SUPERSEDED"
+    assert authorization["authority_level"] == "HISTORICAL_SUPERSEDED_OPERATION_AUTHORIZATION_ONLY"
+    assert authorization["operation_authority_revoked"] is True
+    assert authorization["fresh_r3_bound_authorization_required"] is True
     assert authorization["phase_type"] == "GOVERNANCE_ONLY"
     assert authorization["implementation_authorized"] is False
     assert authorization["generation_id"] == authorization["candidate_id"] == "JFPV3_01"
@@ -930,15 +932,23 @@ def test_jfpv3_prospective_shadow_authorization_is_one_shot_and_non_scientific()
     assert authorization["canonical_r2_merge"] == "bc4f3a327f23d057da1ad970e9eeb7ed2fe10c91"
     assert authorization["canonical_r2_implementation_digest"] == "3f80bcd2dd60aaae6e1307883cca2e996f631f7bbc3b76037eafef8450167e2b"
     assert authorization["canonical_r2_manifest_digest"] == "b1ca7d2bb5025b272bfdcd871a1889f6f25842c2be83c479d19ebad16075520e"
-    assert authorization["activation_authorized_after_canonicalization"] is True
-    assert authorization["activation_authorization_canonicalization_required"] is True
-    assert authorization["activations_authorized"] == authorization["committed_activation_count_allowed"] == 1
-    assert authorization["activate_shadow_command"] == "python -m qntylab.jfp_v3_shadow activate-shadow"
-    assert authorization["forward_collection_authorized_after_activation"] is True
-    assert authorization["collect_due_command"] == "python -m qntylab.jfp_v3_shadow collect-due"
+    assert authorization["activation_authorized_after_canonicalization"] is False
+    assert authorization["historical_activation_authorized_after_canonicalization"] is True
+    assert authorization["activation_authorization_canonicalization_required"] is False
+    assert authorization["historical_activation_authorization_canonicalization_required"] is True
+    assert authorization["activations_authorized"] == authorization["committed_activation_count_allowed"] == 0
+    assert authorization["historical_activations_authorized"] == 1
+    assert authorization["historical_committed_activation_count_allowed"] == 1
+    assert "activate_shadow_command" not in authorization
+    assert authorization["historical_activate_shadow_command"] == "python -m qntylab.jfp_v3_shadow activate-shadow"
+    assert authorization["forward_collection_authorized_after_activation"] is False
+    assert authorization["historical_forward_collection_authorized_after_activation"] is True
+    assert "collect_due_command" not in authorization
+    assert authorization["historical_collect_due_command"] == "python -m qntylab.jfp_v3_shadow collect-due"
     assert authorization["forward_collection_requires_committed_activation"] is True
     assert authorization["forward_collection_requires_due_origin"] is True
-    assert authorization["real_binance_source_access_authorized_only_when_due"] is True
+    assert authorization["real_binance_source_access_authorized_only_when_due"] is False
+    assert authorization["historical_real_binance_source_access_authorized_only_when_due"] is True
     for field in (
         "duplicate_activation_authorized", "replacement_origins_authorized", "schedule_extension_authorized",
         "early_origin_execution_authorized", "interim_inference_authorized", "terminal_evaluation_authorized",
@@ -963,7 +973,7 @@ def test_jfpv3_prospective_shadow_authorization_is_one_shot_and_non_scientific()
     assert authorization["real_prospective_p_values_computed"] == 0
     assert authorization["real_prospective_partial_r2_computed"] == 0
     assert authorization["scientific_classifications_computed"] == 0
-    assert authorization["next_action"].startswith("CLOSED_PASS: Canonicalize this authorization")
+    assert authorization["next_action"].startswith("SUPERSEDED: R2 operational authority is revoked")
 
 
 def test_jh01_real_operation_authorization_is_single_active_source_bound_phase() -> None:

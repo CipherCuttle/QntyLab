@@ -8,7 +8,6 @@
   "required_recorder_qualification_state": "PASS",
   "source_implementation_path": "qntylab/order_flow_prospective_v1_source.py",
   "qualification_workflow_path": ".github/workflows/order-flow-prospective-v1-source-qualification.yml",
-  "live_probe_workflow_path": ".github/workflows/order-flow-prospective-v1-source-live-probe.yml",
   "provider_contract": {
     "provider": "Binance first-party USD-M Futures REST",
     "endpoint_base": "https://fapi.binance.com",
@@ -23,7 +22,7 @@
   },
   "qualification_mode": {
     "pull_request": "synthetic/injected transport only on GitHub-hosted runner; no real provider access and no self-hosted execution",
-    "manual_master_dispatch": "isolated workflow only; one non-scientific live connectivity/shape probe using the latest fully completed hour, printing no price/volume/feature values",
+    "post_merge_live_probe": "one local operator-run non-scientific connectivity/shape probe from a clean detached worktree at the exact recorded canonical master SHA on a trusted non-US host; use the latest fully completed hour and print no price/volume/feature values",
     "scientific_evidence": false,
     "warmup_or_origin_collection": false,
     "persistence_of_live_probe_values": false
@@ -45,16 +44,18 @@
     "provider_payload_observed": false,
     "scientific_evidence_created": false,
     "source_contract_changed": false,
-    "post_merge_p1": "The source seam must recheck wall-clock time during and after the five-request batch so a request sequence crossing the frozen deadline cannot stage late rows.",
-    "repair_runner_labels": ["self-hosted", "linux", "x64", "qntylab-eu-source"],
-    "self_hosted_pr_execution": "FORBIDDEN_BY_SEPARATE_MANUAL_ONLY_WORKFLOW",
-    "retry_authority": "ONE_POST_REPAIR_MANUAL_CANONICAL_MASTER_DISPATCH",
+    "post_merge_p1": "The source seam must recheck wall-clock time during, after, and on source failures inside the five-request batch so an acquisition crossing the frozen deadline cannot stage late rows or omit the terminal WINDOW_MISSED state.",
+    "github_actions_live_probe": "FORBIDDEN",
+    "self_hosted_github_actions_runner": "NOT_USED",
+    "required_local_repository_state": "CLEAN_DETACHED_WORKTREE_AT_EXACT_CANONICAL_MASTER_SHA",
+    "retry_authority": "ONE_POST_REPAIR_LOCAL_CANONICAL_SHA_PROBE",
     "activation_until_pass": "FORBIDDEN"
   },
   "failure_semantics": {
-    "network_http_json_shape_or_timestamp_mismatch": "FAIL_CLOSED",
+    "network_http_json_shape_or_timestamp_mismatch_inside_window": "FAIL_CLOSED",
     "scientific_hour_after_recording_deadline": "WINDOW_MISSED_WITHOUT_PROVIDER_FETCH",
-    "scientific_acquisition_crosses_recording_deadline": "WINDOW_MISSED_AND_STOP_FURTHER_PROVIDER_REQUESTS",
+    "scientific_acquisition_return_crosses_recording_deadline": "WINDOW_MISSED_AND_STOP_FURTHER_PROVIDER_REQUESTS",
+    "scientific_acquisition_failure_crosses_recording_deadline": "WINDOW_MISSED_AND_STOP_FURTHER_PROVIDER_REQUESTS",
     "scientific_hour_before_logical_close": "FAIL_CLOSED",
     "duplicate_exact_scientific_observation": "DELEGATE_TO_QUALIFIED_RECORDER_IDEMPOTENCY",
     "conflicting_second_scientific_observation": "FAIL_CLOSED"
@@ -77,9 +78,11 @@
     "exact request bounds and symbol/interval/limit are machine tested",
     "malformed HTTP/JSON/row-count/timestamp responses fail closed",
     "late scientific hour becomes WINDOW_MISSED without any provider request",
-    "a provider request sequence that crosses the recording deadline becomes WINDOW_MISSED and stops further provider requests",
-    "PR CI performs no real provider access and cannot select the self-hosted live-probe runner",
-    "one post-repair manual canonical-master live probe succeeds for all five symbols from the qualified non-US runner without printing scientific values"
+    "a provider request that returns after the recording deadline becomes WINDOW_MISSED and stops further provider requests",
+    "a provider request that fails after the recording deadline becomes WINDOW_MISSED while the same failure inside the window remains fail-closed",
+    "PR CI performs no real provider access and no repository workflow targets a self-hosted source-probe runner",
+    "the post-merge live probe is run only from a clean detached worktree whose HEAD equals the exact recorded canonical master SHA",
+    "one post-repair local canonical-SHA probe succeeds for all five symbols on a trusted non-US host without printing scientific values"
   ],
-  "next_action": "Hostile-review this bounded pre-activation repair and require green exact-head CI. If clean, merge, register/enable the qntylab-eu-source self-hosted runner outside the blocked US regions, then dispatch exactly one post-repair manual source qualification probe from canonical master using the isolated manual-only workflow. Only PASS permits a separate activation PR before 2026-09-15T00:00:00Z."
+  "next_action": "Hostile-review this bounded pre-activation repair and require green exact-head CI. If clean, merge. Then fetch canonical master, record its exact SHA, create a clean detached worktree at that SHA on a trusted non-US host, verify HEAD equals the recorded SHA and the worktree is clean, and run exactly one local non-scientific source probe. Only PASS permits a separate activation PR before 2026-09-15T00:00:00Z."
 }

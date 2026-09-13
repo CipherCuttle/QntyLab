@@ -8,6 +8,7 @@
   "required_recorder_qualification_state": "PASS",
   "source_implementation_path": "qntylab/order_flow_prospective_v1_source.py",
   "qualification_workflow_path": ".github/workflows/order-flow-prospective-v1-source-qualification.yml",
+  "live_probe_workflow_path": ".github/workflows/order-flow-prospective-v1-source-live-probe.yml",
   "provider_contract": {
     "provider": "Binance first-party USD-M Futures REST",
     "endpoint_base": "https://fapi.binance.com",
@@ -21,8 +22,8 @@
     "alternative_exchange": "FORBIDDEN"
   },
   "qualification_mode": {
-    "pull_request": "synthetic/injected transport only; no real provider access",
-    "manual_master_dispatch": "one non-scientific live connectivity/shape probe using the latest fully completed hour, printing no price/volume/feature values",
+    "pull_request": "synthetic/injected transport only on GitHub-hosted runner; no real provider access and no self-hosted execution",
+    "manual_master_dispatch": "isolated workflow only; one non-scientific live connectivity/shape probe using the latest fully completed hour, printing no price/volume/feature values",
     "scientific_evidence": false,
     "warmup_or_origin_collection": false,
     "persistence_of_live_probe_values": false
@@ -46,6 +47,7 @@
     "source_contract_changed": false,
     "post_merge_p1": "The source seam must recheck wall-clock time during and after the five-request batch so a request sequence crossing the frozen deadline cannot stage late rows.",
     "repair_runner_labels": ["self-hosted", "linux", "x64", "qntylab-eu-source"],
+    "self_hosted_pr_execution": "FORBIDDEN_BY_SEPARATE_MANUAL_ONLY_WORKFLOW",
     "retry_authority": "ONE_POST_REPAIR_MANUAL_CANONICAL_MASTER_DISPATCH",
     "activation_until_pass": "FORBIDDEN"
   },
@@ -76,8 +78,8 @@
     "malformed HTTP/JSON/row-count/timestamp responses fail closed",
     "late scientific hour becomes WINDOW_MISSED without any provider request",
     "a provider request sequence that crosses the recording deadline becomes WINDOW_MISSED and stops further provider requests",
-    "PR CI performs no real provider access",
+    "PR CI performs no real provider access and cannot select the self-hosted live-probe runner",
     "one post-repair manual canonical-master live probe succeeds for all five symbols from the qualified non-US runner without printing scientific values"
   ],
-  "next_action": "Hostile-review this bounded pre-activation repair and require green exact-head CI. If clean, merge, register/enable the qntylab-eu-source self-hosted runner outside the blocked US regions, then dispatch exactly one post-repair manual source qualification probe from canonical master. Only PASS permits a separate activation PR before 2026-09-15T00:00:00Z."
+  "next_action": "Hostile-review this bounded pre-activation repair and require green exact-head CI. If clean, merge, register/enable the qntylab-eu-source self-hosted runner outside the blocked US regions, then dispatch exactly one post-repair manual source qualification probe from canonical master using the isolated manual-only workflow. Only PASS permits a separate activation PR before 2026-09-15T00:00:00Z."
 }

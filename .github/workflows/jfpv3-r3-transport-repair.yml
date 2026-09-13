@@ -8,6 +8,8 @@ on:
       - "tests/test_jfp_v3_shadow.py"
       - "tests/test_jfp_v3_shadow_r3.py"
       - "experiments/research/jigsaw_fast_prospective_signal_discovery_v3/collector_v0r3/**"
+      - "docs/state/projects.toml"
+      - "docs/CURRENT_ROADMAP.md"
       - ".github/workflows/jfpv3-r3-transport-repair.yml"
   workflow_dispatch:
 
@@ -46,3 +48,88 @@ jobs:
           PY
       - name: Run frozen R2 and repaired R3 tests
         run: python -m pytest -q tests/test_jfp_v3_shadow.py tests/test_jfp_v3_shadow_r3.py
+      - name: Generate fail-closed R2 authority-revocation candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("docs/state/projects.toml")
+          text = path.read_text(encoding="utf-8")
+          marker = 'project_id = "JFPV3_PROSPECTIVE_SHADOW_ACTIVATION_AND_FORWARD_COLLECTION_AUTHORIZATION_V0"'
+          marker_at = text.index(marker)
+          section_start = text.rfind("[[project]]", 0, marker_at)
+          next_section = text.find("[[project]]", marker_at)
+          if section_start < 0 or next_section < 0:
+              raise SystemExit("could not isolate R2 authorization project table")
+          section = text[section_start:next_section]
+
+          replacements = {
+              'state = "CLOSED_PASS"': 'state = "SUPERSEDED"',
+              'authority_level = "FROZEN_PROSPECTIVE_SHADOW_OPERATION_AUTHORIZATION_ONLY"': (
+                  'authority_level = "HISTORICAL_SUPERSEDED_OPERATION_AUTHORIZATION_ONLY"\n'
+                  'operation_authority_revoked = true\n'
+                  'fresh_r3_bound_authorization_required = true'
+              ),
+              'activation_authorized_after_canonicalization = true': (
+                  'activation_authorized_after_canonicalization = false\n'
+                  'historical_activation_authorized_after_canonicalization = true'
+              ),
+              'activation_authorization_canonicalization_required = true': (
+                  'activation_authorization_canonicalization_required = false\n'
+                  'historical_activation_authorization_canonicalization_required = true'
+              ),
+              'activations_authorized = 1': 'activations_authorized = 0\nhistorical_activations_authorized = 1',
+              'committed_activation_count_allowed = 1': (
+                  'committed_activation_count_allowed = 0\n'
+                  'historical_committed_activation_count_allowed = 1'
+              ),
+              'activate_shadow_command = "python -m qntylab.jfp_v3_shadow activate-shadow"': (
+                  'historical_activate_shadow_command = "python -m qntylab.jfp_v3_shadow activate-shadow"'
+              ),
+              'forward_collection_authorized_after_activation = true': (
+                  'forward_collection_authorized_after_activation = false\n'
+                  'historical_forward_collection_authorized_after_activation = true'
+              ),
+              'collect_due_command = "python -m qntylab.jfp_v3_shadow collect-due"': (
+                  'historical_collect_due_command = "python -m qntylab.jfp_v3_shadow collect-due"'
+              ),
+              'real_binance_source_access_authorized_only_when_due = true': (
+                  'real_binance_source_access_authorized_only_when_due = false\n'
+                  'historical_real_binance_source_access_authorized_only_when_due = true'
+              ),
+              'next_action = "CLOSED_PASS: Canonicalize this authorization, then execute exactly one real activate-shadow, verify the committed 365-origin schedule, and stop before any origin collection unless an origin is actually due. No scientific inference or terminal evaluation is authorized."': (
+                  'next_action = "SUPERSEDED: R2 operational authority is revoked before any valid activation. Do not run activate-shadow or collect-due from qntylab.jfp_v3_shadow. A fresh separately Git-backed R3-bound authorization is required before any activation, forward collection, or real Binance source access."'
+              ),
+          }
+          for old, new in replacements.items():
+              count = section.count(old)
+              if count != 1:
+                  raise SystemExit(f"expected exactly one R2 authority token, got {count}: {old}")
+              section = section.replace(old, new, 1)
+          text = text[:section_start] + section + text[next_section:]
+          path.write_text(text, encoding="utf-8")
+          PY
+          python -m qntylab.project_context doctor --strict
+          python -m qntylab.project_context render
+          python -m qntylab.project_context render --check
+          git diff --check
+          python - <<'PY'
+          import base64
+          import gzip
+          import json
+          from pathlib import Path
+
+          payload = json.dumps(
+              {
+                  "projects.toml": Path("docs/state/projects.toml").read_text(encoding="utf-8"),
+                  "CURRENT_ROADMAP.md": Path("docs/CURRENT_ROADMAP.md").read_text(encoding="utf-8"),
+              },
+              sort_keys=True,
+              separators=(",", ":"),
+          ).encode("utf-8")
+          encoded = base64.b64encode(gzip.compress(payload, compresslevel=9)).decode("ascii")
+          for index in range(0, len(encoded), 4000):
+              print(f"QNTY_R2_REVOCATION_B64:{index // 4000:04d}:{encoded[index:index + 4000]}")
+          PY

@@ -30,8 +30,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD^)" = "a594d5de247293ac380897aae1e9642842885ae7"
+          test "$(git rev-parse HEAD^)" = "03d452ab104a2c65676445399d9530627727c5b2"
+          test "$(git rev-parse HEAD^^)" = "a594d5de247293ac380897aae1e9642842885ae7"
           test "$(git diff-tree --no-commit-id --name-only -r HEAD)" = ".github/workflows/jfpv3-r3-transport-repair.yml"
+          test "$(git diff-tree --no-commit-id --name-only -r HEAD^)" = ".github/workflows/jfpv3-r3-transport-repair.yml"
+          git fetch --no-tags origin master:refs/remotes/origin/master
       - name: Materialize proven revocation, regression, and read-only workflow
         shell: bash
         env:

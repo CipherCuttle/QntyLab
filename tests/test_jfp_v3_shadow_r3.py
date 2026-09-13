@@ -96,11 +96,38 @@ def test_r2_frozen_transport_demonstrates_the_shift_that_r3_repairs():
     assert bars[-1]["close_time"] == r2.stamp(end + timedelta(hours=1))
 
 
-def test_r3_manifest_binds_new_identity_without_mutating_r2():
+def test_r3_manifest_binds_new_identity_and_exact_r2_dependency():
     identity = r3.implementation_identity()
-    assert identity["implementation_digest"] == "50d402b315e8be6b12b8bce47cea51fcc48009a0f54047cdeec481234ef2e1ca"
+    assert identity["implementation_digest"] == "a2aa54e9c8610fd21ec60977f1fbe8ce63403134a5b9af242fb2c551ef961dda"
     assert r3.R2_CANONICAL_MERGE == "bc4f3a327f23d057da1ad970e9eeb7ed2fe10c91"
-    assert r3.R2_IMPLEMENTATION_DIGEST == "3f80bcd2dd60aaae6e1307883cca2e996f631f7bbc3b76037eafef8450167e2b"
+    assert identity["parent_r2_implementation_digest"] == r3.R2_IMPLEMENTATION_DIGEST
+    assert identity["parent_r2_manifest_digest"] == r3.R2_MANIFEST_DIGEST
+
+
+def test_r3_manifest_fails_closed_if_verified_r2_dependency_changes(monkeypatch):
+    monkeypatch.setattr(
+        r2,
+        "implementation_identity",
+        lambda *args, **kwargs: {
+            "implementation_digest": "0" * 64,
+            "manifest_digest": r3.R2_MANIFEST_DIGEST,
+        },
+    )
+    with pytest.raises(r2.ContractError, match="runtime R2 implementation bytes mismatch"):
+        r3.implementation_identity()
+
+
+def test_r3_manifest_fails_closed_if_verified_r2_manifest_changes(monkeypatch):
+    monkeypatch.setattr(
+        r2,
+        "implementation_identity",
+        lambda *args, **kwargs: {
+            "implementation_digest": r3.R2_IMPLEMENTATION_DIGEST,
+            "manifest_digest": "0" * 64,
+        },
+    )
+    with pytest.raises(r2.ContractError, match="runtime R2 manifest bytes mismatch"):
+        r3.implementation_identity()
 
 
 def test_r3_lineage_fails_closed_without_canonical_r2_ancestry(tmp_path, monkeypatch):

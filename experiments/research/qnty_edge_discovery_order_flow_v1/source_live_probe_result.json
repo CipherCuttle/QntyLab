@@ -1,0 +1,39 @@
+{
+  "artifact_type": "QNTY_EDGE_ORDER_FLOW_PROSPECTIVE_V1_SOURCE_LIVE_PROBE_RESULT",
+  "schema_version": "1.0.0",
+  "candidate_id": "CANDIDATE_ORDER_FLOW_SIGNED_TAKER_QUOTE_IMBALANCE_INCREMENTAL_RETURN_V1",
+  "state": "PASS",
+  "mode": "NON_SCIENTIFIC_SOURCE_QUALIFICATION",
+  "scientific_evidence": false,
+  "probe_canonical_master_sha": "1bd98b3769f27e9ded363058c316bd00e81cea0f",
+  "probe_logical_close_utc": "2026-09-14T00:00:00Z",
+  "worktree_mode": "CLEAN_DETACHED_WORKTREE",
+  "head_verified_exact": true,
+  "worktree_clean": true,
+  "host_class": "TRUSTED_NON_US_OPERATOR_HOST",
+  "symbol_count": 5,
+  "symbols": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "BNBUSDT",
+    "XRPUSDT"
+  ],
+  "provider": "Binance first-party USD-M Futures REST",
+  "endpoint": "https://fapi.binance.com/fapi/v1/klines",
+  "source_substitution": "FORBIDDEN",
+  "payload_persisted": false,
+  "price_volume_feature_values_persisted": false,
+  "receipt_provenance": "OPERATOR_EXECUTED_CANONICAL_COMMAND_AND_REPORTED_TERMINAL_OUTPUT",
+  "receipt_recorded_at_utc": "2026-09-14T00:51:22Z",
+  "authority": {
+    "activation_pr_may_be_created": true,
+    "real_prospective_collection_authorized_by_this_receipt": false,
+    "terminal_evaluation_authorized": false,
+    "router_authorized": false,
+    "qnty_authorized": false,
+    "qntyspot_authorized": false,
+    "trading_authorized": false,
+    "capital_authority": "NONE"
+  }
+}

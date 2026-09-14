@@ -1,0 +1,678 @@
+name: Order Flow V1 durability repair once
+
+on:
+  push:
+    branches:
+      - research/order-flow-v1-activation
+    paths:
+      - .github/workflows/order-flow-v1-durability-repair-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.12.14"
+      - name: Install frozen test runner
+        run: python -m pip install --disable-pip-version-check "pytest==8.4.2"
+      - name: Patch exact durability and host-boundary surface
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test -z "$(git status --porcelain)"
+          python - <<'PY'
+          from __future__ import annotations
+
+          import json
+          from pathlib import Path
+          import subprocess
+
+          OP = Path("qntylab/order_flow_prospective_v1_operation.py")
+          TEST = Path("tests/test_order_flow_prospective_v1_activation.py")
+          RUNTIME = Path("experiments/research/qnty_edge_discovery_order_flow_v1/prospective_runtime.json")
+          DOC = Path("ops/systemd/user/order-flow-v1-prospective.md")
+
+          def once(path: Path, old: str, new: str, label: str) -> None:
+              text = path.read_text(encoding="utf-8")
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{label}: expected exactly one match, got {count}")
+              path.write_text(text.replace(old, new, 1), encoding="utf-8")
+
+          once(
+              OP,
+              'STATE_DIRNAME = "order_flow_prospective_v1"\nLEDGER_FILENAME = recorder.LEDGER_FILENAME\n',
+              'STATE_DIRNAME = "order_flow_prospective_v1"\nCANONICAL_STATE_DIR = Path("/home/swirky/.local/state/qntylab/order_flow_prospective_v1")\nMACHINE_ID_PATH = Path("/etc/machine-id")\nEVIDENCE_RELEASE_SCHEMA = "ORDER_FLOW_V1_EVIDENCE_RELEASE_V1"\nLEDGER_FILENAME = recorder.LEDGER_FILENAME\n',
+              "runtime constants",
+          )
+          once(
+              OP,
+              'def default_state_dir() -> Path:\n    base = Path(os.environ.get("XDG_STATE_HOME") or (Path.home() / ".local" / "state"))\n    return base / "qntylab" / STATE_DIRNAME\n',
+              'def default_state_dir() -> Path:\n    return CANONICAL_STATE_DIR\n\n\ndef _validate_recording_state_dir(state_dir: Path) -> Path:\n    resolved = state_dir.expanduser().resolve()\n    if resolved != CANONICAL_STATE_DIR.resolve():\n        raise OperationBlocked("canonical recording state directory mismatch")\n    return resolved\n',
+              "state directory pin",
+          )
+          once(
+              OP,
+              '    if runtime.get("release_asset") != LEDGER_FILENAME:\n        raise OperationBlocked("runtime release asset changed")\n',
+              '    if runtime.get("release_asset") != LEDGER_FILENAME:\n        raise OperationBlocked("runtime release asset changed")\n    if runtime.get("state_dir") != str(CANONICAL_STATE_DIR):\n        raise OperationBlocked("runtime canonical state directory changed")\n    host_identity = runtime.get("trusted_host_identity")\n    if not isinstance(host_identity, dict):\n        raise OperationBlocked("trusted host identity contract is malformed")\n    if host_identity.get("method") != "SHA256_ETC_MACHINE_ID":\n        raise OperationBlocked("trusted host identity method changed")\n    if host_identity.get("probe_host_binding_required") is not True:\n        raise OperationBlocked("trusted host binding requirement changed")\n    if not isinstance(host_identity.get("sha256"), str):\n        raise OperationBlocked("trusted host identity digest is malformed")\n',
+              "runtime host/state contract",
+          )
+
+          marker = '\ndef _validate_installed_units(root: Path) -> None:\n'
+          host_block = '''\ndef _machine_id_sha256(path: Path = MACHINE_ID_PATH) -> str:
+              try:
+                  payload = path.read_bytes()
+              except OSError as exc:
+                  raise OperationBlocked("trusted host machine-id is unavailable") from exc
+              if not payload:
+                  raise OperationBlocked("trusted host machine-id is empty")
+              return sha256(payload).hexdigest()
+
+
+          def validate_trusted_host(root: Path, machine_id_path: Path = MACHINE_ID_PATH) -> dict[str, str]:
+              runtime = _json(root / RUNTIME_PATH)
+              host_identity = runtime.get("trusted_host_identity")
+              expected = host_identity.get("sha256") if isinstance(host_identity, dict) else None
+              if not isinstance(expected, str) or len(expected) != 64 or any(char not in "0123456789abcdef" for char in expected):
+                  raise OperationBlocked("trusted host attestation is not finalized")
+              actual = _machine_id_sha256(machine_id_path)
+              if actual != expected:
+                  raise OperationBlocked("executing host does not match the qualified trusted host")
+              return {"method": "SHA256_ETC_MACHINE_ID", "sha256": actual}
+          '''
+          once(OP, marker, host_block + marker, "trusted host enforcement")
+          once(
+              OP,
+              '    validate_activation_artifacts(root)\n    validate_project_authority(root)\n    _validate_installed_units(root)\n',
+              '    validate_activation_artifacts(root)\n    validate_project_authority(root)\n    validate_trusted_host(root)\n    _validate_installed_units(root)\n',
+              "canonical host preflight",
+          )
+
+          text = OP.read_text(encoding="utf-8")
+          start = text.index("\ndef _release_snapshot(tag: str)")
+          end = text.index("\ndef record_due(", start)
+          release_block = r'''
+
+def _release_snapshot(tag: str) -> dict[str, Any] | None:
+    result = _run(
+        (
+            "gh",
+            "api",
+            "-H",
+            "Accept: application/vnd.github+json",
+            "-H",
+            "X-GitHub-Api-Version: 2022-11-28",
+            f"repos/{REPOSITORY}/releases/tags/{tag}",
+        ),
+        check=False,
+    )
+    if result.returncode:
+        detail = f"{result.stdout}\n{result.stderr}"
+        if "HTTP 404" in detail or "Not Found" in detail:
+            return None
+        raise OperationBlocked(f"GitHub release lookup failed: {detail.strip()}")
+    try:
+        value = json.loads(result.stdout)
+    except json.JSONDecodeError as exc:
+        raise OperationBlocked("GitHub release lookup returned malformed JSON") from exc
+    if not isinstance(value, dict):
+        raise OperationBlocked("GitHub release lookup returned non-object JSON")
+    return value
+
+
+def _release_metadata(release: dict[str, Any]) -> dict[str, Any]:
+    try:
+        metadata = json.loads(release.get("body") or "")
+    except json.JSONDecodeError as exc:
+        raise OperationBlocked("evidence release metadata is malformed") from exc
+    if not isinstance(metadata, dict) or metadata.get("schema") != EVIDENCE_RELEASE_SCHEMA:
+        raise OperationBlocked("evidence release metadata schema mismatch")
+    if not isinstance(metadata.get("event_count"), int) or metadata["event_count"] < 1:
+        raise OperationBlocked("evidence release event count is malformed")
+    for key in ("head_event_digest", "ledger_sha256"):
+        value = metadata.get(key)
+        if not isinstance(value, str) or len(value) != 64 or any(char not in "0123456789abcdef" for char in value):
+            raise OperationBlocked(f"evidence release metadata digest is malformed: {key}")
+    previous = metadata.get("previous_release_tag")
+    if previous is not None and (not isinstance(previous, str) or not previous.startswith(RELEASE_PREFIX)):
+        raise OperationBlocked("evidence release previous tag is malformed")
+    return metadata
+
+
+def _release_assets(release: dict[str, Any]) -> list[dict[str, Any]]:
+    return [
+        asset
+        for asset in release.get("assets", [])
+        if isinstance(asset, dict) and asset.get("name") == LEDGER_FILENAME
+    ]
+
+
+def _list_evidence_releases() -> list[dict[str, Any]]:
+    result = _run(
+        (
+            "gh",
+            "api",
+            "--paginate",
+            "--slurp",
+            "-H",
+            "Accept: application/vnd.github+json",
+            "-H",
+            "X-GitHub-Api-Version: 2022-11-28",
+            f"repos/{REPOSITORY}/releases?per_page=100",
+        )
+    )
+    try:
+        raw = json.loads(result.stdout)
+    except json.JSONDecodeError as exc:
+        raise OperationBlocked("GitHub release listing returned malformed JSON") from exc
+    pages = raw if isinstance(raw, list) else []
+    releases: list[dict[str, Any]] = []
+    for page in pages:
+        if isinstance(page, list):
+            releases.extend(item for item in page if isinstance(item, dict))
+        elif isinstance(page, dict):
+            releases.append(page)
+        else:
+            raise OperationBlocked("GitHub release listing page is malformed")
+    return [
+        release
+        for release in releases
+        if isinstance(release.get("tag_name"), str) and release["tag_name"].startswith(RELEASE_PREFIX)
+    ]
+
+
+def _evidence_release_chain() -> list[dict[str, Any]]:
+    chain = []
+    seen_tags: set[str] = set()
+    seen_counts: set[int] = set()
+    for release in _list_evidence_releases():
+        tag = release.get("tag_name")
+        if tag in seen_tags:
+            raise OperationBlocked("duplicate evidence release tag")
+        metadata = _release_metadata(release)
+        count = metadata["event_count"]
+        if count in seen_counts:
+            raise OperationBlocked("competing evidence releases exist at the same event count")
+        if tag != f"{RELEASE_PREFIX}{metadata['head_event_digest'][:24]}":
+            raise OperationBlocked("evidence release tag/head digest mismatch")
+        assets = _release_assets(release)
+        if len(assets) > 1:
+            raise OperationBlocked("evidence release asset cardinality mismatch")
+        if assets and assets[0].get("digest") != f"sha256:{metadata['ledger_sha256']}":
+            raise OperationBlocked("evidence release asset/metadata digest mismatch")
+        if release.get("draft") is False:
+            if release.get("immutable") is not True or len(assets) != 1:
+                raise OperationBlocked("published evidence release is not immutable and complete")
+        elif release.get("draft") is not True:
+            raise OperationBlocked("evidence release draft state is malformed")
+        enriched = dict(release)
+        enriched["_evidence_meta"] = metadata
+        chain.append(enriched)
+        seen_tags.add(tag)
+        seen_counts.add(count)
+
+    chain.sort(key=lambda item: item["_evidence_meta"]["event_count"])
+    previous_tag: str | None = None
+    for index, release in enumerate(chain, start=1):
+        metadata = release["_evidence_meta"]
+        if metadata["event_count"] != index:
+            raise OperationBlocked("evidence release chain has an event-count gap")
+        if metadata["previous_release_tag"] != previous_tag:
+            raise OperationBlocked("evidence release chain previous-tag linkage mismatch")
+        if release.get("draft") is True and index != len(chain):
+            raise OperationBlocked("only the evidence chain head may be a draft")
+        previous_tag = release["tag_name"]
+    return chain
+
+
+def _download_release_ledger(tag: str, directory: Path) -> Path:
+    directory.mkdir(parents=True, exist_ok=True)
+    _run(
+        (
+            "gh",
+            "release",
+            "download",
+            tag,
+            "--repo",
+            REPOSITORY,
+            "--pattern",
+            LEDGER_FILENAME,
+            "--dir",
+            str(directory),
+        )
+    )
+    restored = directory / LEDGER_FILENAME
+    if not restored.is_file():
+        raise OperationBlocked("downloaded evidence release ledger is missing")
+    return restored
+
+
+def _ledger_release_metadata(
+    ledger: recorder.EvidenceLedger,
+    *,
+    previous_release_tag: str | None,
+) -> dict[str, Any]:
+    events = ledger.events()
+    if not events or not ledger.path.is_file():
+        raise OperationBlocked("cannot describe an empty evidence ledger")
+    return {
+        "schema": EVIDENCE_RELEASE_SCHEMA,
+        "event_count": len(events),
+        "head_event_digest": events[-1]["event_digest"],
+        "ledger_sha256": sha256(ledger.path.read_bytes()).hexdigest(),
+        "previous_release_tag": previous_release_tag,
+        "scientific_evaluation": "FORBIDDEN",
+    }
+
+
+def _verify_release(tag: str, ledger: recorder.EvidenceLedger, expected_sha256: str) -> dict[str, Any]:
+    release = _release_snapshot(tag)
+    if release is None:
+        raise OperationBlocked("expected immutable release is missing")
+    if release.get("draft") is not False or release.get("immutable") is not True:
+        raise OperationBlocked("evidence release is not published immutable")
+    metadata = _release_metadata(release)
+    events = ledger.events()
+    if metadata["event_count"] != len(events):
+        raise OperationBlocked("immutable evidence release event count mismatch")
+    if metadata["head_event_digest"] != events[-1]["event_digest"]:
+        raise OperationBlocked("immutable evidence release head digest mismatch")
+    if metadata["ledger_sha256"] != expected_sha256:
+        raise OperationBlocked("immutable evidence release metadata ledger digest mismatch")
+    assets = _release_assets(release)
+    if len(assets) != 1 or assets[0].get("digest") != f"sha256:{expected_sha256}":
+        raise OperationBlocked("immutable evidence release asset digest mismatch")
+
+    with tempfile.TemporaryDirectory(prefix="qntylab-orderflow-restore-") as directory:
+        restored = _download_release_ledger(tag, Path(directory))
+        if restored.read_bytes() != ledger.path.read_bytes():
+            raise OperationBlocked("independent immutable evidence restore differs from local ledger")
+    return {
+        "tag": tag,
+        "ledger_sha256": expected_sha256,
+        "immutable": True,
+        "independent_restore": "PASS",
+    }
+
+
+def reconcile_canonical_ledger(ledger: recorder.EvidenceLedger) -> dict[str, Any]:
+    """Restore or reconcile local state against the single remote evidence chain."""
+    chain = _evidence_release_chain()
+    local_events = ledger.events()
+    if not chain:
+        return {"state": "NO_REMOTE_HEAD", "local_event_count": len(local_events)}
+
+    latest = chain[-1]
+    metadata = latest["_evidence_meta"]
+    assets = _release_assets(latest)
+    if not assets:
+        if (
+            len(local_events) == metadata["event_count"]
+            and ledger.path.is_file()
+            and sha256(ledger.path.read_bytes()).hexdigest() == metadata["ledger_sha256"]
+            and local_events[-1]["event_digest"] == metadata["head_event_digest"]
+        ):
+            return {"state": "LOCAL_MATCHES_INCOMPLETE_REMOTE_DRAFT", "tag": latest["tag_name"]}
+        raise OperationBlocked("remote evidence head is an incomplete draft and local recovery bytes are unavailable")
+
+    with tempfile.TemporaryDirectory(prefix="qntylab-orderflow-reconcile-") as directory:
+        restored = _download_release_ledger(latest["tag_name"], Path(directory))
+        restored_bytes = restored.read_bytes()
+        if sha256(restored_bytes).hexdigest() != metadata["ledger_sha256"]:
+            raise OperationBlocked("remote evidence head bytes do not match release metadata")
+        remote_ledger = recorder.EvidenceLedger(Path(directory))
+        remote_events = remote_ledger.events()
+        if len(remote_events) != metadata["event_count"]:
+            raise OperationBlocked("remote evidence ledger event count mismatch")
+        if remote_events[-1]["event_digest"] != metadata["head_event_digest"]:
+            raise OperationBlocked("remote evidence ledger head digest mismatch")
+
+        common = min(len(local_events), len(remote_events))
+        if local_events[:common] != remote_events[:common]:
+            raise OperationBlocked("local ledger diverges from canonical remote evidence")
+
+        if len(local_events) < len(remote_events):
+            ledger.path.parent.mkdir(parents=True, exist_ok=True)
+            temporary = ledger.path.with_name(f".{ledger.path.name}.restore.tmp")
+            temporary.write_bytes(restored_bytes)
+            os.replace(temporary, ledger.path)
+            return {
+                "state": "RESTORED_REMOTE_HEAD",
+                "tag": latest["tag_name"],
+                "event_count": len(remote_events),
+            }
+        if len(local_events) == len(remote_events):
+            if not ledger.path.is_file() or ledger.path.read_bytes() != restored_bytes:
+                raise OperationBlocked("local ledger bytes differ from canonical remote head")
+            return {
+                "state": "LOCAL_MATCHES_REMOTE_HEAD",
+                "tag": latest["tag_name"],
+                "event_count": len(remote_events),
+            }
+        if len(local_events) == len(remote_events) + 1:
+            return {
+                "state": "LOCAL_AHEAD_ONE_UNANCHORED_EVENT",
+                "remote_tag": latest["tag_name"],
+                "local_event_count": len(local_events),
+            }
+        raise OperationBlocked("local ledger is more than one unanchored event ahead of canonical remote evidence")
+
+
+def ensure_immutable_anchor(ledger: recorder.EvidenceLedger, target_commit: str) -> dict[str, Any]:
+    """Publish/resume/verify exactly the next cumulative immutable evidence head."""
+    events = ledger.events()
+    if not events or not ledger.path.is_file():
+        return {"state": "NO_LEDGER"}
+    ledger_sha = sha256(ledger.path.read_bytes()).hexdigest()
+    last_digest = events[-1].get("event_digest")
+    if not isinstance(last_digest, str) or len(last_digest) != 64:
+        raise OperationBlocked("ledger last event digest is malformed")
+    tag = f"{RELEASE_PREFIX}{last_digest[:24]}"
+
+    chain = _evidence_release_chain()
+    release: dict[str, Any] | None = None
+    previous_tag: str | None = None
+    if chain:
+        latest = chain[-1]
+        latest_meta = latest["_evidence_meta"]
+        if latest_meta["event_count"] == len(events):
+            if latest["tag_name"] != tag:
+                raise OperationBlocked("competing evidence head exists at current event count")
+            release = latest
+            previous_tag = latest_meta["previous_release_tag"]
+        elif latest_meta["event_count"] == len(events) - 1:
+            if latest.get("draft") is True:
+                raise OperationBlocked("previous evidence head is still a draft")
+            previous_tag = latest["tag_name"]
+        else:
+            raise OperationBlocked("local ledger is not exactly next after canonical evidence head")
+    elif len(events) != 1:
+        raise OperationBlocked("non-genesis local ledger has no canonical remote predecessor")
+
+    metadata = _ledger_release_metadata(ledger, previous_release_tag=previous_tag)
+    if release is not None:
+        if _release_metadata(release) != metadata:
+            raise OperationBlocked("existing evidence release metadata differs from local ledger")
+        if release.get("immutable") is True:
+            return _verify_release(tag, ledger, ledger_sha)
+        if release.get("draft") is not True:
+            raise OperationBlocked("existing evidence release is neither resumable draft nor immutable")
+
+    if release is None:
+        _run(
+            (
+                "gh",
+                "release",
+                "create",
+                tag,
+                "--repo",
+                REPOSITORY,
+                "--target",
+                target_commit,
+                "--title",
+                tag,
+                "--notes",
+                json.dumps(metadata, sort_keys=True, separators=(",", ":")),
+                "--prerelease",
+                "--draft",
+            )
+        )
+        release = _release_snapshot(tag)
+    if release is None or release.get("draft") is not True:
+        raise OperationBlocked("draft evidence release is unavailable")
+    if _release_metadata(release) != metadata:
+        raise OperationBlocked("draft evidence release metadata mismatch")
+
+    assets = _release_assets(release)
+    if len(assets) == 0:
+        _run(
+            (
+                "gh",
+                "release",
+                "upload",
+                tag,
+                f"{ledger.path}#{LEDGER_FILENAME}",
+                "--repo",
+                REPOSITORY,
+            )
+        )
+        release = _release_snapshot(tag)
+        if release is None:
+            raise OperationBlocked("draft evidence release disappeared after upload")
+        assets = _release_assets(release)
+    if len(assets) != 1 or assets[0].get("digest") != f"sha256:{ledger_sha}":
+        raise OperationBlocked("draft evidence asset digest mismatch")
+
+    _run(
+        (
+            "gh",
+            "release",
+            "edit",
+            tag,
+            "--repo",
+            REPOSITORY,
+            "--draft=false",
+            "--prerelease",
+        )
+    )
+    return _verify_release(tag, ledger, ledger_sha)
+'''
+          OP.write_text(text[:start] + release_block + text[end:], encoding="utf-8")
+
+          once(
+              OP,
+              '    now = recorder.parse_utc(now)\n    target_commit = canonical_preflight(root) if canonical_check else _git(root, "rev-parse", "HEAD")\n    validate_activation_artifacts(root)\n\n    if sys.version_info[:2] != (3, 12):\n',
+              '    now = recorder.parse_utc(now)\n    if not canonical_check and fetcher is None:\n        raise OperationBlocked("noncanonical execution requires an injected synthetic fetcher")\n    resolved_state_dir = _validate_recording_state_dir(state_dir) if canonical_check else Path(state_dir)\n    target_commit = canonical_preflight(root) if canonical_check else _git(root, "rev-parse", "HEAD")\n    validate_activation_artifacts(root)\n\n    if sys.version_info[:2] != (3, 12):\n',
+              "record-due preflight",
+          )
+          once(
+              OP,
+              '    ledger = recorder.EvidenceLedger(state_dir)\n    if ledger.events():\n        anchorer(ledger, target_commit)\n\n    missed = 0\n',
+              '    ledger = recorder.EvidenceLedger(resolved_state_dir)\n    reconciliation = reconcile_canonical_ledger(ledger) if canonical_check else {"state": "NONCANONICAL_SYNTHETIC_TEST_SEAM"}\n    if ledger.events():\n        anchorer(ledger, target_commit)\n\n    missed = 0\n',
+              "remote reconciliation before fetch",
+          )
+          once(
+              OP,
+              '                "last_recorded_close_utc": recorded_close,\n            }\n',
+              '                "last_recorded_close_utc": recorded_close,\n                "reconciliation": reconciliation,\n            }\n',
+              "complete reconciliation output",
+          )
+          once(
+              OP,
+              '                "last_recorded_close_utc": recorded_close,\n            }\n\n        if now >= close + recorder.RECORDING_WINDOW:\n',
+              '                "last_recorded_close_utc": recorded_close,\n                "reconciliation": reconciliation,\n            }\n\n        if now >= close + recorder.RECORDING_WINDOW:\n',
+              "not-due reconciliation output",
+          )
+          once(
+              OP,
+              '        "anchor": anchor,\n        "next_logical_close_utc": recorder.stamp(next_close) if next_close is not None else None,\n',
+              '        "anchor": anchor,\n        "reconciliation": reconciliation,\n        "next_logical_close_utc": recorder.stamp(next_close) if next_close is not None else None,\n',
+              "anchored reconciliation output",
+          )
+
+          runtime = json.loads(RUNTIME.read_text(encoding="utf-8"))
+          runtime["state_dir"] = "/home/swirky/.local/state/qntylab/order_flow_prospective_v1"
+          runtime["trusted_host_identity"] = {
+              "method": "SHA256_ETC_MACHINE_ID",
+              "sha256": "PENDING_OPERATOR_ATTESTATION",
+              "probe_host_binding_required": True,
+          }
+          RUNTIME.write_text(json.dumps(runtime, indent=2) + "\n", encoding="utf-8")
+
+          once(
+              TEST,
+              'from datetime import timedelta\nimport json\nfrom pathlib import Path\n',
+              'from datetime import timedelta\nfrom hashlib import sha256\nimport json\nfrom pathlib import Path\nimport shutil\n\nimport pytest\n',
+              "test imports",
+          )
+          insertion_marker = '\ndef test_frozen_required_close_grid_is_exact():\n'
+          tests_block = '''\ndef test_runtime_pins_state_directory_and_requires_host_attestation():
+              runtime = json.loads((EXP / "prospective_runtime.json").read_text(encoding="utf-8"))
+              assert runtime["state_dir"] == str(operation.CANONICAL_STATE_DIR)
+              assert runtime["trusted_host_identity"]["method"] == "SHA256_ETC_MACHINE_ID"
+              assert runtime["trusted_host_identity"]["probe_host_binding_required"] is True
+              assert isinstance(runtime["trusted_host_identity"]["sha256"], str)
+
+
+          def test_canonical_state_directory_override_fails_closed(tmp_path):
+              with pytest.raises(operation.OperationBlocked, match="state directory mismatch"):
+                  operation._validate_recording_state_dir(tmp_path)
+              assert operation._validate_recording_state_dir(operation.CANONICAL_STATE_DIR) == operation.CANONICAL_STATE_DIR
+
+
+          def test_machine_identity_hash_matches_exact_file_bytes(tmp_path):
+              machine_id = tmp_path / "machine-id"
+              payload = b"probe-host-machine-id\\n"
+              machine_id.write_bytes(payload)
+              assert operation._machine_id_sha256(machine_id) == sha256(payload).hexdigest()
+
+
+          def _release_fixture_for_ledger(ledger, previous_release_tag=None):
+              events = ledger.events()
+              ledger_sha = sha256(ledger.path.read_bytes()).hexdigest()
+              tag = f"{operation.RELEASE_PREFIX}{events[-1]['event_digest'][:24]}"
+              metadata = {
+                  "schema": operation.EVIDENCE_RELEASE_SCHEMA,
+                  "event_count": len(events),
+                  "head_event_digest": events[-1]["event_digest"],
+                  "ledger_sha256": ledger_sha,
+                  "previous_release_tag": previous_release_tag,
+                  "scientific_evaluation": "FORBIDDEN",
+              }
+              return {
+                  "tag_name": tag,
+                  "draft": False,
+                  "immutable": True,
+                  "body": json.dumps(metadata, sort_keys=True, separators=(",", ":")),
+                  "assets": [{"name": operation.LEDGER_FILENAME, "digest": f"sha256:{ledger_sha}"}],
+                  "_evidence_meta": metadata,
+              }
+
+
+          def test_empty_local_ledger_restores_remote_head_before_collection(tmp_path, monkeypatch):
+              remote_dir = tmp_path / "remote"
+              remote = recorder.EvidenceLedger(remote_dir)
+              close = recorder.hour(recorder.FIRST_WARMUP_CLOSE)
+              remote.mark_missed(logical_close=close, detected_at=close + timedelta(hours=1))
+              release = _release_fixture_for_ledger(remote)
+
+              monkeypatch.setattr(operation, "_evidence_release_chain", lambda: [release])
+              monkeypatch.setattr(
+                  operation,
+                  "_download_release_ledger",
+                  lambda tag, directory: Path(shutil.copy2(remote.path, directory / operation.LEDGER_FILENAME)),
+              )
+
+              local = recorder.EvidenceLedger(tmp_path / "local")
+              result = operation.reconcile_canonical_ledger(local)
+              assert result["state"] == "RESTORED_REMOTE_HEAD"
+              assert local.path.read_bytes() == remote.path.read_bytes()
+
+
+          def test_rolled_back_local_ledger_restores_newer_remote_head(tmp_path, monkeypatch):
+              remote_dir = tmp_path / "remote"
+              remote = recorder.EvidenceLedger(remote_dir)
+              first = recorder.hour(recorder.FIRST_WARMUP_CLOSE)
+              remote.mark_missed(logical_close=first, detected_at=first + timedelta(hours=1))
+              remote.mark_missed(logical_close=first + timedelta(hours=1), detected_at=first + timedelta(hours=2))
+              release = _release_fixture_for_ledger(remote)
+
+              local = recorder.EvidenceLedger(tmp_path / "local")
+              local.path.parent.mkdir(parents=True, exist_ok=True)
+              local.path.write_bytes(remote.path.read_bytes().splitlines(keepends=True)[0])
+
+              monkeypatch.setattr(operation, "_evidence_release_chain", lambda: [release])
+              monkeypatch.setattr(
+                  operation,
+                  "_download_release_ledger",
+                  lambda tag, directory: Path(shutil.copy2(remote.path, directory / operation.LEDGER_FILENAME)),
+              )
+              result = operation.reconcile_canonical_ledger(local)
+              assert result["state"] == "RESTORED_REMOTE_HEAD"
+              assert local.path.read_bytes() == remote.path.read_bytes()
+
+
+          def test_noncanonical_mode_cannot_use_real_fetcher(tmp_path):
+              with pytest.raises(operation.OperationBlocked, match="injected synthetic fetcher"):
+                  operation.record_due(
+                      ROOT,
+                      tmp_path,
+                      now=recorder.hour(recorder.FIRST_WARMUP_CLOSE) + timedelta(minutes=5),
+                      canonical_check=False,
+                  )
+          '''
+          once(TEST, insertion_marker, tests_block + insertion_marker, "durability regression tests")
+
+          doc_text = DOC.read_text(encoding="utf-8")
+          anchor = "Before enabling the timer, verify GitHub CLI authentication. The local caller\n"
+          addition = '''Before enabling the timer, the activation runtime must contain the SHA-256 of
+          `/etc/machine-id` from the exact host that passed the one authorized live probe. The
+          raw machine ID is never committed. Obtain only the digest locally with:
+
+          ```bash
+          sha256sum /etc/machine-id | awk '{print $1}'
+          ```
+
+          A pending or mismatched digest blocks before any provider access. The production
+          ledger path is also frozen to `/home/swirky/.local/state/qntylab/order_flow_prospective_v1`;
+          `--state-dir` cannot redirect canonical recording.
+
+          '''
+          if doc_text.count(anchor) != 1:
+              raise SystemExit("install doc anchor mismatch")
+          DOC.write_text(doc_text.replace(anchor, addition + anchor, 1), encoding="utf-8")
+
+          operation_blob = subprocess.check_output(["git", "hash-object", str(OP)], text=True).strip()
+          runtime = json.loads(RUNTIME.read_text(encoding="utf-8"))
+          runtime["operation_git_blob_sha"] = operation_blob
+          RUNTIME.write_text(json.dumps(runtime, indent=2) + "\n", encoding="utf-8")
+          print(f"pinned operation blob {operation_blob}")
+          PY
+      - name: Verify durability repairs
+        run: |
+          set -euo pipefail
+          python -m qntylab.project_context doctor --strict
+          python -m qntylab.project_context render --check
+          python -m pytest -q \
+            tests/test_order_flow_prospective_v1_activation.py \
+            tests/test_order_flow_prospective_v1_source.py \
+            tests/test_order_flow_prospective_v1_recorder.py \
+            tests/test_project_context_v0.py
+          git diff --check
+      - name: Commit only bounded non-workflow repair files
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import subprocess
+          allowed = {
+              "experiments/research/qnty_edge_discovery_order_flow_v1/prospective_runtime.json",
+              "ops/systemd/user/order-flow-v1-prospective.md",
+              "qntylab/order_flow_prospective_v1_operation.py",
+              "tests/test_order_flow_prospective_v1_activation.py",
+          }
+          changed = {
+              line.strip()
+              for line in subprocess.check_output(["git", "diff", "--name-only"], text=True).splitlines()
+              if line.strip()
+          }
+          if changed != allowed:
+              raise SystemExit(f"unexpected durability repair surface: {sorted(changed)}")
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            experiments/research/qnty_edge_discovery_order_flow_v1/prospective_runtime.json \
+            ops/systemd/user/order-flow-v1-prospective.md \
+            qntylab/order_flow_prospective_v1_operation.py \
+            tests/test_order_flow_prospective_v1_activation.py
+          git commit -m "research: harden Order Flow V1 durable local authority"
+          git push origin HEAD:research/order-flow-v1-activation

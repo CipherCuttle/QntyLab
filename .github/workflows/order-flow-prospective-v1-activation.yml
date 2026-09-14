@@ -1,0 +1,40 @@
+name: Order Flow Prospective V1 Activation
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/order-flow-prospective-v1-activation.yml"
+      - "experiments/research/qnty_edge_discovery_order_flow_v1/**"
+      - "qntylab/order_flow_prospective_v1_operation.py"
+      - "qntylab/order_flow_prospective_v1_source.py"
+      - "qntylab/order_flow_prospective_v1_recorder.py"
+      - "ops/systemd/user/order-flow-v1-prospective*"
+      - "tests/test_order_flow_prospective_v1_activation.py"
+      - "tests/test_order_flow_prospective_v1_source.py"
+      - "tests/test_order_flow_prospective_v1_recorder.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  activation-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.12"
+      - name: Verify activation without real provider access
+        run: |
+          set -euo pipefail
+          python -m pytest \
+            tests/test_order_flow_prospective_v1_activation.py \
+            tests/test_order_flow_prospective_v1_source.py \
+            tests/test_order_flow_prospective_v1_recorder.py \
+            -q
+          git diff --check

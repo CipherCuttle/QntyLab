@@ -1,0 +1,24 @@
+# Order Flow Prospective V1 — activated local record-due oneshot.
+# Real Binance provider access is intentionally local/trusted-non-US only.
+# The service operates from a dedicated detached worktree, never the development
+# checkout. Scientific values are written only to the campaign state ledger and
+# its immutable GitHub release snapshots.
+
+[Unit]
+Description=QntyLab Order Flow Prospective V1 record-due
+Documentation=file:///home/swirky/DevHub/repos/QntyLab/ops/systemd/user/order-flow-v1-prospective.md
+
+[Service]
+Type=oneshot
+Environment=HOME=/home/swirky
+Environment=PATH=/usr/bin:/bin:/home/swirky/.local/bin:/snap/bin
+TimeoutStartSec=840
+WorkingDirectory=/home/swirky/DevHub/repos/QntyLab-orderflow-operational
+ExecStartPre=/bin/sh -c 'test -z "$(/usr/bin/git status --porcelain)"'
+ExecStartPre=/usr/bin/git fetch origin master
+ExecStartPre=/usr/bin/git checkout --detach origin/master
+ExecStart=/bin/sh -c 'exec /usr/bin/python3 -m qntylab.order_flow_prospective_v1_operation --record-due --root /home/swirky/DevHub/repos/QntyLab-orderflow-operational --now "$(date -u +%%Y-%%m-%%dT%%H:%%M:%%SZ)"'
+SuccessExitStatus=3
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=order-flow-v1-prospective-record

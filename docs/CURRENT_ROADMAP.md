@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- None.
+- `Order Flow Prospective V1 local activation implementation` — `ACTIVE`. IMPLEMENT_AND_VERIFY_ONLY: finish the bounded activation candidate without live provider access on the branch. After exact canonical merge, install matching local user units from a clean dedicated operational worktree at origin/master; only then begin frozen prospective collection. No backfill or interim evaluation.
 
 ## Queued — not authorized
 

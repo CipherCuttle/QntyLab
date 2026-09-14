@@ -1,0 +1,39 @@
+{
+  "artifact_type": "QNTY_EDGE_ORDER_FLOW_PROSPECTIVE_V1_RUNTIME",
+  "attempt_minutes_utc": [
+    5,
+    20,
+    35,
+    50
+  ],
+  "candidate_id": "CANDIDATE_ORDER_FLOW_SIGNED_TAKER_QUOTE_IMBALANCE_INCREMENTAL_RETURN_V1",
+  "github_actions_real_provider_access": "FORBIDDEN",
+  "interim_evaluation": "FORBIDDEN",
+  "operation_git_blob_sha": "554319c26b9cae1f09b3d8ca107ca9f46ebf0720",
+  "operation_module": "qntylab.order_flow_prospective_v1_operation",
+  "operational_worktree": "/home/swirky/DevHub/repos/QntyLab-orderflow-operational",
+  "persistence": "GITHUB_IMMUTABLE_RELEASE_HASH_CHAIN_V1",
+  "persistent_timer": false,
+  "python_executable": "/usr/bin/python3",
+  "python_required_major_minor": "3.12",
+  "release_asset": "order_flow_prospective_v1_events.jsonl",
+  "release_body_schema": "ORDER_FLOW_V1_EVIDENCE_RELEASE_V1",
+  "release_prefix": "order-flow-v1-evidence-",
+  "release_repository": "CipherCuttle/QntyLab",
+  "release_tag_format": "order-flow-v1-evidence-{event_count:06d}-{head_event_digest_prefix24}",
+  "remote_reconciliation_required_before_provider_access": true,
+  "schema_version": "1.0.0",
+  "service_git_blob_sha": "2fecf2c9168d398cd49080df820d861e23169c81",
+  "service_path": "ops/systemd/user/order-flow-v1-prospective-record.service",
+  "source_access_host": "LOCAL_TRUSTED_NON_US_HOST_ONLY",
+  "state_dir": "/home/swirky/.local/state/qntylab/order_flow_prospective_v1",
+  "timer_frequency": "HOURLY",
+  "timer_git_blob_sha": "f2cffbdfca53d8eccfcb942aed6e2379cba350cf",
+  "timer_path": "ops/systemd/user/order-flow-v1-prospective-record.timer",
+  "trusted_host_identity": {
+    "context": "QNTYLAB_ORDER_FLOW_V1_HOST_V1",
+    "digest": "0902027d8e7eb13bf130934d46a48b61cd6b126fef13f371844f4d5de9e39f5e",
+    "method": "SHA256_CONTEXTUALIZED_SHA256_ETC_MACHINE_ID",
+    "probe_host_binding_required": true
+  }
+}

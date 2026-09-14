@@ -24,11 +24,13 @@ from typing import Any, Callable, Sequence
 
 from . import order_flow_prospective_v1_recorder as recorder
 from . import order_flow_prospective_v1_source as source
+from . import project_context
 
 
 PROBE_CANONICAL_MASTER_SHA = "1bd98b3769f27e9ded363058c316bd00e81cea0f"
 SOURCE_GIT_BLOB_SHA = "1b5550ee2b8bbae3905e7f88583ec88217121274"
 RECORDER_GIT_BLOB_SHA = "02daadaa597dcf00789af66c01fe13e66031ec3d"
+PROJECT_ID = "QNTY_EDGE_ORDER_FLOW_PROSPECTIVE_V1_ACTIVATION"
 
 ACTIVATION_PATH = Path(
     "experiments/research/qnty_edge_discovery_order_flow_v1/prospective_activation.json"
@@ -135,8 +137,12 @@ def validate_activation_artifacts(root: Path) -> dict[str, Any]:
             raise OperationBlocked(f"live probe receipt mismatch: {key}")
 
     expected_activation = {
-        "state": "ACTIVE",
+        "state": "AUTHORIZED_IF_CANONICAL",
         "activation_scope": "PROSPECTIVE_COLLECTION_ONLY",
+        "candidate_branch_is_authority": False,
+        "activation_effective_on_branch": False,
+        "canonicalization_required_before_effect": True,
+        "activation_effective": "AFTER_EXACT_CANONICAL_MERGE_AND_MATCHING_LOCAL_UNIT_INSTALL_ONLY",
         "probe_canonical_master_sha": PROBE_CANONICAL_MASTER_SHA,
         "source_implementation_path": SOURCE_PATH.as_posix(),
         "source_git_blob_sha": SOURCE_GIT_BLOB_SHA,
@@ -156,9 +162,21 @@ def validate_activation_artifacts(root: Path) -> dict[str, Any]:
         if activation.get(key) != expected:
             raise OperationBlocked(f"activation contract mismatch: {key}")
 
-    authority = activation.get("authority")
+    branch_authority = activation.get("branch_authority")
+    if not isinstance(branch_authority, dict):
+        raise OperationBlocked("branch activation authority is malformed")
+    for key in (
+        "real_market_data_access_authorized",
+        "prospective_collection_authorized",
+        "scheduler_authorized",
+        "scientific_recording_authorized",
+    ):
+        if branch_authority.get(key) is not False:
+            raise OperationBlocked(f"branch-local live authority opened: {key}")
+
+    authority = activation.get("authority_after_canonicalization")
     if not isinstance(authority, dict):
-        raise OperationBlocked("activation authority is malformed")
+        raise OperationBlocked("post-canonical activation authority is malformed")
     for key in (
         "real_market_data_access_authorized",
         "prospective_collection_authorized",
@@ -215,12 +233,55 @@ def validate_activation_artifacts(root: Path) -> dict[str, Any]:
     _assert_git_identity(root, RECORDER_PATH, RECORDER_GIT_BLOB_SHA)
 
     return {
-        "state": "ACTIVE",
+        "state": "AUTHORIZED_IF_CANONICAL",
         "probe_canonical_master_sha": PROBE_CANONICAL_MASTER_SHA,
         "source_git_blob_sha": SOURCE_GIT_BLOB_SHA,
         "recorder_git_blob_sha": RECORDER_GIT_BLOB_SHA,
     }
 
+
+def validate_project_authority(root: Path) -> dict[str, Any]:
+    """Require canonical project-context authority for this bounded phase."""
+    data = project_context.context_data(root)
+    active = data.get("active_project")
+    if not isinstance(active, dict) or active.get("project_id") != PROJECT_ID:
+        raise OperationBlocked("canonical project context does not authorize Order Flow V1 activation")
+    if active.get("state") != "ACTIVE" or active.get("implementation_authorized") is not True:
+        raise OperationBlocked("Order Flow V1 project authority is not ACTIVE implementation authority")
+    if active.get("implementation_completed") is not False:
+        raise OperationBlocked("Order Flow V1 activation phase lifecycle is malformed")
+    for key, expected in (
+        ("candidate_branch_is_authority", False),
+        ("activation_effective_on_branch", False),
+        ("canonicalization_required_before_effect", True),
+        ("real_market_data_access_authorized_on_branch", False),
+        ("prospective_collection_authorized_on_branch", False),
+        ("scheduler_authorized_on_branch", False),
+        ("scientific_recording_authorized_on_branch", False),
+        ("post_canonical_real_market_data_access_authorized", True),
+        ("post_canonical_prospective_collection_authorized", True),
+        ("post_canonical_scheduler_authorized", True),
+        ("post_canonical_scientific_recording_authorized", True),
+        ("interim_scientific_evaluation_authorized", False),
+        ("terminal_evaluation_authorized", False),
+        ("router_authorized", False),
+        ("qnty_authorized", False),
+        ("qntyspot_authorized", False),
+    ):
+        if active.get(key) is not expected:
+            raise OperationBlocked(f"canonical project authority mismatch: {key}")
+    for key in ("trading_authority", "capital_authority", "signing_authority", "submission_authority"):
+        if active.get(key) != "NONE":
+            raise OperationBlocked(f"forbidden downstream authority opened: {key}")
+    if active.get("backfill") != "FORBIDDEN" or active.get("source_substitution") != "FORBIDDEN":
+        raise OperationBlocked("canonical no-backfill/source-substitution boundary changed")
+    return {
+        "project_id": PROJECT_ID,
+        "state": "ACTIVE",
+        "implementation_authorized": True,
+        "activation_effective_on_branch": False,
+        "canonicalization_required_before_effect": True,
+    }
 
 def _validate_installed_units(root: Path) -> None:
     unit_dir = Path.home() / ".config" / "systemd" / "user"
@@ -246,6 +307,7 @@ def canonical_preflight(root: Path) -> str:
             "operational checkout is stale; synchronize it before starting Python"
         )
     validate_activation_artifacts(root)
+    validate_project_authority(root)
     _validate_installed_units(root)
     return head
 
@@ -506,10 +568,12 @@ def record_due(
 
 def status(root: Path, state_dir: Path) -> dict[str, Any]:
     authority = validate_activation_artifacts(root)
+    project_authority = validate_project_authority(root)
     ledger = recorder.EvidenceLedger(state_dir)
     next_close = next_required_close(ledger)
     return {
         **authority,
+        "project_authority": project_authority,
         "ledger_event_count": len(ledger.events()),
         "ledger_sha256": ledger.ledger_sha256(),
         "next_logical_close_utc": recorder.stamp(next_close) if next_close is not None else None,

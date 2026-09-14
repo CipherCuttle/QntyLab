@@ -28,12 +28,22 @@ def test_live_probe_receipt_and_activation_boundary_are_exact():
     assert probe["payload_persisted"] is False
     assert probe["price_volume_feature_values_persisted"] is False
 
-    assert activation["state"] == "ACTIVE"
+    assert activation["state"] == "AUTHORIZED_IF_CANONICAL"
     assert activation["activation_scope"] == "PROSPECTIVE_COLLECTION_ONLY"
+    assert activation["candidate_branch_is_authority"] is False
+    assert activation["activation_effective_on_branch"] is False
+    assert activation["canonicalization_required_before_effect"] is True
+    assert activation["activation_effective"] == "AFTER_EXACT_CANONICAL_MERGE_AND_MATCHING_LOCAL_UNIT_INSTALL_ONLY"
     assert activation["backfill"] == "FORBIDDEN"
     assert activation["source_substitution"] == "FORBIDDEN"
     assert activation["persistence"] == "GITHUB_IMMUTABLE_RELEASE_HASH_CHAIN_V1"
-    authority = activation["authority"]
+    branch_authority = activation["branch_authority"]
+    assert branch_authority["real_market_data_access_authorized"] is False
+    assert branch_authority["prospective_collection_authorized"] is False
+    assert branch_authority["scheduler_authorized"] is False
+    assert branch_authority["scientific_recording_authorized"] is False
+
+    authority = activation["authority_after_canonicalization"]
     assert authority["real_market_data_access_authorized"] is True
     assert authority["prospective_collection_authorized"] is True
     assert authority["scheduler_authorized"] is True
@@ -48,7 +58,18 @@ def test_live_probe_receipt_and_activation_boundary_are_exact():
     assert authority["signing_authority"] == "NONE"
     assert authority["submission_authority"] == "NONE"
 
-    assert operation.validate_activation_artifacts(ROOT)["state"] == "ACTIVE"
+    assert operation.validate_activation_artifacts(ROOT)["state"] == "AUTHORIZED_IF_CANONICAL"
+
+
+def test_project_context_authorizes_only_bounded_activation_implementation():
+    authority = operation.validate_project_authority(ROOT)
+    assert authority == {
+        "project_id": operation.PROJECT_ID,
+        "state": "ACTIVE",
+        "implementation_authorized": True,
+        "activation_effective_on_branch": False,
+        "canonicalization_required_before_effect": True,
+    }
 
 
 def test_frozen_required_close_grid_is_exact():

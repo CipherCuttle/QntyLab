@@ -10570,3 +10570,55 @@ signing_authority = "NONE"
 promotion_authority = "NONE"
 terminal_outcome = "C6_CLOSED_PASS_CANONICAL_MERGED"
 next_action = "CLOSED_PASS: C6 canonical merge verified at PR #254 / 8a0d09c508144c178da358466243b83586468d9a. This is the terminal increment; no C7 or follow-on authority is created by this row."
+
+[[project]]
+project_id = "QNTY_EDGE_ORDER_FLOW_PROSPECTIVE_V1_ACTIVATION"
+display_name = "Order Flow Prospective V1 local activation implementation"
+state = "ACTIVE"
+authority_level = "BOUNDED_PROSPECTIVE_ACTIVATION_IMPLEMENTATION_CANDIDATE_ONLY"
+phase_type = "IMPLEMENTATION"
+authoritative_artifacts = [
+  "AGENTS.md",
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qnty_edge_discovery_order_flow_v1/preregistration.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v1/source_live_probe_result.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v1/prospective_activation.json",
+  "experiments/research/qnty_edge_discovery_order_flow_v1/prospective_runtime.json",
+  "qntylab/order_flow_prospective_v1_operation.py",
+  "qntylab/order_flow_prospective_v1_source.py",
+  "qntylab/order_flow_prospective_v1_recorder.py",
+  "ops/systemd/user/order-flow-v1-prospective-record.service",
+  "ops/systemd/user/order-flow-v1-prospective-record.timer",
+  "tests/test_order_flow_prospective_v1_activation.py",
+]
+candidate_id = "CANDIDATE_ORDER_FLOW_SIGNED_TAKER_QUOTE_IMBALANCE_INCREMENTAL_RETURN_V1"
+canonical_base_sha = "1bd98b3769f27e9ded363058c316bd00e81cea0f"
+source_live_probe_state = "PASS"
+source_live_probe_canonical_sha = "1bd98b3769f27e9ded363058c316bd00e81cea0f"
+authority_source = "EXPLICIT_USER_AUTHORITY_REPRESENTED_BY_THIS_GIT_BACKED_PHASE"
+implementation_authorized = true
+implementation_completed = false
+candidate_branch_is_authority = false
+activation_effective_on_branch = false
+canonicalization_required_before_effect = true
+real_market_data_access_authorized_on_branch = false
+prospective_collection_authorized_on_branch = false
+scheduler_authorized_on_branch = false
+scientific_recording_authorized_on_branch = false
+post_canonical_real_market_data_access_authorized = true
+post_canonical_prospective_collection_authorized = true
+post_canonical_scheduler_authorized = true
+post_canonical_scientific_recording_authorized = true
+interim_scientific_evaluation_authorized = false
+terminal_evaluation_authorized = false
+router_authorized = false
+qnty_authorized = false
+qntyspot_authorized = false
+trading_authority = "NONE"
+capital_authority = "NONE"
+signing_authority = "NONE"
+submission_authority = "NONE"
+backfill = "FORBIDDEN"
+source_substitution = "FORBIDDEN"
+next_action = "IMPLEMENT_AND_VERIFY_ONLY: finish the bounded activation candidate without live provider access on the branch. After exact canonical merge, install matching local user units from a clean dedicated operational worktree at origin/master; only then begin frozen prospective collection. No backfill or interim evaluation."

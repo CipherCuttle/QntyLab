@@ -1,0 +1,22 @@
+{
+  "artifact_type": "QNTY_EDGE_ORDER_FLOW_PROSPECTIVE_V1_RUNTIME",
+  "schema_version": "1.0.0",
+  "candidate_id": "CANDIDATE_ORDER_FLOW_SIGNED_TAKER_QUOTE_IMBALANCE_INCREMENTAL_RETURN_V1",
+  "operation_module": "qntylab.order_flow_prospective_v1_operation",
+  "service_path": "ops/systemd/user/order-flow-v1-prospective-record.service",
+  "timer_path": "ops/systemd/user/order-flow-v1-prospective-record.timer",
+  "operational_worktree": "/home/swirky/DevHub/repos/QntyLab-orderflow-operational",
+  "state_dir": "~/.local/state/qntylab/order_flow_prospective_v1",
+  "python_executable": "/usr/bin/python3",
+  "python_required_major_minor": "3.12",
+  "attempt_minutes_utc": [5, 20, 35, 50],
+  "timer_frequency": "HOURLY",
+  "persistent_timer": false,
+  "release_repository": "CipherCuttle/QntyLab",
+  "release_prefix": "order-flow-v1-evidence-",
+  "release_asset": "order_flow_prospective_v1_events.jsonl",
+  "persistence": "GITHUB_IMMUTABLE_RELEASE_HASH_CHAIN_V1",
+  "source_access_host": "LOCAL_TRUSTED_NON_US_HOST_ONLY",
+  "github_actions_real_provider_access": "FORBIDDEN",
+  "interim_evaluation": "FORBIDDEN"
+}

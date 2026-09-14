@@ -3,8 +3,12 @@
   "schema_version": "1.0.0",
   "project_id": "QNTY_EDGE_ORDER_FLOW_PROSPECTIVE_V1_ACTIVATION",
   "candidate_id": "CANDIDATE_ORDER_FLOW_SIGNED_TAKER_QUOTE_IMBALANCE_INCREMENTAL_RETURN_V1",
-  "state": "ACTIVE",
+  "state": "AUTHORIZED_IF_CANONICAL",
   "activation_scope": "PROSPECTIVE_COLLECTION_ONLY",
+  "candidate_branch_is_authority": false,
+  "activation_effective_on_branch": false,
+  "canonicalization_required_before_effect": true,
+  "activation_effective": "AFTER_EXACT_CANONICAL_MERGE_AND_MATCHING_LOCAL_UNIT_INSTALL_ONLY",
   "probe_result_path": "experiments/research/qnty_edge_discovery_order_flow_v1/source_live_probe_result.json",
   "probe_canonical_master_sha": "1bd98b3769f27e9ded363058c316bd00e81cea0f",
   "source_implementation_path": "qntylab/order_flow_prospective_v1_source.py",
@@ -21,7 +25,13 @@
   "backfill": "FORBIDDEN",
   "source_substitution": "FORBIDDEN",
   "persistence": "GITHUB_IMMUTABLE_RELEASE_HASH_CHAIN_V1",
-  "authority": {
+  "branch_authority": {
+    "real_market_data_access_authorized": false,
+    "prospective_collection_authorized": false,
+    "scheduler_authorized": false,
+    "scientific_recording_authorized": false
+  },
+  "authority_after_canonicalization": {
     "real_market_data_access_authorized": true,
     "prospective_collection_authorized": true,
     "scheduler_authorized": true,
@@ -36,5 +46,5 @@
     "submission_authority": "NONE",
     "capital_authority": "NONE"
   },
-  "next_action": "After this activation is canonical, install/enable the dedicated local systemd user timer from the isolated operational worktree. Record only frozen prospective closes and anchor every changed cumulative ledger to an immutable GitHub release. Do not evaluate outcomes before the frozen terminal evaluation phase."
+  "next_action": "Canonicalize this activation candidate. Only after exact canonical merge, from a clean dedicated operational worktree whose HEAD equals origin/master and whose installed user units match canonical bytes, may the bounded local scheduler begin frozen prospective collection. Do not evaluate outcomes before the separately governed terminal evaluation phase."
 }

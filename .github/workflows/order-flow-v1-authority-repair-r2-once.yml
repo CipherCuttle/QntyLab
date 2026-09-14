@@ -1,0 +1,140 @@
+name: Order Flow V1 authority repair r2 once
+
+on:
+  push:
+    branches:
+      - research/order-flow-v1-activation
+    paths:
+      - .github/workflows/order-flow-v1-authority-repair-r2-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.12.14"
+      - name: Install frozen verification dependencies
+        run: python -m pip install --disable-pip-version-check "pytest==8.4.2" requests
+      - name: Reuse guarded P1 patch from first one-shot
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test -z "$(git status --porcelain)"
+          python - <<'PY'
+          from pathlib import Path
+
+          workflow = Path(".github/workflows/order-flow-v1-authority-repair-once.yml").read_text(encoding="utf-8")
+          marker = "          python - <<'PY'\n"
+          start = workflow.index(marker) + len(marker)
+          end = workflow.index("\n          PY\n", start)
+          lines = workflow[start:end].splitlines()
+          script = "\n".join(line[10:] if line.startswith("          ") else line for line in lines) + "\n"
+          exec(compile(script, "order-flow-v1-authority-repair-once", "exec"), {"__name__": "__main__"})
+          PY
+      - name: Repair only stale active-project regression assumptions
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("tests/test_project_context_v0.py")
+          text = path.read_text(encoding="utf-8")
+
+          def once(old: str, new: str, label: str) -> None:
+              global text
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{label}: expected exactly one match, got {count}")
+              text = text.replace(old, new, 1)
+
+          once(
+              'CLAIM_REPAIR_AUTHORIZATION_NEXT_ACTION = "No project implementation is currently authorized."\n',
+              'CLAIM_REPAIR_AUTHORIZATION_NEXT_ACTION = "No project implementation is currently authorized."\nORDER_FLOW_V1_ACTIVATION_PROJECT_ID = "QNTY_EDGE_ORDER_FLOW_PROSPECTIVE_V1_ACTIVATION"\n',
+              "activation test constant",
+          )
+          once(
+              '    assert active_ids == set()\n    execution = next(record for record in registry["project"] if record["project_id"] == DSH_STAGE_A_V1_EXECUTION_PROJECT_ID)\n',
+              '    assert active_ids == {ORDER_FLOW_V1_ACTIVATION_PROJECT_ID}\n    execution = next(record for record in registry["project"] if record["project_id"] == DSH_STAGE_A_V1_EXECUTION_PROJECT_ID)\n',
+              "DSH active id expectation",
+          )
+          once(
+              '    assert v0r3["state"] == "CLOSED_BLOCKED"\n    assert data["active_project"] is None\n    assert data["current_permitted_next_action"] == "No project implementation is currently authorized."\n',
+              '    assert v0r3["state"] == "CLOSED_BLOCKED"\n    assert data["active_project"]["project_id"] == ORDER_FLOW_V1_ACTIVATION_PROJECT_ID\n    assert data["active_project"]["activation_effective_on_branch"] is False\n    assert data["current_permitted_next_action"].startswith("IMPLEMENT_AND_VERIFY_ONLY:")\n',
+              "DSH current active expectation",
+          )
+          once(
+              '    assert receipt["spend_usd"] == 0.0\n    assert data["active_project"] is None\n    assert data["current_permitted_next_action"] == "No project implementation is currently authorized."\n',
+              '    assert receipt["spend_usd"] == 0.0\n    assert data["active_project"]["project_id"] == ORDER_FLOW_V1_ACTIVATION_PROJECT_ID\n    assert data["active_project"]["activation_effective_on_branch"] is False\n    assert data["current_permitted_next_action"].startswith("IMPLEMENT_AND_VERIFY_ONLY:")\n',
+              "offline qualification current active expectation",
+          )
+          once(
+              '    assert {\n        record["project_id"]\n        for record in registry["project"]\n        if record["state"] == "ACTIVE" and record.get("candidate_state") != "ACTIVE_CANDIDATE"\n    } == set()\n',
+              '    assert {\n        record["project_id"]\n        for record in registry["project"]\n        if record["state"] == "ACTIVE" and record.get("candidate_state") != "ACTIVE_CANDIDATE"\n    } == {ORDER_FLOW_V1_ACTIVATION_PROJECT_ID}\n',
+              "funding active id expectation",
+          )
+          once(
+              '    assert data["active_project"] is None\n    assert data["current_permitted_next_action"] == "No project implementation is currently authorized."\n    _assert_project_is_not_active(registry, FUNDING_INCREMENTAL_IMPLEMENTATION_PROJECT_ID)\n',
+              '    assert data["active_project"]["project_id"] == ORDER_FLOW_V1_ACTIVATION_PROJECT_ID\n    assert data["active_project"]["activation_effective_on_branch"] is False\n    assert data["current_permitted_next_action"].startswith("IMPLEMENT_AND_VERIFY_ONLY:")\n    _assert_project_is_not_active(registry, FUNDING_INCREMENTAL_IMPLEMENTATION_PROJECT_ID)\n',
+              "funding current active expectation",
+          )
+          once(
+              '    assert project["downstream_authority"] == "NONE"\n    assert data["active_project"] is None\n',
+              '    assert project["downstream_authority"] == "NONE"\n    assert data["active_project"]["project_id"] == ORDER_FLOW_V1_ACTIVATION_PROJECT_ID\n    assert data["active_project"]["activation_effective_on_branch"] is False\n',
+              "JH01 current active expectation",
+          )
+          path.write_text(text, encoding="utf-8")
+          PY
+      - name: Regenerate canonical roadmap
+        run: python -m qntylab.project_context render
+      - name: Verify repaired authority and regressions
+        run: |
+          set -euo pipefail
+          python -m qntylab.project_context doctor --strict
+          python -m qntylab.project_context render --check
+          python -m pytest -q \
+            tests/test_order_flow_prospective_v1_activation.py \
+            tests/test_order_flow_prospective_v1_source.py \
+            tests/test_order_flow_prospective_v1_recorder.py \
+            tests/test_project_context_v0.py
+          git diff --check
+      - name: Commit only bounded non-workflow repair files
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import subprocess
+          allowed = {
+              "docs/state/projects.toml",
+              "docs/CURRENT_ROADMAP.md",
+              "experiments/research/qnty_edge_discovery_order_flow_v1/prospective_runtime.json",
+              "qntylab/order_flow_prospective_v1_operation.py",
+              "tests/test_order_flow_prospective_v1_activation.py",
+              "tests/test_project_context_v0.py",
+          }
+          changed = {
+              line.strip()
+              for line in subprocess.check_output(["git", "diff", "--name-only"], text=True).splitlines()
+              if line.strip()
+          }
+          if changed != allowed:
+              raise SystemExit(f"unexpected repair surface: {sorted(changed)}")
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            docs/state/projects.toml \
+            docs/CURRENT_ROADMAP.md \
+            experiments/research/qnty_edge_discovery_order_flow_v1/prospective_runtime.json \
+            qntylab/order_flow_prospective_v1_operation.py \
+            tests/test_order_flow_prospective_v1_activation.py \
+            tests/test_project_context_v0.py
+          git commit -m "research: repair Order Flow V1 canonical activation authority"
+          git push origin HEAD:research/order-flow-v1-activation

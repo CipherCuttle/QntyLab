@@ -54,3 +54,15 @@ backfills it.
 The first real warmup logical close is `2026-09-15T00:00:00Z`. Interim model
 evaluation, p-values, support decisions, Router/Qnty/QntySpot use, trading,
 signing, submission, and capital authority remain forbidden.
+
+
+## Canonical state + host binding
+
+Production recording is pinned to `/home/swirky/.local/state/qntylab/order_flow_prospective_v1`. `XDG_STATE_HOME` and
+`--state-dir` are not authority overrides for canonical recording. Before any
+provider access, the runtime verifies a campaign-specific contextual fingerprint
+of `/etc/machine-id` against the Git-backed trusted-host binding and reconciles
+the local cumulative ledger with the latest immutable GitHub evidence release.
+A missing/older local ledger is restored from the remote immutable head; any
+divergence, competing draft, or more-than-one unanchored local event fails
+closed. The reusable raw machine-id digest is not stored in Git.

@@ -174,3 +174,56 @@ def test_local_systemd_timer_is_hourly_nonpersistent_and_no_github_provider_runn
     assert "contents: read" in workflow
     assert "schedule:" not in workflow
     assert "run_non_scientific_live_probe" not in workflow
+
+
+def test_canonical_state_dir_is_fixed_and_xdg_override_is_ignored(monkeypatch):
+    monkeypatch.setenv("XDG_STATE_HOME", "/tmp/not-authorized")
+    assert operation.default_state_dir() == operation.CANONICAL_STATE_DIR
+
+
+def test_trusted_host_binding_uses_campaign_specific_fingerprint(monkeypatch):
+    monkeypatch.setattr(operation, "_trusted_host_fingerprint", lambda path=operation.MACHINE_ID_PATH: operation.TRUSTED_HOST_BINDING_DIGEST)
+    result = operation.validate_trusted_host(ROOT)
+    assert result["context"] == operation.HOST_BINDING_CONTEXT
+    assert result["digest"] == operation.TRUSTED_HOST_BINDING_DIGEST
+
+
+def test_wrong_trusted_host_fails_closed(tmp_path):
+    import pytest
+    machine_id = tmp_path / "machine-id"
+    machine_id.write_text("different-machine\n", encoding="utf-8")
+    with pytest.raises(operation.OperationBlocked, match="qualified trusted host"):
+        operation.validate_trusted_host(ROOT, machine_id)
+
+
+def test_noncanonical_recording_requires_injected_fetcher(tmp_path):
+    import pytest
+    now = recorder.hour(recorder.FIRST_WARMUP_CLOSE) + timedelta(minutes=5)
+    with pytest.raises(operation.OperationBlocked, match="injected synthetic fetcher"):
+        operation.record_due(ROOT, tmp_path, now=now, canonical_check=False, anchorer=lambda ledger, target: {"immutable": True})
+
+
+def test_reconcile_restores_missing_local_ledger_from_remote(monkeypatch, tmp_path):
+    import hashlib
+    remote = recorder.EvidenceLedger(tmp_path / "remote")
+    close = recorder.hour(recorder.FIRST_WARMUP_CLOSE)
+    remote.record_batch(logical_close=close, rows=recorder.synthetic_batch(close), observed_at=close + timedelta(minutes=5))
+    payload = remote.path.read_bytes()
+    events = remote.events()
+    metadata = {"schema": operation.EVIDENCE_RELEASE_SCHEMA, "event_count": 1, "head_event_digest": events[-1]["event_digest"], "ledger_sha256": hashlib.sha256(payload).hexdigest(), "previous_release_tag": None, "scientific_evaluation": "FORBIDDEN"}
+    head = {"tag_name": operation._ledger_tag(events), "draft": False, "immutable": True, "_evidence_meta": metadata}
+    monkeypatch.setattr(operation, "_evidence_release_state", lambda: {"published_head": head, "draft_head": None})
+    monkeypatch.setattr(operation, "_download_release_bytes", lambda requested: payload)
+    local = recorder.EvidenceLedger(tmp_path / "local")
+    result = operation.reconcile_canonical_ledger(local)
+    assert result["state"] == "RESTORED_REMOTE_HEAD"
+    assert local.path.read_bytes() == payload
+    assert local.events() == events
+
+
+def test_runtime_pins_host_state_and_remote_reconciliation():
+    runtime = json.loads((EXP / "prospective_runtime.json").read_text(encoding="utf-8"))
+    assert runtime["state_dir"] == str(operation.CANONICAL_STATE_DIR)
+    assert runtime["trusted_host_identity"] == {"method": "SHA256_CONTEXTUALIZED_SHA256_ETC_MACHINE_ID", "context": operation.HOST_BINDING_CONTEXT, "digest": operation.TRUSTED_HOST_BINDING_DIGEST, "probe_host_binding_required": True}
+    assert runtime["remote_reconciliation_required_before_provider_access"] is True
+    assert runtime["release_body_schema"] == operation.EVIDENCE_RELEASE_SCHEMA

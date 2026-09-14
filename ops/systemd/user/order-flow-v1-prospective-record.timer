@@ -1,0 +1,20 @@
+# Four bounded attempts per UTC hour, all inside the frozen [C,C+1h)
+# recording window. Persistent=false forbids catch-up provider fetches after
+# sleep/offline periods; the operation layer records overdue closes only as
+# WINDOW_MISSED and never backfills them.
+
+[Unit]
+Description=QntyLab Order Flow Prospective V1 hourly record-due schedule
+
+[Timer]
+OnCalendar=*-*-* *:05:00 UTC
+OnCalendar=*-*-* *:20:00 UTC
+OnCalendar=*-*-* *:35:00 UTC
+OnCalendar=*-*-* *:50:00 UTC
+Persistent=false
+AccuracySec=1s
+RandomizedDelaySec=0
+Unit=order-flow-v1-prospective-record.service
+
+[Install]
+WantedBy=timers.target

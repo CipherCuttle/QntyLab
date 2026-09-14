@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
 from hashlib import sha256
+from http.client import HTTPException
 import json
 from pathlib import Path
 import subprocess
@@ -32,7 +33,16 @@ class SourceBlocked(ValueError):
     """The source seam failed closed."""
 
 
+class SourceWindowMissed(SourceBlocked):
+    """Provider acquisition crossed the frozen prospective recording deadline."""
+
+    def __init__(self, detected_at: datetime):
+        self.detected_at = detected_at
+        super().__init__("scientific recording window elapsed during provider acquisition")
+
+
 Fetcher = Callable[..., Sequence[Sequence[Any]]]
+Clock = Callable[[], datetime]
 
 
 def _instant(value: str | datetime) -> datetime:
@@ -51,6 +61,11 @@ def _hour(value: str | datetime) -> datetime:
 
 def _stamp(value: str | datetime) -> str:
     return _instant(value).isoformat().replace("+00:00", "Z")
+
+
+def _effective_now(observed: datetime, clock: Clock | None) -> datetime:
+    actual = _instant(datetime.now(UTC) if clock is None else clock())
+    return max(observed, actual)
 
 
 def validate_recorder_qualification(root: Path = ROOT) -> dict[str, Any]:
@@ -140,7 +155,7 @@ def default_fetch_one(*, symbol: str, logical_close: str | datetime, timeout: fl
             payload = json.loads(response.read())
     except SourceBlocked:
         raise
-    except (HTTPError, URLError, TimeoutError, OSError) as exc:
+    except (HTTPException, HTTPError, URLError, TimeoutError, OSError) as exc:
         raise SourceBlocked(f"Binance USD-M REST transport failure: {exc}") from exc
     except json.JSONDecodeError as exc:
         raise SourceBlocked("Binance USD-M REST returned malformed JSON") from exc
@@ -171,7 +186,13 @@ def validate_probe_row(*, symbol: str, logical_close: str | datetime, raw_row: S
     return {"symbol": symbol, "logical_close_utc": _stamp(close), "status": "SHAPE_TIMESTAMP_PASS"}
 
 
-def fetch_scientific_batch(*, logical_close: str | datetime, observed_at: str | datetime, fetcher: Fetcher | None = None) -> dict[str, list[Any]]:
+def fetch_scientific_batch(
+    *,
+    logical_close: str | datetime,
+    observed_at: str | datetime,
+    fetcher: Fetcher | None = None,
+    clock: Clock | None = None,
+) -> dict[str, list[Any]]:
     validate_recorder_qualification()
     close = _hour(logical_close)
     try:
@@ -179,44 +200,85 @@ def fetch_scientific_batch(*, logical_close: str | datetime, observed_at: str | 
     except recorder.RecorderBlocked as exc:
         raise SourceBlocked(str(exc)) from exc
     observed = _instant(observed_at)
+    deadline = close + RECORDING_WINDOW
     if observed < close:
         raise SourceBlocked("scientific source fetch attempted before logical close")
-    if observed >= close + RECORDING_WINDOW:
+    if observed >= deadline:
         raise SourceBlocked("scientific recording window missed; provider fetch forbidden")
     fetcher = fetcher or default_fetch_one
     rows: dict[str, list[Any]] = {}
+    acquisition_observed = observed
     for symbol in PANEL:
-        payload = list(fetcher(symbol=symbol, logical_close=close))
+        acquisition_observed = _effective_now(acquisition_observed, clock)
+        if acquisition_observed >= deadline:
+            raise SourceWindowMissed(acquisition_observed)
+        try:
+            payload = list(fetcher(symbol=symbol, logical_close=close))
+        except SourceWindowMissed:
+            raise
+        except SourceBlocked as exc:
+            acquisition_observed = _effective_now(acquisition_observed, clock)
+            if acquisition_observed >= deadline:
+                raise SourceWindowMissed(acquisition_observed) from exc
+            raise
+        acquisition_observed = _effective_now(acquisition_observed, clock)
+        if acquisition_observed >= deadline:
+            raise SourceWindowMissed(acquisition_observed)
         if len(payload) != 1:
             raise SourceBlocked(f"exact-hour source must return exactly one row for {symbol}")
         row = list(payload[0])
         validate_probe_row(symbol=symbol, logical_close=close, raw_row=row)
         rows[symbol] = row
     try:
-        recorder.normalize_batch(logical_close=close, rows=rows, observed_at=observed)
+        recorder.normalize_batch(logical_close=close, rows=rows, observed_at=acquisition_observed)
     except recorder.RecorderBlocked as exc:
         raise SourceBlocked(f"scientific source batch rejected: {exc}") from exc
     return rows
 
 
-def stage_due_hour(ledger: recorder.EvidenceLedger, *, logical_close: str | datetime, observed_at: str | datetime, fetcher: Fetcher | None = None) -> dict[str, Any]:
+def stage_due_hour(
+    ledger: recorder.EvidenceLedger,
+    *,
+    logical_close: str | datetime,
+    observed_at: str | datetime,
+    fetcher: Fetcher | None = None,
+    clock: Clock | None = None,
+) -> dict[str, Any]:
     validate_recorder_qualification()
     close = _hour(logical_close)
     observed = _instant(observed_at)
+    deadline = close + RECORDING_WINDOW
     try:
         recorder.classify_logical_close(close)
     except recorder.RecorderBlocked as exc:
         raise SourceBlocked(str(exc)) from exc
     if observed < close:
         raise SourceBlocked("scientific hour is not complete")
-    if observed >= close + RECORDING_WINDOW:
+    if observed >= deadline:
         try:
             return ledger.mark_missed(logical_close=close, detected_at=observed)
         except recorder.RecorderBlocked as exc:
             raise SourceBlocked(str(exc)) from exc
-    rows = fetch_scientific_batch(logical_close=close, observed_at=observed, fetcher=fetcher)
     try:
-        return ledger.record_batch(logical_close=close, rows=rows, observed_at=observed)
+        rows = fetch_scientific_batch(
+            logical_close=close,
+            observed_at=observed,
+            fetcher=fetcher,
+            clock=clock,
+        )
+    except SourceWindowMissed as exc:
+        try:
+            return ledger.mark_missed(logical_close=close, detected_at=exc.detected_at)
+        except recorder.RecorderBlocked as recorder_exc:
+            raise SourceBlocked(str(recorder_exc)) from recorder_exc
+    completed_at = _effective_now(observed, clock)
+    if completed_at >= deadline:
+        try:
+            return ledger.mark_missed(logical_close=close, detected_at=completed_at)
+        except recorder.RecorderBlocked as exc:
+            raise SourceBlocked(str(exc)) from exc
+    try:
+        return ledger.record_batch(logical_close=close, rows=rows, observed_at=completed_at)
     except recorder.RecorderBlocked as exc:
         raise SourceBlocked(str(exc)) from exc
 

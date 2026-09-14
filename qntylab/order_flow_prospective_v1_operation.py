@@ -41,6 +41,9 @@ RUNTIME_PATH = Path(
 )
 SOURCE_PATH = Path("qntylab/order_flow_prospective_v1_source.py")
 RECORDER_PATH = Path("qntylab/order_flow_prospective_v1_recorder.py")
+OPERATION_PATH = Path("qntylab/order_flow_prospective_v1_operation.py")
+SERVICE_PATH = Path("ops/systemd/user/order-flow-v1-prospective-record.service")
+TIMER_PATH = Path("ops/systemd/user/order-flow-v1-prospective-record.timer")
 
 REPOSITORY = "CipherCuttle/QntyLab"
 RELEASE_PREFIX = "order-flow-v1-evidence-"
@@ -193,6 +196,14 @@ def validate_activation_artifacts(root: Path) -> dict[str, Any]:
         raise OperationBlocked("runtime release prefix changed")
     if runtime.get("release_asset") != LEDGER_FILENAME:
         raise OperationBlocked("runtime release asset changed")
+    for key, path in (
+        ("operation_git_blob_sha", OPERATION_PATH),
+        ("service_git_blob_sha", SERVICE_PATH),
+        ("timer_git_blob_sha", TIMER_PATH),
+    ):
+        expected_blob = runtime.get(key)
+        if not isinstance(expected_blob, str) or _git(root, "hash-object", str(path)) != expected_blob:
+            raise OperationBlocked(f"runtime Git blob identity mismatch: {key}")
     if runtime.get("interim_evaluation") != "FORBIDDEN":
         raise OperationBlocked("runtime interim evaluation boundary changed")
 
@@ -211,6 +222,16 @@ def validate_activation_artifacts(root: Path) -> dict[str, Any]:
     }
 
 
+def _validate_installed_units(root: Path) -> None:
+    unit_dir = Path.home() / ".config" / "systemd" / "user"
+    for repo_path in (SERVICE_PATH, TIMER_PATH):
+        installed = unit_dir / repo_path.name
+        if not installed.is_file():
+            raise OperationBlocked(f"activated systemd unit is not installed: {installed}")
+        if installed.read_bytes() != (root / repo_path).read_bytes():
+            raise OperationBlocked(f"installed systemd unit differs from canonical repo bytes: {installed}")
+
+
 def canonical_preflight(root: Path) -> str:
     """Require the already-synchronized dedicated worktree to equal origin/master."""
     if _git(root, "status", "--porcelain"):
@@ -225,6 +246,7 @@ def canonical_preflight(root: Path) -> str:
             "operational checkout is stale; synchronize it before starting Python"
         )
     validate_activation_artifacts(root)
+    _validate_installed_units(root)
     return head
 
 
@@ -323,7 +345,7 @@ def _verify_release(tag: str, ledger: recorder.EvidenceLedger, expected_sha256: 
 
 
 def ensure_immutable_anchor(ledger: recorder.EvidenceLedger, target_commit: str) -> dict[str, Any]:
-    """Publish or verify the current cumulative ledger as one immutable release."""
+    """Publish/resume/verify the current cumulative ledger as one immutable release."""
     events = ledger.events()
     if not events or not ledger.path.is_file():
         return {"state": "NO_LEDGER"}
@@ -333,49 +355,62 @@ def ensure_immutable_anchor(ledger: recorder.EvidenceLedger, target_commit: str)
         raise OperationBlocked("ledger last event digest is malformed")
     tag = f"{RELEASE_PREFIX}{last_digest[:24]}"
 
-    if _release_snapshot(tag) is not None:
+    release = _release_snapshot(tag)
+    if release is not None and release.get("immutable") is True:
         return _verify_release(tag, ledger, ledger_sha)
+    if release is not None and release.get("draft") is not True:
+        raise OperationBlocked("existing evidence release is neither resumable draft nor immutable")
 
-    _run(
-        (
-            "gh",
-            "release",
-            "create",
-            tag,
-            "--repo",
-            REPOSITORY,
-            "--target",
-            target_commit,
-            "--title",
-            tag,
-            "--notes",
-            "Order Flow Prospective V1 cumulative scientific recording snapshot. "
-            "No interim evaluation or downstream authority.",
-            "--prerelease",
-            "--draft",
+    if release is None:
+        _run(
+            (
+                "gh",
+                "release",
+                "create",
+                tag,
+                "--repo",
+                REPOSITORY,
+                "--target",
+                target_commit,
+                "--title",
+                tag,
+                "--notes",
+                "Order Flow Prospective V1 cumulative scientific recording snapshot. "
+                "No interim evaluation or downstream authority.",
+                "--prerelease",
+                "--draft",
+            )
         )
-    )
-    _run(
-        (
-            "gh",
-            "release",
-            "upload",
-            tag,
-            f"{ledger.path}#{LEDGER_FILENAME}",
-            "--repo",
-            REPOSITORY,
-        )
-    )
-    draft = _release_snapshot(tag)
-    if draft is None or draft.get("draft") is not True:
-        raise OperationBlocked("draft evidence release disappeared before publication")
+        release = _release_snapshot(tag)
+    if release is None or release.get("draft") is not True:
+        raise OperationBlocked("draft evidence release is unavailable")
+
     assets = [
         asset
-        for asset in draft.get("assets", [])
+        for asset in release.get("assets", [])
         if isinstance(asset, dict) and asset.get("name") == LEDGER_FILENAME
     ]
+    if len(assets) == 0:
+        _run(
+            (
+                "gh",
+                "release",
+                "upload",
+                tag,
+                f"{ledger.path}#{LEDGER_FILENAME}",
+                "--repo",
+                REPOSITORY,
+            )
+        )
+        release = _release_snapshot(tag)
+        assets = [
+            asset
+            for asset in (release or {}).get("assets", [])
+            if isinstance(asset, dict) and asset.get("name") == LEDGER_FILENAME
+        ]
     if len(assets) != 1 or assets[0].get("digest") != f"sha256:{ledger_sha}":
         raise OperationBlocked("draft evidence asset digest mismatch")
+
     _run(
         (
             "gh",

@@ -20,6 +20,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import time
 from typing import Any, Callable, Sequence
 
 from . import order_flow_prospective_v1_recorder as recorder
@@ -56,6 +57,8 @@ HOST_BINDING_CONTEXT = "QNTYLAB_ORDER_FLOW_V1_HOST_V1"
 TRUSTED_HOST_BINDING_DIGEST = "0902027d8e7eb13bf130934d46a48b61cd6b126fef13f371844f4d5de9e39f5e"
 EVIDENCE_RELEASE_SCHEMA = "ORDER_FLOW_V1_EVIDENCE_RELEASE_V1"
 LEDGER_FILENAME = recorder.LEDGER_FILENAME
+RELEASE_CONVERGENCE_ATTEMPTS = 6
+RELEASE_CONVERGENCE_DELAY_SECONDS = 1.0
 
 Anchorer = Callable[[recorder.EvidenceLedger, str], dict[str, Any]]
 Fetcher = Callable[..., Sequence[Sequence[Any]]]
@@ -405,6 +408,25 @@ def _release_snapshot(tag: str) -> dict[str, Any] | None:
     return value
 
 
+def _wait_for_release_state(
+    tag: str,
+    predicate: Callable[[dict[str, Any]], bool],
+    *,
+    attempts: int = RELEASE_CONVERGENCE_ATTEMPTS,
+    delay_seconds: float = RELEASE_CONVERGENCE_DELAY_SECONDS,
+) -> dict[str, Any]:
+    """Wait briefly for a successful GitHub write to become readable."""
+    if attempts < 1:
+        raise OperationBlocked("GitHub release convergence requires a positive attempt budget")
+    for attempt in range(attempts):
+        release = _release_snapshot(tag)
+        if release is not None and release.get("tag_name") == tag and predicate(release):
+            return release
+        if attempt + 1 < attempts:
+            time.sleep(delay_seconds)
+    raise OperationBlocked("GitHub release state did not converge after successful write")
+
+
 def _release_metadata(release: dict[str, Any]) -> dict[str, Any]:
     try:
         metadata = json.loads(release.get("body") or "")
@@ -620,20 +642,37 @@ def ensure_immutable_anchor(ledger: recorder.EvidenceLedger, target_commit: str)
         release = draft
     if release is None:
         _run(("gh", "release", "create", tag, "--repo", REPOSITORY, "--target", target_commit, "--title", tag, "--notes", json.dumps(metadata, sort_keys=True, separators=(",", ":")), "--prerelease", "--draft"))
-        release = _release_snapshot(tag)
+        release = _wait_for_release_state(
+            tag,
+            lambda candidate: candidate.get("draft") is True
+            and _release_metadata(candidate) == metadata,
+        )
     if release is None or release.get("draft") is not True or _release_metadata(release) != metadata:
         raise OperationBlocked("draft evidence release is unavailable or mismatched")
     assets = _release_assets(release)
     if len(assets) == 0:
         _run(("gh", "release", "upload", tag, f"{ledger.path}#{LEDGER_FILENAME}", "--repo", REPOSITORY))
-        release = _release_snapshot(tag)
-        assets = _release_assets(release or {})
+        release = _wait_for_release_state(
+            tag,
+            lambda candidate: candidate.get("draft") is True
+            and _release_metadata(candidate) == metadata
+            and len(_release_assets(candidate)) == 1
+            and _release_assets(candidate)[0].get("digest")
+            == f"sha256:{metadata['ledger_sha256']}",
+        )
+        assets = _release_assets(release)
     if len(assets) != 1 or assets[0].get("digest") != f"sha256:{metadata['ledger_sha256']}":
         raise OperationBlocked("draft evidence asset digest mismatch")
     _run(("gh", "release", "edit", tag, "--repo", REPOSITORY, "--draft=false", "--prerelease"))
-    release = _release_snapshot(tag)
-    if release is None:
-        raise OperationBlocked("published evidence release is unavailable")
+    release = _wait_for_release_state(
+        tag,
+        lambda candidate: candidate.get("draft") is False
+        and candidate.get("immutable") is True
+        and _release_metadata(candidate) == metadata
+        and len(_release_assets(candidate)) == 1
+        and _release_assets(candidate)[0].get("digest")
+        == f"sha256:{metadata['ledger_sha256']}",
+    )
     return _verify_release(release, ledger)
 
 def record_due(

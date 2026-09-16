@@ -17,6 +17,10 @@ git worktree add --detach \
   origin/master
 ```
 
+The activated campaign requires Python 3.12 and uses the dedicated local runtime
+`/home/swirky/.local/share/qntylab/order-flow-v1-py312/bin/python`. The system
+Python is not activation authority and must not be substituted for this path.
+
 Before enabling the timer, verify GitHub CLI authentication. The local caller
 uses `gh` only to publish and independently restore immutable cumulative
 evidence releases; it does not use GitHub Actions for source acquisition.
@@ -25,7 +29,7 @@ evidence releases; it does not use GitHub Actions for source acquisition.
 gh auth status
 
 cd /home/swirky/DevHub/repos/QntyLab-orderflow-operational
-/usr/bin/python3 -m qntylab.order_flow_prospective_v1_operation \
+/home/swirky/.local/share/qntylab/order-flow-v1-py312/bin/python -m qntylab.order_flow_prospective_v1_operation \
   --status \
   --root /home/swirky/DevHub/repos/QntyLab-orderflow-operational
 ```

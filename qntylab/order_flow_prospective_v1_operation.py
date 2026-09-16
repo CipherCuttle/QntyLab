@@ -387,7 +387,14 @@ def _release_snapshot(tag: str) -> dict[str, Any] | None:
     if result.returncode:
         detail = f"{result.stdout}\n{result.stderr}"
         if "HTTP 404" in detail or "Not Found" in detail:
-            return None
+            matches = [
+                release
+                for release in _list_evidence_releases()
+                if release.get("tag_name") == tag
+            ]
+            if len(matches) > 1:
+                raise OperationBlocked("multiple evidence releases exist for one tag")
+            return matches[0] if matches else None
         raise OperationBlocked(f"GitHub release lookup failed: {detail.strip()}")
     try:
         value = json.loads(result.stdout)

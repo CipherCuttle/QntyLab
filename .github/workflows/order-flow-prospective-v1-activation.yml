@@ -12,6 +12,7 @@ on:
       - "tests/test_order_flow_prospective_v1_activation.py"
       - "tests/test_order_flow_prospective_v1_source.py"
       - "tests/test_order_flow_prospective_v1_recorder.py"
+      - "tests/test_order_flow_prospective_v1_draft_release_lookup.py"
   workflow_dispatch:
 
 permissions:
@@ -38,5 +39,6 @@ jobs:
             tests/test_order_flow_prospective_v1_activation.py \
             tests/test_order_flow_prospective_v1_source.py \
             tests/test_order_flow_prospective_v1_recorder.py \
+            tests/test_order_flow_prospective_v1_draft_release_lookup.py \
             -q
           git diff --check

@@ -9,7 +9,7 @@
   "candidate_id": "CANDIDATE_ORDER_FLOW_SIGNED_TAKER_QUOTE_IMBALANCE_INCREMENTAL_RETURN_V1",
   "github_actions_real_provider_access": "FORBIDDEN",
   "interim_evaluation": "FORBIDDEN",
-  "operation_git_blob_sha": "b7987924480922fcb8be41315e8a02273df2ce2a",
+  "operation_git_blob_sha": "db9434f5fa36763d49d089f67744dc5d1877001d",
   "operation_module": "qntylab.order_flow_prospective_v1_operation",
   "operational_worktree": "/home/swirky/DevHub/repos/QntyLab-orderflow-operational",
   "persistence": "GITHUB_IMMUTABLE_RELEASE_HASH_CHAIN_V1",

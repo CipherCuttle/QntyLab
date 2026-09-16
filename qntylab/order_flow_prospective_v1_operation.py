@@ -468,13 +468,14 @@ def _ledger_release_metadata(ledger: recorder.EvidenceLedger, *, previous_releas
 
 
 def _list_evidence_releases() -> list[dict[str, Any]]:
-    result = _run(("gh", "api", "-H", "Accept: application/vnd.github+json", "-H", "X-GitHub-Api-Version: 2022-11-28", f"repos/{REPOSITORY}/releases?per_page=100"))
+    result = _run(("gh", "api", "--paginate", "--slurp", "-H", "Accept: application/vnd.github+json", "-H", "X-GitHub-Api-Version: 2022-11-28", f"repos/{REPOSITORY}/releases?per_page=100"))
     try:
-        releases = json.loads(result.stdout)
+        pages = json.loads(result.stdout)
     except json.JSONDecodeError as exc:
         raise OperationBlocked("GitHub release listing returned malformed JSON") from exc
-    if not isinstance(releases, list):
-        raise OperationBlocked("GitHub release listing returned non-list JSON")
+    if not isinstance(pages, list) or any(not isinstance(page, list) for page in pages):
+        raise OperationBlocked("GitHub release listing returned malformed pages")
+    releases = [release for page in pages for release in page]
     return [release for release in releases if isinstance(release, dict) and isinstance(release.get("tag_name"), str) and release["tag_name"].startswith(RELEASE_PREFIX)]
 
 

@@ -1,11 +1,12 @@
 """Outcome-blind source qualification for QntySpot Ink Stage B.
 
-This module is deliberately narrower than DEV acquisition.  It proves that a
-JSON-RPC source can faithfully serve the frozen Ink/pool identity and a bounded
-historical log/receipt probe without decoding or persisting economic log data.
+This module proves that a JSON-RPC source can faithfully serve the frozen
+Ink/pool identity and DEV-bounded historical evidence without opening OUTER.
+T1 is inspected only through block metadata. Economic Sync-log requests begin
+at outcome-blind T0 discovery and are never deliberately issued past DEV_END.
 
 Real network execution is fail-closed unless the checkout is canonical master
-and the Stage-B ACTIVE_RESEARCH registry row is present.  Importing this module
+and the Stage-B ACTIVE_RESEARCH registry row is present. Importing this module
 never performs network I/O.
 """
 from __future__ import annotations
@@ -19,7 +20,7 @@ import tomllib
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, Mapping
 
@@ -37,6 +38,7 @@ TOKEN0_SELECTOR = "0x0dfe1681"
 TOKEN1_SELECTOR = "0xd21220a7"
 FACTORY_SELECTOR = "0xc45a0155"
 DEFAULT_PROBE_SPAN = 256
+MAX_T0_SCAN_BLOCKS = 8192
 
 
 class QualificationError(RuntimeError):
@@ -55,7 +57,10 @@ def _norm_address(value: str) -> str:
 def _hex_int(value: str) -> int:
     if not isinstance(value, str) or not value.startswith("0x"):
         raise QualificationError(f"invalid JSON-RPC integer: {value!r}")
-    return int(value, 16)
+    try:
+        return int(value, 16)
+    except ValueError as exc:
+        raise QualificationError(f"invalid JSON-RPC integer: {value!r}") from exc
 
 
 def _decode_address_word(value: str) -> str:
@@ -77,6 +82,10 @@ def _canonical_bytes(value: Any) -> bytes:
 
 def _digest(value: Any) -> str:
     return hashlib.sha256(_canonical_bytes(value)).hexdigest()
+
+
+def _has_code(value: Any) -> bool:
+    return isinstance(value, str) and value not in {"0x", "0x0", "0x00"}
 
 
 @dataclass
@@ -126,11 +135,19 @@ def _block(rpc: RpcCall, number: int) -> Mapping[str, Any]:
     return result
 
 
+def _block_summary(block: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        "number": _hex_int(block["number"]),
+        "hash": block["hash"].lower(),
+        "timestamp": _hex_int(block["timestamp"]),
+    }
+
+
 def find_block_at_or_before_timestamp(rpc: RpcCall, timestamp: int) -> Mapping[str, Any]:
     latest_number = _hex_int(rpc("eth_blockNumber", []))
     latest = _block(rpc, latest_number)
     if _hex_int(latest["timestamp"]) < timestamp:
-        raise QualificationError("provider latest block predates frozen T1")
+        raise QualificationError("provider latest block predates requested historical timestamp")
 
     low, high = 0, latest_number
     best: Mapping[str, Any] | None = None
@@ -144,8 +161,30 @@ def find_block_at_or_before_timestamp(rpc: RpcCall, timestamp: int) -> Mapping[s
         else:
             high = mid - 1
     if best is None:
-        raise QualificationError("no canonical block exists at or before frozen T1")
+        raise QualificationError("no canonical block exists at or before requested timestamp")
     return best
+
+
+def find_first_code_block(rpc: RpcCall, address: str, end_block: int) -> int:
+    """Find first historical block with bytecode using only non-economic metadata."""
+    if end_block < 0:
+        raise QualificationError("invalid historical code-search boundary")
+    if not _has_code(rpc("eth_getCode", [address, hex(end_block)])):
+        raise QualificationError("STOP_SOURCE_CONFLICT: pool bytecode absent at frozen T1")
+
+    low, high = 0, end_block
+    while low < high:
+        mid = (low + high) // 2
+        if _has_code(rpc("eth_getCode", [address, hex(mid)])):
+            high = mid
+        else:
+            low = mid + 1
+    first = low
+    if not _has_code(rpc("eth_getCode", [address, hex(first)])):
+        raise QualificationError("STOP_SOURCE_CONFLICT: historical pool deployment boundary is unstable")
+    if first > 0 and _has_code(rpc("eth_getCode", [address, hex(first - 1)])):
+        raise QualificationError("STOP_SOURCE_CONFLICT: historical pool deployment boundary is non-monotonic")
+    return first
 
 
 def _pool_call(rpc: RpcCall, selector: str) -> str:
@@ -160,7 +199,16 @@ def _log_identity(log: Mapping[str, Any]) -> tuple[str, str, str]:
         raise QualificationError("historical log is missing canonical identity")
     if log.get("removed") is True:
         raise QualificationError("historical probe returned a removed log")
+    _hex_int(log_index)
     return block_hash.lower(), tx_hash.lower(), log_index.lower()
+
+
+def _log_order_key(log: Mapping[str, Any]) -> tuple[int, int, int]:
+    return (
+        _hex_int(log.get("blockNumber")),
+        _hex_int(log.get("transactionIndex")),
+        _hex_int(log.get("logIndex")),
+    )
 
 
 def _sync_logs(rpc: RpcCall, start: int, end: int) -> list[Mapping[str, Any]]:
@@ -174,6 +222,18 @@ def _sync_logs(rpc: RpcCall, start: int, end: int) -> list[Mapping[str, Any]]:
     }])
     if not isinstance(result, list) or not all(isinstance(row, dict) for row in result):
         raise QualificationError("eth_getLogs returned malformed result")
+
+    for row in result:
+        if _norm_address(row.get("address")) != _norm_address(POOL):
+            raise QualificationError("STOP_SOURCE_CONFLICT: provider returned a log for the wrong address")
+        topics = row.get("topics")
+        if not isinstance(topics, list) or not topics or not isinstance(topics[0], str) or topics[0].lower() != SYNC_TOPIC:
+            raise QualificationError("STOP_SOURCE_CONFLICT: provider returned a non-Sync log")
+        block_number = _hex_int(row.get("blockNumber"))
+        if not start <= block_number <= end:
+            raise QualificationError("STOP_SOURCE_CONFLICT: provider over-returned a log outside the requested range")
+        _log_order_key(row)
+        _log_identity(row)
     return result
 
 
@@ -184,11 +244,46 @@ def _identities(logs: list[Mapping[str, Any]]) -> list[tuple[str, str, str]]:
     return values
 
 
-def _bounded_log_integrity_probe(rpc: RpcCall, t1_block: int, span: int) -> dict[str, Any]:
+def find_t0_sync(
+    rpc: RpcCall,
+    deployment_block: int,
+    t1_block: int,
+    *,
+    max_scan_blocks: int = MAX_T0_SCAN_BLOCKS,
+) -> tuple[Mapping[str, Any], Mapping[str, Any]]:
+    """Find T0 with singleton Sync queries so no future interval is pre-opened."""
+    if max_scan_blocks < 1:
+        raise QualificationError("T0 scan limit must be positive")
+    last = min(t1_block, deployment_block + max_scan_blocks - 1)
+    for number in range(deployment_block, last + 1):
+        logs = _sync_logs(rpc, number, number)
+        if logs:
+            first = min(logs, key=_log_order_key)
+            return _block(rpc, number), first
+    raise QualificationError(
+        "STOP_SOURCE_CONFLICT: no eligible Sync observation found within outcome-blind T0 scan bound"
+    )
+
+
+def _dev_end_timestamp(t0_timestamp: int) -> int:
+    t1_timestamp = _cutoff_timestamp()
+    if t0_timestamp >= t1_timestamp:
+        raise QualificationError("STOP_SOURCE_CONFLICT: T0 does not precede frozen T1")
+    return t0_timestamp + ((t1_timestamp - t0_timestamp) * 3) // 5
+
+
+def _bounded_log_integrity_probe(
+    rpc: RpcCall,
+    t0_block: int,
+    dev_end_block: int,
+    span: int,
+) -> dict[str, Any]:
     if span < 2:
         raise QualificationError("qualification probe span must be >= 2")
-    start = max(0, t1_block - span + 1)
-    end = t1_block
+    start = t0_block
+    end = min(dev_end_block, t0_block + span - 1)
+    if end <= start:
+        raise QualificationError("STOP_SOURCE_CONFLICT: DEV interval is too short for split-range integrity probe")
     midpoint = (start + end) // 2
 
     whole_a = _sync_logs(rpc, start, end)
@@ -204,19 +299,22 @@ def _bounded_log_integrity_probe(rpc: RpcCall, t1_block: int, span: int) -> dict
     if sorted(whole_ids_a) != combined:
         raise QualificationError("STOP_SOURCE_CONFLICT: whole-range logs disagree with split-range logs")
     if not whole_a:
-        raise QualificationError("STOP_SOURCE_CONFLICT: no Sync log available in bounded receipt probe")
+        raise QualificationError("STOP_SOURCE_CONFLICT: no Sync log available in DEV-bounded receipt probe")
 
-    first = whole_a[0]
+    first = min(whole_a, key=_log_order_key)
     first_id = _log_identity(first)
     receipt = rpc("eth_getTransactionReceipt", [first_id[1]])
     if not isinstance(receipt, dict):
         raise QualificationError("STOP_SOURCE_CONFLICT: historical transaction receipt unavailable")
     receipt_block_hash = receipt.get("blockHash")
+    receipt_block_number = _hex_int(receipt.get("blockNumber"))
     if not isinstance(receipt_block_hash, str) or receipt_block_hash.lower() != first_id[0]:
         raise QualificationError("STOP_SOURCE_CONFLICT: receipt/log canonical block disagreement")
+    if not start <= receipt_block_number <= end:
+        raise QualificationError("STOP_SOURCE_CONFLICT: receipt escaped DEV-bounded probe range")
 
-    # Deliberately retain identities/counts only.  The raw Sync `data` field
-    # contains reserve values and is neither decoded nor serialized here.
+    # Retain identities/counts only. The raw Sync `data` field contains reserve
+    # values and is never decoded or serialized during source qualification.
     return {
         "from_block": start,
         "to_block": end,
@@ -238,7 +336,7 @@ def qualify_source(rpc: RpcCall, *, provider_id: str, probe_span: int = DEFAULT_
 
     for label, address in (("pool", POOL), ("factory", FACTORY)):
         code = rpc("eth_getCode", [address, "latest"])
-        if not isinstance(code, str) or code in {"0x", "0x0", "0x00"}:
+        if not _has_code(code):
             raise QualificationError(f"STOP_SOURCE_CONFLICT: {label} bytecode unavailable")
 
     token0 = _pool_call(rpc, TOKEN0_SELECTOR)
@@ -249,25 +347,49 @@ def qualify_source(rpc: RpcCall, *, provider_id: str, probe_span: int = DEFAULT_
     if pool_factory != _norm_address(FACTORY):
         raise QualificationError("STOP_SOURCE_CONFLICT: pool factory mismatch")
 
+    # T1 is metadata-only: locating the frozen cutoff does not request economic
+    # observations from the OUTER interval.
     t1 = find_block_at_or_before_timestamp(rpc, _cutoff_timestamp())
     t1_number = _hex_int(t1["number"])
     t1_timestamp = _hex_int(t1["timestamp"])
     if t1_timestamp > _cutoff_timestamp():
         raise QualificationError("STOP_SOURCE_CONFLICT: T1 block search crossed the frozen cutoff")
 
-    probe = _bounded_log_integrity_probe(rpc, t1_number, probe_span)
+    deployment_block = find_first_code_block(rpc, POOL, t1_number)
+    t0, t0_log = find_t0_sync(rpc, deployment_block, t1_number)
+    t0_number = _hex_int(t0["number"])
+    t0_timestamp = _hex_int(t0["timestamp"])
+    if _hex_int(t0_log["blockNumber"]) != t0_number:
+        raise QualificationError("STOP_SOURCE_CONFLICT: T0 Sync/block disagreement")
+
+    dev_end_timestamp = _dev_end_timestamp(t0_timestamp)
+    dev_end = find_block_at_or_before_timestamp(rpc, dev_end_timestamp)
+    dev_end_number = _hex_int(dev_end["number"])
+    if dev_end_number < t0_number or _hex_int(dev_end["timestamp"]) > dev_end_timestamp:
+        raise QualificationError("STOP_SOURCE_CONFLICT: mechanical DEV_END block is invalid")
+
+    # Only now may an economic multi-block integrity probe run, and its upper
+    # bound is mechanically clamped to DEV_END. OUTER remains unopened.
+    probe = _bounded_log_integrity_probe(rpc, t0_number, dev_end_number, probe_span)
+    if probe["to_block"] > dev_end_number:
+        raise QualificationError("STOP_SOURCE_CONFLICT: economic probe crossed DEV_END")
+
     checks = [
         "CHAIN_ID_EXACT",
         "POOL_BYTECODE_PRESENT",
         "FACTORY_BYTECODE_PRESENT",
         "POOL_TOKEN_IDENTITY_EXACT",
         "POOL_FACTORY_EXACT",
-        "T1_HISTORICAL_BLOCK_RETRIEVABLE",
-        "BOUNDED_SYNC_LOG_RETRIEVAL",
+        "T1_METADATA_RETRIEVABLE_WITHOUT_ECONOMIC_OUTER_REQUEST",
+        "POOL_DEPLOYMENT_BOUNDARY_RETRIEVABLE",
+        "T0_ESTABLISHED_OUTCOME_BLIND_BY_SINGLETON_SYNC_SCAN",
+        "DEV_END_COMPUTED_MECHANICALLY_BEFORE_MULTI_BLOCK_ECONOMIC_PROBE",
+        "ECONOMIC_REQUESTS_HARD_CAPPED_AT_DEV_END",
+        "BOUNDED_DEV_SYNC_LOG_RETRIEVAL",
         "REPEATED_REQUEST_DETERMINISTIC",
         "WHOLE_EQUALS_SPLIT_RANGE",
-        "HISTORICAL_RECEIPT_RETRIEVABLE",
-        "RAW_SYNC_ECONOMIC_DATA_NOT_SERIALIZED",
+        "DEV_RECEIPT_RETRIEVABLE",
+        "RAW_SYNC_ECONOMIC_DATA_NOT_DECODED_OR_SERIALIZED",
     ]
     return {
         "artifact_type": "QNTYSPOT_INK_SOURCE_QUALIFICATION_RECEIPT_V1",
@@ -282,14 +404,16 @@ def qualify_source(rpc: RpcCall, *, provider_id: str, probe_span: int = DEFAULT_
         "token0": token0,
         "token1": token1,
         "frozen_cutoff_utc": CUTOFF_UTC,
-        "t1_block": {
-            "number": t1_number,
-            "hash": t1["hash"].lower(),
-            "timestamp": t1_timestamp,
-        },
+        "t1_block": _block_summary(t1),
+        "pool_deployment_block": deployment_block,
+        "t0_block": _block_summary(t0),
+        "dev_end_timestamp": dev_end_timestamp,
+        "dev_end_block": _block_summary(dev_end),
         "bounded_probe": probe,
         "checks": checks,
+        "raw_log_data_decoded": False,
         "raw_log_data_serialized": False,
+        "outer_request_count": 0,
         "candidate_evaluation_performed": False,
         "outer_access_performed": False,
     }
@@ -302,6 +426,10 @@ def material_identity(receipt: Mapping[str, Any]) -> dict[str, Any]:
         "factory": receipt["factory"],
         "tokens": sorted((receipt["token0"], receipt["token1"])),
         "t1_block": receipt["t1_block"],
+        "pool_deployment_block": receipt["pool_deployment_block"],
+        "t0_block": receipt["t0_block"],
+        "dev_end_timestamp": receipt["dev_end_timestamp"],
+        "dev_end_block": receipt["dev_end_block"],
     }
 
 

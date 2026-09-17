@@ -20,8 +20,12 @@ class FakeRpc:
         self.nondeterministic = nondeterministic
         self.truncate_whole = truncate_whole
         self.log_calls = 0
+        self.log_ranges = []
         self.whole_log_range = None
+        self.whole_range_calls = 0
         self.cutoff = qualifier._cutoff_timestamp()
+        self.deployment_block = 10
+        self.sync_block = 20
 
     def _block(self, number: int):
         # block 99 lands exactly on frozen T1, block 100 is later.
@@ -33,7 +37,7 @@ class FakeRpc:
         }
 
     def _sync(self):
-        number = 98
+        number = self.sync_block
         return {
             "address": qualifier.POOL,
             "blockNumber": hex(number),
@@ -43,7 +47,7 @@ class FakeRpc:
             "logIndex": "0x2",
             "removed": False,
             "topics": [qualifier.SYNC_TOPIC],
-            # Deliberate canary: qualification must never copy this field.
+            # Deliberate canary: qualification must never decode/copy this field.
             "data": "0x" + ("deadbeef" * 16),
         }
 
@@ -55,6 +59,9 @@ class FakeRpc:
         if method == "eth_getBlockByNumber":
             return self._block(int(params[0], 16))
         if method == "eth_getCode":
+            address, tag = params
+            if address.lower() == qualifier.POOL.lower() and tag != "latest":
+                return "0x6001600055" if int(tag, 16) >= self.deployment_block else "0x"
             return "0x6001600055"
         if method == "eth_call":
             selector = params[0]["data"]
@@ -69,38 +76,57 @@ class FakeRpc:
             self.log_calls += 1
             start = int(params[0]["fromBlock"], 16)
             end = int(params[0]["toBlock"], 16)
-            contains = start <= 98 <= end
-            if self.whole_log_range is None:
-                self.whole_log_range = (start, end)
-            if self.nondeterministic and self.log_calls == 2:
-                return []
-            # Simulate a provider that silently truncates the repeated whole-range
-            # request while correctly serving the smaller split ranges.
-            if self.truncate_whole and (start, end) == self.whole_log_range:
-                return []
+            self.log_ranges.append((start, end))
+            contains = start <= self.sync_block <= end
+
+            # T0 discovery uses singleton requests. The first multi-block request
+            # is the integrity probe's whole range; halves are strictly smaller.
+            if end > start:
+                if self.whole_log_range is None:
+                    self.whole_log_range = (start, end)
+                if (start, end) == self.whole_log_range:
+                    self.whole_range_calls += 1
+                    if self.nondeterministic and self.whole_range_calls == 2:
+                        return []
+                    if self.truncate_whole:
+                        return []
             return [self._sync()] if contains else []
         if method == "eth_getTransactionReceipt":
             return {
                 "transactionHash": params[0],
-                "blockHash": block_hash(98),
-                "blockNumber": hex(98),
+                "blockHash": block_hash(self.sync_block),
+                "blockNumber": hex(self.sync_block),
                 "status": "0x1",
             }
         raise AssertionError(method)
 
 
-def test_source_qualification_passes_without_serializing_economic_log_data_or_endpoint():
+def test_source_qualification_passes_and_never_requests_outer_economic_logs():
     rpc = FakeRpc()
     receipt = qualifier.qualify_source(rpc, provider_id="primary-archive")
     assert receipt["status"] == "PASS"
     assert receipt["chain_id"] == 57073
     assert receipt["t1_block"]["number"] == 99
+    assert receipt["pool_deployment_block"] == 10
+    assert receipt["t0_block"]["number"] == 20
+    assert receipt["dev_end_block"]["number"] == 67
+    assert receipt["bounded_probe"]["from_block"] == 20
+    assert receipt["bounded_probe"]["to_block"] == 67
     assert receipt["bounded_probe"]["sync_log_count"] == 1
+    assert receipt["outer_request_count"] == 0
+    assert receipt["outer_access_performed"] is False
+    assert all(end <= receipt["dev_end_block"]["number"] for _, end in rpc.log_ranges)
+
+
+def test_source_qualification_does_not_decode_or_serialize_economic_log_data_or_endpoint():
+    rpc = FakeRpc()
+    receipt = qualifier.qualify_source(rpc, provider_id="primary-archive")
+    assert receipt["raw_log_data_decoded"] is False
     assert receipt["raw_log_data_serialized"] is False
     encoded = json.dumps(receipt)
     assert "deadbeef" not in encoded
     assert "http://" not in encoded and "https://" not in encoded
-    assert "RAW_SYNC_ECONOMIC_DATA_NOT_SERIALIZED" in receipt["checks"]
+    assert "RAW_SYNC_ECONOMIC_DATA_NOT_DECODED_OR_SERIALIZED" in receipt["checks"]
 
 
 def test_wrong_chain_fails_closed_before_log_probe():

@@ -60,14 +60,23 @@
     "network_execution_effective_only_after_exact_canonical_merge": true,
     "outcome_blind": true,
     "provider_choice_basis": "technical capability and integrity only; never observed performance",
+    "t1_access_class": "BLOCK_METADATA_ONLY_BEFORE_DEV_BOUNDARY_EXISTS",
+    "t0_method": "find historical pool deployment from bytecode, then scan forward one block at a time for the first eligible Sync observation without decoding reserve data",
+    "dev_end_must_be_computed_before_multi_block_economic_query": true,
+    "economic_request_boundary": "no Sync-log or transaction-receipt request may deliberately target a block after DEV_END",
+    "provider_overreturn_beyond_requested_dev_range": "STOP_SOURCE_CONFLICT; do not decode or serialize raw economic payload",
     "required_checks": [
       "chain ID equals 57073",
       "pool bytecode exists",
       "factory bytecode exists",
       "pool token0/token1 are exactly KRAKMASK and WETH9 in either order",
       "pool factory equals the frozen InkySwap V2 factory",
-      "historical block at T1 is retrievable",
-      "pool Sync log retrieval works on a bounded historical probe",
+      "historical T1 block metadata is retrievable without requesting OUTER economic observations",
+      "historical pool deployment boundary is retrievable from bytecode",
+      "T0 is established outcome-blind by singleton Sync requests",
+      "DEV_END is computed mechanically before any multi-block economic log request",
+      "every economic log request is bounded at or before DEV_END",
+      "pool Sync log retrieval works on a bounded DEV historical probe",
       "repeated historical requests are deterministic",
       "whole-range logs equal the union of adjacent half-range logs",
       "at least one DEV-eligible pool transaction receipt is retrievable before acquisition"
@@ -104,12 +113,14 @@
       "BROADCAST",
       "PROMOTION"
     ],
-    "unavoidable_provider_overfetch": "discard records with timestamp > DEV_END before decoding economic payloads; record only discarded count",
+    "unavoidable_provider_overfetch": "during later DEV acquisition only, discard records with timestamp > DEV_END before decoding economic payloads and record only discarded count",
     "performance_metrics_allowed": false
   },
   "outer_firewall": {
     "initial_access": "INACCESSIBLE",
     "deliberate_outer_request_authorized": false,
+    "request_boundary": "no source request may deliberately retrieve economic observations with timestamp or block boundary after DEV_END",
+    "preferred_query_boundary": "terminate economic ranges at or before DEV_END",
     "outer_economic_value_inspection_authorized": false,
     "outer_serialization_authorized": false,
     "outer_evaluation_authorized": false,
@@ -165,5 +176,5 @@
     "targeted_rereview_only_if_critical_or_high_repaired": true,
     "merge_authority": "NONE"
   },
-  "next_action": "Canonicalize Stage B without network execution. After exact canonical merge, run outcome-blind source qualification. Only a qualification PASS may unlock DEV-only acquisition; candidate evaluation, OUTER access, QntySpot mutation, Order Flow mutation, Hetzner access, trading, signing, broadcast, and capital remain unauthorized."
+  "next_action": "Canonicalize Stage B without network execution. After exact canonical merge, run outcome-blind source qualification with the DEV_END request firewall. Only a qualification PASS may unlock DEV-only acquisition; candidate evaluation, OUTER access, QntySpot mutation, Order Flow mutation, Hetzner access, trading, signing, broadcast, and capital remain unauthorized."
 }

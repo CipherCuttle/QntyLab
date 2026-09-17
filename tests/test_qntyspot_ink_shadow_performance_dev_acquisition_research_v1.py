@@ -96,6 +96,9 @@ def test_frozen_science_and_outer_firewall_are_preserved():
     outer = auth["outer_firewall"]
     assert outer["initial_access"] == "INACCESSIBLE"
     assert outer["deliberate_outer_request_authorized"] is False
+    assert "no source request may deliberately retrieve economic observations" in outer["request_boundary"]
+    assert "DEV_END" in outer["request_boundary"]
+    assert outer["preferred_query_boundary"] == "terminate economic ranges at or before DEV_END"
     assert outer["outer_economic_value_inspection_authorized"] is False
     assert outer["outer_serialization_authorized"] is False
     assert outer["outer_evaluation_authorized"] is False
@@ -107,14 +110,21 @@ def test_frozen_science_and_outer_firewall_are_preserved():
     assert "ACQUIRE_OUTER_DELIBERATELY" in dev["forbidden_operations"]
     assert "EVALUATE_CANDIDATES" in dev["forbidden_operations"]
     assert dev["performance_metrics_allowed"] is False
-    assert "before decoding economic payloads" in dev["unavoidable_provider_overfetch"]
+    assert "later DEV acquisition only" in dev["unavoidable_provider_overfetch"]
 
 
-def test_source_qualification_is_outcome_blind_and_fail_closed():
+def test_source_qualification_is_outcome_blind_fail_closed_and_dev_bounded_before_economic_probe():
     auth = authorization()
     source = auth["source_qualification_contract"]
     assert source["outcome_blind"] is True
     assert source["provider_choice_basis"].endswith("never observed performance")
+    assert source["t1_access_class"] == "BLOCK_METADATA_ONLY_BEFORE_DEV_BOUNDARY_EXISTS"
+    assert "one block at a time" in source["t0_method"]
+    assert source["dev_end_must_be_computed_before_multi_block_economic_query"] is True
+    assert source["economic_request_boundary"] == (
+        "no Sync-log or transaction-receipt request may deliberately target a block after DEV_END"
+    )
+    assert source["provider_overreturn_beyond_requested_dev_range"].startswith("STOP_SOURCE_CONFLICT")
     assert source["raw_economic_log_values_may_be_decoded_during_qualification"] is False
     assert source["qualification_receipt_may_serialize_raw_log_data"] is False
     assert source["cross_provider_material_disagreement"] == "STOP_SOURCE_CONFLICT"

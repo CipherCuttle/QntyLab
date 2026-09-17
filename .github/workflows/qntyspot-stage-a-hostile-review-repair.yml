@@ -24,6 +24,9 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Install verification dependencies
+        run: python -m pip install pytest requests
+
       - name: Apply bounded hostile-review repair
         shell: bash
         run: |
@@ -65,7 +68,7 @@ jobs:
           python -m qntylab.project_context doctor
           python -m qntylab.project_context render --check
           python -m qntylab.research_ledger doctor
-          pytest -q tests/test_project_context_v0.py tests/test_qntyspot_ink_shadow_performance_research_v1.py
+          python -m pytest -q tests/test_project_context_v0.py tests/test_qntyspot_ink_shadow_performance_research_v1.py
           git diff --check
           test -z "$(git diff 67fc6f003875c5228333fd28511cc7ff76af0427 --name-only -- experiments/research/qnty_edge_order_flow_prospective_v1_activation qntylab | grep -v '^qntylab/qntyspot_ink_shadow_performance_prereg_v0.py$' || true)"
 

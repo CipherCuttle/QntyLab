@@ -207,6 +207,7 @@ def test_project_row_binds_the_authorization_and_preserves_zero_execution_receip
     assert row["order_flow_changed"] is False
     assert row["hetzner_touched"] is False
     assert authorization["project_id"] == row["project_id"]
+    assert "experiments/research/qntyspot_ink_shadow_performance_dev_acquisition_activation_v0/activation.json" not in row["authoritative_artifacts"]
 
 
 def test_generated_roadmap_names_the_active_research_lane():

@@ -1,0 +1,180 @@
+name: QntySpot Stage B source qualification runtime v1
+
+on:
+  push:
+    branches:
+      - ops/qntyspot-stage-b-source-qualification-runtime-v1
+
+permissions:
+  contents: read
+
+jobs:
+  primary:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Checkout canonical master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          clean: true
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify exact canonical Stage B runtime merge
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git branch --show-current)" = "master"
+          test -z "$(git status --porcelain)"
+          git fetch --quiet origin master
+          test "$(git rev-parse HEAD)" = "a839306a13f4a810be46835dbfcc043041f161a5"
+          test "$(git rev-parse origin/master)" = "a839306a13f4a810be46835dbfcc043041f161a5"
+          git merge-base --is-ancestor 2649ba0606e432974971f99f1fa347c569e1454c HEAD
+
+      - name: Qualify official Gelato source
+        env:
+          QNTYSPOT_INK_RPC_URL: https://rpc-gel.inkonchain.com
+        shell: bash
+        run: |
+          set -euo pipefail
+          python qntylab/qntyspot_ink_source_qualification_v1.py \
+            --provider-id ink-official-gelato-public \
+            --probe-span 10000 \
+            --coverage-workers 8 \
+            --output primary.json
+
+      - name: Upload primary receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: qntyspot-stage-b-runtime-primary-receipt
+          path: primary.json
+          if-no-files-found: error
+          retention-days: 30
+
+  secondary:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Checkout canonical master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          clean: true
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify exact canonical Stage B runtime merge
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git branch --show-current)" = "master"
+          test -z "$(git status --porcelain)"
+          git fetch --quiet origin master
+          test "$(git rev-parse HEAD)" = "a839306a13f4a810be46835dbfcc043041f161a5"
+          test "$(git rev-parse origin/master)" = "a839306a13f4a810be46835dbfcc043041f161a5"
+          git merge-base --is-ancestor 2649ba0606e432974971f99f1fa347c569e1454c HEAD
+
+      - name: Qualify official QuickNode source
+        env:
+          QNTYSPOT_INK_RPC_URL: https://rpc-qnd.inkonchain.com
+        shell: bash
+        run: |
+          set -euo pipefail
+          python qntylab/qntyspot_ink_source_qualification_v1.py \
+            --provider-id ink-official-quicknode-public \
+            --probe-span 10000 \
+            --coverage-workers 8 \
+            --output secondary.json
+
+      - name: Upload secondary receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: qntyspot-stage-b-runtime-secondary-receipt
+          path: secondary.json
+          if-no-files-found: error
+          retention-days: 30
+
+  compare:
+    needs: [primary, secondary]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout canonical master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          clean: true
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify exact canonical Stage B runtime merge
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git branch --show-current)" = "master"
+          test -z "$(git status --porcelain)"
+          git fetch --quiet origin master
+          test "$(git rev-parse HEAD)" = "a839306a13f4a810be46835dbfcc043041f161a5"
+          test "$(git rev-parse origin/master)" = "a839306a13f4a810be46835dbfcc043041f161a5"
+          git merge-base --is-ancestor 2649ba0606e432974971f99f1fa347c569e1454c HEAD
+
+      - name: Download primary receipt
+        uses: actions/download-artifact@v4
+        with:
+          name: qntyspot-stage-b-runtime-primary-receipt
+          path: qualification/primary
+
+      - name: Download secondary receipt
+        uses: actions/download-artifact@v4
+        with:
+          name: qntyspot-stage-b-runtime-secondary-receipt
+          path: qualification/secondary
+
+      - name: Compare canonical material identity and emit combined receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from qntylab.qntyspot_ink_source_qualification_v1 import (
+              _digest,
+              _write_receipt,
+              compare_sources,
+              material_identity,
+          )
+
+          primary = json.loads(Path('qualification/primary/primary.json').read_text())
+          secondary = json.loads(Path('qualification/secondary/secondary.json').read_text())
+          primary.pop('receipt_digest', None)
+          secondary.pop('receipt_digest', None)
+          compare_sources(primary, secondary)
+
+          combined = dict(primary)
+          combined['secondary_provider_checked'] = True
+          combined['secondary_provider_id'] = secondary['provider_id']
+          combined['secondary_material_identity_digest'] = _digest(material_identity(secondary))
+          _write_receipt(Path('source_qualification_receipt.json'), combined)
+          PY
+          cat source_qualification_receipt.json
+
+      - name: Upload combined qualification receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: qntyspot-stage-b-runtime-source-qualification-receipt
+          path: source_qualification_receipt.json
+          if-no-files-found: error
+          retention-days: 30

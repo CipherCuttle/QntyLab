@@ -119,8 +119,10 @@ def validate_projects_registry(
         _as_string(record.get("next_action"), f"project {project_id} next_action")
         if not isinstance(record.get("implementation_authorized"), bool):
             raise ProjectContextError(f"project {project_id} implementation_authorized must be boolean")
-        if record["implementation_authorized"] and state != "ACTIVE":
-            raise ProjectContextError(f"implementation_authorized=true requires ACTIVE: {project_id}")
+        if record["implementation_authorized"] and state not in {"ACTIVE", "ACTIVE_RESEARCH"}:
+            raise ProjectContextError(
+                f"implementation_authorized=true requires ACTIVE or ACTIVE_RESEARCH: {project_id}"
+            )
         artifacts = _require_list(record.get("authoritative_artifacts"), f"project {project_id} authoritative_artifacts")
         if not artifacts:
             raise ProjectContextError(f"project {project_id} requires authoritative_artifacts")
@@ -131,6 +133,9 @@ def validate_projects_registry(
     active = [record for record in by_id.values() if record["state"] == "ACTIVE"]
     if len(active) > 1:
         raise ProjectContextError("at most one ACTIVE project is permitted")
+    active_research = [record for record in by_id.values() if record["state"] == "ACTIVE_RESEARCH"]
+    if len(active_research) > 1:
+        raise ProjectContextError("at most one ACTIVE_RESEARCH project is permitted")
 
     for project_id, record in by_id.items():
         for field, reverse_field in (("supersedes", "superseded_by"), ("superseded_by", "supersedes")):

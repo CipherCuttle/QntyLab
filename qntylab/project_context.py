@@ -388,6 +388,11 @@ def context_data(
         if record["status"] == "CURRENT_GLOBAL_COMPANION"
     ]
     active = projection["active_project"]
+    active_research_matches = sorted(
+        (record for record in projects.values() if record["state"] == "ACTIVE_RESEARCH"),
+        key=lambda record: record["project_id"],
+    )
+    active_research = active_research_matches[0] if active_research_matches else None
     queued = sorted(
         (
             {
@@ -417,6 +422,12 @@ def context_data(
         "current_global_companions": global_companions,
         "active_project": active,
         "current_permitted_next_action": active["next_action"] if active else "No project implementation is currently authorized.",
+        "active_research_project": active_research,
+        "current_permitted_research_action": (
+            active_research["next_action"]
+            if active_research
+            else "No exploratory research implementation is currently authorized."
+        ),
         "queued_but_unauthorized_projects": queued,
         "superseded_or_stale_planning": stale,
         "research_ledger": _research_summary(root, config),
@@ -439,7 +450,12 @@ def _roadmap_bytes(
         snapshot = _snapshot_for(root, snapshot)
         _, _, projects_registry = load_context_sources(root, snapshot=snapshot)
         projects = validate_projects_registry(root, projects_registry, snapshot=snapshot)
-    groups = (("Active", "ACTIVE"), ("Queued — not authorized", "PLANNED_NOT_AUTHORIZED"), ("Closed / stale", None))
+    groups = (
+        ("Active", "ACTIVE"),
+        ("Active research", "ACTIVE_RESEARCH"),
+        ("Queued — not authorized", "PLANNED_NOT_AUTHORIZED"),
+        ("Closed / stale", None),
+    )
     lines = [
         "# GENERATED — DO NOT EDIT BY HAND",
         "",

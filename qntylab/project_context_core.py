@@ -25,6 +25,7 @@ PROJECT_STATES = frozenset(
         "IDEA",
         "PLANNED_NOT_AUTHORIZED",
         "ACTIVE",
+        "ACTIVE_RESEARCH",
         "BLOCKED",
         "RESULT_PENDING_RECORDING",
         "CLOSED_PASS",

@@ -337,8 +337,8 @@ def test_context_projects_research_fields_independently(monkeypatch: pytest.Monk
 def test_context_text_keeps_research_projection_separate() -> None:
     text = project_context.context_text(project_context.context_data(ROOT))
     assert "- Active project: `QNTY_EDGE_ORDER_FLOW_PROSPECTIVE_V1_ACTIVATION`." in text
-    assert "- Active research project: `QNTYSPOT_INK_SHADOW_PERFORMANCE_RESEARCH_V1`." in text
-    assert "- Permitted research action: STAGE_A_ACTIVE_RESEARCH: finish this governance-only reauthorization and canonicalize it. Before exact canonical merge: no market-data/economic access. After exact canonical merge: Stage B may qualify sources and acquire DEV-only evidence under the frozen firewall. Candidate evaluation, OUTER access, QntySpot mutation, trading, signing, broadcast, and capital remain unauthorized." in text
+    assert "- Active research project: `QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_RESEARCH_V1`." in text
+    assert "- Permitted research action: STAGE_B_CANONICALIZATION_CANDIDATE: no market-network execution is effective on this branch. After exact canonical merge, run outcome-blind source qualification. Only a qualification PASS may unlock DEV-only acquisition; candidate evaluation, OUTER access, QntySpot mutation, Order Flow mutation, Hetzner access, trading, signing, broadcast, and capital remain unauthorized." in text
 
 
 def test_execution_authority_projection_ignores_active_research() -> None:

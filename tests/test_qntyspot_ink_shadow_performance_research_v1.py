@@ -11,6 +11,7 @@ AUTH_PATH = ROOT / "experiments/research/qntyspot_ink_shadow_performance_researc
 PREREG_PATH = ROOT / "experiments/research/qntyspot_ink_shadow_performance_v0/preregistration.json"
 PROJECTS_PATH = ROOT / "docs/state/projects.toml"
 PROJECT_ID = "QNTYSPOT_INK_SHADOW_PERFORMANCE_RESEARCH_V1"
+STAGE_B_ID = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_RESEARCH_V1"
 ORDER_FLOW_ID = "QNTY_EDGE_ORDER_FLOW_PROSPECTIVE_V1_ACTIVATION"
 HISTORICAL_DEV_ID = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0"
 BASE_SHA = "67fc6f003875c5228333fd28511cc7ff76af0427"
@@ -40,13 +41,18 @@ def test_stage_a_branch_descends_from_the_required_parallel_lane_base():
     ).returncode == 0
 
 
-def test_fresh_active_research_lane_coexists_with_order_flow_without_execution_authority_leak():
+
+def test_stage_a_is_closed_while_stage_b_coexists_with_order_flow_without_execution_authority_leak():
     rows = project_rows()
     ordinary_active = [row for row in rows if row["state"] == "ACTIVE"]
     active_research = [row for row in rows if row["state"] == "ACTIVE_RESEARCH"]
     assert [row["project_id"] for row in ordinary_active] == [ORDER_FLOW_ID]
-    assert [row["project_id"] for row in active_research] == [PROJECT_ID]
-
+    assert [row["project_id"] for row in active_research] == [STAGE_B_ID]
+    stage_a = project(PROJECT_ID)
+    assert stage_a["state"] == "CLOSED_PASS"
+    assert stage_a["implementation_authorized"] is False
+    assert stage_a["implementation_completed"] is True
+    assert stage_a["superseded_by"] == [STAGE_B_ID]
     research = active_research[0]
     assert research["implementation_authorized"] is True
     assert research["implementation_completed"] is False
@@ -54,24 +60,20 @@ def test_fresh_active_research_lane_coexists_with_order_flow_without_execution_a
     assert research["capital_authority"] == "NONE"
     assert research["signing_authority"] == "NONE"
     assert research["broadcast_authority"] == "NONE"
-
-    validated = project_context.validate_projects_registry(
-        ROOT,
-        tomllib.loads(PROJECTS_PATH.read_text(encoding="utf-8")),
-    )
+    validated = project_context.validate_projects_registry(ROOT, tomllib.loads(PROJECTS_PATH.read_text(encoding="utf-8")))
     projection = project_context.execution_authority_projection(ROOT, validated)
     assert projection["issues"] == []
     assert projection["active_project"]["project_id"] == ORDER_FLOW_ID
     assert PROJECT_ID not in projection["identity_by_project"]
+    assert STAGE_B_ID not in projection["identity_by_project"]
 
 
-def test_context_projects_operational_and_research_actions_independently():
+def test_context_projects_operational_and_stage_b_research_actions_independently():
     data = project_context.context_data(ROOT)
     assert data["active_project"]["project_id"] == ORDER_FLOW_ID
-    assert data["active_research_project"]["project_id"] == PROJECT_ID
+    assert data["active_research_project"]["project_id"] == STAGE_B_ID
     assert data["current_permitted_next_action"] == project(ORDER_FLOW_ID)["next_action"]
-    assert data["current_permitted_research_action"] == project(PROJECT_ID)["next_action"]
-
+    assert data["current_permitted_research_action"] == project(STAGE_B_ID)["next_action"]
 
 def test_historical_preregistration_and_source_identity_are_bound_without_scientific_mutation():
     authorization = load_json(AUTH_PATH)
@@ -188,10 +190,14 @@ def test_archived_historical_dev_row_remains_archived_and_is_not_revived():
     assert historical["outer_evaluation_count"] == 0
 
 
-def test_project_row_binds_the_authorization_and_preserves_zero_execution_receipts():
+
+def test_stage_a_project_row_is_closed_and_preserves_zero_execution_receipts():
     authorization = load_json(AUTH_PATH)
     row = project(PROJECT_ID)
-    assert row["state"] == "ACTIVE_RESEARCH"
+    assert row["state"] == "CLOSED_PASS"
+    assert row["implementation_authorized"] is False
+    assert row["implementation_completed"] is True
+    assert row["superseded_by"] == [STAGE_B_ID]
     assert row["authority_level"] == "BOUNDED_PARALLEL_RESEARCH_REAUTHORIZATION"
     assert row["historical_preregistration_digest"] == PREREG_DIGEST
     assert row["qntyspot_source_commit"] == QNTYSPOT_SOURCE
@@ -210,9 +216,11 @@ def test_project_row_binds_the_authorization_and_preserves_zero_execution_receip
     assert "experiments/research/qntyspot_ink_shadow_performance_dev_acquisition_activation_v0/activation.json" not in row["authoritative_artifacts"]
 
 
-def test_generated_roadmap_names_the_active_research_lane():
+def test_generated_roadmap_names_stage_b_as_the_active_research_lane():
     expected = (
-        "- `QntySpot Ink shadow performance research V1` — `ACTIVE_RESEARCH`. "
-        + project(PROJECT_ID)["next_action"]
+        "- `QntySpot Ink shadow performance DEV acquisition research V1` — `ACTIVE_RESEARCH`. "
+        + project(STAGE_B_ID)["next_action"]
     )
-    assert expected in project_context._roadmap_bytes(ROOT).decode("utf-8")
+    roadmap = project_context._roadmap_bytes(ROOT).decode("utf-8")
+    assert expected in roadmap
+    assert "`QntySpot Ink shadow performance research V1` — `ACTIVE_RESEARCH`" not in roadmap

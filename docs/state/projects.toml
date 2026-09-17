@@ -10626,9 +10626,10 @@ next_action = "COLLECTION_RUNNING: canonical Order Flow Prospective V1 collectio
 [[project]]
 project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_RESEARCH_V1"
 display_name = "QntySpot Ink shadow performance research V1"
-state = "ACTIVE_RESEARCH"
+state = "CLOSED_PASS"
 authority_level = "BOUNDED_PARALLEL_RESEARCH_REAUTHORIZATION"
 phase_type = "GOVERNANCE_ONLY"
+superseded_by = ["QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_RESEARCH_V1"]
 authoritative_artifacts = [
   "docs/state/projects.toml",
   "docs/CURRENT_ROADMAP.md",
@@ -10660,8 +10661,8 @@ candidate_evaluation_requires_separate_git_backed_authorization = true
 outer_evaluation_requires_separate_git_backed_authorization = true
 execution_authority_projection_must_ignore_active_research = true
 order_flow_parallel_isolation = true
-implementation_authorized = true
-implementation_completed = false
+implementation_authorized = false
+implementation_completed = true
 scientific_execution_authorized = false
 market_data_access_authorized = false
 research_ledger_mutation_authorized = false
@@ -10687,4 +10688,71 @@ hostile_review_required = true
 hostile_review_count = 1
 targeted_rereview_used = true
 merge_authority = "NONE"
-next_action = "STAGE_A_ACTIVE_RESEARCH: finish this governance-only reauthorization and canonicalize it. Before exact canonical merge: no market-data/economic access. After exact canonical merge: Stage B may qualify sources and acquire DEV-only evidence under the frozen firewall. Candidate evaluation, OUTER access, QntySpot mutation, trading, signing, broadcast, and capital remain unauthorized."
+next_action = "CLOSED_PASS: Stage-A parallel-research reauthorization is canonical and consumed. The sole ACTIVE_RESEARCH successor is QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_RESEARCH_V1. Stage A remains immutable historical governance and grants no current network, economic-data, candidate-evaluation, OUTER, QntySpot mutation, trading, signing, broadcast, or capital authority."
+
+[[project]]
+project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_RESEARCH_V1"
+display_name = "QntySpot Ink shadow performance DEV acquisition research V1"
+state = "ACTIVE_RESEARCH"
+authority_level = "BOUNDED_DEV_SOURCE_QUALIFICATION_AND_ACQUISITION"
+phase_type = "DEV_DATA_ACQUISITION"
+supersedes = ["QNTYSPOT_INK_SHADOW_PERFORMANCE_RESEARCH_V1"]
+superseded_by = []
+authoritative_artifacts = [
+  "docs/state/projects.toml",
+  "docs/CURRENT_ROADMAP.md",
+  "experiments/research/qntyspot_ink_shadow_performance_v0/preregistration.json",
+  "experiments/research/qntyspot_ink_shadow_performance_research_v1/authorization.json",
+  "experiments/research/qntyspot_ink_shadow_performance_dev_acquisition_research_v1/authorization.json",
+  "qntylab/qntyspot_ink_source_qualification_v1.py",
+  "tests/test_qntyspot_ink_shadow_performance_dev_acquisition_research_v1.py",
+  "tests/test_qntyspot_ink_source_qualification_v1.py",
+]
+required_base_sha = "ea2dd02964c2e91196bb153a212ec0f8aae50b42"
+parent_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_RESEARCH_V1"
+preregistration_digest = "27ce60c68133f40d9496df1db6009de07957ed8a9bd68b0715cc6c54fe05d18a"
+qntyspot_source_commit = "b9a84c59bd43e7697ee970d2a7571647e5de4501"
+historical_data_cutoff_utc = "2026-08-25T17:02:37Z"
+ink_chain_id = 57073
+inkyswap_v2_pool = "0xed11ed4b195e84ba9b74c4d6ce13b7a43b354264"
+candidate_count = 12
+dev_percentage = "60%"
+outer_percentage = "40%"
+dev_end_formula = "T0 + floor(0.60 * (T1 - T0))"
+outer_initial_access = "INACCESSIBLE"
+scientific_design_mutation = false
+activation_effective_on_branch = false
+source_qualification_authorized_after_canonical_merge = true
+market_data_access_authorized_after_canonical_merge = true
+source_qualification_pass_required_before_dev_acquisition = true
+candidate_evaluation_authorized = false
+outer_access_authorized = false
+research_ledger_mutation_authorized = false
+qntyspot_repository_mutation_authorized = false
+implementation_authorized = true
+implementation_completed = false
+source_qualification_receipt_present = false
+dev_dataset_present = false
+dev_manifest_present = false
+market_network_count = 0
+market_data_acquisition_count = 0
+historical_outcome_read_count = 0
+backtest_count = 0
+strategy_test_count = 0
+outer_evaluation_count = 0
+research_ledger_state_changed = false
+qntyspot_changed = false
+order_flow_changed = false
+hetzner_touched = false
+qntyspot_execution_authority = "NONE"
+trading_authority = "NONE"
+capital_authority = "NONE"
+signing_authority = "NONE"
+approval_authority = "NONE"
+broadcast_authority = "NONE"
+promotion_authority = "NONE"
+hostile_review_required = true
+hostile_review_count = 0
+targeted_rereview_used = false
+merge_authority = "NONE"
+next_action = "STAGE_B_CANONICALIZATION_CANDIDATE: no market-network execution is effective on this branch. After exact canonical merge, run outcome-blind source qualification. Only a qualification PASS may unlock DEV-only acquisition; candidate evaluation, OUTER access, QntySpot mutation, Order Flow mutation, Hetzner access, trading, signing, broadcast, and capital remain unauthorized."

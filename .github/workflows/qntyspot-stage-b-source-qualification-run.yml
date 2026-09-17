@@ -1,0 +1,63 @@
+name: QntySpot Stage B source qualification
+
+on:
+  push:
+    branches:
+      - ops/qntyspot-stage-b-source-qualification-v1
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout canonical master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          clean: true
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify exact canonical Stage B merge
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git branch --show-current)" = "master"
+          test -z "$(git status --porcelain)"
+          git fetch --quiet origin master
+          test "$(git rev-parse HEAD)" = "aa49ec7087ca9deba15f841d4f59bc743ecd0200"
+          test "$(git rev-parse origin/master)" = "aa49ec7087ca9deba15f841d4f59bc743ecd0200"
+
+      - name: Run two-provider outcome-blind qualification
+        env:
+          QNTYSPOT_INK_RPC_URL: https://rpc-gel.inkonchain.com
+          QNTYSPOT_INK_RPC_URL_SECONDARY: https://rpc-qnd.inkonchain.com
+        shell: bash
+        run: |
+          set -euo pipefail
+          python qntylab/qntyspot_ink_source_qualification_v1.py \
+            --provider-id ink-official-gelato-public \
+            --secondary-provider-id ink-official-quicknode-public \
+            --probe-span 5000 \
+            --output experiments/research/qntyspot_ink_shadow_performance_dev_acquisition_research_v1/source_qualification_receipt.json
+
+      - name: Emit sanitized qualification receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat experiments/research/qntyspot_ink_shadow_performance_dev_acquisition_research_v1/source_qualification_receipt.json
+
+      - name: Upload qualification receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: qntyspot-stage-b-source-qualification-receipt
+          path: experiments/research/qntyspot_ink_shadow_performance_dev_acquisition_research_v1/source_qualification_receipt.json
+          if-no-files-found: error
+          retention-days: 30

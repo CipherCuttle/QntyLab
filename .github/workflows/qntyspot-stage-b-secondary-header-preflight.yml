@@ -1,0 +1,113 @@
+name: QntySpot Stage B secondary transport preflight
+
+on:
+  push:
+    branches:
+      - ops/qntyspot-stage-b-secondary-header-preflight-v1
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - provider_id: ink-official-quicknode-public
+            endpoint: https://rpc-qnd.inkonchain.com
+          - provider_id: ink-official-tenderly-public
+            endpoint: https://rpc-ten.inkonchain.com
+          - provider_id: ink-official-listed-drpc-public
+            endpoint: https://ink.drpc.org
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout canonical master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          clean: true
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify exact canonical Stage B merge
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git branch --show-current)" = "master"
+          test -z "$(git status --porcelain)"
+          git fetch --quiet origin master
+          test "$(git rev-parse HEAD)" = "aa49ec7087ca9deba15f841d4f59bc743ecd0200"
+          test "$(git rev-parse origin/master)" = "aa49ec7087ca9deba15f841d4f59bc743ecd0200"
+
+      - name: Metadata-only preflight with explicit User-Agent
+        env:
+          RPC_ENDPOINT: ${{ matrix.endpoint }}
+          PROVIDER_ID: ${{ matrix.provider_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          import urllib.request
+          from pathlib import Path
+          from qntylab.qntyspot_ink_source_qualification_v1 import (
+              CHAIN_ID,
+              POOL,
+              QualificationError,
+              _canonical_bytes,
+              _cutoff_timestamp,
+              _hex_int,
+              assert_canonical_stage_b_authority,
+              find_block_at_or_before_timestamp,
+              find_first_code_block,
+          )
+
+          class HeaderRpc:
+              def __init__(self, endpoint):
+                  self.endpoint = endpoint
+                  self.request_id = 0
+              def call(self, method, params):
+                  self.request_id += 1
+                  payload = _canonical_bytes({
+                      'jsonrpc': '2.0', 'id': self.request_id,
+                      'method': method, 'params': params,
+                  })
+                  req = urllib.request.Request(
+                      self.endpoint,
+                      data=payload,
+                      headers={
+                          'Content-Type': 'application/json',
+                          'Accept': 'application/json',
+                          'User-Agent': 'QntyLab-StageB-SourceQualification/1.0',
+                      },
+                      method='POST',
+                  )
+                  with urllib.request.urlopen(req, timeout=20) as response:
+                      body = json.loads(response.read().decode('utf-8'))
+                  if not isinstance(body, dict) or body.get('id') != self.request_id or body.get('error') is not None or 'result' not in body:
+                      raise QualificationError(f'malformed/error JSON-RPC response for {method}')
+                  return body['result']
+
+          assert_canonical_stage_b_authority(Path('.').resolve())
+          rpc = HeaderRpc(os.environ['RPC_ENDPOINT']).call
+          chain_id = _hex_int(rpc('eth_chainId', []))
+          if chain_id != CHAIN_ID:
+              raise QualificationError(f'chain mismatch: {chain_id}')
+          t1 = find_block_at_or_before_timestamp(rpc, _cutoff_timestamp())
+          deployment = find_first_code_block(rpc, POOL, _hex_int(t1['number']))
+          print(json.dumps({
+              'provider_id': os.environ['PROVIDER_ID'],
+              'transport_preflight': 'PASS',
+              'chain_id': chain_id,
+              't1_block': _hex_int(t1['number']),
+              'deployment_block': deployment,
+              'economic_log_request_count': 0,
+          }, sort_keys=True))
+          PY

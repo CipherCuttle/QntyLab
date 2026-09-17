@@ -1,0 +1,186 @@
+{
+  "artifact_type": "QNTYSPOT_INK_SHADOW_PERFORMANCE_RESEARCH_REAUTHORIZATION",
+  "schema_version": "qntyspot-ink-shadow-performance-research-reauthorization-v1",
+  "project_id": "QNTYSPOT_INK_SHADOW_PERFORMANCE_RESEARCH_V1",
+  "phase": "STAGE_A_FRESH_REAUTHORIZATION",
+  "state": "ACTIVE_RESEARCH",
+  "phase_type": "GOVERNANCE_ONLY",
+  "authority_level": "BOUNDED_PARALLEL_RESEARCH_REAUTHORIZATION",
+  "canonicalization": {
+    "repository": "CipherCuttle/QntyLab",
+    "required_base_sha": "67fc6f003875c5228333fd28511cc7ff76af0427",
+    "required_branch": "research/qntyspot-shadow-performance-reauthorization-v1",
+    "stage_a_candidate_is_market_data_authority": false,
+    "dev_acquisition_may_begin_only_after_exact_canonical_merge": true,
+    "canonical_drift_behavior": "STOP_SOURCE_CONFLICT"
+  },
+  "parallel_lane_contract": {
+    "ordinary_active_project": "QNTY_EDGE_ORDER_FLOW_PROSPECTIVE_V1_ACTIVATION",
+    "ordinary_active_state_must_remain": "ACTIVE",
+    "active_research_project": "QNTYSPOT_INK_SHADOW_PERFORMANCE_RESEARCH_V1",
+    "active_research_state": "ACTIVE_RESEARCH",
+    "execution_authority_projection_must_ignore_active_research": true,
+    "order_flow_contract_mutation_authorized": false,
+    "order_flow_runtime_access_authorized": false,
+    "hetzner_access_authorized": false
+  },
+  "frozen_scientific_binding": {
+    "historical_preregistration_project_id": "QNTYSPOT_INK_SHADOW_PERFORMANCE_V0_PREREGISTRATION",
+    "historical_preregistration_path": "experiments/research/qntyspot_ink_shadow_performance_v0/preregistration.json",
+    "historical_preregistration_implementation": "qntylab/qntyspot_ink_shadow_performance_prereg_v0.py",
+    "historical_preregistration_digest": "27ce60c68133f40d9496df1db6009de07957ed8a9bd68b0715cc6c54fe05d18a",
+    "historical_preregistration_status": "PREREGISTERED_NOT_EXECUTED",
+    "historical_activation_path": "experiments/research/qntyspot_ink_shadow_performance_dev_acquisition_activation_v0/activation.json",
+    "historical_activation_reused_as_template_only": true,
+    "historical_project_row_revived": false,
+    "scientific_design_mutation": false,
+    "qntyspot_source_commit": "b9a84c59bd43e7697ee970d2a7571647e5de4501",
+    "historical_cutoff_utc": "2026-08-25T17:02:37Z",
+    "ink_chain_id": 57073,
+    "base_token": {
+      "symbol": "KRAKMASK",
+      "address": "0x32bcb803f696c99eb263d60a05cafd8689026575"
+    },
+    "quote_token": {
+      "symbol": "WETH9",
+      "address": "0x4200000000000000000000000000000000000006"
+    },
+    "inkyswap_v2_factory": "0x458c5d5b75ccba22651d2c5b61cb1ea1e0b0f95d",
+    "inkyswap_v2_pool": "0xed11ed4b195e84ba9b74c4d6ce13b7a43b354264"
+  },
+  "candidate_contract": {
+    "family_id": "QSP_LADDER_FAMILY_V0",
+    "candidate_count": 12,
+    "spacing_S": ["0.02", "0.04", "0.06", "0.08"],
+    "profit_target_P": ["0.03", "0.06", "0.09"],
+    "candidate_family_mutation_authorized": false,
+    "candidate_evaluation_authorized_in_stage_a": false,
+    "selection_inputs": "DEV_ONLY",
+    "selection_law": [
+      "highest terminal executable WETH wealth",
+      "if tied within <= 1 atomic WETH unit: lower maximum drawdown",
+      "then lower turnover",
+      "then fewer hypothetical trades",
+      "then smaller spacing S",
+      "then smaller profit target P",
+      "then lexical candidate ID"
+    ],
+    "selected_candidate": null,
+    "selected_candidate_digest": null
+  },
+  "chronology_contract": {
+    "t0_definition": "first eligible canonical pool-state observation at or after historical reconstructability",
+    "t0_must_be_established_outcome_blind": true,
+    "t1": "2026-08-25T17:02:37Z",
+    "dev_end_formula": "T0 + floor(0.60 * (T1 - T0))",
+    "dev_interval": "[T0, DEV_END]",
+    "outer_interval": "(DEV_END, T1]",
+    "dev_percentage": "60%",
+    "outer_percentage": "40%",
+    "outer_initial_access": "INACCESSIBLE",
+    "outer_evaluation_limit": 1,
+    "outer_rerun_authorized": false
+  },
+  "stage_b_dev_acquisition_contract": {
+    "effective_only_after_exact_canonical_merge": true,
+    "allowed_operations": [
+      "SOURCE_QUALIFICATION",
+      "VERIFY_CHAIN_POOL_SOURCE_IDENTITY",
+      "VERIFY_HISTORICAL_DATA_AVAILABILITY",
+      "ESTABLISH_T0_OUTCOME_BLIND",
+      "COMPUTE_DEV_END_MECHANICALLY",
+      "ACQUIRE_DEV_EVIDENCE_ONLY",
+      "ACQUIRE_PREREGISTERED_DEV_GAS_EVIDENCE",
+      "BUILD_IMMUTABLE_DEV_MANIFEST"
+    ],
+    "forbidden_operations": [
+      "ACQUIRE_OUTER_DELIBERATELY",
+      "INSPECT_OUTER_ECONOMIC_VALUES",
+      "EVALUATE_CANDIDATES",
+      "SELECT_CANDIDATE",
+      "FREEZE_WINNER",
+      "OUTER_EVALUATION",
+      "FINAL_PERFORMANCE_CLASSIFICATION",
+      "TRADING",
+      "CAPITAL",
+      "SIGNING",
+      "APPROVAL",
+      "BROADCAST",
+      "PROMOTION"
+    ],
+    "unavoidable_provider_overfetch": "discard records with timestamp > DEV_END immediately; record only overfetch count; do not inspect or serialize economic values",
+    "performance_metrics_allowed": false
+  },
+  "source_qualification_contract": {
+    "fail_closed_before_full_acquisition": true,
+    "required_checks": [
+      "chain ID equals 57073",
+      "pool equals 0xed11ed4b195e84ba9b74c4d6ce13b7a43b354264 exactly",
+      "historical block range is accessible",
+      "required contract logs are retrievable",
+      "block timestamps are retrievable",
+      "transaction receipts are retrievable where the gas rule requires them",
+      "pagination and provider range limits are understood",
+      "repeat requests are deterministic where applicable",
+      "silent truncation is ruled out",
+      "canonical event ordering is reconstructable"
+    ],
+    "provider_choice_basis": "technical capability and integrity only; never observed performance",
+    "cross_provider_material_disagreement": "STOP_SOURCE_CONFLICT",
+    "reorg_or_canonical_block_ambiguity": "STOP_SOURCE_CONFLICT"
+  },
+  "research_ledger_contract": {
+    "preflight_command": "python -m qntylab.research_ledger context",
+    "canonical_candidate_stream": "experiments/research/candidates.jsonl",
+    "canonical_decision_stream": "experiments/research/decisions.jsonl",
+    "canonical_trial_stream": "experiments/research/trials/*.jsonl",
+    "stage_a_ledger_mutation_authorized": false,
+    "candidate_execution_requires_12_valid_ledger_identities_or_fresh_append_only_records": true,
+    "lower_level_evaluator_bypass_authorized": false,
+    "project_specific_amm_executor_must_preserve_equivalent_ledger_and_receipt_semantics": true
+  },
+  "future_transition_contract": {
+    "stage_b": "After exact canonical Stage-A merge: qualify source, establish T0/DEV_END, acquire DEV-only evidence, freeze immutable DEV manifest; no candidate evaluation.",
+    "stage_c": "Separate Git-backed authorization required: evaluate exactly the frozen 12 candidates on DEV, then freeze exactly one winner using the preregistered selection law.",
+    "stage_d": "Separate Git-backed authorization required: unlock only the frozen winner and consume exactly one OUTER evaluation.",
+    "stage_e": "Compare the frozen winner with preregistered baselines and record final classification without post-hoc tuning.",
+    "outer_release_gate": ["SELECTED_CANDIDATE", "SELECTED_CANDIDATE_DIGEST"],
+    "post_hoc_candidate_mutation_authorized": false
+  },
+  "stage_a_firewall": {
+    "implementation_authorized": true,
+    "implementation_completed": false,
+    "market_data_access_authorized": false,
+    "scientific_execution_authorized": false,
+    "candidate_evaluation_authorized": false,
+    "outer_access_authorized": false,
+    "research_ledger_mutation_authorized": false,
+    "qntyspot_repository_mutation_authorized": false,
+    "qntyspot_live_execution_authority": "NONE",
+    "qnty_trading_authority": "NONE",
+    "capital_authority": "NONE",
+    "signing_authority": "NONE",
+    "approval_authority": "NONE",
+    "broadcast_authority": "NONE",
+    "promotion_authority": "NONE"
+  },
+  "construction_receipts": {
+    "market_network_count": 0,
+    "market_data_acquisition_count": 0,
+    "historical_outcome_read_count": 0,
+    "backtest_count": 0,
+    "strategy_test_count": 0,
+    "outer_evaluation_count": 0,
+    "research_ledger_state_changed": false,
+    "qntyspot_changed": false,
+    "order_flow_changed": false,
+    "hetzner_touched": false
+  },
+  "review_policy": {
+    "exactly_one_independent_hostile_review_required": true,
+    "critical_high_fix_pass_limit": 1,
+    "targeted_rereview_only_if_critical_or_high_repaired": true,
+    "merge_authority": "NONE"
+  },
+  "next_action": "Complete Stage-A registry/roadmap/test binding, run exact-head verification, obtain exactly one independent hostile review, fix Critical/High only if required, open/retain the PR, and stop without merge or economic-data access."
+}

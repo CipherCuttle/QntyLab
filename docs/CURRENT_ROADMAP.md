@@ -8,7 +8,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active research
 
-- None.
+- `QntySpot Ink shadow performance research V1` — `ACTIVE_RESEARCH`. STAGE_A_ACTIVE_RESEARCH: finish this governance-only reauthorization and canonicalize it. Before exact canonical merge: no market-data/economic access. After exact canonical merge: Stage B may qualify sources and acquire DEV-only evidence under the frozen firewall. Candidate evaluation, OUTER access, QntySpot mutation, trading, signing, broadcast, and capital remain unauthorized.
 
 ## Queued — not authorized
 

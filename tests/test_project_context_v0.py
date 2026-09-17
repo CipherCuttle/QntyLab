@@ -307,7 +307,7 @@ def test_context_projects_research_fields_independently(monkeypatch: pytest.Monk
             "implementation_authorized": True,
         }
     )
-    projects = dict(context.projects)
+    projects = {project_id: row for project_id, row in context.projects.items() if row["state"] != "ACTIVE_RESEARCH"}
     projects[research["project_id"]] = research
     context = project_context.ValidatedContext(
         root=context.root,
@@ -337,8 +337,8 @@ def test_context_projects_research_fields_independently(monkeypatch: pytest.Monk
 def test_context_text_keeps_research_projection_separate() -> None:
     text = project_context.context_text(project_context.context_data(ROOT))
     assert "- Active project: `QNTY_EDGE_ORDER_FLOW_PROSPECTIVE_V1_ACTIVATION`." in text
-    assert "- Active research project: `none`." in text
-    assert "- Permitted research action: No exploratory research implementation is currently authorized." in text
+    assert "- Active research project: `QNTYSPOT_INK_SHADOW_PERFORMANCE_RESEARCH_V1`." in text
+    assert "- Permitted research action: STAGE_A_ACTIVE_RESEARCH: finish this governance-only reauthorization and canonicalize it. Before exact canonical merge: no market-data/economic access. After exact canonical merge: Stage B may qualify sources and acquire DEV-only evidence under the frozen firewall. Candidate evaluation, OUTER access, QntySpot mutation, trading, signing, broadcast, and capital remain unauthorized." in text
 
 
 def test_execution_authority_projection_ignores_active_research() -> None:

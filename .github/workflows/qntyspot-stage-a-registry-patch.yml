@@ -114,6 +114,8 @@ jobs:
                   '    assert "- Active research project: `QNTYSPOT_INK_SHADOW_PERFORMANCE_RESEARCH_V1`." in text',
               '    assert "- Permitted research action: No exploratory research implementation is currently authorized." in text':
                   '    assert "- Permitted research action: STAGE_A_ACTIVE_RESEARCH: finish this governance-only reauthorization and canonicalize it. Before exact canonical merge: no market-data/economic access. After exact canonical merge: Stage B may qualify sources and acquire DEV-only evidence under the frozen firewall. Candidate evaluation, OUTER access, QntySpot mutation, trading, signing, broadcast, and capital remain unauthorized." in text',
+              '    projects = dict(context.projects)\n    projects[research["project_id"]] = research':
+                  '    projects = {project_id: row for project_id, row in context.projects.items() if row["state"] != "ACTIVE_RESEARCH"}\n    projects[research["project_id"]] = research',
           }
           for old, new in replacements.items():
               if test_text.count(old) != 1:

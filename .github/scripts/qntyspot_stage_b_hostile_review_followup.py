@@ -21,9 +21,15 @@ def patch_source() -> None:
         raise QualificationError("STOP_SOURCE_CONFLICT: receipt block hash disagrees with canonical block metadata")
     if _hex_int(receipt.get("status")) != 1:
         raise QualificationError("STOP_SOURCE_CONFLICT: probed Sync receipt is not successful")
-    if _hex_int(receipt.get("gasUsed")) <= 0:
+    gas_used = receipt.get("gasUsed")
+    if not isinstance(gas_used, str):
         raise QualificationError("STOP_SOURCE_CONFLICT: receipt gasUsed is missing or invalid")
-    _hex_int(receipt.get("effectiveGasPrice"))
+    if _hex_int(gas_used) <= 0:
+        raise QualificationError("STOP_SOURCE_CONFLICT: receipt gasUsed is missing or invalid")
+    effective_gas_price = receipt.get("effectiveGasPrice")
+    if not isinstance(effective_gas_price, str):
+        raise QualificationError("STOP_SOURCE_CONFLICT: receipt effectiveGasPrice is missing or invalid")
+    _hex_int(effective_gas_price)
 
     event_records = [_event_identity(log) for log in ordered_a]
 '''
@@ -39,11 +45,9 @@ def patch_source() -> None:
     if not isinstance(required_base, str) or not _git_is_ancestor(root, required_base, head):
         raise QualificationError("STOP_SOURCE_CONFLICT: Stage-B required canonical base is not an ancestor of HEAD")
     reviewed_candidate = current.get("reviewed_candidate_sha")
-    if (
-        not isinstance(reviewed_candidate, str)
-        or len(reviewed_candidate) != 40
-        or not _git_is_ancestor(root, reviewed_candidate, head)
-    ):
+    if not isinstance(reviewed_candidate, str) or len(reviewed_candidate) != 40:
+        raise QualificationError("STOP_SOURCE_CONFLICT: exact reviewed Stage-B candidate is not pinned")
+    if not _git_is_ancestor(root, reviewed_candidate, head):
         raise QualificationError("STOP_SOURCE_CONFLICT: exact reviewed Stage-B candidate is not canonical")
 '''
     if old not in text:
@@ -108,7 +112,42 @@ def patch_tests() -> None:
         qualifier.qualify_source(MissingGasRpc(), provider_id="missing-gas")
 
 
-def test_canonical_authority_requires_exact_reviewed_candidate_ancestor(tmp_path: Path, monkeypatch):
+def test_canonical_authority_requires_reviewed_candidate_pin(tmp_path: Path, monkeypatch):
+    projects = tmp_path / "docs/state"
+    projects.mkdir(parents=True)
+    required_base = "e" * 40
+    (projects / "projects.toml").write_text(
+        "schema_version = 1\\n"
+        "[[project]]\\n"
+        f'project_id = "{qualifier.PREDECESSOR_ID}"\\n'
+        'state = "CLOSED_PASS"\\n'
+        'implementation_authorized = false\\n'
+        "[[project]]\\n"
+        f'project_id = "{qualifier.PROJECT_ID}"\\n'
+        'state = "ACTIVE_RESEARCH"\\n'
+        'implementation_authorized = true\\n'
+        f'required_base_sha = "{required_base}"\\n'
+        'reviewed_candidate_sha = "not-a-sha"\\n',
+        encoding="utf-8",
+    )
+
+    def fake_git(root, *args):
+        if args == ("branch", "--show-current"):
+            return "master"
+        if args == ("status", "--porcelain"):
+            return ""
+        if args in (("rev-parse", "HEAD"), ("rev-parse", "origin/master")):
+            return "a" * 40
+        raise AssertionError(args)
+
+    monkeypatch.setattr(qualifier, "_git", fake_git)
+    monkeypatch.setattr(qualifier, "_git_fetch_origin_master", lambda root: None)
+    monkeypatch.setattr(qualifier, "_git_is_ancestor", lambda root, ancestor, descendant: ancestor == required_base)
+    with pytest.raises(qualifier.QualificationError, match="reviewed Stage-B candidate is not pinned"):
+        qualifier.assert_canonical_stage_b_authority(tmp_path)
+
+
+def test_canonical_authority_rejects_reviewed_candidate_not_in_canonical_history(tmp_path: Path, monkeypatch):
     projects = tmp_path / "docs/state"
     projects.mkdir(parents=True)
     required_base = "e" * 40
@@ -137,11 +176,17 @@ def test_canonical_authority_requires_exact_reviewed_candidate_ancestor(tmp_path
             return "a" * 40
         raise AssertionError(args)
 
+    calls = []
+    def fake_ancestor(root, ancestor, descendant):
+        calls.append(ancestor)
+        return ancestor == required_base
+
     monkeypatch.setattr(qualifier, "_git", fake_git)
     monkeypatch.setattr(qualifier, "_git_fetch_origin_master", lambda root: None)
-    monkeypatch.setattr(qualifier, "_git_is_ancestor", lambda root, ancestor, descendant: ancestor == required_base)
-    with pytest.raises(qualifier.QualificationError, match="exact reviewed Stage-B candidate"):
+    monkeypatch.setattr(qualifier, "_git_is_ancestor", fake_ancestor)
+    with pytest.raises(qualifier.QualificationError, match="reviewed Stage-B candidate is not canonical"):
         qualifier.assert_canonical_stage_b_authority(tmp_path)
+    assert calls == [required_base, reviewed]
 '''
     if "test_receipt_must_expose_frozen_gas_rule_fields" not in text:
         text = text.rstrip() + append

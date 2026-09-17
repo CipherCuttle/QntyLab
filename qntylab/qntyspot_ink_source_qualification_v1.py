@@ -17,6 +17,7 @@ import json
 import os
 import subprocess
 import threading
+import time
 import tomllib
 import urllib.error
 import urllib.request
@@ -42,6 +43,9 @@ FACTORY_SELECTOR = "0xc45a0155"
 DEFAULT_PROBE_SPAN = 256
 DEFAULT_COVERAGE_WORKERS = 1
 MAX_COVERAGE_WORKERS = 16
+DEFAULT_RATE_LIMIT_RETRIES = 5
+DEFAULT_RATE_LIMIT_BACKOFF_SECONDS = 2.0
+MAX_RATE_LIMIT_BACKOFF_SECONDS = 30.0
 MAX_T0_SCAN_BLOCKS = 8192
 MIN_TOTAL_HISTORY_SECONDS = 30 * 24 * 60 * 60
 MIN_DEV_HISTORY_SECONDS = 18 * 24 * 60 * 60
@@ -122,11 +126,36 @@ class JsonRpcClient:
             },
             method="POST",
         )
-        try:
-            with urllib.request.urlopen(request, timeout=self.timeout_seconds) as response:
-                body = json.loads(response.read().decode("utf-8"))
-        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
-            raise QualificationError(f"JSON-RPC transport failure for {method}: {type(exc).__name__}") from exc
+        for attempt in range(DEFAULT_RATE_LIMIT_RETRIES + 1):
+            try:
+                with urllib.request.urlopen(request, timeout=self.timeout_seconds) as response:
+                    body = json.loads(response.read().decode("utf-8"))
+                break
+            except urllib.error.HTTPError as exc:
+                if exc.code != 429 or attempt >= DEFAULT_RATE_LIMIT_RETRIES:
+                    raise QualificationError(
+                        f"JSON-RPC transport failure for {method}: {type(exc).__name__}"
+                    ) from exc
+                delay = min(
+                    DEFAULT_RATE_LIMIT_BACKOFF_SECONDS * (2 ** attempt),
+                    MAX_RATE_LIMIT_BACKOFF_SECONDS,
+                )
+                retry_after = exc.headers.get("Retry-After") if exc.headers is not None else None
+                if retry_after is not None:
+                    try:
+                        retry_after_seconds = float(retry_after)
+                    except (TypeError, ValueError):
+                        retry_after_seconds = None
+                    if retry_after_seconds is not None and retry_after_seconds >= 0:
+                        delay = min(
+                            max(delay, retry_after_seconds),
+                            MAX_RATE_LIMIT_BACKOFF_SECONDS,
+                        )
+                time.sleep(delay)
+            except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
+                raise QualificationError(
+                    f"JSON-RPC transport failure for {method}: {type(exc).__name__}"
+                ) from exc
         if not isinstance(body, dict) or body.get("id") != request_id:
             raise QualificationError(f"malformed JSON-RPC response for {method}")
         if body.get("error") is not None:

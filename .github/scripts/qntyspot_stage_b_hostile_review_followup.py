@@ -8,6 +8,13 @@ AUTH = ROOT / "experiments/research/qntyspot_ink_shadow_performance_dev_acquisit
 STAGE_TESTS = ROOT / "tests/test_qntyspot_ink_shadow_performance_dev_acquisition_research_v1.py"
 
 
+def replace_function(source: str, name: str, replacement: str) -> str:
+    start = source.index(f"def {name}(")
+    next_def = source.find("\n\ndef ", start + 1)
+    end = len(source) if next_def == -1 else next_def + 2
+    return source[:start] + replacement.rstrip() + "\n\n" + source[end:]
+
+
 def patch_source() -> None:
     text = SOURCE.read_text(encoding="utf-8")
     old = '''    canonical_receipt_hash = str(_block(rpc, receipt_block_number)["hash"]).lower()
@@ -33,15 +40,38 @@ def patch_source() -> None:
 
     event_records = [_event_identity(log) for log in ordered_a]
 '''
-    if old not in text:
-        raise SystemExit("receipt validation anchor missing")
-    text = text.replace(old, new, 1)
+    if "receipt gasUsed is missing or invalid" not in text:
+        if old not in text:
+            raise SystemExit("receipt validation anchor missing")
+        text = text.replace(old, new, 1)
 
-    old = '''    required_base = current.get("required_base_sha")
-    if not isinstance(required_base, str) or not _git_is_ancestor(root, required_base, head):
-        raise QualificationError("STOP_SOURCE_CONFLICT: Stage-B required canonical base is not an ancestor of HEAD")
-'''
-    new = '''    required_base = current.get("required_base_sha")
+    text = replace_function(text, "assert_canonical_stage_b_authority", '''
+def assert_canonical_stage_b_authority(root: Path = Path(".")) -> None:
+    branch = _git(root, "branch", "--show-current")
+    if branch != "master":
+        raise QualificationError("real source qualification is forbidden outside canonical master")
+    if _git(root, "status", "--porcelain"):
+        raise QualificationError("real source qualification requires a clean canonical worktree")
+
+    _git_fetch_origin_master(root)
+    try:
+        head = _git(root, "rev-parse", "HEAD")
+        origin_master = _git(root, "rev-parse", "origin/master")
+    except subprocess.CalledProcessError as exc:
+        raise QualificationError("canonical authority check could not resolve HEAD/origin/master") from exc
+    if head != origin_master:
+        raise QualificationError("STOP_SOURCE_CONFLICT: local master is not exact refreshed origin/master")
+
+    registry = tomllib.loads((root / "docs/state/projects.toml").read_text(encoding="utf-8"))["project"]
+    rows = {row["project_id"]: row for row in registry}
+    current = rows.get(PROJECT_ID)
+    predecessor = rows.get(PREDECESSOR_ID)
+    if not current or current.get("state") != "ACTIVE_RESEARCH" or current.get("implementation_authorized") is not True:
+        raise QualificationError("canonical Stage-B ACTIVE_RESEARCH authority is absent")
+    if not predecessor or predecessor.get("state") != "CLOSED_PASS" or predecessor.get("implementation_authorized") is not False:
+        raise QualificationError("Stage-A predecessor is not closed before Stage-B network authority")
+
+    required_base = current.get("required_base_sha")
     if not isinstance(required_base, str) or not _git_is_ancestor(root, required_base, head):
         raise QualificationError("STOP_SOURCE_CONFLICT: Stage-B required canonical base is not an ancestor of HEAD")
     reviewed_candidate = current.get("reviewed_candidate_sha")
@@ -49,9 +79,7 @@ def patch_source() -> None:
         raise QualificationError("STOP_SOURCE_CONFLICT: exact reviewed Stage-B candidate is not pinned")
     if not _git_is_ancestor(root, reviewed_candidate, head):
         raise QualificationError("STOP_SOURCE_CONFLICT: exact reviewed Stage-B candidate is not canonical")
-'''
-    if old not in text:
-        raise SystemExit("reviewed candidate guard anchor missing")
+''')
     SOURCE.write_text(text.rstrip() + "\n", encoding="utf-8")
 
 

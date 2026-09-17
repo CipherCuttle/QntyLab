@@ -273,6 +273,7 @@ def _generated_view_destination(
 def context_text(data: dict[str, Any]) -> str:
     git = data["git"]
     active = data["active_project"]
+    active_research = data["active_research_project"]
     lines = [
         "# QntyLab Project Context",
         "",
@@ -289,7 +290,18 @@ def context_text(data: dict[str, Any]) -> str:
         )
     else:
         lines.append("- None.")
-    lines.extend(("", f"- Active project: `{active['project_id'] if active else 'none'}`.", f"- Permitted next action: {data['current_permitted_next_action']}", "", "## Queued but not authorized", ""))
+    lines.extend(
+        (
+            "",
+            f"- Active project: `{active['project_id'] if active else 'none'}`.",
+            f"- Permitted next action: {data['current_permitted_next_action']}",
+            f"- Active research project: `{active_research['project_id'] if active_research else 'none'}`.",
+            f"- Permitted research action: {data['current_permitted_research_action']}",
+            "",
+            "## Queued but not authorized",
+            "",
+        )
+    )
     if data["queued_but_unauthorized_projects"]:
         lines.extend(f"- `{item['display_name']}`" for item in data["queued_but_unauthorized_projects"])
     else:

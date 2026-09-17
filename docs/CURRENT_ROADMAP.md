@@ -6,6 +6,10 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 - `Order Flow Prospective V1 local activation implementation` — `ACTIVE`. COLLECTION_RUNNING: canonical Order Flow Prospective V1 collection is active on the trusted Hetzner host. Preserve the frozen source/symbol/model/window contract, no-backfill and source-substitution prohibitions, immutable evidence chain, and interim-evaluation prohibition. Operational health monitoring only; do not inspect scientific outcomes. Any terminal evaluation after the frozen campaign tail requires separate Git-backed authorization.
 
+## Active research
+
+- None.
+
 ## Queued — not authorized
 
 - `DSH Stage-A V1R3R2 fresh one-episode live execution authorization V0R7` — `PLANNED_NOT_AUTHORIZED`. AFTER EXACT CANONICAL MERGE ONLY: construct a separate V0R7 activation bound to the exact authorization bytes and repaired claim implementation. Do not activate, execute, read the secret, create a claim, invoke DSH, call a provider, spend, merge, replay V0R5/V0R6, or grant Stage B, Qnty, scientific, trading, capital, promotion, or broader production authority.

@@ -134,10 +134,24 @@ def test_duplicate_project_id_and_unknown_state_fail(tmp_path: Path) -> None:
         project_context.validate_projects_registry(root, {"schema_version": 1, "project": [_project(state="UNKNOWN")]})
 
 
-@pytest.mark.parametrize("state", ["PLANNED_NOT_AUTHORIZED", "CLOSED_NEGATIVE"])
+@pytest.mark.parametrize("state", ["PLANNED_NOT_AUTHORIZED", "CLOSED_NEGATIVE", "BLOCKED", "CLOSED_PASS", "ARCHIVED"])
 def test_non_active_project_cannot_authorize_implementation(tmp_path: Path, state: str) -> None:
-    with pytest.raises(project_context.ProjectContextError, match="requires ACTIVE"):
+    with pytest.raises(project_context.ProjectContextError, match="requires ACTIVE or ACTIVE_RESEARCH"):
         project_context.validate_projects_registry(_tracked_root(tmp_path), {"schema_version": 1, "project": [_project(state=state)]})
+
+
+def test_active_and_active_research_uniqueness_and_implementation_authority(tmp_path: Path) -> None:
+    root = _tracked_root(tmp_path)
+    active = _project("ACTIVE", state="ACTIVE", implementation_authorized=True)
+    research = _project("RESEARCH", state="ACTIVE_RESEARCH", implementation_authorized=True)
+
+    assert project_context.validate_projects_registry(root, {"schema_version": 1, "project": [active]})["ACTIVE"]["state"] == "ACTIVE"
+    assert project_context.validate_projects_registry(root, {"schema_version": 1, "project": [research]})["RESEARCH"]["state"] == "ACTIVE_RESEARCH"
+    assert set(project_context.validate_projects_registry(root, {"schema_version": 1, "project": [active, research]})) == {"ACTIVE", "RESEARCH"}
+    with pytest.raises(project_context.ProjectContextError, match="at most one ACTIVE project"):
+        project_context.validate_projects_registry(root, {"schema_version": 1, "project": [active, _project("ACTIVE-2")]})
+    with pytest.raises(project_context.ProjectContextError, match="at most one ACTIVE_RESEARCH project"):
+        project_context.validate_projects_registry(root, {"schema_version": 1, "project": [research, _project("RESEARCH-2", state="ACTIVE_RESEARCH")]})
 
 
 def test_active_project_with_implementation_false_remains_unauthorized(tmp_path: Path) -> None:
@@ -274,6 +288,79 @@ def test_generated_roadmap_is_deterministic_and_check_detects_drift() -> None:
         assert project_context.render(ROOT, check=True) == 1
     finally:
         roadmap.write_bytes(original)
+
+
+def test_generated_roadmap_has_active_research_section() -> None:
+    roadmap = project_context._roadmap_bytes(ROOT).decode("utf-8")
+    assert "## Active research\n" in roadmap
+
+
+def test_context_projects_research_fields_independently(monkeypatch: pytest.MonkeyPatch) -> None:
+    context = project_context._validated_context(ROOT)
+    active = context.projects[ORDER_FLOW_V1_ACTIVATION_PROJECT_ID]
+    research = dict(active)
+    research.update(
+        {
+            "project_id": "RESEARCH_ONLY",
+            "state": "ACTIVE_RESEARCH",
+            "next_action": "Run the bounded exploratory performance comparison.",
+            "implementation_authorized": True,
+        }
+    )
+    projects = dict(context.projects)
+    projects[research["project_id"]] = research
+    context = project_context.ValidatedContext(
+        root=context.root,
+        snapshot=context.snapshot,
+        config=context.config,
+        adr_registry=context.adr_registry,
+        projects_registry=context.projects_registry,
+        adrs=context.adrs,
+        projects=projects,
+    )
+    monkeypatch.setattr(project_context, "doctor", lambda *args, **kwargs: [])
+    monkeypatch.setattr(project_context, "_research_summary", lambda *args, **kwargs: {})
+    monkeypatch.setattr(
+        project_context,
+        "execution_authority_projection",
+        lambda *args, **kwargs: {"issues": [], "active_project": active, "identity_by_project": {}},
+    )
+
+    data = project_context.context_data(ROOT, validated_context=context)
+
+    assert data["active_project"]["project_id"] == ORDER_FLOW_V1_ACTIVATION_PROJECT_ID
+    assert data["current_permitted_next_action"] == active["next_action"]
+    assert data["active_research_project"]["project_id"] == "RESEARCH_ONLY"
+    assert data["current_permitted_research_action"] == research["next_action"]
+
+
+def test_context_text_keeps_research_projection_separate() -> None:
+    text = project_context.context_text(project_context.context_data(ROOT))
+    assert "- Active project: `QNTY_EDGE_ORDER_FLOW_PROSPECTIVE_V1_ACTIVATION`." in text
+    assert "- Active research project: `none`." in text
+    assert "- Permitted research action: No exploratory research implementation is currently authorized." in text
+
+
+def test_execution_authority_projection_ignores_active_research() -> None:
+    _, _, registry = project_context.load_context_sources(ROOT)
+    projects = project_context.validate_projects_registry(ROOT, registry)
+    research = dict(next(iter(projects.values())))
+    research.update(
+        {
+            "project_id": "RESEARCH_ONLY",
+            "state": "ACTIVE_RESEARCH",
+            "implementation_authorized": True,
+            "authoritative_artifacts": ["docs/state/projects.toml"],
+        }
+    )
+    projects[research["project_id"]] = research
+
+    projection = project_context.execution_authority_projection(ROOT, projects)
+
+    assert projection["issues"] == []
+    assert projection["active_project"] is None or projection["active_project"]["state"] == "ACTIVE"
+    assert projection["active_project"] is None or projection["active_project"]["project_id"] != "RESEARCH_ONLY"
+    assert "RESEARCH_ONLY" not in projection["identity_by_project"]
 
 
 def test_json_is_byte_stable_for_identical_state() -> None:

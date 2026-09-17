@@ -16,10 +16,12 @@ import hashlib
 import json
 import os
 import subprocess
+import threading
 import tomllib
 import urllib.error
 import urllib.request
-from dataclasses import dataclass
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, Mapping
@@ -38,6 +40,8 @@ TOKEN0_SELECTOR = "0x0dfe1681"
 TOKEN1_SELECTOR = "0xd21220a7"
 FACTORY_SELECTOR = "0xc45a0155"
 DEFAULT_PROBE_SPAN = 256
+DEFAULT_COVERAGE_WORKERS = 1
+MAX_COVERAGE_WORKERS = 16
 MAX_T0_SCAN_BLOCKS = 8192
 MIN_TOTAL_HISTORY_SECONDS = 30 * 24 * 60 * 60
 MIN_DEV_HISTORY_SECONDS = 18 * 24 * 60 * 60
@@ -96,19 +100,26 @@ class JsonRpcClient:
     endpoint: str
     timeout_seconds: float = 20.0
     request_id: int = 0
+    _request_id_lock: threading.Lock = field(default_factory=threading.Lock, init=False, repr=False)
 
     def call(self, method: str, params: list[Any]) -> Any:
-        self.request_id += 1
+        with self._request_id_lock:
+            self.request_id += 1
+            request_id = self.request_id
         payload = _canonical_bytes({
             "jsonrpc": "2.0",
-            "id": self.request_id,
+            "id": request_id,
             "method": method,
             "params": params,
         })
         request = urllib.request.Request(
             self.endpoint,
             data=payload,
-            headers={"Content-Type": "application/json"},
+            headers={
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "User-Agent": "QntyLab-StageB-SourceQualification/1.0",
+            },
             method="POST",
         )
         try:
@@ -116,7 +127,7 @@ class JsonRpcClient:
                 body = json.loads(response.read().decode("utf-8"))
         except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
             raise QualificationError(f"JSON-RPC transport failure for {method}: {type(exc).__name__}") from exc
-        if not isinstance(body, dict) or body.get("id") != self.request_id:
+        if not isinstance(body, dict) or body.get("id") != request_id:
             raise QualificationError(f"malformed JSON-RPC response for {method}")
         if body.get("error") is not None:
             error = body["error"]
@@ -406,21 +417,30 @@ def _dev_log_coverage(
     end: int,
     query_span: int,
     canonical_block_hashes: dict[int, str] | None = None,
+    workers: int = DEFAULT_COVERAGE_WORKERS,
 ) -> dict[str, Any]:
     if query_span < 2:
         raise QualificationError("qualification query span must be >= 2")
-    records: list[dict[str, Any]] = []
-    seen: set[tuple[str, str, str]] = set()
-    chunk_count = 0
+    if workers < 1 or workers > MAX_COVERAGE_WORKERS:
+        raise QualificationError(
+            f"coverage workers must be between 1 and {MAX_COVERAGE_WORKERS}"
+        )
+
+    chunks: list[tuple[int, int]] = []
     cursor = start
     while cursor <= end:
         chunk_end = min(end, cursor + query_span - 1)
+        chunks.append((cursor, chunk_end))
+        cursor = chunk_end + 1
+
+    def fetch_chunk(bounds: tuple[int, int]) -> list[Mapping[str, Any]]:
+        chunk_start, chunk_end = bounds
         whole_a = sorted(
-            _sync_logs(rpc, cursor, chunk_end, canonical_block_hashes),
+            _sync_logs(rpc, chunk_start, chunk_end, canonical_block_hashes),
             key=_log_order_key,
         )
         whole_b = sorted(
-            _sync_logs(rpc, cursor, chunk_end, canonical_block_hashes),
+            _sync_logs(rpc, chunk_start, chunk_end, canonical_block_hashes),
             key=_log_order_key,
         )
         whole_ids_a = _identities(whole_a)
@@ -429,10 +449,10 @@ def _dev_log_coverage(
             raise QualificationError(
                 "STOP_SOURCE_CONFLICT: repeated DEV chunk request is nondeterministic"
             )
-        if cursor < chunk_end:
-            midpoint = (cursor + chunk_end) // 2
+        if chunk_start < chunk_end:
+            midpoint = (chunk_start + chunk_end) // 2
             left_ids = _identities(sorted(
-                _sync_logs(rpc, cursor, midpoint, canonical_block_hashes),
+                _sync_logs(rpc, chunk_start, midpoint, canonical_block_hashes),
                 key=_log_order_key,
             ))
             right_ids = _identities(sorted(
@@ -443,6 +463,12 @@ def _dev_log_coverage(
                 raise QualificationError(
                     "STOP_SOURCE_CONFLICT: DEV chunk whole-range logs disagree with split-range logs"
                 )
+        return whole_a
+
+    records: list[dict[str, Any]] = []
+    seen: set[tuple[str, str, str]] = set()
+
+    def consume(whole_a: list[Mapping[str, Any]]) -> None:
         for log in whole_a:
             identity = _log_identity(log)
             if identity in seen:
@@ -451,13 +477,27 @@ def _dev_log_coverage(
                 )
             seen.add(identity)
             records.append(_event_identity(log))
-        chunk_count += 1
-        cursor = chunk_end + 1
+
+    if workers == 1:
+        for chunk in chunks:
+            consume(fetch_chunk(chunk))
+    else:
+        with ThreadPoolExecutor(
+            max_workers=workers,
+            thread_name_prefix="qntyspot-dev-coverage",
+        ) as executor:
+            for offset in range(0, len(chunks), workers):
+                batch = chunks[offset:offset + workers]
+                futures = [executor.submit(fetch_chunk, chunk) for chunk in batch]
+                for future in futures:
+                    consume(future.result())
+
     return {
         "from_block": start,
         "to_block": end,
         "query_span_blocks": query_span,
-        "chunk_count": chunk_count,
+        "chunk_count": len(chunks),
+        "worker_count": workers,
         "sync_log_count": len(records),
         "sync_log_identity_digest": _digest(records),
         "canonical_block_binding_verified": True,
@@ -465,11 +505,21 @@ def _dev_log_coverage(
         "every_chunk_whole_equals_split": True,
     }
 
-def qualify_source(rpc: RpcCall, *, provider_id: str, probe_span: int = DEFAULT_PROBE_SPAN) -> dict[str, Any]:
+def qualify_source(
+    rpc: RpcCall,
+    *,
+    provider_id: str,
+    probe_span: int = DEFAULT_PROBE_SPAN,
+    coverage_workers: int = DEFAULT_COVERAGE_WORKERS,
+) -> dict[str, Any]:
     if not provider_id or any(token in provider_id.lower() for token in ("http://", "https://", "?key=", "apikey")):
         raise QualificationError("provider_id must be a non-secret label, never an endpoint URL")
     if probe_span < 2:
         raise QualificationError("qualification probe span must be >= 2")
+    if coverage_workers < 1 or coverage_workers > MAX_COVERAGE_WORKERS:
+        raise QualificationError(
+            f"coverage workers must be between 1 and {MAX_COVERAGE_WORKERS}"
+        )
 
     chain_id = _hex_int(rpc("eth_chainId", []))
     if chain_id != CHAIN_ID:
@@ -531,6 +581,7 @@ def qualify_source(rpc: RpcCall, *, provider_id: str, probe_span: int = DEFAULT_
         dev_end_number,
         probe_span,
         canonical_block_hashes,
+        coverage_workers,
     )
     if coverage["to_block"] != dev_end_number or coverage["from_block"] != t0_number:
         raise QualificationError("STOP_SOURCE_CONFLICT: DEV coverage did not span the full required range")
@@ -702,6 +753,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--provider-id", required=True)
     parser.add_argument("--secondary-provider-id")
     parser.add_argument("--probe-span", type=int, default=DEFAULT_PROBE_SPAN)
+    parser.add_argument("--coverage-workers", type=int, default=DEFAULT_COVERAGE_WORKERS)
     parser.add_argument(
         "--output",
         default="experiments/research/qntyspot_ink_shadow_performance_dev_acquisition_research_v1/source_qualification_receipt.json",
@@ -717,7 +769,12 @@ def main(argv: list[str] | None = None) -> int:
     endpoint = os.environ.get("QNTYSPOT_INK_RPC_URL")
     if not endpoint:
         raise QualificationError("QNTYSPOT_INK_RPC_URL is required")
-    primary = qualify_source(JsonRpcClient(endpoint).call, provider_id=args.provider_id, probe_span=args.probe_span)
+    primary = qualify_source(
+        JsonRpcClient(endpoint).call,
+        provider_id=args.provider_id,
+        probe_span=args.probe_span,
+        coverage_workers=args.coverage_workers,
+    )
 
     secondary_endpoint = os.environ.get("QNTYSPOT_INK_RPC_URL_SECONDARY")
     secondary: dict[str, Any] | None = None
@@ -728,6 +785,7 @@ def main(argv: list[str] | None = None) -> int:
             JsonRpcClient(secondary_endpoint).call,
             provider_id=args.secondary_provider_id,
             probe_span=args.probe_span,
+            coverage_workers=args.coverage_workers,
         )
         compare_sources(primary, secondary)
 

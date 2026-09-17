@@ -77,7 +77,7 @@ def test_stage_b_authority_is_canonicalization_gated_and_branch_network_receipts
     assert auth["canonicalization"]["runtime_required_base_must_be_ancestor"] is True
     assert auth["canonicalization"]["runtime_exact_reviewed_candidate_must_be_ancestor"] is True
     assert auth["canonicalization"]["runtime_origin_repository_must_match"] == "CipherCuttle/QntyLab"
-    assert auth["canonicalization"]["reviewed_candidate_sha"] == row["reviewed_candidate_sha"] == "3668d8f93481492b8e209f8fd6996fd3b558eb63"
+    assert auth["canonicalization"]["reviewed_candidate_sha"] == row["reviewed_candidate_sha"] == "2649ba0606e432974971f99f1fa347c569e1454c"
     assert row["hostile_review_count"] == 1
     assert row["hostile_review_mode"] == "OWNER_AUTHORIZED_SAME_CHAT_HOSTILE_REVIEW_SUBSTITUTE"
     assert row["hostile_review_independence_claimed"] is False

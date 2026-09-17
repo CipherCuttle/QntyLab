@@ -1,4 +1,7 @@
 import json
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import pytest
@@ -469,3 +472,55 @@ def test_canonical_authority_rejects_noncanonical_origin(tmp_path: Path, monkeyp
     monkeypatch.setattr(qualifier, "_git_is_ancestor", lambda root, ancestor, descendant: True)
     with pytest.raises(qualifier.QualificationError, match="canonical GitHub repository"):
         qualifier.assert_canonical_stage_b_authority(tmp_path)
+
+
+
+def test_parallel_dev_coverage_matches_serial_material_identity():
+    serial = qualifier.qualify_source(
+        FakeRpc(), provider_id="serial", probe_span=16, coverage_workers=1
+    )
+    parallel = qualifier.qualify_source(
+        FakeRpc(), provider_id="parallel", probe_span=16, coverage_workers=4
+    )
+    assert qualifier.material_identity(serial) == qualifier.material_identity(parallel)
+    assert parallel["dev_log_coverage"]["worker_count"] == 4
+    assert parallel["dev_log_coverage"]["chunk_count"] == serial["dev_log_coverage"]["chunk_count"]
+
+
+def test_invalid_parallel_worker_count_fails_before_network_use():
+    rpc = FakeRpc()
+    with pytest.raises(qualifier.QualificationError, match="coverage workers"):
+        qualifier.qualify_source(rpc, provider_id="workers-zero", coverage_workers=0)
+    assert rpc.log_calls == 0
+
+
+def test_json_rpc_client_uses_explicit_transport_identity_and_thread_safe_ids(monkeypatch):
+    seen_ids = []
+    seen_user_agents = []
+    seen_lock = threading.Lock()
+
+    class Response:
+        def __init__(self, payload):
+            self.payload = payload
+        def __enter__(self):
+            return self
+        def __exit__(self, exc_type, exc, tb):
+            return False
+        def read(self):
+            return self.payload
+
+    def fake_urlopen(request, timeout):
+        payload = json.loads(request.data.decode("utf-8"))
+        with seen_lock:
+            seen_ids.append(payload["id"])
+            seen_user_agents.append(dict(request.header_items()).get("User-agent"))
+        time.sleep(0.005)
+        return Response(json.dumps({"jsonrpc": "2.0", "id": payload["id"], "result": "0xdec1"}).encode())
+
+    monkeypatch.setattr(qualifier.urllib.request, "urlopen", fake_urlopen)
+    client = qualifier.JsonRpcClient("https://rpc.example")
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        values = list(executor.map(lambda _: client.call("eth_chainId", []), range(32)))
+    assert values == ["0xdec1"] * 32
+    assert sorted(seen_ids) == list(range(1, 33))
+    assert set(seen_user_agents) == {"QntyLab-StageB-SourceQualification/1.0"}

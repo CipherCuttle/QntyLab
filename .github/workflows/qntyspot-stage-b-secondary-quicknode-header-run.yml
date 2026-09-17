@@ -1,0 +1,115 @@
+name: QntySpot Stage B QuickNode header qualification
+
+on:
+  push:
+    branches:
+      - ops/qntyspot-stage-b-secondary-quicknode-header-v1
+
+permissions:
+  contents: read
+
+jobs:
+  secondary:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Checkout canonical master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          clean: true
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify exact canonical Stage B merge
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git branch --show-current)" = "master"
+          test -z "$(git status --porcelain)"
+          git fetch --quiet origin master
+          test "$(git rev-parse HEAD)" = "aa49ec7087ca9deba15f841d4f59bc743ecd0200"
+          test "$(git rev-parse origin/master)" = "aa49ec7087ca9deba15f841d4f59bc743ecd0200"
+
+      - name: Qualify official QuickNode source with explicit User-Agent transport
+        env:
+          RPC_ENDPOINT: https://rpc-qnd.inkonchain.com
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          import urllib.error
+          import urllib.request
+          from pathlib import Path
+          from qntylab.qntyspot_ink_source_qualification_v1 import (
+              QualificationError,
+              _canonical_bytes,
+              _write_receipt,
+              assert_canonical_stage_b_authority,
+              qualify_source,
+          )
+
+          class HeaderRpc:
+              def __init__(self, endpoint, timeout_seconds=20.0):
+                  self.endpoint = endpoint
+                  self.timeout_seconds = timeout_seconds
+                  self.request_id = 0
+              def call(self, method, params):
+                  self.request_id += 1
+                  payload = _canonical_bytes({
+                      'jsonrpc': '2.0', 'id': self.request_id,
+                      'method': method, 'params': params,
+                  })
+                  req = urllib.request.Request(
+                      self.endpoint,
+                      data=payload,
+                      headers={
+                          'Content-Type': 'application/json',
+                          'Accept': 'application/json',
+                          'User-Agent': 'QntyLab-StageB-SourceQualification/1.0',
+                      },
+                      method='POST',
+                  )
+                  try:
+                      with urllib.request.urlopen(req, timeout=self.timeout_seconds) as response:
+                          body = json.loads(response.read().decode('utf-8'))
+                  except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
+                      raise QualificationError(f'JSON-RPC transport failure for {method}: {type(exc).__name__}') from exc
+                  if not isinstance(body, dict) or body.get('id') != self.request_id:
+                      raise QualificationError(f'malformed JSON-RPC response for {method}')
+                  if body.get('error') is not None:
+                      error = body['error']
+                      code = error.get('code') if isinstance(error, dict) else None
+                      raise QualificationError(f'JSON-RPC error for {method}: code={code}')
+                  if 'result' not in body:
+                      raise QualificationError(f'JSON-RPC result missing for {method}')
+                  return body['result']
+
+          assert_canonical_stage_b_authority(Path('.').resolve())
+          receipt = qualify_source(
+              HeaderRpc(os.environ['RPC_ENDPOINT']).call,
+              provider_id='ink-official-quicknode-public',
+              probe_span=10000,
+          )
+          _write_receipt(Path('secondary.json'), receipt)
+          PY
+
+      - name: Emit sanitized secondary receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat secondary.json
+
+      - name: Upload secondary receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: qntyspot-stage-b-quicknode-secondary-receipt
+          path: secondary.json
+          if-no-files-found: error
+          retention-days: 30

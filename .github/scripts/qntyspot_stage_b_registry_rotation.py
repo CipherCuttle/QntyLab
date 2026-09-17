@@ -209,7 +209,7 @@ def test_generated_roadmap_names_stage_b_as_the_active_research_lane():
     assert expected in roadmap
     assert "`QntySpot Ink shadow performance research V1` — `ACTIVE_RESEARCH`" not in roadmap
 ''')
-    path.write_text(test, encoding='utf-8')
+    path.write_text(test.rstrip() + '\n', encoding='utf-8')
 
 
 def patch_generic_context_test() -> None:

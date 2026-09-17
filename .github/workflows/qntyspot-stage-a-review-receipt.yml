@@ -1,0 +1,78 @@
+name: QntySpot Stage A review receipt
+
+on:
+  push:
+    branches:
+      - research/qntyspot-shadow-performance-reauthorization-v1
+    paths:
+      - .github/workflows/qntyspot-stage-a-review-receipt.yml
+
+permissions:
+  contents: write
+
+jobs:
+  receipt:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/qntyspot-shadow-performance-reauthorization-v1
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Record completed hostile review receipt
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('docs/state/projects.toml')
+          text = path.read_text(encoding='utf-8')
+          marker = 'project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_RESEARCH_V1"'
+          start = text.index(marker)
+          block_start = text.rfind('[[project]]', 0, start)
+          next_block = text.find('\n[[project]]', start)
+          block_end = len(text) if next_block == -1 else next_block
+          block = text[block_start:block_end]
+
+          old_count = 'hostile_review_count = 0'
+          old_rereview = 'targeted_rereview_used = false'
+          if block.count(old_count) != 1 or block.count(old_rereview) != 1:
+              raise SystemExit('review receipt fields are not in expected pre-receipt state')
+          block = block.replace(old_count, 'hostile_review_count = 1', 1)
+          block = block.replace(old_rereview, 'targeted_rereview_used = true', 1)
+          text = text[:block_start] + block + text[block_end:]
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Verify receipt-only change
+        shell: bash
+        run: |
+          python -m qntylab.project_context doctor
+          python -m qntylab.project_context render --check
+          python -m qntylab.research_ledger doctor
+          git diff --check
+          python - <<'PY'
+          import tomllib
+          from pathlib import Path
+          rows = tomllib.loads(Path('docs/state/projects.toml').read_text(encoding='utf-8'))['project']
+          row = next(r for r in rows if r['project_id'] == 'QNTYSPOT_INK_SHADOW_PERFORMANCE_RESEARCH_V1')
+          assert row['hostile_review_count'] == 1
+          assert row['targeted_rereview_used'] is True
+          PY
+          test -z "$(git diff 67fc6f003875c5228333fd28511cc7ff76af0427 --name-only -- experiments/research/qnty_edge_order_flow_prospective_v1_activation qntylab | grep -v '^qntylab/qntyspot_ink_shadow_performance_prereg_v0.py$' || true)"
+
+      - name: Remove one-shot helper and commit receipt
+        shell: bash
+        run: |
+          rm .github/workflows/qntyspot-stage-a-review-receipt.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/state/projects.toml .github/workflows/qntyspot-stage-a-review-receipt.yml
+          git diff --cached --check
+          git commit -m 'Record QntySpot Stage A hostile review receipt'
+          git push origin HEAD:research/qntyspot-shadow-performance-reauthorization-v1

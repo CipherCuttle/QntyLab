@@ -6,6 +6,7 @@ on:
       - research/qntyspot-shadow-performance-dev-acquisition-v1
     paths:
       - .github/workflows/qntyspot-stage-b-registry-rotation.yml
+      - .github/scripts/qntyspot_stage_b_registry_rotation.py
       - tests/test_qntyspot_ink_source_qualification_v1.py
 
 permissions:

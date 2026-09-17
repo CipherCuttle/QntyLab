@@ -6,6 +6,7 @@ on:
       - research/qntyspot-shadow-performance-dev-acquisition-v1
     paths:
       - .github/scripts/qntyspot_stage_b_hostile_review_repair.py
+      - .github/scripts/qntyspot_stage_b_hostile_review_followup.py
       - .github/workflows/qntyspot-stage-b-hostile-review-repair.yml
 
 permissions:
@@ -29,7 +30,9 @@ jobs:
         run: python -m pip install pytest requests
 
       - name: Apply hostile review repairs
-        run: python .github/scripts/qntyspot_stage_b_hostile_review_repair.py
+        run: |
+          python .github/scripts/qntyspot_stage_b_hostile_review_repair.py
+          python .github/scripts/qntyspot_stage_b_hostile_review_followup.py
 
       - name: Verify repaired Stage B candidate
         run: |
@@ -47,6 +50,7 @@ jobs:
       - name: Commit bounded repair and remove helper
         run: |
           rm .github/scripts/qntyspot_stage_b_hostile_review_repair.py
+          rm .github/scripts/qntyspot_stage_b_hostile_review_followup.py
           rm .github/workflows/qntyspot-stage-b-hostile-review-repair.yml
           git config user.name "CipherCuttle"
           git config user.email "97258089+CipherCuttle@users.noreply.github.com"

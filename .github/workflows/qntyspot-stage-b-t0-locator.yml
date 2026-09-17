@@ -1,0 +1,76 @@
+name: QntySpot Stage B T0 locator
+
+on:
+  push:
+    branches:
+      - ops/qntyspot-stage-b-t0-locator-v1
+
+permissions:
+  contents: read
+
+jobs:
+  locate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout canonical master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          clean: true
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Locate first Sync identity in frozen T0 search window
+        env:
+          RPC_ENDPOINT: https://rpc-qnd.inkonchain.com
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, urllib.request
+          from pathlib import Path
+          from qntylab.qntyspot_ink_source_qualification_v1 import (
+              POOL, QualificationError, _canonical_bytes, _hex_int, _sync_logs,
+              assert_canonical_stage_b_authority,
+          )
+
+          class HeaderRpc:
+              def __init__(self, endpoint): self.endpoint, self.request_id = endpoint, 0
+              def call(self, method, params):
+                  self.request_id += 1
+                  req = urllib.request.Request(
+                      self.endpoint,
+                      data=_canonical_bytes({'jsonrpc':'2.0','id':self.request_id,'method':method,'params':params}),
+                      headers={'Content-Type':'application/json','Accept':'application/json','User-Agent':'QntyLab-StageB-SourceQualification/1.0'},
+                      method='POST',
+                  )
+                  with urllib.request.urlopen(req, timeout=30) as response:
+                      body = json.loads(response.read().decode('utf-8'))
+                  if not isinstance(body, dict) or body.get('id') != self.request_id or body.get('error') is not None or 'result' not in body:
+                      raise QualificationError(f'malformed/error JSON-RPC response for {method}')
+                  return body['result']
+
+          assert_canonical_stage_b_authority(Path('.').resolve())
+          rpc = HeaderRpc(os.environ['RPC_ENDPOINT']).call
+          start = 21199334
+          end = start + 8191
+          logs = _sync_logs(rpc, start, end)
+          if not logs:
+              raise QualificationError('no Sync event in frozen 8192-block T0 search window')
+          first = logs[0]
+          print(json.dumps({
+              'provider_id': 'ink-official-quicknode-public',
+              'search_start_block': start,
+              'search_end_block': end,
+              'sync_identity_count': len(logs),
+              't0_block': _hex_int(first['blockNumber']),
+              't0_transaction_hash': first['transactionHash'],
+              't0_log_index': _hex_int(first['logIndex']),
+              'raw_log_data_decoded': False,
+              'raw_log_data_serialized': False,
+              'outer_access_performed': False,
+          }, sort_keys=True))
+          PY

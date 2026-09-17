@@ -1,0 +1,61 @@
+name: QntySpot Stage B dRPC secondary qualification
+
+on:
+  push:
+    branches:
+      - ops/qntyspot-stage-b-secondary-drpc-v1
+
+permissions:
+  contents: read
+
+jobs:
+  secondary:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Checkout canonical master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          clean: true
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify exact canonical Stage B merge
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git branch --show-current)" = "master"
+          test -z "$(git status --porcelain)"
+          git fetch --quiet origin master
+          test "$(git rev-parse HEAD)" = "aa49ec7087ca9deba15f841d4f59bc743ecd0200"
+          test "$(git rev-parse origin/master)" = "aa49ec7087ca9deba15f841d4f59bc743ecd0200"
+
+      - name: Qualify official-listed dRPC source
+        env:
+          QNTYSPOT_INK_RPC_URL: https://ink.drpc.org
+        shell: bash
+        run: |
+          set -euo pipefail
+          python qntylab/qntyspot_ink_source_qualification_v1.py \
+            --provider-id ink-official-listed-drpc-public \
+            --probe-span 10000 \
+            --output secondary.json
+
+      - name: Emit sanitized secondary receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat secondary.json
+
+      - name: Upload secondary receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: qntyspot-stage-b-drpc-secondary-receipt
+          path: secondary.json
+          if-no-files-found: error
+          retention-days: 30

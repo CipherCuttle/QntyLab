@@ -71,7 +71,9 @@ class FakeRpc:
             contains = start <= 98 <= end
             if self.nondeterministic and self.log_calls == 2:
                 return []
-            if self.truncate_whole and (end - start + 1) > (qualifier.DEFAULT_PROBE_SPAN // 2):
+            # The synthetic chain only has blocks 0..100, so the effective
+            # whole probe is 100 blocks while each half is 50 blocks.
+            if self.truncate_whole and (end - start + 1) > 50:
                 return []
             return [self._sync()] if contains else []
         if method == "eth_getTransactionReceipt":

@@ -168,7 +168,7 @@ def test_local_systemd_timer_is_hourly_nonpersistent_and_no_github_provider_runn
         assert f"OnCalendar=*-*-* *:{minute}:00 UTC" in timer
     assert "Persistent=false" in timer
     assert "RandomizedDelaySec=0" in timer
-    assert "QntyLab-orderflow-operational" in service
+    assert "WorkingDirectory=/srv/qntylab-orderflow/repo" in service
     assert "order_flow_prospective_v1_operation --record-due" in service
     assert "git checkout --detach origin/master" in service
     assert "contents: read" in workflow
@@ -227,3 +227,102 @@ def test_runtime_pins_host_state_and_remote_reconciliation():
     assert runtime["trusted_host_identity"] == {"method": "SHA256_CONTEXTUALIZED_SHA256_ETC_MACHINE_ID", "context": operation.HOST_BINDING_CONTEXT, "digest": operation.TRUSTED_HOST_BINDING_DIGEST, "probe_host_binding_required": True}
     assert runtime["remote_reconciliation_required_before_provider_access"] is True
     assert runtime["release_body_schema"] == operation.EVIDENCE_RELEASE_SCHEMA
+
+
+def test_migration_host_binding_accepts_only_exact_hetzner_digest(monkeypatch):
+    import pytest
+
+    expected = "541ef1512288f24b4b831d975a58b8b4918ba84c70f922c5a677bae8c08d458e"
+    assert operation.TRUSTED_HOST_BINDING_DIGEST == expected
+    for digest in (
+        "0902027d8e7eb13bf130934d46a48b61cd6b126fef13f371844f4d5de9e39f5e",
+        "0" + expected[1:],
+    ):
+        monkeypatch.setattr(operation, "_trusted_host_fingerprint", lambda path, d=digest: d)
+        with pytest.raises(operation.OperationBlocked, match="qualified trusted host"):
+            operation.validate_trusted_host(ROOT)
+    monkeypatch.setattr(operation, "_trusted_host_fingerprint", lambda path: expected)
+    assert operation.validate_trusted_host(ROOT)["digest"] == expected
+
+
+def test_migration_fingerprint_preserves_raw_bytes_and_context(tmp_path):
+    from hashlib import sha256
+
+    raw = b"synthetic-machine-id-for-offline-test\n"
+    machine_id = tmp_path / "machine-id"
+    machine_id.write_bytes(raw)
+    assert operation.HOST_BINDING_CONTEXT == "QNTYLAB_ORDER_FLOW_V1_HOST_V1"
+    expected = sha256(b"QNTYLAB_ORDER_FLOW_V1_HOST_V1:" + sha256(raw).hexdigest().encode()).hexdigest()
+    assert operation._trusted_host_fingerprint(machine_id) == expected
+    assert expected != sha256(b"QNTYLAB_ORDER_FLOW_V1_HOST_V1:" + sha256(raw.strip()).hexdigest().encode()).hexdigest()
+
+
+def test_migration_rejects_laptop_state_and_accepts_exact_hetzner_state():
+    import pytest
+
+    expected = Path("/srv/qntylab-orderflow/state/order_flow_prospective_v1")
+    assert operation.CANONICAL_STATE_DIR == expected
+    assert operation._validate_recording_state_dir(expected) == expected
+    for path in (
+        Path("/home/swirky/.local/state/qntylab/order_flow_prospective_v1"),
+        Path("/srv/qnty/state/order_flow_prospective_v1"),
+        expected.parent / "other_campaign",
+    ):
+        with pytest.raises(operation.OperationBlocked, match="canonical recording state directory mismatch"):
+            operation._validate_recording_state_dir(path)
+
+
+def test_migration_runtime_service_and_frozen_blob_contracts():
+    import subprocess
+
+    runtime = json.loads((EXP / "prospective_runtime.json").read_text())
+    service = (ROOT / operation.SERVICE_PATH).read_text()
+    assert runtime["operational_worktree"] == "/srv/qntylab-orderflow/repo"
+    assert runtime["python_executable"] == "/srv/qntylab-orderflow/venv/bin/python"
+    assert runtime["state_dir"] == "/srv/qntylab-orderflow/state/order_flow_prospective_v1"
+    assert runtime["python_required_major_minor"] == "3.12"
+    for line in (
+        "Documentation=file:///srv/qntylab-orderflow/repo/ops/systemd/user/order-flow-v1-prospective.md",
+        "Environment=HOME=/home/viktor",
+        "Environment=PATH=/usr/bin:/bin:/home/viktor/.local/bin:/snap/bin",
+        "WorkingDirectory=/srv/qntylab-orderflow/repo",
+        "Type=oneshot", "TimeoutStartSec=840", "SuccessExitStatus=3",
+        "ExecStartPre=/bin/sh -c 'test -z \"$(/usr/bin/git status --porcelain)\"'",
+        "ExecStartPre=/usr/bin/git fetch origin master",
+        "ExecStartPre=/usr/bin/git checkout --detach origin/master",
+        "StandardOutput=journal", "StandardError=journal",
+    ):
+        assert line in service.splitlines()
+    assert "exec /srv/qntylab-orderflow/venv/bin/python -m qntylab.order_flow_prospective_v1_operation --record-due --root /srv/qntylab-orderflow/repo" in service
+    assert "/home/swirky" not in service
+    assert "[Install]" not in service
+    for key, path in (
+        ("operation_git_blob_sha", operation.OPERATION_PATH),
+        ("service_git_blob_sha", operation.SERVICE_PATH),
+        ("timer_git_blob_sha", operation.TIMER_PATH),
+    ):
+        assert subprocess.check_output(["git", "hash-object", str(path)], cwd=ROOT, text=True).strip() == runtime[key]
+    assert runtime["timer_git_blob_sha"] == "f2cffbdfca53d8eccfcb942aed6e2379cba350cf"
+    assert runtime["persistent_timer"] is False
+    assert runtime["attempt_minutes_utc"] == [5, 20, 35, 50]
+    assert operation.SOURCE_GIT_BLOB_SHA == "1b5550ee2b8bbae3905e7f88583ec88217121274"
+    assert operation.RECORDER_GIT_BLOB_SHA == "02daadaa597dcf00789af66c01fe13e66031ec3d"
+    assert operation.validate_activation_artifacts(ROOT)["state"] == "AUTHORIZED_IF_CANONICAL"
+
+
+def test_migration_receipt_cannot_grant_cutover_or_scientific_authority():
+    receipt = json.loads((EXP / "hetzner_host_migration_v1.json").read_text())
+    assert receipt["candidate_id"] == recorder.CANDIDATE_ID
+    assert receipt["mode"] == "NON_SCIENTIFIC_OPERATIONAL_HOST_MIGRATION"
+    assert receipt["migration_state"] == "CANDIDATE_NOT_EFFECTIVE_UNTIL_CANONICAL_MERGE_AND_CUTOVER"
+    assert receipt["new_host_digest"] == operation.TRUSTED_HOST_BINDING_DIGEST
+    assert receipt["single_writer_cutover_required"] is True
+    assert receipt["laptop_timer_must_stop_before_hetzner_timer_start"] is True
+    assert receipt["state_transfer_method"] == "RESTORE_FROM_LATEST_IMMUTABLE_GITHUB_RELEASE"
+    for key in ("manual_ledger_copy", "backfill", "source_substitution", "interim_evaluation"):
+        assert receipt[key] == "FORBIDDEN"
+    for key in ("provider_payload_persisted", "scientific_values_persisted", "hetzner_order_flow_timer_installed", "hetzner_order_flow_timer_started", "existing_qnty_modified", "cutover_ready"):
+        assert receipt[key] is False
+    assert all(value == "NONE" for value in receipt["authority"].values())
+    assert receipt["github_auth_ready"] is False
+    assert "BLOCKED_HETZNER_GITHUB_AUTH_REQUIRED" in receipt["qualification_blockers"]

@@ -1,0 +1,77 @@
+name: QntySpot Stage B fast T0 locator
+
+on:
+  push:
+    branches:
+      - ops/qntyspot-stage-b-t0-fast-locator-v1
+
+permissions:
+  contents: read
+
+jobs:
+  locate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Checkout canonical master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          clean: true
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Probe first Sync identity only
+        env:
+          RPC_ENDPOINT: https://rpc-qnd.inkonchain.com
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, urllib.request
+          from pathlib import Path
+          from qntylab.qntyspot_ink_source_qualification_v1 import (
+              POOL, SYNC_TOPIC, QualificationError, _canonical_bytes, _hex_int,
+              assert_canonical_stage_b_authority,
+          )
+
+          assert_canonical_stage_b_authority(Path('.').resolve())
+          request_id = 1
+          start = 21199334
+          end = start + 8191
+          payload = _canonical_bytes({
+              'jsonrpc':'2.0','id':request_id,'method':'eth_getLogs','params':[{
+                  'address': POOL,
+                  'fromBlock': hex(start),
+                  'toBlock': hex(end),
+                  'topics': [SYNC_TOPIC],
+              }]
+          })
+          req = urllib.request.Request(
+              os.environ['RPC_ENDPOINT'], data=payload,
+              headers={'Content-Type':'application/json','Accept':'application/json','User-Agent':'QntyLab-StageB-SourceQualification/1.0'},
+              method='POST',
+          )
+          with urllib.request.urlopen(req, timeout=30) as response:
+              body = json.loads(response.read().decode('utf-8'))
+          if not isinstance(body, dict) or body.get('id') != request_id or body.get('error') is not None or not isinstance(body.get('result'), list):
+              raise QualificationError('malformed/error getLogs response')
+          logs = body['result']
+          if not logs:
+              raise QualificationError('no Sync event in frozen T0 search window')
+          first = min(logs, key=lambda x: (_hex_int(x['blockNumber']), _hex_int(x.get('transactionIndex','0x0')), _hex_int(x['logIndex'])))
+          print(json.dumps({
+              'provider_id':'ink-official-quicknode-public',
+              'search_start_block':start,
+              'search_end_block':end,
+              'returned_sync_count':len(logs),
+              'first_sync_block':_hex_int(first['blockNumber']),
+              'first_sync_transaction_hash':first['transactionHash'],
+              'first_sync_log_index':_hex_int(first['logIndex']),
+              'raw_log_data_decoded':False,
+              'raw_log_data_serialized':False,
+              'outer_access_performed':False,
+          }, sort_keys=True))
+          PY

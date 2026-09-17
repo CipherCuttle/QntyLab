@@ -63,7 +63,7 @@ jobs:
         shell: bash
         run: |
           python -m qntylab.project_context doctor
-          python -m qntylab.project_context roadmap --check
+          python -m qntylab.project_context render --check
           python -m qntylab.research_ledger doctor
           pytest -q tests/test_project_context_v0.py tests/test_qntyspot_ink_shadow_performance_research_v1.py
           git diff --check

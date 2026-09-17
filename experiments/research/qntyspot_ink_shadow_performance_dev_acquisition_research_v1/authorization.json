@@ -13,7 +13,13 @@
     "required_branch": "research/qntyspot-shadow-performance-dev-acquisition-v1",
     "candidate_branch_is_authority": false,
     "effective_only_after_exact_canonical_merge": true,
-    "canonical_drift_behavior": "STOP_SOURCE_CONFLICT"
+    "canonical_drift_behavior": "STOP_SOURCE_CONFLICT",
+    "runtime_required_branch": "master",
+    "runtime_requires_clean_worktree": true,
+    "runtime_refresh_origin_master_before_check": true,
+    "runtime_head_must_equal_refreshed_origin_master": true,
+    "runtime_required_base_must_be_ancestor": true,
+    "runtime_exact_reviewed_candidate_must_be_ancestor": true
   },
   "predecessor_contract": {
     "project_id": "QNTYSPOT_INK_SHADOW_PERFORMANCE_RESEARCH_V1",
@@ -54,7 +60,13 @@
     "dev_end_formula": "T0 + floor(0.60 * (T1 - T0))",
     "dev_interval": "[T0, DEV_END]",
     "outer_interval": "(DEV_END, T1]",
-    "scientific_design_mutation": false
+    "scientific_design_mutation": false,
+    "minimum_history_days": {
+      "total_calendar_history": 30,
+      "dev": 18,
+      "outer": 12
+    },
+    "insufficient_history_state": "INSUFFICIENT_HISTORY"
   },
   "source_qualification_contract": {
     "network_execution_effective_only_after_exact_canonical_merge": true,
@@ -74,18 +86,32 @@
       "historical T1 block metadata is retrievable without requesting OUTER economic observations",
       "historical pool deployment boundary is retrievable from bytecode",
       "T0 is established outcome-blind by singleton Sync requests",
+      "the preregistered 30-day total / 18-day DEV / 12-day OUTER minimum-history rule passes",
       "DEV_END is computed mechanically before any multi-block economic log request",
       "every economic log request is bounded at or before DEV_END",
+      "every returned Sync log block hash agrees with canonical block metadata",
       "pool Sync log retrieval works on a bounded DEV historical probe",
       "repeated historical requests are deterministic",
       "whole-range logs equal the union of adjacent half-range logs",
-      "at least one DEV-eligible pool transaction receipt is retrievable before acquisition"
+      "the complete DEV block interval is covered in bounded non-overlapping log-query chunks",
+      "the receipt transaction hash and block hash agree with the probed log and canonical block metadata",
+      "cross-provider material comparison includes T0, DEV_END, probe receipt, and complete DEV log-identity digest",
+      "the DEV-eligible receipt is successful and exposes gasUsed and effectiveGasPrice required by the frozen gas rule"
     ],
     "raw_economic_log_values_may_be_decoded_during_qualification": false,
     "qualification_receipt_may_serialize_raw_log_data": false,
     "cross_provider_material_disagreement": "STOP_SOURCE_CONFLICT",
     "reorg_or_canonical_block_ambiguity": "STOP_SOURCE_CONFLICT",
-    "silent_truncation_or_nondeterminism": "STOP_SOURCE_CONFLICT"
+    "silent_truncation_or_nondeterminism": "STOP_SOURCE_CONFLICT",
+    "full_dev_log_identity_coverage_required": true,
+    "provider_range_limit_strategy": "scan the complete DEV block interval in non-overlapping chunks no wider than the validated probe span",
+    "canonical_log_block_binding_required": true,
+    "receipt_transaction_and_block_binding_required": true,
+    "cross_provider_material_identity_includes_dev_log_digest": true,
+    "receipt_gas_fields_required": [
+      "gasUsed",
+      "effectiveGasPrice"
+    ]
   },
   "dev_acquisition_contract": {
     "enabled_only_after_source_qualification_pass": true,

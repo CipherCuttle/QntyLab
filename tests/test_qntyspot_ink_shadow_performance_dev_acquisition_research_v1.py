@@ -71,6 +71,11 @@ def test_stage_b_authority_is_canonicalization_gated_and_branch_network_receipts
     assert auth["canonicalization"]["required_base_sha"] == row["required_base_sha"] == BASE_SHA
     assert auth["canonicalization"]["candidate_branch_is_authority"] is False
     assert auth["canonicalization"]["effective_only_after_exact_canonical_merge"] is True
+    assert auth["canonicalization"]["runtime_requires_clean_worktree"] is True
+    assert auth["canonicalization"]["runtime_refresh_origin_master_before_check"] is True
+    assert auth["canonicalization"]["runtime_head_must_equal_refreshed_origin_master"] is True
+    assert auth["canonicalization"]["runtime_required_base_must_be_ancestor"] is True
+    assert auth["canonicalization"]["runtime_exact_reviewed_candidate_must_be_ancestor"] is True
     assert auth["source_qualification_contract"]["network_execution_effective_only_after_exact_canonical_merge"] is True
     assert auth["implementation_contract"]["real_network_execution_in_this_candidate_pr"] is False
     assert row["activation_effective_on_branch"] is False
@@ -92,6 +97,8 @@ def test_frozen_science_and_outer_firewall_are_preserved():
     assert frozen["dev_interval"] == "[T0, DEV_END]"
     assert frozen["outer_interval"] == "(DEV_END, T1]"
     assert frozen["scientific_design_mutation"] is False
+    assert frozen["minimum_history_days"] == {"total_calendar_history": 30, "dev": 18, "outer": 12}
+    assert frozen["insufficient_history_state"] == "INSUFFICIENT_HISTORY"
 
     outer = auth["outer_firewall"]
     assert outer["initial_access"] == "INACCESSIBLE"
@@ -130,6 +137,11 @@ def test_source_qualification_is_outcome_blind_fail_closed_and_dev_bounded_befor
     assert source["cross_provider_material_disagreement"] == "STOP_SOURCE_CONFLICT"
     assert source["reorg_or_canonical_block_ambiguity"] == "STOP_SOURCE_CONFLICT"
     assert source["silent_truncation_or_nondeterminism"] == "STOP_SOURCE_CONFLICT"
+    assert source["full_dev_log_identity_coverage_required"] is True
+    assert source["canonical_log_block_binding_required"] is True
+    assert source["receipt_transaction_and_block_binding_required"] is True
+    assert source["cross_provider_material_identity_includes_dev_log_digest"] is True
+    assert source["receipt_gas_fields_required"] == ["gasUsed", "effectiveGasPrice"]
 
 
 def test_candidate_evaluation_ledger_mutation_and_live_authorities_remain_forbidden():

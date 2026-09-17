@@ -76,6 +76,7 @@ def test_stage_b_authority_is_canonicalization_gated_and_branch_network_receipts
     assert auth["canonicalization"]["runtime_head_must_equal_refreshed_origin_master"] is True
     assert auth["canonicalization"]["runtime_required_base_must_be_ancestor"] is True
     assert auth["canonicalization"]["runtime_exact_reviewed_candidate_must_be_ancestor"] is True
+    assert auth["canonicalization"]["runtime_origin_repository_must_match"] == "CipherCuttle/QntyLab"
     assert auth["source_qualification_contract"]["network_execution_effective_only_after_exact_canonical_merge"] is True
     assert auth["implementation_contract"]["real_network_execution_in_this_candidate_pr"] is False
     assert row["activation_effective_on_branch"] is False
@@ -142,6 +143,7 @@ def test_source_qualification_is_outcome_blind_fail_closed_and_dev_bounded_befor
     assert source["receipt_transaction_and_block_binding_required"] is True
     assert source["cross_provider_material_identity_includes_dev_log_digest"] is True
     assert source["receipt_gas_fields_required"] == ["gasUsed", "effectiveGasPrice"]
+    assert source["full_dev_chunk_integrity_validation"] == "REPEAT_PLUS_WHOLE_EQUALS_SPLIT_EACH_CHUNK"
 
 
 def test_candidate_evaluation_ledger_mutation_and_live_authorities_remain_forbidden():

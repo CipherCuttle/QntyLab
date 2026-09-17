@@ -399,6 +399,7 @@ def _bounded_log_integrity_probe(
         "receipt_probe_block_hash": first_id[0],
     }
 
+
 def _dev_log_coverage(
     rpc: RpcCall,
     start: int,
@@ -414,14 +415,40 @@ def _dev_log_coverage(
     cursor = start
     while cursor <= end:
         chunk_end = min(end, cursor + query_span - 1)
-        logs = sorted(
+        whole_a = sorted(
             _sync_logs(rpc, cursor, chunk_end, canonical_block_hashes),
             key=_log_order_key,
         )
-        for log in logs:
+        whole_b = sorted(
+            _sync_logs(rpc, cursor, chunk_end, canonical_block_hashes),
+            key=_log_order_key,
+        )
+        whole_ids_a = _identities(whole_a)
+        whole_ids_b = _identities(whole_b)
+        if whole_ids_a != whole_ids_b:
+            raise QualificationError(
+                "STOP_SOURCE_CONFLICT: repeated DEV chunk request is nondeterministic"
+            )
+        if cursor < chunk_end:
+            midpoint = (cursor + chunk_end) // 2
+            left_ids = _identities(sorted(
+                _sync_logs(rpc, cursor, midpoint, canonical_block_hashes),
+                key=_log_order_key,
+            ))
+            right_ids = _identities(sorted(
+                _sync_logs(rpc, midpoint + 1, chunk_end, canonical_block_hashes),
+                key=_log_order_key,
+            ))
+            if sorted(whole_ids_a) != sorted(left_ids + right_ids):
+                raise QualificationError(
+                    "STOP_SOURCE_CONFLICT: DEV chunk whole-range logs disagree with split-range logs"
+                )
+        for log in whole_a:
             identity = _log_identity(log)
             if identity in seen:
-                raise QualificationError("STOP_SOURCE_CONFLICT: duplicate canonical log identity across DEV chunks")
+                raise QualificationError(
+                    "STOP_SOURCE_CONFLICT: duplicate canonical log identity across DEV chunks"
+                )
             seen.add(identity)
             records.append(_event_identity(log))
         chunk_count += 1
@@ -434,9 +461,9 @@ def _dev_log_coverage(
         "sync_log_count": len(records),
         "sync_log_identity_digest": _digest(records),
         "canonical_block_binding_verified": True,
+        "every_chunk_repeated_deterministically": True,
+        "every_chunk_whole_equals_split": True,
     }
-
-
 
 def qualify_source(rpc: RpcCall, *, provider_id: str, probe_span: int = DEFAULT_PROBE_SPAN) -> dict[str, Any]:
     if not provider_id or any(token in provider_id.lower() for token in ("http://", "https://", "?key=", "apikey")):
@@ -616,6 +643,7 @@ def _git_is_ancestor(root: Path, ancestor: str, descendant: str) -> bool:
 
 
 
+
 def assert_canonical_stage_b_authority(root: Path = Path(".")) -> None:
     branch = _git(root, "branch", "--show-current")
     if branch != "master":
@@ -649,6 +677,18 @@ def assert_canonical_stage_b_authority(root: Path = Path(".")) -> None:
         raise QualificationError("STOP_SOURCE_CONFLICT: exact reviewed Stage-B candidate is not pinned")
     if not _git_is_ancestor(root, reviewed_candidate, head):
         raise QualificationError("STOP_SOURCE_CONFLICT: exact reviewed Stage-B candidate is not canonical")
+
+    origin_url = _git(root, "remote", "get-url", "origin").strip().rstrip("/")
+    if origin_url.endswith(".git"):
+        origin_url = origin_url[:-4]
+    if origin_url.startswith("git@github.com:"):
+        origin_url = "https://github.com/" + origin_url[len("git@github.com:"):]
+    elif origin_url.startswith("ssh://git@github.com/"):
+        origin_url = "https://github.com/" + origin_url[len("ssh://git@github.com/"):]
+    if origin_url.lower() != "https://github.com/ciphercuttle/qntylab":
+        raise QualificationError(
+            "STOP_SOURCE_CONFLICT: origin does not identify canonical GitHub repository CipherCuttle/QntyLab"
+        )
 
 def _write_receipt(path: Path, value: Mapping[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)

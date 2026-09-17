@@ -297,6 +297,8 @@ def test_canonical_authority_accepts_clean_exact_origin_master_with_required_bas
             return ""
         if args in (("rev-parse", "HEAD"), ("rev-parse", "origin/master")):
             return "a" * 40
+        if args == ("remote", "get-url", "origin"):
+            return "git@github.com:CipherCuttle/QntyLab.git"
         raise AssertionError(args)
 
     monkeypatch.setattr(qualifier, "_git", fake_git)
@@ -397,3 +399,73 @@ def test_canonical_authority_rejects_reviewed_candidate_not_in_canonical_history
     with pytest.raises(qualifier.QualificationError, match="reviewed Stage-B candidate is not canonical"):
         qualifier.assert_canonical_stage_b_authority(tmp_path)
     assert calls == [required_base, reviewed]
+
+def test_full_dev_coverage_detects_silent_truncation_in_later_chunk():
+    class LateTruncationRpc(FakeRpc):
+        extra_sync_block = 50
+
+        def _sync_at(self, number):
+            value = dict(self._sync())
+            value["blockNumber"] = hex(number)
+            value["blockHash"] = block_hash(number)
+            value["transactionHash"] = "0x" + f"{number:064x}"
+            return value
+
+        def __call__(self, method, params):
+            if method != "eth_getLogs":
+                return super().__call__(method, params)
+            self.log_calls += 1
+            start = int(params[0]["fromBlock"], 16)
+            end = int(params[0]["toBlock"], 16)
+            self.log_ranges.append((start, end))
+            # With probe_span=16, 36..51 is the second full DEV coverage chunk.
+            # Simulate a provider that silently drops its log only on that whole
+            # request while the adjacent half request still reveals block 50.
+            if (start, end) == (36, 51):
+                return []
+            logs = []
+            for number in (self.sync_block, self.extra_sync_block):
+                if start <= number <= end:
+                    logs.append(self._sync_at(number))
+            return logs
+
+    with pytest.raises(qualifier.QualificationError, match="DEV chunk whole-range logs disagree"):
+        qualifier.qualify_source(LateTruncationRpc(), provider_id="late-truncation", probe_span=16)
+
+
+def test_canonical_authority_rejects_noncanonical_origin(tmp_path: Path, monkeypatch):
+    projects = tmp_path / "docs/state"
+    projects.mkdir(parents=True)
+    required_base = "e" * 40
+    reviewed = "c" * 40
+    (projects / "projects.toml").write_text(
+        "schema_version = 1\n"
+        "[[project]]\n"
+        f'project_id = "{qualifier.PREDECESSOR_ID}"\n'
+        'state = "CLOSED_PASS"\n'
+        'implementation_authorized = false\n'
+        "[[project]]\n"
+        f'project_id = "{qualifier.PROJECT_ID}"\n'
+        'state = "ACTIVE_RESEARCH"\n'
+        'implementation_authorized = true\n'
+        f'required_base_sha = "{required_base}"\n'
+        f'reviewed_candidate_sha = "{reviewed}"\n',
+        encoding="utf-8",
+    )
+
+    def fake_git(root, *args):
+        if args == ("branch", "--show-current"):
+            return "master"
+        if args == ("status", "--porcelain"):
+            return ""
+        if args in (("rev-parse", "HEAD"), ("rev-parse", "origin/master")):
+            return "a" * 40
+        if args == ("remote", "get-url", "origin"):
+            return "https://github.com/attacker/QntyLab.git"
+        raise AssertionError(args)
+
+    monkeypatch.setattr(qualifier, "_git", fake_git)
+    monkeypatch.setattr(qualifier, "_git_fetch_origin_master", lambda root: None)
+    monkeypatch.setattr(qualifier, "_git_is_ancestor", lambda root, ancestor, descendant: True)
+    with pytest.raises(qualifier.QualificationError, match="canonical GitHub repository"):
+        qualifier.assert_canonical_stage_b_authority(tmp_path)

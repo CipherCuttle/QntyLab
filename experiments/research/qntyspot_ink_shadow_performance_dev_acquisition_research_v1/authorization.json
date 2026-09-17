@@ -19,7 +19,8 @@
     "runtime_refresh_origin_master_before_check": true,
     "runtime_head_must_equal_refreshed_origin_master": true,
     "runtime_required_base_must_be_ancestor": true,
-    "runtime_exact_reviewed_candidate_must_be_ancestor": true
+    "runtime_exact_reviewed_candidate_must_be_ancestor": true,
+    "runtime_origin_repository_must_match": "CipherCuttle/QntyLab"
   },
   "predecessor_contract": {
     "project_id": "QNTYSPOT_INK_SHADOW_PERFORMANCE_RESEARCH_V1",
@@ -96,7 +97,9 @@
       "the complete DEV block interval is covered in bounded non-overlapping log-query chunks",
       "the receipt transaction hash and block hash agree with the probed log and canonical block metadata",
       "cross-provider material comparison includes T0, DEV_END, probe receipt, and complete DEV log-identity digest",
-      "the DEV-eligible receipt is successful and exposes gasUsed and effectiveGasPrice required by the frozen gas rule"
+      "the DEV-eligible receipt is successful and exposes gasUsed and effectiveGasPrice required by the frozen gas rule",
+      "runtime origin must identify canonical GitHub repository CipherCuttle/QntyLab before network authority",
+      "every bounded DEV coverage chunk is repeated deterministically and equals the union of adjacent half-range requests"
     ],
     "raw_economic_log_values_may_be_decoded_during_qualification": false,
     "qualification_receipt_may_serialize_raw_log_data": false,
@@ -111,7 +114,8 @@
     "receipt_gas_fields_required": [
       "gasUsed",
       "effectiveGasPrice"
-    ]
+    ],
+    "full_dev_chunk_integrity_validation": "REPEAT_PLUS_WHOLE_EQUALS_SPLIT_EACH_CHUNK"
   },
   "dev_acquisition_contract": {
     "enabled_only_after_source_qualification_pass": true,

@@ -20,6 +20,7 @@ class FakeRpc:
         self.nondeterministic = nondeterministic
         self.truncate_whole = truncate_whole
         self.log_calls = 0
+        self.whole_log_range = None
         self.cutoff = qualifier._cutoff_timestamp()
 
     def _block(self, number: int):
@@ -69,11 +70,13 @@ class FakeRpc:
             start = int(params[0]["fromBlock"], 16)
             end = int(params[0]["toBlock"], 16)
             contains = start <= 98 <= end
+            if self.whole_log_range is None:
+                self.whole_log_range = (start, end)
             if self.nondeterministic and self.log_calls == 2:
                 return []
-            # The synthetic chain only has blocks 0..100, so the effective
-            # whole probe is 100 blocks while each half is 50 blocks.
-            if self.truncate_whole and (end - start + 1) > 50:
+            # Simulate a provider that silently truncates the repeated whole-range
+            # request while correctly serving the smaller split ranges.
+            if self.truncate_whole and (start, end) == self.whole_log_range:
                 return []
             return [self._sync()] if contains else []
         if method == "eth_getTransactionReceipt":

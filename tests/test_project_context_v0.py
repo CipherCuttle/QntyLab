@@ -180,7 +180,7 @@ def test_dsh_stage_a_v1_execution_closure_is_single_bounded_blocked_project() ->
     assert v0r3["state"] == "CLOSED_BLOCKED"
     assert data["active_project"]["project_id"] == ORDER_FLOW_V1_ACTIVATION_PROJECT_ID
     assert data["active_project"]["activation_effective_on_branch"] is False
-    assert data["current_permitted_next_action"].startswith("IMPLEMENT_AND_VERIFY_ONLY:")
+    assert data["current_permitted_next_action"].startswith("COLLECTION_RUNNING:")
     assert execution["state"] == "CLOSED_BLOCKED"
     assert execution["implementation_authorized"] is False
     assert execution["implementation_completed"] is True
@@ -234,7 +234,7 @@ def test_dsh_stage_a_v1r1_offline_qualification_is_closed_without_live_authority
     assert receipt["spend_usd"] == 0.0
     assert data["active_project"]["project_id"] == ORDER_FLOW_V1_ACTIVATION_PROJECT_ID
     assert data["active_project"]["activation_effective_on_branch"] is False
-    assert data["current_permitted_next_action"].startswith("IMPLEMENT_AND_VERIFY_ONLY:")
+    assert data["current_permitted_next_action"].startswith("COLLECTION_RUNNING:")
 
 
 def test_project_supersession_targets_self_and_cycles_fail(tmp_path: Path) -> None:
@@ -340,7 +340,7 @@ def test_funding_incremental_implementation_freeze_is_closed_without_escalation(
         _assert_project_is_not_current_active(data, closed_episode_id)
     assert data["active_project"]["project_id"] == ORDER_FLOW_V1_ACTIVATION_PROJECT_ID
     assert data["active_project"]["activation_effective_on_branch"] is False
-    assert data["current_permitted_next_action"].startswith("IMPLEMENT_AND_VERIFY_ONLY:")
+    assert data["current_permitted_next_action"].startswith("COLLECTION_RUNNING:")
     _assert_project_is_not_active(registry, FUNDING_INCREMENTAL_IMPLEMENTATION_PROJECT_ID)
     _assert_project_is_not_current_active(data, FUNDING_INCREMENTAL_IMPLEMENTATION_PROJECT_ID)
     project = next(

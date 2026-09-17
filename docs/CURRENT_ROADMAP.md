@@ -4,7 +4,7 @@ This is a deterministic projection of `docs/state/projects.toml`; it is not an i
 
 ## Active
 
-- `Order Flow Prospective V1 local activation implementation` — `ACTIVE`. IMPLEMENT_AND_VERIFY_ONLY: finish the bounded activation candidate without live provider access on the branch. After exact canonical merge, install matching local user units from a clean dedicated operational worktree at origin/master; only then begin frozen prospective collection. No backfill or interim evaluation.
+- `Order Flow Prospective V1 local activation implementation` — `ACTIVE`. COLLECTION_RUNNING: canonical Order Flow Prospective V1 collection is active on the trusted Hetzner host. Preserve the frozen source/symbol/model/window contract, no-backfill and source-substitution prohibitions, immutable evidence chain, and interim-evaluation prohibition. Operational health monitoring only; do not inspect scientific outcomes. Any terminal evaluation after the frozen campaign tail requires separate Git-backed authorization.
 
 ## Queued — not authorized
 

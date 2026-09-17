@@ -1,0 +1,149 @@
+name: QntySpot Stage A One-Shot Registry Patch
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches: [master]
+
+permissions:
+  contents: write
+
+jobs:
+  patch-stage-a-state:
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.head_ref == 'research/qntyspot-shadow-performance-reauthorization-v1'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Append active research registry row and patch current-state expectation
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          registry = Path('docs/state/projects.toml')
+          project_id = 'QNTYSPOT_INK_SHADOW_PERFORMANCE_RESEARCH_V1'
+          text = registry.read_text(encoding='utf-8')
+          if f'project_id = "{project_id}"' in text:
+              raise SystemExit(f'{project_id} already exists; refusing duplicate append')
+          block = r'''
+          [[project]]
+          project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_RESEARCH_V1"
+          display_name = "QntySpot Ink shadow performance research V1"
+          state = "ACTIVE_RESEARCH"
+          authority_level = "BOUNDED_PARALLEL_RESEARCH_REAUTHORIZATION"
+          phase_type = "GOVERNANCE_ONLY"
+          authoritative_artifacts = [
+            "docs/state/projects.toml",
+            "docs/CURRENT_ROADMAP.md",
+            "qntylab/qntyspot_ink_shadow_performance_prereg_v0.py",
+            "experiments/research/qntyspot_ink_shadow_performance_v0/preregistration.json",
+            "experiments/research/qntyspot_ink_shadow_performance_dev_acquisition_activation_v0/activation.json",
+            "experiments/research/qntyspot_ink_shadow_performance_research_v1/authorization.json",
+            "tests/test_qntyspot_ink_shadow_performance_research_v1.py",
+          ]
+          required_base_sha = "67fc6f003875c5228333fd28511cc7ff76af0427"
+          historical_preregistration_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_V0_PREREGISTRATION"
+          historical_preregistration_digest = "27ce60c68133f40d9496df1db6009de07957ed8a9bd68b0715cc6c54fe05d18a"
+          historical_preregistration_status = "PREREGISTERED_NOT_EXECUTED"
+          historical_activation_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_ACTIVATION_V0"
+          historical_dev_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_V0"
+          historical_project_row_revived = false
+          qntyspot_source_commit = "b9a84c59bd43e7697ee970d2a7571647e5de4501"
+          historical_data_cutoff_utc = "2026-08-25T17:02:37Z"
+          ink_chain_id = 57073
+          inkyswap_v2_pool = "0xed11ed4b195e84ba9b74c4d6ce13b7a43b354264"
+          candidate_count = 12
+          dev_percentage = "60%"
+          outer_percentage = "40%"
+          dev_end_formula = "T0 + floor(0.60 * (T1 - T0))"
+          outer_initial_access = "INACCESSIBLE"
+          outer_evaluation_limit = 1
+          scientific_design_mutation = false
+          future_dev_acquisition_effective_only_after_exact_canonical_merge = true
+          candidate_evaluation_requires_separate_git_backed_authorization = true
+          outer_evaluation_requires_separate_git_backed_authorization = true
+          execution_authority_projection_must_ignore_active_research = true
+          order_flow_parallel_isolation = true
+          implementation_authorized = true
+          implementation_completed = false
+          scientific_execution_authorized = false
+          market_data_access_authorized = false
+          research_ledger_mutation_authorized = false
+          qntyspot_repository_mutation_authorized = false
+          market_network_count = 0
+          market_data_acquisition_count = 0
+          historical_outcome_read_count = 0
+          backtest_count = 0
+          strategy_test_count = 0
+          outer_evaluation_count = 0
+          research_ledger_state_changed = false
+          qntyspot_changed = false
+          order_flow_changed = false
+          hetzner_touched = false
+          qntyspot_execution_authority = "NONE"
+          trading_authority = "NONE"
+          capital_authority = "NONE"
+          signing_authority = "NONE"
+          approval_authority = "NONE"
+          broadcast_authority = "NONE"
+          promotion_authority = "NONE"
+          hostile_review_required = true
+          hostile_review_count = 0
+          targeted_rereview_used = false
+          merge_authority = "NONE"
+          next_action = "STAGE_A_ACTIVE_RESEARCH: finish this governance-only reauthorization and canonicalize it. Before exact canonical merge: no market-data/economic access. After exact canonical merge: Stage B may qualify sources and acquire DEV-only evidence under the frozen firewall. Candidate evaluation, OUTER access, QntySpot mutation, trading, signing, broadcast, and capital remain unauthorized."
+          '''.strip() + '\n'
+          if not text.endswith('\n'):
+              text += '\n'
+          registry.write_text(text + '\n' + block, encoding='utf-8')
+
+          test_path = Path('tests/test_project_context_v0.py')
+          test_text = test_path.read_text(encoding='utf-8')
+          replacements = {
+              '    assert "- Active research project: `none`." in text':
+                  '    assert "- Active research project: `QNTYSPOT_INK_SHADOW_PERFORMANCE_RESEARCH_V1`." in text',
+              '    assert "- Permitted research action: No exploratory research implementation is currently authorized." in text':
+                  '    assert "- Permitted research action: STAGE_A_ACTIVE_RESEARCH: finish this governance-only reauthorization and canonicalize it. Before exact canonical merge: no market-data/economic access. After exact canonical merge: Stage B may qualify sources and acquire DEV-only evidence under the frozen firewall. Candidate evaluation, OUTER access, QntySpot mutation, trading, signing, broadcast, and capital remain unauthorized." in text',
+          }
+          for old, new in replacements.items():
+              if test_text.count(old) != 1:
+                  raise SystemExit(f'expected exactly one test replacement target: {old}')
+              test_text = test_text.replace(old, new)
+          test_path.write_text(test_text, encoding='utf-8')
+          PY
+
+      - name: Render canonical roadmap from registry
+        run: python -m qntylab.project_context render
+
+      - name: Install verification dependencies
+        run: python -m pip install pytest requests
+
+      - name: Verify Stage A state before commit
+        run: |
+          python -m qntylab.project_context doctor --strict
+          python -m qntylab.project_context render --check
+          python -m qntylab.project_context brief > /dev/null
+          python -m qntylab.research_ledger doctor
+          python -m pytest -q tests/test_qntyspot_ink_shadow_performance_research_v1.py tests/test_project_context_v0.py
+          git diff --check
+          test -z "$(git diff --name-only -- qntylab/order_flow_prospective_v1_source.py qntylab/order_flow_prospective_v1_recorder.py qntylab/order_flow_prospective_v1_operation.py)"
+
+      - name: Remove one-shot helper and commit only bounded state changes
+        run: |
+          git rm .github/workflows/qntyspot-stage-a-registry-patch.yml
+          git add docs/state/projects.toml docs/CURRENT_ROADMAP.md tests/test_project_context_v0.py
+          git diff --cached --check
+          git config user.name "qntylab-stage-a-bot"
+          git config user.email "qntylab-stage-a-bot@users.noreply.github.com"
+          git commit -m "Register QntySpot active research lane"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}

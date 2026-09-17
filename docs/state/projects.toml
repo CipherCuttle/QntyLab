@@ -10709,7 +10709,7 @@ authoritative_artifacts = [
   "tests/test_qntyspot_ink_source_qualification_v1.py",
 ]
 required_base_sha = "ea2dd02964c2e91196bb153a212ec0f8aae50b42"
-reviewed_candidate_sha = "3668d8f93481492b8e209f8fd6996fd3b558eb63"
+reviewed_candidate_sha = "2649ba0606e432974971f99f1fa347c569e1454c"
 parent_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_RESEARCH_V1"
 preregistration_digest = "27ce60c68133f40d9496df1db6009de07957ed8a9bd68b0715cc6c54fe05d18a"
 qntyspot_source_commit = "b9a84c59bd43e7697ee970d2a7571647e5de4501"

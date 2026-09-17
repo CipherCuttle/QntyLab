@@ -20,7 +20,8 @@
     "runtime_head_must_equal_refreshed_origin_master": true,
     "runtime_required_base_must_be_ancestor": true,
     "runtime_exact_reviewed_candidate_must_be_ancestor": true,
-    "runtime_origin_repository_must_match": "CipherCuttle/QntyLab"
+    "runtime_origin_repository_must_match": "CipherCuttle/QntyLab",
+    "reviewed_candidate_sha": "3668d8f93481492b8e209f8fd6996fd3b558eb63"
   },
   "predecessor_contract": {
     "project_id": "QNTYSPOT_INK_SHADOW_PERFORMANCE_RESEARCH_V1",
@@ -201,9 +202,20 @@
     "stage_d": "OUTER release/evaluation requires separate Git-backed authorization after one frozen winner and digest exist."
   },
   "review_policy": {
-    "exactly_one_independent_hostile_review_required": true,
-    "critical_high_fix_pass_limit": 1,
-    "targeted_rereview_only_if_critical_or_high_repaired": true,
+    "independent_hostile_review_requirement_originally_declared": true,
+    "owner_authorized_same_chat_substitution": true,
+    "review_mode": "OWNER_AUTHORIZED_SAME_CHAT_HOSTILE_REVIEW_SUBSTITUTE",
+    "reviewer_independence_claimed": false,
+    "hostile_review_count": 1,
+    "initial_critical_total": 0,
+    "initial_high_total": 5,
+    "repaired_candidate_sha": "3668d8f93481492b8e209f8fd6996fd3b558eb63",
+    "targeted_rereview_used": true,
+    "targeted_rereview_count": 1,
+    "targeted_rereview_scope": "H1_H5_REPAIR_SURFACE_AND_REVIEWED_CANDIDATE_PIN",
+    "targeted_rereview_verdict": "PASS_NO_CRITICAL_HIGH",
+    "targeted_rereview_new_critical_total": 0,
+    "targeted_rereview_new_high_total": 0,
     "merge_authority": "NONE"
   },
   "next_action": "Canonicalize Stage B without network execution. After exact canonical merge, run outcome-blind source qualification with the DEV_END request firewall. Only a qualification PASS may unlock DEV-only acquisition; candidate evaluation, OUTER access, QntySpot mutation, Order Flow mutation, Hetzner access, trading, signing, broadcast, and capital remain unauthorized."

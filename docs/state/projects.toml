@@ -10709,6 +10709,7 @@ authoritative_artifacts = [
   "tests/test_qntyspot_ink_source_qualification_v1.py",
 ]
 required_base_sha = "ea2dd02964c2e91196bb153a212ec0f8aae50b42"
+reviewed_candidate_sha = "3668d8f93481492b8e209f8fd6996fd3b558eb63"
 parent_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_RESEARCH_V1"
 preregistration_digest = "27ce60c68133f40d9496df1db6009de07957ed8a9bd68b0715cc6c54fe05d18a"
 qntyspot_source_commit = "b9a84c59bd43e7697ee970d2a7571647e5de4501"
@@ -10752,7 +10753,17 @@ approval_authority = "NONE"
 broadcast_authority = "NONE"
 promotion_authority = "NONE"
 hostile_review_required = true
-hostile_review_count = 0
-targeted_rereview_used = false
+hostile_review_count = 1
+hostile_review_mode = "OWNER_AUTHORIZED_SAME_CHAT_HOSTILE_REVIEW_SUBSTITUTE"
+hostile_review_independence_claimed = false
+hostile_review_initial_critical_total = 0
+hostile_review_initial_high_total = 5
+hostile_review_repaired_candidate_sha = "3668d8f93481492b8e209f8fd6996fd3b558eb63"
+targeted_rereview_used = true
+targeted_rereview_count = 1
+targeted_rereview_scope = "H1_H5_REPAIR_SURFACE_AND_REVIEWED_CANDIDATE_PIN"
+targeted_rereview_verdict = "PASS_NO_CRITICAL_HIGH"
+targeted_rereview_new_critical_total = 0
+targeted_rereview_new_high_total = 0
 merge_authority = "NONE"
 next_action = "STAGE_B_CANONICALIZATION_CANDIDATE: no market-network execution is effective on this branch. After exact canonical merge, run outcome-blind source qualification. Only a qualification PASS may unlock DEV-only acquisition; candidate evaluation, OUTER access, QntySpot mutation, Order Flow mutation, Hetzner access, trading, signing, broadcast, and capital remain unauthorized."

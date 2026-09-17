@@ -1,0 +1,169 @@
+{
+  "artifact_type": "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_RESEARCH_AUTHORIZATION",
+  "schema_version": "qntyspot-ink-shadow-performance-dev-acquisition-research-v1",
+  "project_id": "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_RESEARCH_V1",
+  "parent_project_id": "QNTYSPOT_INK_SHADOW_PERFORMANCE_RESEARCH_V1",
+  "phase": "STAGE_B_SOURCE_QUALIFICATION_AND_DEV_ACQUISITION",
+  "state": "ACTIVE_RESEARCH",
+  "phase_type": "DEV_DATA_ACQUISITION",
+  "authority_level": "BOUNDED_DEV_SOURCE_QUALIFICATION_AND_ACQUISITION",
+  "canonicalization": {
+    "repository": "CipherCuttle/QntyLab",
+    "required_base_sha": "ea2dd02964c2e91196bb153a212ec0f8aae50b42",
+    "required_branch": "research/qntyspot-shadow-performance-dev-acquisition-v1",
+    "candidate_branch_is_authority": false,
+    "effective_only_after_exact_canonical_merge": true,
+    "canonical_drift_behavior": "STOP_SOURCE_CONFLICT"
+  },
+  "predecessor_contract": {
+    "project_id": "QNTYSPOT_INK_SHADOW_PERFORMANCE_RESEARCH_V1",
+    "required_terminal_state": "CLOSED_PASS",
+    "historical_authorization_path": "experiments/research/qntyspot_ink_shadow_performance_research_v1/authorization.json",
+    "historical_authorization_remains_immutable": true,
+    "historical_dev_activation_path": "experiments/research/qntyspot_ink_shadow_performance_dev_acquisition_activation_v0/activation.json",
+    "historical_dev_activation_is_template_only": true,
+    "historical_dev_project_revived": false
+  },
+  "parallel_lane_contract": {
+    "ordinary_active_project": "QNTY_EDGE_ORDER_FLOW_PROSPECTIVE_V1_ACTIVATION",
+    "ordinary_active_state_must_remain": "ACTIVE",
+    "active_research_project": "QNTYSPOT_INK_SHADOW_PERFORMANCE_DEV_ACQUISITION_RESEARCH_V1",
+    "active_research_state": "ACTIVE_RESEARCH",
+    "execution_authority_projection_must_ignore_active_research": true,
+    "order_flow_contract_mutation_authorized": false,
+    "order_flow_runtime_access_authorized": false,
+    "hetzner_access_authorized": false
+  },
+  "frozen_scientific_binding": {
+    "preregistration_path": "experiments/research/qntyspot_ink_shadow_performance_v0/preregistration.json",
+    "preregistration_digest": "27ce60c68133f40d9496df1db6009de07957ed8a9bd68b0715cc6c54fe05d18a",
+    "qntyspot_source_commit": "b9a84c59bd43e7697ee970d2a7571647e5de4501",
+    "historical_cutoff_utc": "2026-08-25T17:02:37Z",
+    "ink_chain_id": 57073,
+    "base_token": {
+      "symbol": "KRAKMASK",
+      "address": "0x32bcb803f696c99eb263d60a05cafd8689026575"
+    },
+    "quote_token": {
+      "symbol": "WETH9",
+      "address": "0x4200000000000000000000000000000000000006"
+    },
+    "inkyswap_v2_factory": "0x458c5d5b75ccba22651d2c5b61cb1ea1e0b0f95d",
+    "inkyswap_v2_pool": "0xed11ed4b195e84ba9b74c4d6ce13b7a43b354264",
+    "candidate_count": 12,
+    "dev_end_formula": "T0 + floor(0.60 * (T1 - T0))",
+    "dev_interval": "[T0, DEV_END]",
+    "outer_interval": "(DEV_END, T1]",
+    "scientific_design_mutation": false
+  },
+  "source_qualification_contract": {
+    "network_execution_effective_only_after_exact_canonical_merge": true,
+    "outcome_blind": true,
+    "provider_choice_basis": "technical capability and integrity only; never observed performance",
+    "required_checks": [
+      "chain ID equals 57073",
+      "pool bytecode exists",
+      "factory bytecode exists",
+      "pool token0/token1 are exactly KRAKMASK and WETH9 in either order",
+      "pool factory equals the frozen InkySwap V2 factory",
+      "historical block at T1 is retrievable",
+      "pool Sync log retrieval works on a bounded historical probe",
+      "repeated historical requests are deterministic",
+      "whole-range logs equal the union of adjacent half-range logs",
+      "at least one DEV-eligible pool transaction receipt is retrievable before acquisition"
+    ],
+    "raw_economic_log_values_may_be_decoded_during_qualification": false,
+    "qualification_receipt_may_serialize_raw_log_data": false,
+    "cross_provider_material_disagreement": "STOP_SOURCE_CONFLICT",
+    "reorg_or_canonical_block_ambiguity": "STOP_SOURCE_CONFLICT",
+    "silent_truncation_or_nondeterminism": "STOP_SOURCE_CONFLICT"
+  },
+  "dev_acquisition_contract": {
+    "enabled_only_after_source_qualification_pass": true,
+    "allowed_operations": [
+      "VERIFY_CHAIN_POOL_SOURCE_IDENTITY",
+      "VERIFY_HISTORICAL_DATA_AVAILABILITY",
+      "ESTABLISH_T0_OUTCOME_BLIND",
+      "COMPUTE_DEV_END_MECHANICALLY",
+      "ACQUIRE_DEV_EVIDENCE_ONLY",
+      "ACQUIRE_PREREGISTERED_DEV_GAS_EVIDENCE",
+      "BUILD_IMMUTABLE_DEV_MANIFEST"
+    ],
+    "forbidden_operations": [
+      "ACQUIRE_OUTER_DELIBERATELY",
+      "INSPECT_OUTER_ECONOMIC_VALUES",
+      "EVALUATE_CANDIDATES",
+      "SELECT_CANDIDATE",
+      "FREEZE_WINNER",
+      "OUTER_EVALUATION",
+      "FINAL_PERFORMANCE_CLASSIFICATION",
+      "TRADING",
+      "CAPITAL",
+      "SIGNING",
+      "APPROVAL",
+      "BROADCAST",
+      "PROMOTION"
+    ],
+    "unavoidable_provider_overfetch": "discard records with timestamp > DEV_END before decoding economic payloads; record only discarded count",
+    "performance_metrics_allowed": false
+  },
+  "outer_firewall": {
+    "initial_access": "INACCESSIBLE",
+    "deliberate_outer_request_authorized": false,
+    "outer_economic_value_inspection_authorized": false,
+    "outer_serialization_authorized": false,
+    "outer_evaluation_authorized": false,
+    "outer_evaluation_count": 0,
+    "release_requires_separate_git_backed_authorization": true
+  },
+  "research_ledger_contract": {
+    "preflight_command": "python -m qntylab.research_ledger context",
+    "mutation_authorized": false,
+    "candidate_evaluation_authorized": false,
+    "lower_level_evaluator_bypass_authorized": false
+  },
+  "implementation_contract": {
+    "source_qualification_module": "qntylab/qntyspot_ink_source_qualification_v1.py",
+    "real_network_execution_in_this_candidate_pr": false,
+    "source_qualification_receipt_present": false,
+    "dev_dataset_present": false,
+    "dev_manifest_present": false,
+    "candidate_results_present": false
+  },
+  "authority_and_receipts": {
+    "implementation_authorized": true,
+    "implementation_completed": false,
+    "source_qualification_authorized_after_canonical_merge": true,
+    "market_data_access_authorized_after_canonical_merge": true,
+    "market_network_count": 0,
+    "market_data_acquisition_count": 0,
+    "historical_outcome_read_count": 0,
+    "backtest_count": 0,
+    "strategy_test_count": 0,
+    "outer_evaluation_count": 0,
+    "research_ledger_state_changed": false,
+    "qntyspot_changed": false,
+    "order_flow_changed": false,
+    "hetzner_touched": false,
+    "qntyspot_execution_authority": "NONE",
+    "trading_authority": "NONE",
+    "capital_authority": "NONE",
+    "signing_authority": "NONE",
+    "approval_authority": "NONE",
+    "broadcast_authority": "NONE",
+    "promotion_authority": "NONE"
+  },
+  "future_transition_contract": {
+    "source_qualification_pass": "May proceed to DEV-only acquisition under this already-canonical Stage-B authority without candidate evaluation.",
+    "source_qualification_fail": "STOP_SOURCE_CONFLICT; do not acquire DEV economic evidence until a separately reviewed repair is canonical.",
+    "stage_c": "Candidate evaluation requires separate Git-backed authorization after an immutable DEV manifest exists.",
+    "stage_d": "OUTER release/evaluation requires separate Git-backed authorization after one frozen winner and digest exist."
+  },
+  "review_policy": {
+    "exactly_one_independent_hostile_review_required": true,
+    "critical_high_fix_pass_limit": 1,
+    "targeted_rereview_only_if_critical_or_high_repaired": true,
+    "merge_authority": "NONE"
+  },
+  "next_action": "Canonicalize Stage B without network execution. After exact canonical merge, run outcome-blind source qualification. Only a qualification PASS may unlock DEV-only acquisition; candidate evaluation, OUTER access, QntySpot mutation, Order Flow mutation, Hetzner access, trading, signing, broadcast, and capital remain unauthorized."
+}

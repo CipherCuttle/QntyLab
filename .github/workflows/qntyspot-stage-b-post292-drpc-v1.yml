@@ -1,0 +1,59 @@
+name: QntySpot Stage B post-292 dRPC
+
+on:
+  push:
+    branches:
+      - ops/qntyspot-stage-b-post292-drpc-v1
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - name: Checkout canonical master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          clean: true
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify exact post-292 canonical runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git branch --show-current)" = "master"
+          test -z "$(git status --porcelain)"
+          git fetch --quiet origin master
+          test "$(git rev-parse HEAD)" = "fb8018051741fa3726b8a54b11d07cbb01079607"
+          test "$(git rev-parse origin/master)" = "fb8018051741fa3726b8a54b11d07cbb01079607"
+          git merge-base --is-ancestor 6cfdfe49bdbc9a8577191978c8a75f5584ca9ed8 HEAD
+
+      - name: Qualify ink-official-listed-drpc-public
+        env:
+          QNTYSPOT_INK_RPC_URL: https://ink.drpc.org
+        shell: bash
+        run: |
+          set -euo pipefail
+          python qntylab/qntyspot_ink_source_qualification_v1.py \
+            --provider-id ink-official-listed-drpc-public \
+            --probe-span 10000 \
+            --coverage-workers 2 \
+            --block-attestation-workers 2 \
+            --output receipt.json
+          cat receipt.json
+
+      - name: Upload receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: qntyspot-stage-b-post292-drpc-v1-receipt
+          path: receipt.json
+          if-no-files-found: error
+          retention-days: 30

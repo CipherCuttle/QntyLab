@@ -657,3 +657,175 @@ def test_json_rpc_client_does_not_retry_non_429_http_errors(monkeypatch):
         qualifier.JsonRpcClient("https://rpc.example").call("eth_chainId", [])
     assert attempts == 1
     assert sleeps == []
+
+
+def test_parallel_block_attestation_fetches_unique_headers_concurrently_and_caches():
+    class HeaderRpc:
+        def __init__(self):
+            self.lock = threading.Lock()
+            self.active = 0
+            self.max_active = 0
+            self.block_calls = []
+
+        def __call__(self, method, params):
+            if method == "eth_getLogs":
+                start = int(params[0]["fromBlock"], 16)
+                end = int(params[0]["toBlock"], 16)
+                rows = []
+                for number in range(start, end + 1):
+                    rows.append({
+                        "address": qualifier.POOL,
+                        "blockNumber": hex(number),
+                        "blockHash": block_hash(number),
+                        "transactionHash": "0x" + f"{number:064x}",
+                        "transactionIndex": "0x0",
+                        "logIndex": "0x0",
+                        "removed": False,
+                        "topics": [qualifier.SYNC_TOPIC],
+                        "data": "0x",
+                    })
+                return rows
+            if method == "eth_getBlockByNumber":
+                number = int(params[0], 16)
+                with self.lock:
+                    self.active += 1
+                    self.max_active = max(self.max_active, self.active)
+                    self.block_calls.append(number)
+                time.sleep(0.01)
+                with self.lock:
+                    self.active -= 1
+                return {
+                    "number": hex(number),
+                    "hash": block_hash(number),
+                    "timestamp": "0x1",
+                }
+            raise AssertionError(method)
+
+    rpc = HeaderRpc()
+    cache = {}
+    first = qualifier._sync_logs(
+        rpc, 10, 13, cache, block_attestation_workers=4
+    )
+    assert len(first) == 4
+    assert sorted(rpc.block_calls) == [10, 11, 12, 13]
+    assert rpc.max_active >= 2
+
+    second = qualifier._sync_logs(
+        rpc, 10, 13, cache, block_attestation_workers=4
+    )
+    assert len(second) == 4
+    assert sorted(rpc.block_calls) == [10, 11, 12, 13]
+
+
+def test_parallel_block_attestation_still_rejects_stale_log_hash():
+    class StaleHeaderRpc:
+        def __call__(self, method, params):
+            if method == "eth_getLogs":
+                return [
+                    {
+                        "address": qualifier.POOL,
+                        "blockNumber": "0xa",
+                        "blockHash": block_hash(11),
+                        "transactionHash": "0x" + ("ab" * 32),
+                        "transactionIndex": "0x0",
+                        "logIndex": "0x0",
+                        "removed": False,
+                        "topics": [qualifier.SYNC_TOPIC],
+                        "data": "0x",
+                    }
+                ]
+            if method == "eth_getBlockByNumber":
+                return {
+                    "number": "0xa",
+                    "hash": block_hash(10),
+                    "timestamp": "0x1",
+                }
+            raise AssertionError(method)
+
+    with pytest.raises(qualifier.QualificationError, match="canonical block metadata"):
+        qualifier._sync_logs(
+            StaleHeaderRpc(), 10, 10, {}, block_attestation_workers=4
+        )
+
+
+def test_parallel_block_attestation_preserves_material_identity():
+    serial = qualifier.qualify_source(
+        FakeRpc(),
+        provider_id="serial-block-attestation",
+        probe_span=16,
+        coverage_workers=2,
+        block_attestation_workers=1,
+    )
+    parallel = qualifier.qualify_source(
+        FakeRpc(),
+        provider_id="parallel-block-attestation",
+        probe_span=16,
+        coverage_workers=2,
+        block_attestation_workers=4,
+    )
+    assert qualifier.material_identity(serial) == qualifier.material_identity(parallel)
+    assert serial["dev_log_coverage"]["block_attestation_worker_count"] == 1
+    assert parallel["dev_log_coverage"]["block_attestation_worker_count"] == 4
+
+
+def test_invalid_block_attestation_worker_count_fails_before_network_use():
+    rpc = FakeRpc()
+    with pytest.raises(qualifier.QualificationError, match="block attestation workers"):
+        qualifier.qualify_source(
+            rpc,
+            provider_id="block-workers-zero",
+            block_attestation_workers=0,
+        )
+    assert rpc.log_calls == 0
+
+
+def test_timestamp_lookup_steps_back_from_unretrievable_advertised_head():
+    class HeadSkewRpc(FakeRpc):
+        def __call__(self, method, params):
+            if method == "eth_blockNumber":
+                return hex(100)
+            if method == "eth_getBlockByNumber" and int(params[0], 16) == 100:
+                return None
+            return super().__call__(method, params)
+
+    block = qualifier.find_block_at_or_before_timestamp(
+        HeadSkewRpc(), qualifier._cutoff_timestamp()
+    )
+    assert qualifier._hex_int(block["number"]) == 99
+    assert qualifier._hex_int(block["timestamp"]) == qualifier._cutoff_timestamp()
+
+
+def test_timestamp_lookup_fails_when_advertised_head_gap_exceeds_bound(monkeypatch):
+    class MissingHeadRpc(FakeRpc):
+        def __call__(self, method, params):
+            if method == "eth_blockNumber":
+                return hex(100)
+            if method == "eth_getBlockByNumber":
+                number = int(params[0], 16)
+                if number >= 98:
+                    return None
+            return super().__call__(method, params)
+
+    monkeypatch.setattr(qualifier, "MAX_HEAD_LOOKBACK_BLOCKS", 1)
+    with pytest.raises(
+        qualifier.QualificationError,
+        match="unavailable within bounded metadata lookback",
+    ):
+        qualifier.find_block_at_or_before_timestamp(
+            MissingHeadRpc(), qualifier._cutoff_timestamp()
+        )
+
+
+def test_timestamp_lookup_does_not_hide_malformed_non_null_head():
+    class MalformedHeadRpc(FakeRpc):
+        def __call__(self, method, params):
+            if method == "eth_blockNumber":
+                return hex(100)
+            if method == "eth_getBlockByNumber" and int(params[0], 16) == 100:
+                return "not-a-block"
+            return super().__call__(method, params)
+
+    with pytest.raises(qualifier.QualificationError, match="historical block malformed"):
+        qualifier.find_block_at_or_before_timestamp(
+            MalformedHeadRpc(), qualifier._cutoff_timestamp()
+        )

@@ -166,6 +166,7 @@
   },
   "implementation_contract": {
     "source_qualification_module": "qntylab/qntyspot_ink_source_qualification_v1.py",
+    "dev_acquisition_module": "qntylab/qntyspot_ink_dev_acquisition_v1.py",
     "real_network_execution_in_this_candidate_pr": false,
     "source_qualification_receipt_present": false,
     "dev_dataset_present": false,

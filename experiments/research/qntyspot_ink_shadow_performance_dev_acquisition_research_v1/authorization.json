@@ -71,6 +71,10 @@
     "insufficient_history_state": "INSUFFICIENT_HISTORY"
   },
   "source_qualification_contract": {
+    "canonical_qualified_source_receipt_digests": [
+      "79a456a2524c1e12e7a3ab7a3bfd8cffb1531be062b41b10ff06b62254b3231b",
+      "f1cff2c8cefbb25a502681e202708e1b8065709970b82a037310d37b8f06669b"
+    ],
     "network_execution_effective_only_after_exact_canonical_merge": true,
     "outcome_blind": true,
     "provider_choice_basis": "technical capability and integrity only; never observed performance",
@@ -166,6 +170,8 @@
   },
   "implementation_contract": {
     "source_qualification_module": "qntylab/qntyspot_ink_source_qualification_v1.py",
+    "dev_acquisition_module": "qntylab/qntyspot_ink_dev_acquisition_v1.py",
+    "dev_acquisition_reviewed_candidate_sha": "08d69f528c70c0e1f4dcfe9ebcdfe26703aca004",
     "real_network_execution_in_this_candidate_pr": false,
     "source_qualification_receipt_present": false,
     "dev_dataset_present": false,
@@ -216,6 +222,18 @@
     "targeted_rereview_verdict": "PASS_NO_CRITICAL_HIGH",
     "targeted_rereview_new_critical_total": 0,
     "targeted_rereview_new_high_total": 0,
+    "dev_acquisition_review_mode": "OWNER_AUTHORIZED_SAME_CHAT_HOSTILE_REVIEW_SUBSTITUTE",
+    "dev_acquisition_reviewer_independence_claimed": false,
+    "dev_acquisition_hostile_review_count": 1,
+    "dev_acquisition_initial_critical_total": 0,
+    "dev_acquisition_initial_high_total": 3,
+    "dev_acquisition_repaired_candidate_sha": "08d69f528c70c0e1f4dcfe9ebcdfe26703aca004",
+    "dev_acquisition_targeted_rereview_used": true,
+    "dev_acquisition_targeted_rereview_count": 1,
+    "dev_acquisition_targeted_rereview_scope": "CANONICAL_RECEIPT_BINDING_VALID_GAS_RECEIPT_POPULATION_REVIEWED_MATERIALIZER_ANCESTRY",
+    "dev_acquisition_targeted_rereview_verdict": "PASS_NO_CRITICAL_HIGH",
+    "dev_acquisition_targeted_rereview_new_critical_total": 0,
+    "dev_acquisition_targeted_rereview_new_high_total": 0,
     "merge_authority": "NONE"
   },
   "next_action": "Canonicalize Stage B without network execution. After exact canonical merge, run outcome-blind source qualification with the DEV_END request firewall. Only a qualification PASS may unlock DEV-only acquisition; candidate evaluation, OUTER access, QntySpot mutation, Order Flow mutation, Hetzner access, trading, signing, broadcast, and capital remain unauthorized."

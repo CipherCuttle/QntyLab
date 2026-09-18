@@ -87,9 +87,25 @@ def test_stage_b_authority_is_canonicalization_gated_and_branch_network_receipts
     assert row["targeted_rereview_verdict"] == "PASS_NO_CRITICAL_HIGH"
     assert auth["review_policy"]["owner_authorized_same_chat_substitution"] is True
     assert auth["review_policy"]["reviewer_independence_claimed"] is False
+    assert auth["review_policy"]["dev_acquisition_initial_high_total"] == 3
+    assert auth["review_policy"]["dev_acquisition_repaired_candidate_sha"] == "08d69f528c70c0e1f4dcfe9ebcdfe26703aca004"
+    assert auth["review_policy"]["dev_acquisition_targeted_rereview_used"] is True
+    assert auth["review_policy"]["dev_acquisition_targeted_rereview_count"] == 1
+    assert auth["review_policy"]["dev_acquisition_targeted_rereview_verdict"] == "PASS_NO_CRITICAL_HIGH"
+    assert auth["review_policy"]["dev_acquisition_targeted_rereview_new_critical_total"] == 0
+    assert auth["review_policy"]["dev_acquisition_targeted_rereview_new_high_total"] == 0
+    assert row["dev_acquisition_hostile_review_initial_high_total"] == 3
+    assert row["dev_acquisition_hostile_review_repaired_candidate_sha"] == "08d69f528c70c0e1f4dcfe9ebcdfe26703aca004"
+    assert row["dev_acquisition_targeted_rereview_used"] is True
+    assert row["dev_acquisition_targeted_rereview_verdict"] == "PASS_NO_CRITICAL_HIGH"
     assert auth["review_policy"]["merge_authority"] == "NONE"
     assert auth["source_qualification_contract"]["network_execution_effective_only_after_exact_canonical_merge"] is True
     assert auth["implementation_contract"]["real_network_execution_in_this_candidate_pr"] is False
+    assert auth["implementation_contract"]["dev_acquisition_module"] == "qntylab/qntyspot_ink_dev_acquisition_v1.py"
+    assert auth["implementation_contract"]["dev_acquisition_reviewed_candidate_sha"] == "08d69f528c70c0e1f4dcfe9ebcdfe26703aca004"
+    assert row["dev_acquisition_reviewed_candidate_sha"] == "08d69f528c70c0e1f4dcfe9ebcdfe26703aca004"
+    assert "qntylab/qntyspot_ink_dev_acquisition_v1.py" in row["authoritative_artifacts"]
+    assert "tests/test_qntyspot_ink_dev_acquisition_v1.py" in row["authoritative_artifacts"]
     assert row["activation_effective_on_branch"] is False
     assert row["market_network_count"] == 0
     assert row["market_data_acquisition_count"] == 0
@@ -135,6 +151,10 @@ def test_frozen_science_and_outer_firewall_are_preserved():
 def test_source_qualification_is_outcome_blind_fail_closed_and_dev_bounded_before_economic_probe():
     auth = authorization()
     source = auth["source_qualification_contract"]
+    assert source["canonical_qualified_source_receipt_digests"] == [
+        "79a456a2524c1e12e7a3ab7a3bfd8cffb1531be062b41b10ff06b62254b3231b",
+        "f1cff2c8cefbb25a502681e202708e1b8065709970b82a037310d37b8f06669b",
+    ]
     assert source["outcome_blind"] is True
     assert source["provider_choice_basis"].endswith("never observed performance")
     assert source["t1_access_class"] == "BLOCK_METADATA_ONLY_BEFORE_DEV_BOUNDARY_EXISTS"

@@ -36,6 +36,8 @@ DEFAULT_COVERAGE_WORKERS = 2
 MAX_COVERAGE_WORKERS = 8
 DEFAULT_BLOCK_WORKERS = 4
 MAX_BLOCK_WORKERS = 8
+DEFAULT_RECEIPT_WORKERS = 4
+MAX_RECEIPT_WORKERS = 8
 GAS_RECEIPT_THRESHOLD = 30
 GAS_SAMPLE_MAX = 30
 
@@ -65,9 +67,32 @@ def _load_json(path: Path) -> dict[str, Any]:
     return value
 
 
+def _canonical_expected_receipt_digests(root: Path) -> set[str]:
+    authorization = _load_json(root / AUTHORIZATION_PATH)
+    values = authorization.get("source_qualification_contract", {}).get(
+        "canonical_qualified_source_receipt_digests"
+    )
+    if (
+        not isinstance(values, list)
+        or len(values) != 2
+        or len(set(values)) != 2
+        or not all(isinstance(value, str) and len(value) == 64 for value in values)
+    ):
+        raise AcquisitionError(
+            "canonical source qualification receipt binding is absent or incomplete"
+        )
+    return set(values)
+
+
 def _validate_qualification_pair(
-    primary: Mapping[str, Any], secondary: Mapping[str, Any]
+    primary: Mapping[str, Any],
+    secondary: Mapping[str, Any],
+    *,
+    expected_receipt_digests: set[str],
 ) -> None:
+    if len(expected_receipt_digests) != 2:
+        raise AcquisitionError("exactly two canonical qualification receipt digests are required")
+    actual_receipt_digests: set[str] = set()
     for label, receipt in (("primary", primary), ("secondary", secondary)):
         if receipt.get("artifact_type") != "QNTYSPOT_INK_SOURCE_QUALIFICATION_RECEIPT_V1":
             raise AcquisitionError(f"{label} qualification receipt type mismatch")
@@ -78,12 +103,31 @@ def _validate_qualification_pair(
         payload.pop("receipt_digest", None)
         if qualification._digest(payload) != receipt_digest:
             raise AcquisitionError(f"{label} qualification receipt digest mismatch")
+        actual_receipt_digests.add(receipt_digest)
         if receipt.get("status") != "PASS":
             raise AcquisitionError(f"{label} source qualification did not PASS")
         if receipt.get("outer_access_performed") is not False:
             raise AcquisitionError(f"{label} qualification receipt indicates OUTER access")
         if receipt.get("candidate_evaluation_performed") is not False:
             raise AcquisitionError(f"{label} qualification receipt indicates candidate evaluation")
+        if receipt.get("chain_id") != qualification.CHAIN_ID:
+            raise AcquisitionError(f"{label} qualification receipt chain mismatch")
+        if receipt.get("pool") != qualification._norm_address(qualification.POOL):
+            raise AcquisitionError(f"{label} qualification receipt pool mismatch")
+        if receipt.get("factory") != qualification._norm_address(qualification.FACTORY):
+            raise AcquisitionError(f"{label} qualification receipt factory mismatch")
+        if {
+            receipt.get("token0"),
+            receipt.get("token1"),
+        } != {
+            qualification._norm_address(qualification.KRAKMASK),
+            qualification._norm_address(qualification.WETH9),
+        }:
+            raise AcquisitionError(f"{label} qualification receipt token identity mismatch")
+        if receipt.get("frozen_cutoff_utc") != qualification.CUTOFF_UTC:
+            raise AcquisitionError(f"{label} qualification receipt cutoff mismatch")
+    if actual_receipt_digests != expected_receipt_digests:
+        raise AcquisitionError("qualification receipts are not the canonically bound source pair")
     if primary.get("provider_id") == secondary.get("provider_id"):
         raise AcquisitionError("qualification receipts must come from distinct providers")
     try:
@@ -170,12 +214,43 @@ def _fetch_topic_range(
         chunks.append((cursor, chunk_end))
         cursor = chunk_end + 1
 
-    def fetch(bounds: tuple[int, int]) -> list[Mapping[str, Any]]:
-        return _fetch_topic_chunk(
-            rpc, topic=topic, start=bounds[0], end=bounds[1]
+    def fetch(bounds: tuple[int, int]) -> tuple[list[Mapping[str, Any]], dict[str, Any]]:
+        chunk_start, chunk_end = bounds
+        whole_a = _fetch_topic_chunk(
+            rpc, topic=topic, start=chunk_start, end=chunk_end
         )
+        whole_b = _fetch_topic_chunk(
+            rpc, topic=topic, start=chunk_start, end=chunk_end
+        )
+        ids_a = qualification._identities(whole_a)
+        ids_b = qualification._identities(whole_b)
+        if ids_a != ids_b:
+            raise AcquisitionError("repeated DEV acquisition log request is nondeterministic")
+        if chunk_start < chunk_end:
+            midpoint = (chunk_start + chunk_end) // 2
+            left = _fetch_topic_chunk(
+                rpc, topic=topic, start=chunk_start, end=midpoint
+            )
+            right = _fetch_topic_chunk(
+                rpc, topic=topic, start=midpoint + 1, end=chunk_end
+            )
+            if sorted(ids_a) != sorted(
+                qualification._identities(left) + qualification._identities(right)
+            ):
+                raise AcquisitionError(
+                    "DEV acquisition whole-range logs disagree with split-range logs"
+                )
+        identity_rows = [_event_identity(row) for row in whole_a]
+        return whole_a, {
+            "from_block": chunk_start,
+            "to_block": chunk_end,
+            "event_count": len(identity_rows),
+            "event_identity_digest": _digest(identity_rows),
+            "repeated_equal": True,
+            "whole_equals_split": True,
+        }
 
-    ordered_chunks: list[list[Mapping[str, Any]]] = []
+    ordered_chunks: list[tuple[list[Mapping[str, Any]], dict[str, Any]]] = []
     if workers == 1:
         ordered_chunks = [fetch(bounds) for bounds in chunks]
     else:
@@ -189,8 +264,10 @@ def _fetch_topic_range(
                 ordered_chunks.extend(future.result() for future in futures)
 
     rows: list[Mapping[str, Any]] = []
+    receipts: list[dict[str, Any]] = []
     seen: set[tuple[str, str, str]] = set()
-    for chunk_rows in ordered_chunks:
+    for chunk_rows, receipt in ordered_chunks:
+        receipts.append(receipt)
         for row in chunk_rows:
             identity = qualification._log_identity(row)
             if identity in seen:
@@ -198,11 +275,6 @@ def _fetch_topic_range(
             seen.add(identity)
             rows.append(row)
     rows.sort(key=_event_key)
-
-    receipts = [
-        {"from_block": chunk_start, "to_block": chunk_end}
-        for chunk_start, chunk_end in chunks
-    ]
     return rows, receipts
 
 
@@ -308,51 +380,69 @@ def _gas_evidence(
     rpc: qualification.RpcCall,
     swap_logs: list[Mapping[str, Any]],
     block_summaries: Mapping[int, Mapping[str, Any]],
+    *,
+    receipt_workers: int,
 ) -> dict[str, Any]:
+    if receipt_workers < 1 or receipt_workers > MAX_RECEIPT_WORKERS:
+        raise AcquisitionError(
+            f"receipt workers must be between 1 and {MAX_RECEIPT_WORKERS}"
+        )
     tx_logs = _chronological_swap_transactions(swap_logs)
-    sample_indices = _sample_indices(len(tx_logs))
-    samples: list[dict[str, Any]] = []
 
-    for sample_index in sample_indices:
-        log = tx_logs[sample_index]
+    def fetch_valid_receipt(log: Mapping[str, Any]) -> dict[str, Any]:
         tx_hash = str(log["transactionHash"]).lower()
         log_block_number = qualification._hex_int(log["blockNumber"])
         log_block_hash = str(log["blockHash"]).lower()
         receipt = rpc("eth_getTransactionReceipt", [tx_hash])
         if not isinstance(receipt, dict):
-            raise AcquisitionError("selected DEV Swap receipt unavailable")
+            raise AcquisitionError("DEV Swap receipt unavailable")
         if str(receipt.get("transactionHash", "")).lower() != tx_hash:
-            raise AcquisitionError("selected DEV Swap receipt transaction mismatch")
+            raise AcquisitionError("DEV Swap receipt transaction mismatch")
         receipt_block_number = qualification._hex_int(receipt.get("blockNumber"))
         receipt_block_hash = str(receipt.get("blockHash", "")).lower()
         if receipt_block_number != log_block_number or receipt_block_hash != log_block_hash:
-            raise AcquisitionError("selected DEV Swap receipt/log block mismatch")
+            raise AcquisitionError("DEV Swap receipt/log block mismatch")
         if block_summaries[log_block_number]["hash"] != receipt_block_hash:
-            raise AcquisitionError("selected DEV Swap receipt is not canonical")
+            raise AcquisitionError("DEV Swap receipt is not canonical")
         if qualification._hex_int(receipt.get("status")) != 1:
-            raise AcquisitionError("selected DEV Swap receipt is not successful")
+            raise AcquisitionError("DEV Swap receipt is not successful")
         gas_used = qualification._hex_int(receipt.get("gasUsed"))
         effective_gas_price = qualification._hex_int(receipt.get("effectiveGasPrice"))
-        gas_cost_wei = gas_used * effective_gas_price
-        samples.append({
-            "population_index": sample_index,
+        return {
             "transaction_hash": tx_hash,
             "block_number": receipt_block_number,
             "block_hash": receipt_block_hash,
             "gas_used": gas_used,
             "effective_gas_price_wei": effective_gas_price,
-            "gas_cost_wei": gas_cost_wei,
-        })
+            "gas_cost_wei": gas_used * effective_gas_price,
+        }
 
+    if receipt_workers == 1 or len(tx_logs) <= 1:
+        valid_receipts = [fetch_valid_receipt(log) for log in tx_logs]
+    else:
+        with ThreadPoolExecutor(
+            max_workers=min(receipt_workers, len(tx_logs)),
+            thread_name_prefix="qntyspot-dev-gas-receipts",
+        ) as executor:
+            valid_receipts = list(executor.map(fetch_valid_receipt, tx_logs))
+
+    sample_indices = _sample_indices(len(valid_receipts))
+    samples = [
+        {
+            "population_index": sample_index,
+            **valid_receipts[sample_index],
+        }
+        for sample_index in sample_indices
+    ]
     gas_costs = [row["gas_cost_wei"] for row in samples]
     return {
         "mode": (
             "DEV_DERIVED"
-            if len(tx_logs) >= GAS_RECEIPT_THRESHOLD
+            if len(valid_receipts) >= GAS_RECEIPT_THRESHOLD
             else "SENSITIVITY_FALLBACK"
         ),
         "receipt_threshold": GAS_RECEIPT_THRESHOLD,
-        "swap_transaction_population_count": len(tx_logs),
+        "valid_swap_receipt_population_count": len(valid_receipts),
         "sample_count": len(samples),
         "sample_indices": sample_indices,
         "samples": samples,
@@ -389,8 +479,14 @@ def materialize_dev_package(
     query_span: int = DEFAULT_QUERY_SPAN,
     coverage_workers: int = DEFAULT_COVERAGE_WORKERS,
     block_workers: int = DEFAULT_BLOCK_WORKERS,
+    receipt_workers: int = DEFAULT_RECEIPT_WORKERS,
 ) -> dict[str, Any]:
-    _validate_qualification_pair(primary_qualification, secondary_qualification)
+    expected_receipt_digests = _canonical_expected_receipt_digests(root)
+    _validate_qualification_pair(
+        primary_qualification,
+        secondary_qualification,
+        expected_receipt_digests=expected_receipt_digests,
+    )
     if acquisition_provider_id not in {
         primary_qualification.get("provider_id"),
         secondary_qualification.get("provider_id"),
@@ -406,6 +502,8 @@ def materialize_dev_package(
         raise AcquisitionError("qualification block boundaries are malformed")
     if t0_block > dev_end_block:
         raise AcquisitionError("qualification DEV interval is inverted")
+    if output_dir.exists():
+        raise AcquisitionError("immutable DEV output directory already exists")
 
     sync_logs, sync_requests = _fetch_topic_range(
         rpc,
@@ -462,10 +560,13 @@ def materialize_dev_package(
         )
     )
 
-    gas = _gas_evidence(rpc, swap_logs, block_summaries)
+    gas = _gas_evidence(
+        rpc,
+        swap_logs,
+        block_summaries,
+        receipt_workers=receipt_workers,
+    )
 
-    if output_dir.exists():
-        raise AcquisitionError("immutable DEV output directory already exists")
     authorization_bytes = (root / AUTHORIZATION_PATH).read_bytes()
     historical_activation_bytes = (root / HISTORICAL_ACTIVATION_PATH).read_bytes()
 
@@ -508,6 +609,9 @@ def materialize_dev_package(
         "t0": primary_qualification["t0_block"],
         "dev_end": primary_qualification["dev_end_block"],
         "t1": t1,
+        "canonical_qualified_source_receipt_digests": sorted(
+            expected_receipt_digests
+        ),
         "source_identities": [
             {
                 "provider_id": primary_qualification["provider_id"],
@@ -538,6 +642,9 @@ def materialize_dev_package(
             "swap_logs_for_gas_population": len(
                 _chronological_swap_transactions(swap_logs)
             ),
+            "valid_swap_receipts_for_gas_population": gas[
+                "valid_swap_receipt_population_count"
+            ],
             "gas_samples": gas["sample_count"],
         },
         "min_max_block": {
@@ -558,6 +665,8 @@ def materialize_dev_package(
             "ALL_ACQUIRED_LOGS_BOUND_TO_CANONICAL_BLOCK_METADATA",
             "RESERVES_STORED_AS_INTEGER_ATOMIC_UNITS",
             "DETERMINISTIC_BLOCK_TX_LOG_ORDER",
+            "SWAP_LOGS_REPEAT_PLUS_WHOLE_EQUALS_SPLIT",
+            "ALL_SWAP_RECEIPTS_VALIDATED_BEFORE_GAS_SAMPLING",
             "GAS_SAMPLE_RULE_FROZEN",
             "NO_CANDIDATE_EVALUATION",
             "NO_OUTER_ACCESS",
@@ -593,6 +702,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--block-workers", type=int, default=DEFAULT_BLOCK_WORKERS
     )
+    parser.add_argument(
+        "--receipt-workers", type=int, default=DEFAULT_RECEIPT_WORKERS
+    )
     args = parser.parse_args(argv)
 
     root = Path(".").resolve()
@@ -600,7 +712,12 @@ def main(argv: list[str] | None = None) -> int:
 
     primary = _load_json(Path(args.primary_qualification))
     secondary = _load_json(Path(args.secondary_qualification))
-    _validate_qualification_pair(primary, secondary)
+    expected_receipt_digests = _canonical_expected_receipt_digests(root)
+    _validate_qualification_pair(
+        primary,
+        secondary,
+        expected_receipt_digests=expected_receipt_digests,
+    )
 
     endpoint = os.environ.get("QNTYSPOT_INK_RPC_URL")
     if not endpoint:
@@ -617,6 +734,7 @@ def main(argv: list[str] | None = None) -> int:
         query_span=args.query_span,
         coverage_workers=args.coverage_workers,
         block_workers=args.block_workers,
+        receipt_workers=args.receipt_workers,
     )
     return 0
 

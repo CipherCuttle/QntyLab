@@ -247,6 +247,23 @@ def test_materialize_dev_package_is_dev_only_deterministic_and_content_addressed
         assert artifact["bytes"] > 0
 
 
+def test_immutable_output_directory_cannot_be_overwritten(tmp_path: Path):
+    _write_governance(tmp_path)
+    output = tmp_path / "out"
+    output.mkdir()
+    with pytest.raises(acquisition.AcquisitionError, match="already exists"):
+        acquisition.materialize_dev_package(
+            FakeRpc(),
+            primary_qualification=_qualification("primary"),
+            secondary_qualification=_qualification("secondary"),
+            acquisition_provider_id="primary",
+            canonical_qntylab_source_sha="c" * 40,
+            output_dir=output,
+            root=tmp_path,
+            query_span=2,
+        )
+
+
 def test_acquisition_requires_sync_identity_to_match_qualification(tmp_path: Path):
     _write_governance(tmp_path)
     primary = _qualification("primary")

@@ -141,12 +141,24 @@ def _resign(receipt):
     return receipt
 
 
-def _write_governance(root: Path):
+def _write_governance(root: Path, primary=None, secondary=None):
+    primary = primary or _qualification("primary")
+    secondary = secondary or _qualification("secondary")
     auth = root / acquisition.AUTHORIZATION_PATH
     activation = root / acquisition.HISTORICAL_ACTIVATION_PATH
     auth.parent.mkdir(parents=True, exist_ok=True)
     activation.parent.mkdir(parents=True, exist_ok=True)
-    auth.write_text('{"authority":"stage-b"}\n', encoding="utf-8")
+    auth.write_text(
+        json.dumps({
+            "source_qualification_contract": {
+                "canonical_qualified_source_receipt_digests": [
+                    primary["receipt_digest"],
+                    secondary["receipt_digest"],
+                ]
+            }
+        }) + "\n",
+        encoding="utf-8",
+    )
     activation.write_text('{"historical":"template"}\n', encoding="utf-8")
 
 
@@ -176,21 +188,60 @@ def test_qualification_receipt_digest_is_verified():
     secondary = _qualification("secondary")
     primary["history_seconds"]["dev"] += 1
     with pytest.raises(acquisition.AcquisitionError, match="receipt digest mismatch"):
-        acquisition._validate_qualification_pair(primary, secondary)
+        acquisition._validate_qualification_pair(
+            primary,
+            secondary,
+            expected_receipt_digests={
+                primary["receipt_digest"],
+                secondary["receipt_digest"],
+            },
+        )
 
 
 def test_qualification_pair_requires_distinct_matching_providers():
     primary = _qualification("same")
     secondary = _qualification("same")
     with pytest.raises(acquisition.AcquisitionError, match="distinct providers"):
-        acquisition._validate_qualification_pair(primary, secondary)
+        acquisition._validate_qualification_pair(
+            primary,
+            secondary,
+            expected_receipt_digests={
+                primary["receipt_digest"],
+                secondary["receipt_digest"],
+            },
+        )
 
     primary = _qualification("primary")
     secondary = _qualification("secondary")
     secondary["dev_log_coverage"]["sync_log_identity_digest"] = "f" * 64
     _resign(secondary)
     with pytest.raises(acquisition.AcquisitionError, match="cross-provider"):
-        acquisition._validate_qualification_pair(primary, secondary)
+        acquisition._validate_qualification_pair(
+            primary,
+            secondary,
+            expected_receipt_digests={
+                primary["receipt_digest"],
+                secondary["receipt_digest"],
+            },
+        )
+
+
+def test_canonical_receipt_binding_rejects_unbound_pair(tmp_path: Path):
+    primary = _qualification("primary")
+    secondary = _qualification("secondary")
+    other = _qualification("other")
+    _write_governance(tmp_path, primary, secondary)
+    with pytest.raises(acquisition.AcquisitionError, match="canonically bound source pair"):
+        acquisition.materialize_dev_package(
+            FakeRpc(),
+            primary_qualification=primary,
+            secondary_qualification=other,
+            acquisition_provider_id="primary",
+            canonical_qntylab_source_sha="c" * 40,
+            output_dir=tmp_path / "out",
+            root=tmp_path,
+            query_span=2,
+        )
 
 
 def test_materialize_dev_package_is_dev_only_deterministic_and_content_addressed(tmp_path: Path):
@@ -227,6 +278,7 @@ def test_materialize_dev_package_is_dev_only_deterministic_and_content_addressed
     assert first["package_digest"] == second["package_digest"]
     assert first["row_or_event_counts"]["sync_reserve_rows"] == 2
     assert first["row_or_event_counts"]["swap_logs_for_gas_population"] == 1
+    assert first["row_or_event_counts"]["valid_swap_receipts_for_gas_population"] == 1
     assert first["row_or_event_counts"]["gas_samples"] == 1
     assert first["discarded_outer_overfetch_count"] == 0
     assert first["performance_metrics_allowed"] is False
@@ -280,6 +332,7 @@ def test_acquisition_requires_sync_identity_to_match_qualification(tmp_path: Pat
     secondary["dev_log_coverage"]["sync_log_count"] += 1
     _resign(primary)
     _resign(secondary)
+    _write_governance(tmp_path, primary, secondary)
     with pytest.raises(acquisition.AcquisitionError, match="Sync count"):
         acquisition.materialize_dev_package(
             FakeRpc(),

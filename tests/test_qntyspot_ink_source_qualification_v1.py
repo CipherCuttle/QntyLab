@@ -777,3 +777,55 @@ def test_invalid_block_attestation_worker_count_fails_before_network_use():
             block_attestation_workers=0,
         )
     assert rpc.log_calls == 0
+
+
+def test_timestamp_lookup_steps_back_from_unretrievable_advertised_head():
+    class HeadSkewRpc(FakeRpc):
+        def __call__(self, method, params):
+            if method == "eth_blockNumber":
+                return hex(100)
+            if method == "eth_getBlockByNumber" and int(params[0], 16) == 100:
+                return None
+            return super().__call__(method, params)
+
+    block = qualifier.find_block_at_or_before_timestamp(
+        HeadSkewRpc(), qualifier._cutoff_timestamp()
+    )
+    assert qualifier._hex_int(block["number"]) == 99
+    assert qualifier._hex_int(block["timestamp"]) == qualifier._cutoff_timestamp()
+
+
+def test_timestamp_lookup_fails_when_advertised_head_gap_exceeds_bound(monkeypatch):
+    class MissingHeadRpc(FakeRpc):
+        def __call__(self, method, params):
+            if method == "eth_blockNumber":
+                return hex(100)
+            if method == "eth_getBlockByNumber":
+                number = int(params[0], 16)
+                if number >= 98:
+                    return None
+            return super().__call__(method, params)
+
+    monkeypatch.setattr(qualifier, "MAX_HEAD_LOOKBACK_BLOCKS", 1)
+    with pytest.raises(
+        qualifier.QualificationError,
+        match="unavailable within bounded metadata lookback",
+    ):
+        qualifier.find_block_at_or_before_timestamp(
+            MissingHeadRpc(), qualifier._cutoff_timestamp()
+        )
+
+
+def test_timestamp_lookup_does_not_hide_malformed_non_null_head():
+    class MalformedHeadRpc(FakeRpc):
+        def __call__(self, method, params):
+            if method == "eth_blockNumber":
+                return hex(100)
+            if method == "eth_getBlockByNumber" and int(params[0], 16) == 100:
+                return "not-a-block"
+            return super().__call__(method, params)
+
+    with pytest.raises(qualifier.QualificationError, match="historical block malformed"):
+        qualifier.find_block_at_or_before_timestamp(
+            MalformedHeadRpc(), qualifier._cutoff_timestamp()
+        )

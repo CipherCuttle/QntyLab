@@ -134,6 +134,13 @@ def _qualification(provider_id: str):
     return receipt
 
 
+def _resign(receipt):
+    payload = dict(receipt)
+    payload.pop("receipt_digest", None)
+    receipt["receipt_digest"] = qualification._digest(payload)
+    return receipt
+
+
 def _write_governance(root: Path):
     auth = root / acquisition.AUTHORIZATION_PATH
     activation = root / acquisition.HISTORICAL_ACTIVATION_PATH
@@ -181,6 +188,7 @@ def test_qualification_pair_requires_distinct_matching_providers():
     primary = _qualification("primary")
     secondary = _qualification("secondary")
     secondary["dev_log_coverage"]["sync_log_identity_digest"] = "f" * 64
+    _resign(secondary)
     with pytest.raises(acquisition.AcquisitionError, match="cross-provider"):
         acquisition._validate_qualification_pair(primary, secondary)
 
@@ -270,6 +278,8 @@ def test_acquisition_requires_sync_identity_to_match_qualification(tmp_path: Pat
     secondary = _qualification("secondary")
     primary["dev_log_coverage"]["sync_log_count"] += 1
     secondary["dev_log_coverage"]["sync_log_count"] += 1
+    _resign(primary)
+    _resign(secondary)
     with pytest.raises(acquisition.AcquisitionError, match="Sync count"):
         acquisition.materialize_dev_package(
             FakeRpc(),

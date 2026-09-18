@@ -464,7 +464,12 @@ def materialize_dev_package(
 
     gas = _gas_evidence(rpc, swap_logs, block_summaries)
 
-    output_dir.mkdir(parents=True, exist_ok=True)
+    if output_dir.exists():
+        raise AcquisitionError("immutable DEV output directory already exists")
+    authorization_bytes = (root / AUTHORIZATION_PATH).read_bytes()
+    historical_activation_bytes = (root / HISTORICAL_ACTIVATION_PATH).read_bytes()
+
+    output_dir.mkdir(parents=True, exist_ok=False)
     reserve_path = output_dir / "dev_reserves.jsonl"
     gas_path = output_dir / "dev_gas_evidence.json"
     reserve_payload = _serialize_jsonl(reserve_rows)
@@ -472,8 +477,6 @@ def materialize_dev_package(
     reserve_path.write_bytes(reserve_payload)
     gas_path.write_bytes(gas_payload)
 
-    authorization_bytes = (root / AUTHORIZATION_PATH).read_bytes()
-    historical_activation_bytes = (root / HISTORICAL_ACTIVATION_PATH).read_bytes()
     primary_material_digest = _digest(
         qualification.material_identity(primary_qualification)
     )

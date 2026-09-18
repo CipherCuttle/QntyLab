@@ -84,7 +84,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python qntylab/qntyspot_ink_dev_acquisition_v1.py \
+          python -m qntylab.qntyspot_ink_dev_acquisition_v1 \
             --primary-qualification receipts/quicknode/receipt.json \
             --secondary-qualification receipts/gelato/receipt.json \
             --provider-id ink-official-quicknode-public \

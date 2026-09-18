@@ -1,0 +1,26 @@
+name: QntySpot Stage B block attestation repair verification
+
+on:
+  push:
+    branches:
+      - research/qntyspot-stage-b-block-attestation-parallel-v1
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Focused verification
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pytest             tests/test_qntyspot_ink_source_qualification_v1.py             tests/test_qntyspot_ink_shadow_performance_dev_acquisition_research_v1.py             -q
+          python -m py_compile qntylab/qntyspot_ink_source_qualification_v1.py
+          git diff --check master...HEAD

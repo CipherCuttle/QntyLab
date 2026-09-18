@@ -90,6 +90,9 @@ def test_stage_b_authority_is_canonicalization_gated_and_branch_network_receipts
     assert auth["review_policy"]["merge_authority"] == "NONE"
     assert auth["source_qualification_contract"]["network_execution_effective_only_after_exact_canonical_merge"] is True
     assert auth["implementation_contract"]["real_network_execution_in_this_candidate_pr"] is False
+    assert auth["implementation_contract"]["dev_acquisition_module"] == "qntylab/qntyspot_ink_dev_acquisition_v1.py"
+    assert "qntylab/qntyspot_ink_dev_acquisition_v1.py" in row["authoritative_artifacts"]
+    assert "tests/test_qntyspot_ink_dev_acquisition_v1.py" in row["authoritative_artifacts"]
     assert row["activation_effective_on_branch"] is False
     assert row["market_network_count"] == 0
     assert row["market_data_acquisition_count"] == 0

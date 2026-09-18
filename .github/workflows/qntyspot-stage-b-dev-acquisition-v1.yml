@@ -1,0 +1,129 @@
+name: QntySpot Stage B canonical DEV acquisition
+
+on:
+  push:
+    branches:
+      - ops/qntyspot-stage-b-dev-acquisition-v1
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  acquire:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - name: Checkout exact canonical master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          clean: true
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify exact canonical runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git branch --show-current)" = "master"
+          test -z "$(git status --porcelain)"
+          git fetch --quiet origin master
+          test "$(git rev-parse HEAD)" = "c09c5ad942aadffecdb7287f1e688f56fa9d704c"
+          test "$(git rev-parse origin/master)" = "c09c5ad942aadffecdb7287f1e688f56fa9d704c"
+          git merge-base --is-ancestor 08d69f528c70c0e1f4dcfe9ebcdfe26703aca004 HEAD
+
+      - name: Download canonical QuickNode qualification receipt
+        uses: actions/download-artifact@v4
+        with:
+          name: qntyspot-stage-b-post292-quicknode-v1-receipt
+          path: receipts/quicknode
+          github-token: ${{ github.token }}
+          repository: CipherCuttle/QntyLab
+          run-id: 35292668075
+
+      - name: Download canonical Gelato qualification receipt
+        uses: actions/download-artifact@v4
+        with:
+          name: qntyspot-stage-b-post292-gelato-v1-receipt
+          path: receipts/gelato
+          github-token: ${{ github.token }}
+          repository: CipherCuttle/QntyLab
+          run-id: 35294789896
+
+      - name: Verify exact bound qualification pair offline
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f receipts/quicknode/receipt.json
+          test -f receipts/gelato/receipt.json
+          python - <<'PY'
+          from pathlib import Path
+          from qntylab import qntyspot_ink_dev_acquisition_v1 as acquisition
+
+          primary = acquisition._load_json(Path("receipts/quicknode/receipt.json"))
+          secondary = acquisition._load_json(Path("receipts/gelato/receipt.json"))
+          acquisition._validate_qualification_pair(
+              primary,
+              secondary,
+              expected_receipt_digests=acquisition._canonical_expected_receipt_digests(Path(".")),
+          )
+          assert primary["provider_id"] == "ink-official-quicknode-public"
+          assert secondary["provider_id"] == "ink-official-gelato-public"
+          print(primary["receipt_digest"])
+          print(secondary["receipt_digest"])
+          PY
+
+      - name: Materialize canonical DEV package
+        env:
+          QNTYSPOT_INK_RPC_URL: https://rpc-qnd.inkonchain.com
+        shell: bash
+        run: |
+          set -euo pipefail
+          python qntylab/qntyspot_ink_dev_acquisition_v1.py \
+            --primary-qualification receipts/quicknode/receipt.json \
+            --secondary-qualification receipts/gelato/receipt.json \
+            --provider-id ink-official-quicknode-public \
+            --output-dir qntyspot-stage-b-dev-package \
+            --query-span 10000 \
+            --coverage-workers 2 \
+            --block-workers 4 \
+            --receipt-workers 4
+
+      - name: Verify immutable DEV package surface
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f qntyspot-stage-b-dev-package/dev_reserves.jsonl
+          test -f qntyspot-stage-b-dev-package/dev_gas_evidence.json
+          test -f qntyspot-stage-b-dev-package/dev_manifest.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          manifest = json.loads(Path("qntyspot-stage-b-dev-package/dev_manifest.json").read_text())
+          assert manifest["canonical_qntylab_source_sha"] == "c09c5ad942aadffecdb7287f1e688f56fa9d704c"
+          assert manifest["candidate_evaluation_performed"] is False
+          assert manifest["outer_access_performed"] is False
+          assert manifest["outer_evaluation_count"] == 0
+          assert manifest["performance_metrics_allowed"] is False
+          assert manifest["row_or_event_counts"]["sync_reserve_rows"] == 34184
+          print(json.dumps(manifest, sort_keys=True, indent=2))
+          PY
+          sha256sum \
+            qntyspot-stage-b-dev-package/dev_reserves.jsonl \
+            qntyspot-stage-b-dev-package/dev_gas_evidence.json \
+            qntyspot-stage-b-dev-package/dev_manifest.json
+
+      - name: Upload immutable DEV package
+        uses: actions/upload-artifact@v4
+        with:
+          name: qntyspot-stage-b-dev-acquisition-v1-package
+          path: qntyspot-stage-b-dev-package/
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 6

@@ -71,6 +71,13 @@ def _validate_qualification_pair(
     for label, receipt in (("primary", primary), ("secondary", secondary)):
         if receipt.get("artifact_type") != "QNTYSPOT_INK_SOURCE_QUALIFICATION_RECEIPT_V1":
             raise AcquisitionError(f"{label} qualification receipt type mismatch")
+        receipt_digest = receipt.get("receipt_digest")
+        if not isinstance(receipt_digest, str) or len(receipt_digest) != 64:
+            raise AcquisitionError(f"{label} qualification receipt digest is missing")
+        payload = dict(receipt)
+        payload.pop("receipt_digest", None)
+        if qualification._digest(payload) != receipt_digest:
+            raise AcquisitionError(f"{label} qualification receipt digest mismatch")
         if receipt.get("status") != "PASS":
             raise AcquisitionError(f"{label} source qualification did not PASS")
         if receipt.get("outer_access_performed") is not False:

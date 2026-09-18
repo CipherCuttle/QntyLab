@@ -93,7 +93,7 @@ class FakeRpc:
 def _qualification(provider_id: str):
     identity_rows = [qualification._event_identity(log) for log in SYNC_LOGS]
     t0_log = identity_rows[0]
-    return {
+    receipt = {
         "artifact_type": "QNTYSPOT_INK_SOURCE_QUALIFICATION_RECEIPT_V1",
         "status": "PASS",
         "provider_id": provider_id,
@@ -129,8 +129,9 @@ def _qualification(provider_id: str):
         },
         "outer_access_performed": False,
         "candidate_evaluation_performed": False,
-        "receipt_digest": "a" * 64 if provider_id == "primary" else "b" * 64,
     }
+    receipt["receipt_digest"] = qualification._digest(receipt)
+    return receipt
 
 
 def _write_governance(root: Path):
@@ -161,6 +162,14 @@ def test_decode_sync_reserves_rejects_non_uint112():
     bad["data"] = "0x" + f"{1 << 112:064x}" + f"{1:064x}"
     with pytest.raises(acquisition.AcquisitionError, match="uint112"):
         acquisition._decode_sync_reserves(bad)
+
+
+def test_qualification_receipt_digest_is_verified():
+    primary = _qualification("primary")
+    secondary = _qualification("secondary")
+    primary["history_seconds"]["dev"] += 1
+    with pytest.raises(acquisition.AcquisitionError, match="receipt digest mismatch"):
+        acquisition._validate_qualification_pair(primary, secondary)
 
 
 def test_qualification_pair_requires_distinct_matching_providers():

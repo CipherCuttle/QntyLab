@@ -163,6 +163,26 @@ def _write_governance(root: Path, primary=None, secondary=None):
     activation.write_text('{"historical":"template"}\n', encoding="utf-8")
 
 
+def test_reviewed_materializer_candidate_must_be_pinned_and_canonical(tmp_path: Path, monkeypatch):
+    auth = tmp_path / acquisition.AUTHORIZATION_PATH
+    auth.parent.mkdir(parents=True, exist_ok=True)
+    auth.write_text(
+        json.dumps({
+            "implementation_contract": {
+                "dev_acquisition_reviewed_candidate_sha": "d" * 40
+            }
+        }) + "\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(qualification, "_git", lambda root, *args: "e" * 40)
+    monkeypatch.setattr(qualification, "_git_is_ancestor", lambda root, ancestor, descendant: False)
+    with pytest.raises(acquisition.AcquisitionError, match="not canonical"):
+        acquisition._assert_reviewed_materializer_is_canonical(tmp_path)
+
+    monkeypatch.setattr(qualification, "_git_is_ancestor", lambda root, ancestor, descendant: True)
+    acquisition._assert_reviewed_materializer_is_canonical(tmp_path)
+
+
 def test_sample_indices_are_frozen_evenly_spaced_rule():
     assert acquisition._sample_indices(0) == []
     assert acquisition._sample_indices(3) == [0, 1, 2]

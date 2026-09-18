@@ -21,7 +21,7 @@
     "runtime_required_base_must_be_ancestor": true,
     "runtime_exact_reviewed_candidate_must_be_ancestor": true,
     "runtime_origin_repository_must_match": "CipherCuttle/QntyLab",
-    "reviewed_candidate_sha": "56b751ebab695192b8e12d47cc62f3fa9a2c6801"
+    "reviewed_candidate_sha": "6cfdfe49bdbc9a8577191978c8a75f5584ca9ed8"
   },
   "predecessor_contract": {
     "project_id": "QNTYSPOT_INK_SHADOW_PERFORMANCE_RESEARCH_V1",

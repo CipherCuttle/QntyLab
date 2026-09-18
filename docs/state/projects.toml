@@ -10712,6 +10712,7 @@ authoritative_artifacts = [
 ]
 required_base_sha = "ea2dd02964c2e91196bb153a212ec0f8aae50b42"
 reviewed_candidate_sha = "6cfdfe49bdbc9a8577191978c8a75f5584ca9ed8"
+dev_acquisition_reviewed_candidate_sha = "08d69f528c70c0e1f4dcfe9ebcdfe26703aca004"
 parent_project_id = "QNTYSPOT_INK_SHADOW_PERFORMANCE_RESEARCH_V1"
 preregistration_digest = "27ce60c68133f40d9496df1db6009de07957ed8a9bd68b0715cc6c54fe05d18a"
 qntyspot_source_commit = "b9a84c59bd43e7697ee970d2a7571647e5de4501"

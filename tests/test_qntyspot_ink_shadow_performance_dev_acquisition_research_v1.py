@@ -138,6 +138,7 @@ def test_frozen_science_and_outer_firewall_are_preserved():
 def test_source_qualification_is_outcome_blind_fail_closed_and_dev_bounded_before_economic_probe():
     auth = authorization()
     source = auth["source_qualification_contract"]
+    assert source["canonical_qualified_source_receipt_digests"] == []
     assert source["outcome_blind"] is True
     assert source["provider_choice_basis"].endswith("never observed performance")
     assert source["t1_access_class"] == "BLOCK_METADATA_ONLY_BEFORE_DEV_BOUNDARY_EXISTS"

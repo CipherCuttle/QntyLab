@@ -10705,8 +10705,10 @@ authoritative_artifacts = [
   "experiments/research/qntyspot_ink_shadow_performance_research_v1/authorization.json",
   "experiments/research/qntyspot_ink_shadow_performance_dev_acquisition_research_v1/authorization.json",
   "qntylab/qntyspot_ink_source_qualification_v1.py",
+  "qntylab/qntyspot_ink_dev_acquisition_v1.py",
   "tests/test_qntyspot_ink_shadow_performance_dev_acquisition_research_v1.py",
   "tests/test_qntyspot_ink_source_qualification_v1.py",
+  "tests/test_qntyspot_ink_dev_acquisition_v1.py",
 ]
 required_base_sha = "ea2dd02964c2e91196bb153a212ec0f8aae50b42"
 reviewed_candidate_sha = "6cfdfe49bdbc9a8577191978c8a75f5584ca9ed8"

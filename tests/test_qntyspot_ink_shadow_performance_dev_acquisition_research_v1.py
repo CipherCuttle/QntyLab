@@ -91,6 +91,8 @@ def test_stage_b_authority_is_canonicalization_gated_and_branch_network_receipts
     assert auth["source_qualification_contract"]["network_execution_effective_only_after_exact_canonical_merge"] is True
     assert auth["implementation_contract"]["real_network_execution_in_this_candidate_pr"] is False
     assert auth["implementation_contract"]["dev_acquisition_module"] == "qntylab/qntyspot_ink_dev_acquisition_v1.py"
+    assert auth["implementation_contract"]["dev_acquisition_reviewed_candidate_sha"] == "08d69f528c70c0e1f4dcfe9ebcdfe26703aca004"
+    assert row["dev_acquisition_reviewed_candidate_sha"] == "08d69f528c70c0e1f4dcfe9ebcdfe26703aca004"
     assert "qntylab/qntyspot_ink_dev_acquisition_v1.py" in row["authoritative_artifacts"]
     assert "tests/test_qntyspot_ink_dev_acquisition_v1.py" in row["authoritative_artifacts"]
     assert row["activation_effective_on_branch"] is False

@@ -71,6 +71,7 @@
     "insufficient_history_state": "INSUFFICIENT_HISTORY"
   },
   "source_qualification_contract": {
+    "canonical_qualified_source_receipt_digests": [],
     "network_execution_effective_only_after_exact_canonical_merge": true,
     "outcome_blind": true,
     "provider_choice_basis": "technical capability and integrity only; never observed performance",

@@ -45,6 +45,7 @@ DEFAULT_COVERAGE_WORKERS = 1
 MAX_COVERAGE_WORKERS = 16
 DEFAULT_BLOCK_ATTESTATION_WORKERS = 1
 MAX_BLOCK_ATTESTATION_WORKERS = 8
+MAX_HEAD_LOOKBACK_BLOCKS = 64
 DEFAULT_RATE_LIMIT_RETRIES = 5
 DEFAULT_RATE_LIMIT_BACKOFF_SECONDS = 2.0
 MAX_RATE_LIMIT_BACKOFF_SECONDS = 30.0
@@ -169,14 +170,23 @@ class JsonRpcClient:
         return body["result"]
 
 
-def _block(rpc: RpcCall, number: int) -> Mapping[str, Any]:
+def _block_or_none(rpc: RpcCall, number: int) -> Mapping[str, Any] | None:
     result = rpc("eth_getBlockByNumber", [hex(number), False])
+    if result is None:
+        return None
     if not isinstance(result, dict):
-        raise QualificationError(f"historical block unavailable: {number}")
+        raise QualificationError(f"historical block malformed: {number}")
     if _hex_int(result.get("number")) != number:
         raise QualificationError(f"historical block number mismatch: {number}")
     if not isinstance(result.get("hash"), str) or not isinstance(result.get("timestamp"), str):
         raise QualificationError(f"historical block identity incomplete: {number}")
+    return result
+
+
+def _block(rpc: RpcCall, number: int) -> Mapping[str, Any]:
+    result = _block_or_none(rpc, number)
+    if result is None:
+        raise QualificationError(f"historical block unavailable: {number}")
     return result
 
 
@@ -189,10 +199,24 @@ def _block_summary(block: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def find_block_at_or_before_timestamp(rpc: RpcCall, timestamp: int) -> Mapping[str, Any]:
-    latest_number = _hex_int(rpc("eth_blockNumber", []))
-    latest = _block(rpc, latest_number)
+    advertised_latest_number = _hex_int(rpc("eth_blockNumber", []))
+    latest_number = advertised_latest_number
+    latest: Mapping[str, Any] | None = None
+    for offset in range(MAX_HEAD_LOOKBACK_BLOCKS + 1):
+        candidate_number = advertised_latest_number - offset
+        if candidate_number < 0:
+            break
+        candidate = _block_or_none(rpc, candidate_number)
+        if candidate is not None:
+            latest_number = candidate_number
+            latest = candidate
+            break
+    if latest is None:
+        raise QualificationError(
+            "provider advertised head is unavailable within bounded metadata lookback"
+        )
     if _hex_int(latest["timestamp"]) < timestamp:
-        raise QualificationError("provider latest block predates requested historical timestamp")
+        raise QualificationError("provider latest retrievable block predates requested historical timestamp")
 
     low, high = 0, latest_number
     best: Mapping[str, Any] | None = None

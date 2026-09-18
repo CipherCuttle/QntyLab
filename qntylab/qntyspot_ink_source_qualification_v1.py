@@ -43,6 +43,8 @@ FACTORY_SELECTOR = "0xc45a0155"
 DEFAULT_PROBE_SPAN = 256
 DEFAULT_COVERAGE_WORKERS = 1
 MAX_COVERAGE_WORKERS = 16
+DEFAULT_BLOCK_ATTESTATION_WORKERS = 1
+MAX_BLOCK_ATTESTATION_WORKERS = 8
 DEFAULT_RATE_LIMIT_RETRIES = 5
 DEFAULT_RATE_LIMIT_BACKOFF_SECONDS = 2.0
 MAX_RATE_LIMIT_BACKOFF_SECONDS = 30.0
@@ -272,7 +274,12 @@ def _sync_logs(
     start: int,
     end: int,
     canonical_block_hashes: dict[int, str] | None = None,
+    block_attestation_workers: int = DEFAULT_BLOCK_ATTESTATION_WORKERS,
 ) -> list[Mapping[str, Any]]:
+    if block_attestation_workers < 1 or block_attestation_workers > MAX_BLOCK_ATTESTATION_WORKERS:
+        raise QualificationError(
+            f"block attestation workers must be between 1 and {MAX_BLOCK_ATTESTATION_WORKERS}"
+        )
     if start > end:
         return []
     result = rpc("eth_getLogs", [{
@@ -285,6 +292,7 @@ def _sync_logs(
         raise QualificationError("eth_getLogs returned malformed result")
 
     cache = canonical_block_hashes if canonical_block_hashes is not None else {}
+    row_block_hashes: dict[int, str] = {}
     for row in result:
         if _norm_address(row.get("address")) != _norm_address(POOL):
             raise QualificationError("STOP_SOURCE_CONFLICT: provider returned a log for the wrong address")
@@ -294,15 +302,43 @@ def _sync_logs(
         block_number = _hex_int(row.get("blockNumber"))
         if not start <= block_number <= end:
             raise QualificationError("STOP_SOURCE_CONFLICT: provider over-returned a log outside the requested range")
-        canonical_hash = cache.get(block_number)
-        if canonical_hash is None:
-            canonical_hash = str(_block(rpc, block_number)["hash"]).lower()
-            cache[block_number] = canonical_hash
         row_hash = row.get("blockHash")
-        if not isinstance(row_hash, str) or row_hash.lower() != canonical_hash:
-            raise QualificationError("STOP_SOURCE_CONFLICT: log block hash disagrees with canonical block metadata")
+        if not isinstance(row_hash, str):
+            raise QualificationError("historical log is missing canonical identity")
+        normalized_row_hash = row_hash.lower()
+        prior_row_hash = row_block_hashes.get(block_number)
+        if prior_row_hash is not None and prior_row_hash != normalized_row_hash:
+            raise QualificationError(
+                "STOP_SOURCE_CONFLICT: provider returned conflicting block hashes for one block"
+            )
+        row_block_hashes[block_number] = normalized_row_hash
         _log_order_key(row)
         _log_identity(row)
+
+    missing_block_numbers = sorted(
+        number for number in row_block_hashes if number not in cache
+    )
+
+    def fetch_block_hash(number: int) -> tuple[int, str]:
+        return number, str(_block(rpc, number)["hash"]).lower()
+
+    if block_attestation_workers == 1 or len(missing_block_numbers) <= 1:
+        for number in missing_block_numbers:
+            _, canonical_hash = fetch_block_hash(number)
+            cache[number] = canonical_hash
+    elif missing_block_numbers:
+        with ThreadPoolExecutor(
+            max_workers=min(block_attestation_workers, len(missing_block_numbers)),
+            thread_name_prefix="qntyspot-block-attestation",
+        ) as executor:
+            for number, canonical_hash in executor.map(fetch_block_hash, missing_block_numbers):
+                cache[number] = canonical_hash
+
+    for block_number, row_hash in row_block_hashes.items():
+        if row_hash != cache[block_number]:
+            raise QualificationError(
+                "STOP_SOURCE_CONFLICT: log block hash disagrees with canonical block metadata"
+            )
     return result
 
 def _identities(logs: list[Mapping[str, Any]]) -> list[tuple[str, str, str]]:
@@ -371,6 +407,7 @@ def _bounded_log_integrity_probe(
     dev_end_block: int,
     span: int,
     canonical_block_hashes: dict[int, str] | None = None,
+    block_attestation_workers: int = DEFAULT_BLOCK_ATTESTATION_WORKERS,
 ) -> dict[str, Any]:
     if span < 2:
         raise QualificationError("qualification probe span must be >= 2")
@@ -380,8 +417,8 @@ def _bounded_log_integrity_probe(
         raise QualificationError("STOP_SOURCE_CONFLICT: DEV interval is too short for split-range integrity probe")
     midpoint = (start + end) // 2
 
-    whole_a = _sync_logs(rpc, start, end, canonical_block_hashes)
-    whole_b = _sync_logs(rpc, start, end, canonical_block_hashes)
+    whole_a = _sync_logs(rpc, start, end, canonical_block_hashes, block_attestation_workers)
+    whole_b = _sync_logs(rpc, start, end, canonical_block_hashes, block_attestation_workers)
     ordered_a = sorted(whole_a, key=_log_order_key)
     ordered_b = sorted(whole_b, key=_log_order_key)
     whole_ids_a = _identities(ordered_a)
@@ -389,8 +426,8 @@ def _bounded_log_integrity_probe(
     if whole_ids_a != whole_ids_b:
         raise QualificationError("STOP_SOURCE_CONFLICT: repeated historical log request is nondeterministic")
 
-    left = sorted(_sync_logs(rpc, start, midpoint, canonical_block_hashes), key=_log_order_key)
-    right = sorted(_sync_logs(rpc, midpoint + 1, end, canonical_block_hashes), key=_log_order_key)
+    left = sorted(_sync_logs(rpc, start, midpoint, canonical_block_hashes, block_attestation_workers), key=_log_order_key)
+    right = sorted(_sync_logs(rpc, midpoint + 1, end, canonical_block_hashes, block_attestation_workers), key=_log_order_key)
     left_ids = _identities(left)
     right_ids = _identities(right)
     combined = sorted(left_ids + right_ids)
@@ -447,12 +484,17 @@ def _dev_log_coverage(
     query_span: int,
     canonical_block_hashes: dict[int, str] | None = None,
     workers: int = DEFAULT_COVERAGE_WORKERS,
+    block_attestation_workers: int = DEFAULT_BLOCK_ATTESTATION_WORKERS,
 ) -> dict[str, Any]:
     if query_span < 2:
         raise QualificationError("qualification query span must be >= 2")
     if workers < 1 or workers > MAX_COVERAGE_WORKERS:
         raise QualificationError(
             f"coverage workers must be between 1 and {MAX_COVERAGE_WORKERS}"
+        )
+    if block_attestation_workers < 1 or block_attestation_workers > MAX_BLOCK_ATTESTATION_WORKERS:
+        raise QualificationError(
+            f"block attestation workers must be between 1 and {MAX_BLOCK_ATTESTATION_WORKERS}"
         )
 
     chunks: list[tuple[int, int]] = []
@@ -465,11 +507,11 @@ def _dev_log_coverage(
     def fetch_chunk(bounds: tuple[int, int]) -> list[Mapping[str, Any]]:
         chunk_start, chunk_end = bounds
         whole_a = sorted(
-            _sync_logs(rpc, chunk_start, chunk_end, canonical_block_hashes),
+            _sync_logs(rpc, chunk_start, chunk_end, canonical_block_hashes, block_attestation_workers),
             key=_log_order_key,
         )
         whole_b = sorted(
-            _sync_logs(rpc, chunk_start, chunk_end, canonical_block_hashes),
+            _sync_logs(rpc, chunk_start, chunk_end, canonical_block_hashes, block_attestation_workers),
             key=_log_order_key,
         )
         whole_ids_a = _identities(whole_a)
@@ -481,11 +523,11 @@ def _dev_log_coverage(
         if chunk_start < chunk_end:
             midpoint = (chunk_start + chunk_end) // 2
             left_ids = _identities(sorted(
-                _sync_logs(rpc, chunk_start, midpoint, canonical_block_hashes),
+                _sync_logs(rpc, chunk_start, midpoint, canonical_block_hashes, block_attestation_workers),
                 key=_log_order_key,
             ))
             right_ids = _identities(sorted(
-                _sync_logs(rpc, midpoint + 1, chunk_end, canonical_block_hashes),
+                _sync_logs(rpc, midpoint + 1, chunk_end, canonical_block_hashes, block_attestation_workers),
                 key=_log_order_key,
             ))
             if sorted(whole_ids_a) != sorted(left_ids + right_ids):
@@ -527,6 +569,7 @@ def _dev_log_coverage(
         "query_span_blocks": query_span,
         "chunk_count": len(chunks),
         "worker_count": workers,
+        "block_attestation_worker_count": block_attestation_workers,
         "sync_log_count": len(records),
         "sync_log_identity_digest": _digest(records),
         "canonical_block_binding_verified": True,
@@ -540,6 +583,7 @@ def qualify_source(
     provider_id: str,
     probe_span: int = DEFAULT_PROBE_SPAN,
     coverage_workers: int = DEFAULT_COVERAGE_WORKERS,
+    block_attestation_workers: int = DEFAULT_BLOCK_ATTESTATION_WORKERS,
 ) -> dict[str, Any]:
     if not provider_id or any(token in provider_id.lower() for token in ("http://", "https://", "?key=", "apikey")):
         raise QualificationError("provider_id must be a non-secret label, never an endpoint URL")
@@ -548,6 +592,10 @@ def qualify_source(
     if coverage_workers < 1 or coverage_workers > MAX_COVERAGE_WORKERS:
         raise QualificationError(
             f"coverage workers must be between 1 and {MAX_COVERAGE_WORKERS}"
+        )
+    if block_attestation_workers < 1 or block_attestation_workers > MAX_BLOCK_ATTESTATION_WORKERS:
+        raise QualificationError(
+            f"block attestation workers must be between 1 and {MAX_BLOCK_ATTESTATION_WORKERS}"
         )
 
     chain_id = _hex_int(rpc("eth_chainId", []))
@@ -600,6 +648,7 @@ def qualify_source(
         dev_end_number,
         probe_span,
         canonical_block_hashes,
+        block_attestation_workers,
     )
     if probe["to_block"] > dev_end_number:
         raise QualificationError("STOP_SOURCE_CONFLICT: economic probe crossed DEV_END")
@@ -611,6 +660,7 @@ def qualify_source(
         probe_span,
         canonical_block_hashes,
         coverage_workers,
+        block_attestation_workers,
     )
     if coverage["to_block"] != dev_end_number or coverage["from_block"] != t0_number:
         raise QualificationError("STOP_SOURCE_CONFLICT: DEV coverage did not span the full required range")
@@ -784,6 +834,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--probe-span", type=int, default=DEFAULT_PROBE_SPAN)
     parser.add_argument("--coverage-workers", type=int, default=DEFAULT_COVERAGE_WORKERS)
     parser.add_argument(
+        "--block-attestation-workers",
+        type=int,
+        default=DEFAULT_BLOCK_ATTESTATION_WORKERS,
+    )
+    parser.add_argument(
         "--output",
         default="experiments/research/qntyspot_ink_shadow_performance_dev_acquisition_research_v1/source_qualification_receipt.json",
     )
@@ -803,6 +858,7 @@ def main(argv: list[str] | None = None) -> int:
         provider_id=args.provider_id,
         probe_span=args.probe_span,
         coverage_workers=args.coverage_workers,
+        block_attestation_workers=args.block_attestation_workers,
     )
 
     secondary_endpoint = os.environ.get("QNTYSPOT_INK_RPC_URL_SECONDARY")
@@ -815,6 +871,7 @@ def main(argv: list[str] | None = None) -> int:
             provider_id=args.secondary_provider_id,
             probe_span=args.probe_span,
             coverage_workers=args.coverage_workers,
+        block_attestation_workers=args.block_attestation_workers,
         )
         compare_sources(primary, secondary)
 

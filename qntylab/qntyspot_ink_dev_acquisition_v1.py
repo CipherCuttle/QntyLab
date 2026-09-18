@@ -687,6 +687,22 @@ def materialize_dev_package(
     return manifest
 
 
+def _assert_reviewed_materializer_is_canonical(root: Path) -> None:
+    authorization = _load_json(root / AUTHORIZATION_PATH)
+    reviewed = authorization.get("implementation_contract", {}).get(
+        "dev_acquisition_reviewed_candidate_sha"
+    )
+    if not isinstance(reviewed, str) or len(reviewed) != 40:
+        raise AcquisitionError(
+            "exact reviewed DEV acquisition candidate is not pinned"
+        )
+    head = qualification._git(root, "rev-parse", "HEAD")
+    if not qualification._git_is_ancestor(root, reviewed, head):
+        raise AcquisitionError(
+            "STOP_SOURCE_CONFLICT: reviewed DEV acquisition candidate is not canonical"
+        )
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Materialize immutable QntySpot Ink DEV evidence only"
@@ -709,6 +725,7 @@ def main(argv: list[str] | None = None) -> int:
 
     root = Path(".").resolve()
     qualification.assert_canonical_stage_b_authority(root)
+    _assert_reviewed_materializer_is_canonical(root)
 
     primary = _load_json(Path(args.primary_qualification))
     secondary = _load_json(Path(args.secondary_qualification))

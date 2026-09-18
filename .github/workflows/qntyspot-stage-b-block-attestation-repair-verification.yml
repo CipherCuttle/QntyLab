@@ -14,6 +14,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -21,6 +23,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python -m pip install --disable-pip-version-check -q pytest
           python -m pytest             tests/test_qntyspot_ink_source_qualification_v1.py             tests/test_qntyspot_ink_shadow_performance_dev_acquisition_research_v1.py             -q
           python -m py_compile qntylab/qntyspot_ink_source_qualification_v1.py
           git diff --check master...HEAD

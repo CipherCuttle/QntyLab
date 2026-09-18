@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: qntyspot-stage-b-dev-acquisition-verifier
+  cancel-in-progress: true
+
 jobs:
   verify:
     runs-on: ubuntu-24.04

@@ -102,6 +102,7 @@ def _qualification(provider_id: str):
         "factory": qualification.FACTORY,
         "token0": qualification.KRAKMASK,
         "token1": qualification.WETH9,
+        "frozen_cutoff_utc": qualification.CUTOFF_UTC,
         "t1_block": {"number": 20, "hash": _block_hash(20), "timestamp": 1_700_000_020},
         "pool_deployment_block": 9,
         "t0_block": {"number": 10, "hash": _block_hash(10), "timestamp": 1_700_000_010},

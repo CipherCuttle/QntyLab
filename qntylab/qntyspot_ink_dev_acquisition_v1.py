@@ -90,6 +90,8 @@ def _validate_qualification_pair(
     *,
     expected_receipt_digests: set[str],
 ) -> None:
+    if primary.get("provider_id") == secondary.get("provider_id"):
+        raise AcquisitionError("qualification receipts must come from distinct providers")
     if len(expected_receipt_digests) != 2:
         raise AcquisitionError("exactly two canonical qualification receipt digests are required")
     actual_receipt_digests: set[str] = set()
@@ -128,8 +130,6 @@ def _validate_qualification_pair(
             raise AcquisitionError(f"{label} qualification receipt cutoff mismatch")
     if actual_receipt_digests != expected_receipt_digests:
         raise AcquisitionError("qualification receipts are not the canonically bound source pair")
-    if primary.get("provider_id") == secondary.get("provider_id"):
-        raise AcquisitionError("qualification receipts must come from distinct providers")
     try:
         qualification.compare_sources(primary, secondary)
     except qualification.QualificationError as exc:

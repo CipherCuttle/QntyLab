@@ -87,6 +87,17 @@ def test_stage_b_authority_is_canonicalization_gated_and_branch_network_receipts
     assert row["targeted_rereview_verdict"] == "PASS_NO_CRITICAL_HIGH"
     assert auth["review_policy"]["owner_authorized_same_chat_substitution"] is True
     assert auth["review_policy"]["reviewer_independence_claimed"] is False
+    assert auth["review_policy"]["dev_acquisition_initial_high_total"] == 3
+    assert auth["review_policy"]["dev_acquisition_repaired_candidate_sha"] == "08d69f528c70c0e1f4dcfe9ebcdfe26703aca004"
+    assert auth["review_policy"]["dev_acquisition_targeted_rereview_used"] is True
+    assert auth["review_policy"]["dev_acquisition_targeted_rereview_count"] == 1
+    assert auth["review_policy"]["dev_acquisition_targeted_rereview_verdict"] == "PASS_NO_CRITICAL_HIGH"
+    assert auth["review_policy"]["dev_acquisition_targeted_rereview_new_critical_total"] == 0
+    assert auth["review_policy"]["dev_acquisition_targeted_rereview_new_high_total"] == 0
+    assert row["dev_acquisition_hostile_review_initial_high_total"] == 3
+    assert row["dev_acquisition_hostile_review_repaired_candidate_sha"] == "08d69f528c70c0e1f4dcfe9ebcdfe26703aca004"
+    assert row["dev_acquisition_targeted_rereview_used"] is True
+    assert row["dev_acquisition_targeted_rereview_verdict"] == "PASS_NO_CRITICAL_HIGH"
     assert auth["review_policy"]["merge_authority"] == "NONE"
     assert auth["source_qualification_contract"]["network_execution_effective_only_after_exact_canonical_merge"] is True
     assert auth["implementation_contract"]["real_network_execution_in_this_candidate_pr"] is False

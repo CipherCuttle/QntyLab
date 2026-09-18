@@ -41,7 +41,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: qntyspot-stage-b-post292-quicknode-v1-receipt
-          path: receipts/quicknode
+          path: ${{ runner.temp }}/qntyspot-stage-b/receipts/quicknode
           github-token: ${{ github.token }}
           repository: CipherCuttle/QntyLab
           run-id: 35292668075
@@ -50,7 +50,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: qntyspot-stage-b-post292-gelato-v1-receipt
-          path: receipts/gelato
+          path: ${{ runner.temp }}/qntyspot-stage-b/receipts/gelato
           github-token: ${{ github.token }}
           repository: CipherCuttle/QntyLab
           run-id: 35294789896
@@ -59,14 +59,17 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test -f receipts/quicknode/receipt.json
-          test -f receipts/gelato/receipt.json
+          test -z "$(git status --porcelain)"
+          test -f "$RUNNER_TEMP/qntyspot-stage-b/receipts/quicknode/receipt.json"
+          test -f "$RUNNER_TEMP/qntyspot-stage-b/receipts/gelato/receipt.json"
           python - <<'PY'
+          import os
           from pathlib import Path
           from qntylab import qntyspot_ink_dev_acquisition_v1 as acquisition
 
-          primary = acquisition._load_json(Path("receipts/quicknode/receipt.json"))
-          secondary = acquisition._load_json(Path("receipts/gelato/receipt.json"))
+          base = Path(os.environ["RUNNER_TEMP"]) / "qntyspot-stage-b" / "receipts"
+          primary = acquisition._load_json(base / "quicknode" / "receipt.json")
+          secondary = acquisition._load_json(base / "gelato" / "receipt.json")
           acquisition._validate_qualification_pair(
               primary,
               secondary,
@@ -77,6 +80,7 @@ jobs:
           print(primary["receipt_digest"])
           print(secondary["receipt_digest"])
           PY
+          test -z "$(git status --porcelain)"
 
       - name: Materialize canonical DEV package
         env:
@@ -85,10 +89,10 @@ jobs:
         run: |
           set -euo pipefail
           python -m qntylab.qntyspot_ink_dev_acquisition_v1 \
-            --primary-qualification receipts/quicknode/receipt.json \
-            --secondary-qualification receipts/gelato/receipt.json \
+            --primary-qualification "$RUNNER_TEMP/qntyspot-stage-b/receipts/quicknode/receipt.json" \
+            --secondary-qualification "$RUNNER_TEMP/qntyspot-stage-b/receipts/gelato/receipt.json" \
             --provider-id ink-official-quicknode-public \
-            --output-dir qntyspot-stage-b-dev-package \
+            --output-dir "$RUNNER_TEMP/qntyspot-stage-b-dev-package" \
             --query-span 10000 \
             --coverage-workers 2 \
             --block-workers 4 \
@@ -98,14 +102,17 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test -f qntyspot-stage-b-dev-package/dev_reserves.jsonl
-          test -f qntyspot-stage-b-dev-package/dev_gas_evidence.json
-          test -f qntyspot-stage-b-dev-package/dev_manifest.json
+          test -f "$RUNNER_TEMP/qntyspot-stage-b-dev-package/dev_reserves.jsonl"
+          test -f "$RUNNER_TEMP/qntyspot-stage-b-dev-package/dev_gas_evidence.json"
+          test -f "$RUNNER_TEMP/qntyspot-stage-b-dev-package/dev_manifest.json"
+          test -z "$(git status --porcelain)"
           python - <<'PY'
           import json
+          import os
           from pathlib import Path
 
-          manifest = json.loads(Path("qntyspot-stage-b-dev-package/dev_manifest.json").read_text())
+          manifest_path = Path(os.environ["RUNNER_TEMP"]) / "qntyspot-stage-b-dev-package" / "dev_manifest.json"
+          manifest = json.loads(manifest_path.read_text())
           assert manifest["canonical_qntylab_source_sha"] == "c09c5ad942aadffecdb7287f1e688f56fa9d704c"
           assert manifest["candidate_evaluation_performed"] is False
           assert manifest["outer_access_performed"] is False
@@ -115,15 +122,15 @@ jobs:
           print(json.dumps(manifest, sort_keys=True, indent=2))
           PY
           sha256sum \
-            qntyspot-stage-b-dev-package/dev_reserves.jsonl \
-            qntyspot-stage-b-dev-package/dev_gas_evidence.json \
-            qntyspot-stage-b-dev-package/dev_manifest.json
+            "$RUNNER_TEMP/qntyspot-stage-b-dev-package/dev_reserves.jsonl" \
+            "$RUNNER_TEMP/qntyspot-stage-b-dev-package/dev_gas_evidence.json" \
+            "$RUNNER_TEMP/qntyspot-stage-b-dev-package/dev_manifest.json"
 
       - name: Upload immutable DEV package
         uses: actions/upload-artifact@v4
         with:
           name: qntyspot-stage-b-dev-acquisition-v1-package
-          path: qntyspot-stage-b-dev-package/
+          path: ${{ runner.temp }}/qntyspot-stage-b-dev-package/
           if-no-files-found: error
           retention-days: 90
           compression-level: 6

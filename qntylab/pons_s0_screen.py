@@ -1127,6 +1127,7 @@ def run_screen(
         "PONS_S0_M1_LOGISTIC": {},
         "PONS_S0_M2_HIST_GRADIENT_BOOSTING": {},
     }
+    no_feature_predictions: dict[int, float] = {}
     fold_receipts: list[dict[str, Any]] = []
     for fold in folds:
         train_x = _matrix(rows, fold.train_indices)
@@ -1138,6 +1139,9 @@ def run_screen(
         hist.fit(train_x, train_y)
         logistic_p = logistic.predict_proba(test_x)[:, 1]
         hist_p = hist.predict_proba(test_x)[:, 1]
+        train_prevalence = float(train_y.mean())
+        for index in fold.test_indices:
+            no_feature_predictions[index] = train_prevalence
         for index, probability in zip(fold.test_indices, logistic_p, strict=True):
             predictions["PONS_S0_M1_LOGISTIC"][index] = float(probability)
         for index, probability in zip(fold.test_indices, hist_p, strict=True):
@@ -1163,6 +1167,11 @@ def run_screen(
     if len(set(evaluation_indices)) != len(evaluation_indices):
         raise PonsS0ScreenError("test rows overlap across folds")
     y_eval = _labels(rows, evaluation_indices)
+    no_feature_probs = np.asarray(
+        [no_feature_predictions[index] for index in evaluation_indices],
+        dtype=float,
+    )
+    no_feature_probability = _probability_metrics(y_eval, no_feature_probs)
 
     variant_metrics: dict[str, dict[str, Any]] = {}
     c0_accepts = {index: rows[index].c0_trade for index in evaluation_indices}
@@ -1186,8 +1195,17 @@ def run_screen(
             index: predictions[strategy_id][index] >= float(config["probability_threshold"])
             for index in evaluation_indices
         }
+        probability = _probability_metrics(y_eval, probs)
+        probability["no_feature_brier_score"] = no_feature_probability["brier_score"]
+        probability["no_feature_log_loss"] = no_feature_probability["log_loss"]
+        probability["brier_improvement_vs_no_feature"] = (
+            no_feature_probability["brier_score"] - probability["brier_score"]
+        )
+        probability["log_loss_improvement_vs_no_feature"] = (
+            no_feature_probability["log_loss"] - probability["log_loss"]
+        )
         variant_metrics[strategy_id] = {
-            "probability": _probability_metrics(y_eval, probs),
+            "probability": probability,
             "policy": _policy_metrics(rows, evaluation_indices, accepts),
         }
 
@@ -1229,6 +1247,7 @@ def run_screen(
         "coverage": coverage,
         "folds": fold_receipts,
         "variants": variant_metrics,
+        "no_feature_probability_baseline": no_feature_probability,
         "candidate_artifact": None,
         "automatic_winner_selection": False,
         "promotion_authority": "NONE",

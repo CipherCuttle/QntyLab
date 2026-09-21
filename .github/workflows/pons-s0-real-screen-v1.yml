@@ -1,0 +1,251 @@
+name: Pons S0 Real Screen V1
+
+on:
+  push:
+    branches:
+      - agent/pons-s0-real-screen-v1
+    paths:
+      - experiments/forensics/pons_s0_real_screen_v1_origin.json
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pons-s0-real-screen-v1
+  cancel-in-progress: false
+
+jobs:
+  real-screen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      QNTYLAB_MODEL_COMMIT: '6a31642bd74e27f58ef96d87cc69b1ba10b72a4f'
+      SENTRY_SOURCE_COMMIT: '493c85b8d84565cedf6e936063549edfa02edf3a'
+      SENTRY_REPOSITORY: 'CipherCuttle/sentry-forensic-gate'
+      SENTRY_EVIDENCE_PATH: 'docs/evidence/pons-s0-real-cohort-v1'
+      POINTER_PATH: 'experiments/forensics/pons_s0_real_screen_v1_origin.json'
+      OUTPUT_ROOT: 'experiments/research/pons_s0_real_screen_v1'
+      RESEARCH_ROOT: 'experiments/research'
+
+    steps:
+      - name: Checkout real-screen harness
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: harness
+          fetch-depth: 0
+
+      - name: Read frozen origin pointer
+        id: pointer
+        shell: bash
+        run: |
+          set -euo pipefail
+          pointer="harness/${POINTER_PATH}"
+          test -s "${pointer}"
+          jq -e --arg q "${QNTYLAB_MODEL_COMMIT}" --arg s "${SENTRY_SOURCE_COMMIT}" '
+            .schemaVersion == "PONS_S0_REAL_SCREEN_ORIGIN_POINTER_V1" and
+            .qntylabModelCommit == $q and
+            .sentrySourceCommit == $s and
+            .sentryRepository == "CipherCuttle/sentry-forensic-gate" and
+            (.sentryEvidenceCommit | type == "string" and length == 40) and
+            (.originEvidenceDigest | type == "string" and length == 64) and
+            .targetPerformanceInspectedForSelection == false and
+            .promotionAuthority == "NONE" and
+            .liveMoneyAuthority == false
+          ' "${pointer}" >/dev/null
+          echo "sentry_commit=$(jq -r '.sentryEvidenceCommit' "${pointer}")" >> "${GITHUB_OUTPUT}"
+          echo "origin_digest=$(jq -r '.originEvidenceDigest' "${pointer}")" >> "${GITHUB_OUTPUT}"
+
+      - name: Checkout exact reviewed QntyLab model contract
+        uses: actions/checkout@v4
+        with:
+          repository: CipherCuttle/QntyLab
+          ref: 6a31642bd74e27f58ef96d87cc69b1ba10b72a4f
+          path: model-source
+          persist-credentials: false
+
+      - name: Checkout frozen SENTRY evidence commit
+        uses: actions/checkout@v4
+        with:
+          repository: CipherCuttle/sentry-forensic-gate
+          ref: ${{ steps.pointer.outputs.sentry_commit }}
+          path: sentry
+          persist-credentials: false
+
+      - name: Verify model contract unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C model-source rev-parse HEAD)" = "${QNTYLAB_MODEL_COMMIT}"
+          for path in             qntylab/pons_s0_screen.py             experiments/specs/pons_s0_model_screen_v1.json             requirements-pons-s0-v1.txt
+          do
+            cmp "harness/${path}" "model-source/${path}"
+          done
+
+      - name: Verify external SENTRY origin before target read
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence="sentry/${SENTRY_EVIDENCE_PATH}"
+          pointer="harness/${POINTER_PATH}"
+          test -s "${evidence}/features.jsonl"
+          test -f "${evidence}/outcomes.jsonl"
+          test -s "${evidence}/manifest.json"
+          test -s "${evidence}/origin-receipt.json"
+          test -s "${evidence}/summary.json"
+          test -s "${evidence}/SHA256SUMS"
+
+          (
+            cd "${evidence}"
+            sha256sum -c SHA256SUMS
+          )
+
+          expected_origin="$(jq -r '.originEvidenceDigest' "${pointer}")"
+          test "$(jq -r '.evidenceDigest' "${evidence}/origin-receipt.json")" = "${expected_origin}"
+
+          jq -e --arg source "${SENTRY_SOURCE_COMMIT}" --arg expected "${expected_origin}" '
+            .source.repository == "CipherCuttle/sentry-forensic-gate" and
+            .source.repositoryCommit == $source and
+            .evidenceDigest == $expected and
+            .exportContract.feature == "PONS_S0_FEATURE_PACKET_V1" and
+            .exportContract.outcome == "PONS_S0_OUTCOME_PACKET_V1" and
+            .exportContract.manifest == "PONS_S0_EXPORT_MANIFEST_V1" and
+            .frozenAuthority.targetPerformanceInspectedForSelection == false and
+            .frozenAuthority.selectedLaunchCount >= 40 and
+            .frozenAuthority.selectedLaunchCount == .artifacts.featurePacketCount and
+            .boundaries.readOnly == true and
+            .boundaries.signer == false and
+            .boundaries.broadcast == false and
+            .boundaries.liveMoneyAuthority == false and
+            .boundaries.modelPromotionAuthority == false and
+            .boundaries.mergeAuthority == false and
+            .boundaries.edge == "UNPROVEN"
+          ' "${evidence}/origin-receipt.json" >/dev/null
+
+          jq -e '
+            .verdict == "REAL_COHORT_READY_FOR_QNTYLAB" and
+            .scientificState == "EDGE_UNPROVEN" and
+            .selectedLaunchCount >= 40 and
+            .featurePacketCount == .selectedLaunchCount and
+            .boundaries.liveMoneyAuthority == false
+          ' "${evidence}/summary.json" >/dev/null
+
+          feature_sha="$(sha256sum "${evidence}/features.jsonl" | awk '{print $1}')"
+          outcome_sha="$(sha256sum "${evidence}/outcomes.jsonl" | awk '{print $1}')"
+          manifest_sha="$(sha256sum "${evidence}/manifest.json" | awk '{print $1}')"
+          test "${feature_sha}" = "$(jq -r '.artifacts.featureStreamSha256' "${evidence}/origin-receipt.json")"
+          test "${outcome_sha}" = "$(jq -r '.artifacts.outcomeStreamSha256' "${evidence}/origin-receipt.json")"
+          test "${manifest_sha}" = "$(jq -r '.artifacts.manifestFileSha256' "${evidence}/origin-receipt.json")"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install frozen focused model runtime
+        shell: bash
+        working-directory: harness
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check             -r requirements-pons-s0-v1.txt
+
+      - name: Run frozen real S0B screen and persist attempt evidence
+        id: screen
+        shell: bash
+        run: |
+          set -uo pipefail
+          evidence="${GITHUB_WORKSPACE}/sentry/${SENTRY_EVIDENCE_PATH}"
+          pointer="${GITHUB_WORKSPACE}/harness/${POINTER_PATH}"
+          output="${GITHUB_WORKSPACE}/harness/${OUTPUT_ROOT}"
+          research="${GITHUB_WORKSPACE}/harness/${RESEARCH_ROOT}"
+          mkdir -p "${output}"
+
+          cp "${evidence}/origin-receipt.json" "${output}/sentry-origin-receipt.json"
+          jq -n             --arg schema "PONS_S0_REAL_SCREEN_INPUT_BINDING_V1"             --arg qntylab_model_commit "${QNTYLAB_MODEL_COMMIT}"             --arg qntylab_harness_commit "${GITHUB_SHA}"             --arg sentry_evidence_commit "${{ steps.pointer.outputs.sentry_commit }}"             --arg sentry_source_commit "${SENTRY_SOURCE_COMMIT}"             --arg origin_digest "${{ steps.pointer.outputs.origin_digest }}"             --arg manifest_id "$(jq -r '.artifacts.manifestId' "${evidence}/origin-receipt.json")"             --arg manifest_digest "$(jq -r '.artifacts.manifestEvidenceDigest' "${evidence}/origin-receipt.json")"             '{
+              schemaVersion: $schema,
+              qntylabModelCommit: $qntylab_model_commit,
+              qntylabHarnessCommit: $qntylab_harness_commit,
+              sentryEvidenceCommit: $sentry_evidence_commit,
+              sentrySourceCommit: $sentry_source_commit,
+              sentryOriginEvidenceDigest: $origin_digest,
+              manifestId: $manifest_id,
+              manifestEvidenceDigest: $manifest_digest,
+              targetPerformanceInspectedForSelection: false,
+              promotionAuthority: "NONE",
+              liveMoneyAuthority: false,
+              edge: "UNPROVEN"
+            }' > "${output}/input-binding.json"
+
+          set +e
+          (
+            cd harness
+            PYTHONPATH=. python -m qntylab.pons_s0_screen               --manifest "../sentry/${SENTRY_EVIDENCE_PATH}/manifest.json"               --features "../sentry/${SENTRY_EVIDENCE_PATH}/features.jsonl"               --outcomes "../sentry/${SENTRY_EVIDENCE_PATH}/outcomes.jsonl"               --config "experiments/specs/pons_s0_model_screen_v1.json"               --output "${OUTPUT_ROOT}"               --research-root "${RESEARCH_ROOT}"
+          ) > "${output}/screen-run.log" 2>&1
+          rc=$?
+          set -e
+
+          if [ "${rc}" -eq 0 ]; then
+            jq -e '
+              .verdict == "EXPLORATORY_SCREEN_COMPLETE_NO_PROMOTION" and
+              .candidate_artifact == null and
+              .automatic_winner_selection == false and
+              .promotion_authority == "NONE" and
+              .live_money_authority == false and
+              .edge == "UNPROVEN" and
+              .registered_variant_denominator == 4
+            ' "${output}/screen_receipt.json" >/dev/null
+            verdict="EXPLORATORY_SCREEN_COMPLETE_NO_PROMOTION"
+          else
+            verdict="REAL_SCREEN_FAILED_CLOSED"
+          fi
+
+          PYTHONPATH=harness python -m qntylab.research_ledger             --root "harness/${RESEARCH_ROOT}" doctor
+
+          jq -n             --arg schema "PONS_S0_REAL_SCREEN_ATTEMPT_V1"             --arg verdict "${verdict}"             --arg qntylab_model_commit "${QNTYLAB_MODEL_COMMIT}"             --arg qntylab_harness_commit "${GITHUB_SHA}"             --arg sentry_evidence_commit "${{ steps.pointer.outputs.sentry_commit }}"             --arg origin_digest "${{ steps.pointer.outputs.origin_digest }}"             --argjson exit_code "${rc}"             '{
+              schemaVersion: $schema,
+              verdict: $verdict,
+              qntylabModelCommit: $qntylab_model_commit,
+              qntylabHarnessCommit: $qntylab_harness_commit,
+              sentryEvidenceCommit: $sentry_evidence_commit,
+              sentryOriginEvidenceDigest: $origin_digest,
+              screenExitCode: $exit_code,
+              registeredVariantDenominator: 4,
+              candidateArtifact: null,
+              automaticWinnerSelection: false,
+              promotionAuthority: "NONE",
+              liveMoneyAuthority: false,
+              edge: "UNPROVEN"
+            }' > "${output}/attempt-receipt.json"
+
+          echo "rc=${rc}" >> "${GITHUB_OUTPUT}"
+          echo "verdict=${verdict}" >> "${GITHUB_OUTPUT}"
+
+      - name: Commit append-only real-screen evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C harness config user.name 'github-actions[bot]'
+          git -C harness config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C harness add experiments/research
+          if git -C harness diff --cached --quiet; then
+            echo 'No research evidence diff to commit'
+          else
+            git -C harness commit -m "Record Pons S0 real screen attempt [skip ci]"
+            git -C harness push origin HEAD:agent/pons-s0-real-screen-v1
+          fi
+
+      - name: Upload real-screen evidence
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pons-s0-real-screen-v1
+          path: |
+            harness/experiments/research/pons_s0_real_screen_v1/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Enforce fail-closed screen result
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${{ steps.screen.outputs.rc }}" = "0"

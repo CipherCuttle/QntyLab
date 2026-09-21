@@ -36,6 +36,16 @@ Primary development target:
 
 `24h / 86,400,000 ms`
 
+Model universe:
+
+`C0_MECHANICALLY_ADMISSIBLE_WITH_RESOLVED_24H_OUTCOME`
+
+A launch whose frozen `BUY_EVERY_EXECUTABLE_CONTROL_R1` action is
+`WOULD_SKIP` is retained in coverage diagnostics but is **not** a model
+training or test row. M1/M2 may therefore select only among launches that have
+already passed the minimum frozen bidirectional mechanical gate. A learned
+model cannot override mechanical admissibility.
+
 This reuses SENTRY's existing canonical 24h creator/outcome evaluation rather
 than opening a horizon-selection search.
 
@@ -186,6 +196,15 @@ PR-B does not create a new experiment database.
 The runner registers the four frozen variants through the existing QntyLab
 append-only candidate stream and records each completed screen through the
 existing trial stream.
+
+The committed screen spec carries the historical `preregistered_at_utc`.
+Candidate ledger events do **not** copy that timestamp. They use the actual
+append time from the ledger clock, so an event appended after outcomes exist
+cannot masquerade as having been recorded at preregistration time.
+
+Candidate registration occurs before the runner reads feature/outcome packet
+bytes. The denominator therefore exists in the append-only trial ledger before
+the model sees target data.
 
 For irregular Pons launch events, the existing generic identity fields are used
 with explicit semantics:

@@ -416,6 +416,7 @@ def test_end_to_end_screen_reuses_append_only_ledger_without_promotion(tmp_path:
     assert receipt["edge"] == "UNPROVEN"
     assert len(receipt["variants"]) == 4
     assert len(receipt["folds"]) == 3
+    assert receipt["no_feature_probability_baseline"]["observation_count"] > 0
     assert all(
         fold["label_availability_embargo_satisfied"] for fold in receipt["folds"]
     )
@@ -427,6 +428,10 @@ def test_end_to_end_screen_reuses_append_only_ledger_without_promotion(tmp_path:
         assert metrics["log_loss"] >= 0
         assert 0 <= metrics["accuracy"] <= 1
         assert 0 <= metrics["balanced_accuracy"] <= 1
+        assert 0 <= metrics["no_feature_brier_score"] <= 1
+        assert metrics["no_feature_log_loss"] >= 0
+        assert isinstance(metrics["brier_improvement_vs_no_feature"], float)
+        assert isinstance(metrics["log_loss_improvement_vs_no_feature"], float)
 
     history = load_canonical_history(research_root)
     proposals = [

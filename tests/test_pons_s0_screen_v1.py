@@ -38,7 +38,7 @@ def addr(seed: int) -> str:
     return "0x" + f"{seed:040x}"[-40:]
 
 
-def _feature_packet(i: int, *, positive: bool) -> dict:
+def _feature_packet(i: int, *, positive: bool, c0_trade: bool = True) -> dict:
     launch_id = f"launch-{i:03d}"
     baseline_id = f"baseline-{i:03d}"
     decision_block = 100_000 + i * 100
@@ -137,7 +137,7 @@ def _feature_packet(i: int, *, positive: bool) -> dict:
                 "hypotheticalAction": "WOULD_TRADE" if positive else "WOULD_SKIP",
             },
             "buyEveryExecutableControl": {
-                "hypotheticalAction": "WOULD_TRADE",
+                "hypotheticalAction": "WOULD_TRADE" if c0_trade else "WOULD_SKIP",
             },
         },
         "evidenceDigest": policy_digest,
@@ -297,12 +297,23 @@ def _outcome_packet(i: int, *, positive: bool) -> dict:
     return {**material, "evidenceDigest": canonical_sha256(material)}
 
 
-def _write_bundle(root: Path, count: int = 72) -> tuple[Path, Path, Path]:
+def _write_bundle(
+    root: Path,
+    count: int = 72,
+    *,
+    c0_skip_indices: frozenset[int] = frozenset(),
+) -> tuple[Path, Path, Path]:
     features = []
     outcomes = []
     for i in range(count):
         positive = i % 3 != 0
-        features.append(_feature_packet(i, positive=positive))
+        features.append(
+            _feature_packet(
+                i,
+                positive=positive,
+                c0_trade=i not in c0_skip_indices,
+            )
+        )
         outcomes.append(_outcome_packet(i, positive=positive))
     feature_bytes = b"".join(canonical_bytes(row) + b"\n" for row in features)
     outcome_bytes = b"".join(canonical_bytes(row) + b"\n" for row in outcomes)
@@ -355,6 +366,10 @@ def test_preregistered_denominator_is_exactly_four():
     assert config["variants"] == list(FROZEN_VARIANTS)
     assert REGISTERED_VARIANT_DENOMINATOR == 4
     assert config["promotion_authority"] == "NONE"
+    assert (
+        config["research_universe"]
+        == "C0_MECHANICALLY_ADMISSIBLE_WITH_RESOLVED_24H_OUTCOME"
+    )
 
 
 def test_export_integrity_and_tamper_fail_closed(tmp_path: Path):
@@ -375,6 +390,28 @@ def test_export_integrity_and_tamper_fail_closed(tmp_path: Path):
             features_path=features,
             outcomes_path=outcomes,
         )
+
+
+def test_model_universe_cannot_override_mechanical_c0_gate(tmp_path: Path):
+    manifest, features, outcomes = _write_bundle(
+        tmp_path / "bundle",
+        c0_skip_indices=frozenset({5, 11}),
+    )
+    bundle = load_export_bundle(
+        manifest_path=manifest,
+        features_path=features,
+        outcomes_path=outcomes,
+    )
+    rows, coverage = build_screen_rows(bundle)
+    assert coverage["resolved_target_count"] == 72
+    assert coverage["mechanically_admissible_resolved_count"] == 70
+    assert coverage["mechanically_inadmissible_resolved_count"] == 2
+    assert coverage["mechanically_inadmissible_resolved_launch_ids"] == [
+        "launch-005",
+        "launch-011",
+    ]
+    assert all(row.c0_trade for row in rows)
+    assert {row.launch_id for row in rows}.isdisjoint({"launch-005", "launch-011"})
 
 
 def test_block_embargo_excludes_labels_not_known_by_test_decision(tmp_path: Path):
@@ -445,6 +482,11 @@ def test_end_to_end_screen_reuses_append_only_ledger_without_promotion(tmp_path:
     assert {
         event["required_input_kind"] for event in proposals
     } == {"SENTRY_PONS_S0_EXPORT_V1"}
+    config = load_screen_config(CONFIG_PATH)
+    assert all(
+        event["recorded_at_utc"] > config["preregistered_at_utc"]
+        for event in proposals
+    )
     assert not doctor(research_root)
 
     for variant in FROZEN_VARIANTS:

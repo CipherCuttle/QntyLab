@@ -34,6 +34,7 @@ from .research_ledger import (
     preflight,
     rebuild,
     sha256_bytes,
+    utc_now,
     sha256_path,
 )
 
@@ -155,6 +156,7 @@ CONFIG_KEYS = {
     "registered_variant_denominator",
     "variants",
     "promotion_authority",
+    "research_universe",
 }
 
 
@@ -513,6 +515,7 @@ def load_screen_config(path: Path) -> dict[str, Any]:
         "negative_classes": sorted(NEGATIVE_CLASSES),
         "registered_variant_denominator": REGISTERED_VARIANT_DENOMINATOR,
         "promotion_authority": "NONE",
+        "research_universe": "C0_MECHANICALLY_ADMISSIBLE_WITH_RESOLVED_24H_OUTCOME",
     }
     for key, value in expected.items():
         if config.get(key) != value:
@@ -632,6 +635,8 @@ def build_screen_rows(
     }
     rows: list[ScreenRow] = []
     unresolved: list[str] = []
+    mechanically_inadmissible_resolved: list[str] = []
+    resolved_target_count = 0
     for feature in bundle.features:
         launch = _dict_field(feature["launch"], "feature.launch")
         baseline = _dict_field(feature["baseline"], "feature.baseline")
@@ -675,6 +680,11 @@ def build_screen_rows(
             receipts.get("buyEveryExecutableControl"), "feature.policyComparison.control"
         )
         c1 = _dict_field(receipts.get("r1"), "feature.policyComparison.r1")
+        resolved_target_count += 1
+        c0_trade = c0.get("hypotheticalAction") == "WOULD_TRADE"
+        if not c0_trade:
+            mechanically_inadmissible_resolved.append(launch_id)
+            continue
         rows.append(
             ScreenRow(
                 launch_id=launch_id,
@@ -691,7 +701,7 @@ def build_screen_rows(
                 gross_value_usd_micros=gross_value,
                 net_value_usd_micros=net_value,
                 features=_feature_vector(feature),
-                c0_trade=c0.get("hypotheticalAction") == "WOULD_TRADE",
+                c0_trade=True,
                 c1_trade=c1.get("hypotheticalAction") == "WOULD_TRADE",
             )
         )
@@ -700,11 +710,21 @@ def build_screen_rows(
         raise PonsS0ScreenError("duplicate resolved launch in screen rows")
     coverage = {
         "feature_packet_count": len(bundle.features),
-        "resolved_target_count": len(rows),
+        "resolved_target_count": resolved_target_count,
         "unresolved_target_count": len(unresolved),
         "target_coverage_bps": (
-            len(rows) * 10_000 // len(bundle.features) if bundle.features else 0
+            resolved_target_count * 10_000 // len(bundle.features)
+            if bundle.features
+            else 0
         ),
+        "mechanically_admissible_resolved_count": len(rows),
+        "mechanically_inadmissible_resolved_count": len(
+            mechanically_inadmissible_resolved
+        ),
+        "mechanically_inadmissible_resolved_launch_ids": sorted(
+            mechanically_inadmissible_resolved
+        ),
+        "model_universe": "C0_MECHANICALLY_ADMISSIBLE_WITH_RESOLVED_24H_OUTCOME",
         "unresolved_launch_ids": sorted(unresolved),
     }
     return tuple(rows), coverage
@@ -926,7 +946,7 @@ def _variant_event(config: dict[str, Any], variant: dict[str, Any]) -> dict[str,
         "required_input_kind": INPUT_KIND,
         "funding_boundary_mode": "NOT_APPLICABLE",
         "failure_condition": "NO_OUT_OF_SAMPLE_INCREMENTAL_INFORMATION_OR_ECONOMIC_VALUE",
-        "recorded_at_utc": config["preregistered_at_utc"],
+        "recorded_at_utc": utc_now(),
         "registered_screen_id": SCREEN_ID,
         "registered_variant_denominator": REGISTERED_VARIANT_DENOMINATOR,
     }
@@ -1073,6 +1093,7 @@ def _write_variant_receipt_and_ledger(
         "expected_interval": BAR_INTERVAL,
         "registered_screen_id": SCREEN_ID,
         "registered_variant_denominator": REGISTERED_VARIANT_DENOMINATOR,
+        "research_universe": config["research_universe"],
         "target_horizon_ms": TARGET_HORIZON_MS,
         "feature_names": list(FEATURE_NAMES),
         "folds": fold_receipts,
@@ -1109,6 +1130,7 @@ def run_screen(
     research_root: Path,
 ) -> dict[str, Any]:
     config = load_screen_config(config_path)
+    events = register_screen_candidates(config, research_root)
     bundle = load_export_bundle(
         manifest_path=manifest_path,
         features_path=features_path,
@@ -1121,8 +1143,6 @@ def run_screen(
         test_rows=config["test_rows"],
         max_folds=config["max_folds"],
     )
-    events = register_screen_candidates(config, research_root)
-
     predictions: dict[str, dict[int, float]] = {
         "PONS_S0_M1_LOGISTIC": {},
         "PONS_S0_M2_HIST_GRADIENT_BOOSTING": {},

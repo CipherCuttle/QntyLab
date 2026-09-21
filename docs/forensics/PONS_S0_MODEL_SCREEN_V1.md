@@ -153,6 +153,11 @@ Fixed:
 Both report Brier score, log loss, accuracy, balanced accuracy and ROC AUC when
 defined.
 
+Each fold also emits a **no-feature prevalence probability baseline** fitted on
+that fold's embargoed training labels only. M1/M2 report Brier/log-loss
+improvement versus that baseline. This is diagnostic and does not create a fifth
+registered strategy variant.
+
 These are diagnostics, not promotion gates.
 
 ## Economic diagnostics
@@ -224,3 +229,18 @@ python -m pip install -r requirements-pons-s0-v1.txt pytest==9.1.1
 PYTHONPATH=. python -m pytest -q tests/test_pons_s0_screen_v1.py
 PYTHONPATH=. python -m qntylab.research_ledger doctor
 ```
+
+## Source-origin limitation
+
+V1 validates SENTRY packet/manifest **content integrity** and every nested
+content-addressed identity it consumes. The current PR-A manifest does not carry
+a cryptographically bound SENTRY repository commit or CI artifact origin.
+
+Therefore a real scientific S0 run must preserve an external origin receipt for
+the exact SENTRY materialization (repository/ref + artifact/file digest). V1
+does not interpret self-consistent packet bytes as proof that they were produced
+by an authorized SENTRY build.
+
+This limitation blocks later strategy-artifact promotion until the real input
+cohort has an exact origin receipt. It does not affect the synthetic
+implementation qualification in this PR.

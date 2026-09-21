@@ -1200,6 +1200,15 @@ next_action = "No implementation is authorized; require separate Git-backed auth
 implementation_authorized = false
 
 [[project]]
+project_id = "QNTYSPOT_LEVERAGED_PERP_SHADOW_RESEARCH_V0"
+display_name = "QntySpot leveraged-perp shadow research V0"
+state = "PLANNED_NOT_AUTHORIZED"
+authority_level = "PLANNING_ONLY"
+authoritative_artifacts = ["docs/ADR/0005-qntylab-north-star-market-intelligence-architecture.md"]
+next_action = "DO LATER ONLY: after sufficient real-money QntySpot spot evidence exists, design a separate leveraged-perpetual shadow research contract that replays those decisions under realistic fees, slippage, funding, margin/liquidation, and venue semantics. Begin with isolated-margin low-leverage canaries only if shadow evidence separately earns downstream authorization. No implementation, derivatives execution, signing, broadcast, leverage, shorting, margin, or capital authority is granted."
+implementation_authorized = false
+
+[[project]]
 project_id = "QNTY_HANDOFF"
 state = "PLANNED_NOT_AUTHORIZED"
 authority_level = "PLANNING_ONLY"

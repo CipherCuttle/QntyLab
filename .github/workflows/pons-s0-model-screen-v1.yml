@@ -1,0 +1,47 @@
+name: Pons S0 Model Screen V1
+
+on:
+  pull_request:
+    paths:
+      - "qntylab/pons_s0_screen.py"
+      - "experiments/specs/pons_s0_model_screen_v1.json"
+      - "requirements-pons-s0-v1.txt"
+      - "tests/test_pons_s0_screen_v1.py"
+      - "docs/forensics/PONS_S0_MODEL_SCREEN_V1.md"
+      - ".github/workflows/pons-s0-model-screen-v1.yml"
+  push:
+    branches: [master]
+    paths:
+      - "qntylab/pons_s0_screen.py"
+      - "experiments/specs/pons_s0_model_screen_v1.json"
+      - "requirements-pons-s0-v1.txt"
+      - "tests/test_pons_s0_screen_v1.py"
+      - "docs/forensics/PONS_S0_MODEL_SCREEN_V1.md"
+      - ".github/workflows/pons-s0-model-screen-v1.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  screen-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install frozen focused dependencies
+        run: |
+          python -m pip install --disable-pip-version-check \
+            -r requirements-pons-s0-v1.txt \
+            "pytest==9.1.1"
+      - name: Verify Pons S0 screen
+        run: PYTHONPATH=. python -m pytest -q tests/test_pons_s0_screen_v1.py
+      - name: Verify canonical research ledger remains healthy
+        run: PYTHONPATH=. python -m qntylab.research_ledger doctor
+      - name: Verify bounded diff hygiene
+        run: git diff --check ${{ github.event.pull_request.base.sha || 'HEAD^' }}..HEAD

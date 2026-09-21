@@ -95,10 +95,12 @@ jobs:
           test -s "${evidence}/summary.json"
           test -s "${evidence}/SHA256SUMS"
 
-          (
-            cd "${evidence}"
-            sha256sum -c SHA256SUMS
-          )
+          for name in features.jsonl outcomes.jsonl manifest.json origin-receipt.json summary.json; do
+            expected_sha="$(awk -v path="cohort/${name}" '$2 == path { print $1 }' "${evidence}/SHA256SUMS")"
+            test -n "${expected_sha}"
+            actual_sha="$(sha256sum "${evidence}/${name}" | awk '{print $1}')"
+            test "${actual_sha}" = "${expected_sha}"
+          done
 
           expected_origin="$(jq -r '.originEvidenceDigest' "${pointer}")"
           test "$(jq -r '.evidenceDigest' "${evidence}/origin-receipt.json")" = "${expected_origin}"

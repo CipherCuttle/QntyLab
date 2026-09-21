@@ -451,6 +451,9 @@ def test_end_to_end_screen_reuses_append_only_ledger_without_promotion(tmp_path:
     assert receipt["promotion_authority"] == "NONE"
     assert receipt["live_money_authority"] is False
     assert receipt["edge"] == "UNPROVEN"
+    assert receipt["runtime_versions"]["numpy"] == "2.5.3"
+    assert receipt["runtime_versions"]["scipy"] == "1.18.1"
+    assert receipt["runtime_versions"]["scikit_learn"] == "1.9.1"
     assert len(receipt["variants"]) == 4
     assert len(receipt["folds"]) == 3
     assert receipt["no_feature_probability_baseline"]["observation_count"] > 0
@@ -496,3 +499,4 @@ def test_end_to_end_screen_reuses_append_only_ledger_without_promotion(tmp_path:
         assert data["promotion_authority"] == "NONE"
         assert data["live_money_authority"] is False
         assert data["registered_variant_denominator"] == 4
+        assert data["runtime_versions"] == receipt["runtime_versions"]

@@ -163,6 +163,16 @@ Fixed:
 Both report Brier score, log loss, accuracy, balanced accuracy and ROC AUC when
 defined.
 
+The focused numerical runtime is frozen and recorded in every screen/variant
+receipt:
+
+- NumPy `2.5.3`
+- SciPy `1.18.1`
+- scikit-learn `1.9.1`
+
+This matters because optimizer/library drift must not silently change a
+content-addressed research result while source/input hashes remain constant.
+
 Each fold also emits a **no-feature prevalence probability baseline** fitted on
 that fold's embargoed training labels only. M1/M2 report Brier/log-loss
 improvement versus that baseline. This is diagnostic and does not create a fifth

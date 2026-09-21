@@ -62,6 +62,7 @@ ADVERSE_CLASSES = {"CATASTROPHIC_LOSS", "EXIT_FAILURE", "LIQUIDITY_COLLAPSE"}
 CAPACITY_SEMANTICS = "INDEPENDENT_PROBE_CAPACITY_NOT_SEQUENTIAL"
 PERSONA_PARITY = "SHADOW_RECIPIENT_BOUND_LIVE_WALLET_UNVERIFIED"
 MODE = "SHADOW_ONLY"
+RESEARCH_UNIVERSE = "C0_MECHANICALLY_ADMISSIBLE_WITH_RESOLVED_24H_OUTCOME"
 
 FROZEN_VARIANTS: tuple[dict[str, Any], ...] = (
     {
@@ -515,7 +516,7 @@ def load_screen_config(path: Path) -> dict[str, Any]:
         "negative_classes": sorted(NEGATIVE_CLASSES),
         "registered_variant_denominator": REGISTERED_VARIANT_DENOMINATOR,
         "promotion_authority": "NONE",
-        "research_universe": "C0_MECHANICALLY_ADMISSIBLE_WITH_RESOLVED_24H_OUTCOME",
+        "research_universe": RESEARCH_UNIVERSE,
     }
     for key, value in expected.items():
         if config.get(key) != value:
@@ -724,7 +725,7 @@ def build_screen_rows(
         "mechanically_inadmissible_resolved_launch_ids": sorted(
             mechanically_inadmissible_resolved
         ),
-        "model_universe": "C0_MECHANICALLY_ADMISSIBLE_WITH_RESOLVED_24H_OUTCOME",
+        "model_universe": RESEARCH_UNIVERSE,
         "unresolved_launch_ids": sorted(unresolved),
     }
     return tuple(rows), coverage
@@ -1093,7 +1094,7 @@ def _write_variant_receipt_and_ledger(
         "expected_interval": BAR_INTERVAL,
         "registered_screen_id": SCREEN_ID,
         "registered_variant_denominator": REGISTERED_VARIANT_DENOMINATOR,
-        "research_universe": config["research_universe"],
+        "research_universe": RESEARCH_UNIVERSE,
         "target_horizon_ms": TARGET_HORIZON_MS,
         "feature_names": list(FEATURE_NAMES),
         "folds": fold_receipts,

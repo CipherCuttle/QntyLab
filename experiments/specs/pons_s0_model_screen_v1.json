@@ -70,5 +70,6 @@
       }
     }
   ],
-  "promotion_authority": "NONE"
+  "promotion_authority": "NONE",
+  "research_universe": "C0_MECHANICALLY_ADMISSIBLE_WITH_RESOLVED_24H_OUTCOME"
 }

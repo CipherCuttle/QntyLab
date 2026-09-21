@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "screen_id": "PONS_S0_MODEL_SCREEN_V1",
+  "screen_version": "pons-s0-model-screen-v1",
+  "preregistered_at_utc": "2026-09-21T16:12:20Z",
+  "input_kind": "SENTRY_PONS_S0_EXPORT_V1",
+  "feature_schema": "PONS_S0_FEATURE_PACKET_V1",
+  "outcome_schema": "PONS_S0_OUTCOME_PACKET_V1",
+  "target_horizon_ms": 86400000,
+  "positive_classes": [
+    "NORMAL_WIN"
+  ],
+  "negative_classes": [
+    "CATASTROPHIC_LOSS",
+    "EXIT_FAILURE",
+    "LIQUIDITY_COLLAPSE",
+    "NORMAL_LOSS"
+  ],
+  "min_train_rows": 30,
+  "test_rows": 10,
+  "max_folds": 3,
+  "probability_threshold": 0.5,
+  "registered_variant_denominator": 4,
+  "variants": [
+    {
+      "candidate_id": "PONS_S0_C0_BUY_EVERY_EXECUTABLE",
+      "strategy_id": "PONS_S0_C0",
+      "kind": "CONTROL",
+      "parameters": {
+        "policy": "BUY_EVERY_EXECUTABLE_CONTROL_R1",
+        "target_horizon_ms": 86400000
+      }
+    },
+    {
+      "candidate_id": "PONS_S0_C1_FAST_VET_R1",
+      "strategy_id": "PONS_S0_C1",
+      "kind": "CONTROL",
+      "parameters": {
+        "policy": "FAST_VET_R1_CAPACITY_GATE",
+        "target_horizon_ms": 86400000
+      }
+    },
+    {
+      "candidate_id": "PONS_S0_M1_LOGISTIC",
+      "strategy_id": "PONS_S0_M1_LOGISTIC",
+      "kind": "MODEL",
+      "parameters": {
+        "model": "LOGISTIC_REGRESSION_L2",
+        "C": 1,
+        "solver": "lbfgs",
+        "max_iter": 1000,
+        "threshold": 0.5,
+        "target_horizon_ms": 86400000
+      }
+    },
+    {
+      "candidate_id": "PONS_S0_M2_HIST_GRADIENT_BOOSTING",
+      "strategy_id": "PONS_S0_M2_HIST_GRADIENT_BOOSTING",
+      "kind": "MODEL",
+      "parameters": {
+        "model": "HIST_GRADIENT_BOOSTING",
+        "learning_rate": 0.1,
+        "max_iter": 100,
+        "max_leaf_nodes": 15,
+        "min_samples_leaf": 5,
+        "l2_regularization": 1,
+        "random_state": 0,
+        "threshold": 0.5,
+        "target_horizon_ms": 86400000
+      }
+    }
+  ],
+  "promotion_authority": "NONE",
+  "research_universe": "C0_MECHANICALLY_ADMISSIBLE_WITH_RESOLVED_24H_OUTCOME"
+}

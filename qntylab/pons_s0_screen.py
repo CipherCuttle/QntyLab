@@ -998,6 +998,22 @@ def _iso_from_ms(value: int) -> str:
     return datetime.fromtimestamp(value / 1000, tz=UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
+def _runtime_versions() -> dict[str, str]:
+    try:
+        import numpy
+        import scipy
+        import sklearn
+    except ImportError as exc:
+        raise PonsS0ScreenError(
+            "Pons S0 model dependencies missing; install requirements-pons-s0-v1.txt"
+        ) from exc
+    return {
+        "numpy": numpy.__version__,
+        "scipy": scipy.__version__,
+        "scikit_learn": sklearn.__version__,
+    }
+
+
 def _repo_commit() -> str:
     try:
         return subprocess.check_output(
@@ -1076,6 +1092,7 @@ def _write_variant_receipt_and_ledger(
         "run_id": receipt_dir.name,
         "repository_commit": _repo_commit(),
         "relevant_source_sha256": _source_digest(),
+        "runtime_versions": _runtime_versions(),
         "candidate_id": event["candidate_id"],
         "family_id": FAMILY_ID,
         "variant_id": event["variant_id"],
@@ -1260,6 +1277,7 @@ def run_screen(
         "schema_version": 1,
         "screen_id": SCREEN_ID,
         "screen_version": SCREEN_VERSION,
+        "runtime_versions": _runtime_versions(),
         "input_manifest_id": bundle.manifest["manifestId"],
         "input_manifest_evidence_digest": bundle.manifest["evidenceDigest"],
         "registered_variant_denominator": REGISTERED_VARIANT_DENOMINATOR,

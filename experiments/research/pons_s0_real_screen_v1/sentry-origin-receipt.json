@@ -1,0 +1,339 @@
+{
+  "schemaVersion": "PONS_S0_EXTERNAL_ORIGIN_RECEIPT_V1",
+  "source": {
+    "repository": "CipherCuttle/sentry-forensic-gate",
+    "repositoryCommit": "493c85b8d84565cedf6e936063549edfa02edf3a",
+    "sourceTreeVerifiedByGit": true
+  },
+  "exportContract": {
+    "feature": "PONS_S0_FEATURE_PACKET_V1",
+    "outcome": "PONS_S0_OUTCOME_PACKET_V1",
+    "manifest": "PONS_S0_EXPORT_MANIFEST_V1"
+  },
+  "artifacts": {
+    "featureStreamSha256": "2ee2f4615ff4a653771e877262e976f4c9f807f031ba5987b48042f551aae2f6",
+    "outcomeStreamSha256": "dcc6a5f62a6a35c9d1ae4a199e21da768ea7c03f70fdd99701d4bb1d798d9e7d",
+    "manifestFileSha256": "2fd973760c35323384aedf00f31267a16b1f25def6d5bde72ea7b7feb22da72d",
+    "manifestId": "df295570ddf168a5394a3fae71bf3f99aeebad2fbe1d3abb530c34ec62d89dce",
+    "manifestEvidenceDigest": "c620b2ef3781666a231b5edd991d81b601b92677315cd5b94bb4f3def38d1332",
+    "featurePacketCount": 96,
+    "outcomePacketCount": 57
+  },
+  "frozenAuthority": {
+    "chainId": 4663,
+    "ponsAuthorityId": "ROBINHOOD_PONS_V2_FACTORY_2026_08_03_R1",
+    "factory": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+    "authorityFromBlock": "26841846",
+    "asOfBlock": "69066751",
+    "asOfBlockHash": "0xdad32c5b5e91eb495150ef498eba528c5d5e873c2b699ddb8a5bb26808f72682",
+    "asOfTimestampMs": 1790020746000,
+    "headObservedBlock": "69066763",
+    "confirmations": "12",
+    "maturityHorizonMs": 86400000,
+    "maturityCutoffTimestampMs": 1789934346000,
+    "matureThroughBlock": "68207850",
+    "matureThroughBlockHash": "0xda8bd3ce5d1f90d921711396ecce95fd1e9f3891743d08330008750448c25cc2",
+    "matureUniverseLaunchCount": 564865,
+    "matureLaunchUniverseEvidenceDigest": "631817b8f8c4e9ea3fe566a149ad36891dc735a17fcd6f6add77a1968a67ad5f",
+    "cohortTargetCount": 96,
+    "selectedLaunchCount": 96,
+    "cohortSelection": "SYSTEMATIC_ORDINAL_SAMPLE_OVER_COMPLETE_MATURE_FACTORY_UNIVERSE_V1",
+    "cohortSelectionRule": "k=min(N,96); index_i=floor(i*(N-1)/(k-1)); endpoints included",
+    "targetPerformanceInspectedForSelection": false
+  },
+  "materialization": {
+    "materializerId": "PONS_S0_REAL_COHORT_MATERIALIZER_SHARDED_V1",
+    "materializerScriptsSha256": {
+      "pons-s0-cohort-lib.mjs": "0905b11e8b10fb64ba48420086225c2d44307d9f04a4478bc0b36b7a4f9bdc1d",
+      "pons-s0-prepare-cohort-plan.mjs": "d3e0a580b534a3b37bf7fd933b66e474e60492abbee0e4b94040cfaa1499cb02",
+      "pons-s0-materialize-shard.mjs": "28bb00e07681d8f470e382f5a6bb0470b346add620d0d5a0e606d0afd2c1c543",
+      "pons-s0-assemble-cohort.mjs": "5e78c859949e2edf418bcbf99ec32eed30ba3bcf417303a1f46f37f162165cdc"
+    },
+    "planDigest": "70273ec49e5d37acf33eb6ee645d8c3d369168f8eef8c3c287867a4be473ac70",
+    "shardCount": 16,
+    "shardReceipts": [
+      {
+        "schemaVersion": "PONS_S0_SHARD_RECEIPT_V1",
+        "shard": 1,
+        "shardCount": 16,
+        "assignedCount": 6,
+        "materializedCount": 6,
+        "fragmentsFileSha256": "ea457ebb654bca4bdef937e210da28475f6e2369f69faf88dec2738b3ed4c550",
+        "launchIds": [
+          "133de2ce1f186a0486c01ec6e66807d88126546df899420a5e9fc46c5181d1ff",
+          "2be03870af5766168d09905bcc4a8124f8384b980cb2acaf3ff22d26a04d542a",
+          "91ea9011fbeadfd45fef9b21924861512aa690d46d4815de773760e62f55d9aa",
+          "189bba8c03a5d1a2ff60a0596a6ecc93cd359b4e88dc10d79994df86f804ffd0",
+          "a6dd12d432addf76daa862eeec657c24c53c307003cc36a51ac85a6d968ee5aa",
+          "87d1bfebd7fa9d9c8cb63f23ac4c89128d5edf40ae7ec3de2f922088b81cab3c"
+        ]
+      },
+      {
+        "schemaVersion": "PONS_S0_SHARD_RECEIPT_V1",
+        "shard": 2,
+        "shardCount": 16,
+        "assignedCount": 6,
+        "materializedCount": 6,
+        "fragmentsFileSha256": "97d4181ce64ae600a427a5a92212e2f04def2fe4dfa91833d7a86f8c75501eb3",
+        "launchIds": [
+          "0482467d2b91064b0e2f5800c7640a563b73c390c452fd43cb20b8430747c9af",
+          "88ffc0e250ca1cc91d9e99ba078c657ed1eab74d1f63addc9270e06b30336c85",
+          "11d8963d6f132e13e6904af40d7abe192d501cff618105c4130a8f2921cf9640",
+          "8bf640e88f7afe5cd029d86f8fe8bcdddb821d37ab3ebdcf9126958157106205",
+          "e86474a68637b22a820ed6552d40c0b3652a74f8feaaccb2172c60fdc5aa16cf",
+          "fb5d7709ca8e4fd02d3e871078b76c617c8ae2a12fd50b947940a5083f057aa3"
+        ]
+      },
+      {
+        "schemaVersion": "PONS_S0_SHARD_RECEIPT_V1",
+        "shard": 3,
+        "shardCount": 16,
+        "assignedCount": 6,
+        "materializedCount": 6,
+        "fragmentsFileSha256": "a738a9f870e568108ecd054cfc4257bb45c8d5baf3daa8dba1c8c6a469e28857",
+        "launchIds": [
+          "cc02ebcc61adcd899c411a1c1e4eb4589e7491a4f16fdd43da78a9e4482e4144",
+          "753f0ab74879475817ae00f6fc855008cbc1db0caf99bd8dffa99d1675554881",
+          "96c26095cd1fdb874dcf67da6315734e44bd0fd3290471d3ffc2a50771ed6d2f",
+          "12d118084effa0073aee2c84b8d69250275398cf56afa6a2de66ca77e3f5925d",
+          "5ec8107d82a00fdfffc1f6ea4ebd664a1f7497f1ff56d19dd34a998a62533ca3",
+          "13ef1b7854248b7929e56c701d17da2fa8019f0d6ca6b238514c653f1b1b7bb0"
+        ]
+      },
+      {
+        "schemaVersion": "PONS_S0_SHARD_RECEIPT_V1",
+        "shard": 4,
+        "shardCount": 16,
+        "assignedCount": 6,
+        "materializedCount": 6,
+        "fragmentsFileSha256": "3a0de8c9a99cf13f231f5c386170efa20138fd6987da49d34adaea5c62f64f37",
+        "launchIds": [
+          "0952228f3d8c3f39d1dacf8f4c0fa7f19fa16f47a07e945d85e92f9248ab8f43",
+          "4cf5d5bd97d5ff5ceade025187e88881cbba6c00ce4c422a545df7c5ac677d00",
+          "bd7c5348168485f52f6dc840d7b7a06633cbd6aef71307796752a0f0e1c81c79",
+          "4ee0ce6977bbfd8ab2efd7af094e0988cf9bf96d4ee445b8c26ea52d7bc67ce0",
+          "c8e1b8ef13672f1fc4f0ad06def0f50489d40f5753429d669b02d61e34babf8f",
+          "4bfc35c181237ff94c6522dfa40045207c2c107b4df13b23f4656c5bf0576287"
+        ]
+      },
+      {
+        "schemaVersion": "PONS_S0_SHARD_RECEIPT_V1",
+        "shard": 5,
+        "shardCount": 16,
+        "assignedCount": 6,
+        "materializedCount": 6,
+        "fragmentsFileSha256": "1b434386a762b79e085e5d179f9f686523627058e178188ddf560ce13c7271cd",
+        "launchIds": [
+          "d74841f1b2bc46c82cd6fe2e1f1d4197aa8c754a97c168a9a6ef083c63292145",
+          "f609066929e6d2c4d7a14a3a4d0e30a362fa3b8e52de501b884c5aea0361bc56",
+          "c2ea9d662981292e3ae67b1b624c01e60b77f6f330aba28c895caf95bc10d3d3",
+          "03607a1ce70f624f53a82b2f2487485003c23dd0203d41f5fc12d05aa87786e3",
+          "f233741d8534bf6e9a6f02ffa75dfc08ad81869c161e2b3b3cdaebb87b7662f4",
+          "c473ab8dfdd42e276131c5a9ca5c5b049f171465387d161457049d610d428ef5"
+        ]
+      },
+      {
+        "schemaVersion": "PONS_S0_SHARD_RECEIPT_V1",
+        "shard": 6,
+        "shardCount": 16,
+        "assignedCount": 6,
+        "materializedCount": 6,
+        "fragmentsFileSha256": "d6dbe4355716f05f34615ab9af09eaa3c3802d654132658431dfd7ef19b02386",
+        "launchIds": [
+          "7165fc577929b25acb28598c996d46f14ee137177519718a823dd38e4bda4859",
+          "75947ff3593eb0d528c4ed1878424aae406edaadb10d869dc9815bb98b628e69",
+          "d5e68c42f5365c4a47589be55736cd1704bc1d066ca5d1dcd939f6b4031f9993",
+          "554221077f68faa7ab0a8a2a95a3e0611b926fbc7b5872f7c89ed0db2ac9db81",
+          "1e609180160506d0c2568ce60af6414ad14c1e1101cb6848f8e404d663ea4af2",
+          "6456d59058f8f7af3d096e97fe1bbc14bb64cee4f24642e9230cccc05a282afe"
+        ]
+      },
+      {
+        "schemaVersion": "PONS_S0_SHARD_RECEIPT_V1",
+        "shard": 7,
+        "shardCount": 16,
+        "assignedCount": 6,
+        "materializedCount": 6,
+        "fragmentsFileSha256": "76be1fff42b6715dbab9f89cd145e83cac6fe411408fadefa89563106b344a73",
+        "launchIds": [
+          "115b26dd653f5155ed59883a720d54a9d80c0b7b80b770894b624efb6b116692",
+          "a637ff7635a5f4144c8d4de7ede609f779997fb9a180db57bfa58cff2b91df1d",
+          "817fc106e1de2aa394275cf6d46a177af8d70fb68ad804f66bfd3a30e91bfbe7",
+          "4acab4d9237b778f2548e1305e510051d407adcb1d26797a8dc05461f940b5a0",
+          "449f569054e599b6a0d634adb170311cc23de7c9304d56f116ef6545ae541b94",
+          "a83f2082c2545f45dd1a8a2418151c1189f4a632888b61b55ae0cab228a7c942"
+        ]
+      },
+      {
+        "schemaVersion": "PONS_S0_SHARD_RECEIPT_V1",
+        "shard": 8,
+        "shardCount": 16,
+        "assignedCount": 6,
+        "materializedCount": 6,
+        "fragmentsFileSha256": "4a920470d3efa830094c5c50d15e9ec87bf52f295aaa02de9f16d8d1840dc026",
+        "launchIds": [
+          "66db2f0644d87df5f7465641bdb59edd044d0a5ed6629e9027e7d3d6d6d6db3b",
+          "039f206984d730cd8e11c6d755ca5069a5662756aecd2a008377e94ea58a5fc7",
+          "e235860d84be1382fa76087b03bbe74496b28c302544dc75767196750010257f",
+          "780f6844c6ce5fcf5c9d0df69e2d5b8e0fe4aaef4c299dabc35d3f055b34d77d",
+          "413250a3af1280b56261303dc41069d45455dd5150b78411c1db3028f70d4333",
+          "39a2305b0045255bacaeb8642681c710ba484d335f6f2d23a539b4bbd972760e"
+        ]
+      },
+      {
+        "schemaVersion": "PONS_S0_SHARD_RECEIPT_V1",
+        "shard": 9,
+        "shardCount": 16,
+        "assignedCount": 6,
+        "materializedCount": 6,
+        "fragmentsFileSha256": "55fdb3688f6cdbf1c7c9b111b539365a8894044704dff5d8a1006078b82f8ff1",
+        "launchIds": [
+          "c7c0d216357446e2b755ca9e5232558fc9b88fd0434cde2d84290ed4eb786539",
+          "58005f3213cf336370604a2541041e516bc99772c2780d880fe95760c6817b5d",
+          "7ee6bfcf31f6c2fec1e3f8637be9a4e9e24fffcfdae2d5a0c3cf9c84d3a43bef",
+          "83c3235bf293ff9ab5ecb7f8ff9f874329aa48fe7de32500a2b5c96822272fd3",
+          "2d1ccdc91a7e31c797d21c33e0565b6639ee4c5659ba3a6d8502c988727df749",
+          "04b4555e9dd31572727c56f08214a46ecbdc5a9eab9b619d363e3a94dbbcdb20"
+        ]
+      },
+      {
+        "schemaVersion": "PONS_S0_SHARD_RECEIPT_V1",
+        "shard": 10,
+        "shardCount": 16,
+        "assignedCount": 6,
+        "materializedCount": 6,
+        "fragmentsFileSha256": "e508c68d01cbde8d61beaf33e2e458c285f882cd0c283e8d43d67f05ab30438d",
+        "launchIds": [
+          "701b6805029c8013cb52cda1482abf7d4cc0bd5fbaab001d29af283fbb064355",
+          "c34805470d6cbccbcb3abd023787937b10d547d6ea2cdfaeec1dad40c8a282cf",
+          "964644b6a20699f6b6e63fabd0aeb6a501aeb7a00e0e56a11ad8c85008fa3121",
+          "0bf9aebe65168986c91f991f43615e0739d599f90168b02829835461b72c5890",
+          "6b970170272301d807c1ac6c1e8a7ec8d0ac23f8f573b07e936ca730d400bb00",
+          "b3b3db217c19a1adae7cbcc7cea5aa6994ace6b7062fb7ed5a54b68b2c877135"
+        ]
+      },
+      {
+        "schemaVersion": "PONS_S0_SHARD_RECEIPT_V1",
+        "shard": 11,
+        "shardCount": 16,
+        "assignedCount": 6,
+        "materializedCount": 6,
+        "fragmentsFileSha256": "bd2b62e08f04dde2c77030119a0f137ed7bbb3b687b0af26d827fefc94c695e2",
+        "launchIds": [
+          "257ddf134ae14f8b0d2cf05289dfedcc73718c8a86a7ede4966910a93dd97b4d",
+          "a15e0465f331a6aecc1353282dc3f753d0bdd09ccf726b0ab9483b4b24283cef",
+          "3bf439c01c93d6f9cf10d45f3aa95705594229eb91f2ef233766717ee1870ca8",
+          "d89b51a2e152951f2d61019f2fa51b34fee83afe0cd124609d9b3e7bbc093188",
+          "ad112abc3a68566f418e73c9058b55876699b4a427ea064dd871b0711b6922fd",
+          "84c3cf1b17fe7208e761210d70653aacd634e347138f95898c0a028484504bcf"
+        ]
+      },
+      {
+        "schemaVersion": "PONS_S0_SHARD_RECEIPT_V1",
+        "shard": 12,
+        "shardCount": 16,
+        "assignedCount": 6,
+        "materializedCount": 6,
+        "fragmentsFileSha256": "2a64ecdaf7a2a85c111447e0f66fd7c86ea9f9c9ab7be18500f8fffc5f529d66",
+        "launchIds": [
+          "c45e9d3f065efc3f5ae96556c2e31854efca44e802c14eecc0b01b81922a5f22",
+          "1e43ff857f9d3a8c5dc7d0a7f60347b0fbd684560dea973105f3f2fdb26b3229",
+          "a1d7726d1fc82a254b08e32f4c97d74a56a75f6e53a715f52652f49b4a3a9bbd",
+          "949a2a7d63ade66c350578a2c5be034b8c4ca99db58250dfdd382c72e9d5c2d5",
+          "444d849fd49b787e5b827044602a0fddfeaa54f896b2b4e2114fe797a648a9f9",
+          "28fd30407ecac8f89871677072beb24f3deda8ce94d439c1b7a6fd890ac7ff4b"
+        ]
+      },
+      {
+        "schemaVersion": "PONS_S0_SHARD_RECEIPT_V1",
+        "shard": 13,
+        "shardCount": 16,
+        "assignedCount": 6,
+        "materializedCount": 6,
+        "fragmentsFileSha256": "a0094bfb74206022e1d85c870d3a57fd5b5edce96ceb61369561c6132d255eb4",
+        "launchIds": [
+          "c8c85518f6c293de2bf25d9a503212946a2dc74ce3d8dd95d1e6f45cc430087d",
+          "3848ff58c495b4fa9941b7560cd82bba6c779ef02bb0b420abd4196227c9dfd0",
+          "650c77b8440416590a0c988f1ad61c2805e11e9d2d10a0de359ebe1f4209b39d",
+          "545c346b184cd2d33b44551ff07f92ca86b338a62c8636aa603f57fe8427e982",
+          "4a9aedf95171101c6a08e32f9f6d834c4e5b6aa2d3138ab61efd0841747e0fc3",
+          "b82d68063a7fb3f5c3e8d714904ce33921b9a3f25cef9556f4f9c9466f914adb"
+        ]
+      },
+      {
+        "schemaVersion": "PONS_S0_SHARD_RECEIPT_V1",
+        "shard": 14,
+        "shardCount": 16,
+        "assignedCount": 6,
+        "materializedCount": 6,
+        "fragmentsFileSha256": "8d19aafe5884dc3cc8c24750dfd0b991d4256badcd9100908a952fb3a7317eb5",
+        "launchIds": [
+          "b2d24c12d341f1019da62dba7cd3b59fb502d7a923b18e6f9e59a8b3f4a20226",
+          "285ef8a644161dec1eb2b5297e4eb861922e6a50325922828a0cfb283d6bdb99",
+          "c6b88b360800b35ee88b509c2671624d35e7c79531148aa882a88327c7342036",
+          "20bcbc3237037d0d1c41bf43ac5d3eca3757f258a4ed321280a39470b6467b22",
+          "f0e63685f20648cc667f13255cfb5d381b93478104f3c7f97adc5d0a12e89e10",
+          "070b9d8184e3d175f52304b68645121f440e51c389321e0a1f54d9ea5b6da4fd"
+        ]
+      },
+      {
+        "schemaVersion": "PONS_S0_SHARD_RECEIPT_V1",
+        "shard": 15,
+        "shardCount": 16,
+        "assignedCount": 6,
+        "materializedCount": 6,
+        "fragmentsFileSha256": "dc196a85ec52780a7a4d7cb3e954857d36c2b466e6a52ea4368fc845b481488e",
+        "launchIds": [
+          "94ddd498540daaf698cc2e22645d42c1bd3a2a5361df6b6dd83b7ec41843ac78",
+          "5f17a12dfb7ac8e158caa95c26e02956b232f1730bfd4c4800b18955fe26c541",
+          "1107091bddc9dfc291a5d1204881776c32ed6f60d5e5f5095869be17755d8453",
+          "6b8451e3a495192c12aa356ee224ee19975bde4853864abbcd9dc10a2eca6c18",
+          "b4a3cd0de5f24ea0cde0d27b11be955b37561e45b837849c6ebc7ea506b066e6",
+          "8d9f9641209bfd6704a4cffde6bd2609881ffada1af2e9bad9931b514b2b191d"
+        ]
+      },
+      {
+        "schemaVersion": "PONS_S0_SHARD_RECEIPT_V1",
+        "shard": 16,
+        "shardCount": 16,
+        "assignedCount": 6,
+        "materializedCount": 6,
+        "fragmentsFileSha256": "99a3eb74960febff15a7c158890a96aa96adf5078ce68dcf1dccc333b8df283f",
+        "launchIds": [
+          "af4b896b7890742f6019d40e4e7717c15e0266045ea275c6b59a1d78155b4067",
+          "a16f4a24340bcf74d1c2b011f64a1ce654ad777a83cc3b41863efff7f5045ed1",
+          "be1d37cbce9f52126678b5b7ee6c30d0a6451a10b88fbd6a4d4264028078aa43",
+          "32293ded1e72f28afb4daf400acbeea5d70b7e6d9acf4a9da9b2325d7939c26b",
+          "85d2f9c4b8ef58dcf23b1c8873633bad794bc7f8558a97c5e919cba4cf0af754",
+          "141c24aaba082fda73a94087e169476291c167a12c201668d72142c858bb35be"
+        ]
+      }
+    ],
+    "command": "node scripts/pons-s0-prepare-cohort-plan.mjs && node scripts/pons-s0-materialize-shard.mjs (matrix) && node scripts/pons-s0-assemble-cohort.mjs",
+    "harnessRepository": "CipherCuttle/sentry-forensic-gate",
+    "harnessCommit": "2c1d717d950b6a42db8b05e9bd85cd8c6da00aed",
+    "rpcTransportClass": "ROBINHOOD_OFFICIAL_PUBLIC_RPC_LOGS_PLUS_NODEFLARE_ARCHIVE_STATE_VIA_LOCAL_PROXY",
+    "launchDiscovery": "ROBINHOOD_RPC_PONS_S0_LAUNCH_INDEX_V1",
+    "launchDiscoveryTransport": "ROBINHOOD_OFFICIAL_PUBLIC_RPC_TOPIC_FILTERED_LOGS",
+    "launchIndexSha256": "00af1e630831ccdd3658559627964ca4d1c5b64b488f1aca5a429b28323eb5eb",
+    "frozenDiscoveryRunId": "35648177392",
+    "frozenDiscoveryArtifactId": "10669670502",
+    "frozenAsOfBlock": "69066751",
+    "runtimeHeadObservedBlock": "69895633",
+    "launchDiscoveryHeadBlock": "69066763",
+    "launchDiscoveryThroughBlock": "69066763",
+    "minRpcIntervalMs": 250
+  },
+  "boundaries": {
+    "readOnly": true,
+    "signer": false,
+    "wallet": false,
+    "transactionConstruction": false,
+    "broadcast": false,
+    "liveMoneyAuthority": false,
+    "modelPromotionAuthority": false,
+    "mergeAuthority": false,
+    "edge": "UNPROVEN"
+  },
+  "evidenceDigest": "31dd06dca9555954c2ca4546c8e75a9f3a2e9db33062c56076928b16919761ce"
+}

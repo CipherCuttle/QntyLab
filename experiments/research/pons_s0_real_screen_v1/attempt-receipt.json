@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "PONS_S0_REAL_SCREEN_ATTEMPT_V1",
+  "verdict": "REAL_SCREEN_FAILED_CLOSED",
+  "qntylabModelCommit": "6a31642bd74e27f58ef96d87cc69b1ba10b72a4f",
+  "qntylabHarnessCommit": "925c16a31c376dd9cfc5f3c2448d9184e4d716df",
+  "sentryEvidenceCommit": "d711943a25693baee504d2bfe89ae398b75a690a",
+  "sentryOriginEvidenceDigest": "31dd06dca9555954c2ca4546c8e75a9f3a2e9db33062c56076928b16919761ce",
+  "screenExitCode": 1,
+  "registeredVariantDenominator": 4,
+  "candidateArtifact": null,
+  "automaticWinnerSelection": false,
+  "promotionAuthority": "NONE",
+  "liveMoneyAuthority": false,
+  "edge": "UNPROVEN"
+}

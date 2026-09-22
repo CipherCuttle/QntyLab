@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "PONS_S0_REAL_SCREEN_INPUT_BINDING_V1",
+  "qntylabModelCommit": "6a31642bd74e27f58ef96d87cc69b1ba10b72a4f",
+  "qntylabHarnessCommit": "925c16a31c376dd9cfc5f3c2448d9184e4d716df",
+  "sentryEvidenceCommit": "d711943a25693baee504d2bfe89ae398b75a690a",
+  "sentrySourceCommit": "493c85b8d84565cedf6e936063549edfa02edf3a",
+  "sentryOriginEvidenceDigest": "31dd06dca9555954c2ca4546c8e75a9f3a2e9db33062c56076928b16919761ce",
+  "manifestId": "df295570ddf168a5394a3fae71bf3f99aeebad2fbe1d3abb530c34ec62d89dce",
+  "manifestEvidenceDigest": "c620b2ef3781666a231b5edd991d81b601b92677315cd5b94bb4f3def38d1332",
+  "targetPerformanceInspectedForSelection": false,
+  "promotionAuthority": "NONE",
+  "liveMoneyAuthority": false,
+  "edge": "UNPROVEN"
+}

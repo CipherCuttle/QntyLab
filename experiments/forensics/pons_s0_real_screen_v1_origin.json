@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "PONS_S0_REAL_SCREEN_ORIGIN_POINTER_V1",
+  "qntylabModelCommit": "6a31642bd74e27f58ef96d87cc69b1ba10b72a4f",
+  "sentrySourceCommit": "493c85b8d84565cedf6e936063549edfa02edf3a",
+  "sentryRepository": "CipherCuttle/sentry-forensic-gate",
+  "sentryEvidenceCommit": "d711943a25693baee504d2bfe89ae398b75a690a",
+  "originEvidenceDigest": "31dd06dca9555954c2ca4546c8e75a9f3a2e9db33062c56076928b16919761ce",
+  "targetPerformanceInspectedForSelection": false,
+  "promotionAuthority": "NONE",
+  "liveMoneyAuthority": false
+}

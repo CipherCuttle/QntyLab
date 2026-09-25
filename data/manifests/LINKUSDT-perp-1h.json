@@ -1,0 +1,108 @@
+{
+  "funding_rows": 459,
+  "funding_sha256": "47c80026f0e5caf6a1aa0a04a5eb6cb6924ec73b138c0acd85c1638b8021d244",
+  "rows": 3672,
+  "sha256": "bbf2f1711fae5ce5feb5fa35c0516f4c2e50730a6cb2676b243bc8fbe4f4245b",
+  "sources": [
+    {
+      "byte_count": 34396,
+      "members": [
+        "LINKUSDT-1h-2026-03.csv"
+      ],
+      "row_count": 744,
+      "sha256": "c9ea03089caab7774d455df3a85c99b14b6e11af7b280c84ca380ac48ca52c46",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/LINKUSDT/1h/LINKUSDT-1h-2026-03.zip"
+    },
+    {
+      "byte_count": 961,
+      "members": [
+        "LINKUSDT-fundingRate-2026-03.csv"
+      ],
+      "row_count": 93,
+      "sha256": "f9f7bf447ea91651ae9a5f28feb1275c97445d912a958cb8f999847996411262",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/LINKUSDT/LINKUSDT-fundingRate-2026-03.zip"
+    },
+    {
+      "byte_count": 32973,
+      "members": [
+        "LINKUSDT-1h-2026-04.csv"
+      ],
+      "row_count": 720,
+      "sha256": "10c78e9a5dd554125dad89aeb5066a89b42d2895a107921450d5b25e2f5a53a9",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/LINKUSDT/1h/LINKUSDT-1h-2026-04.zip"
+    },
+    {
+      "byte_count": 928,
+      "members": [
+        "LINKUSDT-fundingRate-2026-04.csv"
+      ],
+      "row_count": 90,
+      "sha256": "ff4c11fa47f8a0268f4194e51712a3bc4bb5672d3b1f54860e5d929114a4bf20",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/LINKUSDT/LINKUSDT-fundingRate-2026-04.zip"
+    },
+    {
+      "byte_count": 34460,
+      "members": [
+        "LINKUSDT-1h-2026-05.csv"
+      ],
+      "row_count": 744,
+      "sha256": "fece4fba9d49887f6e87063cc24b5ee7bf5aab2d19b347e21b8588323c72e2a5",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/LINKUSDT/1h/LINKUSDT-1h-2026-05.zip"
+    },
+    {
+      "byte_count": 933,
+      "members": [
+        "LINKUSDT-fundingRate-2026-05.csv"
+      ],
+      "row_count": 93,
+      "sha256": "06536cdd66211e1a25629a54d489493aaab6b3613b9d2207a65af44a3826da1b",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/LINKUSDT/LINKUSDT-fundingRate-2026-05.zip"
+    },
+    {
+      "byte_count": 33095,
+      "members": [
+        "LINKUSDT-1h-2026-06.csv"
+      ],
+      "row_count": 720,
+      "sha256": "1959745f56af66b7c9b6977c213fb828568b766b910d3798ffc3096bf5f00af2",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/LINKUSDT/1h/LINKUSDT-1h-2026-06.zip"
+    },
+    {
+      "byte_count": 964,
+      "members": [
+        "LINKUSDT-fundingRate-2026-06.csv"
+      ],
+      "row_count": 90,
+      "sha256": "33654b89221e8e9c544632cdee76e38c3eedf40aa2c1536ead56e849781e8d07",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/LINKUSDT/LINKUSDT-fundingRate-2026-06.zip"
+    },
+    {
+      "byte_count": 33740,
+      "members": [
+        "LINKUSDT-1h-2026-07.csv"
+      ],
+      "row_count": 744,
+      "sha256": "627adcc5610e00deae964e78a60486c273eeb1d821b6124e31f919369925f71e",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/LINKUSDT/1h/LINKUSDT-1h-2026-07.zip"
+    },
+    {
+      "byte_count": 911,
+      "members": [
+        "LINKUSDT-fundingRate-2026-07.csv"
+      ],
+      "row_count": 93,
+      "sha256": "42f06dfc2f6ab34dda1a7ae739d978b11b05384e098be9d556abf9015414ba9f",
+      "status": 200,
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/LINKUSDT/LINKUSDT-fundingRate-2026-07.zip"
+    }
+  ]
+}
